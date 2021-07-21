@@ -1,107 +1,72 @@
+#ifndef GLPOINTER
+#define GLPOINTER
+
 #include <GL/glx.h>
 
-void (*pGLVertex_Arrays)(GLsizei, GLuint) = (void (*)(GLsizei, GLuint))
-    glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
+extern void (*pGLVertex_Arrays)(GLsizei, GLuint);
 
-void (*pGLGen_Vertex_Arrays)(GLsizei, GLuint *) =(void (*)(GLsizei, GLuint *))
-    glXGetProcAddress((const GLubyte *)"glGenVertexArrays");
+extern void (*pGLGen_Vertex_Arrays)(GLsizei, GLuint *);
 
-void (*pGLGen_Buffers)(GLsizei, GLuint *) = (void (*)(GLsizei, GLuint *))
-    glXGetProcAddress((const GLubyte *)"glGenBuffers");
+extern void (*pGLGen_Buffers)(GLsizei, GLuint *);
 
-void (*pGLBind_Vertex_Array)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glBindVertexArray");
+extern void (*pGLBind_Vertex_Array)(GLuint);
 
-void (*pGLBind_Buffer)(GLenum, GLuint) = (void (*)(GLenum, GLuint))
-    glXGetProcAddress((const GLubyte *)"glBindBuffer");
+extern void (*pGLBind_Buffer)(GLenum, GLuint);
 
-void (*pGLBuffer_Data)(GLenum, GLsizeiptr, const GLvoid *, GLenum) =
-    (void (*)(GLenum, GLsizeiptr, const GLvoid *,
-              GLenum))glXGetProcAddress((const GLubyte *)"glBufferData");
+extern void (*pGLBuffer_Data)(GLenum, GLsizeiptr, const GLvoid *, GLenum);
 
-void (*pGLVertex_Attrib_Pointer)(GLuint, GLint, GLenum, GLboolean, GLsizei,
-                                 const GLvoid *) =
-    (void (*)(GLuint, GLint, GLenum, GLboolean, GLsizei, const GLvoid *))
-        glXGetProcAddress((const GLubyte *)"glVertexAttribPointer");
+extern void (*pGLVertex_Attrib_Pointer)(GLuint, GLint, GLenum, GLboolean, GLsizei,
+                                 const GLvoid *);
 
-void (*pGLEnable_Vertex_Attrib_Array)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glEnableVertexAttribArray");
+extern void (*pGLEnable_Vertex_Attrib_Array)(GLuint);
 
-void (*pGen_Textures)(GLsizei, GLuint *) = (void (*)(GLsizei, GLuint *))
-    glXGetProcAddress((const GLubyte *)"glGenTextures");
+extern void (*pGen_Textures)(GLsizei, GLuint *);
 
-void (*pGLBind_Textures)(GLuint, GLsizei, const GLuint *) = (void (*)(
-    GLuint, GLsizei,
-    const GLuint *))glXGetProcAddress((const GLubyte *)"glBindTextures");
+extern void (*pGLBind_Textures)(GLuint, GLsizei, const GLuint *);
 
-void (*pGLTex_Parameteri)(GLenum, GLenum,
-                          GLint) = (void (*)(GLenum, GLenum, GLint))
-    glXGetProcAddress((const GLubyte *)"glTexParameteri");
+extern void (*pGLTex_Parameteri)(GLenum, GLenum,
+                          GLint);
 
-void (*pGLTex_Image2D)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum,
-                       GLenum, const GLvoid *) =
-    (void (*)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum, GLenum,
-              const GLvoid *))
-        glXGetProcAddress((const GLubyte *)"glTexImage2D");
+extern void (*pGLTex_Image2D)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum,
+                       GLenum, const GLvoid *);
 
-void (*pGLGenerate_Mipmap)(GLenum) = (void (*)(GLenum))
-    glXGetProcAddress((const GLubyte *)"glGenerateMipmap");
+extern void (*pGLGenerate_Mipmap)(GLenum);
 
-void (*pGLGet_Uniform_Location)(GLuint, const GLchar *) = (void (*)(
-    GLuint,
-    const GLchar *))glXGetProcAddress((const GLubyte *)"glGetUniformLocation");
+extern void (*pGLGet_Uniform_Location)(GLuint, const GLchar *);
 
-void (*pGLUniform1i)(GLint, GLint) = (void (*)(GLint, GLint))
-    glXGetProcAddress((const GLubyte *)"glUniform1i");
+extern void (*pGLUniform1i)(GLint, GLint);
 
-void (*pGLDelete_Vertex_Arrays)(GLsizei, const GLuint *) = (void (*)(
-    GLsizei,
-    const GLuint *))glXGetProcAddress((const GLubyte *)"glDeleteVertexArrays");
+extern void (*pGLDelete_Vertex_Arrays)(GLsizei, const GLuint *);
 
-void (*pGLDelete_Buffers)(GLsizei,
-                          const GLuint *) = (void (*)(GLsizei, const GLuint *))
-    glXGetProcAddress((const GLubyte *)"glDeleteBuffers");
+extern void (*pGLDelete_Buffers)(GLsizei,
+                          const GLuint *);
 
-GLuint (*pGLCreate_Shader)(GLenum) = (GLuint(*)(GLenum))
-    glXGetProcAddress((GLubyte *)"glCreateShader");
+extern GLuint (*pGLCreate_Shader)(GLenum);
 
-void (*pGLShader_Source)(GLuint, GLsizei, const GLchar **, const GLint *) =
-    (void (*)(GLuint, GLsizei, const GLchar **, const GLint *))
-        glXGetProcAddress((const GLubyte *)"glShaderSource");
+extern void (*pGLShader_Source)(GLuint, GLsizei, const GLchar **, const GLint *);
 
-void (*pGLCompile_Shader)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glCompileShader");
+extern void (*pGLCompile_Shader)(GLuint);
 
-GLuint (*pGLCreate_Program)(void) = (GLuint(*)(void))
-    glXGetProcAddress((const GLubyte *)"glCreateProgram");
+extern GLuint (*pGLCreate_Program)(void);
 
-void (*pGLAttach_Shader)(GLuint, GLuint) = (void (*)(GLuint, GLuint))
-    glXGetProcAddress((const GLubyte *)"glAttachShader");
+extern void (*pGLAttach_Shader)(GLuint, GLuint);
 
-void (*pGLLink_Program)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glLinkProgram");
+extern void (*pGLLink_Program)(GLuint);
 
-void (*pGLDelete_Shader)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glDeleteShader");
+extern void (*pGLDelete_Shader)(GLuint);
 
-void (*pGLUse_Program)(GLuint) = (void (*)(GLuint))
-    glXGetProcAddress((const GLubyte *)"glUseProgram");
+extern void (*pGLUse_Program)(GLuint);
 
-void (*pGLUniform1f)(GLint, GLfloat) = (void (*)(GLint, GLfloat))
-    glXGetProcAddress((const GLubyte *)"glUniform1f");
+extern void (*pGLUniform1f)(GLint, GLfloat);
 
-void (*pGLGet_Shaderiv)(GLuint, GLenum,
-                       GLint *) = (void (*)(GLuint, GLenum, GLint *))
-    glXGetProcAddress((const GLubyte *)"glGetShaderiv");
+extern void (*pGLGet_Shaderiv)(GLuint, GLenum,
+                        GLint *);
 
-void (*pGLGet_Shader_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *) = (void (*)(
-    GLuint, GLsizei, GLsizei,
-    GLchar *))glXGetProcAddress((const GLubyte *)"glGetShaderInfoLog");
+extern void (*pGLGet_Shader_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
 
-void (*pGLGet_Programiv)(GLuint, GLenum,
-                         GLint *) = (void (*)(GLuint, GLenum, GLint *))
-    glXGetProcAddress((const GLubyte *)"glGetProgramiv");
+extern void (*pGLGet_Programiv)(GLuint, GLenum,
+                         GLint *);
 
-void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *) = (void (*)(
-    GLuint, GLsizei, GLsizei,
-    GLchar *))glXGetProcAddress((const GLubyte *)"glGetProgramInfoLog");
+extern void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
+
+#endif

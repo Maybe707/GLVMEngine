@@ -15,6 +15,7 @@ namespace GLVM::Core
         virtual Display* GetDisplay() = 0;
         virtual Window& GetWindow() = 0;
         virtual GLXContext& GetContext() = 0;
+        virtual void SwapBuffers() = 0;
     };
 
 }
