@@ -6,8 +6,8 @@ namespace GLVM::Core
     void CRenderer::DrawSprite(int* shaderProgram, CSprite& Sprite)
     {
         // Рендеринг
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+//        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+//        glClear(GL_COLOR_BUFFER_BIT);
  
         // Рисуем наш первый треугольник
         pGLUse_Program(*shaderProgram);

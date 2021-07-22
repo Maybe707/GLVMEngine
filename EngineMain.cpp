@@ -3,6 +3,7 @@
 #include "WindowLin.h"
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <iostream>
 #include "GLPointer.h"
@@ -80,43 +81,71 @@ int main()
 
     float aVertices[12] =
     {
-        -0.5f, -0.5f, -0.5f, // левая вершина
-         0.5f, -0.5f, 0.5f, // правая вершина
-         0.0f,  -1.0f, -0.5f  // верхняя вершина   
+        -0.5f, -0.5f, 0.5f, // левая вершина
+        -0.5f,  0.5f, 0.0f, // правая вершина
+         0.0f,  0.0f, 0.0f  // верхняя вершина   
     };
 
     float aVertices2[12] =
     {
-        -0.5f, -0.5f, -0.5f, // левая вершина
-         0.5f, -0.5f, 0.5f, // правая вершина
-         1.0f,  -1.0f, -1.0f  // верхняя вершина   
+         0.5f, -0.5f, -0.5f, // левая вершина
+         0.5f,  0.5f, 0.5f, // правая вершина
+         0.0f,  0.0f, -1.0f  // верхняя вершина   
     };
     
-    CSprite Sprite(aVertices);
-    CSprite Sprite2(aVertices2);
+    GLVM::Core::CSprite Sprite(aVertices);
+    GLVM::Core::CSprite Sprite2(aVertices2);
     GLVM::Core::CRenderer Renderer;
     
     XEvent Xevent;
+    bool bReturn_Flag = false;
 
     // Цикл рендеринга
     while (true)
     {
-      XNextEvent(Window->GetDisplay(), &Xevent);
-        
-      Renderer.DrawSprite(&shaderProgram, Sprite);
-      Renderer.DrawSprite(&shaderProgram, Sprite2);
-      Window->SwapBuffers();
+        Window->ClearDisplay();
+        Renderer.DrawSprite(&shaderProgram, Sprite);
+        Renderer.DrawSprite(&shaderProgram, Sprite2);
+        Window->SwapBuffers();
 
-      if(Xevent.type == KeyPress)
-      {
-          glXMakeCurrent(Window->GetDisplay(), None, NULL);
-          glXDestroyContext(Window->GetDisplay(), Window->GetContext());
-          XDestroyWindow(Window->GetDisplay(), Window->GetWindow());
-          XCloseDisplay(Window->GetDisplay());
-          exit(0);
-      }
+        while(XPending(Window->GetDisplay()))
+        {
+            XNextEvent(Window->GetDisplay(), &Xevent);
+
+            if(Xevent.type == Expose)
+            {
+                puts("Expose");
+                XGetWindowAttributes(Window->GetDisplay(), Window->GetWindow(), &Window->GetGwa());
+                glViewport(0, 0, Window->GetGwa().width, Window->GetGwa().height);
+                glXSwapBuffers(Window->GetDisplay(), Window->GetWindow());
+            }
+      
+            else if(Xevent.type == KeyPress)
+            {
+                glXMakeCurrent(Window->GetDisplay(), None, NULL);
+                glXDestroyContext(Window->GetDisplay(), Window->GetModernContext());
+                XDestroyWindow(Window->GetDisplay(), Window->GetWindow());
+                XFreeColormap(Window->GetDisplay(), Window->GetColorMap());
+                XFree(Window->GetVisual());
+                XFree(Window->GetConfig());
+                XCloseDisplay(Window->GetDisplay());
+
+                bReturn_Flag = true;
+                break;
+                
+                //            exit(0);
+            }
+            if(bReturn_Flag)
+                break;
+        }
+        if(bReturn_Flag)
+            break;
     }
 
+
+    
+    delete Window;
+    Window = nullptr;
     
     return 0;
 }
