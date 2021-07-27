@@ -1,72 +1,88 @@
 #ifndef GLPOINTER
 #define GLPOINTER
 
+#ifdef __linux__
 #include <GL/glx.h>
+#endif
 
-extern void (*pGLVertex_Arrays)(GLsizei, GLuint);
+#ifdef _WIN32
+#include <windows.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
+#endif
 
-extern void (*pGLGen_Vertex_Arrays)(GLsizei, GLuint *);
+#ifdef INIT_EXT
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
 
-extern void (*pGLGen_Buffers)(GLsizei, GLuint *);
+void Initializer();
 
-extern void (*pGLBind_Vertex_Array)(GLuint);
+EXTERN void (*pGLVertex_Arrays)(GLsizei, GLuint);
 
-extern void (*pGLBind_Buffer)(GLenum, GLuint);
+EXTERN void (*pGLGen_Vertex_Arrays)(GLsizei, GLuint *);
 
-extern void (*pGLBuffer_Data)(GLenum, GLsizeiptr, const GLvoid *, GLenum);
+EXTERN void (*pGLGen_Buffers)(GLsizei, GLuint *);
 
-extern void (*pGLVertex_Attrib_Pointer)(GLuint, GLint, GLenum, GLboolean, GLsizei,
+EXTERN void (*pGLBind_Vertex_Array)(GLuint);
+
+EXTERN void (*pGLBind_Buffer)(GLenum, GLuint);
+
+EXTERN void (*pGLBuffer_Data)(GLenum, GLsizeiptr, const GLvoid *, GLenum);
+
+EXTERN void (*pGLVertex_Attrib_Pointer)(GLuint, GLint, GLenum, GLboolean, GLsizei,
                                  const GLvoid *);
 
-extern void (*pGLEnable_Vertex_Attrib_Array)(GLuint);
+EXTERN void (*pGLEnable_Vertex_Attrib_Array)(GLuint);
 
-extern void (*pGen_Textures)(GLsizei, GLuint *);
+EXTERN void (*pGen_Textures)(GLsizei, GLuint *);
 
-extern void (*pGLBind_Textures)(GLuint, GLsizei, const GLuint *);
+EXTERN void (*pGLBind_Textures)(GLuint, GLsizei, const GLuint *);
 
-extern void (*pGLTex_Parameteri)(GLenum, GLenum,
+EXTERN void (*pGLTex_Parameteri)(GLenum, GLenum,
                           GLint);
 
-extern void (*pGLTex_Image2D)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum,
+EXTERN void (*pGLTex_Image2D)(GLenum, GLint, GLint, GLsizei, GLsizei, GLint, GLenum,
                        GLenum, const GLvoid *);
 
-extern void (*pGLGenerate_Mipmap)(GLenum);
+EXTERN void (*pGLGenerate_Mipmap)(GLenum);
 
-extern void (*pGLGet_Uniform_Location)(GLuint, const GLchar *);
+EXTERN GLint (*pGLGet_Uniform_Location)(GLuint, const GLchar *);
 
-extern void (*pGLUniform1i)(GLint, GLint);
+EXTERN void (*pGLUniform1i)(GLint, GLint);
 
-extern void (*pGLDelete_Vertex_Arrays)(GLsizei, const GLuint *);
+EXTERN void (*pGLDelete_Vertex_Arrays)(GLsizei, const GLuint *);
 
-extern void (*pGLDelete_Buffers)(GLsizei,
+EXTERN void (*pGLDelete_Buffers)(GLsizei,
                           const GLuint *);
 
-extern GLuint (*pGLCreate_Shader)(GLenum);
+EXTERN GLuint (*pGLCreate_Shader)(GLenum);
 
-extern void (*pGLShader_Source)(GLuint, GLsizei, const GLchar **, const GLint *);
+EXTERN void (*pGLShader_Source)(GLuint, GLsizei, const GLchar **, const GLint *);
 
-extern void (*pGLCompile_Shader)(GLuint);
+EXTERN void (*pGLCompile_Shader)(GLuint);
 
-extern GLuint (*pGLCreate_Program)(void);
+EXTERN GLuint (*pGLCreate_Program)(void);
 
-extern void (*pGLAttach_Shader)(GLuint, GLuint);
+EXTERN void (*pGLAttach_Shader)(GLuint, GLuint);
 
-extern void (*pGLLink_Program)(GLuint);
+EXTERN void (*pGLLink_Program)(GLuint);
 
-extern void (*pGLDelete_Shader)(GLuint);
+EXTERN void (*pGLDelete_Shader)(GLuint);
 
-extern void (*pGLUse_Program)(GLuint);
+EXTERN void (*pGLUse_Program)(GLuint);
 
-extern void (*pGLUniform1f)(GLint, GLfloat);
+EXTERN void (*pGLUniform1f)(GLint, GLfloat);
 
-extern void (*pGLGet_Shaderiv)(GLuint, GLenum,
+EXTERN void (*pGLGet_Shaderiv)(GLuint, GLenum,
                         GLint *);
 
-extern void (*pGLGet_Shader_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
+EXTERN void (*pGLGet_Shader_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
 
-extern void (*pGLGet_Programiv)(GLuint, GLenum,
+EXTERN void (*pGLGet_Programiv)(GLuint, GLenum,
                          GLint *);
 
-extern void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
+EXTERN void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
 
 #endif

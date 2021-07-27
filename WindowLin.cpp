@@ -1,30 +1,14 @@
 #include "WindowLin.h"
 
-#include <X11/X.h>
-#include <X11/Xutil.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <X11/X.h>
-#include <X11/Xlib.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
-#include <GL/glu.h>
-#include "IWindow.h"
 #include "GLPointer.h"
+#include "IWindow.h"
+//#include "GLPointer.h"
 #include "Event.h"
 
 namespace GLVM::Core
 {    
     CWindowLin::CWindowLin()
     {
-  
-//          Window RootWin;
-//        XVisualInfo *pVisual;
-//        Colormap ColorMap;
-
-        //  const int aAttrib[13];
-//        XSetWindowAttributes Swa;
-
         const int aAttrib[] =
         {
             GLX_RENDER_TYPE, GLX_RGBA_BIT,
@@ -35,7 +19,6 @@ namespace GLVM::Core
             GLX_BLUE_SIZE, 1,
             None
         };
-
         
         pDisp_ = XOpenDisplay(NULL);
         
@@ -58,7 +41,10 @@ namespace GLVM::Core
         } 
         else
         {
-            printf("\n\tvisual %p selected\n", (void *)pVisual_->visualid); /* %p creates hexadecimal output like in glxinfo */
+            
+            ///< creates hexadecimal output like in glxinfo
+            
+            printf("\n\tvisual %p selected\n", (void *)pVisual_->visualid); 
         }
 
         Root_Window_ = DefaultRootWindow(pDisp_);
@@ -81,44 +67,47 @@ namespace GLVM::Core
             exit(1);
         }
 
-        /* Set desired minimum OpenGL version */
-        int context_attribs[] =
+        ///< Set desired minimum OpenGL version
+        
+        int aContext_Attribs[] =
             {
                 GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
                 GLX_CONTEXT_MINOR_VERSION_ARB, 2,
                 None
             };
-        /* Create modern OpenGL context */
+        
+        ///< Create modern OpenGL context
+        
         Context_ = pGLXCreateContextAttribsARB_(pDisp_, pFbc_[0], NULL, true,
-                                                    context_attribs);
+                                                    aContext_Attribs);
         if (!Context_)
         {
             printf("Failed to create OpenGL context. Exiting.\n");
             exit(1);
         }
 
-        /* Show_the_window
-           --------------- */
+        ///< Show_the_window
+        
         XMapWindow(pDisp_, Win_);
         glXMakeCurrent(pDisp_, Win_, Context_);
 
-        int major = 0, minor = 0;
-        glGetIntegerv(GL_MAJOR_VERSION, &major);
-        glGetIntegerv(GL_MINOR_VERSION, &minor);
+        int iMajor = 0, iMinor = 0;
+        glGetIntegerv(GL_MAJOR_VERSION, &iMajor);
+        glGetIntegerv(GL_MINOR_VERSION, &iMinor);
         printf("OpenGL context created.\nVersion %d.%d\nVendor %s\nRenderer %s\n",
-               major, minor,
+               iMajor, iMinor,
                glGetString(GL_VENDOR),
                glGetString(GL_RENDERER));
 
-//        glEnable(GL_DEPTH_TEST);
+        ///< glEnable(GL_DEPTH_TEST);
 
-        XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_); // !!!
-//        glViewport(0, 0, Gwa.width, Gwa.height); // !!!
+        XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
+        Initializer();
     }
 
     CWindowLin::~CWindowLin()
     {
-/*        glXDestroyContext(pDisp_, GLContext_);
+/*!        glXDestroyContext(pDisp_, GLContext_);
         XDestroyWindow(pDisp_, Win_);
         XFreeColormap(pDisp_, Color_Map_);
         XFree(pVisual_);
@@ -126,34 +115,9 @@ namespace GLVM::Core
         XCloseDisplay(pDisp_);*/
     }
 
-    Display* CWindowLin::GetDisplay()
-    {
-        return pDisp_;
-    }
-
-    Window& CWindowLin::GetWindow()
-    {
-        return Win_;
-    }
-
-    GLXContext& CWindowLin::GetContext()
-    {
-        return GLContext_;
-    }
-
-    XWindowAttributes& CWindowLin::GetGwa()
-    {
-        return GWindow_Attributes_;
-    }
-
     void CWindowLin::SwapBuffers()
     {
         glXSwapBuffers(pDisp_, Win_);
-    }
-
-    GLXContext& CWindowLin::GetModernContext()
-    {
-        return Context_;
     }
 
     void CWindowLin::ClearDisplay()
@@ -162,24 +126,31 @@ namespace GLVM::Core
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    Colormap& CWindowLin::GetColorMap()
+    void CWindowLin::HandleEvent(CEvent& _Event)
     {
-        return Color_Map_;
-    }
-
-    XVisualInfo* CWindowLin::GetVisual()
-    {
-        return pVisual_;
-    }
-
-    GLXFBConfig* CWindowLin::GetConfig()
-    {
-        return pFbc_;
-    }
-
-    void CWindowLin::HandleEvent(CEvent& Event)
-    {
+        XEvent Xevent;
         
+        if(XPending(pDisp_))
+        {
+            XNextEvent(pDisp_, &Xevent);
+
+            if(Xevent.type == KeyPress)
+            {
+                _Event.SetEvent(EEvents::eEXIT);
+                _Event.SetReturnFlag(true);
+            }
+        }
+    }
+
+    void CWindowLin::Close()
+    {
+        glXMakeCurrent(pDisp_, None, NULL);
+        glXDestroyContext(pDisp_, Context_);
+        XDestroyWindow(pDisp_, Win_);
+        XFreeColormap(pDisp_, Color_Map_);
+        XFree(pVisual_);
+        XFree(pFbc_);
+        XCloseDisplay(pDisp_);
     }
 }
 

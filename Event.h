@@ -1,26 +1,40 @@
 #ifndef EVENT
 #define EVENT
 
-#include <X11/Xlib.h>
-
 namespace GLVM::Core
-{    
-
-class CEvent
 {
-     enum EEvents
-     {
-         eRENDER,
-         eATACK,
-         eSPAWN,
-     };
+    
+    /*! \enum Events
+        \brief Realise event event types.
+    */
 
-     EEvents eEvent;
+    enum EEvents
+    {
+        eRENDER,
+        eATACK,
+        eSPAWN,
+        eEXIT,
+    };
 
-public:
+    /*! \class Event
+        \brief Realise event game system.
+    */
+    
+    class CEvent
+    {
+        EEvents eEvent_;
+        bool bReturn_Flag_;
+    
+    public:
+        CEvent();
+        EEvents& GetEvent();
+        bool& GetReturnFlag();
+        void SetEvent(EEvents _eEvent);
 
-};
-
+        ///< Function that sets flag using for exit from game.
+        
+        void SetReturnFlag(bool _bReturn_Flag);
+    };
 }
 
 #endif

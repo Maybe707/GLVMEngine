@@ -1,6 +1,12 @@
 #include "WindowCreator.h"
 #include "IWindow.h"
+
+#ifdef __linux__
 #include "WindowLin.h"
+#endif
+#ifdef _WIN32
+#include "WindowWin.h"
+#endif
 
 namespace GLVM::Core
 {    

@@ -5,6 +5,12 @@
 #include "GLPointer.h"
 #include <GL/gl.h>
 
+/*! \class Renderer.
+    \brief Render all game objects.
+
+    Take a game object to render in DrawSprite method.
+*/
+
 namespace GLVM::Core
 {    
 
@@ -12,10 +18,9 @@ namespace GLVM::Core
     {
     
     public:
-        CRenderer()
-        {}
+        CRenderer();
 
-        void DrawSprite(int* shaderProgram, CSprite& Sprite);
+        void DrawSprite(CSprite& _Sprite);
     };
 
 }

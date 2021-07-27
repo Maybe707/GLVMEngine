@@ -3,28 +3,39 @@
 
 namespace GLVM::Core
 {    
-    CSprite::CSprite(float* aVerticesP)
+    CSprite::CSprite(float* _aVertices)
     {
-        for(int i = 0; i < 12; ++i)
-            aVertices[i] = aVerticesP[i];
+        for(int i = 0; i < 9; ++i)
+            aVertices_[i] = _aVertices[i];
             
         pGLGen_Vertex_Arrays(1, &iVao_);
         pGLGen_Buffers(1, &iVbo_);
  
-        // Сначала связываем объект вершинного массива, затем связываем и устанавливаем вершинный буфер(ы), и затем конфигурируем вершинный атрибут(ы)
+        ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
+        
         pGLBind_Vertex_Array(iVao_);
  
         pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices), aVertices, GL_STATIC_DRAW);
+        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_STATIC_DRAW);
  
         pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         pGLEnable_Vertex_Attrib_Array(0);
-    
-        // Обратите внимание, что данное действие разрешено, вызов glVertexAttribPointer() зарегистрировал VBO как привязанный вершинный буферный объект для вершинного атрибута, так что после этого мы можем спокойно выполнить отвязку
+
+        /********************************************************************
+         * Note that this action is allowed, the glVertexAttribPointer () call
+         * has registered the VBO as an anchored vertex buffer for the vertex
+         * attribute, so we can safely unbind after that.
+         *******************************************************************/
+
         pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
- 
-        // Вы можете отменить привязку VAO после этого, чтобы другие вызовы VAO случайно не изменили этот VAO (но подобное довольно редко случается).
-        // Модификация других VAO требует вызова glBindVertexArray(), поэтому мы обычно не снимаем привязку VAO (или VBO), когда это не требуется напрямую
+
+        /***********************************************************************
+         * You can unbind a VAO afterwards so that other VAO calls don't
+         * accidentally change this VAO (but this rarely happens).
+         * Modifying other VAOs requires a call to glBindVertexArray (),
+         * so we usually don't unbind a VAO (or VBO) when not directly required.
+         **********************************************************************/
+
         pGLBind_Vertex_Array(0);
     }
 
