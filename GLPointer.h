@@ -17,7 +17,13 @@
 #define EXTERN extern
 #endif
 
-void Initializer();
+#ifdef __cplusplus
+#define EXTERN_C extern "C"
+#else
+#define EXTERN_C
+#endif
+
+EXTERN_C void Initializer();
 
 EXTERN void (*pGLVertex_Arrays)(GLsizei, GLuint);
 
@@ -84,5 +90,8 @@ EXTERN void (*pGLGet_Programiv)(GLuint, GLenum,
                          GLint *);
 
 EXTERN void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
+
+EXTERN void (*pGLUniform_Matrix4fv)(GLint location, GLsizei count, GLboolean transpose,
+									const GLfloat* value);
 
 #endif

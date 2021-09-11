@@ -13,7 +13,7 @@
 #define INIT_EXT
 #include "GLPointer.h"
 
-void Initializer()
+EXTERN_C void Initializer()
 {
     pGLVertex_Arrays = (void (*)(GLsizei, GLuint))GET_PROC_ADDRESS((const GLubyte *)"glGenVertexArrays");
 
@@ -79,4 +79,6 @@ void Initializer()
         GET_PROC_ADDRESS((const GLubyte *)"glGetProgramiv");
 
     pGLGet_Program_Info_Log = (void (*)(GLuint, GLsizei, GLsizei, GLchar *))GET_PROC_ADDRESS((const GLubyte *)"glGetProgramInfoLog");
+
+	pGLUniform_Matrix4fv = (void (*)(GLint, GLsizei, GLboolean, const GLfloat*))GET_PROC_ADDRESS((const GLubyte *)"glUniformMatrix4fv");
 }

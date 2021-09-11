@@ -1,57 +1,44 @@
 #include "Sprite.h"
-#include <KHR/khrplatform.h>
+
+#define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
+#define SOME_STRANGE_STUFF 0
+#define MIPMAP_LEVEL 0
+#define SOME_OLD_STUFF 0
 
 namespace GLVM::Core
-{    
-    CSprite::CSprite(float* _aVertices)
+{   
+    CSprite::CSprite(const char* _cImage_Path)
     {
-        for(int i = 0; i < 9; ++i)
-            aVertices_[i] = _aVertices[i];
-            
-        pGLGen_Vertex_Arrays(1, &iVao_);
-        pGLGen_Buffers(1, &iVbo_);
- 
-        ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
-        
-        pGLBind_Vertex_Array(iVao_);
- 
-        pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_STATIC_DRAW);
- 
-        pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        pGLEnable_Vertex_Attrib_Array(0);
+		///< Loading and creating texture.
+		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &iTexture_);
+		glBindTexture(GL_TEXTURE_2D, iTexture_);
+		///< Setting texture applying parameters
 
-        /********************************************************************
-         * Note that this action is allowed, the glVertexAttribPointer () call
-         * has registered the VBO as an anchored vertex buffer for the vertex
-         * attribute, so we can safely unbind after that.
-         *******************************************************************/
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		///< Loading image, creating texture and generation mipmap-levels
 
-        pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
-
-        /***********************************************************************
-         * You can unbind a VAO afterwards so that other VAO calls don't
-         * accidentally change this VAO (but this rarely happens).
-         * Modifying other VAOs requires a call to glBindVertexArray (),
-         * so we usually don't unbind a VAO (or VBO) when not directly required.
-         **********************************************************************/
-
-        pGLBind_Vertex_Array(0);
+		uiData_ = stbi_load(_cImage_Path, &iWidth_, &iHeight_, &iNrChannels_, SOME_STRANGE_STUFF);
+		if (uiData_)
+		{
+			glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, iWidth_, iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, uiData_);
+			pGLGenerate_Mipmap(GL_TEXTURE_2D);
+		}
+		else
+		{
+			std::cout << "Failed to load texture" << std::endl;
+		}
+		stbi_image_free(uiData_);
     }
 
-    GLuint* CSprite::GetVbo()
-    {
-        return &iVbo_;
-    }
-
-    GLuint* CSprite::GetVao()
-    {
-        return &iVao_;
-    }
-
-    CSprite::~CSprite()
-    {
-        pGLDelete_Vertex_Arrays(1, &iVao_);
-        pGLDelete_Buffers(1, &iVbo_);
-    }
+	void CSprite::ActiveTexture()
+	{
+		glActiveTexture(GL_TEXTURE10);
+	}
+	
+	void CSprite::BindTexture()
+	{
+		glBindTexture(GL_TEXTURE_2D, iTexture_);
+	}
 }

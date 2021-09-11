@@ -3,6 +3,13 @@
 
 #include <GL/gl.h>
 #include "GLPointer.h"
+#include "GLPointer.h"
+#include "ShaderProgram.h"
+#include "stb_image.h"
+#include <GL/gl.h>
+#include <iostream>
+
+//#define VERTEX_ARRAY_RANGE 30
 
 namespace GLVM::Core
 {
@@ -13,16 +20,20 @@ namespace GLVM::Core
     
     class CSprite
     {
-        GLuint iVbo_;
-        GLuint iVao_;
-        float aVertices_[9];
+//        GLuint iVbo_;
+//        GLuint iVao_;
+		GLuint iTexture_;
+		int iWidth_;
+		int iHeight_;
+		int iNrChannels_;
+		unsigned char* uiData_;
+//        float aVertices_[VERTEX_ARRAY_RANGE];
      
     public:
-        CSprite(float* _aVertices);
-        ~CSprite();
-        
-        GLuint* GetVbo();
-        GLuint* GetVao();
+        CSprite(const char* _cImage_Path);
+  
+		void BindTexture();
+	    void ActiveTexture();
     };
 }
     

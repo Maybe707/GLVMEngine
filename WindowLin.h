@@ -16,7 +16,6 @@ namespace GLVM::Core
     {
         Display* pDisp_;
         Window Win_;
-        GLXContext GLContext_;
         int iNum_Fbc_ = 0;
         GLXContext (*pGLXCreateContextAttribsARB_) (Display*, GLXFBConfig,
                                                   GLXContext, Bool, const int*) = 0;

@@ -135,10 +135,8 @@ namespace GLVM::Core
             XNextEvent(pDisp_, &Xevent);
 
             if(Xevent.type == KeyPress)
-            {
-                _Event.SetEvent(EEvents::eEXIT);
-                _Event.SetReturnFlag(true);
-            }
+                if(Xevent.xkey.keycode == 0x09)
+                    _Event.SetEvent(EEvents::eEXIT);
         }
     }
 

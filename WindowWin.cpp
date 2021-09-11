@@ -115,10 +115,7 @@ namespace GLVM::Core
             TranslateMessage( &msg );
             DispatchMessage( &msg );
             if(msg.message == WM_QUIT)
-            {
                 _Event.SetEvent(EEvents::eEXIT);
-                _Event.SetReturnFlag(true);
-            }
         }
     }
 
