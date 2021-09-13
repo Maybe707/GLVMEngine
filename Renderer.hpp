@@ -1,7 +1,7 @@
 #ifndef RENDERER
 #define RENDERER
 
-#include "Sprite.h"
+#include "Texture.hpp"
 #include "GLPointer.h"
 #include <GL/gl.h>
 
@@ -24,8 +24,8 @@ namespace GLVM::Core
         CRenderer(float* _aVertices);
 		~CRenderer();
 
-        void Draw();
-		void SetModelMatrix(Shader* _Shader_Program, float* _Model_Matrix);
+        void Draw(CTexture const& _Sprite);
+		void SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix);
     };
 }
     

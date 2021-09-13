@@ -79,50 +79,15 @@ public:
         pGLDelete_Shader(uiVertex);
         pGLDelete_Shader(uiFragment);
     }
-    ///< Activate shader program
-    void Use()
-    {
-        pGLUse_Program(iID);
-    }
-    ///< Uniform functions
-    void SetBool(const std::string& name, bool value) const
-    {
-        pGLUniform1i(pGLGet_Uniform_Location(iID, name.c_str()), (int)value);
-    }
-    void SetInt(const std::string& name, int value) const
-    {
-        pGLUniform1i(pGLGet_Uniform_Location(iID, name.c_str()), value);
-    }
-    void SetFloat(const std::string& name, float value) const
-    {
-        pGLUniform1f(pGLGet_Uniform_Location(iID, name.c_str()), value);
-    }
 
+    void Use();
+    void SetBool(const std::string& name, bool value) const;
+    void SetInt(const std::string& name, int value) const;
+    void SetFloat(const std::string& name, float value) const;
+	void SetUniformID();
+	
 private:
-    ///< Functions for exmination of shaders errors
-    void CheckCompileErrors(unsigned int shader, std::string type)
-    {
-        int iSuccess;
-        char cInfo_Log[1024];
-        if (type != "PROGRAM")
-        {
-            pGLGet_Shaderiv(shader, GL_COMPILE_STATUS, &iSuccess);
-            if (!iSuccess)
-            {
-                pGLGet_Shader_Info_Log(shader, 1024, 0, cInfo_Log);
-                std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << type << "\n" << cInfo_Log << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
-        }
-        else
-        {
-            pGLGet_Programiv(shader, GL_LINK_STATUS, &iSuccess);
-            if (!iSuccess)
-            {
-                pGLGet_Program_Info_Log(shader, 1024, 0, cInfo_Log);
-                std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << type << "\n" << cInfo_Log << "\n -- --------------------------------------------------- -- " << std::endl;
-            }
-        }
-    }
+    void CheckCompileErrors(unsigned int shader, std::string type);
 };
 
 #endif

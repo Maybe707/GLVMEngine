@@ -1,11 +1,12 @@
 #include "GLPointer.h"
-#include "IWindow.h"
-#include "WindowCreator.h"
-#include "Sprite.h"
-#include "Renderer.h"
-#include "Event.h"
-#include "ShaderProgram.h"
-#include "VertexData.h"
+#include "IWindow.hpp"
+#include "WindowCreator.hpp"
+#include "Texture.hpp"
+#include "Renderer.hpp"
+#include "Event.hpp"
+#include "ShaderProgram.hpp"
+#include "VertexData.hpp"
+#include "Matrix.hpp"
 
 int main()
 {
@@ -13,34 +14,26 @@ int main()
 	const char* iImage_Path = "../textures/hero.png";
 	const char* iImage_Path2 = "../textures/enemy.png";
 	GLVM::Core::CRenderer Renderer(vertices);
-    GLVM::Core::CSprite Sprite(iImage_Path);
-	GLVM::Core::CSprite Sprite2(iImage_Path2);
+    GLVM::Core::CTexture Texture(iImage_Path);
+	GLVM::Core::CTexture Texture2(iImage_Path2);
     GLVM::Core::CEvent Event;
     Shader Shader_Program("../GLVM/Shader.vs", "../GLVM/Shader.fs");
-	float aModel_Matrix[4][4] = {{0.1f, 0.0f, 0.0f, 0.2f},
-								 {0.0f, 0.1f, 0.0f, 0.2f},
-								 {0.0f, 0.0f, 0.1f, 0.2f},
-								 {0.0f, 0.0f, 0.0f, 1.0f}};
-	float aModel_Matrix2[4][4] = {{0.1f, 0.0f, 0.0f, 0.3f},
-								 {0.0f, 0.1f, 0.0f, 0.3f},
-								 {0.0f, 0.0f, 0.1f, 0.3f},
-								 {0.0f, 0.0f, 0.0f, 1.0f}};
-		
+	GLVM::Math::TCMatrix<4> tMatrix(0.1f);
+	GLVM::Math::TCMatrix<4> tMatrix2(0.1f);
+	tMatrix.Offset(0.6f);
+	tMatrix2.Offset(-0.2f);
+	
     ///< Game rendering loop
     while (true)
     {
         Window->ClearDisplay();
 		Shader_Program.Use();
- 		pGLUniform1i(pGLGet_Uniform_Location(Shader_Program.iID, "tex"), 10);
+		Shader_Program.SetUniformID();
 
-		Renderer.SetModelMatrix(&Shader_Program, *aModel_Matrix);
-		Sprite.ActiveTexture();
-		Sprite.BindTexture();
-        Renderer.Draw();
-		Renderer.SetModelMatrix(&Shader_Program, *aModel_Matrix2);
-		Sprite2.ActiveTexture();
-		Sprite2.BindTexture();
-		Renderer.Draw();
+		Renderer.SetModelMatrix(&Shader_Program, tMatrix.GetMatrix());
+        Renderer.Draw(Texture);
+		Renderer.SetModelMatrix(&Shader_Program, tMatrix2.GetMatrix());
+		Renderer.Draw(Texture2);
         Window->SwapBuffers();
         Window->HandleEvent(Event);
         if(Event.GetEvent() == GLVM::Core::EEvents::eEXIT)

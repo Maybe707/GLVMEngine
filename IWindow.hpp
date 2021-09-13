@@ -3,7 +3,7 @@
 
 //#include <X11/Xlib.h>
 //#include <GL/glx.h>
-#include "Event.h"
+#include "Event.hpp"
 
 namespace GLVM::Core
 {    

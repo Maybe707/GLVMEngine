@@ -1,7 +1,7 @@
 #ifndef WINDOW_CREATOR
 #define WINDOW_CREATOR
 
-#include "IWindow.h"
+#include "IWindow.hpp"
 
 /*! \class WindowCreator
     \brief Create vindow interface

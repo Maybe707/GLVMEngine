@@ -1,16 +1,16 @@
 LDFLAGS = -lGL -lX11
 CXXFLAGS = -std=c++17 -g -Wall
 
-rpgLin: EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o
-	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o $(LDFLAGS)
+rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o
+	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o $(LDFLAGS)
 EngineMain.o: EngineMain.cpp
 	clang++ $(CXXFLAGS) -c -o EngineMain.o EngineMain.cpp
 GLPointer.o: GLPointer.c
 	clang -g -Wall -c -o GLPointer.o GLPointer.c
 WindowCreator.o: WindowCreator.cpp
 	clang++ $(CXXFLAGS) -c -o WindowCreator.o WindowCreator.cpp
-Sprite.o: Sprite.cpp
-	clang++ $(CXXFLAGS) -c -o Sprite.o Sprite.cpp
+Texture.o: Texture.cpp
+	clang++ $(CXXFLAGS) -c -o Texture.o Texture.cpp
 Renderer.o: Renderer.cpp
 	clang++ $(CXXFLAGS) -c -o Renderer.o Renderer.cpp
 ShaderProgram.o: ShaderProgram.cpp

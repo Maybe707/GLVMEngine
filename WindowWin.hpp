@@ -1,4 +1,4 @@
-#include "IWindow.h"
+#include "IWindow.hpp"
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>

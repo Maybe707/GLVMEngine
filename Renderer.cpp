@@ -1,4 +1,5 @@
-#include "Renderer.h"
+#include "Renderer.hpp"
+#include <GL/gl.h>
 
 #define VERTEX_ARRAY_RANGE 30
 #define SIZE_OF_VERTEX_DATA 5
@@ -13,6 +14,7 @@
 #define BASE_ARRAY_COUNTER_VALUE 0
 #define BASE_INDEX_VERTEX_ARRAY 0
 #define NUMBER_OF_DROWING_VERTEXES 6
+#define NUMBER_OF_MATRICES 1
 
 namespace GLVM::Core
 {
@@ -46,15 +48,17 @@ namespace GLVM::Core
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 	
-    void CRenderer::Draw()
+    void CRenderer::Draw(CTexture const& _Sprite)
     {
+		glActiveTexture(GL_TEXTURE10);
+		glBindTexture(GL_TEXTURE_2D, _Sprite.GetTexture());
 		pGLBind_Vertex_Array(iVao_);
         glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
     }
 
-	void CRenderer::SetModelMatrix(Shader* _Shader_Program, float* _Model_Matrix)
+	void CRenderer::SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix)
 	{
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, 1, GL_TRUE, _Model_Matrix);
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, _Model_Matrix);
 	}
 }

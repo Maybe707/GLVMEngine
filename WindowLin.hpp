@@ -7,7 +7,7 @@
 #include <GL/glu.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "IWindow.h"
+#include "IWindow.hpp"
 
 namespace GLVM::Core
 {    

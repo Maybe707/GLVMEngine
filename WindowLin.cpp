@@ -1,9 +1,7 @@
-#include "WindowLin.h"
+#include "WindowLin.hpp"
 
 #include "GLPointer.h"
-#include "IWindow.h"
-//#include "GLPointer.h"
-#include "Event.h"
+#include "Event.hpp"
 
 namespace GLVM::Core
 {    
