@@ -1,11 +1,16 @@
-#include "WindowLin.hpp"
+#include "WindowX.hpp"
 
 #include "GLPointer.h"
 #include "Event.hpp"
+#include <GL/glx.h>
+#include <X11/X.h>
+#include <X11/Xlib.h>
+#include <bits/types/time_t.h>
+#include <iostream>
 
 namespace GLVM::Core
 {    
-    CWindowLin::CWindowLin()
+    CWindowX::CWindowX()
     {
         const int aAttrib[] =
         {
@@ -49,7 +54,7 @@ namespace GLVM::Core
         Color_Map_ = XCreateColormap(pDisp_, Root_Window_, pVisual_->visual, AllocNone);
 
         Set_Window_Attributes_.colormap = Color_Map_;
-        Set_Window_Attributes_.event_mask = ExposureMask | KeyPressMask;
+        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask;
 
         Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 600, 600, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
@@ -101,9 +106,16 @@ namespace GLVM::Core
 
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
         Initializer();
+		Drawable = glXGetCurrentDrawable();
+		const int kInterval = 0;
+
+		if (Drawable)
+		{
+			pGLXSwap_Interval_EXT(pDisp_, Drawable, kInterval);
+		}
     }
 
-    CWindowLin::~CWindowLin()
+    CWindowX::~CWindowX()
     {
 /*!        glXDestroyContext(pDisp_, GLContext_);
         XDestroyWindow(pDisp_, Win_);
@@ -113,32 +125,81 @@ namespace GLVM::Core
         XCloseDisplay(pDisp_);*/
     }
 
-    void CWindowLin::SwapBuffers()
+    void CWindowX::SwapBuffers()
     {
         glXSwapBuffers(pDisp_, Win_);
     }
 
-    void CWindowLin::ClearDisplay()
+    void CWindowX::ClearDisplay()
     {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
 
-    void CWindowLin::HandleEvent(CEvent& _Event)
+    bool CWindowX::HandleEvent(CEvent& _Event)
     {
-        XEvent Xevent;
-        
-        if(XPending(pDisp_))
+        XEvent uXEvent;
+		
+        while(XPending(pDisp_))
         {
-            XNextEvent(pDisp_, &Xevent);
+            XNextEvent(pDisp_, &uXEvent);
+			KeySym ulKey;
 
-            if(Xevent.type == KeyPress)
-                if(Xevent.xkey.keycode == 0x09)
+			switch(uXEvent.type)
+			{
+			case KeyPress:
+				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
+                if(uXEvent.xkey.keycode == 0x09)
+				{
                     _Event.SetEvent(EEvents::eEXIT);
+				}
+				if(ulKey == XK_a)
+				{
+                    _Event.SetEvent(EEvents::eMOVE_LEFT);
+				}
+				if(ulKey == XK_d)
+				{
+                    _Event.SetEvent(EEvents::eMOVE_RIGHT);
+				}
+				if(ulKey == XK_s)
+				{
+                    _Event.SetEvent(EEvents::eMOVE_DOWN);
+				}
+				if(ulKey == XK_w)
+				{
+                    _Event.SetEvent(EEvents::eMOVE_UP);
+				}
+				break;
+			case KeyRelease:
+				if(XEventsQueued(pDisp_, QueuedAfterReading))
+				{
+					XEvent uXNext_Event;
+					XPeekEvent(pDisp_, &uXNext_Event);
+    
+					if (uXNext_Event.type == KeyPress && uXNext_Event.xkey.time == uXEvent.xkey.time &&
+						uXNext_Event.xkey.keycode == uXEvent.xkey.keycode)
+					{
+						///< Key wasn’t actually released
+						continue;
+					}
+				}
+		    	ulKey = XLookupKeysym(&uXEvent.xkey, 0);
+			 	if(ulKey == XK_a)
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+				if(ulKey == XK_d)
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+				if(ulKey == XK_s)
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+				if(ulKey == XK_w)
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+				break;
+			}
+			return true;
         }
+		return false;
     }
 
-    void CWindowLin::Close()
+    void CWindowX::Close()
     {
         glXMakeCurrent(pDisp_, None, NULL);
         glXDestroyContext(pDisp_, Context_);

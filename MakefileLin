@@ -1,8 +1,8 @@
 LDFLAGS = -lGL -lX11
 CXXFLAGS = -std=c++17 -g -Wall
 
-rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o
-	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowLin.o stb_image.o $(LDFLAGS)
+rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o
+	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o $(LDFLAGS)
 EngineMain.o: EngineMain.cpp
 	clang++ $(CXXFLAGS) -c -o EngineMain.o EngineMain.cpp
 GLPointer.o: GLPointer.c
@@ -17,10 +17,14 @@ ShaderProgram.o: ShaderProgram.cpp
 	clang++ $(CXXFLAGS) -c -o ShaderProgram.o ShaderProgram.cpp
 Event.o: Event.cpp
 	clang++ $(CXXFLAGS) -c -o Event.o Event.cpp
-WindowLin.o: WindowLin.cpp
-	clang++ $(CXXFLAGS) -c -o WindowLin.o WindowLin.cpp
+WindowX.o: WindowX.cpp
+	clang++ $(CXXFLAGS) -c -o WindowX.o WindowX.cpp
 stb_image.o: stb_image.cpp
 	clang++ $(CXXFLAGS) -c -o stb_image.o stb_image.cpp
+ChronoX.o: ChronoX.cpp
+	clang++ $(CXXFLAGS) -c -o ChronoX.o ChronoX.cpp
+TimerCreator.o: TimerCreator.cpp
+	clang++ $(CXXFLAGS) -c -o TimerCreator.o TimerCreator.cpp
 
 clean:
 	rm -rf *.o rpgLin

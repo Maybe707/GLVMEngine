@@ -40,7 +40,7 @@ namespace GLVM::Core
 
         void ClearDisplay() override;
     
-        void HandleEvent(CEvent& _Event) override;
+        bool HandleEvent(CEvent& _Event) override;
 
         void Close() override;
             

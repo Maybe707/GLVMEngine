@@ -81,4 +81,14 @@ EXTERN_C void Initializer()
     pGLGet_Program_Info_Log = (void (*)(GLuint, GLsizei, GLsizei, GLchar *))GET_PROC_ADDRESS((const GLubyte *)"glGetProgramInfoLog");
 
 	pGLUniform_Matrix4fv = (void (*)(GLint, GLsizei, GLboolean, const GLfloat*))GET_PROC_ADDRESS((const GLubyte *)"glUniformMatrix4fv");
+
+	pGLActive_Texture = (void (*)(GLenum))GET_PROC_ADDRESS((const GLubyte *)"glActiveTexture");
+
+#ifdef __linux__
+pGLXSwap_Interval_EXT = (void (*)(Display*, GLXDrawable, int))GET_PROC_ADDRESS((const GLubyte *)"glXSwapIntervalEXT");
+#endif
+	
+#ifdef _WIN32
+pWGLSwap_Interval_EXT = (BOOL (WINAPI *)(int))GET_PROC_ADDRESS((const GLubyte *)"wglSwapIntervalEXT");
+#endif
 }

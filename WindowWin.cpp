@@ -1,5 +1,10 @@
 #include "WindowWin.hpp"
 
+#define VK_W 0x57
+#define VK_S 0x53
+#define VK_A 0x41
+#define VK_D 0x44
+
 namespace GLVM::Core
 {    
     CWindowWin::CWindowWin()
@@ -92,6 +97,8 @@ namespace GLVM::Core
         wglMakeCurrent( pModern_DC_, pModern_Context_);
 
         Initializer();
+		const int kInterval = 0;
+		pWGLSwap_Interval_EXT(kInterval);
     }
 
     void CWindowWin::SwapBuffers()
@@ -104,29 +111,34 @@ namespace GLVM::Core
         glClear( GL_COLOR_BUFFER_BIT );
     }
 
-    void CWindowWin::HandleEvent(CEvent& _Event)
+    bool CWindowWin::HandleEvent(CEvent& _Event)
     {
         ///< Create message struct object.
         MSG msg;
 
         if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
         {
-            
+            SetWindowLongPtrW(pModern_Window_, GWLP_USERDATA, (LONG_PTR)&_Event);
             TranslateMessage( &msg );
             DispatchMessage( &msg );
-            if(msg.message == WM_QUIT)
-                _Event.SetEvent(EEvents::eEXIT);
+			// if(msg.message == WM_KEYDOWN)
+			// {
+			// 	if(
+            //     _Event.SetEvent(EEvents::eEXIT);
+			// }
         }
     }
 
     void CWindowWin::Close()
     {
         DestroyWindow(pModern_Window_);
+		PostQuitMessage(0);
     }
         
 ///< Callback method for events handling.
     LRESULT CALLBACK CWindowWin::MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam)
     {
+		CEvent* pEvent = (CEvent*)GetWindowLongPtrW(_pHwnd, GWLP_USERDATA);
         switch (_pMsg) 
         { 
         case WM_CREATE: 
@@ -146,57 +158,47 @@ namespace GLVM::Core
             switch (_pWParam) 
             { 
             case VK_LEFT: 
-                    
-                ///< Process the LEFT ARROW key. 
-                     
                 break; 
  
             case VK_RIGHT: 
-                    
-                ///< Process the RIGHT ARROW key. 
-                     
+			    pEvent->SetEvent(EEvents::eEXIT);
                 break; 
  
-            case VK_UP:
-                DestroyWindow(_pHwnd);
-                ///< Process the UP ARROW key. 
-                     
+            case VK_W:
+				pEvent->SetEvent(EEvents::eMOVE_UP);
+                break;
+
+			case VK_S:
+				pEvent->SetEvent(EEvents::eMOVE_DOWN);
+                break;
+
+			case VK_A:
+				pEvent->SetEvent(EEvents::eMOVE_LEFT);
+                break;
+
+			case VK_D:
+				pEvent->SetEvent(EEvents::eMOVE_RIGHT);
+                break;
+
+			case VK_UP:
                 break; 
  
             case VK_DOWN: 
-                    
-                ///< Process the DOWN ARROW key. 
-                     
                 break; 
  
             case VK_HOME: 
-                    
-                ///< Process the HOME key. 
-                     
                 break; 
  
             case VK_END: 
-                    
-                ///< Process the END key. 
-                     
                 break; 
  
             case VK_INSERT: 
-                    
-                ///< Process the INS key. 
-                     
                 break; 
  
             case VK_DELETE: 
-                    
-                ///< Process the DEL key. 
-                     
                 break; 
  
             case VK_F2: 
-                    
-                ///< Process the F2 key. 
-                    
                 break;
             
             default:
@@ -204,6 +206,57 @@ namespace GLVM::Core
             }
             break;      
 
+        case WM_KEYUP: 
+            switch (_pWParam) 
+            { 
+            case VK_LEFT: 
+                break; 
+ 
+            case VK_RIGHT: 
+                break; 
+ 
+            case VK_W:
+				pEvent->SetEvent(EEvents::eKEYRELEASE);
+                break;
+
+			case VK_S:
+				pEvent->SetEvent(EEvents::eKEYRELEASE);
+                break;
+
+			case VK_A:
+				pEvent->SetEvent(EEvents::eKEYRELEASE);
+                break;
+
+			case VK_D:
+				pEvent->SetEvent(EEvents::eKEYRELEASE);
+                break;
+
+			case VK_UP:
+                break; 
+ 
+            case VK_DOWN: 
+                break; 
+ 
+            case VK_HOME: 
+                break; 
+ 
+            case VK_END: 
+                break; 
+ 
+            case VK_INSERT: 
+                break; 
+ 
+            case VK_DELETE: 
+                break; 
+ 
+            case VK_F2: 
+                break;
+            
+            default:
+                break;
+            }
+            break;      
+			
         case WM_DESTROY:
             PostQuitMessage(0);
             break;

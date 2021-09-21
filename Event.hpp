@@ -10,10 +10,15 @@ namespace GLVM::Core
 
     enum EEvents
     {
+		eKEYRELEASE,
         eRENDER,
         eATACK,
         eSPAWN,
         eEXIT,
+		eMOVE_UP,
+		eMOVE_DOWN,
+		eMOVE_LEFT,
+		eMOVE_RIGHT,
     };
 
     /*! \class Event

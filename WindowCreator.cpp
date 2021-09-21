@@ -1,8 +1,8 @@
 #include "WindowCreator.hpp"
-#include "IWindow.hpp"
+//#include "IWindow.hpp"
 
 #ifdef __linux__
-#include "WindowLin.hpp"
+#include "WindowX.hpp"
 #endif
 #ifdef _WIN32
 #include "WindowWin.hpp"
@@ -13,7 +13,7 @@ namespace GLVM::Core
         IWindow* CWindowCreator::Create()
         {
 #ifdef __linux__ 
-            return new CWindowLin;
+            return new CWindowX;
 #endif
 
 #ifdef _WIN32

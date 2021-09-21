@@ -50,7 +50,7 @@ namespace GLVM::Core
 	
     void CRenderer::Draw(CTexture const& _Sprite)
     {
-		glActiveTexture(GL_TEXTURE10);
+		pGLActive_Texture(GL_TEXTURE10);
 		glBindTexture(GL_TEXTURE_2D, _Sprite.GetTexture());
 		pGLBind_Vertex_Array(iVao_);
         glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);

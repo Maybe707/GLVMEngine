@@ -7,7 +7,7 @@
 #include <GL/glu.h>
 #include <stdio.h>
 #include <stdlib.h>
-//#include "IWindow.hpp"
+#include "IWindow.hpp"
 
 namespace GLVM::Core
 {    
@@ -26,6 +26,7 @@ namespace GLVM::Core
         Colormap Color_Map_;
         XVisualInfo* pVisual_;
         GLXFBConfig* pFbc_;
+		GLXDrawable Drawable;
 
     public:
         
@@ -35,7 +36,7 @@ namespace GLVM::Core
 
         void SwapBuffers() override;
         void ClearDisplay() override;
-        void HandleEvent(CEvent& _Event) override;
+        bool HandleEvent(CEvent& _Event) override;
         void Close() override;
     };
 }

@@ -1,16 +1,16 @@
 CC = x86_64-w64-mingw32-g++
 LDFLAGS = -lgdi32 -lopengl32
 
-rpgWin: EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o WindowWin.o
-	        $(CC) -o rpgWin EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o WindowWin.o $(LDFLAGS)
+rpgWin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o
+	        $(CC) -o rpgWin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o $(LDFLAGS)
 EngineMain.o: EngineMain.cpp
 	        $(CC) -c -o EngineMain.o EngineMain.cpp
 GLPointer.o: GLPointer.c
 	        $(CC) -c -o GLPointer.o GLPointer.c
 WindowCreator.o: WindowCreator.cpp
 	        $(CC) -c -o WindowCreator.o WindowCreator.cpp
-Sprite.o: Sprite.cpp
-	        $(CC) -c -o Sprite.o Sprite.cpp
+Texture.o: Texture.cpp
+	        $(CC) -c -o Texture.o Texture.cpp
 Renderer.o: Renderer.cpp
 	        $(CC) -c -o Renderer.o Renderer.cpp
 ShaderProgram.o: ShaderProgram.cpp
@@ -19,6 +19,12 @@ Event.o: Event.cpp
 	        $(CC) -c -o Event.o Event.cpp
 WindowWin.o: WindowWin.cpp
 	        $(CC) -c -o WindowWin.o WindowWin.cpp
+stb_image.o: stb_image.cpp
+		$(CC) -c -o stb_image.o stb_image.cpp
+ChronoWin.o: ChronoWin.cpp
+		$(CC) -c -o ChronoWin.o ChronoWin.cpp
+TimerCreator.o: TimerCreator.cpp
+		$(CC) -c -o TimerCreator.o TimerCreator.cpp
 
 clean:
 	        rm -rf *.o rpgWin.exe

@@ -2,6 +2,7 @@
 #define GLPOINTER
 
 #ifdef __linux__
+#include <X11/Xlib.h>
 #include <GL/glx.h>
 #endif
 
@@ -91,7 +92,19 @@ EXTERN void (*pGLGet_Programiv)(GLuint, GLenum,
 
 EXTERN void (*pGLGet_Program_Info_Log)(GLuint, GLsizei, GLsizei, GLchar *);
 
-EXTERN void (*pGLUniform_Matrix4fv)(GLint location, GLsizei count, GLboolean transpose,
-									const GLfloat* value);
+EXTERN void (*pGLUniform_Matrix4fv)(GLint, GLsizei, GLboolean,
+									const GLfloat*);
+
+EXTERN void (*pGLActive_Texture)(GLenum);
+
+#ifdef __linux__
+EXTERN void (*pGLXSwap_Interval_EXT)(Display *, GLXDrawable, int);
+#endif
+
+#ifdef _WIN32
+EXTERN BOOL (WINAPI *pWGLSwap_Interval_EXT)(int);
+#endif
+
+//EXTERN BOOL (WINAPI *pWGLSwap_Interval_EXT)(int);
 
 #endif
