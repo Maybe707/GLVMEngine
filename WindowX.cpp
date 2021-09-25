@@ -107,7 +107,7 @@ namespace GLVM::Core
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
         Initializer();
 		Drawable = glXGetCurrentDrawable();
-		const int kInterval = 0;
+		const int kInterval = 1;
 
 		if (Drawable)
 		{
@@ -185,13 +185,13 @@ namespace GLVM::Core
 				}
 		    	ulKey = XLookupKeysym(&uXEvent.xkey, 0);
 			 	if(ulKey == XK_a)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_A);
 				if(ulKey == XK_d)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_D);
 				if(ulKey == XK_s)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_S);
 				if(ulKey == XK_w)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE);
+			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
 				break;
 			}
 			return true;

@@ -15,7 +15,7 @@ namespace GLVM::Math
 	{
 		float aMatrix_[u_iRange][u_iRange] {};
 	public:
-		TCMatrix(double _fScale)
+		TCMatrix(double _fScale = 0.1)
 		{
 			for(int count = 0; count < (u_iRange-LIMITER); ++count)
 			{
@@ -24,11 +24,11 @@ namespace GLVM::Math
 			aMatrix_[u_iRange-LIMITER][u_iRange-LIMITER] = HOMOGENEOUS_COORDINATE;
 		}
 
-		float const* GetMatrix() const
+		float* GetMatrix()
 		{
 			return *aMatrix_;
 		}
-
+		
 		void Offset(double _fOffset)
 		{
 			for(int count = 0; count < (u_iRange-LIMITER); ++count)

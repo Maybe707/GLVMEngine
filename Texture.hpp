@@ -26,6 +26,7 @@ namespace GLVM::Core
         CTexture(const char* _cImage_Path);
 
 		const GLuint& GetTexture() const;
+		void SetTexture(unsigned char* _uiData);
     };
 }
     

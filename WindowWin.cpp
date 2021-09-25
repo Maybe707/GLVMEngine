@@ -97,7 +97,7 @@ namespace GLVM::Core
         wglMakeCurrent( pModern_DC_, pModern_Context_);
 
         Initializer();
-		const int kInterval = 0;
+		const int kInterval = 1;
 		pWGLSwap_Interval_EXT(kInterval);
     }
 
@@ -116,17 +116,14 @@ namespace GLVM::Core
         ///< Create message struct object.
         MSG msg;
 
-        if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+        while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             SetWindowLongPtrW(pModern_Window_, GWLP_USERDATA, (LONG_PTR)&_Event);
             TranslateMessage( &msg );
             DispatchMessage( &msg );
-			// if(msg.message == WM_KEYDOWN)
-			// {
-			// 	if(
-            //     _Event.SetEvent(EEvents::eEXIT);
-			// }
+			return true;
         }
+		return false;
     }
 
     void CWindowWin::Close()
@@ -145,9 +142,9 @@ namespace GLVM::Core
             ///< Initialize the window. 
             return 0; 
  
-        case WM_PAINT: 
-            ///< Paint the window's client area. 
-            return 0; 
+        // case WM_PAINT: 
+        //     ///< Paint the window's client area. 
+        //     return 0; 
  
         case WM_SIZE:
             glViewport( 0, 0, LOWORD(_pLParam), HIWORD(_pLParam));
@@ -216,19 +213,19 @@ namespace GLVM::Core
                 break; 
  
             case VK_W:
-				pEvent->SetEvent(EEvents::eKEYRELEASE);
+				pEvent->SetEvent(EEvents::eKEYRELEASE_W);
                 break;
 
 			case VK_S:
-				pEvent->SetEvent(EEvents::eKEYRELEASE);
+				pEvent->SetEvent(EEvents::eKEYRELEASE_S);
                 break;
 
 			case VK_A:
-				pEvent->SetEvent(EEvents::eKEYRELEASE);
+				pEvent->SetEvent(EEvents::eKEYRELEASE_A);
                 break;
 
 			case VK_D:
-				pEvent->SetEvent(EEvents::eKEYRELEASE);
+				pEvent->SetEvent(EEvents::eKEYRELEASE_D);
                 break;
 
 			case VK_UP:

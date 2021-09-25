@@ -31,10 +31,18 @@ namespace GLVM::Core
 			std::cout << "Failed to load texture" << std::endl;
 		}
 		stbi_image_free(uiData_);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
 	const GLuint& CTexture::GetTexture() const
 	{
 		return iTexture_;
+	}
+
+	void CTexture::SetTexture(unsigned char* _uiData)
+	{
+		uiData_ = _uiData;
 	}
 }

@@ -10,7 +10,11 @@ namespace GLVM::Core
 
     enum EEvents
     {
-		eKEYRELEASE,
+		eDEFAULT,
+		eKEYRELEASE_A,
+		eKEYRELEASE_D,
+		eKEYRELEASE_S,
+		eKEYRELEASE_W,
         eRENDER,
         eATACK,
         eSPAWN,
