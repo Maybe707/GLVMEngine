@@ -1,5 +1,4 @@
 #include "Renderer.hpp"
-#include <GL/gl.h>
 
 #define VERTEX_ARRAY_RANGE 30
 #define SIZE_OF_VERTEX_DATA 5
@@ -16,14 +15,25 @@
 #define NUMBER_OF_DROWING_VERTEXES 6
 #define NUMBER_OF_MATRICES 1
 
+float vertices5[VERTEX_ARRAY_RANGE] =
+{
+	// координаты        // текстурные координаты
+	0.5f,  0.5f, 0.0f,   0.33f, 1.0f, // верхняя правая вершина
+	0.5f, -0.5f, 0.0f,   0.33f, 0.75f, // нижняя правая вершина
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.75f, // нижняя левая вершина
+	-0.5f,  0.5f, 0.0f,   0.0f, 1.0f,  // верхняя левая вершина
+	0.5f,  0.5f, 0.0f,   0.33f, 1.0f,
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.75f
+};
+
 namespace GLVM::Core
 {
-    CRenderer::CRenderer(float* _aVertices)
+    CRenderer::CRenderer()
 	{
 		float aVertices_[VERTEX_ARRAY_RANGE];
 		
         for(int i = BASE_ARRAY_COUNTER_VALUE; i < VERTEX_ARRAY_RANGE; ++i)
-            aVertices_[i] = _aVertices[i];
+            aVertices_[i] = vertices5[i];
 		
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
@@ -48,13 +58,26 @@ namespace GLVM::Core
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 	
-    void CRenderer::Draw(CTexture const& _Sprite)
+    void CRenderer::Draw(CPlayer& _Player)
     {
 		pGLActive_Texture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, _Sprite.GetTexture());
+		glBindTexture(GL_TEXTURE_2D, _Player.GetTexture().GetTexture());
 		pGLBind_Vertex_Array(iVao_);
         glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
     }
+
+	void CRenderer::DrawAll(TCVectorContainer<IGameObject*>* pWorldContainer, Shader* _Shader_Program)
+	{
+		for(int i = 0; i < pWorldContainer->GetSize(); ++i)
+		{
+			unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
+			pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, pWorldContainer->GetVectorContainer()[i]->GetMatrix()->GetMatrix());
+			pGLActive_Texture(GL_TEXTURE10);
+			glBindTexture(GL_TEXTURE_2D, pWorldContainer->GetVectorContainer()[i]->GetTexture().GetTexture());
+			pGLBind_Vertex_Array(iVao_);
+			glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
+		}
+	}
 
 	void CRenderer::SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix)
 	{

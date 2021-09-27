@@ -1,9 +1,13 @@
 #ifndef EVENT
 #define EVENT
 
+//#include "Stack.hpp"
+
 namespace GLVM::Core
 {
-    
+
+	class CStack;
+	
     /*! \enum Events
         \brief Realise event event types.
     */
@@ -18,11 +22,11 @@ namespace GLVM::Core
         eRENDER,
         eATACK,
         eSPAWN,
-        eEXIT,
 		eMOVE_UP,
 		eMOVE_DOWN,
 		eMOVE_LEFT,
 		eMOVE_RIGHT,
+		eGAME_LOOP_KILL,
     };
 
     /*! \class Event
@@ -37,7 +41,11 @@ namespace GLVM::Core
         CEvent();
         EEvents& GetEvent();
         void SetEvent(EEvents _eEvent);
+
+		void SetLastEvent(CStack _Stack);
     };
+
+
 }
 
 #endif

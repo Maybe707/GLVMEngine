@@ -105,8 +105,8 @@ namespace GLVM::Core
         ///< glEnable(GL_DEPTH_TEST);
 
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
-        Initializer();
 		Drawable = glXGetCurrentDrawable();
+		Initializer();
 		const int kInterval = 1;
 
 		if (Drawable)
@@ -149,27 +149,26 @@ namespace GLVM::Core
 			{
 			case KeyPress:
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
-                if(uXEvent.xkey.keycode == 0x09)
+				switch(ulKey)
 				{
-                    _Event.SetEvent(EEvents::eEXIT);
-				}
-				if(ulKey == XK_a)
-				{
-                    _Event.SetEvent(EEvents::eMOVE_LEFT);
-				}
-				if(ulKey == XK_d)
-				{
-                    _Event.SetEvent(EEvents::eMOVE_RIGHT);
-				}
-				if(ulKey == XK_s)
-				{
-                    _Event.SetEvent(EEvents::eMOVE_DOWN);
-				}
-				if(ulKey == XK_w)
-				{
-                    _Event.SetEvent(EEvents::eMOVE_UP);
+				case XK_Escape:
+					_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
+					break;
+				case XK_a:
+					_Event.SetEvent(EEvents::eMOVE_LEFT);
+					break;
+				case XK_d:
+					_Event.SetEvent(EEvents::eMOVE_RIGHT);
+					break;
+				case XK_s:
+					_Event.SetEvent(EEvents::eMOVE_DOWN);
+					break;
+				case XK_w:
+					_Event.SetEvent(EEvents::eMOVE_UP);
+					break;
 				}
 				break;
+
 			case KeyRelease:
 				if(XEventsQueued(pDisp_, QueuedAfterReading))
 				{

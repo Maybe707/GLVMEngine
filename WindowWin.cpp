@@ -1,4 +1,5 @@
 #include "WindowWin.hpp"
+#include "GLPointer.h"
 
 #define VK_W 0x57
 #define VK_S 0x53
@@ -96,7 +97,7 @@ namespace GLVM::Core
         ///< Clean up
         wglMakeCurrent( pModern_DC_, pModern_Context_);
 
-        Initializer();
+		Initializer();
 		const int kInterval = 1;
 		pWGLSwap_Interval_EXT(kInterval);
     }
@@ -158,7 +159,7 @@ namespace GLVM::Core
                 break; 
  
             case VK_RIGHT: 
-			    pEvent->SetEvent(EEvents::eEXIT);
+			    pEvent->SetEvent(EEvents::eGAME_LOOP_KILL);
                 break; 
  
             case VK_W:

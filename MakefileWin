@@ -1,8 +1,8 @@
 CC = x86_64-w64-mingw32-g++
 LDFLAGS = -lgdi32 -lopengl32
 
-rpgWin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o
-	        $(CC) -o rpgWin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o $(LDFLAGS)
+rpgWin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o Engine.o VertexData.o
+	        $(CC) -o rpgWin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowWin.o stb_image.o ChronoWin.o TimerCreator.o Engine.o VertexData.o $(LDFLAGS)
 EngineMain.o: EngineMain.cpp
 	        $(CC) -c -o EngineMain.o EngineMain.cpp
 GLPointer.o: GLPointer.c
@@ -25,6 +25,10 @@ ChronoWin.o: ChronoWin.cpp
 		$(CC) -c -o ChronoWin.o ChronoWin.cpp
 TimerCreator.o: TimerCreator.cpp
 		$(CC) -c -o TimerCreator.o TimerCreator.cpp
+Engine.o: Engine.cpp
+		$(CC) -c -o Engine.o Engine.cpp
+VertexData.o: VertexData.cpp
+		$(CC) -c -o VertexData.o VertexData.cpp
 
 clean:
 	        rm -rf *.o rpgWin.exe

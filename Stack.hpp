@@ -7,91 +7,95 @@
 namespace GLVM::Core
 {
 	class CStack
-{
-	int iHead_ = 0;
-	static const int iStack_Range_ = 4;
-	EEvents aStack[iStack_Range_] = {};
-public:
-	void Push(const EEvents& _Event)
 	{
-
-		for(int i = 0; i < iHead_; ++i)
+		int iHead_ = 0;
+		static const int iStack_Range_ = 4;
+		EEvents aStack_[iStack_Range_] = {};
+	public:
+		void Push(const EEvents& _Event)
 		{
-			if(aStack[iHead_ - 1] == _Event)
+
+			for(int i = 0; i < iHead_; ++i)
+			{
+				if(aStack_[iHead_ - 1] == _Event)
+					return;
+			}
+
+			if(iHead_ == iStack_Range_)
 				return;
-		}
-
-		if(iHead_ == 4)
-		{
-			return;
-		}
-		aStack[iHead_] = _Event;
+		
+			aStack_[iHead_] = _Event;
 				
-		++iHead_;
-	}
-
-	EEvents& Pop()
-	{
-		return aStack[iHead_-1];
-	}
-
-	void Remove(const EEvents& _Event)
-	{
-		EEvents aTemp_Stack[iStack_Range_] = {};
-		int n = 0;
-		
-		for(int j = 0; j < iStack_Range_; ++j)
-			aTemp_Stack[j] = aStack[j];
-
-		for(int i = 0; i < iHead_; ++i)
-		{
-			if(_Event == aTemp_Stack[i])
-				continue;
-
-			aStack[n] = aTemp_Stack[i];
-			++n;
+			++iHead_;
 		}
 
-		--iHead_;
-		aStack[iHead_] = EEvents::eDEFAULT;
-	}
-	
-	// void Remove(const EEvents& _Event)
-	// {
-	// 	EEvents aTemp_Stack[iStack_Range_] = {};
-			
-	// 	for(int j = 0; j < iStack_Range_; ++j)
-	// 		aTemp_Stack[j] = aStack[j];
+		EEvents& Pop()
+		{
+			return aStack_[iHead_-1];
+		}
 
-	// 	bool bFlag = false;
+		void Remove(const EEvents& _Event)
+		{
+			EEvents aTemp_Stack[iStack_Range_] = {};
+			int n = 0;
 		
-	// 	for(int i = 0; i < iHead_; ++i)
-	// 	{
-	// 		if((i+1) == iHead_)
-	// 			break;
+			for(int j = 0; j < iStack_Range_; ++j)
+				aTemp_Stack[j] = aStack_[j];
 
-	// 		if(_Event == aTemp_Stack[i])
-	// 			bFlag = true;
+			for(int i = 0; i < iHead_; ++i)
+			{
+				if(_Event == aTemp_Stack[i])
+					continue;
 
-	// 		if(bFlag)
-	// 		{
-	// 			aStack[i] = aTemp_Stack[i+1];
-	// 			continue;
-	// 		}
+				aStack_[n] = aTemp_Stack[i];
+				++n;
+			}
 
-	// 		aStack[i] = aTemp_Stack[i];
-	// 	}
+			--iHead_;
+			aStack_[iHead_] = EEvents::eDEFAULT;
+		}
 
-	// 	--iHead_;
-	// 	aStack[iHead_] = EEvents::eDEFAULT;
-	// }
+		void Show()
+		{
+			for(int i = 0; i < iStack_Range_; ++i)
+				std::cout << aStack_[i] << std::endl;
+			std::cout << "Stack" << std::endl;
+		}
 
-	void Show()
-	{
-		for(int i = 0; i < iStack_Range_; ++i)
-			std::cout << aStack[i] << std::endl;
-		std::cout << "Stack" << std::endl;
-	}
-};
+		void ControlInput(CEvent& _eEvent)
+		{ 
+			switch(_eEvent.GetEvent())
+			{
+			case eGAME_LOOP_KILL:
+				Push(eGAME_LOOP_KILL);
+				break;
+			case eKEYRELEASE_A:
+				Remove(eMOVE_LEFT);
+				break;
+			case eKEYRELEASE_D:
+				Remove(eMOVE_RIGHT);
+				break;
+			case eKEYRELEASE_S:
+				Remove(eMOVE_DOWN); 
+				break;
+			case eKEYRELEASE_W:
+				Remove(eMOVE_UP); 
+				break;
+			case eMOVE_LEFT:
+				Push(eMOVE_LEFT);
+				break;
+			case eMOVE_RIGHT:
+				Push(eMOVE_RIGHT);
+				break;
+			case eMOVE_DOWN:
+				Push(eMOVE_DOWN);
+				break;
+			case eMOVE_UP:
+				Push(eMOVE_UP);
+				break;
+			}
+		}
+	};
+	
 }
 #endif

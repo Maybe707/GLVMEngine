@@ -3,6 +3,7 @@
 
 #include "Matrix.hpp"
 #include "Texture.hpp"
+#include "GameObject.hpp"
 
 #define X_AXIS 12
 #define Y_AXIS 13
@@ -10,7 +11,7 @@
 
 namespace GLVM::Core
 {
-	class CPlayer
+	class CPlayer : public IGameObject
 	{
 		CTexture Texture_;
 		Math::TCMatrix<MATRIX_RANGE> tModel_Matrix_;
@@ -22,7 +23,12 @@ namespace GLVM::Core
 			Texture_ = _Texture;
 		}
 
-		Math::TCMatrix<MATRIX_RANGE>* GetMatrix()
+		virtual CTexture& GetTexture() override
+		{
+			return Texture_;
+		}
+
+		virtual Math::TCMatrix<MATRIX_RANGE>* GetMatrix() override
 		{
 			return &tModel_Matrix_;
 		}

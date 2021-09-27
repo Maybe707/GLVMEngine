@@ -1,9 +1,11 @@
 #ifndef RENDERER
 #define RENDERER
 
+#include "Player.hpp"
 #include "Texture.hpp"
 #include "GLPointer.h"
 #include <GL/gl.h>
+#include "VectorContainer.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -21,11 +23,12 @@ namespace GLVM::Core
 		GLuint iVao_;
     
     public:
-        CRenderer(float* _aVertices);
+        CRenderer();
 		~CRenderer();
 
-        void Draw(CTexture const& _Sprite);
+        void Draw(CPlayer& _Player);
 		void SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix);
+		void DrawAll(TCVectorContainer<IGameObject*>* pWorldContainer, Shader* _Shader_Program);
     };
 }
     
