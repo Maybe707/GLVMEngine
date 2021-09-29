@@ -56,7 +56,7 @@ namespace GLVM::Core
         Set_Window_Attributes_.colormap = Color_Map_;
         Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask;
 
-        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 600, 600, 0, pVisual_->depth, InputOutput,
+        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1280, 1280, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
 
     

@@ -1,4 +1,5 @@
 #include "Renderer.hpp"
+#include <GL/gl.h>
 
 #define VERTEX_ARRAY_RANGE 30
 #define SIZE_OF_VERTEX_DATA 5
@@ -30,6 +31,13 @@ namespace GLVM::Core
 {
     CRenderer::CRenderer()
 	{
+		aMatrix_Ortho_[0]  = 2/1280.0f;
+		//Matrix_Ortho[3]  -= 1;
+		//Matrix_Ortho[7]  -= 1;
+		aMatrix_Ortho_[5]  = 2/1280.0f;
+		aMatrix_Ortho_[10] = 1/(600.0f-0.0f);
+		aMatrix_Ortho_[15] = 1.0f;
+		//Matrix_Ortho[14] = -m_zn/(m_zf-m_zn);
 		float aVertices_[VERTEX_ARRAY_RANGE];
 		
         for(int i = BASE_ARRAY_COUNTER_VALUE; i < VERTEX_ARRAY_RANGE; ++i)
@@ -50,6 +58,7 @@ namespace GLVM::Core
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 		stbi_set_flip_vertically_on_load(true);
+		glViewport(0, 0, 1280, 1280);
 	}
 
 	CRenderer::~CRenderer()
@@ -78,10 +87,16 @@ namespace GLVM::Core
 			glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
 		}
 	}
-
+ 
 	void CRenderer::SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix)
 	{
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, _Model_Matrix);
+	}
+
+	void CRenderer::SetProjectionMatrix(Shader* _Shader_Program)
+	{
+		unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
+		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, aMatrix_Ortho_);
 	}
 }

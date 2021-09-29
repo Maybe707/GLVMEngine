@@ -1,12 +1,13 @@
 #ifndef MATRIX
 #define MATRIX
 
+#include "Event.hpp"
+#include "VertexVector.hpp"
+
 #define LIMITER 1
 #define HOMOGENEOUS_COORDINATE 1
 #define OFFSET_X 0
 #define OFFSET_Y 1
-
-#include "Event.hpp"
 
 namespace GLVM::Math
 {
@@ -28,13 +29,17 @@ namespace GLVM::Math
 		{
 			return *aMatrix_;
 		}
-		
-		void Offset(double _fOffset)
+
+		float (&Matrix())[u_iRange][u_iRange]
 		{
-			for(int count = 0; count < (u_iRange-LIMITER); ++count)
-			{
-				aMatrix_[u_iRange-LIMITER][count] = _fOffset;
-			}
+			return aMatrix_;
+		}
+		
+		void Offset(const Core::SVertexVector& _VertexVector)
+		{
+			aMatrix_[u_iRange-LIMITER][0] = _VertexVector.fAxis_X;
+			aMatrix_[u_iRange-LIMITER][1] = _VertexVector.fAxis_Y;
+			aMatrix_[u_iRange-LIMITER][2] = _VertexVector.fAxis_Z;
 		}
 
 		void Move(double _dOffset, Core::CEvent _Event)

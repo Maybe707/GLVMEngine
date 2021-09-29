@@ -44,6 +44,8 @@ namespace GLVM::Core
 		Chrono_ = Time::CTimerCreator().Create();
 		Renderer_ = new CRenderer();
 		Shader_Program = new Shader();
+		Event_.SetEvent(eDEFAULT);
+
 		
 		dDelta_Time_ = 0.0;
 		bGame_Loop_Active_ = true;
@@ -62,29 +64,31 @@ namespace GLVM::Core
 		while(bGame_Loop_Active_)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
+			dDelta_Time_ *= 200;
 			Chrono_->Reset();
 
 			Window_->ClearDisplay();
 			Shader_Program->Use();
 			Shader_Program->SetUniformID();
-
+			Renderer_->SetProjectionMatrix(Shader_Program);
 //			Renderer_->SetModelMatrix(Shader_Program, _tMatrix2.GetMatrix());
 //			Renderer_->Draw(_Texture2);
 
-			Renderer_->DrawAll(&tWorldContainer, Shader_Program);
+
 			
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
 			}
 			Event_.SetLastEvent(Input_Stack_);
-		
-			if(Event_.GetEvent() == GLVM::Core::EEvents::eGAME_LOOP_KILL)
+			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
 				bGame_Loop_Active_ = false;
 			_Player.Move(dDelta_Time_, Event_);
+			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
 //			Input_Stack_.Show();
-//			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
-//			Renderer_->Draw(_Player);
+			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
+			Renderer_->Draw(_Player);
+			Renderer_->DrawAll(&tWorldContainer, Shader_Program);
 			Window_->SwapBuffers();
 		}
 	}

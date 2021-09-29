@@ -74,7 +74,7 @@ namespace GLVM::Core
 
         RegisterClass(&window_Class_);
         
-        pModern_Window_ = CreateWindowEx(0, aClass_Name, "Sample Window Class", WS_OVERLAPPEDWINDOW, 0, 0, 400, 400, NULL, NULL, GetModuleHandleA(NULL), NULL);
+        pModern_Window_ = CreateWindowEx(0, aClass_Name, "Sample Window Class", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, GetModuleHandleA(NULL), NULL);
         ShowWindow(pModern_Window_, SW_SHOW);
         pModern_DC_ = GetDC( pModern_Window_ );
         

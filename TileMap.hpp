@@ -1,0 +1,25 @@
+const int g_kMap_Height = 21, g_kMap_Width = 27;
+const char* Map_Array[g_kMap_Height] =
+{
+	"ssssssssssssssssssssssssss",
+	"ss                       s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                         ",
+	"s                         ",
+	"s                         ",
+	"s                         ",
+	"s                         ",
+	"s                       ss",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"s                        s",
+	"sssssssss     ssssssssssss",
+};

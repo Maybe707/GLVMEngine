@@ -13,7 +13,7 @@
     Take a game object to render in DrawSprite method.
 */
 
-
+#define ORTO_MATRIX_RANGE 16
 
 namespace GLVM::Core
 {    
@@ -21,6 +21,7 @@ namespace GLVM::Core
     {
 	    GLuint iVbo_;
 		GLuint iVao_;
+		float aMatrix_Ortho_[ORTO_MATRIX_RANGE] = {};
     
     public:
         CRenderer();
@@ -29,6 +30,7 @@ namespace GLVM::Core
         void Draw(CPlayer& _Player);
 		void SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix);
 		void DrawAll(TCVectorContainer<IGameObject*>* pWorldContainer, Shader* _Shader_Program);
+		void SetProjectionMatrix(Shader* _Shader_Program);
     };
 }
     

@@ -17,6 +17,7 @@
 #include "GameObject.hpp"
 #include "StaticObject.hpp"
 #include "VectorContainer.hpp"
+#include "Collision.hpp"
 
 namespace GLVM::Core
 {
@@ -33,6 +34,7 @@ namespace GLVM::Core
 		double dDelta_Time_;
 		bool bGame_Loop_Active_;
 		CStack Input_Stack_;
+		CCollision Collision_;
 		
 		Engine();
 		~Engine();
