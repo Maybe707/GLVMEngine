@@ -1,5 +1,6 @@
 #include "Renderer.hpp"
 #include <GL/gl.h>
+#include <GL/glext.h>
 
 #define VERTEX_ARRAY_RANGE 30
 #define SIZE_OF_VERTEX_DATA 5
@@ -16,7 +17,7 @@
 #define NUMBER_OF_DROWING_VERTEXES 6
 #define NUMBER_OF_MATRICES 1
 
-float vertices5[VERTEX_ARRAY_RANGE] =
+float fBase_Array[VERTEX_ARRAY_RANGE] =
 {
 	// координаты        // текстурные координаты
 	0.5f,  0.5f, 0.0f,   0.33f, 1.0f, // верхняя правая вершина
@@ -41,7 +42,7 @@ namespace GLVM::Core
 		float aVertices_[VERTEX_ARRAY_RANGE];
 		
         for(int i = BASE_ARRAY_COUNTER_VALUE; i < VERTEX_ARRAY_RANGE; ++i)
-            aVertices_[i] = vertices5[i];
+            aVertices_[i] = fBase_Array[i];
 		
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
@@ -51,7 +52,7 @@ namespace GLVM::Core
         pGLBind_Vertex_Array(iVao_);
 
 		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_STATIC_DRAW);
+        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_DYNAMIC_DRAW);
  
         pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);

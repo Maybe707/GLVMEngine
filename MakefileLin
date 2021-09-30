@@ -1,8 +1,8 @@
 LDFLAGS = -lGL -lX11
 CXXFLAGS = -std=c++17 -g -Wall
 
-rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o
-	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o $(LDFLAGS)
+rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o Player.o StaticObject.o
+	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o Player.o StaticObject.o $(LDFLAGS)
 EngineMain.o: EngineMain.cpp
 	clang++ $(CXXFLAGS) -c -o EngineMain.o EngineMain.cpp
 GLPointer.o: GLPointer.c
@@ -31,6 +31,10 @@ VertexData.o: VertexData.cpp
 	clang++ $(CXXFLAGS) -c -o VertexData.o VertexData.cpp
 Collision.o: Collision.cpp
 	clang++ $(CXXFLAGS) -c -o Collision.o Collision.cpp
+Player.o: Player.cpp
+	clang++ $(CXXFLAGS) -c -o Player.o Player.cpp
+StaticObject.o: StaticObject.cpp
+	clang++ $(CXXFLAGS) -c -o StaticObject.o StaticObject.cpp
 
 clean:
 	rm -rf *.o rpgLin

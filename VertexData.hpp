@@ -12,4 +12,24 @@ extern float vertices[kVertex_Size2];
 
 extern float vertices2[kVertex_Size2];
 
+extern float vertices3[kVertex_Size2];
+
+extern float vertices4[kVertex_Size2];
+
+extern float vertices5[kVertex_Size2];
+
+extern float vertices6[kVertex_Size2];
+
+extern float vertices7[kVertex_Size2];
+
+extern float vertices8[kVertex_Size2];
+
+extern float vertices9[kVertex_Size2];
+
+extern float vertices10[kVertex_Size2];
+
+extern float vertices11[kVertex_Size2];
+
+extern float vertices12[kVertex_Size2];
+
 #endif

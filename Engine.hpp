@@ -18,13 +18,13 @@
 #include "StaticObject.hpp"
 #include "VectorContainer.hpp"
 #include "Collision.hpp"
+#include "Animation.hpp"
 
 namespace GLVM::Core
 {
 
 	class Engine
 	{
-	public:
 		TCVectorContainer<IGameObject*> tWorldContainer;
 		IWindow* Window_;
 		Time::IChrono* Chrono_;
@@ -32,14 +32,16 @@ namespace GLVM::Core
 		CEvent Event_;
 		Shader* Shader_Program;
 		double dDelta_Time_;
-		bool bGame_Loop_Active_;
 		CStack Input_Stack_;
 		CCollision Collision_;
-		
+		CAnimation Animation_;
+
+	public:
 		Engine();
 		~Engine();
 		void ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent);
 		void GameLoop(CPlayer& _Player);
+		TCVectorContainer<IGameObject*>& GetWorldContainer();
 		void GameKill();
 	};
 		

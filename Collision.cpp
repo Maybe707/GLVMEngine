@@ -32,23 +32,14 @@ namespace GLVM::Core
 		bool bCollision_Flag = false;
 		float fX = 0;
 		float fY = 0;
-		std::cout << _Game_Object.GetVertexVector().fAxis_X << std::endl;
-		std::cout << _Game_Object.GetVertexVector().fAxis_Y << std::endl;
-		std::cout << _Player.GetVertexVector().fAxis_X << std::endl;
-		std::cout << _Player.GetVertexVector().fAxis_Y << std::endl;
 		if(_Game_Object.GetSign() == 's')
 		{
 			fX = std::abs(_Game_Object.GetVertexVector().fAxis_X - _Player.GetVertexVector().fAxis_X);
 			fY = std::abs(_Game_Object.GetVertexVector().fAxis_Y - _Player.GetVertexVector().fAxis_Y);
 		}
-		std::cout << fX << " X" << std::endl;
-		std::cout << fY << " Y" << std::endl;
 		if(fX < 64.0f && fY < 64.0f)
 			bCollision_Flag = true;
 
-		//	std::cout << fAxis_X << std::endl;
-//		std::cout << fAxis_Y << std::endl;
-		std::cout << bCollision_Flag << std::endl;
 		return bCollision_Flag;
 	}
 

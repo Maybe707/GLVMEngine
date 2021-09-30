@@ -1,5 +1,7 @@
 #include "Engine.hpp"
+#include "GLPointer.h"
 #include "IWindow.hpp"
+#include <GL/glext.h>
 
 namespace GLVM::Core
 {    
@@ -45,10 +47,8 @@ namespace GLVM::Core
 		Renderer_ = new CRenderer();
 		Shader_Program = new Shader();
 		Event_.SetEvent(eDEFAULT);
-
 		
 		dDelta_Time_ = 0.0;
-		bGame_Loop_Active_ = true;
 	}
 
 	Engine::~Engine()
@@ -61,7 +61,9 @@ namespace GLVM::Core
 
 	void Engine::GameLoop(CPlayer& _Player)
 	{
-		while(bGame_Loop_Active_)
+		double dAnimation_Delta = 0;
+		bool bGame_Loop_Active = true;
+		while(bGame_Loop_Active)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
 			dDelta_Time_ *= 200;
@@ -82,16 +84,21 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
-				bGame_Loop_Active_ = false;
+				bGame_Loop_Active = false;
 			_Player.Move(dDelta_Time_, Event_);
 			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
 //			Input_Stack_.Show();
+			Animation_.Walk(Input_Stack_, dAnimation_Delta, dDelta_Time_, _Player);
 			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
 			Renderer_->Draw(_Player);
+//			pGLBind_Buffer(GL_ARRAY_BUFFER, Renderer_->iVbo_);
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 			Renderer_->DrawAll(&tWorldContainer, Shader_Program);
 			Window_->SwapBuffers();
 		}
 	}
+
+	TCVectorContainer<IGameObject*>& Engine::GetWorldContainer() { return tWorldContainer; }
 
 	void Engine::GameKill()
 	{
