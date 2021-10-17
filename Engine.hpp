@@ -23,7 +23,7 @@
 namespace GLVM::Core
 {
 
-	class Engine
+	class CEngine
 	{
 		TCVectorContainer<IGameObject*> tWorldContainer;
 		IWindow* Window_;
@@ -35,10 +35,10 @@ namespace GLVM::Core
 		CStack Input_Stack_;
 		CCollision Collision_;
 		CAnimation Animation_;
-
+		
 	public:
-		Engine();
-		~Engine();
+		CEngine();
+		~CEngine();
 		void ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent);
 		void GameLoop(CPlayer& _Player);
 		TCVectorContainer<IGameObject*>& GetWorldContainer();

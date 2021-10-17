@@ -4,7 +4,7 @@
 #include <GL/gl.h>
 #include "GLPointer.h"
 #include "ShaderProgram.hpp"
-#include "stb_image.h"
+//#include "stb_image.h"
 #include <iostream>
 
 namespace GLVM::Core
@@ -20,10 +20,10 @@ namespace GLVM::Core
 		int iWidth_;
 		int iHeight_;
 		int iNrChannels_;
-		unsigned char* uiData_;
+		const unsigned char* uiData_;
      
     public:
-        CTexture(const char* _cImage_Path);
+        CTexture(int _iWidth, int _iHeight, const unsigned char* _uiData);
 
 		const GLuint& GetTexture() const;
 		void SetTexture(unsigned char* _uiData);

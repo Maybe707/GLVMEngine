@@ -20,12 +20,12 @@
 float fBase_Array[VERTEX_ARRAY_RANGE] =
 {
 	// координаты        // текстурные координаты
-	0.5f,  0.5f, 0.0f,   0.33f, 1.0f, // верхняя правая вершина
-	0.5f, -0.5f, 0.0f,   0.33f, 0.75f, // нижняя правая вершина
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.75f, // нижняя левая вершина
+	0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // верхняя правая вершина
+	0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // нижняя правая вершина
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // нижняя левая вершина
 	-0.5f,  0.5f, 0.0f,   0.0f, 1.0f,  // верхняя левая вершина
-	0.5f,  0.5f, 0.0f,   0.33f, 1.0f,
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.75f
+	0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f
 };
 
 namespace GLVM::Core
@@ -58,7 +58,7 @@ namespace GLVM::Core
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-		stbi_set_flip_vertically_on_load(true);
+///<	stbi_set_flip_vertically_on_load(true);
 		glViewport(0, 0, 1280, 1280);
 	}
 

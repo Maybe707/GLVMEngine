@@ -6,7 +6,7 @@
 namespace GLVM::Core
 {    
 
-	void Engine::ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent)
+	void CEngine::ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent)
  	{ 
 		switch(_eEvent.GetEvent())
 		{
@@ -40,7 +40,7 @@ namespace GLVM::Core
 		}
 	}
 
-    Engine::Engine()
+    CEngine::CEngine()
 	{
 		Window_ = CWindowCreator().Create();
 		Chrono_ = Time::CTimerCreator().Create();
@@ -51,7 +51,7 @@ namespace GLVM::Core
 		dDelta_Time_ = 0.0;
 	}
 
-	Engine::~Engine()
+	CEngine::~CEngine()
 	{
 		delete Renderer_;
 		Renderer_ = nullptr;
@@ -59,7 +59,7 @@ namespace GLVM::Core
 		Shader_Program = nullptr;
 	}
 
-	void Engine::GameLoop(CPlayer& _Player)
+	void CEngine::GameLoop(CPlayer& _Player)
 	{
 		double dAnimation_Delta = 0;
 		bool bGame_Loop_Active = true;
@@ -73,10 +73,6 @@ namespace GLVM::Core
 			Shader_Program->Use();
 			Shader_Program->SetUniformID();
 			Renderer_->SetProjectionMatrix(Shader_Program);
-//			Renderer_->SetModelMatrix(Shader_Program, _tMatrix2.GetMatrix());
-//			Renderer_->Draw(_Texture2);
-
-
 			
 			while((Window_->HandleEvent(Event_)))
 			{
@@ -87,20 +83,18 @@ namespace GLVM::Core
 				bGame_Loop_Active = false;
 			_Player.Move(dDelta_Time_, Event_);
 			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
-//			Input_Stack_.Show();
 			Animation_.Walk(Input_Stack_, dAnimation_Delta, dDelta_Time_, _Player);
 			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
 			Renderer_->Draw(_Player);
-//			pGLBind_Buffer(GL_ARRAY_BUFFER, Renderer_->iVbo_);
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_Static_Object), aVertices_Static_Object, GL_DYNAMIC_DRAW);
 			Renderer_->DrawAll(&tWorldContainer, Shader_Program);
 			Window_->SwapBuffers();
 		}
 	}
 
-	TCVectorContainer<IGameObject*>& Engine::GetWorldContainer() { return tWorldContainer; }
+	TCVectorContainer<IGameObject*>& CEngine::GetWorldContainer() { return tWorldContainer; }
 
-	void Engine::GameKill()
+	void CEngine::GameKill()
 	{
 	   	Window_->Close();
 		delete Window_;

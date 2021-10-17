@@ -13,6 +13,7 @@ namespace GLVM::Core
 
 	class CAnimation
 	{
+		EEvents eSave_Event_;
 		bool bFlag_ = true;
 		float aVertices_[30];
 		static const int anim_index_array = 3;
@@ -28,20 +29,21 @@ namespace GLVM::Core
 		void Walk(CStack& _Inputs, double& Animation_Delta, double& Delta_Time, CPlayer& _Player)
 		{
 //			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			std::cout << _Inputs.Pop() << std::endl;
 			_Player.SetVertex(aVertices_);
-			if(_Inputs.Pop() == EEvents::eDEFAULT && bFlag_)
-			{
+			if(_Inputs.Pop() != eDEFAULT)
+				bFlag_ = false;
+			if(_Inputs.Pop() == eDEFAULT && bFlag_)
 				_Player.SetVertex(vertices);
-			}
-			if(_Inputs.Pop() == EEvents::eMOVE_DOWN)
+			if(_Inputs.Pop() != eSave_Event_)
+				Animation_Delta = 31.0f;
+			eSave_Event_ = _Inputs.Pop();
+			if(_Inputs.Pop() == eMOVE_DOWN)
 			{
-				if(bFlag_)
-					pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), Vertex_Animation[0][0], GL_STATIC_DRAW);
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
 				{
-					bFlag_ = false;
+					// if(bFlag_ != false)
+					// 	bFlag_ = false;
 					switch(anim_count)
 					{
 					case 0:
@@ -66,12 +68,11 @@ namespace GLVM::Core
 			}
 			else if(_Inputs.Pop() == EEvents::eMOVE_LEFT)
 			{
-				if(bFlag_)
-					pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), Vertex_Animation[1][0], GL_STATIC_DRAW);
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
 				{
-					bFlag_ = false;
+					// if(bFlag_ != false)
+					// 	bFlag_ = false;
 					switch(anim_count)
 					{
 					case 0:
@@ -96,12 +97,11 @@ namespace GLVM::Core
 			}
 			else if(_Inputs.Pop() == EEvents::eMOVE_RIGHT)
 			{
-				if(bFlag_)
-					pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), Vertex_Animation[2][0], GL_STATIC_DRAW);
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
 				{
-					bFlag_ = false;
+					// if(bFlag_ != false)
+					// 	bFlag_ = false;
 					switch(anim_count)
 					{
 					case 0:
@@ -126,12 +126,11 @@ namespace GLVM::Core
 			}
 			else if(_Inputs.Pop() == EEvents::eMOVE_UP)
 			{
-				if(bFlag_)
-					pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), Vertex_Animation[3][0], GL_STATIC_DRAW);
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
 				{
-					bFlag_ = false;
+					// if(bFlag_ != false)
+					// 	bFlag_ = false;
 					switch(anim_count)
 					{
 					case 0:

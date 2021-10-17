@@ -8,6 +8,8 @@ extern float aVertices[kVertex_Size];
 
 extern float aVertices2[kVertex_Size];
 
+extern float aVertices_Static_Object[kVertex_Size2];
+
 extern float vertices[kVertex_Size2];
 
 extern float vertices2[kVertex_Size2];
