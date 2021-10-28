@@ -3,7 +3,6 @@
 
 #include "Matrix.hpp"
 #include "Texture.hpp"
-#include "GameObject.hpp"
 #include "VertexVector.hpp"
 
 #define X_AXIS 12
@@ -13,7 +12,7 @@
 namespace GLVM::Core
 {
 	
-	class CPlayer : public IGameObject
+	class CPlayer
 	{
 		float aVertices_[30];
 		SVertexVector vertex_Vector_;

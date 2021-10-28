@@ -1,10 +1,16 @@
-#ifndef IUNIT
-#define IUNIT
-
-class IUnit
+#ifndef UNIT
+#define UNIT
+ 
+namespace GLVM::Core
 {
-public:
-	
-};
+	using Entity_ID = unsigned int; 
 
+	class Unit
+	{
+		Entity_ID u_iID_;
+	public:
+	
+	};
+}
+	
 #endif

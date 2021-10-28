@@ -29,7 +29,7 @@ namespace GLVM::Core
 
         void Draw(CPlayer& _Player);
 		void SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix);
-		void DrawAll(TCVectorContainer<IGameObject*>* pWorldContainer, Shader* _Shader_Program);
+		void DrawAll(TCVectorContainer<GameObject*>* pWorldContainer, Shader* _Shader_Program);
 		void SetProjectionMatrix(Shader* _Shader_Program);
     };
 }

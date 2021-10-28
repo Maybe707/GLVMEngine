@@ -1,4 +1,5 @@
 #include "Texture.hpp"
+#include "ConstVectorContainer.hpp"
 #include <GL/gl.h>
 
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
@@ -8,8 +9,10 @@
 
 namespace GLVM::Core
 {   
-    CTexture::CTexture(int _iWidth, int _iHeight, const unsigned char* _uiData)
+    CTexture::CTexture(unsigned int _iWidth, unsigned int _iHeight, const unsigned char* _uiData, const unsigned int _Entity_ID)
     {
+		s_tTexture_Components_Array.Push(this, _Entity_ID);
+		
 		iWidth_ = _iWidth;
 		iHeight_ = _iHeight;
 		uiData_ = _uiData;
@@ -26,18 +29,6 @@ namespace GLVM::Core
 
 		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, iWidth_, iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _uiData);
 		pGLGenerate_Mipmap(GL_TEXTURE_2D);
-		
-		// uiData_ = stbi_load(_cImage_Path, &iWidth_, &iHeight_, &iNrChannels_, SOME_STRANGE_STUFF);
-		// if (uiData_)
-		// {
-		// 	glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, 96, 128, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, chelik_dat);
-		// 	pGLGenerate_Mipmap(GL_TEXTURE_2D);
-		// }
-		// else
-		// {
-		// 	std::cout << "Failed to load texture" << std::endl;
-		// }
-		// stbi_image_free(uiData_);
 
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -51,5 +42,10 @@ namespace GLVM::Core
 	void CTexture::SetTexture(unsigned char* _uiData)
 	{
 		uiData_ = _uiData;
+	}
+
+	TCConstVectorContainer<CTexture*>& CTexture::GetTextureComponentsArray()
+	{
+		return s_tTexture_Components_Array;
 	}
 }

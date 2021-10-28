@@ -1,8 +1,7 @@
 #include "Collision.hpp"
 
-namespace GLVM::Core
+namespace GLVM::ECS
 {
-    
 	void CCollision::Repel(CPlayer& _Player, double& _fDelta_Time, CEvent& _Event)
 	{
 		if (_Event.GetEvent() == eMOVE_UP)

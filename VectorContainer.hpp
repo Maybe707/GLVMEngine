@@ -1,25 +1,31 @@
 #ifndef VECTOR_CONTAINER
 #define VECTOR_CONTAINER
 
+#include "Constants.hpp"
+#include "IContainer.hpp"
+
 namespace GLVM::Core
 {
 
 	template<class T>
-	class TCVectorContainer
+	class TCVectorContainer : public IContainer
 	{
-		int iSize_ = 0;
-		int iCapacity_ = 0;
-		int iExpander_ = 10;
+		unsigned int iSize_ = 0;
+		unsigned int iCapacity_ = 0;
+		unsigned int iExpander_ = 10;
 		T* aVector_Container_ = new T[iSize_];
 	public:
 		~TCVectorContainer();
 		void Push(const T _Item);
 		void RemoveItem(const T _Item);
+		void RemoveFirstItem();
 		T& GetItem(const T _Item);
+		T& GetFirstItem();
 		T& GetHead();
 		T* GetVectorContainer();
 		int GetSize();
 		int GetCapacity();
+		unsigned int& operator[](const unsigned int _iIndex);
 	};
 
 	template<class T>
@@ -34,23 +40,29 @@ namespace GLVM::Core
 	{
 		if(iSize_ == iCapacity_)
 		{
-			T aTemp_Vector_Container[iCapacity_];
-			if(iCapacity_ > 0)
-			{
-				for(int i = 0; i < iCapacity_; ++i)
-					aTemp_Vector_Container[i] = aVector_Container_[i];
-			}
+			T* aTemp_Vector_Container = new T[iCapacity_ + iExpander_];
+			for(int i = 0; i < iCapacity_; ++i)
+				aTemp_Vector_Container[i] = aVector_Container_[i];
 
 			delete [] aVector_Container_;
-			aVector_Container_ = nullptr;
+			aVector_Container_ = aTemp_Vector_Container;
+			// T aTemp_Vector_Container[iCapacity_];
+			// if(iCapacity_ > 0)
+			// {
+			// 	for(int i = 0; i < iCapacity_; ++i)
+			// 		aTemp_Vector_Container[i] = aVector_Container_[i];
+			// }
 
-			aVector_Container_ = new T[iCapacity_ + iExpander_];
+			// delete [] aVector_Container_;
+			// aVector_Container_ = nullptr;
 
-			if(iCapacity_ > 0)
-			{
-				for(int j = 0; j < iCapacity_; ++j)
-					aVector_Container_[j] = aTemp_Vector_Container[j];
-			}
+			// aVector_Container_ = new T[iCapacity_ + iExpander_];
+
+			// if(iCapacity_ > 0)
+			// {
+			// 	for(int j = 0; j < iCapacity_; ++j)
+			// 		aVector_Container_[j] = aTemp_Vector_Container[j];
+			// }
 
 			iCapacity_ += iExpander_;
 			
@@ -59,12 +71,9 @@ namespace GLVM::Core
 			return;
 		}
 
-		if(iSize_ < iCapacity_)
-		{
-			aVector_Container_[iSize_] = _Item;
-			++iSize_;
-			return;
-		}
+		aVector_Container_[iSize_] = _Item;
+		++iSize_;
+		return;
 	}
 
 	template<class T>
@@ -90,15 +99,40 @@ namespace GLVM::Core
 			++iTemp_Index;
 		}
 		--iSize_;
-		aVector_Container_[iSize_] = 0;
+		aVector_Container_[iSize_] = k_iNull;
 	}
 
+	template<class T>
+	void TCVectorContainer<T>::RemoveFirstItem()
+	{
+		if(iSize_ < 1)
+			return;
+		
+		T aTemp_Vector_Container[iCapacity_];
+		if(iCapacity_ > 0)
+		{
+			for(int i = 0; i < (iCapacity_-1); ++i)
+				aTemp_Vector_Container[i] = aVector_Container_[i+1];
+		}
+		
+		for(int j = 0; j < (iCapacity_-1); ++j)
+			aVector_Container_[j] = aTemp_Vector_Container[j];
+		--iSize_;
+		aVector_Container_[iSize_] = k_iNull;
+	}
+	
 	template<class T>
 	T& TCVectorContainer<T>::GetItem(const T _Item)
 	{
 		for(int i = 0; i < iCapacity_; ++i)
 			if(_Item == aVector_Container_[i])
 				return aVector_Container_[i];
+	}
+
+	template<class T>
+	T& TCVectorContainer<T>::GetFirstItem()
+	{
+		return aVector_Container_[k_iNull];
 	}
 
 	template<class T>
@@ -113,10 +147,15 @@ namespace GLVM::Core
 		return aVector_Container_;
 	}
 
-	template<class T>
+	template<typename T>
 	int TCVectorContainer<T>::GetSize() { return iSize_; }
-	template<class T>
+	template<typename T>
 	int TCVectorContainer<T>::GetCapacity() { return iCapacity_; }
+	template<typename T>
+	unsigned int& TCVectorContainer<T>::operator[](const unsigned int _iIndex)
+	{
+		return aVector_Container_[_iIndex];
+	}
 }
     
 #endif 

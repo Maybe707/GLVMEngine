@@ -10,22 +10,26 @@
 
 namespace GLVM::Core 
 {
-    
+	using Entity_ID = unsigned int; 
+	
 	class CStaticObject : public IGameObject
 	{
-		SVertexVector vertex_Vector_;
-		const char kSign_ = 's';
-		CTexture Texture_;
-		Math::TCMatrix<MATRIX_RANGE> tModel_Matrix_;
+		Entity_ID u_iID_;
 	public:
-		CStaticObject(const CTexture& _Texture);
-		virtual SVertexVector& GetVertexVector() override;
-		virtual const char& GetSign() override;
-		virtual CTexture& GetTexture() override;
-		void SetMatrix(Math::TCMatrix<MATRIX_RANGE>& _tModel_Matrix);
-		virtual Math::TCMatrix<MATRIX_RANGE>* GetMatrix() override;
+		
+		
+	// 	SVertexVector vertex_Vector_;
+	// 	const char kSign_ = 's';
+	// 	CTexture Texture_;
+	// 	Math::TCMatrix<MATRIX_RANGE> tModel_Matrix_;
+	// public:
+	// 	CStaticObject(const CTexture& _Texture);
+	// 	virtual SVertexVector& GetVertexVector() override;
+	// 	virtual const char& GetSign() override;
+	// 	virtual CTexture& GetTexture() override;
+	// 	void SetMatrix(Math::TCMatrix<MATRIX_RANGE>& _tModel_Matrix);
+	// 	virtual Math::TCMatrix<MATRIX_RANGE>* GetMatrix() override;
 	};
-
 }
 
 #endif
