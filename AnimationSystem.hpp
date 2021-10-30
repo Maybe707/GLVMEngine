@@ -1,19 +1,20 @@
-#ifndef ANIMATION
-#define ANIMATION
+#ifndef ANIMATION_SYSTEM
+#define ANIMATION_SYSTEM
 
 #include "Event.hpp"
-#include "Player.hpp"
 #include "VertexData.hpp"
 #include "Stack.hpp"
+#include "ISystem.hpp"
+#include "Player.hpp"
 
 #define ANIM_PER_AXIS_NUMBER 4
 
-namespace GLVM::Core
+namespace GLVM::ECS
 {
 
-	class CAnimation
+	class CAnimation : public ECS::ISystem
 	{
-		EEvents eSave_Event_;
+		Core::EEvents eSave_Event_;
 		bool bFlag_ = true;
 		float aVertices_[30];
 		static const int anim_index_array = 3;
@@ -26,18 +27,18 @@ namespace GLVM::Core
 			{vertices10, vertices11, vertices12}
 		};
 	public:
-		void Walk(CStack& _Inputs, double& Animation_Delta, double& Delta_Time, CPlayer& _Player)
+		void Walk(Core::CStack& _Inputs, double& Animation_Delta, double& Delta_Time, Core::CPlayer& _Player)
 		{
 //			glBindBuffer(GL_ARRAY_BUFFER, VBO);
-			_Player.SetVertex(aVertices_);
-			if(_Inputs.Pop() != eDEFAULT)
+//			_Player.SetVertex(aVertices_);
+			if(_Inputs.Pop() != Core::eDEFAULT)
 				bFlag_ = false;
-			if(_Inputs.Pop() == eDEFAULT && bFlag_)
-				_Player.SetVertex(vertices);
+			if(_Inputs.Pop() == Core::eDEFAULT && bFlag_)
+//				_Player.Core::SetVertex(vertices);
 			if(_Inputs.Pop() != eSave_Event_)
 				Animation_Delta = 31.0f;
 			eSave_Event_ = _Inputs.Pop();
-			if(_Inputs.Pop() == eMOVE_DOWN)
+			if(_Inputs.Pop() == Core::eMOVE_DOWN)
 			{
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
@@ -66,7 +67,7 @@ namespace GLVM::Core
 //					return;
 				}
 			}
-			else if(_Inputs.Pop() == EEvents::eMOVE_LEFT)
+			else if(_Inputs.Pop() == Core::EEvents::eMOVE_LEFT)
 			{
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
@@ -95,7 +96,7 @@ namespace GLVM::Core
 //					return;
 				}
 			}
-			else if(_Inputs.Pop() == EEvents::eMOVE_RIGHT)
+			else if(_Inputs.Pop() == Core::EEvents::eMOVE_RIGHT)
 			{
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)
@@ -124,7 +125,7 @@ namespace GLVM::Core
 //					return;
 				}
 			}
-			else if(_Inputs.Pop() == EEvents::eMOVE_UP)
+			else if(_Inputs.Pop() == Core::EEvents::eMOVE_UP)
 			{
 				Animation_Delta += Delta_Time;
 				if(Animation_Delta > 30.0f)

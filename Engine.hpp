@@ -4,7 +4,7 @@
 #include "GLPointer.h"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
-#include "Renderer.hpp"
+#include "RenderSystem.hpp"
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
 #include "Event.hpp"
@@ -12,36 +12,35 @@
 #include "WindowCreator.hpp"
 #include "TimerCreator.hpp"
 #include "Player.hpp"
-#include "Texture.hpp"
-#include "Matrix.hpp"
-#include "GameObject.hpp"
-#include "StaticObject.hpp"
+#include "TextureComponent.hpp"
+#include "MatrixComponent.hpp"
 #include "VectorContainer.hpp"
-#include "Collision.hpp"
-#include "Animation.hpp"
+#include "CollisionSystem.hpp"
+#include "AnimationSystem.hpp"
+#include "EntityManager.hpp"
+#include "ComponentManager.hpp"
+#include "ColliderComponent.hpp"
 
 namespace GLVM::Core
 {
 
 	class CEngine
 	{
-		TCVectorContainer<IGameObject*> tWorldContainer;
 		IWindow* Window_;
 		Time::IChrono* Chrono_;
-		CRenderer* Renderer_;
+		CRenderSystem* Renderer_;
 		CEvent Event_;
 		Shader* Shader_Program;
 		double dDelta_Time_;
 		CStack Input_Stack_;
-		CCollision Collision_;
-		CAnimation Animation_;
+		ECS::CCollisionSystem Collision_;
+		ECS::CAnimation Animation_;
 		
 	public:
 		CEngine();
 		~CEngine();
 		void ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent);
-		void GameLoop(CPlayer& _Player);
-		TCVectorContainer<IGameObject*>& GetWorldContainer();
+		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void GameKill();
 	};
 		

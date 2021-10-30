@@ -10,6 +10,7 @@ namespace GLVM::ECS
 {
 	class CComponentManager
 	{
+	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
 		Core::TCConstVectorContainer<Core::IContainer*> tMain_Container_;
 	public:
@@ -45,6 +46,16 @@ namespace GLVM::ECS
 			
 		}
 
+		Core::TCConstVectorContainer<Core::IContainer*>& GetWorldContainer()
+		{
+			return tMain_Container_;
+		}
+
+		unsigned int GetContainerID()
+		{
+			return s_iComponents_Container_ID;
+		}
+		
 		~CComponentManager()
 		{
 			for(int i = 0; i < s_iComponents_Container_ID; ++i)

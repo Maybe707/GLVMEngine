@@ -1,40 +1,22 @@
+C = clang
+CC = clang++
 LDFLAGS = -lGL -lX11
-CXXFLAGS = -std=c++17 -g -Wall
+CXXFLAGS = -c -std=c++17 -g -Wall
+CFLAGS = -c -g -Wall
+SOURCES = Engine.cpp EngineMain.cpp GLPointer.c WindowCreator.cpp TextureComponent.cpp RenderSystem.cpp ShaderProgram.cpp Event.cpp WindowX.cpp ChronoX.cpp TimerCreator.cpp VertexData.cpp CollisionSystem.cpp MatrixComponent.cpp	
+OBJECTS = $(SOURCES:.cpp=.o)
+EXECUTABLE = rpgLin
 
-rpgLin: EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o Player.o StaticObject.o
-	clang++ -o rpgLin EngineMain.o GLPointer.o WindowCreator.o Texture.o Renderer.o ShaderProgram.o Event.o WindowX.o stb_image.o ChronoX.o TimerCreator.o Engine.o VertexData.o Collision.o Player.o StaticObject.o $(LDFLAGS)
-EngineMain.o: EngineMain.cpp
-	clang++ $(CXXFLAGS) -c -o EngineMain.o EngineMain.cpp
-GLPointer.o: GLPointer.c
-	clang -g -Wall -c -o GLPointer.o GLPointer.c
-WindowCreator.o: WindowCreator.cpp
-	clang++ $(CXXFLAGS) -c -o WindowCreator.o WindowCreator.cpp
-Texture.o: Texture.cpp
-	clang++ $(CXXFLAGS) -c -o Texture.o Texture.cpp
-Renderer.o: Renderer.cpp
-	clang++ $(CXXFLAGS) -c -o Renderer.o Renderer.cpp
-ShaderProgram.o: ShaderProgram.cpp
-	clang++ $(CXXFLAGS) -c -o ShaderProgram.o ShaderProgram.cpp
-Event.o: Event.cpp
-	clang++ $(CXXFLAGS) -c -o Event.o Event.cpp
-WindowX.o: WindowX.cpp
-	clang++ $(CXXFLAGS) -c -o WindowX.o WindowX.cpp
-stb_image.o: stb_image.cpp
-	clang++ $(CXXFLAGS) -c -o stb_image.o stb_image.cpp
-ChronoX.o: ChronoX.cpp
-	clang++ $(CXXFLAGS) -c -o ChronoX.o ChronoX.cpp
-TimerCreator.o: TimerCreator.cpp
-	clang++ $(CXXFLAGS) -c -o TimerCreator.o TimerCreator.cpp
-Engine.o: Engine.cpp
-	clang++ $(CXXFLAGS) -c -o Engine.o Engine.cpp
-VertexData.o: VertexData.cpp
-	clang++ $(CXXFLAGS) -c -o VertexData.o VertexData.cpp
-Collision.o: Collision.cpp
-	clang++ $(CXXFLAGS) -c -o Collision.o Collision.cpp
-Player.o: Player.cpp
-	clang++ $(CXXFLAGS) -c -o Player.o Player.cpp
-StaticObject.o: StaticObject.cpp
-	clang++ $(CXXFLAGS) -c -o StaticObject.o StaticObject.cpp
+all: $(SOURCES) $(EXECUTABLE)
+
+$(EXECUTABLE): $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+
+%.o : %.cpp
+	$(CC) $(CXXFLAGS) $< -o $@
+
+%.o : %.cpp
+	$(C) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf *.o rpgLin

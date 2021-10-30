@@ -6,7 +6,6 @@ namespace GLVM::ECS
 	class IComponent
 	{
 	public:
-		unsigned int u_iComponent_ID;
 	};
 }
 

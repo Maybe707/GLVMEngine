@@ -1,4 +1,8 @@
-#include "Renderer.hpp"
+#include "RenderSystem.hpp"
+#include "ComponentManager.hpp"
+#include "ConstVectorContainer.hpp"
+#include "TextureComponent.hpp"
+#include "TransformComponent.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
 
@@ -30,7 +34,7 @@ float fBase_Array[VERTEX_ARRAY_RANGE] =
 
 namespace GLVM::Core
 {
-    CRenderer::CRenderer()
+    CRenderSystem::CRenderSystem()
 	{
 		aMatrix_Ortho_[0]  = 2/1280.0f;
 		//Matrix_Ortho[3]  -= 1;
@@ -62,40 +66,42 @@ namespace GLVM::Core
 		glViewport(0, 0, 1280, 1280);
 	}
 
-	CRenderer::~CRenderer()
+	CRenderSystem::~CRenderSystem()
 	{
 		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 	
-    void CRenderer::Draw(CPlayer& _Player)
+    void CRenderSystem::Draw()
     {
 		pGLActive_Texture(GL_TEXTURE10);
-		glBindTexture(GL_TEXTURE_2D, _Player.GetTexture().GetTexture());
+//		glBindTexture(GL_TEXTURE_2D, _Player.GetTexture().GetTexture());
 		pGLBind_Vertex_Array(iVao_);
         glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
     }
 
-	void CRenderer::DrawAll(TCVectorContainer<IGameObject*>* pWorldContainer, Shader* _Shader_Program)
+	void CRenderSystem::DrawAll(TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
+								TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
+								Shader* _Shader_Program)
 	{
-		for(int i = 0; i < pWorldContainer->GetSize(); ++i)
+		for(int i = 0; i < _tTransformContainer->GetSize(); ++i)
 		{
-			unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-			pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, pWorldContainer->GetVectorContainer()[i]->GetMatrix()->GetMatrix());
+			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[i]);
 			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, pWorldContainer->GetVectorContainer()[i]->GetTexture().GetTexture());
+			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[i].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
 			glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
 		}
 	}
  
-	void CRenderer::SetModelMatrix(Shader* _Shader_Program, float const* _Model_Matrix)
+	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
 	{
+		Model_Matrix_.Offset(_transform_Component);
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, _Model_Matrix);
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, Model_Matrix_.GetMatrix());
 	}
 
-	void CRenderer::SetProjectionMatrix(Shader* _Shader_Program)
+	void CRenderSystem::SetProjectionMatrix(Shader* _Shader_Program)
 	{
 		unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, aMatrix_Ortho_);

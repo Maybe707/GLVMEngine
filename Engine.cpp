@@ -1,6 +1,9 @@
 #include "Engine.hpp"
+#include "ComponentManager.hpp"
 #include "GLPointer.h"
 #include "IWindow.hpp"
+#include "TextureComponent.hpp"
+#include "TransformComponent.hpp"
 #include <GL/glext.h>
 
 namespace GLVM::Core
@@ -37,6 +40,8 @@ namespace GLVM::Core
 		case eMOVE_UP:
 			_Stack.Push(eMOVE_UP);
 			break;
+		default:
+			break;
 		}
 	}
 
@@ -44,7 +49,7 @@ namespace GLVM::Core
 	{
 		Window_ = CWindowCreator().Create();
 		Chrono_ = Time::CTimerCreator().Create();
-		Renderer_ = new CRenderer();
+		Renderer_ = new CRenderSystem();
 		Shader_Program = new Shader();
 		Event_.SetEvent(eDEFAULT);
 		
@@ -59,7 +64,7 @@ namespace GLVM::Core
 		Shader_Program = nullptr;
 	}
 
-	void CEngine::GameLoop(CPlayer& _Player)
+	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
 		double dAnimation_Delta = 0;
 		bool bGame_Loop_Active = true;
@@ -81,18 +86,19 @@ namespace GLVM::Core
 			Event_.SetLastEvent(Input_Stack_);
 			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
 				bGame_Loop_Active = false;
-			_Player.Move(dDelta_Time_, Event_);
-			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
-			Animation_.Walk(Input_Stack_, dAnimation_Delta, dDelta_Time_, _Player);
-			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
-			Renderer_->Draw(_Player);
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_Static_Object), aVertices_Static_Object, GL_DYNAMIC_DRAW);
-			Renderer_->DrawAll(&tWorldContainer, Shader_Program);
+//			_Player.Move(dDelta_Time_, Event_);
+//			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
+//			Animation_.Walk(Input_Stack_, dAnimation_Delta, dDelta_Time_, _Player);
+//			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
+//			Renderer_->Draw(_Player);
+//			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_Static_Object), aVertices_Static_Object, GL_DYNAMIC_DRAW);
+			Renderer_->DrawAll(static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[1]),
+							   static_cast<TCConstVectorContainer<ECS::CTextureComponent>*>(_ComponentManager.tMain_Container_[0]), Shader_Program);
 			Window_->SwapBuffers();
 		}
 	}
-
-	TCVectorContainer<IGameObject*>& CEngine::GetWorldContainer() { return tWorldContainer; }
+	
+//	TCVectorContainer<IGameObject*>& CEngine::GetWorldContainer() { return tWorldContainer; }
 
 	void CEngine::GameKill()
 	{
