@@ -1,10 +1,16 @@
 #include "Engine.hpp"
-#include "ComponentManager.hpp"
-#include "GLPointer.h"
-#include "IWindow.hpp"
-#include "TextureComponent.hpp"
+#include "ColliderComponent.hpp"
+#include "ConstVectorContainer.hpp"
+#include "MoveComponent.hpp"
 #include "TransformComponent.hpp"
-#include <GL/glext.h>
+#include "VectorContainer.hpp"
+#include "VertexComponent.hpp"
+#include <iostream>
+
+#define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
+#define SOME_STRANGE_STUFF 0
+#define MIPMAP_LEVEL 0
+#define SOME_OLD_STUFF 0
 
 namespace GLVM::Core
 {    
@@ -50,6 +56,7 @@ namespace GLVM::Core
 		Window_ = CWindowCreator().Create();
 		Chrono_ = Time::CTimerCreator().Create();
 		Renderer_ = new CRenderSystem();
+		Movement_ = new ECS::CMovementSystem();
 		Shader_Program = new Shader();
 		Event_.SetEvent(eDEFAULT);
 		
@@ -62,6 +69,8 @@ namespace GLVM::Core
 		Renderer_ = nullptr;
 		delete Shader_Program;
 		Shader_Program = nullptr;
+		delete Movement_;
+		Movement_ = nullptr;
 	}
 
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
@@ -87,19 +96,45 @@ namespace GLVM::Core
 			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
 				bGame_Loop_Active = false;
 //			_Player.Move(dDelta_Time_, Event_);
-//			Collision_.Detection(tWorldContainer, _Player, dDelta_Time_, Event_);
+
 //			Animation_.Walk(Input_Stack_, dAnimation_Delta, dDelta_Time_, _Player);
 //			Renderer_->SetModelMatrix(Shader_Program, _Player.GetMatrix()->GetMatrix());
 //			Renderer_->Draw(_Player);
 //			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_Static_Object), aVertices_Static_Object, GL_DYNAMIC_DRAW);
-			Renderer_->DrawAll(static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[1]),
-							   static_cast<TCConstVectorContainer<ECS::CTextureComponent>*>(_ComponentManager.tMain_Container_[0]), Shader_Program);
+			Movement_->Move(static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::STransformComponent>()]), static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]), static_cast<TCConstVectorContainer<ECS::SMoveComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]), dDelta_Time_, Event_.GetEvent());
+			Collision_.Detection(static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::STransformComponent>()]), static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::CColliderComponent>()]), static_cast<TCConstVectorContainer<ECS::SMoveComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]), static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]), dDelta_Time_);
+			Animation_.Walk(static_cast<TCConstVectorContainer<ECS::SVertexComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SVertexComponent>()]),
+							static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SAnimationMoveComponent>()]),
+							Input_Stack_, dAnimation_Delta, dDelta_Time_);
+			Renderer_->DrawAll(static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::STransformComponent>()]),
+							   static_cast<TCConstVectorContainer<ECS::CTextureComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::CTextureComponent>()]),
+							   static_cast<TCConstVectorContainer<ECS::SVertexComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SVertexComponent>()]),
+							   static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SVertexComponent>()]),
+							   Shader_Program);
 			Window_->SwapBuffers();
 		}
 	}
 	
 //	TCVectorContainer<IGameObject*>& CEngine::GetWorldContainer() { return tWorldContainer; }
 
+ 	void CEngine::LoadTextureData(GLVM::ECS::CTextureComponent& _Texture)
+	{
+		///< Loading and creating texture.
+		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
+		glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
+	
+		///< Setting texture applying parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		///< Loading image, creating texture and generation mipmap-levels
+		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
+		pGLGenerate_Mipmap(GL_TEXTURE_2D);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	
 	void CEngine::GameKill()
 	{
 	   	Window_->Close();

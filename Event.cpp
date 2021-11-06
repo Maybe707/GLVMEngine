@@ -32,6 +32,8 @@ namespace GLVM::Core
 		case GLVM::Core::eMOVE_UP:
 			SetEvent(GLVM::Core::EEvents::eMOVE_UP);
 			break;
+		default:
+			break;
 		}
 	}
 }

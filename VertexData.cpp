@@ -1,5 +1,4 @@
 const int kVertex_Size = 9;
-const int kVertex_Size2 = 30;
 constexpr float kWidth_Offset = 1.0f/3;
 
 float aVertices[kVertex_Size] =

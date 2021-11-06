@@ -1,9 +1,9 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
-#include "IComponent.hpp"
 #include "ConstVectorContainer.hpp"
-
+#include "VectorContainer.hpp"
+#include <iostream>
 #include "IContainer.hpp"
 
 namespace GLVM::ECS
@@ -13,6 +13,7 @@ namespace GLVM::ECS
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
 		Core::TCConstVectorContainer<Core::IContainer*> tMain_Container_;
+		Core::TCConstVectorContainer<Core::IContainer*> tOrdered_Container_;
 	public:
 		template <typename S>
 		unsigned int CreateComponentContainer()
@@ -26,26 +27,24 @@ namespace GLVM::ECS
 			Core::TCConstVectorContainer<S>* pComponent_Container =
 				new Core::TCConstVectorContainer<S>;
 			tMain_Container_.Push(pComponent_Container, s_iComponents_Container_ID);
+			Core::TCVectorContainer<unsigned int>* pOrdered_Indexes_Container =
+				new Core::TCVectorContainer<unsigned int>;
+			tOrdered_Container_.Push(pOrdered_Indexes_Container, s_iComponents_Container_ID);
 			++s_iComponents_Container_ID;
 			return s_iLocal_ID;
 		}
-		
-		template <typename S>
-		void BindComponentToEntity(unsigned int& _u_iEntity, S& _Component)
-		{
-			unsigned int u_iIndex;
-			u_iIndex = CreateComponentContainer<S>();
-			AddComponentToContainer<S>(_Component, u_iIndex, _u_iEntity);
-		}
-		
-		template <typename S>
-		void AddComponentToContainer(S& _Component, unsigned int _u_iIndex,
-			unsigned int _u_iEntity)
-		{
-			static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[_u_iIndex])->Push(_Component, _u_iEntity);
-			
-		}
 
+		template <typename S>
+		S& CreateComponent(unsigned int& _u_iEntity)
+		{
+			unsigned int u_iIndex; ///< Index for Main and Ordered containers.
+			S Component;
+			u_iIndex = CreateComponentContainer<S>();
+			static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[u_iIndex])->Push(Component, _u_iEntity);
+			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[u_iIndex])->Push(_u_iEntity);
+			return (*static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
+		}
+		
 		Core::TCConstVectorContainer<Core::IContainer*>& GetWorldContainer()
 		{
 			return tMain_Container_;
@@ -62,6 +61,8 @@ namespace GLVM::ECS
 			{
 				delete tMain_Container_[i];
 				tMain_Container_[i] = nullptr;
+				delete tOrdered_Container_[i];
+				tOrdered_Container_[i] = nullptr;
 			}
 		}
 	};

@@ -1,5 +1,5 @@
-#ifndef TEXTURE
-#define TEXTURE
+#ifndef TEXTURE_COMPONENT
+#define TEXTURE_COMPONENT
 
 #include <GL/gl.h>
 #include "GLPointer.h"
@@ -22,9 +22,7 @@ namespace GLVM::ECS
 		unsigned int iHeight_;
 		unsigned int iNrChannels_;
 		const unsigned char* u_iData_;
-     
-        CTextureComponent();
-    };
+	};
 }
     
 #endif

@@ -45,6 +45,8 @@ namespace GLVM::ECS
 		case GLVM::Core::EEvents::eMOVE_UP:
 			aMatrix_[u_iRange-LIMITER][OFFSET_Y] += _dOffset;
 			break;
+		default:
+			break;
 		}
 	}
 }

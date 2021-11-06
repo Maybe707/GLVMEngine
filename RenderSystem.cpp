@@ -5,6 +5,8 @@
 #include "TransformComponent.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include "AnimationMoveComponent.hpp"
+#include "VectorContainer.hpp"
 
 #define VERTEX_ARRAY_RANGE 30
 #define SIZE_OF_VERTEX_DATA 5
@@ -71,7 +73,7 @@ namespace GLVM::Core
 		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
-	
+
     void CRenderSystem::Draw()
     {
 		pGLActive_Texture(GL_TEXTURE10);
@@ -82,10 +84,13 @@ namespace GLVM::Core
 
 	void CRenderSystem::DrawAll(TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
 								TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
+								TCConstVectorContainer<ECS::SVertexComponent>* _pVertex_Container,
+								TCVectorContainer<unsigned int>* _pOrdered_Vertex_Container,
 								Shader* _Shader_Program)
 	{
 		for(int i = 0; i < _tTransformContainer->GetSize(); ++i)
 		{
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Vertex_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Vertex_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
 			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[i]);
 			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[i].iTexture_);
@@ -97,6 +102,9 @@ namespace GLVM::Core
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
 	{
 		Model_Matrix_.Offset(_transform_Component);
+		Model_Matrix_.Matrix()[0][0] = 64;
+		Model_Matrix_.Matrix()[1][1] = 64;
+		Model_Matrix_.Matrix()[2][2] = 64;
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, Model_Matrix_.GetMatrix());
 	}

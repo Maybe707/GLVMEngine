@@ -93,6 +93,8 @@ namespace GLVM::Core
 			case eMOVE_UP:
 				Push(eMOVE_UP);
 				break;
+			default:
+				break;
 			}
 		}
 	};
