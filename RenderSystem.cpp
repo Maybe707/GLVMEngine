@@ -1,27 +1,4 @@
 #include "RenderSystem.hpp"
-#include "ComponentManager.hpp"
-#include "ConstVectorContainer.hpp"
-#include "TextureComponent.hpp"
-#include "TransformComponent.hpp"
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include "AnimationMoveComponent.hpp"
-#include "VectorContainer.hpp"
-
-#define VERTEX_ARRAY_RANGE 30
-#define SIZE_OF_VERTEX_DATA 5
-#define LAYOUT_0 0
-#define LAYOUT_1 1
-#define VERTEX_SIZE 3
-#define TEXTURE_SIZE 2
-#define VERTEX_OFFSET 0
-#define TEXTURE_OFFSET 3
-#define NUMBER_OF_CREATING_VBO_OBJECT_1 1
-#define NUMBER_OF_CREATING_VAO_OBJECT_1 1
-#define BASE_ARRAY_COUNTER_VALUE 0
-#define BASE_INDEX_VERTEX_ARRAY 0
-#define NUMBER_OF_DROWING_VERTEXES 6
-#define NUMBER_OF_MATRICES 1
 
 float fBase_Array[VERTEX_ARRAY_RANGE] =
 {
@@ -34,10 +11,16 @@ float fBase_Array[VERTEX_ARRAY_RANGE] =
 	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f
 };
 
-namespace GLVM::Core
+namespace GLVM::ECS
 {
     CRenderSystem::CRenderSystem()
 	{
+		for(unsigned int count = 0; count < (u_iRange-LIMITER); ++count)
+		{
+			aMatrix_Model_[count][count] = 64.0;
+		}
+		aMatrix_Model_[u_iRange-LIMITER][u_iRange-LIMITER] = HOMOGENEOUS_COORDINATE;
+		
 		aMatrix_Ortho_[0]  = 2/1280.0f;
 		//Matrix_Ortho[3]  -= 1;
 		//Matrix_Ortho[7]  -= 1;
@@ -74,26 +57,19 @@ namespace GLVM::Core
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 
-    void CRenderSystem::Draw()
-    {
-		pGLActive_Texture(GL_TEXTURE10);
-//		glBindTexture(GL_TEXTURE_2D, _Player.GetTexture().GetTexture());
-		pGLBind_Vertex_Array(iVao_);
-        glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
-    }
-
-	void CRenderSystem::DrawAll(TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
-								TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
-								TCConstVectorContainer<ECS::SVertexComponent>* _pVertex_Container,
-								TCVectorContainer<unsigned int>* _pOrdered_Vertex_Container,
+	void CRenderSystem::DrawAll(Core::TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
+								Core::TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
+								Core::TCConstVectorContainer<ECS::SVertexComponent>* _pVertex_Container,
+								Core::TCVectorContainer<unsigned int>* _pOrdered_Vertex_Container,
+								Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container,
 								Shader* _Shader_Program)
 	{
-		for(int i = 0; i < _tTransformContainer->GetSize(); ++i)
+		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Vertex_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Vertex_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
-			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[i]);
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
+			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
 			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[i].iTexture_);
+			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
 			glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
 		}
@@ -101,12 +77,11 @@ namespace GLVM::Core
  
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
 	{
-		Model_Matrix_.Offset(_transform_Component);
-		Model_Matrix_.Matrix()[0][0] = 64;
-		Model_Matrix_.Matrix()[1][1] = 64;
-		Model_Matrix_.Matrix()[2][2] = 64;
+		aMatrix_Model_[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
+		aMatrix_Model_[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
+		aMatrix_Model_[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, Model_Matrix_.GetMatrix());
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, *aMatrix_Model_);
 	}
 
 	void CRenderSystem::SetProjectionMatrix(Shader* _Shader_Program)

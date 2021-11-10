@@ -12,7 +12,6 @@
 #include "WindowCreator.hpp"
 #include "TimerCreator.hpp"
 #include "TextureComponent.hpp"
-#include "MatrixComponent.hpp"
 #include "VectorContainer.hpp"
 #include "CollisionSystem.hpp"
 #include "AnimationSystem.hpp"
@@ -31,6 +30,7 @@
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
 #include "VertexComponent.hpp"
+#include "AnimationMoveComponent.hpp"
 
 using Entity = unsigned int;
 
@@ -41,19 +41,18 @@ namespace GLVM::Core
 	{
 		IWindow* Window_;
 		Time::IChrono* Chrono_;
-		CRenderSystem* Renderer_;
+		ECS::CRenderSystem* Renderer_System;
 		CEvent Event_;
 		Shader* Shader_Program;
 		double dDelta_Time_;
 		CStack Input_Stack_;
-		ECS::CCollisionSystem Collision_;
-		ECS::CAnimation Animation_;
-		ECS::CMovementSystem* Movement_;
+		ECS::CCollisionSystem Collision_System;
+		ECS::CAnimationSystem Animation_System;
+		ECS::CMovementSystem* Movement_System;
 		
 	public:
 		CEngine();
 		~CEngine();
-		void ControlInput(CStack& _Stack, bool& _bGame_Loop_Active, CEvent& _eEvent);
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
 		void GameKill();

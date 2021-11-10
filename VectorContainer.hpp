@@ -41,7 +41,7 @@ namespace GLVM::Core
 		if(iSize_ == iCapacity_)
 		{
 			T* aTemp_Vector_Container = new T[iCapacity_ + iExpander_];
-			for(int i = 0; i < iCapacity_; ++i)
+			for(unsigned int i = 0; i < iCapacity_; ++i)
 				aTemp_Vector_Container[i] = aVector_Container_[i];
 
 			delete [] aVector_Container_;
@@ -81,25 +81,34 @@ namespace GLVM::Core
 	{
 		if(iSize_ < 1)
 			return;
+
+		bool bRemove_Flag = false;
 		
 		int iTemp_Index = 0;
 		T aTemp_Vector_Container[iCapacity_];
 		if(iCapacity_ > 0)
 		{
-			for(int i = 0; i < iCapacity_; ++i)
+			for(unsigned int i = 0; i < iCapacity_; ++i)
 				aTemp_Vector_Container[i] = aVector_Container_[i];
 		}
 		
-		for(int j = 0; j < iCapacity_; ++j)
+		for(unsigned int j = 0; j < iCapacity_; ++j)
 		{
 			if(_Item == aVector_Container_[j])
+			{
+				bRemove_Flag = true;
 				continue;
+			}
 
 			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
 			++iTemp_Index;
 		}
-		--iSize_;
-		aVector_Container_[iSize_] = k_iNull;
+
+		if(bRemove_Flag)
+		{
+			--iSize_;
+			aVector_Container_[iSize_] = k_iNull;
+		}
 	}
 
 	template<class T>
@@ -111,11 +120,11 @@ namespace GLVM::Core
 		T aTemp_Vector_Container[iCapacity_];
 		if(iCapacity_ > 0)
 		{
-			for(int i = 0; i < (iCapacity_-1); ++i)
+			for(unsigned int i = 0; i < (iCapacity_-1); ++i)
 				aTemp_Vector_Container[i] = aVector_Container_[i+1];
 		}
 		
-		for(int j = 0; j < (iCapacity_-1); ++j)
+		for(unsigned int j = 0; j < (iCapacity_-1); ++j)
 			aVector_Container_[j] = aTemp_Vector_Container[j];
 		--iSize_;
 		aVector_Container_[iSize_] = k_iNull;

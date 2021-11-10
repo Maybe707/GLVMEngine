@@ -1,7 +1,5 @@
-#include "AnimationMoveComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
-#include "VertexComponent.hpp"
 
 int main()
 {
@@ -10,11 +8,11 @@ int main()
 	GLVM::ECS::CComponentManager ComponentManager;
 	Entity u_iPlayer = 0;
 	EntityManager.CreateEntity(u_iPlayer);
-	GLVM::ECS::SVertexComponent& VertexPlayer = ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
 	GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	GLVM::ECS::SMoveComponent& MovePlayer = ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-	GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
-	GLVM::ECS::SAnimationMoveComponent& AnimationMovePlayer = ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
+	ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
+	ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
+	ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96;
 	TexturePlayer.iHeight_ = 128;
 	TexturePlayer.u_iData_ = chelik_dat;
@@ -23,12 +21,12 @@ int main()
 	TransformPlayer.fPos_X = 5;
 	TransformPlayer.fPos_Y = 3;
 	TransformPlayer.fPos_Z = 3;
-
+	
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);
-	GLVM::ECS::SVertexComponent& VertexWitch = ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
+	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
 	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
-	GLVM::ECS::CColliderComponent& ColliderWitch = ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch);
+	ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch);
 	TextureWitch.iWidth_ = 32;
 	TextureWitch.iHeight_ = 32;
 	TextureWitch.u_iData_ = witch_dat;
@@ -37,12 +35,13 @@ int main()
 	TransformWitch.fPos_X = 90;
 	TransformWitch.fPos_Y = 90;
 	TransformWitch.fPos_Z = 90;
+//	EntityManager.RemoveEntity(u_iWitch, ComponentManager);
 
 	Entity u_iWitch2 = 0;
 	EntityManager.CreateEntity(u_iWitch2);
-   	GLVM::ECS::SVertexComponent& VertexWitch2 = ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
+   	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-	GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch2);
+	ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch2);
 	TextureWitch2.iWidth_ = 32;
 	TextureWitch2.iHeight_ = 32;
 	TextureWitch2.u_iData_ = witch_dat;
@@ -54,9 +53,9 @@ int main()
 
 	Entity u_iWitch3 = 0;
 	EntityManager.CreateEntity(u_iWitch3);
-	GLVM::ECS::SVertexComponent& VertexWitch3 = ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch3);
+	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch3);
 	GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
-	GLVM::ECS::CColliderComponent& ColliderWitch3 = ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch3);
+	ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch3);
 	TextureWitch3.iWidth_ = 32;
 	TextureWitch3.iHeight_ = 32;
 	TextureWitch3.u_iData_ = witch_dat;

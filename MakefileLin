@@ -3,7 +3,7 @@ CC = clang++
 LDFLAGS = -lGL -lX11
 CXXFLAGS = -c -std=c++17 -g -Wall
 CFLAGS = -c -g -Wall
-SOURCES = Engine.cpp EngineMain.cpp GLPointer.c WindowCreator.cpp RenderSystem.cpp ShaderProgram.cpp Event.cpp WindowX.cpp ChronoX.cpp TimerCreator.cpp VertexData.cpp CollisionSystem.cpp MatrixComponent.cpp AnimationSystem.cpp
+SOURCES = Engine.cpp EngineMain.cpp GLPointer.c WindowCreator.cpp RenderSystem.cpp ShaderProgram.cpp Event.cpp WindowX.cpp ChronoX.cpp TimerCreator.cpp VertexData.cpp CollisionSystem.cpp AnimationSystem.cpp
 OBJECTS = $(SOURCES:.cpp=.o)
 EXECUTABLE = rpgLin
 

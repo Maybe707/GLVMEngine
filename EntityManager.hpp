@@ -3,6 +3,7 @@
 
 #include "ConstVectorContainer.hpp"
 #include "VectorContainer.hpp"
+#include "ComponentManager.hpp"
 
 using Entity_Type_ID = unsigned int;
 using Entity_Object_ID = unsigned int;
@@ -31,10 +32,15 @@ namespace GLVM::ECS
 			}
 		}
 		
-		void RemoveEntity(Entity_Object_ID& _Entity_Object_ID)
+		void RemoveEntity(Entity_Object_ID& _Entity_Object_ID, CComponentManager& _ComponentManager)
 		{
 			tRemoved_Objects_Registry_.Push(_Entity_Object_ID);
 			tActive_Objects_Registry_[_Entity_Object_ID] = k_iUint_Max;
+			for(int i = 0, iSize = _ComponentManager.tOrdered_Container_.GetSize();
+				i < iSize; ++i)
+			{
+				static_cast<Core::TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[i])->RemoveItem(_Entity_Object_ID);
+			}
 		}
 	};
 }

@@ -14,7 +14,6 @@ namespace GLVM::ECS
 		inline static unsigned int s_iComponents_Container_ID = 0;
 		Core::TCConstVectorContainer<Core::IContainer*> tMain_Container_;
 		Core::TCConstVectorContainer<Core::IContainer*> tOrdered_Container_;
-	public:
 		template <typename S>
 		unsigned int CreateComponentContainer()
 		{
@@ -44,12 +43,14 @@ namespace GLVM::ECS
 			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[u_iIndex])->Push(_u_iEntity);
 			return (*static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
 		}
-		
-		Core::TCConstVectorContainer<Core::IContainer*>& GetWorldContainer()
-		{
-			return tMain_Container_;
-		}
 
+		template <typename S>
+		void RemoveComponent(unsigned int& _u_iEntity)
+		{
+//			static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
+			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[CreateComponentContainer<S>()])->RemoveItem(_u_iEntity);
+		}
+		
 		unsigned int GetContainerID()
 		{
 			return s_iComponents_Container_ID;
@@ -57,12 +58,15 @@ namespace GLVM::ECS
 		
 		~CComponentManager()
 		{
-			for(int i = 0; i < s_iComponents_Container_ID; ++i)
+			for(int i = 0, iSize_Main = tMain_Container_.GetSize(); i < iSize_Main; ++i)
 			{
 				delete tMain_Container_[i];
 				tMain_Container_[i] = nullptr;
-				delete tOrdered_Container_[i];
-				tOrdered_Container_[i] = nullptr;
+			}
+			for(int j = 0, iSize_Ordered = tOrdered_Container_.GetSize(); j < iSize_Ordered; ++j)
+			{
+				delete tOrdered_Container_[j];
+				tOrdered_Container_[j] = nullptr;
 			}
 		}
 	};

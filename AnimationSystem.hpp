@@ -16,7 +16,7 @@
 namespace GLVM::ECS
 {
 
-	class CAnimation : public ECS::ISystem
+	class CAnimationSystem : public ECS::ISystem
 	{
 		Core::EEvents eSave_Event_;
 		static const int anim_index_array = 3;
@@ -31,7 +31,7 @@ namespace GLVM::ECS
 	public:
 		void ArrayCopy(float* _aArray_Source, float* _aArray_Destination, unsigned int _u_iRange)
 		{
-			for(int i = 0; i < _u_iRange; ++i)
+			for(unsigned int i = 0; i < _u_iRange; ++i)
 				_aArray_Destination[i] = _aArray_Source[i];
 		}
 		

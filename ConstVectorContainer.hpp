@@ -3,6 +3,7 @@
 
 #include "Constants.hpp"
 #include "IContainer.hpp"
+#include "ExtraFunctions.hpp"
 
 namespace GLVM::Core
 {
@@ -16,6 +17,7 @@ namespace GLVM::Core
 		T* aConst_Vector_Container_ = new T[iSize_];
 	public:
 		~TCConstVectorContainer();
+		void Remove(const unsigned int _Index);
 		void Push(const T _Item, const unsigned int _Index);
 		void Push(const unsigned int _Index);
 		T& operator[](const unsigned int _Index);
@@ -31,6 +33,12 @@ namespace GLVM::Core
 		aConst_Vector_Container_ = nullptr;
 	}
 
+	// template<typename T>
+    // void TCConstVectorContainer<T>::Remove(const unsigned int _Index)
+	// {
+	// 	aConst_Vector_Container_[_Index] = nullptr;
+	// }
+
 	template<typename T>
 	void TCConstVectorContainer<T>::Push(const T _Item, const unsigned int _Index)
 	{
@@ -40,7 +48,7 @@ namespace GLVM::Core
 			iCapacity_ = (_Index + 1);
 			T* aTemp_Const_Vector_Container_ = new T[iCapacity_];
 
-			for(int j = 0; j < u_iTemp_Capacity; ++j)
+			for(unsigned int j = 0; j < u_iTemp_Capacity; ++j)
 				aTemp_Const_Vector_Container_[j] = aConst_Vector_Container_[j];
 
 			delete [] aConst_Vector_Container_;
@@ -61,7 +69,7 @@ namespace GLVM::Core
 			unsigned int* aTemp_Const_Vector_Container_ =
 				new unsigned int[iCapacity_];
 
-			for(int j = 0; j < u_iTemp_Capacity; ++j)
+			for(unsigned int j = 0; j < u_iTemp_Capacity; ++j)
 				aTemp_Const_Vector_Container_[j] = aConst_Vector_Container_[j];
 
 			delete [] aConst_Vector_Container_;
