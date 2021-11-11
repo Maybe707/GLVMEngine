@@ -48,10 +48,12 @@ namespace GLVM::Core
 		bool bGame_Loop_Active = true;
 		Animation_System.Animation_Delta = dAnimation_Delta;
 
+		///< Call of ActivateSystem function must be in this order. 
+		
 		System_Manager->ActivateSystem(Movement_System);
-		System_Manager->ActivateSystem(Renderer_System);
-		System_Manager->ActivateSystem(&Animation_System);
 		System_Manager->ActivateSystem(&Collision_System);
+		System_Manager->ActivateSystem(&Animation_System);
+		System_Manager->ActivateSystem(Renderer_System);
 		
 		while(bGame_Loop_Active)
 		{
