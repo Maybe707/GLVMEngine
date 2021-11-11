@@ -8,15 +8,18 @@
 #include "Event.hpp"
 #include <iostream>
 #include "MoveComponent.hpp"
+#include "ColliderComponent.hpp"
+#include "VectorContainer.hpp"
 
 namespace GLVM::ECS
 {
 	class CCollisionSystem : public ISystem
 	{
 	public:
+		double _dDelta_Time;
 		void Repel(STransformComponent& _transform_Component, SMoveComponent& _move_Component, double& _fDelta_Time);
 		bool BoxCollider(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);
-		void Detection(Core::TCConstVectorContainer<STransformComponent>* _pTransform_Components_Container, Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container, Core::TCConstVectorContainer<SMoveComponent>* _pMove_Components_Container, Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container, double& _dDelta_Time);
+		void Update(ECS::CComponentManager& _Component_Manager) override;
 	};
 }
 	

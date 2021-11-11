@@ -1,4 +1,8 @@
 #include "RenderSystem.hpp"
+#include "ComponentManager.hpp"
+#include "TextureComponent.hpp"
+#include "TransformComponent.hpp"
+#include "VertexComponent.hpp"
 
 float fBase_Array[VERTEX_ARRAY_RANGE] =
 {
@@ -57,13 +61,12 @@ namespace GLVM::ECS
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 
-	void CRenderSystem::DrawAll(Core::TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
-								Core::TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
-								Core::TCConstVectorContainer<ECS::SVertexComponent>* _pVertex_Container,
-								Core::TCVectorContainer<unsigned int>* _pOrdered_Vertex_Container,
-								Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container,
-								Shader* _Shader_Program)
+	void CRenderSystem::Update(CComponentManager& _Component_Manager)
 	{
+		Core::TCConstVectorContainer<STransformComponent>* _tTransformContainer = GetInnerMainContainer<STransformComponent>(_Component_Manager);
+		Core::TCConstVectorContainer<CTextureComponent>* _tTextureContainer = GetInnerMainContainer<CTextureComponent>(_Component_Manager);
+		Core::TCConstVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerMainContainer<SVertexComponent>(_Component_Manager);
+		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<CTextureComponent>(_Component_Manager);
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);

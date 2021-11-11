@@ -25,7 +25,7 @@ namespace GLVM::Core
 		T* GetVectorContainer();
 		int GetSize();
 		int GetCapacity();
-		unsigned int& operator[](const unsigned int _iIndex);
+		T& operator[](const unsigned int _iIndex);
 	};
 
 	template<class T>
@@ -46,23 +46,6 @@ namespace GLVM::Core
 
 			delete [] aVector_Container_;
 			aVector_Container_ = aTemp_Vector_Container;
-			// T aTemp_Vector_Container[iCapacity_];
-			// if(iCapacity_ > 0)
-			// {
-			// 	for(int i = 0; i < iCapacity_; ++i)
-			// 		aTemp_Vector_Container[i] = aVector_Container_[i];
-			// }
-
-			// delete [] aVector_Container_;
-			// aVector_Container_ = nullptr;
-
-			// aVector_Container_ = new T[iCapacity_ + iExpander_];
-
-			// if(iCapacity_ > 0)
-			// {
-			// 	for(int j = 0; j < iCapacity_; ++j)
-			// 		aVector_Container_[j] = aTemp_Vector_Container[j];
-			// }
 
 			iCapacity_ += iExpander_;
 			
@@ -161,7 +144,7 @@ namespace GLVM::Core
 	template<typename T>
 	int TCVectorContainer<T>::GetCapacity() { return iCapacity_; }
 	template<typename T>
-	unsigned int& TCVectorContainer<T>::operator[](const unsigned int _iIndex)
+	T& TCVectorContainer<T>::operator[](const unsigned int _iIndex)
 	{
 		return aVector_Container_[_iIndex];
 	}

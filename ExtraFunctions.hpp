@@ -77,6 +77,8 @@ namespace GLVM::Extra
 			return eNONE;
 		}
 	}
+
+
 } ///< namespace GLVM::Extra 
 
 #endif

@@ -31,6 +31,7 @@
 #include "TextureComponent.hpp"
 #include "VertexComponent.hpp"
 #include "AnimationMoveComponent.hpp"
+#include "SystemManager.hpp"
 
 using Entity = unsigned int;
 
@@ -49,6 +50,7 @@ namespace GLVM::Core
 		ECS::CCollisionSystem Collision_System;
 		ECS::CAnimationSystem Animation_System;
 		ECS::CMovementSystem* Movement_System;
+		ECS::CSystemManager* System_Manager;
 		
 	public:
 		CEngine();

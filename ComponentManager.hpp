@@ -70,6 +70,19 @@ namespace GLVM::ECS
 			}
 		}
 	};
+
+	template <typename T>
+	Core::TCConstVectorContainer<T>* GetInnerMainContainer(ECS::CComponentManager& _Component_Manager)
+	{
+		return static_cast<Core::TCConstVectorContainer<T>*>(_Component_Manager.tMain_Container_[_Component_Manager.CreateComponentContainer<T>()]);
+	}
+
+	template <typename T>
+	Core::TCVectorContainer<unsigned int>* GetInnerIndexContainer(ECS::CComponentManager& _Component_Manager)
+	{
+		return static_cast<Core::TCVectorContainer<unsigned int>*>(_Component_Manager.tOrdered_Container_[_Component_Manager.CreateComponentContainer<T>()]);
+}
+
 }
 
 #endif

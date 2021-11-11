@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
 #include "ConstVectorContainer.hpp"
 #include "MoveComponent.hpp"
@@ -24,6 +25,7 @@ namespace GLVM::Core
 		Renderer_System = new ECS::CRenderSystem();
 		Movement_System = new ECS::CMovementSystem();
 		Shader_Program = new Shader();
+		System_Manager = new ECS::CSystemManager();
 		Event_.SetEvent(eDEFAULT);
 		
 		dDelta_Time_ = 0.0;
@@ -37,22 +39,22 @@ namespace GLVM::Core
 		Shader_Program = nullptr;
 		delete Movement_System;
 		Movement_System = nullptr;
+		delete System_Manager;
+		System_Manager = nullptr;
 	}
 
+
+	
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
 		double dAnimation_Delta = 0;
 		bool bGame_Loop_Active = true;
-		
-		TCConstVectorContainer<ECS::STransformComponent>* pIner_Object_Component_Container_Of_Type_STransformComponent = static_cast<TCConstVectorContainer<ECS::STransformComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::STransformComponent>()]);
-		TCVectorContainer<unsigned int>* pIner_Index_Component_Container_Of_Type_SMoveComponent = static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]);
-		TCConstVectorContainer<ECS::SMoveComponent>* pIner_Object_Component_Container_Of_Type_SMoveComponent = static_cast<TCConstVectorContainer<ECS::SMoveComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SMoveComponent>()]);
-		TCVectorContainer<unsigned int>* pIner_Index_ComponentContainer_Of_Type_CColliderComponent = static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::CColliderComponent>()]);
-		TCConstVectorContainer<ECS::SVertexComponent>* pIner_Object_Component_Container_Of_Type_SVertexComponent = static_cast<TCConstVectorContainer<ECS::SVertexComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::SVertexComponent>()]);
-		TCVectorContainer<unsigned int>* pIner_Index_Component_Container_Of_Type_SAnimationMoveComponent = static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SAnimationMoveComponent>()]);
-		TCConstVectorContainer<ECS::CTextureComponent>* pIner_Object_Component_Container_Of_Type_CTextureComponent = static_cast<TCConstVectorContainer<ECS::CTextureComponent>*>(_ComponentManager.tMain_Container_[_ComponentManager.CreateComponentContainer<ECS::CTextureComponent>()]);
-		TCVectorContainer<unsigned int>* pIner_Index_Component_Container_Of_Type_SVertexComponent = static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::SVertexComponent>()]);
-		TCVectorContainer<unsigned int>* pIner_Index_Component_Container_Of_Type_CTextureComponent = static_cast<TCVectorContainer<unsigned int>*>(_ComponentManager.tOrdered_Container_[_ComponentManager.CreateComponentContainer<ECS::CTextureComponent>()]);
+		Animation_System.Animation_Delta = dAnimation_Delta;
+
+		System_Manager->ActivateSystem(Movement_System);
+		System_Manager->ActivateSystem(Renderer_System);
+		System_Manager->ActivateSystem(&Animation_System);
+		System_Manager->ActivateSystem(&Collision_System);
 		
 		while(bGame_Loop_Active)
 		{
@@ -73,39 +75,14 @@ namespace GLVM::Core
 			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
 				bGame_Loop_Active = false;
 
-			Movement_System->Move
-			(
-				pIner_Object_Component_Container_Of_Type_STransformComponent,
-				pIner_Index_Component_Container_Of_Type_SMoveComponent,
-				pIner_Object_Component_Container_Of_Type_SMoveComponent,
-				dDelta_Time_, Event_.GetEvent()
-			);
-
-			Collision_System.Detection
-			(
-				pIner_Object_Component_Container_Of_Type_STransformComponent,
-				pIner_Index_ComponentContainer_Of_Type_CColliderComponent,
-				pIner_Object_Component_Container_Of_Type_SMoveComponent,
-				pIner_Index_Component_Container_Of_Type_SMoveComponent,
-				dDelta_Time_
-			);
-
-			Animation_System.Walk
-			(
-				pIner_Object_Component_Container_Of_Type_SVertexComponent,
-				pIner_Index_Component_Container_Of_Type_SAnimationMoveComponent,
-				Input_Stack_, dAnimation_Delta, dDelta_Time_
-			);
+			Movement_System->_dOffset = dDelta_Time_;
+			Movement_System->_Event = Event_.GetEvent();
+			Collision_System._dDelta_Time = dDelta_Time_;
+			Animation_System.eEvent_ = Input_Stack_.Pop();
+			Animation_System.Delta_Time = dDelta_Time_;
+			Renderer_System->_Shader_Program = Shader_Program;
 			
-			Renderer_System->DrawAll
-			(
-				pIner_Object_Component_Container_Of_Type_STransformComponent,
-				pIner_Object_Component_Container_Of_Type_CTextureComponent,
-				pIner_Object_Component_Container_Of_Type_SVertexComponent,
-				pIner_Index_Component_Container_Of_Type_SVertexComponent,
-				pIner_Index_Component_Container_Of_Type_CTextureComponent,
-				Shader_Program
-			);
+			System_Manager->Update(_ComponentManager);
 			
 			Window_->SwapBuffers();
 		}
@@ -128,6 +105,8 @@ namespace GLVM::Core
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
+
+
 	
 	void CEngine::GameKill()
 	{

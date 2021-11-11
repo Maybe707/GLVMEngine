@@ -2,16 +2,28 @@
 #define SYSTEM_MANAGER
 
 #include "ComponentManager.hpp"
+#include "ConstVectorContainer.hpp"
+#include "ISystem.hpp"
+#include "VectorContainer.hpp"
 
 namespace GLVM::ECS
 {
-	class TCSystemManager
+	class CSystemManager
 	{
 	public:
-		template<typename T>
-		void Method(CComponentManager& _Component_Manager)
+		inline static unsigned int s_iSystem_ID = 0;
+		Core::TCVectorContainer<ISystem*> tSystemContainer;
+
+		void ActivateSystem(ISystem* _System)
 		{
-			_Component_Manager.CreateComponentContainer<T>();
+			tSystemContainer.Push(_System);
+			++s_iSystem_ID;
+		}
+
+		void Update(CComponentManager& _Component_Manager)
+		{
+			for(int i = 0; i < s_iSystem_ID; ++i)
+				tSystemContainer[i]->Update(_Component_Manager);
 		}
 	};
 }

@@ -4,6 +4,7 @@
 #include "TextureComponent.hpp"
 #include "GLPointer.h"
 #include <GL/gl.h>
+#include "ISystem.hpp"
 #include "VectorContainer.hpp"
 #include "VertexComponent.hpp"
 #include "ComponentManager.hpp"
@@ -39,26 +40,22 @@
 
 namespace GLVM::ECS
 {    
-    class CRenderSystem
+    class CRenderSystem : public ISystem
     {
+	public:
 	    GLuint iVbo_;
 		GLuint iVao_;
 		float aMatrix_Ortho_[MATRIX_RANGE] = {};
 		static const unsigned int u_iRange = 4;
 		float aMatrix_Model_[u_iRange][u_iRange] {};
-    
-    public:
+		Shader* _Shader_Program;
+
         CRenderSystem();
 		~CRenderSystem();
 
 		void LoadTextureData(ECS::CTextureComponent& _Texture);
 		void SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
-		void DrawAll(Core::TCConstVectorContainer<ECS::STransformComponent>* _tTransformContainer,
-					 Core::TCConstVectorContainer<ECS::CTextureComponent>* _tTextureContainer,
-					 Core::TCConstVectorContainer<ECS::SVertexComponent>* _pVertex_Container,
-					 Core::TCVectorContainer<unsigned int>* _pOrdered_Vertex_Container,
-					 Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container,
-					 Shader* _Shader_Program);
+		void Update(CComponentManager& _Component_Manager) override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
     };
 }

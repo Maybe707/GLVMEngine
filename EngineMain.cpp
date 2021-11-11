@@ -26,6 +26,7 @@ int main()
 	EntityManager.CreateEntity(u_iWitch);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
 	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
+	ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iWitch);
 	ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iWitch);
 	TextureWitch.iWidth_ = 32;
 	TextureWitch.iHeight_ = 32;
