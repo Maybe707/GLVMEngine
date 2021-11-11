@@ -5,7 +5,6 @@
 #include "GLPointer.h"
 #include "ShaderProgram.hpp"
 #include <iostream>
-#include "ConstVectorContainer.hpp"
 
 namespace GLVM::ECS
 {

@@ -1,7 +1,6 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
-#include "ConstVectorContainer.hpp"
 #include "VectorContainer.hpp"
 #include <iostream>
 #include "IContainer.hpp"
@@ -12,8 +11,8 @@ namespace GLVM::ECS
 	{
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
-		Core::TCConstVectorContainer<Core::IContainer*> tMain_Container_;
-		Core::TCConstVectorContainer<Core::IContainer*> tOrdered_Container_;
+		Core::TCVectorContainer<Core::IContainer*> tMain_Container_;
+		Core::TCVectorContainer<Core::IContainer*> tOrdered_Container_;
 		template <typename S>
 		unsigned int CreateComponentContainer()
 		{
@@ -23,12 +22,12 @@ namespace GLVM::ECS
 				return s_iLocal_ID;
 			s_iLocal_ID = s_iComponents_Container_ID;
 			s_bComponent_Container_Flag = true;
-			Core::TCConstVectorContainer<S>* pComponent_Container =
-				new Core::TCConstVectorContainer<S>;
-			tMain_Container_.Push(pComponent_Container, s_iComponents_Container_ID);
+			Core::TCVectorContainer<S>* pComponent_Container =
+				new Core::TCVectorContainer<S>;
+			tMain_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
 			Core::TCVectorContainer<unsigned int>* pOrdered_Indexes_Container =
 				new Core::TCVectorContainer<unsigned int>;
-			tOrdered_Container_.Push(pOrdered_Indexes_Container, s_iComponents_Container_ID);
+			tOrdered_Container_.Insert(pOrdered_Indexes_Container, s_iComponents_Container_ID);
 			++s_iComponents_Container_ID;
 			return s_iLocal_ID;
 		}
@@ -39,9 +38,9 @@ namespace GLVM::ECS
 			unsigned int u_iIndex; ///< Index for Main and Ordered containers.
 			S Component;
 			u_iIndex = CreateComponentContainer<S>();
-			static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[u_iIndex])->Push(Component, _u_iEntity);
+			static_cast<Core::TCVectorContainer<S>*>(tMain_Container_[u_iIndex])->Insert(Component, _u_iEntity);
 			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[u_iIndex])->Push(_u_iEntity);
-			return (*static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
+			return (*static_cast<Core::TCVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
 		}
 
 		template <typename S>
@@ -72,9 +71,9 @@ namespace GLVM::ECS
 	};
 
 	template <typename T>
-	Core::TCConstVectorContainer<T>* GetInnerMainContainer(ECS::CComponentManager& _Component_Manager)
+	Core::TCVectorContainer<T>* GetInnerMainContainer(ECS::CComponentManager& _Component_Manager)
 	{
-		return static_cast<Core::TCConstVectorContainer<T>*>(_Component_Manager.tMain_Container_[_Component_Manager.CreateComponentContainer<T>()]);
+		return static_cast<Core::TCVectorContainer<T>*>(_Component_Manager.tMain_Container_[_Component_Manager.CreateComponentContainer<T>()]);
 	}
 
 	template <typename T>

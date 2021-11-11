@@ -17,6 +17,7 @@ namespace GLVM::Core
 	public:
 		~TCVectorContainer();
 		void Push(const T _Item);
+		void Insert(const T _Item, const unsigned int _Index);
 		void RemoveItem(const T _Item);
 		void RemoveFirstItem();
 		T& GetItem(const T _Item);
@@ -59,6 +60,26 @@ namespace GLVM::Core
 		return;
 	}
 
+	template<typename T>
+	void TCVectorContainer<T>::Insert(const T _Item, const unsigned int _Index)
+	{
+		if(_Index >= iCapacity_)
+		{
+			unsigned int u_iTemp_Capacity = iCapacity_;
+			iCapacity_ = (_Index + 1);
+			T* aTemp_Vector_Container_ = new T[iCapacity_];
+
+			for(unsigned int j = 0; j < u_iTemp_Capacity; ++j)
+				aTemp_Vector_Container_[j] = aVector_Container_[j];
+
+			delete [] aVector_Container_;
+			aVector_Container_ = aTemp_Vector_Container_;
+		}
+
+		aVector_Container_[_Index] = _Item;
+		++iSize_;
+	}
+	
 	template<class T>
 	void TCVectorContainer<T>::RemoveItem(const T _Item)
 	{

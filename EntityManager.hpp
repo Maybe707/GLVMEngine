@@ -1,7 +1,6 @@
 #ifndef ENTITY_MANAGER
 #define ENTITY_MANAGER
 
-#include "ConstVectorContainer.hpp"
 #include "VectorContainer.hpp"
 #include "ComponentManager.hpp"
 
@@ -14,7 +13,7 @@ namespace GLVM::ECS
 	{
 		inline static Entity_Type_ID u_iType_ID_ = 0;		
  		Core::TCVectorContainer<Entity_Object_ID> tRemoved_Objects_Registry_;
-		Core::TCConstVectorContainer<Entity_Object_ID> tActive_Objects_Registry_;
+		Core::TCVectorContainer<Entity_Object_ID> tActive_Objects_Registry_;
 	public:
 		void CreateEntity(Entity_Object_ID& _Entity_Object_ID)
 		{

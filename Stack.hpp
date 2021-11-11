@@ -2,7 +2,6 @@
 #define STACK
 
 #include "Event.hpp"
-#include <iostream>
 
 namespace GLVM::Core
 {
@@ -53,13 +52,6 @@ namespace GLVM::Core
 
 			--iHead_;
 			aStack_[iHead_] = EEvents::eDEFAULT;
-		}
-
-		void Show()
-		{
-			for(int i = 0; i < iStack_Range_; ++i)
-				std::cout << aStack_[i] << std::endl;
-			std::cout << "Stack" << std::endl;
 		}
 
 		void ControlInput(CEvent& _eEvent)

@@ -1,7 +1,6 @@
 #ifndef MOVEMENT_SYSTEM
 #define MOVEMENT_SYSTEM
 
-#include "ConstVectorContainer.hpp"
 #include "Event.hpp"
 #include "TransformComponent.hpp"
 #include "VectorContainer.hpp"
@@ -18,9 +17,9 @@ namespace GLVM::ECS
 		Core::EEvents _Event;
 		void Update(ECS::CComponentManager& _Component_Manager) override
 		{
-			Core::TCConstVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerMainContainer<ECS::STransformComponent>(_Component_Manager);
+			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerMainContainer<ECS::STransformComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIndexContainer<ECS::SMoveComponent>(_Component_Manager);
-			Core::TCConstVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerMainContainer<ECS::SMoveComponent>(_Component_Manager);
+			Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerMainContainer<ECS::SMoveComponent>(_Component_Manager);
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
 				switch(_Event)

@@ -1,14 +1,11 @@
 #include "Engine.hpp"
 #include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
-#include "ConstVectorContainer.hpp"
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
 #include "VectorContainer.hpp"
 #include "VertexComponent.hpp"
-#include <iostream>
-#include <typeinfo>
 #include "IContainer.hpp"
 
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1

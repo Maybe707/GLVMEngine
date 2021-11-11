@@ -1,7 +1,6 @@
 #ifndef ANIMATION_SYSTEM
 #define ANIMATION_SYSTEM
 
-#include "ConstVectorContainer.hpp"
 #include "Event.hpp"
 #include "VectorContainer.hpp"
 #include "VertexData.hpp"
@@ -42,7 +41,7 @@ namespace GLVM::ECS
 		
 		void Update(CComponentManager& _Component_Manager) override
 		{
-			Core::TCConstVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerMainContainer<SVertexComponent>(_Component_Manager);
+			Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerMainContainer<SVertexComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Animation_Move_Container = GetInnerIndexContainer<SAnimationMoveComponent>(_Component_Manager);
 			for(int i = 0, iSize = _pOrdered_Animation_Move_Container->GetSize(); i < iSize; ++i)
 			{

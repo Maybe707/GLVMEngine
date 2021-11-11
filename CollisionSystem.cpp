@@ -37,9 +37,9 @@ namespace GLVM::ECS
 
 	void CCollisionSystem::Update(CComponentManager& _Component_Manager)
 	{
-		Core::TCConstVectorContainer<STransformComponent>* _pTransform_Components_Container = GetInnerMainContainer<STransformComponent>(_Component_Manager);
+		Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = GetInnerMainContainer<STransformComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container = GetInnerIndexContainer<CColliderComponent>(_Component_Manager);
-		Core::TCConstVectorContainer<SMoveComponent>* _pMove_Components_Container = GetInnerMainContainer<SMoveComponent>(_Component_Manager);
+		Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = GetInnerMainContainer<SMoveComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container = GetInnerIndexContainer<SMoveComponent>(_Component_Manager);
 		for(int i = 0, iSize = pOrdered_Colliders_Container->GetSize(); i < iSize; ++i)
 		{

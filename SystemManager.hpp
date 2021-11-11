@@ -2,7 +2,6 @@
 #define SYSTEM_MANAGER
 
 #include "ComponentManager.hpp"
-#include "ConstVectorContainer.hpp"
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
 

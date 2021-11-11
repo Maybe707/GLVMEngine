@@ -8,7 +8,6 @@
 #include "VectorContainer.hpp"
 #include "VertexComponent.hpp"
 #include "ComponentManager.hpp"
-#include "ConstVectorContainer.hpp"
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
 #include <GL/glext.h>

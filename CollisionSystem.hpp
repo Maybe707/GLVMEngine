@@ -2,7 +2,6 @@
 #define COLLISION_SYSTEM
 
 #include "VectorContainer.hpp"
-#include "ConstVectorContainer.hpp"
 #include "TransformComponent.hpp"
 #include "ISystem.hpp"
 #include "Event.hpp"

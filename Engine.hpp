@@ -26,7 +26,6 @@
 #include <GL/glext.h>
 #include "VertexData.hpp"
 #include "MovementSystem.hpp"
-#include "ConstVectorContainer.hpp"
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
 #include "VertexComponent.hpp"
