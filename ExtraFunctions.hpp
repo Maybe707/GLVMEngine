@@ -57,7 +57,7 @@ namespace GLVM::Extra
 	};
 
 	template<typename T>
-	ETypes TypeAveluator(T _Value)
+	ETypes TypeEvaluator(T _Value)
 	{
 		switch(STypes<T>::eType)
 		{
