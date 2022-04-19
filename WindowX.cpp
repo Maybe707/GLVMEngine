@@ -139,7 +139,7 @@ namespace GLVM::Core
     bool CWindowX::HandleEvent(CEvent& _Event)
     {
         XEvent uXEvent;
-		
+
         while(XPending(pDisp_))
         {
             XNextEvent(pDisp_, &uXEvent);
@@ -179,18 +179,26 @@ namespace GLVM::Core
 						uXNext_Event.xkey.keycode == uXEvent.xkey.keycode)
 					{
 						///< Key wasn’t actually released
+                        XNextEvent(pDisp_, &uXNext_Event);
 						continue;
 					}
 				}
 		    	ulKey = XLookupKeysym(&uXEvent.xkey, 0);
-			 	if(ulKey == XK_a)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_A);
-				if(ulKey == XK_d)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_D);
-				if(ulKey == XK_s)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_S);
-				if(ulKey == XK_w)
-			 		_Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
+                switch(ulKey)
+                {
+                case XK_a:
+                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_A);
+                    break;
+                case XK_d:
+                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_D);
+                    break;
+                case XK_s:
+                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_S);
+                    break;
+                case XK_w:
+                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
+                    break;
+                }
 				break;
 			}
 			return true;

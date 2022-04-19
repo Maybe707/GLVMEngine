@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
+#include "ComponentManager.hpp"
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
@@ -39,8 +40,6 @@ namespace GLVM::Core
 		delete System_Manager;
 		System_Manager = nullptr;
 	}
-
-
 	
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
@@ -54,18 +53,23 @@ namespace GLVM::Core
 		System_Manager->ActivateSystem(&Collision_System);
 		System_Manager->ActivateSystem(&Animation_System);
 		System_Manager->ActivateSystem(Renderer_System);
-		
+
 		while(bGame_Loop_Active)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
 			dDelta_Time_ *= 200;
 			Chrono_->Reset();
 
+            // Core::TCVectorContainer<ECS::STransformComponent>* _tTransformContainer = GetInnerMainContainer<ECS::STransformComponent>(_ComponentManager);
+            // Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<ECS::CTextureComponent>(_ComponentManager);
+            
+            // (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += std::fmod(dDelta_Time_, 360);
+            // std::cout << (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate << std::endl;
+            
 			Window_->ClearDisplay();
 			Shader_Program->Use();
 			Shader_Program->SetUniformID();
 			Renderer_System->SetProjectionMatrix(Shader_Program);
-			
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
@@ -77,8 +81,8 @@ namespace GLVM::Core
 			Movement_System->_dOffset = dDelta_Time_;
 			Movement_System->_Event = Event_.GetEvent();
 			Collision_System._dDelta_Time = dDelta_Time_;
-			// Animation_System.eEvent_ = Input_Stack_.Pop();
-			// Animation_System.Delta_Time = dDelta_Time_;
+			Animation_System.eEvent_ = Input_Stack_.Pop();
+			Animation_System.Delta_Time = dDelta_Time_;
 			Renderer_System->_Shader_Program = Shader_Program;
 			
 			System_Manager->Update(_ComponentManager);

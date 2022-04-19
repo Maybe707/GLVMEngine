@@ -128,21 +128,24 @@ namespace GLVM::ECS
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
             SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);
-            
+            (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
-			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-            if(i == 0)
-            {
-                Matrix<float, 4> temp(1.0f);
-                temp = SetRotate<float, 4>(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);
 
-                aMatrix_Model_[u_iRange-LIMITER][0] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_X;
-                aMatrix_Model_[u_iRange-LIMITER][1] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Y;
-                aMatrix_Model_[u_iRange-LIMITER][2] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Z;
-                temp = temp * aMatrix_Model_;
-                unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-                pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &temp[0][0]);
-            }
+			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
+            // if(i == 0)
+            // {
+            //     Matrix<float, 4> temp(1.0f);
+            //     temp = SetRotate<float, 4>(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);
+
+            //     // aMatrix_Model_[u_iRange-LIMITER][0] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_X;
+            //     // aMatrix_Model_[u_iRange-LIMITER][1] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Y;
+            //     // aMatrix_Model_[u_iRange-LIMITER][2] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Z;
+            //     temp = temp * aMatrix_Model_;
+            //     unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
+            //     pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &temp[0][0]);
+            // }
+            if(i == 0)
+                SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
 			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
@@ -174,13 +177,15 @@ namespace GLVM::ECS
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, *aMatrix_Ortho_);
 	}
 
-    template<class T, int var>
-	Matrix<T, var> CRenderSystem::SetRotate(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
+	void CRenderSystem::SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
         Matrix<float, 4> trans(2.0f);
-        trans = Rotate(trans, Vector<float, 4>(1.0, 1.0, 1.0f, 1.0f), _transform_Component.fPos_X);
-
-        return trans;
+        trans = Rotate(trans, Vector<float, 4>(1.0, 1.0, 1.0f, 1.0f), _transform_Component.fRotate);
+        trans = aMatrix_Model_ * trans;
+        std::cout << _transform_Component.fRotate << std::endl;
+        unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &trans[0][0]);
+//        _transform_Component.fRotate = 0;
 	}
     
     void CRenderSystem::SetViewMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
@@ -189,8 +194,8 @@ namespace GLVM::ECS
         aMatrix_View_[1][1] = 1.0;
         aMatrix_View_[2][2] = 1.0;
         aMatrix_View_[3][3] = 1.0;
-//        aMatrix_View_[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
-//        aMatrix_View_[u_iRange-LIMITER][1] = -_transform_Component.fPos_Y;
+        aMatrix_View_[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
+        aMatrix_View_[u_iRange-LIMITER][1] = -_transform_Component.fPos_Y;
 //        aMatrix_View_[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z;
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, *aMatrix_View_);

@@ -60,8 +60,7 @@ namespace GLVM::ECS
 		void SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
 		void Update(CComponentManager& _Component_Manager) override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
-        template<class T, int var>
-        Matrix<T, var> SetRotate(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
+        void SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
     };
 }

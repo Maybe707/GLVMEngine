@@ -23,6 +23,7 @@ int main()
 	TransformPlayer.fPos_X = 50;
 	TransformPlayer.fPos_Y = 30;
 	TransformPlayer.fPos_Z = 200;
+    TransformPlayer.fRotate = 120;
     
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);

@@ -8,6 +8,7 @@ namespace GLVM::ECS
 		float fPos_X;
 		float fPos_Y;
 		float fPos_Z;
+        float fRotate = 0;
 	};
 }
 
