@@ -17,7 +17,7 @@ namespace GLVM::ECS
 	public:
 		void CreateEntity(Entity_ID& _Entity_ID)
 		{
-			if(tRemoved_Entity_Registry_.GetSize() > k_iNull)
+			if(tRemoved_Entity_Registry_.GetSize() > k_iNull)    ///< Check out wether or not free ID in removed entities registry.
 			{
 				_Entity_ID = tRemoved_Entity_Registry_.GetFirstItem();
 				tActive_Entity_Registry_.Push(tRemoved_Entity_Registry_.GetFirstItem());
@@ -30,14 +30,16 @@ namespace GLVM::ECS
 				++u_iID;
 			}
 		}
-        
-        ///< Dont need to delete real component in this method. Because systems dont work with component without indices for
-        ///< that component in ordered container.
+
+        /**************************************************************************************
+         * Dont need to delete real component in this method. Because systems dont work with
+         * component without indices forthat component in ordered container.
+         **************************************************************************************/
         
 		void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager& _ComponentManager)
 		{
 			tRemoved_Entity_Registry_.Push(_Entity_ID);
-			tActive_Entity_Registry_[_Entity_ID - 1] = k_iUint_Max;
+			tActive_Entity_Registry_[_Entity_ID - 1] = k_iUint_Max;    ///< Minus 1 because of starting value of u_iID.
 			for(int i = 0, iSize = _ComponentManager.tWorld_IDs_Container.GetSize();
 				i < iSize; ++i)
 			{

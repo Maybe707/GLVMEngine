@@ -16,21 +16,25 @@ namespace GLVM::ECS
 		Core::TCVectorContainer<Core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
 		Core::TCVectorContainer<Core::TCVectorContainer<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
         
-		template <typename Component_Type>    ///<  S - is a type of component.
+		template <typename Component_Type>
 		unsigned int CreateComponentContainer()
 		{
 			static unsigned int s_iLocal_Container_ID = 0;
 			static bool s_bExist_Component_Container_Flag = false;
 			if(s_bExist_Component_Container_Flag)    ///< If already had containers for that type - just return local index. 
 				return s_iLocal_Container_ID;
-			s_iLocal_Container_ID = s_iComponents_Container_ID;
+            
+			s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
 			s_bExist_Component_Container_Flag = true;
+            
 			Core::TCVectorContainer<Component_Type>* pComponent_Container =
-				new Core::TCVectorContainer<Component_Type>;
+				new Core::TCVectorContainer<Component_Type>;    ///< Create component container of current type.
 			tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
+            
 			Core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
-				new Core::TCVectorContainer<Entity_ID>;
+				new Core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
 			tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
+            
 			++s_iComponents_Container_ID;
 			return s_iLocal_Container_ID;
 		}
@@ -46,8 +50,10 @@ namespace GLVM::ECS
 			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iIndex]))[_u_iEntity];
 		}
 
-        ///< Dont need to delete real component in this method. Because systems dont work with component without indices for
-        ///< that component in ordered container.
+        /**************************************************************************************
+         * Dont need to delete real component in this method. Because systems dont work with
+         * component without indices forthat component in ordered container.
+         **************************************************************************************/
         
 		template <typename Component_Type>
 		void RemoveComponent(unsigned int& _u_iEntity)
