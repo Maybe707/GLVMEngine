@@ -11,30 +11,34 @@ namespace GLVM::ECS
 {
 	class CEntityManager
 	{
-		inline static Entity_Type_ID u_iType_ID_ = 0;		
- 		Core::TCVectorContainer<Entity_Object_ID> tRemoved_Objects_Registry_;
-		Core::TCVectorContainer<Entity_Object_ID> tActive_Objects_Registry_;
+    public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
+		inline static Entity_Type_ID u_iType_ID_ = 1;		
+ 		Core::TCVectorContainer<Entity_Object_ID> tRemoved_Entity_Registry_;
+		Core::TCVectorContainer<Entity_Object_ID> tActive_Entity_Registry_;
 	public:
 		void CreateEntity(Entity_Object_ID& _Entity_Object_ID)
 		{
-			if(tRemoved_Objects_Registry_.GetSize() > k_iNull)
+			if(tRemoved_Entity_Registry_.GetSize() > k_iNull)
 			{
-				_Entity_Object_ID = tRemoved_Objects_Registry_.GetFirstItem();
-				tActive_Objects_Registry_.Push(tRemoved_Objects_Registry_.GetFirstItem());
-				tRemoved_Objects_Registry_.RemoveFirstItem();
+				_Entity_Object_ID = tRemoved_Entity_Registry_.GetFirstItem();
+				tActive_Entity_Registry_.Push(tRemoved_Entity_Registry_.GetFirstItem());
+				tRemoved_Entity_Registry_.RemoveFirstItem();
 			}
 			else
 			{
-				tActive_Objects_Registry_.Push(u_iType_ID_);
+				tActive_Entity_Registry_.Push(u_iType_ID_);
 				_Entity_Object_ID = u_iType_ID_;
 				++u_iType_ID_;
 			}
 		}
-		
+
+        ///< Dont need to delete real component in this method. Because systems dont work with component without indices for
+        ///< that component in ordered container.
+        
 		void RemoveEntity(Entity_Object_ID& _Entity_Object_ID, CComponentManager& _ComponentManager)
 		{
-			tRemoved_Objects_Registry_.Push(_Entity_Object_ID);
-			tActive_Objects_Registry_[_Entity_Object_ID] = k_iUint_Max;
+			tRemoved_Entity_Registry_.Push(_Entity_Object_ID);
+			tActive_Entity_Registry_[_Entity_Object_ID - 1] = k_iUint_Max;
 			for(int i = 0, iSize = _ComponentManager.tOrdered_Container_.GetSize();
 				i < iSize; ++i)
 			{

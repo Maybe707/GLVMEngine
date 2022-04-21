@@ -10,7 +10,7 @@ namespace GLVM::ECS
 	class CComponentManager
 	{
 	public:
-		inline static unsigned int s_iComponents_Container_ID = 0;
+		inline static unsigned int s_iComponents_Container_ID = 1;
 		Core::TCVectorContainer<Core::IContainer*> tMain_Container_;
 		Core::TCVectorContainer<Core::IContainer*> tOrdered_Container_;
 		template <typename S>
@@ -43,6 +43,9 @@ namespace GLVM::ECS
 			return (*static_cast<Core::TCVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
 		}
 
+        ///< Dont need to delete real component in this method. Because systems dont work with component without indices for
+        ///< that component in ordered container.
+        
 		template <typename S>
 		void RemoveComponent(unsigned int& _u_iEntity)
 		{

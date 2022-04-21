@@ -3,6 +3,7 @@
 
 #include "Constants.hpp"
 #include "IContainer.hpp"
+#include <iostream>
 
 namespace GLVM::Core
 {
@@ -27,8 +28,9 @@ namespace GLVM::Core
 		int GetSize();
 		int GetCapacity();
 		T& operator[](const unsigned int _iIndex);
+        void Print();
 	};
-
+    
 	template<class T>
 	TCVectorContainer<T>::~TCVectorContainer()
 	{
@@ -36,6 +38,8 @@ namespace GLVM::Core
 		aVector_Container_ = nullptr;
 	}
 
+    ///< Push element on top of the container.
+    
 	template<class T>
 	void TCVectorContainer<T>::Push(const T _Item)
 	{
@@ -60,13 +64,15 @@ namespace GLVM::Core
 		return;
 	}
 
+    ///< Insert element into chosen cell.
+    
 	template<typename T>
 	void TCVectorContainer<T>::Insert(const T _Item, const unsigned int _Index)
 	{
 		if(_Index >= iCapacity_)
 		{
 			unsigned int u_iTemp_Capacity = iCapacity_;
-			iCapacity_ = (_Index + 1);
+			iCapacity_ = (_Index + iExpander_);
 			T* aTemp_Vector_Container_ = new T[iCapacity_];
 
 			for(unsigned int j = 0; j < u_iTemp_Capacity; ++j)
@@ -169,6 +175,15 @@ namespace GLVM::Core
 	{
 		return aVector_Container_[_iIndex];
 	}
+
+    template<class T>
+    void TCVectorContainer<T>::Print()
+    {
+        for(int i = 0; i < iCapacity_; ++i)
+            std::cout << aVector_Container_[i] << std::endl;
+
+        std::cout << "End of container" << std::endl;
+    }
 }
     
 #endif 

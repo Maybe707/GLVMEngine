@@ -182,7 +182,7 @@ namespace GLVM::ECS
         Matrix<float, 4> trans(2.0f);
         trans = Rotate(trans, Vector<float, 4>(1.0, 1.0, 1.0f, 1.0f), _transform_Component.fRotate);
         trans = aMatrix_Model_ * trans;
-        std::cout << _transform_Component.fRotate << std::endl;
+
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &trans[0][0]);
 //        _transform_Component.fRotate = 0;

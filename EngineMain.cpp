@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "MoveComponent.hpp"
 #include "SpritesData.hpp"
 
 int main()
@@ -15,8 +16,6 @@ int main()
 	ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
-    // TexturePlayer.iWidth_ = 64;
-	// TexturePlayer.iHeight_ = 64;
 	TexturePlayer.u_iData_ = chelik_dat;
 	GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.CreateComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
@@ -24,7 +23,10 @@ int main()
 	TransformPlayer.fPos_Y = 30;
 	TransformPlayer.fPos_Z = 200;
     TransformPlayer.fRotate = 120;
-    
+//    EntityManager.tActive_Entity_Registry_.Print();
+    // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
+    // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
+
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
@@ -39,7 +41,8 @@ int main()
 	TransformWitch.fPos_X = 190;
 	TransformWitch.fPos_Y = 190;
 	TransformWitch.fPos_Z = 190;
-//	EntityManager.RemoveEntity(u_iWitch, ComponentManager);
+	// EntityManager.RemoveEntity(u_iWitch, ComponentManager);
+    // EntityManager.tActive_Entity_Registry_.Print();    
 
 	Entity u_iWitch2 = 0;
 	EntityManager.CreateEntity(u_iWitch2);
