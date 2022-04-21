@@ -5,52 +5,55 @@
 #include <iostream>
 #include "IContainer.hpp"
 
+typedef unsigned int Entity_ID;
+
 namespace GLVM::ECS
 {
 	class CComponentManager
 	{
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 1;
-		Core::TCVectorContainer<Core::IContainer*> tMain_Container_;
-		Core::TCVectorContainer<Core::IContainer*> tOrdered_Container_;
-		template <typename S>
+		Core::TCVectorContainer<Core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
+		Core::TCVectorContainer<Core::TCVectorContainer<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
+        
+		template <typename Component_Type>    ///<  S - is a type of component.
 		unsigned int CreateComponentContainer()
 		{
-			static unsigned int s_iLocal_ID = 0;
-			static bool s_bComponent_Container_Flag = false;
-			if(s_bComponent_Container_Flag)
-				return s_iLocal_ID;
-			s_iLocal_ID = s_iComponents_Container_ID;
-			s_bComponent_Container_Flag = true;
-			Core::TCVectorContainer<S>* pComponent_Container =
-				new Core::TCVectorContainer<S>;
-			tMain_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
-			Core::TCVectorContainer<unsigned int>* pOrdered_Indexes_Container =
-				new Core::TCVectorContainer<unsigned int>;
-			tOrdered_Container_.Insert(pOrdered_Indexes_Container, s_iComponents_Container_ID);
+			static unsigned int s_iLocal_Container_ID = 0;
+			static bool s_bExist_Component_Container_Flag = false;
+			if(s_bExist_Component_Container_Flag)    ///< If already had containers for that type - just return local index. 
+				return s_iLocal_Container_ID;
+			s_iLocal_Container_ID = s_iComponents_Container_ID;
+			s_bExist_Component_Container_Flag = true;
+			Core::TCVectorContainer<Component_Type>* pComponent_Container =
+				new Core::TCVectorContainer<Component_Type>;
+			tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
+			Core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
+				new Core::TCVectorContainer<Entity_ID>;
+			tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
 			++s_iComponents_Container_ID;
-			return s_iLocal_ID;
+			return s_iLocal_Container_ID;
 		}
 
-		template <typename S>
-		S& CreateComponent(unsigned int& _u_iEntity)
+		template <typename Component_Type>
+		Component_Type& CreateComponent(unsigned int& _u_iEntity)
 		{
-			unsigned int u_iIndex; ///< Index for Main and Ordered containers.
-			S Component;
-			u_iIndex = CreateComponentContainer<S>();
-			static_cast<Core::TCVectorContainer<S>*>(tMain_Container_[u_iIndex])->Insert(Component, _u_iEntity);
-			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[u_iIndex])->Push(_u_iEntity);
-			return (*static_cast<Core::TCVectorContainer<S>*>(tMain_Container_[u_iIndex]))[_u_iEntity];
+			unsigned int u_iIndex; ///< Index for world components and world ID's containers.
+			Component_Type Component;
+			u_iIndex = CreateComponentContainer<Component_Type>();
+			static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iIndex])->Insert(Component, _u_iEntity);
+			static_cast<Core::TCVectorContainer<unsigned int>*>(tWorld_IDs_Container[u_iIndex])->Push(_u_iEntity);
+			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iIndex]))[_u_iEntity];
 		}
 
         ///< Dont need to delete real component in this method. Because systems dont work with component without indices for
         ///< that component in ordered container.
         
-		template <typename S>
+		template <typename Component_Type>
 		void RemoveComponent(unsigned int& _u_iEntity)
 		{
-//			static_cast<Core::TCConstVectorContainer<S>*>(tMain_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
-			static_cast<Core::TCVectorContainer<unsigned int>*>(tOrdered_Container_[CreateComponentContainer<S>()])->RemoveItem(_u_iEntity);
+//			static_cast<Core::TCConstVectorContainer<S>*>(tWorld_Components_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
+			static_cast<Core::TCVectorContainer<unsigned int>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
 		}
 		
 		unsigned int GetContainerID()
@@ -60,29 +63,29 @@ namespace GLVM::ECS
 		
 		~CComponentManager()
 		{
-			for(int i = 0, iSize_Main = tMain_Container_.GetSize(); i < iSize_Main; ++i)
+			for(int i = 0, iSize_Main = tWorld_Components_Container_.GetSize(); i < iSize_Main; ++i)
 			{
-				delete tMain_Container_[i];
-				tMain_Container_[i] = nullptr;
+				delete tWorld_Components_Container_[i];
+				tWorld_Components_Container_[i] = nullptr;
 			}
-			for(int j = 0, iSize_Ordered = tOrdered_Container_.GetSize(); j < iSize_Ordered; ++j)
+			for(int j = 0, iSize_Ordered = tWorld_IDs_Container.GetSize(); j < iSize_Ordered; ++j)
 			{
-				delete tOrdered_Container_[j];
-				tOrdered_Container_[j] = nullptr;
+				delete tWorld_IDs_Container[j];
+				tWorld_IDs_Container[j] = nullptr;
 			}
 		}
 	};
 
-	template <typename T>
-	Core::TCVectorContainer<T>* GetInnerMainContainer(ECS::CComponentManager& _Component_Manager)
+	template <typename Component_Type>
+	Core::TCVectorContainer<Component_Type>* GetInnerComponentContainer(ECS::CComponentManager& _Component_Manager)
 	{
-		return static_cast<Core::TCVectorContainer<T>*>(_Component_Manager.tMain_Container_[_Component_Manager.CreateComponentContainer<T>()]);
+		return static_cast<Core::TCVectorContainer<Component_Type>*>(_Component_Manager.tWorld_Components_Container_[_Component_Manager.CreateComponentContainer<Component_Type>()]);
 	}
 
-	template <typename T>
-	Core::TCVectorContainer<unsigned int>* GetInnerIndexContainer(ECS::CComponentManager& _Component_Manager)
+	template <typename Component_Type>
+	Core::TCVectorContainer<Entity_ID>* GetInnerIDsContainer(ECS::CComponentManager& _Component_Manager)
 	{
-		return static_cast<Core::TCVectorContainer<unsigned int>*>(_Component_Manager.tOrdered_Container_[_Component_Manager.CreateComponentContainer<T>()]);
+		return static_cast<Core::TCVectorContainer<Entity_ID>*>(_Component_Manager.tWorld_IDs_Container[_Component_Manager.CreateComponentContainer<Component_Type>()]);
 }
 
 }

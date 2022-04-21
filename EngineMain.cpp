@@ -27,6 +27,7 @@ int main()
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
     // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
 
+    
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iWitch);

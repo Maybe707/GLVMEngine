@@ -17,9 +17,9 @@ namespace GLVM::ECS
 		Core::EEvents _Event;
 		void Update(ECS::CComponentManager& _Component_Manager) override
 		{
-			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerMainContainer<ECS::STransformComponent>(_Component_Manager);
-			Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIndexContainer<ECS::SMoveComponent>(_Component_Manager);
-			Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerMainContainer<ECS::SMoveComponent>(_Component_Manager);
+			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerComponentContainer<ECS::STransformComponent>(_Component_Manager);
+			Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIDsContainer<ECS::SMoveComponent>(_Component_Manager);
+			Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerComponentContainer<ECS::SMoveComponent>(_Component_Manager);
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
 				switch(_Event)
