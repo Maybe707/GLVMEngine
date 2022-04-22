@@ -39,7 +39,7 @@ namespace GLVM::ECS
 		void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager& _ComponentManager)
 		{
 			tRemoved_Entity_Registry_.Push(_Entity_ID);
-			tActive_Entity_Registry_[_Entity_ID - 1] = k_iUint_Max;    ///< Minus 1 because of starting value of u_iID.
+			tActive_Entity_Registry_[_Entity_ID - 1] = k_iUint_Max;    ///< Minus 1 because the value of u_iID started from 1.
 			for(int i = 0, iSize = _ComponentManager.tWorld_IDs_Container.GetSize();
 				i < iSize; ++i)
 			{

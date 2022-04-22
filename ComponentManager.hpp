@@ -1,9 +1,13 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
+#include "AnimationMoveComponent.hpp"
+#include "ColliderComponent.hpp"
+#include "MoveComponent.hpp"
 #include "VectorContainer.hpp"
 #include <iostream>
 #include "IContainer.hpp"
+#include "VertexComponent.hpp"
 
 typedef unsigned int Entity_ID;
 
@@ -51,6 +55,31 @@ namespace GLVM::ECS
 			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
+        void CreateComponentSet(Entity_ID& _u_IEntity, bool* _pComponent_Bit_Set, int _iBit_Set_Range)
+        {
+            for(int i = 0; i < _iBit_Set_Range; ++i)    ///< i - component type index.
+            {
+                if(_pComponent_Bit_Set[i] == true)
+                {
+                    switch(i)
+                    {
+                    case 0:
+                        CreateComponent<SVertexComponent>(_u_IEntity);
+                        break;
+                    case 3:
+                        CreateComponent<SMoveComponent>(_u_IEntity);
+                        break;
+                    case 5:
+                        CreateComponent<CColliderComponent>(_u_IEntity);
+                        break;
+                    case 7:
+                        CreateComponent<SAnimationMoveComponent>(_u_IEntity);
+                        break;
+                    }
+                }
+            }
+        }
+        
         /**************************************************************************************
          * Dont need to delete real component in this method. Because systems dont work with
          * component without indices forthat component in ordered container.
