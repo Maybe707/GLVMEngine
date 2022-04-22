@@ -121,10 +121,10 @@ namespace GLVM::ECS
 
 	void CRenderSystem::Update(CComponentManager& _Component_Manager)
 	{
-		Core::TCVectorContainer<STransformComponent>* _tTransformContainer = GetInnerMainContainer<STransformComponent>(_Component_Manager);
-		Core::TCVectorContainer<CTextureComponent>* _tTextureContainer = GetInnerMainContainer<CTextureComponent>(_Component_Manager);
-		Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerMainContainer<SVertexComponent>(_Component_Manager);
-		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<CTextureComponent>(_Component_Manager);
+		Core::TCVectorContainer<STransformComponent>* _tTransformContainer = GetInnerComponentContainer<STransformComponent>(_Component_Manager);
+		Core::TCVectorContainer<CTextureComponent>* _tTextureContainer = GetInnerComponentContainer<CTextureComponent>(_Component_Manager);
+		Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
+		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIDsContainer<CTextureComponent>(_Component_Manager);
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
             SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);

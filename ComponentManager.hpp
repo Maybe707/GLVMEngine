@@ -8,6 +8,7 @@
 #include <iostream>
 #include "IContainer.hpp"
 #include "VertexComponent.hpp"
+#include <cassert>
 
 typedef unsigned int Entity_ID;
 
@@ -25,9 +26,9 @@ namespace GLVM::ECS
 		{
 			static unsigned int s_iLocal_Container_ID = 0;
 			static bool s_bExist_Component_Container_Flag = false;
-			if(s_bExist_Component_Container_Flag)    ///< If already had containers for that type - just return local index. 
+			if(s_bExist_Component_Container_Flag)  
 				return s_iLocal_Container_ID;
-            
+                                                                                                                
 			s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
 			s_bExist_Component_Container_Flag = true;
             
@@ -44,52 +45,38 @@ namespace GLVM::ECS
 		}
         
 		template <typename Component_Type>
-		Component_Type& CreateComponent(Entity_ID& _u_iEntity)
+		Component_Type& CreateComponent(const Entity_ID& _u_iEntity)
 		{
-			unsigned int u_iLocal_Container_ID; ///< Index for world components and world ID's containers.
+			unsigned int u_iLocal_Container_ID = 0; ///< Index for world components and world ID's containers.
 			Component_Type Component;
 			u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
-            
+
 			static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
 			static_cast<Core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
 			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
+        /// Allow to give a various components to chosen entity.
+        
         template <typename Component_Type, typename Component_Type2, typename... Args>
 		void CreateComponent(Entity_ID& _u_iEntity)
 		{
             CreateComponent<Component_Type2, Args...>(_u_iEntity);
             CreateComponent<Component_Type>(_u_iEntity);
         }
-        
-        // void CreateComponentSet(Entity_ID& _u_IEntity, bool* _pComponent_Bit_Set, int _iBit_Set_Range)
-        // {
-        //     for(int i = 0; i < _iBit_Set_Range; ++i)    ///< i - component type index.
-        //     {
-        //         if(_pComponent_Bit_Set[i] == true)
-        //         {
-        //             switch(i)
-        //             {
-        //             case 0:
-        //                 CreateComponent<SVertexComponent>(_u_IEntity);
-        //                 break;
-        //             case 3:
-        //                 CreateComponent<SMoveComponent>(_u_IEntity);
-        //                 break;
-        //             case 5:
-        //                 CreateComponent<CColliderComponent>(_u_IEntity);
-        //                 break;
-        //             case 7:
-        //                 CreateComponent<SAnimationMoveComponent>(_u_IEntity);
-        //                 break;
-        //             }
-        //         }
-        //     }
-        // }
+
+        template <typename Component_Type>
+        Component_Type& GetComponent(const Entity_ID& _u_iEntity)
+        {
+            unsigned int u_iLocal_Container_ID;
+            u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
+            assert(u_iLocal_Container_ID > 0);
+            return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
+        }
         
         /**************************************************************************************
          * Dont need to delete real component in this method. Because systems dont work with
-         * component without indices forthat component in ordered container.
+         * component without indices for that component in ordered container.
          **************************************************************************************/
         
 		template <typename Component_Type>

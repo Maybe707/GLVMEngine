@@ -37,10 +37,10 @@ namespace GLVM::ECS
 
 	void CCollisionSystem::Update(CComponentManager& _Component_Manager)
 	{
-		Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = GetInnerMainContainer<STransformComponent>(_Component_Manager);
-		Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container = GetInnerIndexContainer<CColliderComponent>(_Component_Manager);
-		Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = GetInnerMainContainer<SMoveComponent>(_Component_Manager);
-		Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container = GetInnerIndexContainer<SMoveComponent>(_Component_Manager);
+		Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = GetInnerComponentContainer<STransformComponent>(_Component_Manager);
+		Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container = GetInnerIDsContainer<CColliderComponent>(_Component_Manager);
+		Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = GetInnerComponentContainer<SMoveComponent>(_Component_Manager);
+		Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container = GetInnerIDsContainer<SMoveComponent>(_Component_Manager);
 		for(int i = 0, iSize = pOrdered_Colliders_Container->GetSize(); i < iSize; ++i)
 		{
 			for(int j = 0,iSize_Iner = (pOrdered_Colliders_Container->GetSize()); j < iSize_Iner; ++j)
