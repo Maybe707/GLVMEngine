@@ -1,3 +1,5 @@
+#include "AnimationMoveComponent.hpp"
+#include "ColliderComponent.hpp"
 #include "Engine.hpp"
 #include "MoveComponent.hpp"
 #include "SpritesData.hpp"
@@ -9,13 +11,14 @@ int main()
 	GLVM::ECS::CComponentManager ComponentManager;
 	Entity u_iPlayer = 0;
 	EntityManager.CreateEntity(u_iPlayer);
-    bool bComponent_Bit_Set[8] = {true, false, false, true, false, true, false, true};
-    ComponentManager.CreateComponentSet(u_iPlayer, bComponent_Bit_Set, 8);
-//	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
+//    bool bComponent_Bit_Set[8] = {true, false, false, true, false, true, false, true};
+//    ComponentManager.CreateComponentSet(u_iPlayer, bComponent_Bit_Set, 8);
+	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
 	GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
 	TexturePlayer.u_iData_ = chelik_dat;
