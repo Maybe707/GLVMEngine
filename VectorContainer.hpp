@@ -38,7 +38,7 @@ namespace GLVM::Core
 		aVector_Container_ = nullptr;
 	}
 
-    ///< Push element on top of the container.
+    /// Push element on top of the container.
     
 	template<class T>
 	void TCVectorContainer<T>::Push(const T _Item)
@@ -64,7 +64,7 @@ namespace GLVM::Core
 		return;
 	}
 
-    ///< Insert element into chosen cell.
+    /// Insert element into chosen cell.
     
 	template<typename T>
 	void TCVectorContainer<T>::Insert(const T _Item, const unsigned int _Index)

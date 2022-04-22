@@ -40,14 +40,15 @@ namespace GLVM::ECS
 		}
 
 		template <typename Component_Type>
-		Component_Type& CreateComponent(unsigned int& _u_iEntity)
+		Component_Type& CreateComponent(Entity_ID& _u_iEntity)
 		{
-			unsigned int u_iIndex; ///< Index for world components and world ID's containers.
+			unsigned int u_iLocal_Container_ID; ///< Index for world components and world ID's containers.
 			Component_Type Component;
-			u_iIndex = CreateComponentContainer<Component_Type>();
-			static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iIndex])->Insert(Component, _u_iEntity);
-			static_cast<Core::TCVectorContainer<unsigned int>*>(tWorld_IDs_Container[u_iIndex])->Push(_u_iEntity);
-			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iIndex]))[_u_iEntity];
+			u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
+            
+			static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
+			static_cast<Core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
+			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
         /**************************************************************************************
@@ -56,10 +57,10 @@ namespace GLVM::ECS
          **************************************************************************************/
         
 		template <typename Component_Type>
-		void RemoveComponent(unsigned int& _u_iEntity)
+		void RemoveComponent(Entity_ID& _u_iEntity)
 		{
 //			static_cast<Core::TCConstVectorContainer<S>*>(tWorld_Components_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
-			static_cast<Core::TCVectorContainer<unsigned int>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
+			static_cast<Core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
 		}
 		
 		unsigned int GetContainerID()
