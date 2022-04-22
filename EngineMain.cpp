@@ -26,7 +26,6 @@ int main()
 //    EntityManager.tActive_Entity_Registry_.Print();
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
     // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-
     
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);
