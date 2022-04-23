@@ -31,6 +31,7 @@
 #include "VertexComponent.hpp"
 #include "AnimationMoveComponent.hpp"
 #include "SystemManager.hpp"
+#include "ViewComponent.hpp"
 
 using Entity = unsigned int;
 

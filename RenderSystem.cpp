@@ -3,6 +3,7 @@
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
 #include "VertexComponent.hpp"
+#include "ViewComponent.hpp"
 #include <GL/gl.h>
 #include <cmath>
 
@@ -124,26 +125,19 @@ namespace GLVM::ECS
 		Core::TCVectorContainer<STransformComponent>* _tTransformContainer = GetInnerComponentContainer<STransformComponent>(_Component_Manager);
 		Core::TCVectorContainer<CTextureComponent>* _tTextureContainer = GetInnerComponentContainer<CTextureComponent>(_Component_Manager);
 		Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
+        Core::TCVectorContainer<CViewComponent>* _pView_Container = GetInnerComponentContainer<CViewComponent>(_Component_Manager);
+        Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = GetInnerIDsContainer<CViewComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIDsContainer<CTextureComponent>(_Component_Manager);
+        for(int j = 0, iSize = _pOrdered_View_Container->GetSize(); j < iSize; ++j)
+        {
+            SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_View_Container)[j]]);
+        }
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
-            SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);
-            (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
+//            (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
 
 			SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-            // if(i == 0)
-            // {
-            //     Matrix<float, 4> temp(1.0f);
-            //     temp = SetRotate<float, 4>(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]]);
-
-            //     // aMatrix_Model_[u_iRange-LIMITER][0] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_X;
-            //     // aMatrix_Model_[u_iRange-LIMITER][1] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Y;
-            //     // aMatrix_Model_[u_iRange-LIMITER][2] = (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]].fPos_Z;
-            //     temp = temp * aMatrix_Model_;
-            //     unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-            //     pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &temp[0][0]);
-            // }
             if(i == 0)
                 SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
 			pGLActive_Texture(GL_TEXTURE10);
@@ -196,7 +190,7 @@ namespace GLVM::ECS
         aMatrix_View_[3][3] = 1.0;
         aMatrix_View_[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
         aMatrix_View_[u_iRange-LIMITER][1] = -_transform_Component.fPos_Y;
-//        aMatrix_View_[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z;
+        aMatrix_View_[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z;
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, *aMatrix_View_);
     }

@@ -3,7 +3,8 @@
 #include "Engine.hpp"
 #include "MoveComponent.hpp"
 #include "SpritesData.hpp"
-#include "TextureComponent.hpp"
+#include "ViewComponent.hpp"
+
 
 int main()
 {
@@ -19,7 +20,7 @@ int main()
 	// ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
-    ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
 	TexturePlayer.u_iData_ = chelik_dat;
@@ -77,7 +78,7 @@ int main()
 	TransformWitch3.fPos_X = 130;
 	TransformWitch3.fPos_Y = 140;
 	TransformWitch3.fPos_Z = 150;
-	
+
     ///< Game rendering loop
 	GLVM.GameLoop(ComponentManager);
 	GLVM.GameKill();
