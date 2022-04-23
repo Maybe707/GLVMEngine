@@ -8,7 +8,6 @@
 #include <iostream>
 #include "IContainer.hpp"
 #include "VertexComponent.hpp"
-#include <cassert>
 
 typedef unsigned int Entity_ID;
 
@@ -70,7 +69,7 @@ namespace GLVM::ECS
         {
             unsigned int u_iLocal_Container_ID;
             u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
-            assert(u_iLocal_Container_ID > 0);
+
             return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
         }
         

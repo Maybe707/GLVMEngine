@@ -3,6 +3,7 @@
 #include "Engine.hpp"
 #include "MoveComponent.hpp"
 #include "SpritesData.hpp"
+#include "TextureComponent.hpp"
 
 int main()
 {
@@ -13,7 +14,8 @@ int main()
 	EntityManager.CreateEntity(u_iPlayer);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
 //    ComponentManager.GetComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-	GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
 	// ComponentManager.CreateComponent<GLVM::ECS::SAnimationMoveComponent>(u_iPlayer);
@@ -29,8 +31,7 @@ int main()
     TransformPlayer.fRotate = 120;
 //    EntityManager.tActive_Entity_Registry_.Print();
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-    // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-    
+    // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);    
     
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);
