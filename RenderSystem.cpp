@@ -70,9 +70,9 @@ namespace GLVM::ECS
 	{
 		for(unsigned int count = 0; count < (u_iRange-LIMITER); ++count)
 		{
-			aMatrix_Translation[count][count] = 64.0;
+			tTranslation_Matrix[count][count] = 64.0;
 		}
-		aMatrix_Translation[u_iRange-LIMITER][u_iRange-LIMITER] = HOMOGENEOUS_COORDINATE;
+		tTranslation_Matrix[u_iRange-LIMITER][u_iRange-LIMITER] = HOMOGENEOUS_COORDINATE;
 		
 		// aMatrix_Ortho_[0]  = 2/1280.0f;
 		// //Matrix_Ortho[3]  -= 1;
@@ -161,24 +161,24 @@ namespace GLVM::ECS
                 {
                     if(n == m)
                     {
-                        aMatrix_Translation[n][m] = 64.0f;
+                        tTranslation_Matrix[n][m] = 64.0f;
                         continue;
                     }
 
-                    aMatrix_Translation[n][m] = 0.0f;
+                    tTranslation_Matrix[n][m] = 0.0f;
                 }
-            aMatrix_Translation[3][3] = 1.0f;
+            tTranslation_Matrix[3][3] = 1.0f;
 		}
 	}
  
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
 	{
-		aMatrix_Translation[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
-		aMatrix_Translation[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
-		aMatrix_Translation[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
+		tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
+		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
+		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
   
 		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &aMatrix_Translation[0][0]);
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tTranslation_Matrix[0][0]);
 	}
 
 	void CRenderSystem::SetProjectionMatrix(Shader* _Shader_Program)
@@ -189,25 +189,26 @@ namespace GLVM::ECS
 
 	void CRenderSystem::SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
-        Matrix<float, 4> tMatrix_Rotate(1.0f);
-        Matrix<float, 4> tMatrix_Model(1.0f);
-        tMatrix_Rotate = Rotate(tMatrix_Rotate, Vector<float, 4>(1.0f, 1.0f, 1.0f, 1.0f), _transform_Component.fRotate);
-        aMatrix_Translation[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
-		aMatrix_Translation[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
-		aMatrix_Translation[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
-//        PrintMatrix(aMatrix_Model_);
-        tMatrix_Model = tMatrix_Rotate * aMatrix_Translation;
-
-//        PrintMatrix(aMatrix_Model_);
+        Matrix<float, 4> tRotation_Matrix(1.0f);
+        Matrix<float, 4> tModel_Matrix(1.0f);
         
-//        trans = trans * aMatrix_Model_;
-
-        // unsigned int uiTransformt_Loc0 = pGLGet_Uniform_Location(_Shader_Program->iID, "aRotate_Matrix");
-		// pGLUniform_Matrix4fv(uiTransformt_Loc0, NUMBER_OF_MATRICES, GL_FALSE, &trans[0][0]);
+        tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 1.0f, 1.0f, 1.0f), _transform_Component.fRotate);
         
+        tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
+		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
+		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
+
+        /// For normal matrices.
+        
+        // tTranslation_Matrix[0][3] = _transform_Component.fPos_X;
+		// tTranslation_Matrix[1][3] = _transform_Component.fPos_Y;
+		// tTranslation_Matrix[2][3] = _transform_Component.fPos_Z;
+        // tModel_Matrix.SelfTensorTranspose();
+        
+        tModel_Matrix =tRotation_Matrix * tTranslation_Matrix;
+
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tMatrix_Model[0][0]);
-//        _transform_Component.fRotate = 0;
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 	}
     
     void CRenderSystem::SetViewMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
@@ -218,8 +219,6 @@ namespace GLVM::ECS
         aMatrix_View_[3][3] = 1.0;
         aMatrix_View_[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
         aMatrix_View_[u_iRange-LIMITER][1] = -_transform_Component.fPos_Y;
-        // aMatrix_View_[u_iRange-LIMITER][0] = -x_axis;
-        // aMatrix_View_[u_iRange-LIMITER][1] = -y_axis;
 //        aMatrix_View_[u_iRange-LIMITER][2] = _transform_Component.fPos_Z + 100;
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &aMatrix_View_[0][0]);
