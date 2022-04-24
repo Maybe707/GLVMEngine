@@ -50,7 +50,7 @@ namespace GLVM::ECS
 //        float aMatrix_Ortho_[u_iRange][u_iRange] = {};
         Matrix<float, 4> aMatrix_Ortho_{1.0f};
 //	 	float aMatrix_Model_[u_iRange][u_iRange] {};
-        Matrix<float, 4> aMatrix_Model_{1.0f};
+        Matrix<float, 4> aMatrix_Translation{1.0f};
 //        float aMatrix_View_[u_iRange][u_iRange] {};
         Matrix<float, 4> aMatrix_View_{1.0f};
 		Shader* _Shader_Program;
