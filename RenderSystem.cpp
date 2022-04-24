@@ -141,15 +141,17 @@ namespace GLVM::ECS
         }
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
-            (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
+            //(*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
 
 //            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
             
-            if(i == 0)
-                SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-            else 
-                SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
+            // if(i == 0)
+            //     SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
+            // else 
+            //     SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
+
+            SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
 
 			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
@@ -191,6 +193,7 @@ namespace GLVM::ECS
 	{
         Matrix<float, 4> tRotation_Matrix(1.0f);
         Matrix<float, 4> tModel_Matrix(1.0f);
+        Matrix<float, 4> tScaling_Matrix(1.0f);
         
         tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 1.0f, 1.0f, 1.0f), _transform_Component.fRotate);
         
@@ -198,6 +201,10 @@ namespace GLVM::ECS
 		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
 		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
 
+        tScaling_Matrix[0][0] = _transform_Component.fScale;
+        tScaling_Matrix[1][1] = _transform_Component.fScale;
+        tScaling_Matrix[2][2] = _transform_Component.fScale;
+        
         /// For normal matrices.
         
         // tTranslation_Matrix[0][3] = _transform_Component.fPos_X;
@@ -205,7 +212,7 @@ namespace GLVM::ECS
 		// tTranslation_Matrix[2][3] = _transform_Component.fPos_Z;
         // tModel_Matrix.SelfTensorTranspose();
         
-        tModel_Matrix =tRotation_Matrix * tTranslation_Matrix;
+        tModel_Matrix = tScaling_Matrix * tRotation_Matrix * tTranslation_Matrix;
 
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);

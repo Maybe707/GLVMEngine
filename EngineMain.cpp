@@ -27,8 +27,9 @@ int main()
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.CreateComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
 	TransformPlayer.fPos_X = 40;
 	TransformPlayer.fPos_Y = 50;
-	TransformPlayer.fPos_Z = 100;
-    TransformPlayer.fRotate = 0;
+	TransformPlayer.fPos_Z = 200;
+    TransformPlayer.fRotate = 50;
+    TransformPlayer.fScale = 1.5;
 //    EntityManager.tActive_Entity_Registry_.Print();
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
     // ComponentManager.CreateCeomponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
