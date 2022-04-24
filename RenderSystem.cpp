@@ -190,22 +190,23 @@ namespace GLVM::ECS
 	void CRenderSystem::SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
         Matrix<float, 4> trans(1.0f);
+        Matrix<float, 4> mat_result(1.0f);
         trans = Rotate(trans, Vector<float, 4>(1.0f, 1.0f, 1.0f, 1.0f), _transform_Component.fRotate);
         aMatrix_Model_[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
 		aMatrix_Model_[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
 		aMatrix_Model_[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
 //        PrintMatrix(aMatrix_Model_);
-//        aMatrix_Model_ = aMatrix_Model_ * trans;
+        mat_result = trans * aMatrix_Model_;
 
 //        PrintMatrix(aMatrix_Model_);
         
 //        trans = trans * aMatrix_Model_;
 
-        unsigned int uiTransformt_Loc0 = pGLGet_Uniform_Location(_Shader_Program->iID, "aRotate_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc0, NUMBER_OF_MATRICES, GL_FALSE, &trans[0][0]);
+        // unsigned int uiTransformt_Loc0 = pGLGet_Uniform_Location(_Shader_Program->iID, "aRotate_Matrix");
+		// pGLUniform_Matrix4fv(uiTransformt_Loc0, NUMBER_OF_MATRICES, GL_FALSE, &trans[0][0]);
         
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &aMatrix_Model_[0][0]);
+		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &mat_result[0][0]);
 //        _transform_Component.fRotate = 0;
 	}
     

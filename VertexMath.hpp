@@ -19,8 +19,8 @@ public:
 		for(int i = 0; i < var; ++i)
 		{
 			m_matrix[i][i] = arg;
-			if(i == (var-1))
-				m_matrix[i][i] = 1;
+			// if(i == (var-1))
+			// 	m_matrix[i][i] = 1;
 		}
   	}
 
