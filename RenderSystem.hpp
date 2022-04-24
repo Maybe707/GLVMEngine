@@ -47,7 +47,6 @@ namespace GLVM::ECS
 		GLuint iVao_;
 		static const unsigned int u_iRange = 4;
         Matrix<float, 4> tProjection_Matrix{1.0f};
-        Matrix<float, 4> aMatrix_View_{1.0f};
 		Shader* _Shader_Program;
 
         CRenderSystem();
