@@ -5,7 +5,6 @@
 #include "SpritesData.hpp"
 #include "ViewComponent.hpp"
 
-
 int main()
 {
 	GLVM::Core::CEngine GLVM;
@@ -26,13 +25,14 @@ int main()
 	TexturePlayer.u_iData_ = chelik_dat;
 	GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.CreateComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
-	TransformPlayer.fPos_X = 50;
-	TransformPlayer.fPos_Y = 30;
-	TransformPlayer.fPos_Z = 200;
-    TransformPlayer.fRotate = 120;
+	TransformPlayer.fPos_X = 40;
+	TransformPlayer.fPos_Y = 50;
+	TransformPlayer.fPos_Z = 100;
+    TransformPlayer.fRotate = 0;
 //    EntityManager.tActive_Entity_Registry_.Print();
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
-    // ComponentManager.CreateComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);    
+    // ComponentManager.CreateCeomponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
+    
     
 	Entity u_iWitch = 0;
 	EntityManager.CreateEntity(u_iWitch);

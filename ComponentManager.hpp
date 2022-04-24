@@ -16,7 +16,7 @@ namespace GLVM::ECS
 	class CComponentManager
 	{
 	public:
-		inline static unsigned int s_iComponents_Container_ID = 1;
+		inline static unsigned int s_iComponents_Container_ID = 0;
 		Core::TCVectorContainer<Core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
 		Core::TCVectorContainer<Core::TCVectorContainer<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
         
@@ -92,12 +92,12 @@ namespace GLVM::ECS
 		
 		~CComponentManager()
 		{
-			for(int i = 1, iSize_Main = tWorld_Components_Container_.GetSize() + 1; i < iSize_Main; ++i)
+			for(int i = 0, iSize_Main = tWorld_Components_Container_.GetSize(); i < iSize_Main; ++i)
 			{
 				delete tWorld_Components_Container_[i];
 				tWorld_Components_Container_[i] = nullptr;
 			}
-			for(int j = 1, iSize_Ordered = tWorld_IDs_Container.GetSize() + 1; j < iSize_Ordered; ++j)
+			for(int j = 0, iSize_Ordered = tWorld_IDs_Container.GetSize(); j < iSize_Ordered; ++j)
 			{
 				delete tWorld_IDs_Container[j];
 				tWorld_IDs_Container[j] = nullptr;

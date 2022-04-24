@@ -11,7 +11,7 @@ namespace GLVM::ECS
 	class CEntityManager
 	{
     public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
-		inline static Entity_ID u_iID = 1;		
+		inline static Entity_ID u_iID = 0;		
  		Core::TCVectorContainer<Entity_ID> tRemoved_Entity_Registry_;
 		Core::TCVectorContainer<Entity_ID> tActive_Entity_Registry_;
 	public:
@@ -39,7 +39,7 @@ namespace GLVM::ECS
 		void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager& _ComponentManager)
 		{
 			tRemoved_Entity_Registry_.Push(_Entity_ID);
-			tActive_Entity_Registry_[_Entity_ID - 1] = k_iUint_Max;    ///< Minus 1 because the value of u_iID started from 1.
+			tActive_Entity_Registry_[_Entity_ID] = k_iUint_Max;  
 			for(int i = 0, iSize = _ComponentManager.tWorld_IDs_Container.GetSize();
 				i < iSize; ++i)
 			{

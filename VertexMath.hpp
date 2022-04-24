@@ -22,7 +22,7 @@ public:
 			if(i == (var-1))
 				m_matrix[i][i] = 1;
 		}
-	}
+  	}
 
 	Matrix<T, var> operator*(Matrix& matrix);
 	T* operator[](const int index);
@@ -166,27 +166,68 @@ Matrix<T, var> Rotate(Matrix<T, var> matrix, Vector<T, var> vector, float angle)
 	angle *= PI/180;
 	Matrix<T, var> tempMatrix(1.0f);
 
-	tempMatrix[0][0] = std::cos(angle) + (vector[0] * vector[0]) * (1 - std::cos(angle));
-	tempMatrix[1][0] = vector[0] * vector[1] * (1 - std::cos(angle)) - vector[2] * std::sin(angle);
-	tempMatrix[2][0] = vector[0] * vector[2] * (1 - std::cos(angle)) + vector[1] * std::sin(angle);
-	tempMatrix[3][0] = 0;
-	tempMatrix[0][1] = vector[1] * vector[0] * (1 - std::cos(angle)) + vector[2] * std::sin(angle);
-	tempMatrix[1][1] = std::cos(angle) + (vector[1] * vector[1]) * (1 - std::cos(angle));
-	tempMatrix[2][1] = vector[1] * vector[2] * (1 - std::cos(angle)) - vector[0] * std::sin(angle);
-	tempMatrix[3][1] = 0;
-	tempMatrix[0][2] = vector[2] * vector[0] * (1 - std::cos(angle)) - vector[1] * std::sin(angle);
-	tempMatrix[1][2] = vector[2] * vector[1] * (1 - std::cos(angle)) + vector[0] * std::sin(angle);
-	tempMatrix[2][2] = std::cos(angle) + (vector[2] * vector[2]) * (1 - std::cos(angle));
-	tempMatrix[3][2] = 0;
-	tempMatrix[0][3] = 0;
-	tempMatrix[1][3] = 0;
-	tempMatrix[2][3] = 0;
-	tempMatrix[3][3] = 1;
+	tempMatrix[0][0] = std::cos(angle) + (vector[0] * vector[0]) * (static_cast<T>(1) - std::cos(angle));
+	tempMatrix[1][0] = vector[0] * vector[1] * (static_cast<T>(1) - std::cos(angle)) - vector[2] * std::sin(angle);
+	tempMatrix[2][0] = vector[0] * vector[2] * (static_cast<T>(1) - std::cos(angle)) + vector[1] * std::sin(angle);
+	tempMatrix[3][0] = static_cast<T>(0);
+	tempMatrix[0][1] = vector[1] * vector[0] * (static_cast<T>(1) - std::cos(angle)) + vector[2] * std::sin(angle);
+	tempMatrix[1][1] = std::cos(angle) + (vector[1] * vector[1]) * (static_cast<T>(1) - std::cos(angle));
+	tempMatrix[2][1] = vector[1] * vector[2] * (static_cast<T>(1) - std::cos(angle)) - vector[0] * std::sin(angle);
+	tempMatrix[3][1] = static_cast<T>(0);
+	tempMatrix[0][2] = vector[2] * vector[0] * (static_cast<T>(1) - std::cos(angle)) - vector[1] * std::sin(angle);
+	tempMatrix[1][2] = vector[2] * vector[1] * (static_cast<T>(1) - std::cos(angle)) + vector[0] * std::sin(angle);
+	tempMatrix[2][2] = std::cos(angle) + (vector[2] * vector[2]) * (static_cast<T>(1) - std::cos(angle));
+	tempMatrix[3][2] = static_cast<T>(0);
+	tempMatrix[0][3] = static_cast<T>(0);
+	tempMatrix[1][3] = static_cast<T>(0);
+	tempMatrix[2][3] = static_cast<T>(0);
+	tempMatrix[3][3] = static_cast<T>(1);
 
-	Matrix<T, var> tempMatrix2;
-	tempMatrix2 = matrix * tempMatrix;
+	// float range = std::sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+	// for(int l = 0; l < var; ++l)
+	// 	vector[l] = vector[l]/range;
 
-	return tempMatrix2;
+	// angle *= PI/180;
+	// Matrix<T, var> tempMatrix(1.0f);
+
+	// tempMatrix[0][0] = std::cos(angle) + (vector[0] * vector[0]) * (1 - std::cos(angle));
+	// tempMatrix[1][0] = vector[0] * vector[1] * (1 - std::cos(angle)) - vector[2] * std::sin(angle);
+	// tempMatrix[2][0] = vector[0] * vector[2] * (1 - std::cos(angle)) + vector[1] * std::sin(angle);
+	// tempMatrix[3][0] = 0;
+	// tempMatrix[0][1] = vector[1] * vector[0] * (1 - std::cos(angle)) + vector[2] * std::sin(angle);
+	// tempMatrix[1][1] = std::cos(angle) + (vector[1] * vector[1]) * (1 - std::cos(angle));
+	// tempMatrix[2][1] = vector[1] * vector[2] * (1 - std::cos(angle)) - vector[0] * std::sin(angle);
+	// tempMatrix[3][1] = 0;
+	// tempMatrix[0][2] = vector[2] * vector[0] * (1 - std::cos(angle)) - vector[1] * std::sin(angle);
+	// tempMatrix[1][2] = vector[2] * vector[1] * (1 - std::cos(angle)) + vector[0] * std::sin(angle);
+	// tempMatrix[2][2] = std::cos(angle) + (vector[2] * vector[2]) * (1 - std::cos(angle));
+	// tempMatrix[3][2] = 0;
+	// tempMatrix[0][3] = 0;
+	// tempMatrix[1][3] = 0;
+	// tempMatrix[2][3] = 0;
+	// tempMatrix[3][3] = 1;
+    
+    // tempMatrix[0][0] = std::cos(angle) + (vector[0] * vector[0]) * (1 - std::cos(angle));
+	// tempMatrix[0][1] = vector[0] * vector[1] * (1 - std::cos(angle)) - vector[2] * std::sin(angle);
+	// tempMatrix[0][2] = vector[0] * vector[2] * (1 - std::cos(angle)) + vector[1] * std::sin(angle);
+	// tempMatrix[0][3] = 0;
+	// tempMatrix[1][0] = vector[1] * vector[0] * (1 - std::cos(angle)) + vector[2] * std::sin(angle);
+	// tempMatrix[1][1] = std::cos(angle) + (vector[1] * vector[1]) * (1 - std::cos(angle));
+	// tempMatrix[1][2] = vector[1] * vector[2] * (1 - std::cos(angle)) - vector[0] * std::sin(angle);
+	// tempMatrix[1][3] = 0;
+	// tempMatrix[2][0] = vector[2] * vector[0] * (1 - std::cos(angle)) - vector[1] * std::sin(angle);
+	// tempMatrix[2][1] = vector[2] * vector[1] * (1 - std::cos(angle)) + vector[0] * std::sin(angle);
+	// tempMatrix[2][2] = std::cos(angle) + (vector[2] * vector[2]) * (1 - std::cos(angle));
+	// tempMatrix[2][3] = 0;
+	// tempMatrix[3][0] = 0;
+	// tempMatrix[3][1] = 0;
+	// tempMatrix[3][2] = 0;
+	// tempMatrix[3][3] = 1;
+
+    Matrix<float, 4> model_mat(1.0f);
+    model_mat = matrix * tempMatrix;
+    
+	return model_mat;
 }
 
 template <class T, int var>

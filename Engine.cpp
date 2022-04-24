@@ -48,11 +48,11 @@ namespace GLVM::Core
 		Animation_System.Animation_Delta = dAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
-		
-		System_Manager->ActivateSystem(Movement_System);
+
+        System_Manager->ActivateSystem(Movement_System);
 		System_Manager->ActivateSystem(&Collision_System);
 		System_Manager->ActivateSystem(&Animation_System);
-		System_Manager->ActivateSystem(Renderer_System);
+        System_Manager->ActivateSystem(Renderer_System);
 
 		while(bGame_Loop_Active)
 		{
@@ -81,8 +81,8 @@ namespace GLVM::Core
 			Movement_System->_dOffset = dDelta_Time_;
 			Movement_System->_Event = Event_.GetEvent();
 			Collision_System._dDelta_Time = dDelta_Time_;
-			Animation_System.eEvent_ = Input_Stack_.Pop();
-			Animation_System.Delta_Time = dDelta_Time_;
+			// Animation_System.eEvent_ = Input_Stack_.Pop();
+			// Animation_System.Delta_Time = dDelta_Time_;
 			Renderer_System->_Shader_Program = Shader_Program;
 			
 			System_Manager->Update(_ComponentManager);
