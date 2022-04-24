@@ -29,7 +29,7 @@ int main()
 	TransformPlayer.fPos_Y = 50;
 	TransformPlayer.fPos_Z = 200;
     TransformPlayer.fRotate = 50;
-    TransformPlayer.fScale = 1.5;
+    TransformPlayer.fScale = 120.0f;
 //    EntityManager.tActive_Entity_Registry_.Print();
     // ComponentManager.RemoveComponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
     // ComponentManager.CreateCeomponent<GLVM::ECS::SMoveComponent>(u_iPlayer);
@@ -49,6 +49,7 @@ int main()
 	TransformWitch.fPos_X = 190;
 	TransformWitch.fPos_Y = 190;
 	TransformWitch.fPos_Z = 190;
+    TransformWitch.fScale = 64.0f;
 	// EntityManager.RemoveEntity(u_iWitch, ComponentManager);
     // EntityManager.tActive_Entity_Registry_.Print();    
 
@@ -65,6 +66,7 @@ int main()
 	TransformWitch2.fPos_X = 290;
 	TransformWitch2.fPos_Y = 290;
 	TransformWitch2.fPos_Z = 290;
+  TransformWitch2.fScale = 64.0f;
     
 	Entity u_iWitch3 = 0;
 	EntityManager.CreateEntity(u_iWitch3);
@@ -79,6 +81,7 @@ int main()
 	TransformWitch3.fPos_X = 130;
 	TransformWitch3.fPos_Y = 140;
 	TransformWitch3.fPos_Z = 150;
+    TransformWitch3.fScale = 64.0f;
 
     ///< Game rendering loop
 	GLVM.GameLoop(ComponentManager);

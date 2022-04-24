@@ -67,13 +67,7 @@ float aVertex_Box[VERTEX_ARRAY_RANGE] =
 namespace GLVM::ECS
 {
     CRenderSystem::CRenderSystem()
-	{
-		for(unsigned int count = 0; count < (u_iRange-LIMITER); ++count)
-		{
-			tTranslation_Matrix[count][count] = 64.0;
-		}
-		tTranslation_Matrix[u_iRange-LIMITER][u_iRange-LIMITER] = HOMOGENEOUS_COORDINATE;
-		
+	{	
 		// aMatrix_Ortho_[0]  = 2/1280.0f;
 		// //Matrix_Ortho[3]  -= 1;
 		// //Matrix_Ortho[7]  -= 1;
@@ -90,12 +84,12 @@ namespace GLVM::ECS
         float fov = 90;
         float f = 3, n = 10;
         float S = std::tan((fov/2)*(PI/360));
-        aMatrix_Ortho_[0][0] = 1/((1280.0f/1280.0f)*S);
-        aMatrix_Ortho_[1][1] = 1/S;
-        aMatrix_Ortho_[2][2] = -((f+n)/(f-n));
-        aMatrix_Ortho_[2][3] = -((2*f*n)/(f-n));
-        aMatrix_Ortho_[3][2] = -1;
-        aMatrix_Ortho_[3][3] = 1;
+        tProjection_Matrix[0][0] = 1/((1280.0f/1280.0f)*S);
+        tProjection_Matrix[1][1] = 1/S;
+        tProjection_Matrix[2][2] = -((f+n)/(f-n));
+        tProjection_Matrix[2][3] = -((2*f*n)/(f-n));
+        tProjection_Matrix[3][2] = -1;
+        tProjection_Matrix[3][3] = 1;
 
 		float aVertices_[VERTEX_ARRAY_RANGE];
 		
@@ -144,59 +138,30 @@ namespace GLVM::ECS
             //(*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
 
-//            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-            
-            // if(i == 0)
-            //     SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-            // else 
-            //     SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-
-            SetRotate(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
+            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
 
 			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
-
-            for(int n = 0; n < 4; ++n)
-                for(int m = 0; m < 4; ++m)
-                {
-                    if(n == m)
-                    {
-                        tTranslation_Matrix[n][m] = 64.0f;
-                        continue;
-                    }
-
-                    tTranslation_Matrix[n][m] = 0.0f;
-                }
-            tTranslation_Matrix[3][3] = 1.0f;
 		}
-	}
- 
-	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component)
-	{
-		tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
-		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
-		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
-  
-		unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tTranslation_Matrix[0][0]);
 	}
 
 	void CRenderSystem::SetProjectionMatrix(Shader* _Shader_Program)
 	{
 		unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &aMatrix_Ortho_[0][0]);
+		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
 	}
 
-	void CRenderSystem::SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
+	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
         Matrix<float, 4> tRotation_Matrix(1.0f);
         Matrix<float, 4> tModel_Matrix(1.0f);
         Matrix<float, 4> tScaling_Matrix(1.0f);
+        Matrix<float, 4> tTranslation_Matrix(1.0f);
         
         tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 1.0f, 1.0f, 1.0f), _transform_Component.fRotate);
-        
+
         tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
 		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
 		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;

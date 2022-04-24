@@ -45,13 +45,8 @@ namespace GLVM::ECS
 	public:
 	    GLuint iVbo_;
 		GLuint iVao_;
-//		float aMatrix_Ortho_[MATRIX_RANGE] = {};
 		static const unsigned int u_iRange = 4;
-//        float aMatrix_Ortho_[u_iRange][u_iRange] = {};
-        Matrix<float, 4> aMatrix_Ortho_{1.0f};
-//	 	float aMatrix_Model_[u_iRange][u_iRange] {};
-        Matrix<float, 4> tTranslation_Matrix{1.0f};
-//        float aMatrix_View_[u_iRange][u_iRange] {};
+        Matrix<float, 4> tProjection_Matrix{1.0f};
         Matrix<float, 4> aMatrix_View_{1.0f};
 		Shader* _Shader_Program;
 
@@ -59,10 +54,9 @@ namespace GLVM::ECS
 		~CRenderSystem();
 
 		void LoadTextureData(ECS::CTextureComponent& _Texture);
-		void SetModelMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
 		void Update(CComponentManager& _Component_Manager) override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
-        void SetRotate(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
+        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
         void PrintMatrix(Matrix<float, 4> _tMatrix);
     };
