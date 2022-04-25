@@ -12,6 +12,7 @@
 #include <GL/glext.h>
 #include "AnimationMoveComponent.hpp"
 #include "VertexMath.hpp"
+#include "Event.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -53,10 +54,10 @@ namespace GLVM::ECS
 		~CRenderSystem();
 
 		void LoadTextureData(ECS::CTextureComponent& _Texture);
-		void Update(CComponentManager& _Component_Manager) override;
+		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
-        void SetViewMatrix(Shader* _Shader_Program, const ECS::STransformComponent& _transform_Component);
+        void SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event);
         void PrintMatrix(Matrix<float, 4> _tMatrix);
     };
 }

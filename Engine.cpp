@@ -70,6 +70,7 @@ namespace GLVM::Core
 			Shader_Program->Use();
 			Shader_Program->SetUniformID();
 			Renderer_System->SetProjectionMatrix(Shader_Program);
+//            Renderer_System->SetViewMatrix(Shader_Program, Event_);
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
@@ -78,14 +79,16 @@ namespace GLVM::Core
 			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
 				bGame_Loop_Active = false;
 
+            std::cout << "Pointer position: " << "x = " << Event_.mouse_Pointer_Position_.u_iX << " " << "y = " << Event_.mouse_Pointer_Position_.u_iY << std::endl;
+            
 			Movement_System->_dOffset = dDelta_Time_;
-			Movement_System->_Event = Event_.GetEvent();
+			Movement_System->_Anim_Event = Event_.GetEvent();
 			Collision_System._dDelta_Time = dDelta_Time_;
-			// Animation_System.eEvent_ = Input_Stack_.Pop();
-			// Animation_System.Delta_Time = dDelta_Time_;
+			Animation_System.eEvent_ = Input_Stack_.Pop();
+			Animation_System.Delta_Time = dDelta_Time_;
 			Renderer_System->_Shader_Program = Shader_Program;
 			
-			System_Manager->Update(_ComponentManager);
+			System_Manager->Update(_ComponentManager, Event_);
 			
 			Window_->SwapBuffers();
 		}

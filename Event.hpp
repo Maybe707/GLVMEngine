@@ -8,7 +8,7 @@ namespace GLVM::Core
 
 	class CStack;
 	
-    /*! \enum Events
+    /*! \enum EEvents
         \brief Realise event event types.
     */
 
@@ -27,22 +27,30 @@ namespace GLVM::Core
 		eMOVE_DOWN,
 		eMOVE_LEFT,
 		eMOVE_RIGHT,
-		eGAME_LOOP_KILL,
+        eMOUSE_POINTER_POSITION,
+        eGAME_LOOP_KILL,
     };
 
+    struct SMousePointerPosition
+    {
+        unsigned int u_iX;
+        unsigned int u_iY;
+    };
+    
     /*! \class Event
         \brief Realise event game system.
     */
-    
+
     class CEvent
     {
         EEvents eEvent_;
     
     public:
+        SMousePointerPosition mouse_Pointer_Position_;
+        
         CEvent();
         EEvents& GetEvent();
         void SetEvent(EEvents _eEvent);
-
 		void SetLastEvent(CStack _Stack);
     };
 

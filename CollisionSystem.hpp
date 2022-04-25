@@ -18,7 +18,7 @@ namespace GLVM::ECS
 		double _dDelta_Time;
 		void Repel(STransformComponent& _transform_Component, SMoveComponent& _move_Component, double& _fDelta_Time);
 		bool BoxCollider(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);
-		void Update(ECS::CComponentManager& _Component_Manager) override;
+		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
 	};
 }
 	

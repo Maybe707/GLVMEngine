@@ -35,7 +35,7 @@ namespace GLVM::ECS
 		return bCollision_Flag;
 	}
 
-	void CCollisionSystem::Update(CComponentManager& _Component_Manager)
+	void CCollisionSystem::Update(CComponentManager& _Component_Manager, Core::CEvent& _Event)
 	{
 		Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = GetInnerComponentContainer<STransformComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container = GetInnerIDsContainer<CColliderComponent>(_Component_Manager);

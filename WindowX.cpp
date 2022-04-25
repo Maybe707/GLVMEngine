@@ -54,9 +54,9 @@ namespace GLVM::Core
         Color_Map_ = XCreateColormap(pDisp_, Root_Window_, pVisual_->visual, AllocNone);
 
         Set_Window_Attributes_.colormap = Color_Map_;
-        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask;
+        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask | PointerMotionMask;
 
-        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1280, 1280, 0, pVisual_->depth, InputOutput,
+        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1920, 1080, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
 
     
@@ -144,9 +144,42 @@ namespace GLVM::Core
         {
             XNextEvent(pDisp_, &uXEvent);
 			KeySym ulKey;
+            
+            XMotionEvent motion;
+            int iNumber_Of_Screens;
+            Window* pRoot_Windows;
+            Window Root_Window_Returned;
+            Window Local_Window_Returned;
+            unsigned int u_iMask_Return;
+            bool bPointer_Search_Flag;
+            int iRoot_X, iRoot_Y;
+            int iLocal_Window_X, iLocal_Window_Y;
 
 			switch(uXEvent.type)
 			{
+            case MotionNotify:
+                iNumber_Of_Screens = XScreenCount(pDisp_);
+                pRoot_Windows = (unsigned long*)malloc(sizeof(Window) * iNumber_Of_Screens);
+                for (int i = 0; i < iNumber_Of_Screens; ++i)
+                {
+                    pRoot_Windows[i] = XRootWindow(pDisp_, i);
+                }
+                for(int j = 0; j < iNumber_Of_Screens; ++j)
+                {
+                bPointer_Search_Flag = XQueryPointer(pDisp_, pRoot_Windows[j], &Root_Window_Returned, &Local_Window_Returned, &iRoot_X,
+                                                     &iRoot_Y, &iLocal_Window_X, &iLocal_Window_Y, &u_iMask_Return);
+                }
+                XQueryPointer(pDisp_, Local_Window_Returned, &Root_Window_Returned, &Local_Window_Returned, &iRoot_X, &iRoot_Y,
+                              &iLocal_Window_X, &iLocal_Window_Y, &u_iMask_Return);
+                std::cout << "Root window: " << Root_Window_Returned << std::endl;
+                std::cout << "Local window: " << Local_Window_Returned << std::endl;
+                std::cout << "Root window pointer posotion:  " << iRoot_X << " " << iRoot_Y << std::endl;
+                std::cout << "Local window pointer posotion: : " << iLocal_Window_X << " " << iLocal_Window_Y << std::endl;
+                motion = uXEvent.xmotion;
+                _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
+                _Event.mouse_Pointer_Position_.u_iX = iLocal_Window_X;
+                _Event.mouse_Pointer_Position_.u_iY = iLocal_Window_Y;
+                break;
 			case KeyPress:
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
 				switch(ulKey)

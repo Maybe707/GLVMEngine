@@ -1,3 +1,4 @@
+#include "Event.hpp"
 #include "Stack.hpp"
 
 namespace GLVM::Core

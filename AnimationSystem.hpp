@@ -40,7 +40,7 @@ namespace GLVM::ECS
 				_aArray_Destination[i] = _aArray_Source[i];
 		}
 		
-		void Update(CComponentManager& _Component_Manager) override
+		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
 			Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Animation_Move_Container = GetInnerIDsContainer<SAnimationMoveComponent>(_Component_Manager);

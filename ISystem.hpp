@@ -2,6 +2,7 @@
 #define ISYSTEM
 
 #include "ComponentManager.hpp"
+#include "Event.hpp"
 
 namespace GLVM::ECS
 {
@@ -9,7 +10,7 @@ namespace GLVM::ECS
 	{
 	public:
 		virtual ~ISystem() {}
-		virtual void Update(ECS::CComponentManager& _Component_Manager) = 0;
+		virtual void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) = 0;
 	};
 }
 

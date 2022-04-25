@@ -19,10 +19,10 @@ namespace GLVM::ECS
 			++s_iSystem_ID;
 		}
 
-		void Update(CComponentManager& _Component_Manager)
+		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event)
 		{
 			for(int i = 0; i < s_iSystem_ID; ++i)
-				tSystemContainer[i]->Update(_Component_Manager);
+				tSystemContainer[i]->Update(_Component_Manager, _Event);
 		}
 	};
 }

@@ -44,7 +44,7 @@ namespace GLVM::ECS
 		}
         
 		template <typename Component_Type>
-		Component_Type& CreateComponent(const Entity_ID& _u_iEntity)
+		void CreateComponent(const Entity_ID& _u_iEntity)
 		{
 			unsigned int u_iLocal_Container_ID = 0; ///< Index for world components and world ID's containers.
 			Component_Type Component;
@@ -52,7 +52,7 @@ namespace GLVM::ECS
 
 			static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
 			static_cast<Core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
-			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
+//			return (*static_cast<Core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
         /// Allow to give a various components to chosen entity.
