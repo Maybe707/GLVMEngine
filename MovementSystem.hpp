@@ -33,11 +33,11 @@ namespace GLVM::ECS
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
 					break;
 				case Core::EEvents::eMOVE_DOWN:
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Y -= _dOffset;
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Z -= _dOffset;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN; 
 					break;
 				case Core::EEvents::eMOVE_UP:
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Y += _dOffset;
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Z += _dOffset;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
 					break;
 				default:

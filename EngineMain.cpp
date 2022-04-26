@@ -25,7 +25,7 @@ int main()
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
 	TransformPlayer.fPos_X = 0;
 	TransformPlayer.fPos_Y = 0;
-	TransformPlayer.fPos_Z = 150;
+	TransformPlayer.fPos_Z = 170;
     TransformPlayer.fRotate = 30.0f;
     TransformPlayer.fScale = 120.0f;
     
@@ -39,8 +39,8 @@ int main()
 	TextureWitch.u_iData_ = witch_dat;
 	GLVM.LoadTextureData(TextureWitch);
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
-	TransformWitch.fPos_X = 0;
-	TransformWitch.fPos_Y = 0;
+	TransformWitch.fPos_X = 50;
+	TransformWitch.fPos_Y = 30;
 	TransformWitch.fPos_Z = 100;
     TransformWitch.fScale = 64.0f;
 	// EntityManager.RemoveEntity(u_iWitch, ComponentManager);

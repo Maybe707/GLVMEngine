@@ -6,11 +6,11 @@ namespace GLVM::ECS
 	{
 		if (_move_Component.eEvent_ == Core::eMOVE_UP)
 		{
-			_transform_Component.fPos_Y = (_transform_Component.fPos_Y - _fDelta_Time);
+			_transform_Component.fPos_Z = (_transform_Component.fPos_Z - _fDelta_Time);
 		}
 		if (_move_Component.eEvent_ == Core::eMOVE_DOWN)
 		{
-			_transform_Component.fPos_Y = (_transform_Component.fPos_Y + _fDelta_Time);
+			_transform_Component.fPos_Z = (_transform_Component.fPos_Z + _fDelta_Time);
 		}
 		if (_move_Component.eEvent_ == Core::eMOVE_RIGHT)
 		{
@@ -27,9 +27,11 @@ namespace GLVM::ECS
 		bool bCollision_Flag = false;
 		float fX = 0;
 		float fY = 0;
+        float fZ = 0;
 		fX = std::abs(_transform_Component2.fPos_X - _transform_Component1.fPos_X);
 		fY = std::abs(_transform_Component2.fPos_Y - _transform_Component1.fPos_Y);
-		if(fX < 32.0f && fY < 32.0f)
+        fZ = std::abs(_transform_Component2.fPos_Z - _transform_Component1.fPos_Z);
+		if(fX < 32.0f && fY < 32.0f && fZ < 32.0f)
 			bCollision_Flag = true;
 
 		return bCollision_Flag;

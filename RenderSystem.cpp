@@ -83,10 +83,23 @@ namespace GLVM::ECS
         // tProjection_Matrix[2][2] = 1/(600.0f - 0.0f);
         // tProjection_Matrix[3][3] = 1.0f;
 
+        // float fov = 90;
+        // float f = 3, n = 10;
+        // float S = std::tan((fov/2)*(PI/360));
+        // tProjection_Matrix[0][0] = 1/((1920.0f/1080.0f)*S);
+        // tProjection_Matrix[1][1] = 1/S;
+        // tProjection_Matrix[2][2] = -((f+n)/(f-n));
+        // tProjection_Matrix[2][3] = -((2*f*n)/(f-n));
+        // tProjection_Matrix[3][2] = -1;
+        // tProjection_Matrix[3][3] = 1;
+
         float fov = 90;
         float f = 3, n = 10;
-        float S = std::tan((fov/2)*(PI/360));
-        tProjection_Matrix[0][0] = 1/((1920.0f/1080.0f)*S);
+        float zm = f - n;
+        float zp = f + n;
+        float S = std::tan((fov/2) * (PI / 360));
+        float fAspect_Ratio = 1920.0f/1080.0f;
+        tProjection_Matrix[0][0] = (1/S) / fAspect_Ratio;
         tProjection_Matrix[1][1] = 1/S;
         tProjection_Matrix[2][2] = -((f+n)/(f-n));
         tProjection_Matrix[2][3] = -((2*f*n)/(f-n));
@@ -202,6 +215,7 @@ namespace GLVM::ECS
 
         tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX - 960.0f) -_transform_Component.fPos_X;
         tView_Matrix[u_iRange-LIMITER][1] = (_Event.mouse_Pointer_Position_.u_iY - 540.0f) - _transform_Component.fPos_Y;
+        tView_Matrix[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z + 100;
 
         // tView_Matrix[u_iRange-LIMITER][0] = 0;
         // tView_Matrix[u_iRange-LIMITER][1] = 0;
