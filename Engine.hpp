@@ -45,7 +45,7 @@ namespace GLVM::Core
 		ECS::CRenderSystem* Renderer_System;
 		CEvent Event_;
 		Shader* Shader_Program;
-		double dDelta_Time_;
+		float dDelta_Time_;
 		CStack Input_Stack_;
 		ECS::CCollisionSystem Collision_System;
 		ECS::CAnimationSystem Animation_System;

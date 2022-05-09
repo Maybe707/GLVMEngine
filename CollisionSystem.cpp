@@ -31,7 +31,7 @@ namespace GLVM::ECS
 		fX = std::abs(_transform_Component2.fPos_X - _transform_Component1.fPos_X);
 		fY = std::abs(_transform_Component2.fPos_Y - _transform_Component1.fPos_Y);
         fZ = std::abs(_transform_Component2.fPos_Z - _transform_Component1.fPos_Z);
-		if(fX < 32.0f && fY < 32.0f && fZ < 32.0f)
+		if(fX < 0.2f && fY < 0.2f && fZ < 0.2f)
 			bCollision_Flag = true;
 
 		return bCollision_Flag;

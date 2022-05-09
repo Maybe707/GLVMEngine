@@ -43,7 +43,7 @@ namespace GLVM::Core
 	
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
-		double dAnimation_Delta = 0;
+		float dAnimation_Delta = 0;
 		bool bGame_Loop_Active = true;
 		Animation_System.Animation_Delta = dAnimation_Delta;
 
@@ -57,8 +57,9 @@ namespace GLVM::Core
 		while(bGame_Loop_Active)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
-			dDelta_Time_ *= 200;
+			dDelta_Time_ *= 2;
 			Chrono_->Reset();
+            std::cout << dDelta_Time_ << std::endl;
 
             // Core::TCVectorContainer<ECS::STransformComponent>* _tTransformContainer = GetInnerMainContainer<ECS::STransformComponent>(_ComponentManager);
             // Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<ECS::CTextureComponent>(_ComponentManager);
@@ -74,12 +75,14 @@ namespace GLVM::Core
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
+                if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
+                    bGame_Loop_Active = false;
 			}
 			Event_.SetLastEvent(Input_Stack_);
-			if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
-				bGame_Loop_Active = false;
+
 
             std::cout << "Pointer position: " << "x = " << Event_.mouse_Pointer_Position_.u_iX << " " << "y = " << Event_.mouse_Pointer_Position_.u_iY << std::endl;
+            std::cout << "Event: " << Event_.GetEvent();
             
 			Movement_System->_dOffset = dDelta_Time_;
 			Movement_System->_Anim_Event = Event_.GetEvent();

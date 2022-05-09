@@ -9,6 +9,9 @@
 #include "ViewComponent.hpp"
 #include <GL/gl.h>
 #include <cmath>
+#include <ctime>
+#include <pthread.h>
+#include <ratio>
 
 float fBase_Array[30] =
 {
@@ -93,17 +96,22 @@ namespace GLVM::ECS
         // tProjection_Matrix[3][2] = -1;
         // tProjection_Matrix[3][3] = 1;
 
-        float fov = 90;
-        float f = 3, n = 10;
-        float zm = f - n;
-        float zp = f + n;
-        float S = std::tan((fov/2) * (PI / 360));
-        float fAspect_Ratio = 1920.0f/1080.0f;
-        tProjection_Matrix[0][0] = (1/S) / fAspect_Ratio;
-        tProjection_Matrix[1][1] = 1/S;
-        tProjection_Matrix[2][2] = -((f+n)/(f-n));
-        tProjection_Matrix[2][3] = -((2*f*n)/(f-n));
-        tProjection_Matrix[3][2] = -1;
+        // float fov = 60;
+        // float f = 3, n = 10;
+        // float zm = f - n;
+        // float zp = f + n;
+        // float S = std::tan((fov/2) * (PI / 360));
+        // float fAspect_Ratio = 1920.0f/1080.0f;
+        // tProjection_Matrix[0][0] = (1/S) / fAspect_Ratio;
+        // tProjection_Matrix[1][1] = 1/S;
+        // tProjection_Matrix[2][2] = -((f+n)/(f-n));
+        // tProjection_Matrix[2][3] = -((2*f*n)/(f-n));
+        // tProjection_Matrix[3][2] = -1;
+        // tProjection_Matrix[3][3] = 1;
+
+        tProjection_Matrix[0][0] = 1;
+        tProjection_Matrix[1][1] = 1;
+        tProjection_Matrix[2][2] = 1;
         tProjection_Matrix[3][3] = 1;
 
 		float aVertices_[VERTEX_ARRAY_RANGE];
@@ -117,10 +125,10 @@ namespace GLVM::ECS
         ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
         
         pGLBind_Vertex_Array(iVao_);
-
+		
 		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
         pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_DYNAMIC_DRAW);
- 
+		
         pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
@@ -144,17 +152,19 @@ namespace GLVM::ECS
         Core::TCVectorContainer<CViewComponent>* _pView_Container = GetInnerComponentContainer<CViewComponent>(_Component_Manager);
         Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = GetInnerIDsContainer<CViewComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIDsContainer<CTextureComponent>(_Component_Manager);
+        ECS::STransformComponent* Player;
         for(int j = 0, iSize = _pOrdered_View_Container->GetSize(); j < iSize; ++j)
         {
-            SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_View_Container)[j]], _Event);
+            Player = &(*_tTransformContainer)[(*_pOrdered_View_Container)[j]];
+            SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_View_Container)[j]], _Event, *Player);
         }
 		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
 		{
             //(*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += 1;
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
 
-            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]]);
-
+            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]], *Player);
+            
 			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
@@ -168,37 +178,55 @@ namespace GLVM::ECS
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
 	}
 
-	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
+	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, ECS::STransformComponent& _Player)
 	{
         Matrix<float, 4> tRotation_Matrix(1.0f);
         Matrix<float, 4> tModel_Matrix(1.0f);
         Matrix<float, 4> tScaling_Matrix(1.0f);
         Matrix<float, 4> tTranslation_Matrix(1.0f);
         
-        tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 0.0f, 0.0f, 1.0f), _transform_Component.fRotate);
+        // tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(0.0f, 1.0f, 0.0f, 1.0f), _Event.mouse_Pointer_Position_.u_iX);
+        // tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 0.0f, 0.0f, 1.0f), _Event.mouse_Pointer_Position_.u_iY);
 
-        tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
-		tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
-		tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
+        // float radius = 10.0f
+        // float PI = 3.14f;
+        // float fAngle = _Event.mouse_Pointer_Position_.u_iX / 180;
+        // fAngle = fAngle * (PI / 180);
+                
+        // float cam_x = std::sin(fAngle) * radius;
+
+        // tTranslation_Matrix = LookAtRH(Vector<float, 3>(_Player.fPos_X, _Player.fPos_Y, _Player.fPos_Z),
+        //                                Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
+        //                                Vector<float, 3>(0.0f, 1.0f, 0.0f));
+        
+        // tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
+		// tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
+		// tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
+		// tTranslation_Matrix[u_iRange-LIMITER][3] = 1.0f;
 
         tScaling_Matrix[0][0] = _transform_Component.fScale;
         tScaling_Matrix[1][1] = _transform_Component.fScale;
         tScaling_Matrix[2][2] = _transform_Component.fScale;
+		tScaling_Matrix[3][3] = 1.0f;
         
         /// For normal matrices.
         
-        // tTranslation_Matrix[0][3] = _transform_Component.fPos_X;
-		// tTranslation_Matrix[1][3] = _transform_Component.fPos_Y;
-		// tTranslation_Matrix[2][3] = _transform_Component.fPos_Z;
+        tTranslation_Matrix[3][0] = _transform_Component.fPos_X;
+		tTranslation_Matrix[3][1] = _transform_Component.fPos_Y;
+		tTranslation_Matrix[3][2] = _transform_Component.fPos_Z;
         // tModel_Matrix.SelfTensorTranspose();
         
-        tModel_Matrix = tScaling_Matrix * tRotation_Matrix * tTranslation_Matrix;
+        tModel_Matrix = tScaling_Matrix * tTranslation_Matrix;
+//		tModel_Matrix = tTranslation_Matrix * tScaling_Matrix;
+
+		PrintMatrix(tModel_Matrix);
 
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 	}
     
-    void CRenderSystem::SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event)
+    void CRenderSystem::SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event,
+                                      ECS::STransformComponent& _Player)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         
@@ -213,16 +241,44 @@ namespace GLVM::ECS
         // tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX - 960.0f);
         // tView_Matrix[u_iRange-LIMITER][1] = (_Event.mouse_Pointer_Position_.u_iY - 540.0f);
 
+        /*!
         tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX - 960.0f) -_transform_Component.fPos_X;
         tView_Matrix[u_iRange-LIMITER][1] = (_Event.mouse_Pointer_Position_.u_iY - 540.0f) - _transform_Component.fPos_Y;
         tView_Matrix[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z + 100;
+        */
 
         // tView_Matrix[u_iRange-LIMITER][0] = 0;
         // tView_Matrix[u_iRange-LIMITER][1] = 0;
 
+        // tView_Matrix[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
+        // tView_Matrix[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z + 100;
+
+        const float radious = 10.0f;
+        // tView_Matrix = LookAtRH(Vector<float, 3>(_Event.mouse_Pointer_Position_.u_iX-960, 0, _Event.mouse_Pointer_Position_.u_iY-540),
+        //                         Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
+        //                         {0, 1.0f, 0});
+
+        // tView_Matrix = LookAtRH(Vector<float, 3>(0.3f, 0.2f, 0.5f),
+        //                         Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
+        //                         {0, 1.0f, 0});
+
+        // tView_Matrix = FPS_View_RH(Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y,
+        //                                _transform_Component.fPos_Z),
+        //                            (_Event.mouse_Pointer_Position_.u_iY / 6.0f - 90.0f),
+        //                            (_Event.mouse_Pointer_Position_.u_iX / 3.0f));
+
+        // tView_Matrix[3][0] = _transform_Component.fPos_X;
+        // tView_Matrix[3][1] = _transform_Component.fPos_Y;
+        // tView_Matrix[3][2] = _transform_Component.fPos_Z;
+
+        tView_Matrix = LookAtRH(Vector<float, 3>(_Player.fPos_X, _Player.fPos_Y, _Player.fPos_Z),
+                                Vector<float, 3>(0.0f, 0.0f, 0.5f),
+                                Vector<float, 3>(0.0f, 1.0f, 0.0f));
+        
         std::cout << "View matrix x: " << tView_Matrix[3][0] << std::endl;
         std::cout << "View matrix y: " << tView_Matrix[3][1] << std::endl;
-        
+        std::cout << "View matrix y: " << tView_Matrix[3][2] << std::endl;
+		
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
     }

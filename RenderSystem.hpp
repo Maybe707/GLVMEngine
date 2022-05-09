@@ -56,8 +56,8 @@ namespace GLVM::ECS
 		void LoadTextureData(ECS::CTextureComponent& _Texture);
 		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
-        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
-        void SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event);
+        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, ECS::STransformComponent& _Player);
+        void SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event, ECS::STransformComponent& _Player);
         void PrintMatrix(Matrix<float, 4> _tMatrix);
     };
 }
