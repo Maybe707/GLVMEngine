@@ -33,7 +33,7 @@ namespace GLVM::ECS
 			{vertices7, vertices8, vertices9},
 			{vertices10, vertices11, vertices12}
 		};
-
+        
 		void ArrayCopy(float* _aArray_Source, float* _aArray_Destination, unsigned int _u_iRange)
 		{
 			for(unsigned int i = 0; i < _u_iRange; ++i)

@@ -120,8 +120,11 @@ public:
 	const T2& operator[](const int index) const;
 	template<class T, int var>
 	Vector<T2, var2> operator*(const Matrix<T, var>& matrix);
-    Vector<T2, var2> operator-(const Vector<T2, var2>& _vector);
-    void operator*(T2 _scalar);
+    Vector<T2, var2> operator-(Vector<T2, var2> _vector);
+    Vector<T2, var2> operator+(Vector<T2, var2> _vector);
+    void operator-=(Vector<T2, var2> _vector);
+    void operator+=(Vector<T2, var2> _vector);
+    Vector<T2, var2> operator*(T2 _scalar);
 };
 
 template<class T2, int var2>
@@ -151,7 +154,7 @@ Vector<T2, var2> Vector<T2, var2>::operator*(const Matrix<T, var>& matrix)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
+Vector<T2, var2> Vector<T2, var2>::operator-(Vector<T2, var2> _vector)
 {
     Vector<T2, var2> temp_Vector(1);
 
@@ -163,10 +166,42 @@ Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
 }
 
 template <typename T2, int var2>
-void Vector<T2, var2>::operator*(T2 _scalar)
+Vector<T2, var2> Vector<T2, var2>::operator+(Vector<T2, var2> _vector)
 {
+        Vector<T2, var2> temp_Vector(1);
+
+    temp_Vector[0] = m_vector[0] + _vector[0];
+    temp_Vector[1] = m_vector[1] + _vector[1];
+    temp_Vector[2] = m_vector[2] + _vector[2];
+
+    return temp_Vector;
+}
+
+template <typename T2, int var2>
+void Vector<T2, var2>::operator-=(Vector<T2, var2> _vector)
+{
+    m_vector[0] = m_vector[0] - _vector[0];
+    m_vector[1] = m_vector[1] - _vector[1];
+    m_vector[2] = m_vector[2] - _vector[2];
+}
+
+template <typename T2, int var2>
+void Vector<T2, var2>::operator+=(Vector<T2, var2> _vector)
+{
+    m_vector[0] = m_vector[0] + _vector[0];
+    m_vector[1] = m_vector[1] + _vector[1];
+    m_vector[2] = m_vector[2] + _vector[2];
+}
+
+template <typename T2, int var2>
+Vector<T2, var2> Vector<T2, var2>::operator*(T2 _scalar)
+{
+    Vector<T2, var2> temp_vec(1.0f);
+    
     for(int i = 0; i < var2; ++i)
-        m_vector[i] = m_vector[i] * _scalar;
+        temp_vec[i] = m_vector[i] * _scalar;
+
+    return temp_vec;
 }
 
 template <class T, class T2,int var, int var2>
@@ -350,9 +385,17 @@ Matrix<T, 4> LookAtRH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
     Result[3][0] = -Dot(s, _eye);
     Result[3][1] = -Dot(u, _eye);
     Result[3][2] = Dot(f, _eye);
-    Result.SelfTensorTranspose();
+//    Result.SelfTensorTranspose();
 
     return Result;
+}
+
+template <typename T3>
+T3 Radians(T3 _angle)
+{
+    _angle *= PI / static_cast<T3>(180);
+
+    return _angle;
 }
 
 template <typename T>

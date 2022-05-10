@@ -8,6 +8,7 @@
 #include "ComponentManager.hpp"
 #include "ISystem.hpp"
 #include "VertexMath.hpp"
+#include "ViewComponent.hpp"
 
 namespace GLVM::ECS
 {
@@ -18,34 +19,40 @@ namespace GLVM::ECS
 		Core::EEvents _Anim_Event;
 		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
-            Vector<float, 3> Front_Camera(0.0f, 0.0f, -1.0f);
-            Vector<float, 3> Up_Camera(0.0f, 1.0f, 0.0f);
 			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerComponentContainer<ECS::STransformComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIDsContainer<ECS::SMoveComponent>(_Component_Manager);
 			Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerComponentContainer<ECS::SMoveComponent>(_Component_Manager);
+            Core::TCVectorContainer<ECS::CViewComponent>* _tViewContainer = ECS::GetInnerComponentContainer<ECS::CViewComponent>(_Component_Manager);
+            Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
+            ECS::CViewComponent& view_Component = (*_tViewContainer)[(*_pOrdered_View_Container)[0]];
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
+                float cameraSpeed = static_cast<float>(2.5 * _dOffset);
 				switch(_Anim_Event)
 				{
 				case Core::EEvents::eMOVE_LEFT:
-                    std::cout << "Privet" << std::endl;
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_X -= Normalize(Cross(Front_Camera, Up_Camera)) *_dOffset;
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) *cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_LEFT;
 					break;
 				case Core::EEvents::eMOVE_RIGHT:
-                    std::cout << "Privet" << std::endl;
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_X += _dOffset;
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) *cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
 					break;
 				case Core::EEvents::eMOVE_DOWN:
-                    std::cout << "Privet" << std::endl;
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Z -= _dOffset;
-					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN; 
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+                        view_Component.Front_Camera * cameraSpeed;
+					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
+                    std::cout << "Z Axis: " << (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[2] << std::endl;
+                    std::cout << "Front cam: " << view_Component.Front_Camera[2] << std::endl;
 					break;
 				case Core::EEvents::eMOVE_UP:
-                    std::cout << "Privet" << std::endl;
-					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].fPos_Z += _dOffset;
+					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+                        view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
+                    std::cout << "Z Axis: " << (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[2] << std::endl;
+                    std::cout << "Front cam: " << view_Component.Front_Camera[2] << std::endl;
 					break;
 				default:
 					break;

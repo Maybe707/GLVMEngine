@@ -8,6 +8,7 @@
 #include "VectorContainer.hpp"
 #include "VertexComponent.hpp"
 #include "IContainer.hpp"
+#include "ViewComponent.hpp"
 
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
 #define SOME_STRANGE_STUFF 0
@@ -57,12 +58,14 @@ namespace GLVM::Core
 		while(bGame_Loop_Active)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
-			dDelta_Time_ *= 2;
+//			dDelta_Time_ /= 2;
 			Chrono_->Reset();
             std::cout << dDelta_Time_ << std::endl;
 
             // Core::TCVectorContainer<ECS::STransformComponent>* _tTransformContainer = GetInnerMainContainer<ECS::STransformComponent>(_ComponentManager);
             // Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<ECS::CTextureComponent>(_ComponentManager);
+
+
             
             // (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += std::fmod(dDelta_Time_, 360);
             // std::cout << (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate << std::endl;
@@ -79,7 +82,6 @@ namespace GLVM::Core
                     bGame_Loop_Active = false;
 			}
 			Event_.SetLastEvent(Input_Stack_);
-
 
             std::cout << "Pointer position: " << "x = " << Event_.mouse_Pointer_Position_.u_iX << " " << "y = " << Event_.mouse_Pointer_Position_.u_iY << std::endl;
             std::cout << "Event: " << Event_.GetEvent();
@@ -111,8 +113,8 @@ namespace GLVM::Core
 		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
 		pGLGenerate_Mipmap(GL_TEXTURE_2D);
 
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 

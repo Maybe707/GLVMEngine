@@ -1,13 +1,13 @@
 #ifndef TRANSFORM_COMPONENT
 #define TRANSFORM_COMPONENT
 
+#include "VertexMath.hpp"
+
 namespace GLVM::ECS
 {    
 	struct STransformComponent
 	{
-		float fPos_X;
-		float fPos_Y;
-		float fPos_Z;
+        Vector<float, 3> tVertex{0.0f, 0.0f, 0.0f};
         float fRotate = 0.0f;
         float fScale = 1.0f;
 	};

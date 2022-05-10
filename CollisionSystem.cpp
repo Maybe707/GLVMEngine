@@ -6,19 +6,19 @@ namespace GLVM::ECS
 	{
 		if (_move_Component.eEvent_ == Core::eMOVE_UP)
 		{
-			_transform_Component.fPos_Z = (_transform_Component.fPos_Z - _fDelta_Time);
+			_transform_Component.tVertex[2] = (_transform_Component.tVertex[2] - _fDelta_Time);
 		}
 		if (_move_Component.eEvent_ == Core::eMOVE_DOWN)
 		{
-			_transform_Component.fPos_Z = (_transform_Component.fPos_Z + _fDelta_Time);
+			_transform_Component.tVertex[2] = (_transform_Component.tVertex[2] + _fDelta_Time);
 		}
 		if (_move_Component.eEvent_ == Core::eMOVE_RIGHT)
 		{
-		    _transform_Component.fPos_X = (_transform_Component.fPos_X - _fDelta_Time);
+		    _transform_Component.tVertex[0] = (_transform_Component.tVertex[0] - _fDelta_Time);
 		}
 		if (_move_Component.eEvent_ == Core::eMOVE_LEFT)
 		{
-			_transform_Component.fPos_X = (_transform_Component.fPos_X + _fDelta_Time);
+			_transform_Component.tVertex[0] = (_transform_Component.tVertex[0] + _fDelta_Time);
 		}
 	}
 
@@ -28,9 +28,9 @@ namespace GLVM::ECS
 		float fX = 0;
 		float fY = 0;
         float fZ = 0;
-		fX = std::abs(_transform_Component2.fPos_X - _transform_Component1.fPos_X);
-		fY = std::abs(_transform_Component2.fPos_Y - _transform_Component1.fPos_Y);
-        fZ = std::abs(_transform_Component2.fPos_Z - _transform_Component1.fPos_Z);
+		fX = std::abs(_transform_Component2.tVertex[0] - _transform_Component1.tVertex[0]);
+		fY = std::abs(_transform_Component2.tVertex[1] - _transform_Component1.tVertex[1]);
+        fZ = std::abs(_transform_Component2.tVertex[2] - _transform_Component1.tVertex[2]);
 		if(fX < 0.2f && fY < 0.2f && fZ < 0.2f)
 			bCollision_Flag = true;
 
