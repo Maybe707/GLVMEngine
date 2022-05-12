@@ -33,8 +33,10 @@ namespace GLVM::Core
 
     struct SMousePointerPosition
     {
-        unsigned int u_iX;
-        unsigned int u_iY;
+        int iPosition_X;
+        int iPosition_Y;
+        int iOffset_X = 0;
+        int iOffset_Y = 0;
     };
     
     /*! \class Event

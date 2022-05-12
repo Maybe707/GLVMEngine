@@ -58,23 +58,13 @@ namespace GLVM::Core
 		while(bGame_Loop_Active)
 		{
 			dDelta_Time_ = Chrono_->GetElapsed();
-//			dDelta_Time_ /= 2;
 			Chrono_->Reset();
-            std::cout << dDelta_Time_ << std::endl;
-
-            // Core::TCVectorContainer<ECS::STransformComponent>* _tTransformContainer = GetInnerMainContainer<ECS::STransformComponent>(_ComponentManager);
-            // Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIndexContainer<ECS::CTextureComponent>(_ComponentManager);
-
-
-            
-            // (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate += std::fmod(dDelta_Time_, 360);
-            // std::cout << (*_tTransformContainer)[(*_pOrdered_Texture_Container)[0]].fRotate << std::endl;
             
 			Window_->ClearDisplay();
-			Shader_Program->Use();
+
+            Shader_Program->Use();
 			Shader_Program->SetUniformID();
 			Renderer_System->SetProjectionMatrix(Shader_Program);
-//            Renderer_System->SetViewMatrix(Shader_Program, Event_);
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
@@ -83,8 +73,8 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 
-            std::cout << "Pointer position: " << "x = " << Event_.mouse_Pointer_Position_.u_iX << " " << "y = " << Event_.mouse_Pointer_Position_.u_iY << std::endl;
-            std::cout << "Event: " << Event_.GetEvent();
+            Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X, Event_.mouse_Pointer_Position_.iPosition_Y,
+                                &Event_.mouse_Pointer_Position_.iOffset_X, &Event_.mouse_Pointer_Position_.iOffset_Y);
             
 			Movement_System->_dOffset = dDelta_Time_;
 			Movement_System->_Anim_Event = Event_.GetEvent();

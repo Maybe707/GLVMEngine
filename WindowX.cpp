@@ -6,6 +6,7 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <bits/types/time_t.h>
+#include <bits/types/wint_t.h>
 #include <iostream>
 
 namespace GLVM::Core
@@ -54,7 +55,7 @@ namespace GLVM::Core
         Color_Map_ = XCreateColormap(pDisp_, Root_Window_, pVisual_->visual, AllocNone);
 
         Set_Window_Attributes_.colormap = Color_Map_;
-        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask | PointerMotionMask;
+        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask | PointerMotionMask | StructureNotifyMask;
 
         Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1920, 1080, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
@@ -90,7 +91,7 @@ namespace GLVM::Core
         }
 
         ///< Show_the_window
-        
+
         XMapWindow(pDisp_, Win_);
         glXMakeCurrent(pDisp_, Win_, Context_);
 
@@ -104,6 +105,21 @@ namespace GLVM::Core
 
         ///< glEnable(GL_DEPTH_TEST);
 
+        // Cursor invisibleCursor;
+        // Pixmap bitmapNoData;
+        // XColor black;
+        // static char noData[] = { 0,0,0,0,0,0,0,0 };
+        // black.red = black.green = black.blue = 0;
+
+        // bitmapNoData = XCreateBitmapFromData(pDisp_, Win_, noData, 8, 8);
+        // invisibleCursor = XCreatePixmapCursor(pDisp_, bitmapNoData, bitmapNoData, 
+        //                                       &black, &black, 0, 0);
+        // XDefineCursor(pDisp_,Win_, invisibleCursor);
+        
+        // XFreeCursor(display, invisibleCursor);
+        // XFreePixmap(display, bitmapNoData);
+        
+        
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
 		Drawable = glXGetCurrentDrawable();
 		Initializer();
@@ -114,7 +130,7 @@ namespace GLVM::Core
 			pGLXSwap_Interval_EXT(pDisp_, Drawable, kInterval);
 		}
     }
-
+    
     CWindowX::~CWindowX()
     {
 /*!        glXDestroyContext(pDisp_, GLContext_);
@@ -125,6 +141,55 @@ namespace GLVM::Core
         XCloseDisplay(pDisp_);*/
     }
 
+    void CWindowX::CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset)
+    {
+        // if(!bFirst_Enter_)
+        // {
+        //     getMousePosition(&last_X_, &last_Y_);
+        //     bFirst_Enter_ = true;
+        // }
+
+//        int tempX, tempY;
+//        getMousePosition(&tempX, &tempY);
+        // _x = tempX - m_lastX;
+        // _y = tempY - m_lastY;
+
+        // if(!bFirst_Enter_)
+        // {
+            
+        //     bFirst_Enter_ = true;
+        // }
+
+        if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
+            return;
+        
+        int iOffset_X = 0, iOffset_Y = 0;
+        iOffset_X = _x_position - 960;
+        iOffset_Y = _y_position - 540;
+
+        std::cout << "Offset X: " << iOffset_X << std::endl;
+        std::cout << "Offset Y: " << iOffset_Y << std::endl;
+        
+        *_x_offset += iOffset_X;
+        *_y_offset -= iOffset_Y;
+
+        if(*_y_offset > 890)
+            *_y_offset = 890;
+        else if(*_y_offset < -890)
+            *_y_offset = -890;
+        
+//        int iScreen_Center_X, iScreen_Center_Y;
+        
+        XWarpPointer(pDisp_, None, Win_, 0, 0, 0, 0, 960, 540);
+        XFlush(pDisp_);
+          
+//        Window root_window = XRootWindow(pDisp_, 0);
+//        XSelectInput(pDisp_, Win_, KeyReleaseMask);
+
+        // last_X_ = iScreen_Center_X;
+        // last_Y_ = iScreen_Center_Y;
+    }
+    
     void CWindowX::SwapBuffers()
     {
         glXSwapBuffers(pDisp_, Win_);
@@ -144,7 +209,7 @@ namespace GLVM::Core
         {
             XNextEvent(pDisp_, &uXEvent);
 			KeySym ulKey;
-            
+
             XMotionEvent motion;
             int iNumber_Of_Screens;
             Window* pRoot_Windows;
@@ -177,8 +242,25 @@ namespace GLVM::Core
                 std::cout << "Local window pointer posotion: : " << iLocal_Window_X << " " << iLocal_Window_Y << std::endl;
                 motion = uXEvent.xmotion;
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
-                _Event.mouse_Pointer_Position_.u_iX = iLocal_Window_X;
-                _Event.mouse_Pointer_Position_.u_iY = iLocal_Window_Y;
+                _Event.mouse_Pointer_Position_.iPosition_X = iLocal_Window_X;
+                _Event.mouse_Pointer_Position_.iPosition_Y = iLocal_Window_Y;
+
+            // case ConfigureNotify:
+            //     center_x = event.xconfigure.width  / 2;
+            //     center_y = event.xconfigure.height / 2;
+            //     break;
+ 
+            case MapNotify:
+                XGrabPointer
+                    (
+                        pDisp_, Win_, 
+                        True, PointerMotionMask,
+                        GrabModeAsync, GrabModeAsync,
+                        Win_,
+                        None, CurrentTime
+                    );
+                break;
+                
                 break;
 			case KeyPress:
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);

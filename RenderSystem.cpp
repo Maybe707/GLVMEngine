@@ -106,7 +106,6 @@ namespace GLVM::ECS
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-///<	stbi_set_flip_vertically_on_load(true);
         glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, 1920, 1080);
 	}
@@ -159,25 +158,6 @@ namespace GLVM::ECS
         Matrix<float, 4> tModel_Matrix(1.0f);
         Matrix<float, 4> tScaling_Matrix(1.0f);
         Matrix<float, 4> tTranslation_Matrix(1.0f);
-        
-        // tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(0.0f, 1.0f, 0.0f, 1.0f), _Event.mouse_Pointer_Position_.u_iX);
-        // tRotation_Matrix = Rotate(tRotation_Matrix, Vector<float, 4>(1.0f, 0.0f, 0.0f, 1.0f), _Event.mouse_Pointer_Position_.u_iY);
-
-        // float radius = 10.0f
-        // float PI = 3.14f;
-        // float fAngle = _Event.mouse_Pointer_Position_.u_iX / 180;
-        // fAngle = fAngle * (PI / 180);
-                
-        // float cam_x = std::sin(fAngle) * radius;
-
-        // tTranslation_Matrix = LookAtRH(Vector<float, 3>(_Player.fPos_X, _Player.fPos_Y, _Player.fPos_Z),
-        //                                Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
-        //                                Vector<float, 3>(0.0f, 1.0f, 0.0f));
-        
-        // tTranslation_Matrix[u_iRange-LIMITER][0] = _transform_Component.fPos_X;
-		// tTranslation_Matrix[u_iRange-LIMITER][1] = _transform_Component.fPos_Y;
-		// tTranslation_Matrix[u_iRange-LIMITER][2] = _transform_Component.fPos_Z;
-		// tTranslation_Matrix[u_iRange-LIMITER][3] = 1.0f;
 
         tScaling_Matrix[0][0] = _transform_Component.fScale;
         tScaling_Matrix[1][1] = _transform_Component.fScale;
@@ -206,86 +186,44 @@ namespace GLVM::ECS
 
         // if(bFirst_Mouse)
         // {
-        //     fLast_X = _Event.mouse_Pointer_Position_.u_iX;
-        //     fLast_Y = _Event.mouse_Pointer_Position_.u_iY;
+        //     fLast_X = _Event.mouse_Pointer_Position_.iPosition_X;
+        //     fLast_Y = _Event.mouse_Pointer_Position_.iPosition_Y;
         //     bFirst_Mouse = false;
         // }
 
-        float fOffset_X = _Event.mouse_Pointer_Position_.u_iX - fLast_X;
-        float fOffset_Y = fLast_Y - _Event.mouse_Pointer_Position_.u_iY;
-        fLast_X = _Event.mouse_Pointer_Position_.u_iX;
-        fLast_Y = _Event.mouse_Pointer_Position_.u_iY;
+        // float fOffset_X = _Event.mouse_Pointer_Position_.u_iX - fLast_X;
+        // float fOffset_Y = fLast_Y - _Event.mouse_Pointer_Position_.u_iY;
+        // fLast_X = _Event.mouse_Pointer_Position_.u_iX;
+        // fLast_Y = _Event.mouse_Pointer_Position_.u_iY;
 
         const float kSensitivity = 0.1f;
-        fOffset_X *= kSensitivity;
-        fOffset_Y *= kSensitivity;
+        // fOffset_X *= kSensitivity;
+        // fOffset_Y *= kSensitivity;
 
-        fYaw += fOffset_X;
-        fPitch += fOffset_Y;
+        // fYaw += fOffset_X;
+        // fPitch += fOffset_Y;
+
+        fYaw = _Event.mouse_Pointer_Position_.iOffset_X;
+        fPitch = _Event.mouse_Pointer_Position_.iOffset_Y;
+        fYaw *= kSensitivity;
+        fPitch *= kSensitivity;
 
         if(fPitch > 89.0f)
             fPitch = 89.0f;
         if(fPitch < -89.0f)
             fPitch = -89.0f;
 
-        // Vector<float, 3> Front_Camera(0.0f, 0.0, -1.0f);
-        // Vector<float, 3> Up_Camera(0.0f, 1.0f, 0.0f);
         Vector<float, 3> front;
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
-        
-        // tView_Matrix[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
-        // tView_Matrix[u_iRange-LIMITER][1] = -_transform_Component.fPos_Y;
-
-//        aMatrix_View_[u_iRange-LIMITER][2] = _transform_Component.fPos_Z + 100;
-
-        // tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX / 2.0f);
-        // tView_Matrix[u_iRange-LIMITER][1] = _Event.mouse_Pointer_Position_.u_iY;
-
-        // tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX - 960.0f);
-        // tView_Matrix[u_iRange-LIMITER][1] = (_Event.mouse_Pointer_Position_.u_iY - 540.0f);
-
-        /*!
-        tView_Matrix[u_iRange-LIMITER][0] = -(_Event.mouse_Pointer_Position_.u_iX - 960.0f) -_transform_Component.fPos_X;
-        tView_Matrix[u_iRange-LIMITER][1] = (_Event.mouse_Pointer_Position_.u_iY - 540.0f) - _transform_Component.fPos_Y;
-        tView_Matrix[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z + 100;
-        */
-
-        // tView_Matrix[u_iRange-LIMITER][0] = 0;
-        // tView_Matrix[u_iRange-LIMITER][1] = 0;
-
-        // tView_Matrix[u_iRange-LIMITER][0] = -_transform_Component.fPos_X;
-        // tView_Matrix[u_iRange-LIMITER][2] = -_transform_Component.fPos_Z + 100;
-
-        const float radious = 10.0f;
-        // tView_Matrix = LookAtRH(Vector<float, 3>(_Event.mouse_Pointer_Position_.u_iX-960, 0, _Event.mouse_Pointer_Position_.u_iY-540),
-        //                         Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
-        //                         {0, 1.0f, 0});
-
-        // tView_Matrix = LookAtRH(Vector<float, 3>(0.3f, 0.2f, 0.5f),
-        //                         Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y, _transform_Component.fPos_Z),
-        //                         {0, 1.0f, 0});
-
-        // tView_Matrix = FPS_View_RH(Vector<float, 3>(_transform_Component.fPos_X, _transform_Component.fPos_Y,
-        //                                _transform_Component.fPos_Z),
-        //                            (_Event.mouse_Pointer_Position_.u_iY / 6.0f - 90.0f),
-        //                            (_Event.mouse_Pointer_Position_.u_iX / 3.0f));
-
-        // tView_Matrix[3][0] = _transform_Component.fPos_X;
-        // tView_Matrix[3][1] = _transform_Component.fPos_Y;
-        // tView_Matrix[3][2] = _transform_Component.fPos_Z;
 
         PrintVector(_Player.tVertex);
         
         tView_Matrix = LookAtRH(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
                                 _view_Component.Up_Camera);
-        
-        std::cout << "View matrix x: " << tView_Matrix[3][0] << std::endl;
-        std::cout << "View matrix y: " << tView_Matrix[3][1] << std::endl;
-        std::cout << "View matrix z: " << tView_Matrix[3][2] << std::endl;
 		
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);

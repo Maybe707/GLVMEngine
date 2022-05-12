@@ -25,12 +25,19 @@ namespace GLVM::Core
         GLXFBConfig* pFbc_;
 		GLXDrawable Drawable;
 
+        bool bFirst_Enter_;
+        int last_X_;
+        int last_Y_;
+        
+        //XWindowAttributes gwa_;
+        
+
     public:
         
         CWindowX();
         ~CWindowX();
 
-
+        void CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset) override;
         void SwapBuffers() override;
         void ClearDisplay() override;
         bool HandleEvent(CEvent& _Event) override;
