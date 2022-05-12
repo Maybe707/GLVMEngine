@@ -42,17 +42,18 @@ namespace GLVM::ECS
 		
 		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
+            std::cout << "Anim: " << Animation_Delta << std::endl;
 			Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Animation_Move_Container = GetInnerIDsContainer<SAnimationMoveComponent>(_Component_Manager);
 			for(int i = 0, iSize = _pOrdered_Animation_Move_Container->GetSize(); i < iSize; ++i)
 			{
 				if(eEvent_ != eSave_Event_)
-					Animation_Delta = 31.0f;
+					Animation_Delta = 0.31f;
 				eSave_Event_ = eEvent_;
 				if(eEvent_ == Core::eMOVE_DOWN)
 				{
 					Animation_Delta += Delta_Time;
-					if(Animation_Delta > 30.0f)
+					if(Animation_Delta > 0.3f)
 					{
 						switch(anim_count)
 						{
@@ -77,7 +78,7 @@ namespace GLVM::ECS
 					else if(eEvent_ == Core::EEvents::eMOVE_LEFT)
 					{
 						Animation_Delta += Delta_Time;
-						if(Animation_Delta > 30.0f)
+						if(Animation_Delta > 0.3f)
 						{
 							switch(anim_count)
 							{
@@ -102,7 +103,7 @@ namespace GLVM::ECS
 					else if(eEvent_ == Core::EEvents::eMOVE_RIGHT)
 					{
 						Animation_Delta += Delta_Time;
-						if(Animation_Delta > 30.0f)
+						if(Animation_Delta > 0.3f)
 						{
 							switch(anim_count)
 							{
@@ -127,7 +128,7 @@ namespace GLVM::ECS
 					else if(eEvent_ == Core::EEvents::eMOVE_UP)
 					{
 						Animation_Delta += Delta_Time;
-						if(Animation_Delta > 30.0f)
+						if(Animation_Delta > 0.3f)
 						{
 							switch(anim_count)
 							{

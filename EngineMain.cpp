@@ -16,25 +16,24 @@ int main()
     
 	Entity u_iPlayer;
 	EntityManager.CreateEntity(u_iPlayer);
-    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent>(u_iPlayer);
-    // GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	// TexturePlayer.iWidth_ = 96; 
-	// TexturePlayer.iHeight_ = 128;
-//	TexturePlayer.u_iData_ = chelik_dat;
-//	GLVM.LoadTextureData(TexturePlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CTextureComponent>(u_iPlayer);
+    GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	TexturePlayer.iWidth_ = 96; 
+	TexturePlayer.iHeight_ = 128;
+	TexturePlayer.u_iData_ = chelik_dat;
+	GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager.GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
 	// TransformPlayer.fPos_X = 150.0f;
 	// TransformPlayer.fPos_Y = 100.0f;
 	// TransformPlayer.fPos_Z = 30.0f;
     // TransformPlayer.fRotate = 30.0f;
-    // TransformPlayer.fScale = 64.0f;
     
     TransformPlayer.tVertex[0] = 0.0f;
 	TransformPlayer.tVertex[1] = 0.0f;
-	TransformPlayer.tVertex[2] = 3.0f;
+	TransformPlayer.tVertex[2] = 5.0f;
     // TransformPlayer.fRotate = 0.0f;
-    TransformPlayer.fScale = 0.1f;
+    TransformPlayer.fScale = 0.5f;
 
     ViewPlayer.Front_Camera[0] = 0.0f;
     ViewPlayer.Front_Camera[1] = 0.0f;

@@ -78,7 +78,7 @@ namespace GLVM::ECS
 		// aMatrix_Ortho_[15] = 1.0f;
 		// //Matrix_Ortho[14] = -m_zn/(m_zf-m_zn);
 
-        float f = 10, n = 1;
+        float f = 10, n = 0.1;
         float fov = 90;
         float S = 1 / std::tan((fov/2) * (PI / 180));
         tProjection_Matrix[0][0] = S;

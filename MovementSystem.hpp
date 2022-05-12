@@ -32,12 +32,12 @@ namespace GLVM::ECS
 				{
 				case Core::EEvents::eMOVE_LEFT:
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
-                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) *cameraSpeed;
+                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_LEFT;
 					break;
 				case Core::EEvents::eMOVE_RIGHT:
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) *cameraSpeed;
+                        Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
 					break;
 				case Core::EEvents::eMOVE_DOWN:
