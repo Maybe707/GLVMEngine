@@ -24,12 +24,16 @@ namespace GLVM::ECS
         {
         case Core::eMOVE_UP:
             _transform_Component.tVertex -= _view_Component.Front_Camera * cameraSpeed;
+            break;
         case Core::eMOVE_DOWN:
             _transform_Component.tVertex += _view_Component.Front_Camera * cameraSpeed;
+            break;
         case Core::eMOVE_RIGHT:
             _transform_Component.tVertex -= Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * cameraSpeed;
+            break;
         case Core::eMOVE_LEFT:
             _transform_Component.tVertex += Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * cameraSpeed;
+            break;
         default:
             break;
         }
@@ -44,7 +48,7 @@ namespace GLVM::ECS
 		fX = std::abs(_transform_Component2.tVertex[0] - _transform_Component1.tVertex[0]);
 		fY = std::abs(_transform_Component2.tVertex[1] - _transform_Component1.tVertex[1]);
         fZ = std::abs(_transform_Component2.tVertex[2] - _transform_Component1.tVertex[2]);
-		if(fX < 1.0f && fY < 1.0f && fZ < 1.0f)
+		if(fX < 0.5f && fY < 0.5f && fZ < 0.5f)
 			bCollision_Flag = true;
 
 		return bCollision_Flag;

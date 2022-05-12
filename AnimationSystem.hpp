@@ -33,7 +33,8 @@ namespace GLVM::ECS
 			{vertices7, vertices8, vertices9},
 			{vertices10, vertices11, vertices12}
 		};
-        
+
+        ///< Write one side of cube(if vertex component had vertices for 3D cube).
 		void ArrayCopy(float* _aArray_Source, float* _aArray_Destination, unsigned int _u_iRange)
 		{
 			for(unsigned int i = 0; i < _u_iRange; ++i)
@@ -42,7 +43,6 @@ namespace GLVM::ECS
 		
 		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
-            std::cout << "Anim: " << Animation_Delta << std::endl;
 			Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
 			Core::TCVectorContainer<unsigned int>* _pOrdered_Animation_Move_Container = GetInnerIDsContainer<SAnimationMoveComponent>(_Component_Manager);
 			for(int i = 0, iSize = _pOrdered_Animation_Move_Container->GetSize(); i < iSize; ++i)

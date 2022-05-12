@@ -1,5 +1,8 @@
 #include "WindowWin.hpp"
+#include "Event.hpp"
 #include "GLPointer.h"
+#include <iostream>
+#include <iterator>
 
 #define VK_W 0x57
 #define VK_S 0x53
@@ -10,9 +13,7 @@ namespace GLVM::Core
 {    
     CWindowWin::CWindowWin()
     {
-        HWND pClassic_Window_;
-        HDC pClassic_DC_;
-        HGLRC pClassic_Context_;
+
 
         ///< Create classic window
         pClassic_Window_ = CreateWindowA( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1, NULL, NULL, GetModuleHandle( NULL ), NULL );
@@ -85,7 +86,8 @@ namespace GLVM::Core
         SetPixelFormat( pModern_DC_, iModern_Pixel_Format, &classic_Format_Descriptor );
 		
         ///< Create modern OpenGL 4.2 context		
-        int aAttributes[] = {
+        int aAttributes[] =
+        {
             WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
             WGL_CONTEXT_MINOR_VERSION_ARB, 2,
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
@@ -133,14 +135,42 @@ namespace GLVM::Core
         DestroyWindow(pModern_Window_);
 		PostQuitMessage(0);
     }
+
+    void CWindowWin::CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset)
+    {
+        POINT point_position{960, 540};
+        ClientToScreen(pModern_Window_, &point_position);
+
+        ///< Solve a problem with endlessly growing numbers in the start game run.
+        if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
+            return;
         
+        int iOffset_X = 0, iOffset_Y = 0;
+        iOffset_X = _x_position - 960;
+        iOffset_Y = _y_position - 540;
+        
+        *_x_offset += iOffset_X;
+        *_y_offset -= iOffset_Y;
+
+        if(*_y_offset > 890)
+            *_y_offset = 890;
+        else if(*_y_offset < -890)
+            *_y_offset = -890;
+
+        SetCursorPos(point_position.x, point_position.y);
+    }
+    
 ///< Callback method for events handling.
     LRESULT CALLBACK CWindowWin::MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam)
     {
 		CEvent* pEvent = (CEvent*)GetWindowLongPtrW(_pHwnd, GWLP_USERDATA);
+
+        int iMouse_Position_X, iMouse_Position_Y;
+        
         switch (_pMsg) 
         { 
-        case WM_CREATE: 
+        case WM_CREATE:
+
             ///< Initialize the window. 
             return 0; 
  
@@ -153,6 +183,14 @@ namespace GLVM::Core
             ///< Set the size and position of the window. 
             return 0;
 
+        case WM_MOUSEMOVE:
+            iMouse_Position_X = GET_X_LPARAM(_pLParam);
+            iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
+            pEvent->SetEvent(EEvents::eMOUSE_POINTER_POSITION);
+            pEvent->mouse_Pointer_Position_.iPosition_X = iMouse_Position_X;
+            pEvent->mouse_Pointer_Position_.iPosition_Y = iMouse_Position_Y;
+            return 0;
+            
         case WM_KEYDOWN: 
             switch (_pWParam) 
             { 

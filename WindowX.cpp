@@ -224,31 +224,36 @@ namespace GLVM::Core
 			switch(uXEvent.type)
 			{
             case MotionNotify:
-                iNumber_Of_Screens = XScreenCount(pDisp_);
-                pRoot_Windows = (unsigned long*)malloc(sizeof(Window) * iNumber_Of_Screens);
-                ///< Count through all windows and write thir indices to array pRoot_Windows.
-                for (int i = 0; i < iNumber_Of_Screens; ++i)
-                    pRoot_Windows[i] = XRootWindow(pDisp_, i);
-                /*!
-                Serching for the mouse cursor in each window and when find out write to related pointer index of root window,
-                 local window (if contained) and coordinates of cursor in root window and specified window.
-                */
-                for(int j = 0; j < iNumber_Of_Screens; ++j)
-                    bPointer_Search_Flag = XQueryPointer(pDisp_, pRoot_Windows[j], &Root_Window_Returned, &Local_Window_Returned, &iRoot_X,
-                                                     &iRoot_Y, &iSpecified_Window_X, &iSpecified_Window_Y, &u_iMask_Return);
-                ///< Searching mouse cursor in local window.
-                XQueryPointer(pDisp_, Local_Window_Returned, &Root_Window_Returned, &Local_Window_Returned, &iRoot_X, &iRoot_Y,
-                              &iSpecified_Window_X, &iSpecified_Window_Y, &u_iMask_Return);
+                // iNumber_Of_Screens = XScreenCount(pDisp_);
+                // pRoot_Windows = (unsigned long*)malloc(sizeof(Window) * iNumber_Of_Screens);
+                // ///< Count through all windows and write thir indices to array pRoot_Windows.
+                // for (int i = 0; i < iNumber_Of_Screens; ++i)
+                //     pRoot_Windows[i] = XRootWindow(pDisp_, i);
+                // /*!
+                // Serching for the mouse cursor in each window and when find out write to related pointer index of root window,
+                //  local window (if contained) and coordinates of cursor in root window and specified window.
+                // */
+                // for(int j = 0; j < iNumber_Of_Screens; ++j)
+                //     bPointer_Search_Flag = XQueryPointer(pDisp_, pRoot_Windows[j], &Root_Window_Returned, &Local_Window_Returned, &iRoot_X,
+                //                                      &iRoot_Y, &iSpecified_Window_X, &iSpecified_Window_Y, &u_iMask_Return);
+                // ///< Searching mouse cursor in local window.
+                // XQueryPointer(pDisp_, Local_Window_Returned, &Root_Window_Returned, &Local_Window_Returned, &iRoot_X, &iRoot_Y,
+                //               &iSpecified_Window_X, &iSpecified_Window_Y, &u_iMask_Return);
                 
-                std::cout << "Root window: " << Root_Window_Returned << std::endl;
-                std::cout << "Local window: " << Local_Window_Returned << std::endl;
-                std::cout << "Root window pointer posotion:  " << iRoot_X << " " << iRoot_Y << std::endl;
-                std::cout << "Local window pointer posotion: : " << iSpecified_Window_X << " " << iSpecified_Window_Y << std::endl;
+                // std::cout << "Root window: " << Root_Window_Returned << std::endl;
+                // std::cout << "Local window: " << Local_Window_Returned << std::endl;
+                // std::cout << "Root window pointer posotion:  " << iRoot_X << " " << iRoot_Y << std::endl;
+                // std::cout << "Local window pointer posotion: : " << iSpecified_Window_X << " " << iSpecified_Window_Y << std::endl;
                 
+                ///< With structure "motion" we can get position of mouse pointer and e.c.
                 motion = uXEvent.xmotion;
+
+                std::cout << "Mouse position X: " << motion.x << std::endl;
+                std::cout << "Mouse position Y: " << motion.y << std::endl;
+                
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
-                _Event.mouse_Pointer_Position_.iPosition_X = iSpecified_Window_X;
-                _Event.mouse_Pointer_Position_.iPosition_Y = iSpecified_Window_Y;
+                _Event.mouse_Pointer_Position_.iPosition_X = motion.x;
+                _Event.mouse_Pointer_Position_.iPosition_Y = motion.y;
                                 
             // case ConfigureNotify:
             //     center_x = event.xconfigure.width  / 2;

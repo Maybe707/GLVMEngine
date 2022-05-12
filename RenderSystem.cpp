@@ -219,8 +219,6 @@ namespace GLVM::ECS
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
 
-        PrintVector(_Player.tVertex);
-        
         tView_Matrix = LookAtRH(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
                                 _view_Component.Up_Camera);

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <wchar.h>
 #include <windows.h>
+#include <windowsx.h>
 #include <GL/gl.h>
 #include "glext.h"
 #include "GLPointer.h"
@@ -27,6 +28,9 @@ namespace GLVM::Core
         
     class CWindowWin : public IWindow
     {
+        HWND pClassic_Window_;
+        HDC pClassic_DC_;
+        HGLRC pClassic_Context_;
         
         WNDCLASS window_Class_;
         HWND pModern_Window_;
@@ -43,6 +47,8 @@ namespace GLVM::Core
         bool HandleEvent(CEvent& _Event) override;
 
         void Close() override;
+
+        virtual void CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset) override;
             
         ///< Callback method for events handling.
         static LRESULT CALLBACK MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam);

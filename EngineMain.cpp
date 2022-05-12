@@ -60,7 +60,7 @@ int main()
     TransformWitch.tVertex[0] = 0.0f;
     TransformWitch.tVertex[1] = 0.0f;
     TransformWitch.tVertex[2] = 3.5f;
-    TransformWitch.fScale = 1.0f;
+    TransformWitch.fScale = 0.5f;
 	// EntityManager.RemoveEntity(u_iWitch, ComponentManager);
     // EntityManager.tActive_Entity_Registry_.Print();
 
@@ -82,7 +82,7 @@ int main()
     TransformWitch2.tVertex[0] = 0.3f;
     TransformWitch2.tVertex[1] = 0.2f;
     TransformWitch2.tVertex[2] = 4.0f;
-    TransformWitch2.fScale = 1.0f;
+    TransformWitch2.fScale = 0.5f;
 	// EntityManager.RemoveEntity(u_iWitch, ComponentManager);
     // EntityManager.tActive_Entity_Registry_.Print();    
 	
