@@ -1,10 +1,13 @@
 #include "CollisionSystem.hpp"
+#include "Event.hpp"
+#include "EventComponent.hpp"
+#include "GravityComponent.hpp"
 #include "ViewComponent.hpp"
 
 namespace GLVM::ECS
 {
 	void CCollisionSystem::Repel(STransformComponent& _transform_Component, SMoveComponent& _move_Component,
-                                 double& _fDelta_Time, CViewComponent& _view_Component)
+                                 double& _fDelta_Time, CViewComponent& _view_Component, SEventComponent& _event_Component)
 	{
         // switch(_move_Component.eEvent_)
         // {
@@ -19,6 +22,12 @@ namespace GLVM::ECS
         // default:
         //     break;
         // }
+        if(_event_Component.eEvent_ == Core::eGRAVITY_COLLISION_FLAG)
+        {
+            _transform_Component.tVertex[1] += 0.01f;
+            return;
+        }
+        
         float cameraSpeed = static_cast<float>(2.5 * _fDelta_Time);
         switch(_move_Component.eEvent_)
         {
@@ -60,7 +69,8 @@ namespace GLVM::ECS
 		Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container = GetInnerIDsContainer<CColliderComponent>(_Component_Manager);
 		Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = GetInnerComponentContainer<SMoveComponent>(_Component_Manager);
 		Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container = GetInnerIDsContainer<SMoveComponent>(_Component_Manager);
-
+        Core::TCVectorContainer<SEventComponent>* _pEvent_Component_Container = ECS::GetInnerComponentContainer<ECS::SEventComponent>(_Component_Manager);
+        Core::TCVectorContainer<unsigned int>* _pOrdered_Event_Container = ECS::GetInnerIDsContainer<ECS::SEventComponent>(_Component_Manager);
         Core::TCVectorContainer<ECS::CViewComponent>* _pViewContainer = ECS::GetInnerComponentContainer<ECS::CViewComponent>(_Component_Manager);
         Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
         ECS::CViewComponent& view_Component = (*_pViewContainer)[(*_pOrdered_View_Container)[0]];
@@ -80,7 +90,8 @@ namespace GLVM::ECS
                         {
 							Repel((*_pTransform_Components_Container)[(*pOrdered_Move_Container)[x]],
                                   (*_pMove_Components_Container)[(*pOrdered_Move_Container)[x]], _dDelta_Time
-                                  , (*_pViewContainer)[(*_pOrdered_View_Container)[x]]);
+                                  , (*_pViewContainer)[(*_pOrdered_View_Container)[x]],
+                                (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[x]]);
                         }
                     }
 			}

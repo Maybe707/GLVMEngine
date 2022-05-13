@@ -166,11 +166,14 @@ namespace GLVM::Core
 		CEvent* pEvent = (CEvent*)GetWindowLongPtrW(_pHwnd, GWLP_USERDATA);
 
         int iMouse_Position_X, iMouse_Position_Y;
+        // tagRECT rect;
+        // const RECT* rect_ptr = &rect;
         
         switch (_pMsg) 
         { 
         case WM_CREATE:
-
+            // GetWindowRect(pModern_Window_, &rect);
+            // ClipCursor(rect_ptr);
             ///< Initialize the window. 
             return 0; 
  
@@ -186,8 +189,6 @@ namespace GLVM::Core
         case WM_MOUSEMOVE:
             iMouse_Position_X = GET_X_LPARAM(_pLParam);
             iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
-            std::cout << "X: " << iMouse_Position_X << std::endl;
-            std::cout << "Y: " << iMouse_Position_Y << std::endl;
             pEvent->SetEvent(EEvents::eMOUSE_POINTER_POSITION);
             pEvent->mouse_Pointer_Position_.iPosition_X = iMouse_Position_X;
             pEvent->mouse_Pointer_Position_.iPosition_Y = iMouse_Position_Y;

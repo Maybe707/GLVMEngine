@@ -1,6 +1,8 @@
 #include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
 #include "Engine.hpp"
+#include "EventComponent.hpp"
+#include "GravityComponent.hpp"
 #include "MoveComponent.hpp"
 #include "SpritesData.hpp"
 #include "TextureComponent.hpp"
@@ -16,7 +18,7 @@ int main()
     
 	Entity u_iPlayer;
 	EntityManager.CreateEntity(u_iPlayer);
-    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CTextureComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CGravityComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
     GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
@@ -24,14 +26,15 @@ int main()
 	GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager.GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
+    GLVM::ECS::CGravityComponent& GravityPlayer = ComponentManager.GetComponent<GLVM::ECS::CGravityComponent>(u_iPlayer);
 	// TransformPlayer.fPos_X = 150.0f;
 	// TransformPlayer.fPos_Y = 100.0f;
 	// TransformPlayer.fPos_Z = 30.0f;
     // TransformPlayer.fRotate = 30.0f;
     
     TransformPlayer.tVertex[0] = 0.0f;
-	TransformPlayer.tVertex[1] = 0.0f;
-	TransformPlayer.tVertex[2] = 5.0f;
+	TransformPlayer.tVertex[1] = 1.0f;
+	TransformPlayer.tVertex[2] = 3.5f;
     // TransformPlayer.fRotate = 0.0f;
     TransformPlayer.fScale = 0.5f;
 
@@ -41,6 +44,10 @@ int main()
     ViewPlayer.Up_Camera[0] = 0.0f;
     ViewPlayer.Up_Camera[1] = 1.0f;
     ViewPlayer.Up_Camera[2] = 0.0f;
+
+    GravityPlayer.tGravity_[0] = 0.0f;
+    GravityPlayer.tGravity_[1] = 0.0f;
+    GravityPlayer.tGravity_[2] = 0.0f;
     
 	Entity u_iWitch;
 	EntityManager.CreateEntity(u_iWitch);

@@ -2,6 +2,7 @@
 #include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
 #include "ComponentManager.hpp"
+#include "GravitySystem.hpp"
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
@@ -21,9 +22,13 @@ namespace GLVM::Core
 	{
 		Window_ = CWindowCreator().Create();
 		Chrono_ = Time::CTimerCreator().Create();
+        
 		Renderer_System = new ECS::CRenderSystem();
 		Movement_System = new ECS::CMovementSystem();
+        Gravity_System_ = new ECS::CGravitySystem();
+        
 		Shader_Program = new Shader();
+        
 		System_Manager = new ECS::CSystemManager();
 		Event_.SetEvent(eDEFAULT);
 		
@@ -49,7 +54,8 @@ namespace GLVM::Core
 		Animation_System.Animation_Delta = dAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
-
+                 
+        System_Manager->ActivateSystem(Gravity_System_);
         System_Manager->ActivateSystem(Movement_System);
 		System_Manager->ActivateSystem(&Collision_System);
 		System_Manager->ActivateSystem(&Animation_System);

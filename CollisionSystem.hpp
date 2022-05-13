@@ -2,6 +2,8 @@
 #define COLLISION_SYSTEM
 
 #include "VectorContainer.hpp"
+#include "EventComponent.hpp"
+#include "GravityComponent.hpp"
 #include "TransformComponent.hpp"
 #include "ISystem.hpp"
 #include "Event.hpp"
@@ -19,7 +21,7 @@ namespace GLVM::ECS
 	public:
 		double _dDelta_Time;
 		void Repel(STransformComponent& _transform_Component, SMoveComponent& _move_Component,
-                   double& _fDelta_Time, CViewComponent& _view_Component);
+                   double& _fDelta_Time, CViewComponent& _view_Component, SEventComponent& _event_Component);
 		bool BoxCollider(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);
 		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
 	};

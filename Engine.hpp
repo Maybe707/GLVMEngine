@@ -2,6 +2,7 @@
 #define ENGINE
 
 #include "GLPointer.h"
+#include "GravitySystem.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
 #include "RenderSystem.hpp"
@@ -42,15 +43,18 @@ namespace GLVM::Core
 	{
 		IWindow* Window_;
 		Time::IChrono* Chrono_;
-		ECS::CRenderSystem* Renderer_System;
-		CEvent Event_;
+        CEvent Event_;
 		Shader* Shader_Program;
 		float dDelta_Time_;
 		CStack Input_Stack_;
+        
+		ECS::CRenderSystem* Renderer_System;
 		ECS::CCollisionSystem Collision_System;
 		ECS::CAnimationSystem Animation_System;
 		ECS::CMovementSystem* Movement_System;
-		ECS::CSystemManager* System_Manager;
+        ECS::CGravitySystem* Gravity_System_;
+        
+        ECS::CSystemManager* System_Manager;
 		
 	public:
 		CEngine();

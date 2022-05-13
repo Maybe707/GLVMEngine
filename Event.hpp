@@ -20,6 +20,7 @@ namespace GLVM::Core
 		eKEYRELEASE_D,
 		eKEYRELEASE_S,
 		eKEYRELEASE_W,
+        eGRAVITY_COLLISION_FLAG,
         eRENDER,
         eATACK,
         eSPAWN,
