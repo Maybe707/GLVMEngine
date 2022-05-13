@@ -142,7 +142,7 @@ namespace GLVM::Core
         ClientToScreen(pModern_Window_, &point_position);
 
         ///< Solve a problem with endlessly growing numbers in the start game run.
-        if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
+        if(_x_position > 1911 || _x_position < 0 || _y_position > 1052 || _y_position < 0)
             return;
         
         int iOffset_X = 0, iOffset_Y = 0;
@@ -186,6 +186,8 @@ namespace GLVM::Core
         case WM_MOUSEMOVE:
             iMouse_Position_X = GET_X_LPARAM(_pLParam);
             iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
+            std::cout << "X: " << iMouse_Position_X << std::endl;
+            std::cout << "Y: " << iMouse_Position_Y << std::endl;
             pEvent->SetEvent(EEvents::eMOUSE_POINTER_POSITION);
             pEvent->mouse_Pointer_Position_.iPosition_X = iMouse_Position_X;
             pEvent->mouse_Pointer_Position_.iPosition_Y = iMouse_Position_Y;
