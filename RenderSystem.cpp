@@ -219,10 +219,14 @@ namespace GLVM::ECS
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
 
-        tView_Matrix = LookAtRH(_Player.tVertex,
+        // tView_Matrix = LookAtRH(_Player.tVertex,
+        //                         _Player.tVertex + _view_Component.Front_Camera,
+        //                         _view_Component.Up_Camera);
+
+        tView_Matrix = FPSview(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
                                 _view_Component.Up_Camera);
-		
+        
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
     }

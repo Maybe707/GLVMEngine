@@ -41,20 +41,20 @@ namespace GLVM::Core
 
 	class CEngine
 	{
-		IWindow* Window_;
+		IWindow*       Window_;
 		Time::IChrono* Chrono_;
-        CEvent Event_;
-		Shader* Shader_Program;
-		float dDelta_Time_;
-		CStack Input_Stack_;
+        CEvent         Event_;
+		Shader*        Shader_Program;
+		float          fDelta_Time_;
+		CStack         Input_Stack_;
         
-		ECS::CRenderSystem* Renderer_System;
+		ECS::CRenderSystem*   Renderer_System;
 		ECS::CCollisionSystem Collision_System;
 		ECS::CAnimationSystem Animation_System;
 		ECS::CMovementSystem* Movement_System;
-        ECS::CGravitySystem* Gravity_System_;
+        ECS::CGravitySystem*  Gravity_System_;
         
-        ECS::CSystemManager* System_Manager;
+        ECS::CSystemManager*  System_Manager;
 		
 	public:
 		CEngine();

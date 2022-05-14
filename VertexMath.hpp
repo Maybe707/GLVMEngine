@@ -390,6 +390,33 @@ Matrix<T, 4> LookAtRH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
     return Result;
 }
 
+template <typename T>
+Matrix<T, 4> FPSview(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
+{
+//    _center.m_vector[1] = _eye.m_vector[1];
+    
+    Vector<T, 3> f(Normalize(_center - _eye));
+    Vector<T, 3> s(Normalize(Cross(f, _up)));
+    Vector<T, 3> u(Cross(s, f));
+
+    Matrix<T, 4> Result(1.0f);
+    Result[0][0] = s[0];
+    Result[1][0] = s[1];
+    Result[2][0] = s[2];
+    Result[0][1] = u[0];
+    Result[1][1] = u[1];
+    Result[2][1] = u[2];
+    Result[0][2] = -f[0];
+    Result[1][2] = -f[1];
+    Result[2][2] = -f[2];
+    Result[3][0] = -Dot(s, _eye);
+    Result[3][1] = -Dot(u, _eye);
+    Result[3][2] = Dot(f, _eye);
+//    Result.SelfTensorTranspose();
+
+    return Result;
+}
+
 template <typename T3>
 T3 Radians(T3 _angle)
 {

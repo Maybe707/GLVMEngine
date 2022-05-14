@@ -27,7 +27,7 @@ namespace GLVM::ECS
             ECS::CViewComponent& view_Component = (*_tViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
-                float cameraSpeed = static_cast<float>(2.5 * _dOffset);
+                float cameraSpeed = 2.5f * _dOffset;
 				switch(_Anim_Event)
 				{
 				case Core::EEvents::eMOVE_LEFT:
@@ -40,19 +40,27 @@ namespace GLVM::ECS
                         Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
 					break;
+				// case Core::EEvents::eMOVE_DOWN:
+				// 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+                //         view_Component.Front_Camera * cameraSpeed;
+				// 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
+				// 	break;
+				// case Core::EEvents::eMOVE_UP:
+				// 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+                //         view_Component.Front_Camera * cameraSpeed;
+				// 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
+				// 	break;
 				case Core::EEvents::eMOVE_DOWN:
+                    view_Component.Front_Camera[1] = 0.0f;
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
                         view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
-                    std::cout << "Z Axis: " << (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[2] << std::endl;
-                    std::cout << "Front cam: " << view_Component.Front_Camera[2] << std::endl;
 					break;
 				case Core::EEvents::eMOVE_UP:
+                    view_Component.Front_Camera[1] = 0.0f;
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
                         view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
-                    std::cout << "Z Axis: " << (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[2] << std::endl;
-                    std::cout << "Front cam: " << view_Component.Front_Camera[2] << std::endl;
 					break;
 				default:
 					break;

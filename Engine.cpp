@@ -12,46 +12,48 @@
 #include "ViewComponent.hpp"
 
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
-#define SOME_STRANGE_STUFF 0
-#define MIPMAP_LEVEL 0
-#define SOME_OLD_STUFF 0
+#define SOME_STRANGE_STUFF                  0
+#define MIPMAP_LEVEL                        0
+#define SOME_OLD_STUFF                      0
 
 namespace GLVM::Core
 {    
     CEngine::CEngine()
 	{
-		Window_ = CWindowCreator().Create();
-		Chrono_ = Time::CTimerCreator().Create();
+		Window_         = CWindowCreator().Create();
+		Chrono_         = Time::CTimerCreator().Create();
         
 		Renderer_System = new ECS::CRenderSystem();
 		Movement_System = new ECS::CMovementSystem();
         Gravity_System_ = new ECS::CGravitySystem();
         
-		Shader_Program = new Shader();
+		Shader_Program  = new Shader();
+        System_Manager  = new ECS::CSystemManager();
         
-		System_Manager = new ECS::CSystemManager();
-		Event_.SetEvent(eDEFAULT);
-		
-		dDelta_Time_ = 0.0;
+        fDelta_Time_    = 0.0;
+        
+        Event_.SetEvent(eDEFAULT);
 	}
 
 	CEngine::~CEngine()
 	{
 		delete Renderer_System;
-		Renderer_System = nullptr;
 		delete Shader_Program;
-		Shader_Program = nullptr;
 		delete Movement_System;
-		Movement_System = nullptr;
+        delete Gravity_System_;
 		delete System_Manager;
-		System_Manager = nullptr;
+		System_Manager  = nullptr;
+        Renderer_System = nullptr;
+        Shader_Program  = nullptr;
+        Gravity_System_ = nullptr;
+        Movement_System = nullptr;
 	}
 	
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
-		float dAnimation_Delta = 0;
-		bool bGame_Loop_Active = true;
-		Animation_System.Animation_Delta = dAnimation_Delta;
+		float fAnimation_Delta           = 0.0f;
+		bool bGame_Loop_Active           = true;
+		Animation_System.Animation_Delta = fAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
                  
@@ -63,7 +65,7 @@ namespace GLVM::Core
 
 		while(bGame_Loop_Active)
 		{
-			dDelta_Time_ = Chrono_->GetElapsed();
+			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
             
 			Window_->ClearDisplay();
@@ -79,15 +81,18 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 
-            Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X, Event_.mouse_Pointer_Position_.iPosition_Y,
-                                &Event_.mouse_Pointer_Position_.iOffset_X, &Event_.mouse_Pointer_Position_.iOffset_Y);
-            
-			Movement_System->_dOffset = dDelta_Time_;
-			Movement_System->_Anim_Event = Event_.GetEvent();
-			Collision_System._dDelta_Time = dDelta_Time_;
-			Animation_System.eEvent_ = Input_Stack_.Pop();
-			Animation_System.Delta_Time = dDelta_Time_;
-			Renderer_System->_Shader_Program = Shader_Program;
+            Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
+                                Event_.mouse_Pointer_Position_.iPosition_Y,
+                                &Event_.mouse_Pointer_Position_.iOffset_X,
+                                &Event_.mouse_Pointer_Position_.iOffset_Y);
+
+            Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
+			Movement_System->_dOffset                     = fDelta_Time_;
+			Movement_System->_Anim_Event                  = Event_.GetEvent();
+			Collision_System.fDelta_Time_                 = fDelta_Time_;
+			Animation_System.eEvent_                      = Input_Stack_.Pop();
+			Animation_System.Delta_Time                   = fDelta_Time_;
+			Renderer_System->_Shader_Program              = Shader_Program;
 			
 			System_Manager->Update(_ComponentManager, Event_);
 			
@@ -119,8 +124,8 @@ namespace GLVM::Core
 	{
 	   	Window_->Close();
 		delete Window_;
+        delete Chrono_;
 		Window_ = nullptr;
-		delete Chrono_;
 		Chrono_ = nullptr;
 	}
 }

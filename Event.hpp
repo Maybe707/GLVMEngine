@@ -24,6 +24,7 @@ namespace GLVM::Core
         eRENDER,
         eATACK,
         eSPAWN,
+        eJUMP,
 		eMOVE_UP,
 		eMOVE_DOWN,
 		eMOVE_LEFT,
