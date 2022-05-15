@@ -208,6 +208,9 @@ namespace GLVM::ECS
         fYaw *= kSensitivity;
         fPitch *= kSensitivity;
 
+        _Event.mouse_Pointer_Position_.fPitch_ = fPitch;
+        _Event.mouse_Pointer_Position_.fYaw_ = fYaw;
+        
         if(fPitch > 89.0f)
             fPitch = 89.0f;
         if(fPitch < -89.0f)
@@ -222,7 +225,7 @@ namespace GLVM::ECS
         // tView_Matrix = LookAtRH(_Player.tVertex,
         //                         _Player.tVertex + _view_Component.Front_Camera,
         //                         _view_Component.Up_Camera);
-
+ 
         tView_Matrix = FPSview(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
                                 _view_Component.Up_Camera);

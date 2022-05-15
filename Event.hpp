@@ -41,6 +41,8 @@ namespace GLVM::Core
         int iPosition_Y;
         int iOffset_X = 0;
         int iOffset_Y = 0;
+        float fPitch_;
+        float fYaw_;
     };
     
     /*! \class Event

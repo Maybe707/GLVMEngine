@@ -31,7 +31,8 @@ namespace GLVM::ECS
             ECS::CViewComponent& view_Component = (*_tViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
-                float cameraSpeed = 2.5f * _dOffset;
+                float cameraSpeed = 1.5f * _dOffset;
+                Vector<float, 3> front(1.0f);
 				switch(_Anim_Event)
 				{
 				case Core::EEvents::eMOVE_LEFT:
@@ -56,12 +57,18 @@ namespace GLVM::ECS
 				// 	break;
 				case Core::EEvents::eMOVE_DOWN:
                     view_Component.Front_Camera[1] = 0.0f;
+                    front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                    front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                    view_Component.Front_Camera = Normalize(front);
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
                         view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
 					break;
 				case Core::EEvents::eMOVE_UP:
                     view_Component.Front_Camera[1] = 0.0f;
+                    front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                    front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                    view_Component.Front_Camera = Normalize(front);
 					(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
                         view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;

@@ -8,7 +8,7 @@ namespace GLVM::Core
 	class CStack
 	{
 		int iHead_ = 0;
-		static const int iStack_Range_ = 4;
+		static const int iStack_Range_ = 5;
 		EEvents aStack_[iStack_Range_] = {};
 	public:
 		void Push(const EEvents& _Event)
@@ -73,6 +73,9 @@ namespace GLVM::Core
 			case eKEYRELEASE_W:
 				Remove(eMOVE_UP); 
 				break;
+            case eKEYRELEASE_JUMP:
+                Remove(eKEYRELEASE_JUMP);
+                break;
 			case eMOVE_LEFT:
 				Push(eMOVE_LEFT);
 				break;
@@ -85,6 +88,9 @@ namespace GLVM::Core
 			case eMOVE_UP:
 				Push(eMOVE_UP);
 				break;
+            case eJUMP:
+                Push(eJUMP);
+                break;
 			default:
 				break;
 			}

@@ -81,7 +81,7 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 
-            for(int i = 0; i < 4; ++i)
+            for(int i = 0; i < 5; ++i)
                 std::cout << "Input stack: " << Input_Stack_[i] << std::endl;
             std::cout << "Event: " << Event_.GetEvent() << std::endl;
             
