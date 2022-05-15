@@ -69,7 +69,7 @@ int main()
     TransformWitch2.tVertex[2] = 4.0f;
     TransformWitch2.fScale = 0.5f;
 
-        Entity u_iWitch3;
+    Entity u_iWitch3;
 	EntityManager.CreateEntity(u_iWitch3);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
 	GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
@@ -83,7 +83,7 @@ int main()
     TransformWitch3.tVertex[2] = 3.5f;
     TransformWitch3.fScale = 0.5f;
 
-        Entity u_iWitch4;
+    Entity u_iWitch4;
 	EntityManager.CreateEntity(u_iWitch4);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch4);
 	GLVM::ECS::CTextureComponent& TextureWitch4 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch4);
@@ -97,7 +97,7 @@ int main()
     TransformWitch4.tVertex[2] = 3.0f;
     TransformWitch4.fScale = 0.5f;
 
-        Entity u_iWitch5;
+    Entity u_iWitch5;
 	EntityManager.CreateEntity(u_iWitch5);
 	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch5);
 	GLVM::ECS::CTextureComponent& TextureWitch5 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch5);
@@ -110,6 +110,20 @@ int main()
     TransformWitch5.tVertex[1] = 0.5f;
     TransformWitch5.tVertex[2] = 2.5f;
     TransformWitch5.fScale = 0.5f;
+
+    Entity u_iWitch6;
+	EntityManager.CreateEntity(u_iWitch6);
+	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch6);
+	GLVM::ECS::CTextureComponent& TextureWitch6 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch6);
+	TextureWitch6.iWidth_ = 32;
+	TextureWitch6.iHeight_ = 32;
+	TextureWitch6.u_iData_ = witch_dat;
+	GLVM.LoadTextureData(TextureWitch6);
+	GLVM::ECS::STransformComponent& TransformWitch6 = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch6);
+    TransformWitch6.tVertex[0] = 0.3f;
+    TransformWitch6.tVertex[1] = 0.5f;
+    TransformWitch6.tVertex[2] = 2.0f;
+    TransformWitch6.fScale = 0.5f;
 	
     ///< Game rendering loop
 	GLVM.GameLoop(ComponentManager);
