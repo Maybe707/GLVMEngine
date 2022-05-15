@@ -20,6 +20,7 @@ namespace GLVM::Core
 		eKEYRELEASE_D,
 		eKEYRELEASE_S,
 		eKEYRELEASE_W,
+        eKEYRELEASE_JUMP,
         eGRAVITY_COLLISION_FLAG,
         eRENDER,
         eATACK,
@@ -31,6 +32,7 @@ namespace GLVM::Core
 		eMOVE_RIGHT,
         eMOUSE_POINTER_POSITION,
         eGAME_LOOP_KILL,
+        eEmpty,
     };
 
     struct SMousePointerPosition

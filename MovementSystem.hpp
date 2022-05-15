@@ -17,6 +17,10 @@ namespace GLVM::ECS
 	public:
 		float _dOffset;
 		Core::EEvents _Anim_Event;
+        Core::CStack& Input_Stack_;
+
+        CMovementSystem(Core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
+        
 		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
 			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerComponentContainer<ECS::STransformComponent>(_Component_Manager);
@@ -62,6 +66,10 @@ namespace GLVM::ECS
                         view_Component.Front_Camera * cameraSpeed;
 					(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
 					break;
+                case Core::EEvents::eJUMP:
+                    (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[1] += 1.0f;
+                    (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eJUMP;
+                    break;
 				default:
 					break;
 				}

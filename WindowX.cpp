@@ -293,6 +293,9 @@ namespace GLVM::Core
 				case XK_w:
 					_Event.SetEvent(EEvents::eMOVE_UP);
 					break;
+                case XK_space:
+                    _Event.SetEvent(EEvents::eJUMP);
+                    break;
 				}
 				break;
 
@@ -324,6 +327,9 @@ namespace GLVM::Core
                     break;
                 case XK_w:
                     _Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
+                    break;
+                case XK_space:
+                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_JUMP);
                     break;
                 }
 				break;

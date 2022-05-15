@@ -120,6 +120,8 @@ public:
 	const T2& operator[](const int index) const;
 	template<class T, int var>
 	Vector<T2, var2> operator*(const Matrix<T, var>& matrix);
+    Vector<T2, var2> operator*(Vector<T2, var2> _vector);
+    Vector<T2, var2> operator*=(Vector<T2, var2> _vector);
     Vector<T2, var2> operator-(Vector<T2, var2> _vector);
     Vector<T2, var2> operator+(Vector<T2, var2> _vector);
     void operator-=(Vector<T2, var2> _vector);
@@ -151,6 +153,26 @@ Vector<T2, var2> Vector<T2, var2>::operator*(const Matrix<T, var>& matrix)
 			tempVector[i] += m_vector[j] * matrix[j][i];
 		}
 	return tempVector;
+}
+
+template <typename T2, int var2>
+Vector<T2, var2> Vector<T2, var2>::operator*(Vector<T2, var2> _vector)
+{
+    Vector<T2, var2> tempVector;
+    for(int i = 0; i < 3; ++i)
+        tempVector[i] = m_vector[i] * _vector[i];
+
+    return tempVector;
+}
+
+template <typename T2, int var2>
+Vector<T2, var2> Vector<T2, var2>::operator*=(Vector<T2, var2> _vector)
+{
+    Vector<T2, var2> tempVector;
+    for(int i = 0; i < 3; ++i)
+        tempVector[i] = m_vector[i] * _vector[i];
+
+    return tempVector;
 }
 
 template <typename T2, int var2>

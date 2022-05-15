@@ -89,6 +89,22 @@ namespace GLVM::Core
 				break;
 			}
 		}
+
+        EEvents SearchElement(EEvents _element)
+        {
+            for(int i = 0; i < iHead_; ++i)
+            {
+                if(aStack_[i] == _element)
+                    return _element;
+            }
+
+            return eEmpty;
+        }
+        
+        EEvents operator[](int _iIndex)
+        {
+            return aStack_[_iIndex];
+        }
 	};
 	
 }

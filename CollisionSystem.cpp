@@ -69,23 +69,6 @@ namespace GLVM::ECS
                                        float& _fDelta_Time)
 	{
 		bool bCollision_Flag = false;
-		// float fX             = 0;
-		// float fY             = 0;
-        // float fZ             = 0;
-		// fX = std::abs(_transform_Component2.tVertex[0] - _transform_Component1.tVertex[0]);
-		// fY = std::abs(_transform_Component2.tVertex[1] - _transform_Component1.tVertex[1]);
-        // fZ = std::abs(_transform_Component2.tVertex[2] - _transform_Component1.tVertex[2]);
-        
-		// if(fX < 0.5f && fY < 0.5f && fZ < 0.5f)
-        // {
-        //     if((_transform_Component1.tVertex[1] - 0.5f + 0.01f) > _transform_Component2.tVertex[1])
-        //     {
-        //         Gravity(_transform_Component1, _event_Component);
-        //         bCollision_Flag = false;
-        //         return bCollision_Flag;
-        //     }
-        //     bCollision_Flag = true;
-        // }
 
         if(_transform_Component1.tVertex[1] > (_transform_Component2.tVertex[1] + 0.45f))
         {
@@ -100,11 +83,6 @@ namespace GLVM::ECS
            (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
            _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
         {
-            // if((_transform_Component1.tVertex[1] + 0.01f) > (_transform_Component2.tVertex[1] + 0.5f))
-            // {
-            //     bCollision_Flag = Gravity(_transform_Component1, _event_Component);
-            //     return bCollision_Flag;
-            // }
             bCollision_Flag = true;
         }
 		return bCollision_Flag;
@@ -138,8 +116,6 @@ namespace GLVM::ECS
 				if(BoxCollider((*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[i]], (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]], (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[i]], fDelta_Time_))
 					for(int x = 0, iSize_Rep = (pOrdered_Move_Container->GetSize()); x < iSize_Rep; ++x)
                     {
-						// if((*pOrdered_Colliders_Container)[i] == (*pOrdered_Move_Container)[x])
-						// 	Repel((*_pTransform_Components_Container)[(*pOrdered_Move_Container)[x]], (*_pMove_Components_Container)[(*pOrdered_Move_Container)[x]], _dDelta_Time);
                         if((*pOrdered_Colliders_Container)[i] == (*pOrdered_Move_Container)[x] &&
                            (*pOrdered_Colliders_Container)[i] == (*_pOrdered_View_Container)[x])
                         {

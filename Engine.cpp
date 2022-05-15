@@ -24,7 +24,7 @@ namespace GLVM::Core
 		Chrono_         = Time::CTimerCreator().Create();
         
 		Renderer_System = new ECS::CRenderSystem();
-		Movement_System = new ECS::CMovementSystem();
+		Movement_System = new ECS::CMovementSystem(Input_Stack_);
         Gravity_System_ = new ECS::CGravitySystem();
         
 		Shader_Program  = new Shader();
@@ -81,6 +81,10 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 
+            for(int i = 0; i < 4; ++i)
+                std::cout << "Input stack: " << Input_Stack_[i] << std::endl;
+            std::cout << "Event: " << Event_.GetEvent() << std::endl;
+            
             Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
                                 Event_.mouse_Pointer_Position_.iPosition_Y,
                                 &Event_.mouse_Pointer_Position_.iOffset_X,
