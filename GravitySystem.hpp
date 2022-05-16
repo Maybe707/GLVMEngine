@@ -85,7 +85,8 @@ namespace GLVM::ECS
             
             for(int n = 0; n < _pOrdered_Gravity_Container->GetSize(); ++n)
             {
-                (*_pTransform_Components_Container)[(*_pOrdered_Gravity_Container)[n]].tVertex[1] -= fAcceleration_of_Gravity_;
+                _Component_Manager.GetComponent<ECS::STransformComponent>((*ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager))[n]).tVertex[1] -= fAcceleration_of_Gravity_;
+//                (*_pTransform_Components_Container)[(*_pOrdered_Gravity_Container)[n]].tVertex[1] -= fAcceleration_of_Gravity_;
                 (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[n]].eEvent_ = Core::EEvents::eGRAVITY_COLLISION_FLAG;
             }
         }
