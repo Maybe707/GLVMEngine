@@ -50,7 +50,7 @@ namespace GLVM::ECS
 				if(eEvent_ != eSave_Event_)
 					Animation_Delta = 0.31f;
 				eSave_Event_ = eEvent_;
-				if(eEvent_ == Core::eMOVE_DOWN)
+				if(eEvent_ == Core::eMOVE_BACKWARD)
 				{
 					Animation_Delta += Delta_Time;
 					if(Animation_Delta > 0.3f)
@@ -125,7 +125,7 @@ namespace GLVM::ECS
 							Animation_Delta = 0;
 						}
 					}
-					else if(eEvent_ == Core::EEvents::eMOVE_UP)
+					else if(eEvent_ == Core::EEvents::eMOVE_FORWARD)
 					{
 						Animation_Delta += Delta_Time;
 						if(Animation_Delta > 0.3f)

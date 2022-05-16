@@ -35,10 +35,10 @@ namespace GLVM::ECS
         float cameraSpeed = static_cast<float>(2.5 * _fDelta_Time);
         switch(_move_Component.eEvent_)
         {
-        case Core::eMOVE_UP:
+        case Core::eMOVE_FORWARD:
             _transform_Component.tVertex -= _view_Component.Front_Camera * cameraSpeed;
             break;
-        case Core::eMOVE_DOWN:
+        case Core::eMOVE_BACKWARD:
             _transform_Component.tVertex += _view_Component.Front_Camera * cameraSpeed;
             break;
         case Core::eMOVE_RIGHT:

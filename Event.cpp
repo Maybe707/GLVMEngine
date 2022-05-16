@@ -27,11 +27,11 @@ namespace GLVM::Core
 		case GLVM::Core::eMOVE_LEFT:
 			SetEvent(GLVM::Core::EEvents::eMOVE_LEFT);
 			break;
-		case GLVM::Core::eMOVE_DOWN:
-			SetEvent(GLVM::Core::EEvents::eMOVE_DOWN);
+		case GLVM::Core::eMOVE_BACKWARD:
+			SetEvent(GLVM::Core::EEvents::eMOVE_BACKWARD);
 			break;
-		case GLVM::Core::eMOVE_UP:
-			SetEvent(GLVM::Core::EEvents::eMOVE_UP);
+		case GLVM::Core::eMOVE_FORWARD:
+			SetEvent(GLVM::Core::EEvents::eMOVE_FORWARD);
 			break;
 		default:
 			break;

@@ -68,10 +68,10 @@ namespace GLVM::Core
 				Remove(eMOVE_RIGHT);
 				break;
 			case eKEYRELEASE_S:
-				Remove(eMOVE_DOWN); 
+				Remove(eMOVE_BACKWARD); 
 				break;
 			case eKEYRELEASE_W:
-				Remove(eMOVE_UP); 
+				Remove(eMOVE_FORWARD); 
 				break;
             case eKEYRELEASE_JUMP:
                 Remove(eKEYRELEASE_JUMP);
@@ -82,11 +82,11 @@ namespace GLVM::Core
 			case eMOVE_RIGHT:
 				Push(eMOVE_RIGHT);
 				break;
-			case eMOVE_DOWN:
-				Push(eMOVE_DOWN);
+			case eMOVE_BACKWARD:
+				Push(eMOVE_BACKWARD);
 				break;
-			case eMOVE_UP:
-				Push(eMOVE_UP);
+			case eMOVE_FORWARD:
+				Push(eMOVE_FORWARD);
 				break;
             case eJUMP:
                 Push(eJUMP);

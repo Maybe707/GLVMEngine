@@ -288,10 +288,10 @@ namespace GLVM::Core
 					_Event.SetEvent(EEvents::eMOVE_RIGHT);
 					break;
 				case XK_s:
-					_Event.SetEvent(EEvents::eMOVE_DOWN);
+					_Event.SetEvent(EEvents::eMOVE_BACKWARD);
 					break;
 				case XK_w:
-					_Event.SetEvent(EEvents::eMOVE_UP);
+					_Event.SetEvent(EEvents::eMOVE_FORWARD);
 					break;
                 case XK_space:
                     _Event.SetEvent(EEvents::eJUMP);
