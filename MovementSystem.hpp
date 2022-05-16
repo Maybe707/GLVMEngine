@@ -34,6 +34,14 @@ namespace GLVM::ECS
 			{
                 float cameraSpeed = 1.5f * _dOffset;
                 Vector<float, 3> front(1.0f);
+                Vector<float, 3> temp_vector(0.0f);
+                if(CompareDirection(Input_Stack_, Core::EEvents::eMOVE_UP, Core::EEvents::eMOVE_RIGHT))
+                {
+                    std::cout << "Privet" << std::endl;
+                    Input_Stack_.Remove(Core::EEvents::eMOVE_UP);
+                    Input_Stack_.Remove(Core::EEvents::eMOVE_DOWN);
+                    Input_Stack_.Push(Core::EEvents::eMOVE_DIAGONAL);
+                }
                 for(int n = 0; n < 5; ++n)
                 {
                     switch((Input_Stack_)[n])
@@ -48,16 +56,6 @@ namespace GLVM::ECS
                             Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
                         break;
-                        // case Core::EEvents::eMOVE_DOWN:
-                        // 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
-                        //         view_Component.Front_Camera * cameraSpeed;
-                        // 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
-                        // 	break;
-                        // case Core::EEvents::eMOVE_UP:
-                        // 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                        //         view_Component.Front_Camera * cameraSpeed;
-                        // 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
-                        // 	break;
                     case Core::EEvents::eMOVE_DOWN:
                         view_Component.Front_Camera[1] = 0.0f;
                         front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
@@ -76,6 +74,16 @@ namespace GLVM::ECS
                             view_Component.Front_Camera * cameraSpeed;
                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
                         break;
+                    case Core::EEvents::eMOVE_DIAGONAL:
+                        view_Component.Front_Camera[1] = 0.0f;
+                        front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        view_Component.Front_Camera = Normalize(front) * cameraSpeed;
+                        temp_vector = Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
+                        temp_vector = temp_vector + view_Component.Front_Camera;
+                        temp_vector = Normalize(temp_vector);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += Normalize(temp_vector) * cameraSpeed;
+                        break;
                     case Core::EEvents::eJUMP:
                         (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[1] += 1.0f;
                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eJUMP;
@@ -88,7 +96,47 @@ namespace GLVM::ECS
 			}
 		}
 
+        bool CompareDirection(Core::CStack& _input_Stack,
+                              Core::EEvents _event0,
+                              Core::EEvents _event1)
+        {
+            Core::EEvents eTemp_Event0;
+            Core::EEvents eTemp_Event1;
+
+            eTemp_Event0 = _input_Stack.SearchElement(_event0);
+            eTemp_Event1 = _input_Stack.SearchElement(_event1);
+            
+            if((eTemp_Event0 == _event0) && (eTemp_Event1 == _event1))
+                return true;
+            else
+                return false;
+        }
+        
+        void DiscardOpposite(Core::CStack& _input_Stack)
+        {
+            if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_LEFT, Core::EEvents::eMOVE_RIGHT))
+            {
+                _input_Stack.Remove(Core::EEvents::eMOVE_LEFT);
+                _input_Stack.Remove(Core::EEvents::eMOVE_RIGHT);
+            }
+            if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_DOWN, Core::EEvents::eMOVE_UP))
+            {
+                _input_Stack.Remove(Core::EEvents::eMOVE_DOWN);
+                _input_Stack.Remove(Core::EEvents::eMOVE_UP);
+            }
+        }
 	};
 }
 
 #endif
+
+// case Core::EEvents::eMOVE_DOWN:
+// 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+//         view_Component.Front_Camera * cameraSpeed;
+// 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_DOWN;
+// 	break;
+// case Core::EEvents::eMOVE_UP:
+// 	(*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+//         view_Component.Front_Camera * cameraSpeed;
+// 	(*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_UP;
+// 	break;

@@ -14,7 +14,18 @@
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
 #define SOME_STRANGE_STUFF                  0
 #define MIPMAP_LEVEL                        0
-#define SOME_OLD_STUFF                      0
+#define SOME_OLD_STUFF 0
+
+/*******************************************************************
+ * Legends never die...
+ * You are about to face most terrifying data structures of all time.
+ *    "Abandon hope all ye who enter here..." (c) Dante Alighieri.
+ *******************************************************************
+ *****************  👑  !!!  DESTRUCTOR_3000  !!!  👑  *************/
+
+#define DESTRUCTOR_3000 \
+    std::cout << "You have been destructurized. [=]___[=]" << std::endl; \
+    exit(1)
 
 namespace GLVM::Core
 {    

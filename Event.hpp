@@ -30,6 +30,7 @@ namespace GLVM::Core
 		eMOVE_DOWN,
 		eMOVE_LEFT,
 		eMOVE_RIGHT,
+        eMOVE_DIAGONAL,
         eMOUSE_POINTER_POSITION,
         eGAME_LOOP_KILL,
         eEmpty,
