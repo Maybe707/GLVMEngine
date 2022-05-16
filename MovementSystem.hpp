@@ -34,7 +34,10 @@ namespace GLVM::ECS
 			{
                 float cameraSpeed = 1.5f * _dOffset;
                 Vector<float, 3> front(1.0f);
-                Vector<float, 3> temp_vector(0.0f);
+                Vector<float, 3> temp_Vector0(0.0f);
+                Vector<float, 3> temp_Vector1(0.0f);
+                Vector<float, 3> temp_Vector2(0.0f);
+                Vector<float, 3> temp_Vector3(0.0f);
                 if(CompareDirection(Input_Stack_, Core::EEvents::eMOVE_FORWARD, Core::EEvents::eMOVE_RIGHT))
                 {
                     std::cout << "Privet" << std::endl;
@@ -47,42 +50,68 @@ namespace GLVM::ECS
                     switch((Input_Stack_)[n])
                     {
                     case Core::EEvents::eMOVE_LEFT:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
-                            Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
-                        (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_LEFT;
+                        // (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+                        //     Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
+                        // (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_LEFT;
+                        temp_Vector0 = CalculateVectorRL((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         view_Component,
+                                                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         cameraSpeed,
+                                                         Input_Stack_[n]);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += temp_Vector0;
                         break;
                     case Core::EEvents::eMOVE_RIGHT:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
-                        (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
+                        // (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+                        //     Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
+                        // (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_RIGHT;
+                        temp_Vector1 = CalculateVectorRL((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         view_Component,
+                                                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         cameraSpeed,
+                                                         Input_Stack_[n]);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += temp_Vector1;
                         break;
                     case Core::EEvents::eMOVE_BACKWARD:
-                        view_Component.Front_Camera[1] = 0.0f;
-                        front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
-                        front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
-                        view_Component.Front_Camera = Normalize(front);
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
-                            view_Component.Front_Camera * cameraSpeed;
-                        (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_BACKWARD;
+                        // view_Component.Front_Camera[1] = 0.0f;
+                        // front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        // front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        // view_Component.Front_Camera = Normalize(front);
+                        // (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex -=
+                        //     view_Component.Front_Camera * cameraSpeed;
+                        // (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_BACKWARD;
+                        temp_Vector2 = CalculateVectorFB((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         cameraSpeed,
+                                                         view_Component,
+                                                         _Event,
+                                                         Input_Stack_[n]);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += temp_Vector2;
                         break;
                     case Core::EEvents::eMOVE_FORWARD:
-                        view_Component.Front_Camera[1] = 0.0f;
-                        front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
-                        front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
-                        view_Component.Front_Camera = Normalize(front);
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            view_Component.Front_Camera * cameraSpeed;
-                        (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_FORWARD;
+                        // view_Component.Front_Camera[1] = 0.0f;
+                        // front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        // front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
+                        // view_Component.Front_Camera = Normalize(front);
+                        // (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
+                        //     view_Component.Front_Camera * cameraSpeed;
+                        // (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eMOVE_FORWARD;
+                        temp_Vector3 = CalculateVectorFB((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                                         cameraSpeed,
+                                                         view_Component,
+                                                         _Event,
+                                                         Input_Stack_[n]);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += temp_Vector3;
                         break;
                     case Core::EEvents::eMOVE_DIAGONAL:
                         view_Component.Front_Camera[1] = 0.0f;
                         front[0] = std::cos(Radians(_Event.mouse_Pointer_Position_.fYaw_));
                         front[2] = std::sin(Radians(_Event.mouse_Pointer_Position_.fYaw_));
                         view_Component.Front_Camera = Normalize(front) * cameraSpeed;
-                        temp_vector = Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
-                        temp_vector = temp_vector + view_Component.Front_Camera;
-                        temp_vector = Normalize(temp_vector);
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += Normalize(temp_vector) * cameraSpeed;
+                        temp_Vector0 = Normalize(Cross(view_Component.Front_Camera, view_Component.Up_Camera)) * cameraSpeed;
+                        temp_Vector0 = temp_Vector0 + view_Component.Front_Camera;
+                        temp_Vector0 = Normalize(temp_Vector0);
+                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex += Normalize(temp_Vector0) * cameraSpeed;
                         break;
                     case Core::EEvents::eJUMP:
                         (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[1] += 1.0f;
@@ -127,7 +156,7 @@ namespace GLVM::ECS
         }
 
         Vector<float, 3> CalculateVectorRL(STransformComponent _transform_Component,
-                                   ECS::CViewComponent& _view_Component,
+                                           ECS::CViewComponent& _view_Component,
                                            SMoveComponent& _move_Component,
                                            float _camera_Speed,
                                            Core::EEvents _current_Event)
