@@ -205,11 +205,11 @@ namespace GLVM::Core
                 break; 
  
             case VK_W:
-				pEvent->SetEvent(EEvents::eMOVE_UP);
+				pEvent->SetEvent(EEvents::eMOVE_FORWARD);
                 break;
 
 			case VK_S:
-				pEvent->SetEvent(EEvents::eMOVE_DOWN);
+				pEvent->SetEvent(EEvents::eMOVE_BACKWARD);
                 break;
 
 			case VK_A:
@@ -218,6 +218,10 @@ namespace GLVM::Core
 
 			case VK_D:
 				pEvent->SetEvent(EEvents::eMOVE_RIGHT);
+                break;
+
+            case VK_SPACE:
+                pEvent->SetEvent(EEvents::eJUMP);
                 break;
 
 			case VK_UP:
@@ -270,6 +274,9 @@ namespace GLVM::Core
 			case VK_D:
 				pEvent->SetEvent(EEvents::eKEYRELEASE_D);
                 break;
+
+            case VK_SPACE:
+                pEvent->SetEvent(EEvents::eKEYRELEASE_JUMP);
 
 			case VK_UP:
                 break; 

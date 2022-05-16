@@ -20,10 +20,6 @@ namespace GLVM::ECS
 		Core::EEvents _Anim_Event;
         Core::CStack& Input_Stack_;
         Vector<float, 3> front{1.0f};
-        Vector<float, 3> temp_Vector0{0.0f};
-        Vector<float, 3> temp_Vector1{0.0f};
-        Vector<float, 3> temp_Vector2{0.0f};
-        Vector<float, 3> temp_Vector3{0.0f};
 
         CMovementSystem(Core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
         
@@ -37,21 +33,19 @@ namespace GLVM::ECS
             ECS::CViewComponent& view_Component = (*_tViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
 			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
 			{
-                float cameraSpeed = 1.5f * _dOffset;            
+                float cameraSpeed = 2.5f * _dOffset;            
                 for(int n = 0; n < 5; ++n)
                 {
                     bool flag = false;
                     
                     flag = FixDiagonalMove(Input_Stack_,
                                     (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
-                                    (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
                                     cameraSpeed,
                                     view_Component,
-                                    _Event,
-                                    Input_Stack_[n]);
+                                    _Event);
                     if(flag)
                         break;
-                    switch((Input_Stack_)[n])
+                    switch(Input_Stack_[n])
                     {
                     case Core::EEvents::eMOVE_LEFT:
                         (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
@@ -165,71 +159,49 @@ namespace GLVM::ECS
             return temp_Vector;
         }
 
+        void CalculatePerdendicularVectors(float _camera_Speed,
+                                           ECS::CViewComponent& _view_Component,
+                                           Core::CEvent& _event,
+                                           Vector<float, 3>& _temp_Vector)
+        {
+            _view_Component.Front_Camera[1] = 0.0f;
+            front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
+            front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
+            _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
+            _temp_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * _camera_Speed;
+        }
+        
         bool FixDiagonalMove(Core::CStack& _input_Stack,
                                          STransformComponent& _transform_Component,
-                                         SMoveComponent& _move_Component,
                                          float _camera_Speed,
                                          ECS::CViewComponent& _view_Component,
-                                         Core::CEvent& _event,
-                                         Core::EEvents _current_Event)
+                                         Core::CEvent& _event)
         {
             Vector<float, 3> temp_Vector(0.0f);
             if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_BACKWARD, Core::EEvents::eMOVE_RIGHT))
             {
-                _view_Component.Front_Camera[1] = 0.0f;
-                front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
-                temp_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * _camera_Speed;
-                temp_Vector = _view_Component.Front_Camera - temp_Vector;
-                temp_Vector = Normalize(temp_Vector);
-                _transform_Component.tVertex -= Normalize(temp_Vector) * _camera_Speed;
-
+                CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
+                _transform_Component.tVertex -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
                 return true;
             }
-
             if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_FORWARD, Core::EEvents::eMOVE_RIGHT))
             {
-                _view_Component.Front_Camera[1] = 0.0f;
-                front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
-                temp_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * _camera_Speed;
-                temp_Vector = temp_Vector + _view_Component.Front_Camera;
-                temp_Vector = Normalize(temp_Vector);
-                _transform_Component.tVertex += Normalize(temp_Vector) * _camera_Speed;
-                
+                CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
+                _transform_Component.tVertex += Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
                 return true;
             }
-
             if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_FORWARD, Core::EEvents::eMOVE_LEFT))
             {
-                _view_Component.Front_Camera[1] = 0.0f;
-                front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
-                temp_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * _camera_Speed;
-                temp_Vector = _view_Component.Front_Camera - temp_Vector;
-                temp_Vector = Normalize(temp_Vector);
-                _transform_Component.tVertex += Normalize(temp_Vector) * _camera_Speed;
-
+                CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
+                _transform_Component.tVertex += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
                 return true;
             }
-
             if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_BACKWARD, Core::EEvents::eMOVE_LEFT))
             {
-                _view_Component.Front_Camera[1] = 0.0f;
-                front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-                _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
-                temp_Vector -= Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * _camera_Speed;
-                temp_Vector = temp_Vector - _view_Component.Front_Camera;
-                temp_Vector = Normalize(temp_Vector);
-                _transform_Component.tVertex += Normalize(temp_Vector) * _camera_Speed;
-
+                CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
+                _transform_Component.tVertex -= Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
                 return true;
             }
-
             return false;
         }
         

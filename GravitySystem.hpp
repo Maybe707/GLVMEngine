@@ -18,7 +18,6 @@ namespace GLVM::ECS
         
         bool BoxCollider(STransformComponent& _transform_Component1,
                          STransformComponent& _transform_Component2,
-                         SEventComponent& _event_Component,
                          float& _fDelta_Time)
         {
             bool bCollision_Flag = false;
@@ -30,7 +29,7 @@ namespace GLVM::ECS
                (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
                _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
             {
-                fAcceleration_of_Gravity_ = 0.0f;
+//                fAcceleration_of_Gravity_ = 0.0f;
                 bCollision_Flag           = true;
             }
             return bCollision_Flag;
@@ -40,11 +39,13 @@ namespace GLVM::ECS
         {
             if(_event_Component.eEvent_ == Core::eGRAVITY_COLLISION_FLAG)
                 _transform_Component.tVertex[1] = _transform_Component2.tVertex[1] + 0.5f;
+            fAcceleration_of_Gravity_ = 0.0f;
 //                _transform_Component.tVertex[1] += 0.01f;
         }
         
         void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override
         {
+            int flag = 0;
             Core::TCVectorContainer<CGravityComponent>* _pGravity_Component_Container = ECS::GetInnerComponentContainer<ECS::CGravityComponent>(_Component_Manager);
             Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container                 =
                         GetInnerIDsContainer<SMoveComponent>(_Component_Manager);
@@ -62,22 +63,19 @@ namespace GLVM::ECS
                         GetInnerIDsContainer<CColliderComponent>(_Component_Manager);
             ECS::CViewComponent& view_Component = (*_pViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
 
-            std::cout << "collider array: " << pOrdered_Colliders_Container->GetSize() << std::endl;
-            std::cout << "gravity array: " << _pOrdered_Gravity_Container->GetSize() << std::endl;
-
             for(int i = 0, iSize = pOrdered_Colliders_Container->GetSize(); i < iSize; ++i)
             {
                 for(int j = 0,iSize_Iner = (pOrdered_Colliders_Container->GetSize()); j < iSize_Iner; ++j)
                 {
                     if(i == j)
                         continue;
-                    if(BoxCollider((*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[i]], (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]], (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[i]], fAcceleration_of_Gravity_))
+                    if(BoxCollider((*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[i]], (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]], fAcceleration_of_Gravity_))
                         for(int x = 0, iSize_Rep = (_pOrdered_Gravity_Container->GetSize()); x < iSize_Rep; ++x)
                         {
-                            if((*pOrdered_Colliders_Container)[i] == (*_pOrdered_Gravity_Container)[x] &&
-                               (*pOrdered_Colliders_Container)[i] == (*_pOrdered_View_Container)[x])
+                            if((*pOrdered_Colliders_Container)[i] == (*_pOrdered_Gravity_Container)[x])
                             {
-                                Gravity((*_pTransform_Components_Container)[(*pOrdered_Move_Container)[x]],
+                                std::cout << "Gravity" << std::endl;
+                                Gravity((*_pTransform_Components_Container)[(*_pOrdered_Gravity_Container)[x]],
                                         (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[x]],
                                         (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]]);
                             }

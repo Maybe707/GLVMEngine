@@ -91,10 +91,6 @@ namespace GLVM::Core
                     bGame_Loop_Active = false;
 			}
 			Event_.SetLastEvent(Input_Stack_);
-
-            for(int i = 0; i < 5; ++i)
-                std::cout << "Input stack: " << Input_Stack_[i] << std::endl;
-            std::cout << "Event: " << Event_.GetEvent() << std::endl;
             
             Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
                                 Event_.mouse_Pointer_Position_.iPosition_Y,

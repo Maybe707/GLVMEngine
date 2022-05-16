@@ -167,9 +167,6 @@ namespace GLVM::Core
         int iOffset_X = 0, iOffset_Y = 0;
         iOffset_X = _x_position - 960;
         iOffset_Y = _y_position - 540;
-
-        std::cout << "Offset X: " << iOffset_X << std::endl;
-        std::cout << "Offset Y: " << iOffset_Y << std::endl;
         
         *_x_offset += iOffset_X;
         *_y_offset -= iOffset_Y;
@@ -248,9 +245,6 @@ namespace GLVM::Core
                 ///< With structure "motion" we can get position of mouse pointer and e.c.
                 motion = uXEvent.xmotion;
 
-                std::cout << "Mouse position X: " << motion.x << std::endl;
-                std::cout << "Mouse position Y: " << motion.y << std::endl;
-                
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
                 _Event.mouse_Pointer_Position_.iPosition_X = motion.x;
                 _Event.mouse_Pointer_Position_.iPosition_Y = motion.y;
