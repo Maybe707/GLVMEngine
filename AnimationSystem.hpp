@@ -43,10 +43,15 @@ namespace GLVM::ECS
 		
 		void Update(CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
-			Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
-			Core::TCVectorContainer<unsigned int>* _pOrdered_Animation_Move_Container = GetInnerIDsContainer<SAnimationMoveComponent>(_Component_Manager);
-			for(int i = 0, iSize = _pOrdered_Animation_Move_Container->GetSize(); i < iSize; ++i)
+            Core::TCVectorContainer<unsigned int>* pEntity_Container_refAnimationMove =
+                ECS::GetInnerIDsContainer<ECS::SAnimationMoveComponent>(_Component_Manager);
+            unsigned int uiVector_AnimationMove_Size = pEntity_Container_refAnimationMove->GetSize();
+
+            
+			for(int i = 0, iSize = uiVector_AnimationMove_Size; i < iSize; ++i)
 			{
+                unsigned int uiEntity_refAnimationMove = (*pEntity_Container_refAnimationMove)[i];
+                                
 				if(eEvent_ != eSave_Event_)
 					Animation_Delta = 0.31f;
 				eSave_Event_ = eEvent_;
@@ -58,13 +63,13 @@ namespace GLVM::ECS
 						switch(anim_count)
 						{
 						case 0:
-							ArrayCopy(Vertex_Animation[0][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+							ArrayCopy(Vertex_Animation[0][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 							break;
 						case 1:
-							ArrayCopy(Vertex_Animation[0][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+							ArrayCopy(Vertex_Animation[0][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 							break;
 						case 2:
-							ArrayCopy(Vertex_Animation[0][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+							ArrayCopy(Vertex_Animation[0][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 							break;
 						default:
 							break;
@@ -83,13 +88,13 @@ namespace GLVM::ECS
 							switch(anim_count)
 							{
 							case 0:
-								ArrayCopy(Vertex_Animation[1][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[1][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 1:
-								ArrayCopy(Vertex_Animation[1][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[1][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 2:
-								ArrayCopy(Vertex_Animation[1][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[1][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							default:
 								break;
@@ -108,13 +113,13 @@ namespace GLVM::ECS
 							switch(anim_count)
 							{
 							case 0:
-								ArrayCopy(Vertex_Animation[2][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[2][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 1:
-								ArrayCopy(Vertex_Animation[2][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[2][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 2:
-								ArrayCopy(Vertex_Animation[2][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[2][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							default:
 								break;
@@ -133,13 +138,13 @@ namespace GLVM::ECS
 							switch(anim_count)
 							{
 							case 0:
-								ArrayCopy(Vertex_Animation[3][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[3][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 1:
-								ArrayCopy(Vertex_Animation[3][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[3][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							case 2:
-								ArrayCopy(Vertex_Animation[3][anim_count], (*_pVertex_Container)[(*_pOrdered_Animation_Move_Container)[i]].aVertex_, 30);
+								ArrayCopy(Vertex_Animation[3][anim_count], _Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refAnimationMove).aVertex_, 30);
 								break;
 							default:
 								break;

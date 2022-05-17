@@ -25,65 +25,69 @@ namespace GLVM::ECS
         
 		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override
 		{
-			Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerComponentContainer<ECS::STransformComponent>(_Component_Manager);
-			Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIDsContainer<ECS::SMoveComponent>(_Component_Manager);
-			Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerComponentContainer<ECS::SMoveComponent>(_Component_Manager);
-            Core::TCVectorContainer<ECS::CViewComponent>* _tViewContainer = ECS::GetInnerComponentContainer<ECS::CViewComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
-            ECS::CViewComponent& view_Component = (*_tViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
-			for(int i = 0; i < _pOrdered_Move_Container->GetSize(); ++i)
+            Core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
+                ECS::GetInnerIDsContainer<ECS::SMoveComponent>(_Component_Manager);
+            unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
+
+            Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+                ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
+            unsigned int u_iVector_View_Size = pEntity_Container_refView->GetSize();
+            unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
+            ECS::CViewComponent& view_Component = _Component_Manager.GetComponent<ECS::CViewComponent>(iEntity_refView);
+            
+			for(int i = 0; i < u_iVector_Move_Size; ++i)
 			{
                 float cameraSpeed = 2.5f * _dOffset;            
-                for(int n = 0; n < 5; ++n)
+                for(int n = 0, u_iNumber_of_Events = 5; n < u_iNumber_of_Events; ++n)
                 {
-                    bool flag = false;
-                    
-                    flag = FixDiagonalMove(Input_Stack_,
-                                    (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
-                                    cameraSpeed,
-                                    view_Component,
-                                    _Event);
-                    if(flag)
+                    bool bDiagonal_Movement_Availability = false;
+                    unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
+                    bDiagonal_Movement_Availability = FixDiagonalMove(Input_Stack_,
+                                           _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove),
+                                           cameraSpeed,
+                                           view_Component,
+                                           _Event);
+                    if(bDiagonal_Movement_Availability)
                         break;
                     switch(Input_Stack_[n])
                     {
                     case Core::EEvents::eMOVE_LEFT:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            CalculateVectorRL((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                        _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex +=
+                            CalculateVectorRL(_Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                               view_Component,
-                                              (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                              _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove),
                                               cameraSpeed,
                                               Input_Stack_[n]);
                         break;
                     case Core::EEvents::eMOVE_RIGHT:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            CalculateVectorRL((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                        _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex +=
+                            CalculateVectorRL(_Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                               view_Component,
-                                              (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                                              _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove),
                                               cameraSpeed,
                                               Input_Stack_[n]);
                         break;
                     case Core::EEvents::eMOVE_BACKWARD:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            CalculateVectorFB((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
-                                              (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                        _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex +=
+                            CalculateVectorFB(_Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove),
+                                              _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove),
                                               cameraSpeed,
                                               view_Component,
                                               _Event,
                                               Input_Stack_[n]);
                         break;
                     case Core::EEvents::eMOVE_FORWARD:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex +=
-                            CalculateVectorFB((*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]],
-                                              (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]],
+                        _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex +=
+                            CalculateVectorFB(_Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove),
+                                              _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove),
                                               cameraSpeed,
                                               view_Component,
                                               _Event,
                                               Input_Stack_[n]);
                         break;
                     case Core::EEvents::eJUMP:
-                        (*_pTransform_Components_Container)[(*_pOrdered_Move_Container)[i]].tVertex[1] += 1.0f;
-                        (*_pMove_Components_Container)[(*_pOrdered_Move_Container)[i]].eEvent_ = Core::EEvents::eJUMP;
+                        _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex[1] += 1.0f;
+                        _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                         break;
                     default:
                         break;

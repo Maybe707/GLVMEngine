@@ -4,6 +4,7 @@
 #include "Event.hpp"
 #include "TextureComponent.hpp"
 #include "TransformComponent.hpp"
+#include "VectorContainer.hpp"
 #include "VertexComponent.hpp"
 #include "VertexMath.hpp"
 #include "ViewComponent.hpp"
@@ -118,29 +119,31 @@ namespace GLVM::ECS
 
 	void CRenderSystem::Update(CComponentManager& _Component_Manager, Core::CEvent& _Event)
 	{
-		Core::TCVectorContainer<STransformComponent>* _tTransformContainer = GetInnerComponentContainer<STransformComponent>(_Component_Manager);
-		Core::TCVectorContainer<CTextureComponent>* _tTextureContainer = GetInnerComponentContainer<CTextureComponent>(_Component_Manager);
-		Core::TCVectorContainer<SVertexComponent>* _pVertex_Container = GetInnerComponentContainer<SVertexComponent>(_Component_Manager);
-        Core::TCVectorContainer<CViewComponent>* _pView_Container = GetInnerComponentContainer<CViewComponent>(_Component_Manager);
-        Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = GetInnerIDsContainer<CViewComponent>(_Component_Manager);
-		Core::TCVectorContainer<unsigned int>* _pOrdered_Texture_Container = GetInnerIDsContainer<CTextureComponent>(_Component_Manager);
-        ECS::STransformComponent* Player;
-        int test = 0;
-        for(int j = 0, iSize = _pOrdered_View_Container->GetSize(); j < iSize; ++j)
-        {
-            test = j;
-            Player = &(*_tTransformContainer)[(*_pOrdered_View_Container)[j]];
-            SetViewMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_View_Container)[j]], _Event, *Player,
-                          (*_pView_Container)[(*_pOrdered_View_Container)[j]]);
-        }
-		for(int i = 0, iSize = _pOrdered_Texture_Container->GetSize(); i < iSize; ++i)
-		{
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof((*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_), &(*_pVertex_Container)[(*_pOrdered_Texture_Container)[i]].aVertex_, GL_DYNAMIC_DRAW);
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+            ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
+        unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
+            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(_Component_Manager);
+        unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
-            SetModelMatrix(_Shader_Program, (*_tTransformContainer)[(*_pOrdered_Texture_Container)[i]], *Player);
+        ECS::STransformComponent* Player_Transform_Component;
+        
+        for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
+        {
+            unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
+            Player_Transform_Component = &(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView));
+            SetViewMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView), _Event, *Player_Transform_Component,
+                          _Component_Manager.GetComponent<ECS::CViewComponent>(uiEntity_refView));
+        }
+		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
+		{
+            unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
+
+            SetModelMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refTexture), *Player_Transform_Component);
             
 			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, (*_tTextureContainer)[(*_pOrdered_Texture_Container)[i]].iTexture_);
+			glBindTexture(GL_TEXTURE_2D, _Component_Manager.GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
 			pGLBind_Vertex_Array(iVao_);
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
 		}

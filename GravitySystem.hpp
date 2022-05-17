@@ -1,6 +1,7 @@
 #ifndef GRAVITY_SYSTEM
 #define GRAVITY_SYSTEM
 
+#include "ColliderComponent.hpp"
 #include "ComponentManager.hpp"
 #include "Event.hpp"
 #include "EventComponent.hpp"
@@ -11,14 +12,16 @@
 
 namespace GLVM::ECS
 {
+
     class CGravitySystem : public ECS::ISystem
     {
     public:
         float fAcceleration_of_Gravity_;
+
+        ///< Check for collision with ground.
         
         bool BoxCollider(STransformComponent& _transform_Component1,
-                         STransformComponent& _transform_Component2,
-                         float& _fDelta_Time)
+                         STransformComponent& _transform_Component2)
         {
             bool bCollision_Flag = false;
             
@@ -29,65 +32,60 @@ namespace GLVM::ECS
                (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
                _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
             {
-//                fAcceleration_of_Gravity_ = 0.0f;
                 bCollision_Flag           = true;
             }
             return bCollision_Flag;
         }
 
-        void Gravity(STransformComponent& _transform_Component, SEventComponent& _event_Component, STransformComponent& _transform_Component2)
-        {
-            if(_event_Component.eEvent_ == Core::eGRAVITY_COLLISION_FLAG)
-                _transform_Component.tVertex[1] = _transform_Component2.tVertex[1] + 0.5f;
-            fAcceleration_of_Gravity_ = 0.0f;
-//                _transform_Component.tVertex[1] += 0.01f;
-        }
+        ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
         
+        void Gravity(STransformComponent& _transform_Component, STransformComponent& _transform_Component2)
+        {
+            _transform_Component.tVertex[1] = _transform_Component2.tVertex[1] + 0.5f;
+            fAcceleration_of_Gravity_ = 0.0f;
+        }
+
+        /*! This update searching for refering to colliders entities and check their
+         *  transform components for collision, and if collision detected check if
+         *  backtracking entity had gravity component for call Gravity function.
+         */
+         
         void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override
         {
-            int flag = 0;
-            Core::TCVectorContainer<CGravityComponent>* _pGravity_Component_Container = ECS::GetInnerComponentContainer<ECS::CGravityComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* pOrdered_Move_Container                 =
-                        GetInnerIDsContainer<SMoveComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* _pOrdered_Gravity_Container = ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager);
-            Core::TCVectorContainer<SEventComponent>* _pEvent_Component_Container = ECS::GetInnerComponentContainer<ECS::SEventComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* _pOrdered_Event_Container = ECS::GetInnerIDsContainer<ECS::SEventComponent>(_Component_Manager);
-            Core::TCVectorContainer<STransformComponent>* _pTransform_Components_Container = ECS::GetInnerComponentContainer<ECS::STransformComponent>(_Component_Manager);
-            // Core::TCVectorContainer<unsigned int>* _pOrdered_Move_Container = ECS::GetInnerIDsContainer<ECS::SMoveComponent>(_Component_Manager);
-			// Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container = ECS::GetInnerComponentContainer<ECS::SMoveComponent>(_Component_Manager);
-            Core::TCVectorContainer<ECS::CViewComponent>* _pViewContainer = ECS::GetInnerComponentContainer<ECS::CViewComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container = ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
-            Core::TCVectorContainer<SMoveComponent>* _pMove_Components_Container           =
-            GetInnerComponentContainer<SMoveComponent>(_Component_Manager);
-            Core::TCVectorContainer<unsigned int>* pOrdered_Colliders_Container            =
-                        GetInnerIDsContainer<CColliderComponent>(_Component_Manager);
-            ECS::CViewComponent& view_Component = (*_pViewContainer)[(*_pOrdered_View_Container)[0]];  //!!!!!!!! REMOVE HARDCODE !!!!!!!!!!!
-
-            for(int i = 0, iSize = pOrdered_Colliders_Container->GetSize(); i < iSize; ++i)
+            Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
+                ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
+            unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
+            
+            for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
             {
-                for(int j = 0,iSize_Iner = (pOrdered_Colliders_Container->GetSize()); j < iSize_Iner; ++j)
+                for(int j = 0,iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
                 {
-                    if(i == j)
+                    unsigned int iBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];
+                    unsigned int iCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
+                    
+                    if(iBacktracking_Entity_refCollider == iCompared_Entity_refCollider)
                         continue;
-                    if(BoxCollider((*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[i]], (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]], fAcceleration_of_Gravity_))
-                        for(int x = 0, iSize_Rep = (_pOrdered_Gravity_Container->GetSize()); x < iSize_Rep; ++x)
+                    if(BoxCollider(_Component_Manager.GetComponent<ECS::STransformComponent>(iBacktracking_Entity_refCollider),
+                                   _Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refCollider)))
+                        for(int x = 0, iSize_Grav = ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager)->GetSize(); x < iSize_Grav; ++x)
                         {
-                            if((*pOrdered_Colliders_Container)[i] == (*_pOrdered_Gravity_Container)[x])
+                            int iCompared_Entity_refGravity = (*pEntity_Container_refCollider)[x];
+                            if(iBacktracking_Entity_refCollider == iCompared_Entity_refGravity)
                             {
                                 std::cout << "Gravity" << std::endl;
-                                Gravity((*_pTransform_Components_Container)[(*_pOrdered_Gravity_Container)[x]],
-                                        (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[x]],
-                                        (*_pTransform_Components_Container)[(*pOrdered_Colliders_Container)[j]]);
+                                Gravity(_Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refGravity),
+                                        _Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refCollider));
                             }
                         }
                 }
             }
+
+            ///< Forcing all entities that had gravity component falling down.
             
-            for(int n = 0; n < _pOrdered_Gravity_Container->GetSize(); ++n)
+            for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager)->GetSize(); ++n)
             {
-                _Component_Manager.GetComponent<ECS::STransformComponent>((*ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager))[n]).tVertex[1] -= fAcceleration_of_Gravity_;
-//                (*_pTransform_Components_Container)[(*_pOrdered_Gravity_Container)[n]].tVertex[1] -= fAcceleration_of_Gravity_;
-                (*_pEvent_Component_Container)[(*_pOrdered_Event_Container)[n]].eEvent_ = Core::EEvents::eGRAVITY_COLLISION_FLAG;
+                int iEntity_refGravity = (*ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager))[n];
+                _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refGravity).tVertex[1] -= fAcceleration_of_Gravity_;
             }
         }
     };
