@@ -2,6 +2,7 @@
 #define STACK
 
 #include "Event.hpp"
+#include <iostream>
 
 namespace GLVM::Core
 {
@@ -76,6 +77,9 @@ namespace GLVM::Core
             case eKEYRELEASE_JUMP:
                 Remove(eKEYRELEASE_JUMP);
                 break;
+            case eMOUSE_LEFT_BUTTON_RELEASE:
+                Remove(eMOUSE_LEFT_BUTTON_RELEASE);
+                break;
 			case eMOVE_LEFT:
 				Push(eMOVE_LEFT);
 				break;
@@ -90,6 +94,9 @@ namespace GLVM::Core
 				break;
             case eJUMP:
                 Push(eJUMP);
+                break;
+            case eMOUSE_LEFT_BUTTON:
+                Push(eMOUSE_LEFT_BUTTON);
                 break;
 			default:
 				break;
@@ -110,6 +117,12 @@ namespace GLVM::Core
         EEvents operator[](int _iIndex)
         {
             return aStack_[_iIndex];
+        }
+
+        void PrintStack()
+        {
+            for(int i = 0; i < 5; ++i)
+                std::cout << "Stack: " << aStack_[i] << std::endl;
         }
 	};
 	

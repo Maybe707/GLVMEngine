@@ -1,14 +1,5 @@
-#include "AnimationMoveComponent.hpp"
-#include "ColliderComponent.hpp"
 #include "Engine.hpp"
-#include "EventComponent.hpp"
-#include "GravityComponent.hpp"
-#include "MoveComponent.hpp"
 #include "SpritesData.hpp"
-#include "TextureComponent.hpp"
-#include "TransformComponent.hpp"
-#include "VertexComponent.hpp"
-#include "ViewComponent.hpp"
 
 int main()
 {

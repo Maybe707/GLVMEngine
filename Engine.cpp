@@ -2,6 +2,7 @@
 #include "AnimationMoveComponent.hpp"
 #include "ColliderComponent.hpp"
 #include "ComponentManager.hpp"
+#include "Event.hpp"
 #include "GravitySystem.hpp"
 #include "MoveComponent.hpp"
 #include "TextureComponent.hpp"
@@ -91,6 +92,8 @@ namespace GLVM::Core
                     bGame_Loop_Active = false;
 			}
 			Event_.SetLastEvent(Input_Stack_);
+
+            Input_Stack_.PrintStack();
             
             Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
                                 Event_.mouse_Pointer_Position_.iPosition_Y,

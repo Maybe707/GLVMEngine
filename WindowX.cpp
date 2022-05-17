@@ -55,7 +55,8 @@ namespace GLVM::Core
         Color_Map_ = XCreateColormap(pDisp_, Root_Window_, pVisual_->visual, AllocNone);
 
         Set_Window_Attributes_.colormap = Color_Map_;
-        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask | PointerMotionMask | StructureNotifyMask;
+        Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask |
+            PointerMotionMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask;
 
         Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1920, 1080, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
@@ -207,6 +208,7 @@ namespace GLVM::Core
         {
             XNextEvent(pDisp_, &uXEvent);
 			KeySym ulKey;
+            unsigned int uiMouse_Button;
 
             XMotionEvent motion;
             int iNumber_Of_Screens;
@@ -244,7 +246,7 @@ namespace GLVM::Core
                 
                 ///< With structure "motion" we can get position of mouse pointer and e.c.
                 motion = uXEvent.xmotion;
-
+                
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
                 _Event.mouse_Pointer_Position_.iPosition_X = motion.x;
                 _Event.mouse_Pointer_Position_.iPosition_Y = motion.y;
@@ -266,8 +268,26 @@ namespace GLVM::Core
                         None, CurrentTime
                     );
                 break;
-                
+            case ButtonPress:
+                uiMouse_Button = uXEvent.xbutton.button;
+                switch(uiMouse_Button)
+                {
+                case 1:
+                    _Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
+                    break;
+                }
                 break;
+
+            case ButtonRelease:
+                uiMouse_Button = uXEvent.xbutton.button;
+                switch(uiMouse_Button)
+                {
+                case 1:
+                    _Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
+                    break;
+                }
+                break;
+                
 			case KeyPress:
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
 				switch(ulKey)

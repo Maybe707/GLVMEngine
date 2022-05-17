@@ -33,6 +33,11 @@
 #include "AnimationMoveComponent.hpp"
 #include "SystemManager.hpp"
 #include "ViewComponent.hpp"
+#include "EventComponent.hpp"
+#include "GravityComponent.hpp"
+#include "MoveComponent.hpp"
+#include "TransformComponent.hpp"
+#include "ViewComponent.hpp"
 
 using Entity = unsigned int;
 

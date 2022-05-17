@@ -32,6 +32,8 @@ namespace GLVM::Core
 		eMOVE_RIGHT,
         eMOVE_DIAGONAL,
         eMOUSE_POINTER_POSITION,
+        eMOUSE_LEFT_BUTTON_RELEASE,
+        eMOUSE_LEFT_BUTTON,
         eGAME_LOOP_KILL,
         eEmpty,
     };
