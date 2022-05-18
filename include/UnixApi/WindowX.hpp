@@ -24,10 +24,6 @@ namespace GLVM::Core
         XVisualInfo* pVisual_;
         GLXFBConfig* pFbc_;
 		GLXDrawable Drawable;
-
-        bool bFirst_Enter_;
-        int last_X_;
-        int last_Y_;
         
         //XWindowAttributes gwa_;
         

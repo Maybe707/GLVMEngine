@@ -31,7 +31,6 @@ namespace GLVM::ECS
 
             Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
                 ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
-            unsigned int u_iVector_View_Size = pEntity_Container_refView->GetSize();
             unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
             ECS::CViewComponent& view_Component = _Component_Manager.GetComponent<ECS::CViewComponent>(iEntity_refView);
             

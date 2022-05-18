@@ -12,7 +12,6 @@ EXECUTABLE = rpgLin
 all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	echo $(OBJECTS)
 	$(CC) $(LDFLAGS) $(OBJECTS) -o $(BUILD)/$@
 
 $(BUILD)/%.o : %.c

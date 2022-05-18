@@ -106,7 +106,6 @@ namespace GLVM::ECS
             GetInnerComponentContainer<ECS::CViewComponent>(_Component_Manager);
         Core::TCVectorContainer<unsigned int>* _pOrdered_View_Container                =
             GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
-        ECS::CViewComponent& view_Component = (*_pViewContainer)[(*_pOrdered_View_Container)[0]];
 		for(int i = 0, iSize = pOrdered_Colliders_Container->GetSize(); i < iSize; ++i)
 		{
 			for(int j = 0,iSize_Iner = (pOrdered_Colliders_Container->GetSize()); j < iSize_Iner; ++j)

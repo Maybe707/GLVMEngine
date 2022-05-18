@@ -211,14 +211,14 @@ namespace GLVM::Core
             unsigned int uiMouse_Button;
 
             XMotionEvent motion;
-            int iNumber_Of_Screens;
-            Window* pRoot_Windows;
-            Window Root_Window_Returned;
-            Window Local_Window_Returned;
-            unsigned int u_iMask_Return;
-            bool bPointer_Search_Flag;
-            int iRoot_X, iRoot_Y;
-            int iSpecified_Window_X, iSpecified_Window_Y;
+            // int iNumber_Of_Screens;
+            // Window* pRoot_Windows;
+            // Window Root_Window_Returned;
+            // Window Local_Window_Returned;
+            // unsigned int u_iMask_Return;
+            // bool bPointer_Search_Flag;
+            // int iRoot_X, iRoot_Y;
+            // int iSpecified_Window_X, iSpecified_Window_Y;
 
 			switch(uXEvent.type)
 			{
