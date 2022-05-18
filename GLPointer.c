@@ -11,7 +11,7 @@
 #endif
 
 #define INIT_EXT
-#include "GLPointer.h"
+#include "include/GLPointer.h"
 
 EXTERN_C void Initializer()
 {

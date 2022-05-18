@@ -2,13 +2,13 @@
 #define MOVEMENT_SYSTEM
 
 #include "Event.hpp"
-#include "TransformComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"
-#include "MoveComponent.hpp"
+#include "Components/MoveComponent.hpp"
 #include "ComponentManager.hpp"
 #include "ISystem.hpp"
 #include "VertexMath.hpp"
-#include "ViewComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Stack.hpp"
 
 namespace GLVM::ECS

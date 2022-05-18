@@ -20,8 +20,8 @@ public:
 
     Shader()
     {
-		const char* _pVertex_Path = "../GLVM/Shader.vs";
-		const char* _pFragment_Path = "../GLVM/Shader.fs";
+		const char* _pVertex_Path = "../Shader.vs";
+		const char* _pFragment_Path = "../Shader.fs";
         std::string sVertex_Code;
         std::string sFragment_Code;
         std::ifstream Vertex_Shader_File;

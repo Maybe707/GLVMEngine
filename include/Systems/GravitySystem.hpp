@@ -1,13 +1,13 @@
 #ifndef GRAVITY_SYSTEM
 #define GRAVITY_SYSTEM
 
-#include "ColliderComponent.hpp"
-#include "ComponentManager.hpp"
-#include "Event.hpp"
-#include "EventComponent.hpp"
-#include "GravityComponent.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "../ComponentManager.hpp"
+#include "../Event.hpp"
+#include "Components/EventComponent.hpp"
+#include "Components/GravityComponent.hpp"
 #include "ISystem.hpp"
-#include "TransformComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"
 
 namespace GLVM::ECS

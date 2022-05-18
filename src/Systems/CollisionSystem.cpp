@@ -1,8 +1,8 @@
-#include "CollisionSystem.hpp"
+#include "Systems/CollisionSystem.hpp"
 #include "Event.hpp"
-#include "EventComponent.hpp"
-#include "GravityComponent.hpp"
-#include "ViewComponent.hpp"
+#include "Components/EventComponent.hpp"
+#include "Components/GravityComponent.hpp"
+#include "Components/ViewComponent.hpp"
 
 namespace GLVM::ECS
 {

@@ -8,8 +8,8 @@
 #include "Stack.hpp"
 #include "ISystem.hpp"
 #include "GLPointer.h"
-#include "AnimationMoveComponent.hpp"
-#include "VertexComponent.hpp"
+#include "Components/AnimationMoveComponent.hpp"
+#include "Components/VertexComponent.hpp"
 
 #define ANIM_PER_AXIS_NUMBER 4
 

@@ -5,15 +5,15 @@
 #include <GL/gl.h>
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
-#include "VertexComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include "ComponentManager.hpp"
-#include "TextureComponent.hpp"
-#include "TransformComponent.hpp"
+#include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include <GL/glext.h>
-#include "AnimationMoveComponent.hpp"
+#include "Components/AnimationMoveComponent.hpp"
 #include "VertexMath.hpp"
 #include "Event.hpp"
-#include "ViewComponent.hpp"
+#include "Components/ViewComponent.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.

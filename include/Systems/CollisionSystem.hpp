@@ -2,16 +2,16 @@
 #define COLLISION_SYSTEM
 
 #include "VectorContainer.hpp"
-#include "EventComponent.hpp"
-#include "GravityComponent.hpp"
-#include "TransformComponent.hpp"
+#include "Components/EventComponent.hpp"
+#include "Components/GravityComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "ISystem.hpp"
 #include "Event.hpp"
-#include "MoveComponent.hpp"
-#include "ColliderComponent.hpp"
+#include "Components/MoveComponent.hpp"
+#include "Components/ColliderComponent.hpp"
 #include "VectorContainer.hpp"
 #include "VertexMath.hpp"
-#include "ViewComponent.hpp"
+#include "Components/ViewComponent.hpp"
 
 namespace GLVM::ECS
 {

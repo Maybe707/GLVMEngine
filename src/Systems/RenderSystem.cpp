@@ -1,13 +1,13 @@
-#include "RenderSystem.hpp"
+#include "Systems/RenderSystem.hpp"
 #include "ComponentManager.hpp"
 #include "Engine.hpp"
 #include "Event.hpp"
-#include "TextureComponent.hpp"
-#include "TransformComponent.hpp"
+#include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"
-#include "VertexComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include "VertexMath.hpp"
-#include "ViewComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <cmath>
 

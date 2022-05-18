@@ -3,20 +3,24 @@ CC = clang++
 LDFLAGS = -lGL -lX11
 CXXFLAGS = -c -std=c++17 -g -Wall
 CFLAGS = -c -g -Wall
-SOURCES = Engine.cpp EngineMain.cpp GLPointer.c WindowCreator.cpp RenderSystem.cpp ShaderProgram.cpp Event.cpp WindowX.cpp ChronoX.cpp TimerCreator.cpp VertexData.cpp CollisionSystem.cpp AnimationSystem.cpp
-OBJECTS = $(SOURCES:.cpp=.o)
+INC = -I./include
+BUILD = build
+SOURCES = $(wildcard *.c) $(wildcard src/*.cpp) $(wildcard src/Components/*.cpp) $(wildcard src/Systems/*.cpp) $(wildcard src/UnixApi/*.cpp)
+OBJECTS = $(SOURCES:src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = rpgLin
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	echo $(OBJECTS)
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $(BUILD)/$@
 
-%.o : %.cpp
-	$(CC) $(CXXFLAGS) $< -o $@
+$(BUILD)/%.o : %.c
+	$(C) $(INC) $(CFLAGS) $< -o $@
 
-%.o : %.c
-	$(C) $(CFLAGS) $< -o $@
+$(BUILD)/%.o : ./src/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o rpgLin
+	rm -r $(BUILD)/*

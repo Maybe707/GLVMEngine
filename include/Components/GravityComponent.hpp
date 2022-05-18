@@ -1,7 +1,7 @@
 #ifndef GRAVITY_COMPONENT
 #define GRAVITY_COMPONENT
 
-#include "VertexMath.hpp"
+#include "../VertexMath.hpp"
 
 namespace GLVM::ECS
 {

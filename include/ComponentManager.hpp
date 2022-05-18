@@ -1,13 +1,13 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
-#include "AnimationMoveComponent.hpp"
-#include "ColliderComponent.hpp"
-#include "MoveComponent.hpp"
+#include "Components/AnimationMoveComponent.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/MoveComponent.hpp"
 #include "VectorContainer.hpp"
 #include <iostream>
 #include "IContainer.hpp"
-#include "VertexComponent.hpp"
+#include "Components/VertexComponent.hpp"
 
 typedef unsigned int Entity_ID;
 

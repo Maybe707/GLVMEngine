@@ -2,7 +2,7 @@
 //#include "IWindow.hpp"
 
 #ifdef __linux__
-#include "WindowX.hpp"
+#include "UnixApi/WindowX.hpp"
 #endif
 #ifdef _WIN32
 #include "WindowWin.hpp"

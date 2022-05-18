@@ -1,44 +1,69 @@
-ifeq ($(OS),Windows_NT)
-    uname_S := Windows
-else
-    uname_S := $(shell uname -s)
-endif
+C = clang
+CC = clang++
+LDFLAGS = -lGL -lX11
+CXXFLAGS = -c -std=c++17 -g -Wall
+CFLAGS = -c -g -Wall
+INC = -I./include
+BUILD1 = build
+BUILD2 = build/Systems
+BUILD3 = build/Components
+BUILD4 = build/UnixApi
+SOURCES1 = $(wildcard *.c)
+SOURCES2 = $(wildcard src/*.cpp)
+SOURCES3 = $(wildcard src/Systems/*.cpp)
+SOURCES4 = $(wildcard src/Components/*.cpp)
+SOURCES5 = $(wildcard src/UnixApi/*.cpp)
+OBJECTS1 = $(SOURCES5:%.c=$(BUILD1)/%.o)
+OBJECTS2 = $(SOURCES1:src/%.cpp=$(BUILD1)/%.o)
+OBJECTS3 = $(SOURCES2:src/Systems/%.cpp=$(BUILD2)/%.o)
+OBJECTS4 = $(SOURCES3:src/Components/%.cpp=$(BUILD3)/%.o)
+OBJECTS5 = $(SOURCES4:src/UnixApi/%.cpp=$(BUILD4)/%.o)
+EXECUTABLE = glvm
 
-ifeq ($(uname_S), Windows)
-    rpg = rpgWin.exe
-	CC = x86_64-w64-mingw32-g++
-	LDFLAGS = -lgdi32 -lopengl32
-	WINDOWO = WindowWin.o
-	WINDOWS = WindowWin.cpp
-endif
-ifeq ($(uname_S), Linux)
-    rpg = rpgLin
-	CC = g++
-	LDFLAGS = -lGL -lX11
-	WINDOWO = WindowLin.o
-	WINDOWS = WindowLin.cpp
-endif
+all: $(EXECUTABLE)
 
-all: $(rpg)
+$(EXECUTABLE) : $(OBJECTS1) $(OBJECTS2) $(OBJECTS3) $(OBJECTS4) $(OBJECTS5)
+	 $(CC) $(INC) $(OBJECTS1) $(OBJECTS2) $(OBJECTS3) $(OBJECTS4) $(OBJECTS5) -o $(BUILD1)/$@
 
-EngineMain.o: EngineMain.cpp
-	$(CC) -c -o EngineMain.o EngineMain.cpp
-GLPointer.o: GLPointer.c
-	$(CC) -c -o GLPointer.o GLPointer.c
-WindowCreator.o: WindowCreator.cpp
-	$(CC) -c -o WindowCreator.o WindowCreator.cpp
-Sprite.o: Sprite.cpp
-	$(CC) -c -o Sprite.o Sprite.cpp
-Renderer.o: Renderer.cpp
-	$(CC) -c -o Renderer.o Renderer.cpp
-ShaderProgram.o: ShaderProgram.cpp
-	$(CC) -c -o ShaderProgram.o ShaderProgram.cpp
-Event.o: Event.cpp
-	$(CC) -c -o Event.o Event.cpp
-$(WINDOWO): $(WINDOWS)
-	$(CC) -c -o $(WINDOWO) $(WINDOWS)
-$(rpg): EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o $(WINDOWO)
-	$(CC) -o $(rpg) EngineMain.o GLPointer.o WindowCreator.o Sprite.o Renderer.o ShaderProgram.o Event.o $(WINDOWO) $(LDFLAGS)
+# Make targets for C-files.
+$(BUILD1)/%.o : ./src/%.c
+	mkdir -p $(@D)
+	$(C) $(INC) $(CFLAGS) $< -o $@
+
+$(BUILD2)/%.o : ./src/Systems/%.c
+	mkdir -p $(@D)
+	$(C) $(INC) $(CFLAGS) $< -o $@
+
+$(BUILD3)/%.o : ./src/Components/%.c
+	mkdir -p $(@D)
+	$(C) $(INC) $(CFLAGS) $< -o $@
+
+$(BUILD4)/%.o : ./src/UnixApi/%.c
+	mkdir -p $(@D)
+	$(C) $(INC) $(CFLAGS) $< -o $@
+
+$(BUILD1)/%.o : %.c
+	$(C) $(INC) $(CFLAGS) $< -o $@
+
+# Make targets for C++-files.
+
+$(BUILD1)/%.o : ./src/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
+
+$(BUILD2)/%.o : ./src/Systems/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
+
+$(BUILD3)/%.o : ./src/Components/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
+
+$(BUILD4)/%.o : ./src/UnixApi/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o $(rpg)
+	rm -r $(BUILD1)/*
+	
+
