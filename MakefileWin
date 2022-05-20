@@ -2,22 +2,26 @@ CC = x86_64-w64-mingw32-g++
 LDFLAGS = -lgdi32 -lopengl32
 CXXFLAGS = -c -std=c++17 -g -Wall
 CFLAGS = -c -g -Wall
-SOURCES = Engine.cpp EngineMain.cpp GLPointer.c WindowCreator.cpp RenderSystem.cpp ShaderProgram.cpp Event.cpp WindowWin.cpp ChronoWin.cpp TimerCreator.cpp VertexData.cpp CollisionSystem.cpp AnimationSystem.cpp
-
-OBJECTS = $(SOURCES:.cpp=.o)
-EXECUTABLE = rpgWin
+INC = -I./include
+BUILD = build
+SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.cpp ./src/Systems/RenderSystem.cpp \
+	  ./src/ShaderProgram.cpp ./src/Event.cpp ./src/WinApi/WindowWin.cpp ./src/WinApi/ChronoWin.cpp ./src/TimerCreator.cpp \
+	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp
+OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
+EXECUTABLE = winGame
 
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@ $(LDFLAGS)
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $(BUILD)/$@
 
-%.o : %.cpp
-	$(CC) $(CXXFLAGS) $< -o $@
+$(BUILD)/%.o : ./src/%.cpp
+	mkdir -p $(@D)
+	$(CC) $(INC) $(CXXFLAGS) $< -o $@
 
-%.o : %.c
-	$(C) $(CFLAGS) $< -o $@
+$(BUILD)/%.o : %.c
+	$(C) $(INC) $(CFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o rpgWin
+	rm -r $(BUILD)/*
 

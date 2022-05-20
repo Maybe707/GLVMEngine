@@ -25,23 +25,51 @@ namespace GLVM::ECS
         {
             bool bCollision_Flag = false;
             
-            if((_transform_Component1.tVertex[0] + 0.5f) > _transform_Component2.tVertex[0] &&
-               _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + 0.5f   &&
-               (_transform_Component1.tVertex[1] + 0.5f) > _transform_Component2.tVertex[1] &&
-               _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + 0.5f   &&
-               (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
-               _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
+            // if((_transform_Component1.tVertex[0] + 0.5f) > _transform_Component2.tVertex[0] &&
+            //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + 0.5f   &&
+            //    (_transform_Component1.tVertex[1] + 0.5f) > _transform_Component2.tVertex[1] &&
+            //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + 0.5f   &&
+            //    (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
+            //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
+            
+            // if((((_transform_Component1.tVertex[0] + _transform_Component1.fScale) > _transform_Component2.tVertex[0]) ||
+            //    (_transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + _transform_Component2.fScale))   &&
+            //    (((_transform_Component1.tVertex[1] + _transform_Component1.fScale) > _transform_Component2.tVertex[1]) ||
+            //     (_transform_Component1.tVertex[1] < (_transform_Component2.tVertex[1] + _transform_Component2.fScale)))   &&
+            //    (((_transform_Component1.tVertex[2] + _transform_Component1.fScale) > _transform_Component2.tVertex[2] ||
+            //      _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + _transform_Component2.fScale)))
+
+            // if((_transform_Component1.tVertex[0] + _transform_Component1.fScale) > _transform_Component2.tVertex[0] &&
+            //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + _transform_Component2.fScale   &&
+            //    (_transform_Component1.tVertex[1] + _transform_Component1.fScale) > _transform_Component2.tVertex[1] &&
+            //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + _transform_Component2.fScale   &&
+            //    (_transform_Component1.tVertex[2] + _transform_Component1.fScale) > _transform_Component2.tVertex[2] &&
+            //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + _transform_Component2.fScale)
+
+            if(_transform_Component1.tVertex[0] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[0] - _transform_Component2.fScale / 2 &&
+               _transform_Component1.tVertex[0] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[0] + _transform_Component2.fScale / 2 &&
+               _transform_Component1.tVertex[1] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[1] - _transform_Component2.fScale / 2 &&
+               _transform_Component1.tVertex[1] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 &&
+               _transform_Component1.tVertex[2] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[2] - _transform_Component2.fScale / 2 &&
+               _transform_Component1.tVertex[2] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[2] + _transform_Component2.fScale / 2)
+            
+            // if(_transform_Component1.tVertex[0] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[0] - _transform_Component2.fScale / 2 ||
+            //    _transform_Component1.tVertex[0] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[0] + _transform_Component2.fScale / 2 ||
+            //    _transform_Component1.tVertex[1] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[1] - _transform_Component2.fScale / 2 ||
+            //    _transform_Component1.tVertex[1] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 ||
+            //    _transform_Component1.tVertex[2] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[2] - _transform_Component2.fScale / 2 ||
+            //    _transform_Component1.tVertex[2] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[2] + _transform_Component2.fScale / 2)
             {
-                bCollision_Flag           = true;
+                bCollision_Flag = true;
             }
             return bCollision_Flag;
         }
 
         ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
         
-        void Gravity(STransformComponent& _transform_Component, STransformComponent& _transform_Component2)
+        void Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2)
         {
-            _transform_Component.tVertex[1] = _transform_Component2.tVertex[1] + 0.5f;
+            _transform_Component1.tVertex[1] = _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
             fAcceleration_of_Gravity_ = 0.0f;
         }
 
@@ -55,11 +83,16 @@ namespace GLVM::ECS
             Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
                 ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
             unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
+            Core::TCVectorContainer<unsigned int>* pEntity_Container_refGravity =
+                ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
+            unsigned int uiVector_Gravity_Size = pEntity_Container_refGravity->GetSize();
             
             for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
             {
                 for(int j = 0,iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
                 {
+                    if(i == 1)                ///< DELETE GOVNO!!
+                        break;
                     unsigned int iBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];
                     unsigned int iCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
                     
@@ -67,13 +100,12 @@ namespace GLVM::ECS
                         continue;
                     if(BoxCollider(_Component_Manager.GetComponent<ECS::STransformComponent>(iBacktracking_Entity_refCollider),
                                    _Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refCollider)))
-                        for(int x = 0, iSize_Grav = ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager)->GetSize(); x < iSize_Grav; ++x)
+                        for(int x = 0, iSize_Grav = uiVector_Gravity_Size; x < iSize_Grav; ++x)
                         {
-                            int iCompared_Entity_refGravity = (*pEntity_Container_refCollider)[x];
-                            if(iBacktracking_Entity_refCollider == iCompared_Entity_refGravity)
+                            unsigned int uiBacktracking_Entity_refGravity = (*pEntity_Container_refGravity)[x];
+                            if(iBacktracking_Entity_refCollider == uiBacktracking_Entity_refGravity)
                             {
-                                std::cout << "Gravity" << std::endl;
-                                Gravity(_Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refGravity),
+                                Gravity(_Component_Manager.GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refGravity),
                                         _Component_Manager.GetComponent<ECS::STransformComponent>(iCompared_Entity_refCollider));
                             }
                         }

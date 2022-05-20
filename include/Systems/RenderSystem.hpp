@@ -47,6 +47,8 @@ namespace GLVM::ECS
 	public:
 	    GLuint iVbo_;
 		GLuint iVao_;
+        GLuint iVbo_Crosshair_;
+		GLuint iVao_Crosshair_;
 		static const unsigned int u_iRange = 4;
         Matrix<float, 4> tProjection_Matrix{1.0f};
 		Shader* _Shader_Program;
@@ -67,6 +69,7 @@ namespace GLVM::ECS
         void SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
         void PrintMatrix(Matrix<float, 4> _tMatrix);
         void PrintVector(Vector<float, 3> _tVector);
+        void DrawCrosshare();
     };
 }
     

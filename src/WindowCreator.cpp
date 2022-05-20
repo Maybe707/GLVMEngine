@@ -5,7 +5,7 @@
 #include "UnixApi/WindowX.hpp"
 #endif
 #ifdef _WIN32
-#include "WindowWin.hpp"
+#include "WinApi/WindowWin.hpp"
 #endif
 
 namespace GLVM::Core

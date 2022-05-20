@@ -55,12 +55,16 @@ namespace GLVM::Core
 			aStack_[iHead_] = EEvents::eDEFAULT;
 		}
 
+        ///<       !!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE ALL THIS IF'S WHITH CHECKEVENT FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!
+        
 		void ControlInput(CEvent& _eEvent)
-		{ 
+		{
+            if(!(SearchElement(_eEvent.GetEvent()) == eEmpty))
+                return;
 			switch(_eEvent.GetEvent())
 			{
 			case eGAME_LOOP_KILL:
-				Push(eGAME_LOOP_KILL);
+                Push(eGAME_LOOP_KILL);
 				break;
 			case eKEYRELEASE_A:
 				Remove(eMOVE_LEFT);
@@ -75,22 +79,22 @@ namespace GLVM::Core
 				Remove(eMOVE_FORWARD); 
 				break;
             case eKEYRELEASE_JUMP:
-                Remove(eKEYRELEASE_JUMP);
+                Remove(eJUMP);
                 break;
             case eMOUSE_LEFT_BUTTON_RELEASE:
-                Remove(eMOUSE_LEFT_BUTTON_RELEASE);
+                Remove(eMOUSE_LEFT_BUTTON);
                 break;
 			case eMOVE_LEFT:
-				Push(eMOVE_LEFT);
+                Push(eMOVE_LEFT);
 				break;
 			case eMOVE_RIGHT:
-				Push(eMOVE_RIGHT);
+                Push(eMOVE_RIGHT);
 				break;
 			case eMOVE_BACKWARD:
-				Push(eMOVE_BACKWARD);
+                Push(eMOVE_BACKWARD);
 				break;
 			case eMOVE_FORWARD:
-				Push(eMOVE_FORWARD);
+                Push(eMOVE_FORWARD);
 				break;
             case eJUMP:
                 Push(eJUMP);
@@ -123,6 +127,16 @@ namespace GLVM::Core
         {
             for(int i = 0; i < 5; ++i)
                 std::cout << "Stack: " << aStack_[i] << std::endl;
+        }
+
+        bool CheckEvent(EEvents _element)
+        {
+            for(int i = 0; i < iHead_; ++i)
+            {
+                if(aStack_[i] == _element)
+                    return true;
+            }
+            return false;
         }
 	};
 	

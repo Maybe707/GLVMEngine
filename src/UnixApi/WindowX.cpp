@@ -78,6 +78,8 @@ namespace GLVM::Core
             {
                 GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
                 GLX_CONTEXT_MINOR_VERSION_ARB, 2,
+                // GLX_CONTEXT_PROFILE_MASK_ARB,
+                // GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
                 None
             };
         

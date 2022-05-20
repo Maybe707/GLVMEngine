@@ -33,6 +33,9 @@ namespace GLVM::Core
 		case GLVM::Core::eMOVE_FORWARD:
 			SetEvent(GLVM::Core::EEvents::eMOVE_FORWARD);
 			break;
+        case GLVM::Core::eMOUSE_LEFT_BUTTON:
+			SetEvent(GLVM::Core::EEvents::eMOUSE_LEFT_BUTTON);
+			break;
 		default:
 			break;
 		}

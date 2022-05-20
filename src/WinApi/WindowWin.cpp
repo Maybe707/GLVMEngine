@@ -1,4 +1,4 @@
-#include "WindowWin.hpp"
+#include "WinApi/WindowWin.hpp"
 #include "Event.hpp"
 #include "GLPointer.h"
 #include <iostream>
@@ -120,9 +120,9 @@ namespace GLVM::Core
         ///< Create message struct object.
         MSG msg;
 
+        SetWindowLongPtrW(pModern_Window_, GWLP_USERDATA, (LONG_PTR)&_Event);
         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            SetWindowLongPtrW(pModern_Window_, GWLP_USERDATA, (LONG_PTR)&_Event);
             TranslateMessage( &msg );
             DispatchMessage( &msg );
 			return true;
@@ -186,6 +186,14 @@ namespace GLVM::Core
             ///< Set the size and position of the window. 
             return 0;
 
+        case WM_LBUTTONDOWN:
+            pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
+            return 0;
+            
+        case WM_LBUTTONUP:
+            pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
+            return 0;
+
         case WM_MOUSEMOVE:
             iMouse_Position_X = GET_X_LPARAM(_pLParam);
             iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
@@ -201,9 +209,12 @@ namespace GLVM::Core
                 break; 
  
             case VK_RIGHT: 
-			    pEvent->SetEvent(EEvents::eGAME_LOOP_KILL);
                 break; 
- 
+
+            case VK_ESCAPE:
+                pEvent->SetEvent(EEvents::eGAME_LOOP_KILL);
+                break;
+                
             case VK_W:
 				pEvent->SetEvent(EEvents::eMOVE_FORWARD);
                 break;

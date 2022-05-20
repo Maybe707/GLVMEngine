@@ -2,7 +2,10 @@
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "ComponentManager.hpp"
+#include "Components/CrosshairComponent.hpp"
+#include "Components/GravityComponent.hpp"
 #include "Event.hpp"
+#include "Systems/CollisionSystem.hpp"
 #include "Systems/GravitySystem.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/TextureComponent.hpp"
@@ -11,6 +14,8 @@
 #include "Components/VertexComponent.hpp"
 #include "IContainer.hpp"
 #include "Components/ViewComponent.hpp"
+#include <GL/gl.h>
+#include <GL/glext.h>
 
 #define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
 #define SOME_STRANGE_STUFF                  0
@@ -34,10 +39,11 @@ namespace GLVM::Core
 	{
 		Window_         = CWindowCreator().Create();
 		Chrono_         = Time::CTimerCreator().Create();
-        
-		Renderer_System = new ECS::CRenderSystem();
-		Movement_System = new ECS::CMovementSystem(Input_Stack_);
-        Gravity_System_ = new ECS::CGravitySystem();
+
+        Collision_System = new ECS::CCollisionSystem(Input_Stack_);
+		Renderer_System  = new ECS::CRenderSystem();
+		Movement_System  = new ECS::CMovementSystem(Input_Stack_);
+        Gravity_System_  = new ECS::CGravitySystem();
         
 		Shader_Program  = new Shader();
         System_Manager  = new ECS::CSystemManager();
@@ -69,9 +75,9 @@ namespace GLVM::Core
 
 		///< Call of ActivateSystem function must be in this order. 
                  
-        System_Manager->ActivateSystem(Gravity_System_);
         System_Manager->ActivateSystem(Movement_System);
-		System_Manager->ActivateSystem(&Collision_System);
+		System_Manager->ActivateSystem(Collision_System);
+        System_Manager->ActivateSystem(Gravity_System_);
 		System_Manager->ActivateSystem(&Animation_System);
         System_Manager->ActivateSystem(Renderer_System);
 
@@ -93,24 +99,39 @@ namespace GLVM::Core
 			}
 			Event_.SetLastEvent(Input_Stack_);
 
-            Input_Stack_.PrintStack();
+//            Input_Stack_.PrintStack();
             
             Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
                                 Event_.mouse_Pointer_Position_.iPosition_Y,
                                 &Event_.mouse_Pointer_Position_.iOffset_X,
                                 &Event_.mouse_Pointer_Position_.iOffset_Y);
-
-            Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
+            
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Movement_System->_Anim_Event                  = Event_.GetEvent();
-			Collision_System.fDelta_Time_                 = fDelta_Time_;
+			Collision_System->fDelta_Time_                = fDelta_Time_;
+            Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
 			Animation_System.eEvent_                      = Input_Stack_.Pop();
 			Animation_System.Delta_Time                   = fDelta_Time_;
+
+            // Core::TCVectorContainer<unsigned int>* pEntity_Container_refGravity =
+            //     ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_ComponentManager);
+            // unsigned int uiEntity_refGravity = (*pEntity_Container_refGravity)[0];
+            // ECS::STransformComponent& Player = _ComponentManager.GetComponent<ECS::STransformComponent>(uiEntity_refGravity);
+            
+            // Core::TCVectorContainer<unsigned int>* pEntity_Container_refCrosshair =
+            //     ECS::GetInnerIDsContainer<ECS::SCrosshairComponent>(_ComponentManager);
+            // unsigned int uiEntity_refCrosshair = (*pEntity_Container_refCrosshair)[0];
+            // ECS::STransformComponent& rCrosshair = _ComponentManager.GetComponent<ECS::STransformComponent>(uiEntity_refCrosshair);
+            // rCrosshair.tVertex[0] = Player.tVertex[0];
+            // rCrosshair.tVertex[1] = Player.tVertex[1];
+            // rCrosshair.tVertex[2] = 0.3f;
+            
 			Renderer_System->_Shader_Program              = Shader_Program;
-			
+            
 			System_Manager->Update(_ComponentManager, Event_);
-			
-			Window_->SwapBuffers();
+//            Renderer_System->DrawCrosshare();
+            
+            Window_->SwapBuffers();
 		}
 	}
 

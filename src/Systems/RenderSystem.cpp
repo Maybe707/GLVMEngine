@@ -4,11 +4,13 @@
 #include "Event.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "GLPointer.h"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
+#include <X11/X.h>
 #include <cmath>
 
 float fBase_Array[30] =
@@ -127,12 +129,13 @@ namespace GLVM::ECS
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
         ECS::STransformComponent* Player_Transform_Component;
-        
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
         {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
             Player_Transform_Component = &(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView));
-            SetViewMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView), _Event, *Player_Transform_Component,
+            SetViewMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView),
+                          _Event,
+                          *Player_Transform_Component,
                           _Component_Manager.GetComponent<ECS::CViewComponent>(uiEntity_refView));
         }
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
@@ -141,8 +144,7 @@ namespace GLVM::ECS
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
 
             SetModelMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refTexture), *Player_Transform_Component);
-            
-			pGLActive_Texture(GL_TEXTURE10);
+  			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, _Component_Manager.GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
 			pGLBind_Vertex_Array(iVao_);
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
@@ -247,5 +249,45 @@ namespace GLVM::ECS
     {
         for(int i = 0; i < 3; ++i)
             std::cout << "Vector: " << _tVector[i] << std::endl;
+    }
+
+    void CRenderSystem::DrawCrosshare()
+    {
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        // glColor3f(1.0f, 3.0f, 0.0f);
+        // glBegin(GL_TRIANGLES);
+        // glVertex3f(0.25f, 0.25f, 0.0f);
+        // glVertex3f(0.5f, 0.25f, 0.1f);
+        // glVertex3f(0.5f, 0.25f, 0.3f);
+        // glEnd();
+
+        float vertices[] = {
+            0.5f, 0.5f, 0.5f, // left  
+            0.5f, 0.2f, 0.3f, // right 
+            0.0f,  0.5f, 0.5f  // top   
+        }; 
+
+        pGLGen_Vertex_Arrays(1, &iVao_Crosshair_);
+        pGLGen_Buffers(1, &iVbo_Crosshair_);
+        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+        pGLBind_Vertex_Array(iVao_Crosshair_);
+
+        pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_Crosshair_);
+        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
+
+        pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        pGLEnable_Vertex_Attrib_Array(0);
+        
+//        glClearColor(0.4f, 0.3f, 0.3f, 1.0f);
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+//        pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
+
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+//        pGLBind_Vertex_Array(0);         
     }
 }

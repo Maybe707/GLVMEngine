@@ -54,7 +54,7 @@ namespace GLVM::Core
 		CStack         Input_Stack_;
         
 		ECS::CRenderSystem*   Renderer_System;
-		ECS::CCollisionSystem Collision_System;
+		ECS::CCollisionSystem* Collision_System;
 		ECS::CAnimationSystem Animation_System;
 		ECS::CMovementSystem* Movement_System;
         ECS::CGravitySystem*  Gravity_System_;
