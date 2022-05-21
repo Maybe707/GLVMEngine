@@ -3,7 +3,6 @@
 
 #include "ComponentManager.hpp"
 #include "Event.hpp"
-#include "Components/ViewComponent.hpp"
 
 namespace GLVM::ECS
 {

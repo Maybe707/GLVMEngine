@@ -2,6 +2,7 @@
 #define ENGINE
 
 #include "GLPointer.h"
+#include "Systems/GUISystem.hpp"
 #include "Systems/GravitySystem.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
@@ -38,6 +39,25 @@
 #include "Components/MoveComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Components/AnimationMoveComponent.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "ComponentManager.hpp"
+#include "Components/CrosshairComponent.hpp"
+#include "Components/GravityComponent.hpp"
+#include "Event.hpp"
+#include "Systems/CollisionSystem.hpp"
+#include "Systems/GUISystem.hpp"
+#include "Systems/GravitySystem.hpp"
+#include "Components/MoveComponent.hpp"
+#include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "VectorContainer.hpp"
+#include "Components/VertexComponent.hpp"
+#include "IContainer.hpp"
+#include "Components/ViewComponent.hpp"
+#include <GL/gl.h>
+#include <GL/glext.h>
+#include "Constants.hpp"
 
 using Entity = unsigned int;
 
@@ -50,16 +70,17 @@ namespace GLVM::Core
 		Time::IChrono* Chrono_;
         CEvent         Event_;
 		Shader*        Shader_Program;
+        Shader*        GUI_Shader_Program_;
 		float          fDelta_Time_;
 		CStack         Input_Stack_;
         
-		ECS::CRenderSystem*   Renderer_System;
-		ECS::CCollisionSystem* Collision_System;
-		ECS::CAnimationSystem Animation_System;
-		ECS::CMovementSystem* Movement_System;
-        ECS::CGravitySystem*  Gravity_System_;
+		ECS::CRenderSystem*    Renderer_System;
+        ECS::CCollisionSystem* Collision_System;
+		ECS::CAnimationSystem  Animation_System;
+		ECS::CMovementSystem*  Movement_System;
+        ECS::CGravitySystem*   Gravity_System_;
         
-        ECS::CSystemManager*  System_Manager;
+        ECS::CSystemManager*   System_Manager;
 		
 	public:
 		CEngine();
@@ -67,6 +88,8 @@ namespace GLVM::Core
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
 		void GameKill();
+
+        ECS::CGUISystem*       GUI_System;
 	};
 		
 }

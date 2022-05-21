@@ -13,16 +13,16 @@ int main()
     
 	Entity u_iPlayer;
 	EntityManager.CreateEntity(u_iPlayer);
-    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CGravityComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
-    GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	TexturePlayer.iWidth_ = 96; 
-	TexturePlayer.iHeight_ = 128;
-	TexturePlayer.u_iData_ = chelik_dat;
-	GLVM.LoadTextureData(TexturePlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CGravityComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
+    // GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	// TexturePlayer.iWidth_ = 96; 
+	// TexturePlayer.iHeight_ = 128;
+	// TexturePlayer.u_iData_ = chelik_dat;
+	// GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager.GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
     GLVM::ECS::CGravityComponent& GravityPlayer = ComponentManager.GetComponent<GLVM::ECS::CGravityComponent>(u_iPlayer);
-    TransformPlayer.fScale = 0.5f;
+    TransformPlayer.fScale = 1.0f;
     TransformPlayer.tVertex[0] = 0.0f;
 	TransformPlayer.tVertex[1] = 5.0f;
 	TransformPlayer.tVertex[2] = 0.0f;
@@ -48,21 +48,21 @@ int main()
     TransformWitch.tVertex[0] = 3.5f;
     TransformWitch.tVertex[1] = 0.0f;
     TransformWitch.tVertex[2] = 0.0f;
-    TransformWitch.fScale = 0.5f;
+    TransformWitch.fScale = 2.5f;
 
-    // Entity u_iWitch2;
-	// EntityManager.CreateEntity(u_iWitch2);
-	// ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
-	// GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-	// TextureWitch2.iWidth_ = 32;
-	// TextureWitch2.iHeight_ = 32;
-	// TextureWitch2.u_iData_ = witch_dat;
-	// GLVM.LoadTextureData(TextureWitch2);
-	// GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
-    // TransformWitch2.tVertex[0] = 1.5f;
-    // TransformWitch2.tVertex[1] = 0.0f;
-    // TransformWitch2.tVertex[2] = 0.0f;
-    // TransformWitch2.fScale = 2.0f;
+    Entity u_iWitch2;
+	EntityManager.CreateEntity(u_iWitch2);
+	ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
+	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
+	TextureWitch2.iWidth_ = 32;
+	TextureWitch2.iHeight_ = 32;
+	TextureWitch2.u_iData_ = witch_dat;
+	GLVM.LoadTextureData(TextureWitch2);
+	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
+    TransformWitch2.tVertex[0] = 1.5f;
+    TransformWitch2.tVertex[1] = 0.0f;
+    TransformWitch2.tVertex[2] = 0.0f;
+    TransformWitch2.fScale = 2.0f;
 
     // Entity u_iWitch3;
 	// EntityManager.CreateEntity(u_iWitch3);
@@ -78,20 +78,6 @@ int main()
     // TransformWitch3.tVertex[1] = 1.0f;
     // TransformWitch3.tVertex[2] = 0.0f;
 
-    Entity uiCrosshare;
-    EntityManager.CreateEntity(uiCrosshare);
-    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::STransformComponent, GLVM::ECS::SCrosshairComponent>(uiCrosshare);
-    GLVM::ECS::CTextureComponent& TextureCrosshare = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(uiCrosshare);
-	TextureCrosshare.iWidth_ = 32;
-	TextureCrosshare.iHeight_ = 32;
-    TextureCrosshare.u_iData_ = witch_dat;
-    GLVM.LoadTextureData(TextureCrosshare);
-    GLVM::ECS::STransformComponent& TransformCrosshare = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(uiCrosshare);
-    TransformCrosshare.fScale = 0.5f;
-    TransformCrosshare.tVertex[0] = 0.5f;
-    TransformCrosshare.tVertex[1] = 0.5f;
-    TransformCrosshare.tVertex[2] = 0.5f;
-    
     ///< Game rendering loop
 	GLVM.GameLoop(ComponentManager);
 	GLVM.GameKill();

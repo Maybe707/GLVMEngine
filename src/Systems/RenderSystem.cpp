@@ -10,7 +10,7 @@
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
-#include <X11/X.h>
+//#include <X11/X.h>
 #include <cmath>
 
 float fBase_Array[30] =
@@ -128,6 +128,9 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(_Component_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
+        _Shader_Program->Use();
+        _Shader_Program->SetUniformID();
+        
         ECS::STransformComponent* Player_Transform_Component;
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
         {
@@ -169,13 +172,10 @@ namespace GLVM::ECS
         tScaling_Matrix[2][2] = _transform_Component.fScale;
 		tScaling_Matrix[3][3] = 1.0f;
         
-        /// For normal matrices.
-        
         tTranslation_Matrix[3][0] = _transform_Component.tVertex[0];
 		tTranslation_Matrix[3][1] = _transform_Component.tVertex[1];
 		tTranslation_Matrix[3][2] = _transform_Component.tVertex[2];
         tTranslation_Matrix[3][3] = 1.0f;
-        // tModel_Matrix.SelfTensorTranspose();
         
         tModel_Matrix = tScaling_Matrix * tTranslation_Matrix;
 //		tModel_Matrix = tTranslation_Matrix * tScaling_Matrix;
@@ -188,25 +188,7 @@ namespace GLVM::ECS
                                       ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-
-        // if(bFirst_Mouse)
-        // {
-        //     fLast_X = _Event.mouse_Pointer_Position_.iPosition_X;
-        //     fLast_Y = _Event.mouse_Pointer_Position_.iPosition_Y;
-        //     bFirst_Mouse = false;
-        // }
-
-        // float fOffset_X = _Event.mouse_Pointer_Position_.u_iX - fLast_X;
-        // float fOffset_Y = fLast_Y - _Event.mouse_Pointer_Position_.u_iY;
-        // fLast_X = _Event.mouse_Pointer_Position_.u_iX;
-        // fLast_Y = _Event.mouse_Pointer_Position_.u_iY;
-
         const float kSensitivity = 0.1f;
-        // fOffset_X *= kSensitivity;
-        // fOffset_Y *= kSensitivity;
-
-        // fYaw += fOffset_X;
-        // fPitch += fOffset_Y;
 
         fYaw = _Event.mouse_Pointer_Position_.iOffset_X;
         fPitch = _Event.mouse_Pointer_Position_.iOffset_Y;
@@ -226,10 +208,6 @@ namespace GLVM::ECS
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
-
-        // tView_Matrix = LookAtRH(_Player.tVertex,
-        //                         _Player.tVertex + _view_Component.Front_Camera,
-        //                         _view_Component.Up_Camera);
  
         tView_Matrix = FPSview(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
@@ -237,57 +215,7 @@ namespace GLVM::ECS
         
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
-    }
 
-    void CRenderSystem::PrintMatrix(Matrix<float, 4> _tMatrix)
-    {
-        for(int i = 0; i < 4; ++i)
-            for(int j = 0; j < 4; ++j)
-                std::cout << "Matrix: " << _tMatrix[i][j] << std::endl;
-    }
-    void CRenderSystem::PrintVector(Vector<float, 3> _tVector)
-    {
-        for(int i = 0; i < 3; ++i)
-            std::cout << "Vector: " << _tVector[i] << std::endl;
-    }
-
-    void CRenderSystem::DrawCrosshare()
-    {
-        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        // glColor3f(1.0f, 3.0f, 0.0f);
-        // glBegin(GL_TRIANGLES);
-        // glVertex3f(0.25f, 0.25f, 0.0f);
-        // glVertex3f(0.5f, 0.25f, 0.1f);
-        // glVertex3f(0.5f, 0.25f, 0.3f);
-        // glEnd();
-
-        float vertices[] = {
-            0.5f, 0.5f, 0.5f, // left  
-            0.5f, 0.2f, 0.3f, // right 
-            0.0f,  0.5f, 0.5f  // top   
-        }; 
-
-        pGLGen_Vertex_Arrays(1, &iVao_Crosshair_);
-        pGLGen_Buffers(1, &iVbo_Crosshair_);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        pGLBind_Vertex_Array(iVao_Crosshair_);
-
-        pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_Crosshair_);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
-
-        pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        pGLEnable_Vertex_Attrib_Array(0);
-        
-//        glClearColor(0.4f, 0.3f, 0.3f, 1.0f);
-//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-//        pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
-
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-//        pGLBind_Vertex_Array(0);         
+        SetProjectionMatrix(_Shader_Program);
     }
 }

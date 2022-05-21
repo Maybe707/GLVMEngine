@@ -99,6 +99,8 @@ namespace GLVM::Core
         ///< Clean up
         wglMakeCurrent( pModern_DC_, pModern_Context_);
 
+
+        
 		Initializer();
 		const int kInterval = 1;
 		pWGLSwap_Interval_EXT(kInterval);
@@ -158,6 +160,7 @@ namespace GLVM::Core
             *_y_offset = -890;
 
         SetCursorPos(point_position.x, point_position.y);
+        SetCursor(NULL);
     }
     
 ///< Callback method for events handling.

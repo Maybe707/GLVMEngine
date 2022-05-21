@@ -18,10 +18,10 @@ class Shader
 public:
     unsigned int iID;
 
-    Shader()
+    Shader(const char* _kVertex_Shader_Path, const char* _kFragment_Shader_Path)
     {
-		const char* _pVertex_Path = "../Shader.vs";
-		const char* _pFragment_Path = "../Shader.fs";
+		const char* _pVertex_Path = _kVertex_Shader_Path;
+		const char* _pFragment_Path = _kFragment_Shader_Path;
         std::string sVertex_Code;
         std::string sFragment_Code;
         std::ifstream Vertex_Shader_File;

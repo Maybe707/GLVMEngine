@@ -108,19 +108,19 @@ namespace GLVM::Core
 
         ///< glEnable(GL_DEPTH_TEST);
 
-        // Cursor invisibleCursor;
-        // Pixmap bitmapNoData;
-        // XColor black;
-        // static char noData[] = { 0,0,0,0,0,0,0,0 };
-        // black.red = black.green = black.blue = 0;
+        Cursor invisibleCursor;
+        Pixmap bitmapNoData;
+        XColor black;
+        static char noData[] = { 0,0,0,0,0,0,0,0 };
+        black.red = black.green = black.blue = 0;
 
-        // bitmapNoData = XCreateBitmapFromData(pDisp_, Win_, noData, 8, 8);
-        // invisibleCursor = XCreatePixmapCursor(pDisp_, bitmapNoData, bitmapNoData, 
-        //                                       &black, &black, 0, 0);
-        // XDefineCursor(pDisp_,Win_, invisibleCursor);
+        bitmapNoData = XCreateBitmapFromData(pDisp_, Win_, noData, 8, 8);
+        invisibleCursor = XCreatePixmapCursor(pDisp_, bitmapNoData, bitmapNoData, 
+                                              &black, &black, 0, 0);
+        XDefineCursor(pDisp_,Win_, invisibleCursor);
         
-        // XFreeCursor(display, invisibleCursor);
-        // XFreePixmap(display, bitmapNoData);
+        XFreeCursor(pDisp_, invisibleCursor);
+        XFreePixmap(pDisp_, bitmapNoData);
         
         
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);

@@ -1,26 +1,5 @@
 #include "Engine.hpp"
-#include "Components/AnimationMoveComponent.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "ComponentManager.hpp"
-#include "Components/CrosshairComponent.hpp"
-#include "Components/GravityComponent.hpp"
-#include "Event.hpp"
-#include "Systems/CollisionSystem.hpp"
-#include "Systems/GravitySystem.hpp"
-#include "Components/MoveComponent.hpp"
-#include "Components/TextureComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "VectorContainer.hpp"
-#include "Components/VertexComponent.hpp"
-#include "IContainer.hpp"
-#include "Components/ViewComponent.hpp"
-#include <GL/gl.h>
-#include <GL/glext.h>
-
-#define NUMBER_OF_CREATING_TEXTURE_OBJECT_1 1
-#define SOME_STRANGE_STUFF                  0
-#define MIPMAP_LEVEL                        0
-#define SOME_OLD_STUFF 0
+#include "ShaderProgram.hpp"
 
 /*******************************************************************
  * Legends never die...
@@ -37,18 +16,20 @@ namespace GLVM::Core
 {    
     CEngine::CEngine()
 	{
-		Window_         = CWindowCreator().Create();
-		Chrono_         = Time::CTimerCreator().Create();
+		Window_             = CWindowCreator().Create();
+		Chrono_             = Time::CTimerCreator().Create();
 
-        Collision_System = new ECS::CCollisionSystem(Input_Stack_);
-		Renderer_System  = new ECS::CRenderSystem();
-		Movement_System  = new ECS::CMovementSystem(Input_Stack_);
-        Gravity_System_  = new ECS::CGravitySystem();
+        Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
+        GUI_System          = new ECS::CGUISystem();
+		Renderer_System     = new ECS::CRenderSystem();
+		Movement_System     = new ECS::CMovementSystem(Input_Stack_);
+        Gravity_System_     = new ECS::CGravitySystem();
         
-		Shader_Program  = new Shader();
-        System_Manager  = new ECS::CSystemManager();
+		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
+        GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
+        System_Manager      = new ECS::CSystemManager();
         
-        fDelta_Time_    = 0.0;
+        fDelta_Time_        = 0.0;
         
         Event_.SetEvent(eDEFAULT);
 	}
@@ -74,12 +55,14 @@ namespace GLVM::Core
 		Animation_System.Animation_Delta = fAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
-                 
+
+  
         System_Manager->ActivateSystem(Movement_System);
 		System_Manager->ActivateSystem(Collision_System);
         System_Manager->ActivateSystem(Gravity_System_);
 		System_Manager->ActivateSystem(&Animation_System);
         System_Manager->ActivateSystem(Renderer_System);
+        System_Manager->ActivateSystem(GUI_System);
 
 		while(bGame_Loop_Active)
 		{
@@ -90,7 +73,7 @@ namespace GLVM::Core
 
             Shader_Program->Use();
 			Shader_Program->SetUniformID();
-			Renderer_System->SetProjectionMatrix(Shader_Program);
+
 			while((Window_->HandleEvent(Event_)))
 			{
 				Input_Stack_.ControlInput(Event_);
@@ -112,25 +95,10 @@ namespace GLVM::Core
             Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
 			Animation_System.eEvent_                      = Input_Stack_.Pop();
 			Animation_System.Delta_Time                   = fDelta_Time_;
-
-            // Core::TCVectorContainer<unsigned int>* pEntity_Container_refGravity =
-            //     ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_ComponentManager);
-            // unsigned int uiEntity_refGravity = (*pEntity_Container_refGravity)[0];
-            // ECS::STransformComponent& Player = _ComponentManager.GetComponent<ECS::STransformComponent>(uiEntity_refGravity);
-            
-            // Core::TCVectorContainer<unsigned int>* pEntity_Container_refCrosshair =
-            //     ECS::GetInnerIDsContainer<ECS::SCrosshairComponent>(_ComponentManager);
-            // unsigned int uiEntity_refCrosshair = (*pEntity_Container_refCrosshair)[0];
-            // ECS::STransformComponent& rCrosshair = _ComponentManager.GetComponent<ECS::STransformComponent>(uiEntity_refCrosshair);
-            // rCrosshair.tVertex[0] = Player.tVertex[0];
-            // rCrosshair.tVertex[1] = Player.tVertex[1];
-            // rCrosshair.tVertex[2] = 0.3f;
-            
 			Renderer_System->_Shader_Program              = Shader_Program;
+            GUI_System->_Shader_Program                   = GUI_Shader_Program_;
             
 			System_Manager->Update(_ComponentManager, Event_);
-//            Renderer_System->DrawCrosshare();
-            
             Window_->SwapBuffers();
 		}
 	}
