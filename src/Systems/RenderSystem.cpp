@@ -10,7 +10,6 @@
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
-//#include <X11/X.h>
 #include <cmath>
 
 float fBase_Array[30] =
@@ -212,6 +211,10 @@ namespace GLVM::ECS
         tView_Matrix = FPSview(_Player.tVertex,
                                 _Player.tVertex + _view_Component.Front_Camera,
                                 _view_Component.Up_Camera);
+
+        // tView_Matrix = FPS_View_RH(_Player.tVertex,
+        //                        fPitch,
+        //                        fYaw);
         
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);

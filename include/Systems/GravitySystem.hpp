@@ -24,41 +24,12 @@ namespace GLVM::ECS
                          STransformComponent& _transform_Component2)
         {
             bool bCollision_Flag = false;
-            
-            // if((_transform_Component1.tVertex[0] + 0.5f) > _transform_Component2.tVertex[0] &&
-            //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + 0.5f   &&
-            //    (_transform_Component1.tVertex[1] + 0.5f) > _transform_Component2.tVertex[1] &&
-            //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + 0.5f   &&
-            //    (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
-            //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
-            
-            // if((((_transform_Component1.tVertex[0] + _transform_Component1.fScale) > _transform_Component2.tVertex[0]) ||
-            //    (_transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + _transform_Component2.fScale))   &&
-            //    (((_transform_Component1.tVertex[1] + _transform_Component1.fScale) > _transform_Component2.tVertex[1]) ||
-            //     (_transform_Component1.tVertex[1] < (_transform_Component2.tVertex[1] + _transform_Component2.fScale)))   &&
-            //    (((_transform_Component1.tVertex[2] + _transform_Component1.fScale) > _transform_Component2.tVertex[2] ||
-            //      _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + _transform_Component2.fScale)))
-
-            // if((_transform_Component1.tVertex[0] + _transform_Component1.fScale) > _transform_Component2.tVertex[0] &&
-            //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + _transform_Component2.fScale   &&
-            //    (_transform_Component1.tVertex[1] + _transform_Component1.fScale) > _transform_Component2.tVertex[1] &&
-            //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + _transform_Component2.fScale   &&
-            //    (_transform_Component1.tVertex[2] + _transform_Component1.fScale) > _transform_Component2.tVertex[2] &&
-            //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + _transform_Component2.fScale)
-
             if(_transform_Component1.tVertex[0] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[0] - _transform_Component2.fScale / 2 &&
                _transform_Component1.tVertex[0] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[0] + _transform_Component2.fScale / 2 &&
                _transform_Component1.tVertex[1] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[1] - _transform_Component2.fScale / 2 &&
                _transform_Component1.tVertex[1] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 &&
                _transform_Component1.tVertex[2] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[2] - _transform_Component2.fScale / 2 &&
                _transform_Component1.tVertex[2] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[2] + _transform_Component2.fScale / 2)
-            
-            // if(_transform_Component1.tVertex[0] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[0] - _transform_Component2.fScale / 2 ||
-            //    _transform_Component1.tVertex[0] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[0] + _transform_Component2.fScale / 2 ||
-            //    _transform_Component1.tVertex[1] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[1] - _transform_Component2.fScale / 2 ||
-            //    _transform_Component1.tVertex[1] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 ||
-            //    _transform_Component1.tVertex[2] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[2] - _transform_Component2.fScale / 2 ||
-            //    _transform_Component1.tVertex[2] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[2] + _transform_Component2.fScale / 2)
             {
                 bCollision_Flag = true;
             }
@@ -91,8 +62,8 @@ namespace GLVM::ECS
             {
                 for(int j = 0,iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
                 {
-                    if(i == 1)                ///< DELETE GOVNO!!
-                        break;
+                    // if(i == 1)                ///< DELETE GOVNO!!
+                    //     break;
                     unsigned int iBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];
                     unsigned int iCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
                     

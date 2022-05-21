@@ -131,17 +131,6 @@ namespace GLVM::ECS
             }
         }
 	}
-
-    bool CCollisionSystem::Gravity(STransformComponent& _transform_Component, SEventComponent& _event_Component)
-    {
-        if(_event_Component.eEvent_ == Core::eGRAVITY_COLLISION_FLAG)
-        {
-            _transform_Component.tVertex[1] += 0.01f;
-            return false;
-        }
-        
-        return true;
-    }
     
 	bool CCollisionSystem::BoxCollider(STransformComponent& _transform_Component1,
                                        STransformComponent& _transform_Component2,
@@ -149,30 +138,12 @@ namespace GLVM::ECS
                                        float& _fDelta_Time)
 	{
 		bool bCollision_Flag = false;
-
-//        if(_transform_Component1.tVertex[1] > (_transform_Component2.tVertex[1] + 0.45f))
         if((_transform_Component1.tVertex[1] - _transform_Component1.fScale / 2) > (_transform_Component2.tVertex[1] + (_transform_Component2.fScale / 2  - 0.1f)))
         {
             bCollision_Flag = false;
             return bCollision_Flag;
         }
 
-        // std::cout << "Scale one: " << _transform_Component1.fScale << std::endl;
-        // std::cout << "Scale two: " << _transform_Component2.fScale << std::endl;
-        
-        // if((_transform_Component1.tVertex[0] + _transform_Component1.fScale) > _transform_Component2.tVertex[0] &&
-        //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + _transform_Component2.fScale   &&
-        //    (_transform_Component1.tVertex[1] + _transform_Component1.fScale) > _transform_Component2.tVertex[1] &&
-        //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + _transform_Component2.fScale   &&
-        //    (_transform_Component1.tVertex[2] + _transform_Component1.fScale) > _transform_Component2.tVertex[2] &&
-        //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + _transform_Component2.fScale)
-            
-        // if((_transform_Component1.tVertex[0] + 0.5f) > _transform_Component2.tVertex[0] &&
-        //    _transform_Component1.tVertex[0] < _transform_Component2.tVertex[0] + 0.5f   &&
-        //    (_transform_Component1.tVertex[1] + 0.5f) > _transform_Component2.tVertex[1] &&
-        //    _transform_Component1.tVertex[1] < _transform_Component2.tVertex[1] + 0.5f   &&
-        //    (_transform_Component1.tVertex[2] + 0.5f) > _transform_Component2.tVertex[2] &&
-        //    _transform_Component1.tVertex[2] < _transform_Component2.tVertex[2] + 0.5f)
         if(_transform_Component1.tVertex[0] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[0] - _transform_Component2.fScale / 2 &&
            _transform_Component1.tVertex[0] - _transform_Component1.fScale / 2 < _transform_Component2.tVertex[0] + _transform_Component2.fScale / 2 &&
            _transform_Component1.tVertex[1] + _transform_Component1.fScale / 2 > _transform_Component2.tVertex[1] - _transform_Component2.fScale / 2 &&
@@ -205,13 +176,6 @@ namespace GLVM::ECS
                 unsigned int uiBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];
                 unsigned int uiCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
                 unsigned int uiEntity_refEvent = (*pEntity_Container_refEvent)[i];
-
-                // std::cout << "Container 1 size: " << iSize << std::endl;
-                // std::cout << "Container 2 size: " << iSize_Iner << std::endl;
-                // std::cout << "Index 1: " << i << std::endl;
-                // std::cout << "Index 2: " << j << std::endl;
-                // std::cout << "Entity 1: " << uiBacktracking_Entity_refCollider << std::endl;
-                // std::cout << "Entity 2: " << uiCompared_Entity_refCollider << std::endl;
                 
 				if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
 					continue;
