@@ -23,7 +23,7 @@ namespace GLVM::Core
         GUI_System          = new ECS::CGUISystem();
 		Renderer_System     = new ECS::CRenderSystem();
 		Movement_System     = new ECS::CMovementSystem(Input_Stack_);
-        Gravity_System_     = new ECS::CGravitySystem();
+        Gravity_System_     = new ECS::CGravitySystem(Input_Stack_);
         
 		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
@@ -92,6 +92,8 @@ namespace GLVM::Core
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Movement_System->_Anim_Event                  = Event_.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
+            Gravity_System_->fDelta_Time_                 = fDelta_Time_;
+//            std::cout << "Delta: " << fDelta_Time_ << std::endl;
             Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
 			Animation_System.eEvent_                      = Input_Stack_.Pop();
 			Animation_System.Delta_Time                   = fDelta_Time_;

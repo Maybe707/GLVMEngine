@@ -16,7 +16,9 @@ namespace GLVM::Core
 		unsigned int iExpander_ = 10;
 		T* aVector_Container_ = new T[iSize_];
 	public:
-		~TCVectorContainer();
+        TCVectorContainer() {}
+        TCVectorContainer(const TCVectorContainer<T>& _vector);
+        ~TCVectorContainer();
 		void Push(const T _Item);
 		void Insert(const T _Item, const unsigned int _Index);
 		void RemoveItem(const T _Item);
@@ -29,7 +31,39 @@ namespace GLVM::Core
 		int GetCapacity();
 		T& operator[](const unsigned int _iIndex);
         void Print();
+        TCVectorContainer& operator=(const TCVectorContainer<T>& _vector);
 	};
+
+    template <class T>
+    TCVectorContainer<T>& TCVectorContainer<T>::operator=(const TCVectorContainer<T>& _vector)
+    {
+        if(this == &_vector)
+            return *this;
+
+        T* aTemp_Vector_Container_ = new T[_vector.iSize_];
+        this->iSize_ = _vector.iSize_;
+        
+        for(int i = 0; i < _vector.iSize_; ++i)
+            aTemp_Vector_Container_[i] = _vector.aVector_Container_[i];
+        delete [] this->aVector_Container_;
+        this->aVector_Container_ = nullptr;
+        this->aVector_Container_ = aTemp_Vector_Container_;
+
+        return *this;
+    }
+
+    template <class T>
+    TCVectorContainer<T>::TCVectorContainer(const TCVectorContainer<T>& _vector)
+    {
+        T* aTemp_Vector_Container_ = new T[_vector.iSize_];
+        this->iSize_ = _vector.iSize_;
+        
+        for(int i = 0; i < _vector.iSize_; ++i)
+            aTemp_Vector_Container_[i] = _vector.aVector_Container_[i];
+        delete [] this->aVector_Container_;
+        this->aVector_Container_ = nullptr;
+        this->aVector_Container_ = aTemp_Vector_Container_;
+    }
     
 	template<class T>
 	TCVectorContainer<T>::~TCVectorContainer()
@@ -67,7 +101,7 @@ namespace GLVM::Core
     /// Insert element into chosen cell.
     
 	template<typename T>
-	void TCVectorContainer<T>::Insert(const T _Item, const unsigned int _Index)
+	void TCVectorContainer<T>::Insert(T _Item, const unsigned int _Index)
 	{
 		if(_Index >= iCapacity_)
 		{
@@ -79,6 +113,7 @@ namespace GLVM::Core
 				aTemp_Vector_Container_[j] = aVector_Container_[j];
 
 			delete [] aVector_Container_;
+            aVector_Container_ = nullptr;
 			aVector_Container_ = aTemp_Vector_Container_;
 		}
 

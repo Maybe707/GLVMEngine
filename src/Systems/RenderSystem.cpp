@@ -149,7 +149,12 @@ namespace GLVM::ECS
   			pGLActive_Texture(GL_TEXTURE10);
 			glBindTexture(GL_TEXTURE_2D, _Component_Manager.GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
 			pGLBind_Vertex_Array(iVao_);
+
+//            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+                        
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
+
+//            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); 
 		}
 	}
 

@@ -6,6 +6,7 @@ namespace GLVM::ECS
 {
 	struct SMoveComponent
 	{
+        float fVelocity_;
 		Core::EEvents eEvent_ = Core::EEvents::eDEFAULT;
 	};
 }
