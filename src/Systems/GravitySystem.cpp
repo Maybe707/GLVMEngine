@@ -157,37 +157,38 @@ namespace GLVM::ECS
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
                 
                 // std::cout << "Entity: " << uiEntity_refCollider << std::endl;
-                // std::cout << "Ground collider: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].uiGround_Collider_ << std::endl;
-                // std::cout << "Ground collision: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bGround_Collision_ << std::endl;
-                // std::cout << "Wall collider: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].uiWall_Collider_ << std::endl;
-                // std::cout << "Wall collision: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bWall_Collision_ << std::endl;
+                // std::cout << "Ground collider: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_ << std::endl;
+                // std::cout << "Ground collision: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ << std::endl;
+                // std::cout << "Wall collider: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiWall_Collider_ << std::endl;
+                // std::cout << "Wall collision: " << _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ << std::endl;
 
-                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bGround_Collision_)
-                    std::cout << "GRAV TRUE! " << uiEntity_refCollider << std::endl;
+                // if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_)
+                //     std::cout << "GRAV TRUE! " << uiEntity_refCollider << std::endl;
                 
-                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bGround_Collision_)
+                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_)
                 {
+                    unsigned int uiCollider = _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_;
                     Gravity(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
-                            _Component_Manager.GetComponent<ECS::STransformComponent>(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].uiGround_Collider_));
-//                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bGround_Collision_ = false;
+                            _Component_Manager.GetComponent<ECS::STransformComponent>(uiCollider));
+                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
-                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bWall_Collision_)
+                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_)
                 {
                     Repel(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
                           _Component_Manager.GetComponent<ECS::SMoveComponent>(uiEntity_refCollider),
                           fDelta_Time_,
                           _Component_Manager.GetComponent<ECS::CViewComponent>(uiEntity_refCollider),
                           _Event);
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).aColliders_Container_[uiEntity_refCollider].bWall_Collision_ = false;
+                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ = false;
                 }
         }
 
         ///< Forcing all entities that had gravity component falling down.
 
-        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager)->GetSize(); ++n)
-        // {
-        //     int iEntity_refGravity = (*ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager))[n];
-        //     _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refGravity).tVertex[1] -= fAcceleration_of_Gravity_;
-        // }
+        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager)->GetSize(); ++n)
+        {
+            int iEntity_refGravity = (*ECS::GetInnerIDsContainer<ECS::CGravityComponent>(_Component_Manager))[n];
+            _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refGravity).tVertex[1] -= fAcceleration_of_Gravity_;
+        }
     }
 }
