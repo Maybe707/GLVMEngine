@@ -8,7 +8,7 @@ BUILD = build
 SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.cpp ./src/Systems/RenderSystem.cpp \
 	  ./src/ShaderProgram.cpp ./src/Event.cpp ./src/UnixApi/WindowX.cpp ./src/UnixApi/ChronoX.cpp ./src/TimerCreator.cpp \
 	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
-	  ./src/Systems/GravitySystem.cpp
+	  ./src/Systems/PhysicsSystem.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 

@@ -5,6 +5,7 @@
 #include "../ComponentManager.hpp"
 #include "../Event.hpp"
 #include "Components/EventComponent.hpp"
+#include "Components/GravityComponent.hpp"
 #include "ISystem.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"

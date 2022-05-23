@@ -148,9 +148,9 @@ namespace GLVM::ECS
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
             ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refGravity =
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refRigidBody =
             ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager);
-        unsigned int uiVector_Gravity_Size = pEntity_Container_refGravity->GetSize();
+        unsigned int uiVector_RigidBody_Size = pEntity_Container_refRigidBody->GetSize();
             
         for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
         {
@@ -178,8 +178,8 @@ namespace GLVM::ECS
 
         for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager)->GetSize(); ++n)
         {
-            int iEntity_refGravity = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager))[n];
-            _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refGravity).tVertex[1] -= fAcceleration_of_Gravity_;
+            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager))[n];
+            _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tVertex[1] -= fAcceleration_of_Gravity_;
         }
     }
 }

@@ -3,7 +3,7 @@
 
 #include "VectorContainer.hpp"
 #include "Components/EventComponent.hpp"
-#include "Components/GravityComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "ISystem.hpp"

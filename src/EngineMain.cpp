@@ -1,8 +1,4 @@
-#include "Components/ColliderComponent.hpp"
-#include "Components/CrosshairComponent.hpp"
-#include "Components/TextureComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/VertexComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 
@@ -14,7 +10,7 @@ int main()
     
 	Entity u_iPlayer;
 	EntityManager.CreateEntity(u_iPlayer);
-    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CGravityComponent, GLVM::ECS::SEventComponent, GLVM::ECS::CTextureComponent>(u_iPlayer);
+    ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent, GLVM::ECS::CTextureComponent>(u_iPlayer);
     GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
@@ -22,7 +18,7 @@ int main()
 	GLVM.LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager.GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
-    GLVM::ECS::CGravityComponent& GravityPlayer = ComponentManager.GetComponent<GLVM::ECS::CGravityComponent>(u_iPlayer);
+    GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager.GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
 //    GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformPlayer.fScale = 0.5f;
     TransformPlayer.tVertex[0] = 0.0f;
@@ -34,9 +30,9 @@ int main()
     ViewPlayer.Up_Camera[0] = 0.0f;
     ViewPlayer.Up_Camera[1] = 1.0f;
     ViewPlayer.Up_Camera[2] = 0.0f;
-    GravityPlayer.tGravity_[0] = 0.0f;
-    GravityPlayer.tGravity_[1] = 0.0f;
-    GravityPlayer.tGravity_[2] = 0.0f;
+    // GravityPlayer.tGravity_[0] = 0.0f;
+    // GravityPlayer.tGravity_[1] = 0.0f;
+    // GravityPlayer.tGravity_[2] = 0.0f;
     // ColliderPlayer.aColliders_Container_[0].bGround_Collision_ = false;
     // ColliderPlayer.aColliders_Container_[0].bWall_Collision_ = false;
     

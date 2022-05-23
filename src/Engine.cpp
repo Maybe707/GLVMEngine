@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 #include "ShaderProgram.hpp"
+#include "Systems/GravitySystem.hpp"
 
 /*******************************************************************
  * Legends never die...
@@ -23,7 +24,7 @@ namespace GLVM::Core
         GUI_System          = new ECS::CGUISystem();
 		Renderer_System     = new ECS::CRenderSystem();
 		Movement_System     = new ECS::CMovementSystem(Input_Stack_);
-        Gravity_System_     = new ECS::CGravitySystem(Input_Stack_);
+        Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         
 		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
@@ -39,12 +40,12 @@ namespace GLVM::Core
 		delete Renderer_System;
 		delete Shader_Program;
 		delete Movement_System;
-        delete Gravity_System_;
+        delete Physics_System_;
 		delete System_Manager;
 		System_Manager  = nullptr;
         Renderer_System = nullptr;
         Shader_Program  = nullptr;
-        Gravity_System_ = nullptr;
+        Physics_System_ = nullptr;
         Movement_System = nullptr;
 	}
 	
@@ -59,7 +60,7 @@ namespace GLVM::Core
   
         System_Manager->ActivateSystem(Movement_System);
 		System_Manager->ActivateSystem(Collision_System);
-        System_Manager->ActivateSystem(Gravity_System_);
+        System_Manager->ActivateSystem(Physics_System_);
 		System_Manager->ActivateSystem(&Animation_System);
         System_Manager->ActivateSystem(Renderer_System);
         System_Manager->ActivateSystem(GUI_System);
@@ -92,9 +93,9 @@ namespace GLVM::Core
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Movement_System->_Anim_Event                  = Event_.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
-            Gravity_System_->fDelta_Time_                 = fDelta_Time_;
+            Physics_System_->fDelta_Time_                 = fDelta_Time_;
 //            std::cout << "Delta: " << fDelta_Time_ << std::endl;
-            Gravity_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
+            Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
 			Animation_System.eEvent_                      = Input_Stack_.Pop();
 			Animation_System.Delta_Time                   = fDelta_Time_;
 			Renderer_System->_Shader_Program              = Shader_Program;

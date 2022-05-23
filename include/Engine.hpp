@@ -35,7 +35,7 @@
 #include "SystemManager.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Components/EventComponent.hpp"
-#include "Components/GravityComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/ViewComponent.hpp"
@@ -43,7 +43,6 @@
 #include "Components/ColliderComponent.hpp"
 #include "ComponentManager.hpp"
 #include "Components/CrosshairComponent.hpp"
-#include "Components/GravityComponent.hpp"
 #include "Event.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/GUISystem.hpp"
@@ -78,7 +77,7 @@ namespace GLVM::Core
         ECS::CCollisionSystem* Collision_System;
 		ECS::CAnimationSystem  Animation_System;
 		ECS::CMovementSystem*  Movement_System;
-        ECS::CGravitySystem*   Gravity_System_;
+        ECS::CPhysicsSystem*   Physics_System_;
         
         ECS::CSystemManager*   System_Manager;
 		
