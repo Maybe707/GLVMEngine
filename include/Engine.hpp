@@ -62,7 +62,6 @@ using Entity = unsigned int;
 
 namespace GLVM::Core
 {
-
 	class CEngine
 	{
 		IWindow*       Window_;

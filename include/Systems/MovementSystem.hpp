@@ -88,6 +88,9 @@ namespace GLVM::ECS
                         _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex[1] += 1.0f;
                         _Component_Manager.GetComponent<ECS::SMoveComponent>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                         break;
+                    case Core::EEvents::eMOUSE_LEFT_BUTTON:
+                        unsigned int uiEntity_Projectile;
+                        
                     default:
                         break;
                     }

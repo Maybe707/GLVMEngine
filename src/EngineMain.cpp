@@ -1,4 +1,3 @@
-#include "Components/RigidBodyComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 
