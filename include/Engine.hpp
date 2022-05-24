@@ -57,6 +57,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "Constants.hpp"
+#include <mutex>
 
 using Entity = unsigned int;
 
@@ -64,6 +65,9 @@ namespace GLVM::Core
 {
 	class CEngine
 	{
+        static CEngine* pInstance_;
+        static std::mutex  Mutex_;
+        
 		IWindow*       Window_;
 		Time::IChrono* Chrono_;
         CEvent         Event_;
@@ -79,10 +83,17 @@ namespace GLVM::Core
         ECS::CPhysicsSystem*   Physics_System_;
         
         ECS::CSystemManager*   System_Manager;
-		
-	public:
-		CEngine();
+
+        CEngine();
 		~CEngine();
+        
+	public:
+
+        CEngine(CEngine& _engine) = delete;
+        void operator=(const CEngine& _engine) = delete;
+
+        static CEngine* GetInstance();
+        
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
 		void GameKill();

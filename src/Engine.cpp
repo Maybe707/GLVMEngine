@@ -1,6 +1,7 @@
 #include "Engine.hpp"
 #include "ShaderProgram.hpp"
 #include "Systems/GravitySystem.hpp"
+#include <mutex>
 
 /*******************************************************************
  * Legends never die...
@@ -14,7 +15,10 @@
     exit(1)
 
 namespace GLVM::Core
-{    
+{
+    CEngine* CEngine::pInstance_ = nullptr;
+    std::mutex CEngine::Mutex_;
+    
     CEngine::CEngine()
 	{
 		Window_             = CWindowCreator().Create();
@@ -42,13 +46,25 @@ namespace GLVM::Core
 		delete Movement_System;
         delete Physics_System_;
 		delete System_Manager;
+        delete GUI_System;
 		System_Manager  = nullptr;
         Renderer_System = nullptr;
         Shader_Program  = nullptr;
         Physics_System_ = nullptr;
         Movement_System = nullptr;
+        GUI_System      = nullptr;
 	}
-	
+
+    CEngine* CEngine::GetInstance()
+    {
+        std::lock_guard<std::mutex> lock(Mutex_);
+        if(pInstance_ == nullptr)
+        {
+            pInstance_ = new CEngine();
+        }
+        return pInstance_;
+    }
+    
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
 		float fAnimation_Delta           = 0.0f;

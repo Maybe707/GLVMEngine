@@ -3,7 +3,7 @@
 
 int main()
 {
-	GLVM::Core::CEngine GLVM;
+	GLVM::Core::CEngine* GLVM = GLVM::Core::CEngine::GetInstance();
 	GLVM::ECS::CEntityManager EntityManager;
 	GLVM::ECS::CComponentManager ComponentManager;
     
@@ -14,7 +14,7 @@ int main()
 	TexturePlayer.iWidth_ = 96; 
 	TexturePlayer.iHeight_ = 128;
 	TexturePlayer.u_iData_ = chelik_dat;
-	GLVM.LoadTextureData(TexturePlayer);
+	GLVM->LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager.GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager.GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
@@ -42,7 +42,7 @@ int main()
 	TextureWitch.iWidth_ = 32;
 	TextureWitch.iHeight_ = 32;
 	TextureWitch.u_iData_ = witch_dat;
-	GLVM.LoadTextureData(TextureWitch);
+	GLVM->LoadTextureData(TextureWitch);
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
 //    GLVM::ECS::CColliderComponent& ColliderWitch1 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformWitch.tVertex[0] = 3.0f;
@@ -59,7 +59,7 @@ int main()
 	TextureWitch2.iWidth_ = 32;
 	TextureWitch2.iHeight_ = 32;
 	TextureWitch2.u_iData_ = witch_dat;
-	GLVM.LoadTextureData(TextureWitch2);
+	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager.GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformWitch2.tVertex[0] = 0.5f;
@@ -84,8 +84,8 @@ int main()
     // TransformWitch3.tVertex[2] = 0.0f;
 
     ///< Game rendering loop
-	GLVM.GameLoop(ComponentManager);
-	GLVM.GameKill();
+	GLVM->GameLoop(ComponentManager);
+	GLVM->GameKill();
 
     return 0;
 }
