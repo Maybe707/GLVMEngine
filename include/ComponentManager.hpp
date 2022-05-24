@@ -8,6 +8,7 @@
 #include <iostream>
 #include "IContainer.hpp"
 #include "Components/VertexComponent.hpp"
+#include <mutex>
 
 typedef unsigned int Entity_ID;
 
@@ -15,10 +16,20 @@ namespace GLVM::ECS
 {
 	class CComponentManager
 	{
+        static CComponentManager* pInstance_;
+        static std::mutex  Mutex_;
+        
+        CComponentManager();
+        ~CComponentManager();
+        
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
 		Core::TCVectorContainer<Core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
 		Core::TCVectorContainer<Core::TCVectorContainer<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
+
+        CComponentManager(CComponentManager& _component_Manager) = delete;         ///< Dont need to make cope because of singleton property.
+        void operator=(const CComponentManager& _component_Manager) = delete;      ///< Dont need assignment operator because of singleton property.
+        static CComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
         
 		template <typename Component_Type>
 		unsigned int CreateComponentContainer()
@@ -85,24 +96,7 @@ namespace GLVM::ECS
 			static_cast<Core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
 		}
 		
-		unsigned int GetContainerID()
-		{
-			return s_iComponents_Container_ID;
-		}
-		
-		~CComponentManager()
-		{
-			for(int i = 0, iSize_Main = tWorld_Components_Container_.GetSize(); i < iSize_Main; ++i)
-			{
-				delete tWorld_Components_Container_[i];
-				tWorld_Components_Container_[i] = nullptr;
-			}
-			for(int j = 0, iSize_Ordered = tWorld_IDs_Container.GetSize(); j < iSize_Ordered; ++j)
-			{
-				delete tWorld_IDs_Container[j];
-				tWorld_IDs_Container[j] = nullptr;
-			}
-		}
+		unsigned int GetContainerID();
 	};
 
 	template <typename Component_Type>
@@ -115,8 +109,7 @@ namespace GLVM::ECS
 	Core::TCVectorContainer<Entity_ID>* GetInnerIDsContainer(ECS::CComponentManager& _Component_Manager)
 	{
 		return static_cast<Core::TCVectorContainer<Entity_ID>*>(_Component_Manager.tWorld_IDs_Container[_Component_Manager.CreateComponentContainer<Component_Type>()]);
-}
-
+    }
 }
 
 #endif

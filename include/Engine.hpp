@@ -89,10 +89,9 @@ namespace GLVM::Core
         
 	public:
 
-        CEngine(CEngine& _engine) = delete;
-        void operator=(const CEngine& _engine) = delete;
-
-        static CEngine* GetInstance();
+        CEngine(CEngine& _engine) = delete;                   ///< Dont need to make cope because of singleton property.
+        void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
+        static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method.
         
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
