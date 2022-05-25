@@ -11,6 +11,7 @@
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <cmath>
+#include "Globals.hpp"
 
 float fBase_Array[30] =
 {
@@ -118,13 +119,14 @@ namespace GLVM::ECS
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
 
-	void CRenderSystem::Update(CComponentManager& _Component_Manager, Core::CEvent& _Event)
+	void CRenderSystem::Update()
 	{
+        CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::CViewComponent>(_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
         _Shader_Program->Use();
@@ -134,20 +136,20 @@ namespace GLVM::ECS
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
         {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
-            Player_Transform_Component = &(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView));
-            SetViewMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refView),
-                          _Event,
+            Player_Transform_Component = &(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView));
+            SetViewMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView),
+                          g_eEvent,
                           *Player_Transform_Component,
-                          _Component_Manager.GetComponent<ECS::CViewComponent>(uiEntity_refView));
+                          pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refView));
         }
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(_Component_Manager.GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
 
-            SetModelMatrix(_Shader_Program, _Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refTexture), *Player_Transform_Component);
+            SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture), *Player_Transform_Component);
   			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, _Component_Manager.GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
+			glBindTexture(GL_TEXTURE_2D, pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
 			pGLBind_Vertex_Array(iVao_);
 
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );

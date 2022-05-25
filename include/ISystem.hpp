@@ -10,7 +10,7 @@ namespace GLVM::ECS
 	{
 	public:
 		virtual ~ISystem() {}
-		virtual void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) = 0;
+		virtual void Update() = 0;
 	};
 }
 

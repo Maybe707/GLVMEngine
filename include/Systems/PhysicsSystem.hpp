@@ -13,8 +13,7 @@
 
 namespace GLVM::ECS
 {
-
-    class CPhysicsSystem : public ECS::ISystem
+    class CPhysicsSystem : public ISystem
     {
     public:
         float fAcceleration_of_Gravity_;
@@ -32,7 +31,7 @@ namespace GLVM::ECS
          *  backtracking entity had gravity component for call Gravity function.
          */
          
-        void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
+        void Update() override;
         void Repel(STransformComponent& _transform_Component,
                    SMoveComponent& _move_Component,
                    float& _fDelta_Time,

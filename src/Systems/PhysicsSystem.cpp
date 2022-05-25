@@ -1,4 +1,4 @@
-#include "Systems/GravitySystem.hpp"
+#include "Systems/PhysicsSystem.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -6,10 +6,10 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Event.hpp"
-#include <cmath>
+#include "Globals.hpp"
 
 namespace GLVM::ECS
-{    
+{
     bool CompareDirection(Core::CStack& _input_Stack,
                           Core::EEvents _event0,
                           Core::EEvents _event1)
@@ -143,43 +143,44 @@ namespace GLVM::ECS
      *  backtracking entity had gravity component for call Gravity function.
      */
          
-    void CPhysicsSystem::Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) 
+    void CPhysicsSystem::Update() 
     {
+        CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
-            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*pComponent_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refRigidBody =
-            ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager);
         unsigned int uiVector_RigidBody_Size = pEntity_Container_refRigidBody->GetSize();
             
         for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
         {
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
                 
-                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_)
+                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_)
                 {
-                    unsigned int uiCollider = _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_;
-                    Gravity(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
-                            _Component_Manager.GetComponent<ECS::STransformComponent>(uiCollider));
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
+                    unsigned int uiCollider = pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_;
+                    Gravity(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
+                            pComponent_Manager->GetComponent<ECS::STransformComponent>(uiCollider));
+                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
-                if(_Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_)
+                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_)
                 {
-                    Repel(_Component_Manager.GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
-                          _Component_Manager.GetComponent<ECS::SMoveComponent>(uiEntity_refCollider),
+                    Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
+                          pComponent_Manager->GetComponent<ECS::SMoveComponent>(uiEntity_refCollider),
                           fDelta_Time_,
-                          _Component_Manager.GetComponent<ECS::CViewComponent>(uiEntity_refCollider),
-                          _Event);
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ = false;
+                          pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refCollider),
+                          g_eEvent);
+                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ = false;
                 }
         }
 
         ///< Forcing all entities that had gravity component falling down.
 
-        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager)->GetSize(); ++n)
+        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
         {
-            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(_Component_Manager))[n];
-            _Component_Manager.GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tVertex[1] -= fAcceleration_of_Gravity_;
+            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
+            pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tVertex[1] -= fAcceleration_of_Gravity_;
         }
     }
 }

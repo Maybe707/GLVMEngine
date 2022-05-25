@@ -30,7 +30,7 @@ namespace GLVM::ECS
                                  Core::CEvent& _event);
         bool Gravity(STransformComponent& _transform_Component, SEventComponent& _event_Component);
 		bool BoxCollider(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);
-		void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
+		void Update() override;
         bool UpperActorCheck(STransformComponent& _transform_Component1,
                              STransformComponent& _transform_Component2);
     };

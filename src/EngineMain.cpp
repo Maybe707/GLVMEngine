@@ -1,4 +1,3 @@
-#include "ComponentManager.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 

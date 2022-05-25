@@ -4,7 +4,7 @@
 
 namespace GLVM::ECS
 {
-    void CGUISystem::Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event)
+    void CGUISystem::Update()
     {
         Matrix<float, 4> tModel_Matrix(1.0);
         tModel_Matrix[0][0] = 0.1;

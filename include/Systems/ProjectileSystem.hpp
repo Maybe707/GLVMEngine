@@ -4,13 +4,14 @@
 #include "ISystem.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "VectorContainer.hpp"
+#include "ComponentManager.hpp"
 
 namespace GLVM::ECS
 {
     class CProjectileSystem : public ISystem
     {
     public:
-        void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
+        void Update() override;
     };
 }
 

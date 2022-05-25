@@ -40,10 +40,11 @@ namespace GLVM::ECS
         return false;
     }
     
-	void CCollisionSystem::Update(CComponentManager& _Component_Manager, Core::CEvent& _Event)
+	void CCollisionSystem::Update()
 	{
+        CComponentManager* _Component_Manager = CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
-            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*_Component_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
             
 		for(int i = 0, iSize = uiVector_Collider_Size; i < iSize; ++i)
@@ -53,21 +54,21 @@ namespace GLVM::ECS
                 unsigned int uiBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];  
                 unsigned int uiCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
                 
-                bool bBox_Collider_Flag = BoxCollider(_Component_Manager.GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider),
-                                                      _Component_Manager.GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
-                bool bUpper_Actor_Check_Flag = UpperActorCheck(_Component_Manager.GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider), _Component_Manager.GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
+                bool bBox_Collider_Flag = BoxCollider(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider),
+                                                      _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
+                bool bUpper_Actor_Check_Flag = UpperActorCheck(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider), _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
 
 				if(bUpper_Actor_Check_Flag && bBox_Collider_Flag)
                 {
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
                     
                 if(bBox_Collider_Flag)
                 {
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
-                    _Component_Manager.GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
 			}

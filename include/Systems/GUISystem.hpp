@@ -17,7 +17,7 @@ namespace GLVM::ECS
 		GLuint iVao_Crosshair_;
 
     public:
-        void Update(ECS::CComponentManager& _Component_Manager, Core::CEvent& _Event) override;
+        void Update() override;
         void LoadCrosshairTexture(const unsigned char* _kTexture_Data);
 
         Shader* _Shader_Program;

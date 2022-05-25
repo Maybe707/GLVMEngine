@@ -3,9 +3,9 @@
 
 #include "GLPointer.h"
 #include "Systems/GUISystem.hpp"
-#include "Systems/GravitySystem.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
+#include "Systems/PhysicsSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
@@ -20,12 +20,9 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "ComponentManager.hpp"
-#include "GLPointer.h"
 #include "IWindow.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include <GL/glext.h>
 #include "VertexData.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Components/MoveComponent.hpp"
@@ -36,7 +33,6 @@
 #include "Components/ViewComponent.hpp"
 #include "Components/EventComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
-#include "Components/MoveComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Components/AnimationMoveComponent.hpp"
@@ -46,14 +42,11 @@
 #include "Event.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/GUISystem.hpp"
-#include "Systems/GravitySystem.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/TextureComponent.hpp"
-#include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "IContainer.hpp"
-#include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "Constants.hpp"
@@ -70,7 +63,6 @@ namespace GLVM::Core
         
 		IWindow*       Window_;
 		Time::IChrono* Chrono_;
-        CEvent         Event_;
 		Shader*        Shader_Program;
         Shader*        GUI_Shader_Program_;
 		float          fDelta_Time_;

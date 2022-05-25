@@ -1,6 +1,5 @@
 #include "Engine.hpp"
 #include "ShaderProgram.hpp"
-#include "Systems/GravitySystem.hpp"
 #include <mutex>
 
 /*******************************************************************
@@ -13,6 +12,8 @@
 #define DESTRUCTOR_3000 \
     std::cout << "You have been destructurized. [=]___[=]" << std::endl; \
     exit(1)
+
+GLVM::Core::CEvent g_eEvent;
 
 namespace GLVM::Core
 {
@@ -36,7 +37,7 @@ namespace GLVM::Core
         
         fDelta_Time_        = 0.0;
         
-        Event_.SetEvent(eDEFAULT);
+        g_eEvent.SetEvent(eDEFAULT);
 	}
 
 	CEngine::~CEngine()
@@ -91,23 +92,23 @@ namespace GLVM::Core
             Shader_Program->Use();
 			Shader_Program->SetUniformID();
 
-			while((Window_->HandleEvent(Event_)))
+			while((Window_->HandleEvent(g_eEvent)))
 			{
-				Input_Stack_.ControlInput(Event_);
-                if(Event_.GetEvent() == EEvents::eGAME_LOOP_KILL)
+				Input_Stack_.ControlInput(g_eEvent);
+                if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
                     bGame_Loop_Active = false;
 			}
-			Event_.SetLastEvent(Input_Stack_);
+			g_eEvent.SetLastEvent(Input_Stack_);
 
 //            Input_Stack_.PrintStack();
             
-            Window_->CursorLock(Event_.mouse_Pointer_Position_.iPosition_X,
-                                Event_.mouse_Pointer_Position_.iPosition_Y,
-                                &Event_.mouse_Pointer_Position_.iOffset_X,
-                                &Event_.mouse_Pointer_Position_.iOffset_Y);
+            Window_->CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+                                g_eEvent.mouse_Pointer_Position_.iPosition_Y,
+                                &g_eEvent.mouse_Pointer_Position_.iOffset_X,
+                                &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
             
 			Movement_System->_dOffset                     = fDelta_Time_;
-			Movement_System->_Anim_Event                  = Event_.GetEvent();
+			Movement_System->_Anim_Event                  = g_eEvent.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
             Physics_System_->fDelta_Time_                 = fDelta_Time_;
 //            std::cout << "Delta: " << fDelta_Time_ << std::endl;
@@ -117,7 +118,7 @@ namespace GLVM::Core
 			Renderer_System->_Shader_Program              = Shader_Program;
             GUI_System->_Shader_Program                   = GUI_Shader_Program_;
             
-			System_Manager->Update(_ComponentManager, Event_);
+			System_Manager->Update();
             Window_->SwapBuffers();
 		}
 	}
@@ -139,8 +140,6 @@ namespace GLVM::Core
 		// glEnable(GL_BLEND);
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
-
-
 	
 	void CEngine::GameKill()
 	{
