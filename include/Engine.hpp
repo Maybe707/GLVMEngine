@@ -68,19 +68,17 @@ namespace GLVM::Core
 		float          fDelta_Time_;
 		CStack         Input_Stack_;
         
-		ECS::CRenderSystem*    Renderer_System;
-        ECS::CCollisionSystem* Collision_System;
-		ECS::CAnimationSystem  Animation_System;
-		ECS::CMovementSystem*  Movement_System;
-        ECS::CPhysicsSystem*   Physics_System_;
-        
-        ECS::CSystemManager*   System_Manager;
+		// ECS::CRenderSystem*    Renderer_System;
+        // ECS::CCollisionSystem* Collision_System;
+		// ECS::CAnimationSystem*  Animation_System;
+		// ECS::CMovementSystem*  Movement_System;
+        // ECS::CPhysicsSystem*   Physics_System_;
 
         CEngine();
-		~CEngine();
         
 	public:
-
+        ~CEngine();
+        
         CEngine(CEngine& _engine) = delete;                   ///< Dont need to make cope because of singleton property.
         void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
         static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method.

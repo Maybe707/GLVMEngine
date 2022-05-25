@@ -5,9 +5,10 @@ CFLAGS = -c -g -Wall
 INC = -I./include
 BUILD = build
 SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.cpp ./src/Systems/RenderSystem.cpp \
-	  ./src/ShaderProgram.cpp ./src/Event.cpp ./src/WinApi/WindowWin.cpp ./src/WinApi/ChronoWin.cpp ./src/TimerCreator.cpp \
-	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
-	  ./src/PhysicsSystem.cpp ./src/ComponentManager ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp
+	./src/ShaderProgram.cpp ./src/Event.cpp ./src/WinApi/WindowWin.cpp ./src/WinApi/ChronoWin.cpp ./src/TimerCreator.cpp \
+	./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
+	./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
+	./src/SystemManager.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = winGame
 
