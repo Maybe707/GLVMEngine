@@ -60,6 +60,17 @@ namespace GLVM::Core
         
         for(int i = 0; i < _vector.iSize_; ++i)
             aVector_Container[i] = _vector.aVector_Container_[i];
+
+
+        // T* aTemp_Vector_Container_ = new T[_vector.iSize_];
+        // this->iSize_ = _vector.iSize_;
+        
+        // for(int i = 0; i < _vector.iSize_; ++i)
+        //     aTemp_Vector_Container_[i] = _vector.aVector_Container_[i];
+        // delete [] this->aVector_Container_;
+        // this->aVector_Container_ = nullptr;
+        // this->aVector_Container_ = aTemp_Vector_Container_;
+
     }
     
 	template<class T>

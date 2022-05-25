@@ -3,8 +3,8 @@
 
 int main()
 {
-	GLVM::Core::CEngine* GLVM = GLVM::Core::CEngine::GetInstance();
-	GLVM::ECS::CEntityManager* EntityManager = GLVM::ECS::CEntityManager::GetInstance();
+	GLVM::Core::CEngine*          GLVM             = GLVM::Core::CEngine::GetInstance();
+	GLVM::ECS::CEntityManager*    EntityManager    = GLVM::ECS::CEntityManager::GetInstance();
 	GLVM::ECS::CComponentManager* ComponentManager = GLVM::ECS::CComponentManager::GetInstance();
     
 	Entity u_iPlayer;

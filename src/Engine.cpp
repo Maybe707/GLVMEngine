@@ -31,6 +31,13 @@ namespace GLVM::Core
 	{
 		Window_             = CWindowCreator().Create();
 		Chrono_             = Time::CTimerCreator().Create();
+
+        Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
+        GUI_System          = new ECS::CGUISystem();
+        Renderer_System     = new ECS::CRenderSystem();
+        Movement_System     = new ECS::CMovementSystem(Input_Stack_);
+        Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
+        Animation_System    = new ECS::CAnimationSystem();
         
 		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
@@ -70,12 +77,12 @@ namespace GLVM::Core
 	{
         ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
 
-        ECS::CCollisionSystem* Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
-        ECS::CGUISystem*       GUI_System          = new ECS::CGUISystem();
-        ECS::CRenderSystem*    Renderer_System     = new ECS::CRenderSystem();
-        ECS::CMovementSystem*  Movement_System     = new ECS::CMovementSystem(Input_Stack_);
-        ECS::CPhysicsSystem*   Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
-        ECS::CAnimationSystem* Animation_System    = new ECS::CAnimationSystem();
+        // ECS::CCollisionSystem* Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
+        // ECS::CGUISystem*       GUI_System          = new ECS::CGUISystem();
+        // ECS::CRenderSystem*    Renderer_System     = new ECS::CRenderSystem();
+        // ECS::CMovementSystem*  Movement_System     = new ECS::CMovementSystem(Input_Stack_);
+        // ECS::CPhysicsSystem*   Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
+        // ECS::CAnimationSystem* Animation_System    = new ECS::CAnimationSystem();
         
 		float fAnimation_Delta            = 0.0f;
 		bool bGame_Loop_Active            = true;

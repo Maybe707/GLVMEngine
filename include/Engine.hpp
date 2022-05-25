@@ -68,11 +68,11 @@ namespace GLVM::Core
 		float          fDelta_Time_;
 		CStack         Input_Stack_;
         
-		// ECS::CRenderSystem*    Renderer_System;
-        // ECS::CCollisionSystem* Collision_System;
-		// ECS::CAnimationSystem*  Animation_System;
-		// ECS::CMovementSystem*  Movement_System;
-        // ECS::CPhysicsSystem*   Physics_System_;
+		ECS::CRenderSystem*    Renderer_System;
+        ECS::CCollisionSystem* Collision_System;
+		ECS::CAnimationSystem*  Animation_System;
+		ECS::CMovementSystem*  Movement_System;
+        ECS::CPhysicsSystem*   Physics_System_;
 
         CEngine();
         
