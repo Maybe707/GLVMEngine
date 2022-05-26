@@ -31,28 +31,45 @@ namespace GLVM::ECS
         float cameraSpeed = 2.5f * _dOffset;            
         int counter = 0;
 
-
-
-
+        if(fProjectile_Accumulator_ > 0)
+            fProjectile_Accumulator_ -= cameraSpeed;
+        
         std::cout << "Projectile accumulator: " << fProjectile_Accumulator_ << std::endl;
         
         for(int i = 0; i < u_iVector_Move_Size; ++i)
         {
-
-            for(int n = 0; n < 5; ++n)
+            for(int n = 0; n < 6; ++n)
             {
-//                Input_Stack_.PrintStack();
                 bool bDiagonal_Movement_Availability = false;
-                if(fProjectile_Accumulator_ > 0)
-                    fProjectile_Accumulator_ -= cameraSpeed;
+                
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
+                
+
+                
+                if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON)
+                {
+                    if(fProjectile_Accumulator_ <= 0)
+                    {
+                        std::cout << "Signal!!" << std::endl;
+                        CalculateProjectile(pComponent_Manager,
+                                            iEntity_refMove,
+                                            cameraSpeed,
+                                            view_Component,
+                                            Input_Stack_, n);
+                        fProjectile_Accumulator_ = 2.0;
+                    }
+                }
+                    
+                
+//                Input_Stack_.PrintStack();
+            
                 bDiagonal_Movement_Availability = FixDiagonalMove(Input_Stack_,
                                                                   pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                                                   cameraSpeed,
                                                                   view_Component,
                                                                   g_eEvent);
-                // if(bDiagonal_Movement_Availability)
-                //     break;
+                if(bDiagonal_Movement_Availability)
+                    break;
                 switch(Input_Stack_[n])
                 {
                 case Core::EEvents::eMOVE_LEFT:
@@ -93,19 +110,19 @@ namespace GLVM::ECS
                     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex[1] += 1.0f;
                     pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                     break;
-                case Core::EEvents::eMOUSE_LEFT_BUTTON:
+                // case Core::EEvents::eMOUSE_LEFT_BUTTON:
 
-                    if(fProjectile_Accumulator_ <= 0)
-                    {
-                        std::cout << "Signal!!" << std::endl;
-                        CalculateProjectile(pComponent_Manager,
-                                            iEntity_refMove,
-                                            cameraSpeed,
-                                            view_Component,
-                                            Input_Stack_, n);
-                        fProjectile_Accumulator_ = 10.0;
-                    }
-                    break;
+                //     if(fProjectile_Accumulator_ <= 0)
+                //     {
+                //         std::cout << "Signal!!" << std::endl;
+                //         CalculateProjectile(pComponent_Manager,
+                //                             iEntity_refMove,
+                //                             cameraSpeed,
+                //                             view_Component,
+                //                             Input_Stack_, n);
+                //         fProjectile_Accumulator_ = 10.0;
+                //     }
+                //     break;
                 default:
                     break;
                 }

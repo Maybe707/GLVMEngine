@@ -20,7 +20,7 @@ namespace GLVM::ECS
 	class CMovementSystem : public ISystem
 	{
 	public:
-        float fProjectile_Accumulator_ = 10.0f; 
+        float fProjectile_Accumulator_ = 2.0f; 
 		float _dOffset;
 		Core::EEvents _Anim_Event;
         Core::CStack& Input_Stack_;
