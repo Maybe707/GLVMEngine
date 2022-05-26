@@ -1,5 +1,5 @@
-#ifndef RENDERER
-#define RENDERER
+#ifndef RENDER_SYSTEM
+#define RENDER_SYSTEM
 
 #include "GLPointer.h"
 #include <GL/gl.h>
@@ -47,7 +47,7 @@ namespace GLVM::ECS
 		void Update() override;
 		void SetProjectionMatrix(Shader* _Shader_Program);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, ECS::STransformComponent& _Player);
-        void SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
+        void SetViewMatrix(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
     };
 }
     

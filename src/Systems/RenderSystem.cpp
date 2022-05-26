@@ -122,9 +122,9 @@ namespace GLVM::ECS
 	void CRenderSystem::Update()
 	{
         CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
-        unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
+        // Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+        //     ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+        // unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
@@ -133,15 +133,12 @@ namespace GLVM::ECS
         _Shader_Program->SetUniformID();
         
         ECS::STransformComponent* Player_Transform_Component;
-        for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
-        {
-            unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
-            Player_Transform_Component = &(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView));
-            SetViewMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView),
-                          g_eEvent,
-                          *Player_Transform_Component,
-                          pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refView));
-        }
+        // for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
+        // {
+        //     unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
+        //     Player_Transform_Component = &(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView));
+        //     SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refView));
+        // }
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
@@ -190,19 +187,18 @@ namespace GLVM::ECS
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 	}
     
-    void CRenderSystem::SetViewMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, Core::CEvent& _Event,
-                                      ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
+    void CRenderSystem::SetViewMatrix(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;
-
-        fYaw = _Event.mouse_Pointer_Position_.iOffset_X;
-        fPitch = _Event.mouse_Pointer_Position_.iOffset_Y;
+        
+        fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
+        fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
         fYaw *= kSensitivity;
         fPitch *= kSensitivity;
 
-        _Event.mouse_Pointer_Position_.fPitch_ = fPitch;
-        _Event.mouse_Pointer_Position_.fYaw_ = fYaw;
+        g_eEvent.mouse_Pointer_Position_.fPitch_ = fPitch;
+        g_eEvent.mouse_Pointer_Position_.fYaw_ = fYaw;
         
         if(fPitch > 89.0f)
             fPitch = 89.0f;

@@ -2,6 +2,7 @@
 #include "ShaderProgram.hpp"
 #include "SystemManager.hpp"
 #include "Systems/AnimationSystem.hpp"
+#include "Systems/CameraSystem.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/GUISystem.hpp"
 #include "Systems/MovementSystem.hpp"
@@ -40,6 +41,7 @@ namespace GLVM::Core
         Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System    = new ECS::CAnimationSystem();
         pProjectile_System_ = new ECS::CProjectileSystem();
+        pCamera_System      = new ECS::CCameraSystem();
         
 		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
@@ -91,8 +93,9 @@ namespace GLVM::Core
 		Animation_System->Animation_Delta = fAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
-  
+
         pSystem_Manager->ActivateSystem(Movement_System);
+        pSystem_Manager->ActivateSystem(pCamera_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
 //        pSystem_Manager->ActivateSystem(Physics_System_);
         pSystem_Manager->ActivateSystem(pProjectile_System_);
@@ -135,6 +138,7 @@ namespace GLVM::Core
 			Animation_System->Delta_Time                  = fDelta_Time_;
 			Renderer_System->_Shader_Program              = Shader_Program;
             GUI_System->_Shader_Program                   = GUI_Shader_Program_;
+            pCamera_System->Shader_Program_               = Shader_Program;
             
 			pSystem_Manager->Update();
             Window_->SwapBuffers();

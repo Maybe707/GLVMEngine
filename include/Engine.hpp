@@ -5,6 +5,7 @@
 #include "Systems/GUISystem.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
+#include "Systems/CameraSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
@@ -75,6 +76,8 @@ namespace GLVM::Core
 		ECS::CMovementSystem*   Movement_System;
         ECS::CPhysicsSystem*    Physics_System_;
         ECS::CProjectileSystem* pProjectile_System_;
+        ECS::CGUISystem*        GUI_System;
+        ECS::CCameraSystem*     pCamera_System;
 
         CEngine();
         
@@ -88,8 +91,6 @@ namespace GLVM::Core
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
 		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
 		void GameKill();
-
-        ECS::CGUISystem*       GUI_System;
 	};
 		
 }

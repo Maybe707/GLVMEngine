@@ -44,8 +44,6 @@ namespace GLVM::ECS
                 
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 
-
-                
                 if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON)
                 {
                     if(fProjectile_Accumulator_ <= 0)
@@ -59,8 +57,6 @@ namespace GLVM::ECS
                         fProjectile_Accumulator_ = 2.0;
                     }
                 }
-                    
-                
 //                Input_Stack_.PrintStack();
             
                 bDiagonal_Movement_Availability = FixDiagonalMove(Input_Stack_,
@@ -224,7 +220,7 @@ namespace GLVM::ECS
     {
         Vector<float, 3> front(0.0f);
         Vector<float, 3> temp_Vector(0.0f);
-        _view_Component.Front_Camera[1] = 0.0f;
+//        _view_Component.Front_Camera[1] = 0.0f;
         front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
         front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
         _view_Component.Front_Camera = Normalize(front);
