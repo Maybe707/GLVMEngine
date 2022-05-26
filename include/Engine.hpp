@@ -6,6 +6,7 @@
 #include "IChrono.hpp"
 #include "IWindow.hpp"
 #include "Systems/PhysicsSystem.hpp"
+#include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
@@ -68,11 +69,12 @@ namespace GLVM::Core
 		float          fDelta_Time_;
 		CStack         Input_Stack_;
         
-		ECS::CRenderSystem*    Renderer_System;
-        ECS::CCollisionSystem* Collision_System;
+		ECS::CRenderSystem*     Renderer_System;
+        ECS::CCollisionSystem*  Collision_System;
 		ECS::CAnimationSystem*  Animation_System;
-		ECS::CMovementSystem*  Movement_System;
-        ECS::CPhysicsSystem*   Physics_System_;
+		ECS::CMovementSystem*   Movement_System;
+        ECS::CPhysicsSystem*    Physics_System_;
+        ECS::CProjectileSystem* pProjectile_System_;
 
         CEngine();
         

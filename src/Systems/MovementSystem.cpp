@@ -1,4 +1,16 @@
 #include "Systems/MovementSystem.hpp"
+#include "ComponentManager.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/MoveComponent.hpp"
+#include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
+#include "Components/ProjectileComponent.hpp"
+#include "Components/ViewComponent.hpp"
+#include "Engine.hpp"
+#include "EntityManager.hpp"
+#include "Event.hpp"
+#include "Stack.hpp"
 
 namespace GLVM::ECS
 {
@@ -15,21 +27,32 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
-            
+
+        float cameraSpeed = 2.5f * _dOffset;            
+        int counter = 0;
+
+
+
+
+        std::cout << "Projectile accumulator: " << fProjectile_Accumulator_ << std::endl;
+        
         for(int i = 0; i < u_iVector_Move_Size; ++i)
         {
-            float cameraSpeed = 2.5f * _dOffset;            
-            for(int n = 0, u_iNumber_of_Events = 5; n < u_iNumber_of_Events; ++n)
+
+            for(int n = 0; n < 5; ++n)
             {
+//                Input_Stack_.PrintStack();
                 bool bDiagonal_Movement_Availability = false;
+                if(fProjectile_Accumulator_ > 0)
+                    fProjectile_Accumulator_ -= cameraSpeed;
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 bDiagonal_Movement_Availability = FixDiagonalMove(Input_Stack_,
                                                                   pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                                                   cameraSpeed,
                                                                   view_Component,
                                                                   g_eEvent);
-                if(bDiagonal_Movement_Availability)
-                    break;
+                // if(bDiagonal_Movement_Availability)
+                //     break;
                 switch(Input_Stack_[n])
                 {
                 case Core::EEvents::eMOVE_LEFT:
@@ -71,8 +94,18 @@ namespace GLVM::ECS
                     pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                     break;
                 case Core::EEvents::eMOUSE_LEFT_BUTTON:
-                    unsigned int uiEntity_Projectile;
-                    
+
+                    if(fProjectile_Accumulator_ <= 0)
+                    {
+                        std::cout << "Signal!!" << std::endl;
+                        CalculateProjectile(pComponent_Manager,
+                                            iEntity_refMove,
+                                            cameraSpeed,
+                                            view_Component,
+                                            Input_Stack_, n);
+                        fProjectile_Accumulator_ = 10.0;
+                    }
+                    break;
                 default:
                     break;
                 }
@@ -80,6 +113,45 @@ namespace GLVM::ECS
         }
     }
 
+    void CMovementSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
+                                              unsigned int iEntity_refMove,
+                                              float cameraSpeed,
+                                              CViewComponent& view_Component,
+                                              Core::CStack& Input_Stack_,
+                                              int n)
+    {
+        unsigned int uiEntity_Projectile;
+        ECS::CEntityManager::GetInstance()->CreateEntity(uiEntity_Projectile);
+        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
+                                                               ECS::STransformComponent, ECS::CTextureComponent,
+                                                               ECS::CProjectileComponent>(uiEntity_Projectile);
+        ECS::CTextureComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_Projectile);
+        rTextureProjectile.iWidth_  = 96;
+        rTextureProjectile.iHeight_ = 128;
+        rTextureProjectile.u_iData_ = chelik_dat;
+        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
+        ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
+        rTransformProjectile.fScale = 0.5f;
+        rTransformProjectile.tVertex[0] = 0.5f;
+        rTransformProjectile.tVertex[1] = 0.5f;
+        rTransformProjectile.tVertex[2] = 0.5f;
+        // rTransformProjectile.tVertex = CalculateForwardVectorProjectile(
+        //     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
+        //     pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove),
+        //     cameraSpeed,
+        //     view_Component,
+        //     g_eEvent,
+        //     Input_Stack_[n]
+        //     );
+        Vector<float, 3> temp_vec(0.0f);
+        temp_vec = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex;
+        temp_vec *= cameraSpeed;
+        rTransformProjectile.tVertex = temp_vec;
+        rTransformProjectile.tVertex[2] += 0.5f;
+        rTransformProjectile.tVertex[1] += 0.5f;
+        rTransformProjectile.tVertex[0] += 0.5f;
+    }
+    
     bool CMovementSystem::CompareDirection(Core::CStack& _input_Stack,
                                            Core::EEvents _event0,
                                            Core::EEvents _event1)
@@ -147,6 +219,27 @@ namespace GLVM::ECS
         return temp_Vector;
     }
 
+    Vector<float, 3> CMovementSystem::CalculateForwardVectorProjectile(STransformComponent _transform_Component,
+                                                                       SMoveComponent& _move_Component,
+                                                                       float _camera_Speed,
+                                                                       ECS::CViewComponent& _view_Component,
+                                                                       Core::CEvent& _event,
+                                                                       Core::EEvents _current_Event)
+    {
+        Vector<float, 3> front(0.0f);
+        Vector<float, 3> temp_Vector(0.0f);
+        // _view_Component.Front_Camera[1] = 0.0f;
+        // front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
+        // front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
+        front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_)) * std::cos(Radians(_event.mouse_Pointer_Position_.fPitch_));
+        front[1] = std::sin(Radians(_event.mouse_Pointer_Position_.fPitch_));
+        front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_)) * std::cos(Radians(_event.mouse_Pointer_Position_.fPitch_));
+        _view_Component.Front_Camera = Normalize(front);
+        temp_Vector += _view_Component.Front_Camera * _camera_Speed;
+        _move_Component.eEvent_ = _current_Event;
+        return temp_Vector;
+    }
+    
     void CMovementSystem::CalculatePerdendicularVectors(float _camera_Speed,
                                                         ECS::CViewComponent& _view_Component,
                                                         Core::CEvent& _event,

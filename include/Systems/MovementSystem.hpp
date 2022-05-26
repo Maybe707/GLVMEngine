@@ -11,12 +11,16 @@
 #include "Components/ViewComponent.hpp"
 #include "Stack.hpp"
 #include "Globals.hpp"
+#include "EntityManager.hpp"
+#include "ComponentManager.hpp"
+#include "chelik.hpp"
 
 namespace GLVM::ECS
 {
 	class CMovementSystem : public ISystem
 	{
 	public:
+        float fProjectile_Accumulator_ = 10.0f; 
 		float _dOffset;
 		Core::EEvents _Anim_Event;
         Core::CStack& Input_Stack_;
@@ -25,6 +29,13 @@ namespace GLVM::ECS
         
 		void Update();
 
+        void CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
+                                 unsigned int iEntity_refMove,
+                                 float cameraSpeed,
+                                 CViewComponent& view_Component,
+                                 Core::CStack& Input_Stack_,
+                                 int n);
+        
         bool CompareDirection(Core::CStack& _input_Stack,
                               Core::EEvents _event0,
                               Core::EEvents _event1);
@@ -40,6 +51,12 @@ namespace GLVM::ECS
                                            ECS::CViewComponent& _view_Component,
                                            Core::CEvent& _event,
                                            Core::EEvents _current_Event);
+        Vector<float, 3> CalculateForwardVectorProjectile(STransformComponent _transform_Component,
+                                                          SMoveComponent& _move_Component,
+                                                          float _camera_Speed,
+                                                          ECS::CViewComponent& _view_Component,
+                                                          Core::CEvent& _event,
+                                                          Core::EEvents _current_Event);
         void CalculatePerdendicularVectors(float _camera_Speed,
                                            ECS::CViewComponent& _view_Component,
                                            Core::CEvent& _event,

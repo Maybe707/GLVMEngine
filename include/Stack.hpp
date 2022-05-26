@@ -118,7 +118,7 @@ namespace GLVM::Core
             return eEmpty;
         }
         
-        EEvents operator[](int _iIndex)
+        EEvents& operator[](int _iIndex)
         {
             return aStack_[_iIndex];
         }

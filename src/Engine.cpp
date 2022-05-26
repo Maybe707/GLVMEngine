@@ -6,6 +6,7 @@
 #include "Systems/GUISystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
+#include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include <mutex>
 
@@ -38,6 +39,7 @@ namespace GLVM::Core
         Movement_System     = new ECS::CMovementSystem(Input_Stack_);
         Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System    = new ECS::CAnimationSystem();
+        pProjectile_System_ = new ECS::CProjectileSystem();
         
 		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
@@ -83,17 +85,17 @@ namespace GLVM::Core
         // ECS::CMovementSystem*  Movement_System     = new ECS::CMovementSystem(Input_Stack_);
         // ECS::CPhysicsSystem*   Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         // ECS::CAnimationSystem* Animation_System    = new ECS::CAnimationSystem();
-        
+
 		float fAnimation_Delta            = 0.0f;
 		bool bGame_Loop_Active            = true;
 		Animation_System->Animation_Delta = fAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order. 
-
   
         pSystem_Manager->ActivateSystem(Movement_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
-        pSystem_Manager->ActivateSystem(Physics_System_);
+//        pSystem_Manager->ActivateSystem(Physics_System_);
+        pSystem_Manager->ActivateSystem(pProjectile_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
         pSystem_Manager->ActivateSystem(Renderer_System);
         pSystem_Manager->ActivateSystem(GUI_System);
