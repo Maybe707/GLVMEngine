@@ -144,6 +144,7 @@ namespace GLVM::ECS
         rTextureProjectile.u_iData_ = chelik_dat;
         Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
+        ECS::CProjectileComponent& rProjectileComponent = pComponent_Manager->GetComponent<ECS::CProjectileComponent>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.5f;
         rTransformProjectile.tVertex[0] = 0.5f;
         rTransformProjectile.tVertex[1] = 0.5f;
@@ -156,13 +157,46 @@ namespace GLVM::ECS
         //     g_eEvent,
         //     Input_Stack_[n]
         //     );
-        Vector<float, 3> temp_vec(0.0f);
-        temp_vec = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex;
-        temp_vec *= cameraSpeed;
-        rTransformProjectile.tVertex = temp_vec;
-        rTransformProjectile.tVertex[2] += 0.5f;
-        rTransformProjectile.tVertex[1] += 0.5f;
-        rTransformProjectile.tVertex[0] += 0.5f;
+        // Vector<float, 3> temp_vec(0.0f);
+        // temp_vec = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex;
+        // temp_vec *= cameraSpeed;
+        // rTransformProjectile.tVertex = temp_vec;
+        Vector<float, 3> vec(0.0f);
+       rTransformProjectile.tVertex = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tVertex;
+       rProjectileComponent.forward_= GetDirectionVector(pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
+                                                         view_Component);
+       // vec = rTransformProjectile.tVertex + rProjectileComponent.forward_;
+       // rTransformProjectile.tVertex = (vec - rTransformProjectile.tVertex);
+//       rTransformProjectile.tVertex[2] += 0.5f;
+//       rTransformProjectile.tVertex[1] += 0.5f;
+//       rTransformProjectile.tVertex[0] += 0.25f;
+    }
+
+    Vector<float, 3> CMovementSystem::GetDirectionVector(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
+    {
+                Matrix<float, 4> tView_Matrix(1.0f);
+        const float kSensitivity = 0.1f;
+
+        fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
+        fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
+        fYaw *= kSensitivity;
+        fPitch *= kSensitivity;
+
+        g_eEvent.mouse_Pointer_Position_.fPitch_ = fPitch;
+        g_eEvent.mouse_Pointer_Position_.fYaw_ = fYaw;
+        
+        if(fPitch > 89.0f)
+            fPitch = 89.0f;
+        if(fPitch < -89.0f)
+            fPitch = -89.0f;
+
+        Vector<float, 3> front;
+        front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
+        front[1] = std::sin(Radians(fPitch));
+        front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
+        _view_Component.Front_Camera = Normalize(front);
+
+        return _view_Component.Front_Camera;
     }
     
     bool CMovementSystem::CompareDirection(Core::CStack& _input_Stack,

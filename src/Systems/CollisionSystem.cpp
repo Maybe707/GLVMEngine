@@ -50,13 +50,13 @@ namespace GLVM::ECS
 //        std::cout << "Vector size: " << uiVector_Collider_Size << std::endl;
 		for(int i = 0, iSize = uiVector_Collider_Size; i < iSize; ++i)
 		{
-			for(int j = 0, iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
+			for(int j = i + 1, iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
 			{
                 unsigned int uiBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];  
                 unsigned int uiCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
 
-                if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
-                    continue;
+                // if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
+                //     continue;
                 
                 bool bBox_Collider_Flag = BoxCollider(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider),
                                                       _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
