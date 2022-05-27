@@ -29,25 +29,13 @@ namespace GLVM::ECS
 	public:
 	    GLuint iVbo_;
 		GLuint iVao_;
-
-		static const unsigned int u_iRange = 4;
-        Matrix<float, 4> tProjection_Matrix{1.0f};
 		Shader* _Shader_Program;
-        
-        ///< Mouse parameters.
-        float fYaw = -90.0f;
-        float fPitch = 0.0f;
-        float fLast_X = 1920.0f / 2.0f;
-        float fLast_Y = 1080.0f / 2.0f;
-        bool bFirst_Mouse = true;
 
         CRenderSystem();
 		~CRenderSystem();
 
 		void Update() override;
-		void SetProjectionMatrix(Shader* _Shader_Program);
-        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component, ECS::STransformComponent& _Player);
-        void SetViewMatrix(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
+        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };
 }
     
