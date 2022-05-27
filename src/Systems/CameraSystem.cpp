@@ -45,11 +45,11 @@ namespace GLVM::ECS
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
  
-        tView_Matrix = FPSview(_Player.tVertex,
-                               _Player.tVertex + _view_Component.Front_Camera,
+        tView_Matrix = FPSview(_Player.tPosition,
+                               _Player.tPosition + _view_Component.Front_Camera,
                                _view_Component.Up_Camera);
 
-        // tView_Matrix = FPS_View_RH(_Player.tVertex,
+        // tView_Matrix = FPS_View_RH(_Player.tPosition,
         //                        fPitch,
         //                        fYaw);
         

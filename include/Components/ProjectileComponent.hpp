@@ -12,7 +12,6 @@ namespace GLVM::ECS
         float fDamage_;
         float fSpeed_;
         float fFlying_Range_;
-        Vector<float, 3> forward_{0.0f};
     };
 }
 

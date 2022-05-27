@@ -7,7 +7,10 @@ namespace GLVM::ECS
 {    
 	struct STransformComponent
 	{
-        Vector<float, 3> tVertex{0.0f, 0.0f, 0.0f};
+        Vector<float, 3> tPosition{0.0f, 0.0f, 0.0f};
+        Vector<float, 3> tForward{0.0f, 0.0f, 0.0};
+        Vector<float, 3> tRight{0.0f, 0.0f, 0.0};
+        Vector<float, 3> tUp{0.0f, 0.0f, 0.0};
         float fRotate = 0.0f;
         float fScale = 1.0f;
 	};

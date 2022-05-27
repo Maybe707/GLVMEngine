@@ -32,7 +32,7 @@ namespace GLVM::ECS
                                        Vector<float, 3>& _temp_Vector)
     {
         Vector<float, 3> front{1.0f};
-        _view_Component.Front_Camera[1] = 0.0f;
+//        _view_Component.Front_Camera[1] = 0.0f;
         front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
         front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
         _view_Component.Front_Camera = Normalize(front) * _camera_Speed;
@@ -49,25 +49,25 @@ namespace GLVM::ECS
         if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_BACKWARD, Core::EEvents::eMOVE_RIGHT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-            _transform_Component.tVertex += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
+            _transform_Component.tPosition += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_FORWARD, Core::EEvents::eMOVE_RIGHT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-            _transform_Component.tVertex -= Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
+            _transform_Component.tPosition -= Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_FORWARD, Core::EEvents::eMOVE_LEFT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-            _transform_Component.tVertex -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
+            _transform_Component.tPosition -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_BACKWARD, Core::EEvents::eMOVE_LEFT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-            _transform_Component.tVertex += Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
+            _transform_Component.tPosition += Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
             return true;
         }
         return false;
@@ -94,16 +94,16 @@ namespace GLVM::ECS
             switch(Input_Stack_[n])
             {
             case Core::eMOVE_FORWARD:
-                _transform_Component.tVertex -= _view_Component.Front_Camera * cameraSpeed;
+                _transform_Component.tPosition -= _transform_Component.tForward * cameraSpeed;
                 break;
             case Core::eMOVE_BACKWARD:
-                _transform_Component.tVertex += _view_Component.Front_Camera * cameraSpeed;
+                _transform_Component.tPosition += _transform_Component.tForward * cameraSpeed;
                 break;
             case Core::eMOVE_RIGHT:
-                _transform_Component.tVertex -= Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * cameraSpeed;
+                _transform_Component.tPosition -= _transform_Component.tRight * cameraSpeed;
                 break;
             case Core::eMOVE_LEFT:
-                _transform_Component.tVertex += Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera)) * cameraSpeed;
+                _transform_Component.tPosition += _transform_Component.tRight * cameraSpeed;
                 break;
             default:
                 break;
@@ -115,7 +115,7 @@ namespace GLVM::ECS
         
     void CPhysicsSystem::Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2)
     {
-        _transform_Component1.tVertex[1] = _transform_Component2.tVertex[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
+        _transform_Component1.tPosition[1] = _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
         fAcceleration_of_Gravity_ = 0.0f;
     }
 
@@ -161,7 +161,7 @@ namespace GLVM::ECS
         for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
         {
             int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-            pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tVertex[1] -= fAcceleration_of_Gravity_;
+            pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
         }
     }
 }

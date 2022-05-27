@@ -150,9 +150,9 @@ namespace GLVM::ECS
         tScaling_Matrix[2][2] = _transform_Component.fScale;
 		tScaling_Matrix[3][3] = 1.0f;
         
-        tTranslation_Matrix[3][0] = _transform_Component.tVertex[0];
-		tTranslation_Matrix[3][1] = _transform_Component.tVertex[1];
-		tTranslation_Matrix[3][2] = _transform_Component.tVertex[2];
+        tTranslation_Matrix[3][0] = _transform_Component.tPosition[0];
+		tTranslation_Matrix[3][1] = _transform_Component.tPosition[1];
+		tTranslation_Matrix[3][2] = _transform_Component.tPosition[2];
         tTranslation_Matrix[3][3] = 1.0f;
         
         tModel_Matrix = tScaling_Matrix * tTranslation_Matrix;
