@@ -79,25 +79,6 @@ namespace GLVM::ECS
                                  CViewComponent& _view_Component,
                                  Core::CEvent& _event)
     {
-        // switch(_move_Component.eEvent_)
-        // {
-        // case Core::eMOVE_UP:
-        //     _transform_Component.tVertex[2] = (_transform_Component.tVertex[2] - _fDelta_Time);
-        // case Core::eMOVE_DOWN:
-        //     _transform_Component.tVertex[2] = (_transform_Component.tVertex[2] + _fDelta_Time);
-        // case Core::eMOVE_RIGHT:
-        //     _transform_Component.tVertex[0] = (_transform_Component.tVertex[0] - _fDelta_Time);
-        // case Core::eMOVE_LEFT:
-        //     _transform_Component.tVertex[0] = (_transform_Component.tVertex[0] + _fDelta_Time);
-        // default:
-        //     break;
-        // }
-        
-        // if(_event_Component.eEvent_ == Core::eGRAVITY_COLLISION_FLAG)
-        // {
-        //     _transform_Component.tVertex[1] += 0.01f;
-        //     return;
-        // }
         for(int n = 0; n < 5; ++n)
         {
             float cameraSpeed = static_cast<float>(2.5 * _fDelta_Time);
