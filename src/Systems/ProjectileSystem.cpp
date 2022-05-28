@@ -22,17 +22,17 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
-        
+//        std::cout << "Projectiles size: " << uiVector_Projectile_Size << std::endl;
         for(int i = 0; i < uiVector_Projectile_Size; ++i)
         {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
-
+            
 //           std::cout << "Entities: " << uiEntity_refProjectile << std::endl;
             
             if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_)
             {
                 std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
-                  pEntity_Manager->RemoveEntity(uiEntity_refProjectile, *pComponent_Manager);
+//                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, *pComponent_Manager);
 //                pComponent_Manager->RemoveComponent<CTextureComponent>(uiEntity_refProjectile);
 //                pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition -= 0.2;
 //                std::cout << "We are finaly here: " << uiEntity_refProjectile << std::endl;

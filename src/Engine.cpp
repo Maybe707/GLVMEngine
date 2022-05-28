@@ -96,7 +96,7 @@ namespace GLVM::Core
 
         pSystem_Manager->ActivateSystem(Movement_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
-//        pSystem_Manager->ActivateSystem(pProjectile_System_);
+        pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
         pSystem_Manager->ActivateSystem(pCamera_System);

@@ -3,6 +3,7 @@ a.exe
 a.out
 doxy/
 exec
+.ccls-cache/
 libgcc_s_seh-1.dll
 libstdc++-6.dll
 libwinpthread-1.dll
