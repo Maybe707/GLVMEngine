@@ -170,7 +170,7 @@ namespace GLVM::ECS
         rTextureProjectile.u_iData_ = chelik_dat;
         Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
-        rTransformProjectile.fScale = 0.1f;
+        rTransformProjectile.fScale = 0.2f;
         // rTransformProjectile.tPosition[0] = 0.5f;
         // rTransformProjectile.tPosition[1] = 0.5f;
         // rTransformProjectile.tPosition[2] = 0.5f;
@@ -191,6 +191,7 @@ namespace GLVM::ECS
        rTransformProjectile.tForward = GetDirectionVector(pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                                          view_Component);
 
+       rTransformProjectile.tPosition +=rTransformProjectile.tForward;
        // vec = rTransformProjectile.tPosition + rProjectileComponent.forward_;
        // rTransformProjectile.tPosition = (vec - rTransformProjectile.tPosition);
 //       rTransformProjectile.tPosition[2] += 0.5f;

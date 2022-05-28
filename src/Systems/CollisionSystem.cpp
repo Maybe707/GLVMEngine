@@ -62,8 +62,8 @@ namespace GLVM::ECS
 
                 if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
                     continue;
-                if(uiCompared_Entity_refCollider == 0)
-                    continue;
+                // if(uiCompared_Entity_refCollider == 0)
+                //     continue;
                 
                 bool bBox_Collider_Flag = BoxCollider(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider),
                                                       _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
