@@ -10,16 +10,17 @@ int main()
     
 	Entity u_iPlayer;
 	EntityManager->CreateEntity(u_iPlayer);
-    ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent, GLVM::ECS::CTextureComponent>(u_iPlayer);
-    GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	TexturePlayer.iWidth_ = 96; 
-	TexturePlayer.iHeight_ = 128;
-	TexturePlayer.u_iData_ = chelik_dat;
-	GLVM->LoadTextureData(TexturePlayer);
+    ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
+    // GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	// TexturePlayer.iWidth_ = 96; 
+	// TexturePlayer.iHeight_ = 128;
+	// TexturePlayer.u_iData_ = chelik_dat;
+	// GLVM->LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager->GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager->GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
-//    GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
+    GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager->GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
+    ColliderPlayer.bPush_Collission = true;
     TransformPlayer.fScale = 0.5f;
     TransformPlayer.tPosition[0] = 0.0f;
 	TransformPlayer.tPosition[1] = 3.0f;
@@ -49,7 +50,7 @@ int main()
     TransformWitch.tPosition[0] = 3.0f;
     TransformWitch.tPosition[1] = 2.5f;
     TransformWitch.tPosition[2] = 0.0f;
-    TransformWitch.fScale = 2.5f;
+    TransformWitch.fScale = 3.5f;
     // ColliderWitch1.aColliders_Container_[0].bGround_Collision_ = false;
     // ColliderWitch1.aColliders_Container_[0].bWall_Collision_ = false;
 
@@ -63,10 +64,10 @@ int main()
 	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
-    TransformWitch2.tPosition[0] = 0.5f;
+    TransformWitch2.tPosition[0] = -1.0f;
     TransformWitch2.tPosition[1] = 0.0f;
     TransformWitch2.tPosition[2] = 0.0f;
-    TransformWitch2.fScale = 2.0f;
+    TransformWitch2.fScale = 3.5f;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
 

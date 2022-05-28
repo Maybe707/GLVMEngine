@@ -140,6 +140,16 @@ namespace GLVM::ECS
             vec[1] = -1.0f;
             rTransform_Component.tPosition += vec * cameraSpeed;
         }
+
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
+            GetInnerIDsContainer<CProjectileComponent>(*pComponent_Manager);
+        unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
+        for(int x = 0; x < uiVector_Projectile_Size; ++x)
+        {
+            unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
+            ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
+            rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.1f;
+        }
     }
 
     void CMovementSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
@@ -160,10 +170,10 @@ namespace GLVM::ECS
         rTextureProjectile.u_iData_ = chelik_dat;
         Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
-        rTransformProjectile.fScale = 0.5f;
-        rTransformProjectile.tPosition[0] = 0.5f;
-        rTransformProjectile.tPosition[1] = 0.5f;
-        rTransformProjectile.tPosition[2] = 0.5f;
+        rTransformProjectile.fScale = 0.1f;
+        // rTransformProjectile.tPosition[0] = 0.5f;
+        // rTransformProjectile.tPosition[1] = 0.5f;
+        // rTransformProjectile.tPosition[2] = 0.5f;
         // rTransformProjectile.tPosition = CalculateForwardVectorProjectile(
         //     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
         //     pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove),
@@ -180,6 +190,7 @@ namespace GLVM::ECS
        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tPosition;
        rTransformProjectile.tForward = GetDirectionVector(pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove),
                                                          view_Component);
+
        // vec = rTransformProjectile.tPosition + rProjectileComponent.forward_;
        // rTransformProjectile.tPosition = (vec - rTransformProjectile.tPosition);
 //       rTransformProjectile.tPosition[2] += 0.5f;

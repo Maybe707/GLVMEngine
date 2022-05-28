@@ -27,13 +27,14 @@ namespace GLVM::ECS
         {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
-//           std::cout << "Entities: " << uiEntity_refProjectile << std::endl;
+            //         std::cout << "Projectile Entities: " << uiEntity_refProjectile << std::endl;
             
-            if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_)
+            if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ ||
+                pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_)
             {
                 std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
 //                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, *pComponent_Manager);
-//                pComponent_Manager->RemoveComponent<CTextureComponent>(uiEntity_refProjectile);
+                pComponent_Manager->RemoveComponent<CTextureComponent>(uiEntity_refProjectile);
 //                pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition -= 0.2;
 //                std::cout << "We are finaly here: " << uiEntity_refProjectile << std::endl;
                 continue;
@@ -42,8 +43,8 @@ namespace GLVM::ECS
             // temp_vec = GetDirectionVector(pComponent_Manager->GetComponent<STransformComponent>(iEntity_refView), view_Component);
 //            pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition += temp_vec * 0.1;
 
-            ECS::STransformComponent& rTransfromComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
-            rTransfromComponent.tPosition += rTransfromComponent.tForward * 0.1f;
+            // ECS::STransformComponent& rTransfromComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
+            // rTransfromComponent.tPosition += rTransfromComponent.tForward * 0.1f;
             
             // pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[0] +=
             //     pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[0] / 10;

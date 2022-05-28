@@ -151,14 +151,16 @@ namespace GLVM::ECS
         {
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
                 
-                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_)
+                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ &&
+                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
                 {
                     unsigned int uiCollider = pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_;
                     Gravity(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
                             pComponent_Manager->GetComponent<ECS::STransformComponent>(uiCollider));
                     pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
-                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_)
+                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ &&
+                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
                 {
                     Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
                           pComponent_Manager->GetComponent<ECS::SMoveComponent>(uiEntity_refCollider),
