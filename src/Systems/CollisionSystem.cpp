@@ -55,13 +55,13 @@ namespace GLVM::ECS
         
 		for(int i = 0, iSize = uiVector_Collider_Size; i < iSize; ++i)
 		{
-			for(int j = 0, iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
+			for(int j = i + 1, iSize_Iner = uiVector_Collider_Size; j < iSize_Iner; ++j)
 			{
                 unsigned int uiBacktracking_Entity_refCollider = (*pEntity_Container_refCollider)[i];  
                 unsigned int uiCompared_Entity_refCollider = (*pEntity_Container_refCollider)[j];
 
-                if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
-                    continue;
+                // if(uiBacktracking_Entity_refCollider == uiCompared_Entity_refCollider)
+                //     continue;
                 // if(uiCompared_Entity_refCollider == 0)
                 //     continue;
                 
@@ -72,6 +72,7 @@ namespace GLVM::ECS
 				if(bUpper_Actor_Check_Flag && bBox_Collider_Flag)
                 {
                     _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiCompared_Entity_refCollider).bGround_Collision_ = true;
                     _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
@@ -79,6 +80,7 @@ namespace GLVM::ECS
                 if(bBox_Collider_Flag)
                 {
                     _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiCompared_Entity_refCollider).bWall_Collision_ = true;
                     _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
