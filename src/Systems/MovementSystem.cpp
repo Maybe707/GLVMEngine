@@ -130,6 +130,16 @@ namespace GLVM::ECS
                 }
             }
         }
+
+        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
+        {
+            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
+            //    pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
+            ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
+            Vector<float, 3> vec(0.0f);
+            vec[1] = -1.0f;
+            rTransform_Component.tPosition += vec * cameraSpeed;
+        }
     }
 
     void CMovementSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,

@@ -115,8 +115,21 @@ namespace GLVM::ECS
         
     void CPhysicsSystem::Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2)
     {
-        _transform_Component1.tPosition[1] = _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
-        fAcceleration_of_Gravity_ = 0.0f;
+        // _transform_Component1.tPosition[1] = _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
+        // fAcceleration_of_Gravity_ = 0.0f;
+        CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
+        
+        float cameraSpeed = 2.5f * fDelta_Time_;            
+        
+        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
+        {
+            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
+            //    pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
+            ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
+            Vector<float, 3> vec(0.0f);
+            vec[1] = -1.0f;
+            rTransform_Component.tPosition -= vec * cameraSpeed;
+        }
     }
 
     /*! This update searching for refering to colliders entities and check their
@@ -158,10 +171,12 @@ namespace GLVM::ECS
 
         ///< Forcing all entities that had gravity component falling down.
 
-        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
-        {
-            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-            pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
-        }
+        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
+        // {
+        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
+        //     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
+        // }
+
+
     }
 }
