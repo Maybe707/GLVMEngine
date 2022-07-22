@@ -11,10 +11,12 @@
 #include "EntityManager.hpp"
 #include "Event.hpp"
 #include "Stack.hpp"
+#include <alsa/output.h>
 
 namespace GLVM::ECS
 {
-    CMovementSystem::CMovementSystem(Core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
+    CMovementSystem::CMovementSystem(Core::CStack& _input_Stack, Core::CSoundEngine& _sound_Engine) :
+        Input_Stack_(_input_Stack), Sound_Engine_(_sound_Engine) {}
         
     void CMovementSystem::Update()
     {
@@ -164,6 +166,13 @@ namespace GLVM::ECS
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
                                                                ECS::STransformComponent, ECS::CTextureComponent,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
+
+        Core::CSoundSample* pSound_Sample = new Core::CSoundSample();
+        pSound_Sample->kPath_to_File_ = "../laser2.wav";
+        pSound_Sample->uiDuration_ = 5;
+        pSound_Sample->uiRate_ = 22050;
+        Sound_Engine_.GetSoundContaier().Push(pSound_Sample);
+        
         ECS::CTextureComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_Projectile);
         rTextureProjectile.iWidth_  = 96;
         rTextureProjectile.iHeight_ = 128;

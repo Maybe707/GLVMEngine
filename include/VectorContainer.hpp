@@ -22,6 +22,7 @@ namespace GLVM::Core
 		void Push(const T _Item);
 		void Insert(const T _Item, const unsigned int _Index);
 		void RemoveItem(const T _Item);
+        void RemoveObject(const T _Item);
 		void RemoveFirstItem();
 		T& GetItem(const T _Item);
 		T& GetFirstItem();
@@ -163,10 +164,47 @@ namespace GLVM::Core
 		if(bRemove_Flag)
 		{
 			--iSize_;
-			aVector_Container_[iSize_] = k_iNull;
+//			aVector_Container_[iSize_] = k_iNull;
 		}
 	}
 
+	template<class T>
+	void TCVectorContainer<T>::RemoveObject(const T _Item)
+	{
+		if(iSize_ < 1)
+			return;
+
+		bool bRemove_Flag = false;
+		
+		int iTemp_Index = 0;
+		T aTemp_Vector_Container[iCapacity_];
+		if(iCapacity_ > 0)
+		{
+			for(unsigned int i = 0; i < iCapacity_; ++i)
+				aTemp_Vector_Container[i] = aVector_Container_[i];
+		}
+		
+		for(unsigned int j = 0; j < iCapacity_; ++j)
+		{
+			if(_Item == aVector_Container_[j])
+			{
+                delete aVector_Container_[j];
+                aVector_Container_[j] = nullptr;
+				bRemove_Flag = true;
+				continue;
+			}
+
+			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
+			++iTemp_Index;
+		}
+
+		if(bRemove_Flag)
+		{
+			--iSize_;
+            aVector_Container_[iSize_] = nullptr;
+		}
+	}
+    
 	template<class T>
 	void TCVectorContainer<T>::RemoveFirstItem()
 	{

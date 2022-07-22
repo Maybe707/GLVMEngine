@@ -1,5 +1,6 @@
 #include "Engine.hpp"
 #include "ShaderProgram.hpp"
+#include "SoundEngine.hpp"
 #include "SystemManager.hpp"
 #include "Systems/AnimationSystem.hpp"
 #include "Systems/CameraSystem.hpp"
@@ -10,7 +11,8 @@
 #include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include <mutex>
-
+#include <thread>
+                  
 /*******************************************************************
  * Legends never die...
  * You are about to face most terrifying data structures of all time.
@@ -23,11 +25,20 @@
     exit(1)
 
 GLVM::Core::CEvent g_eEvent;
+GLVM::Core::CSoundEngine g_Sound_Engine;
 
 namespace GLVM::Core
 {
     CEngine* CEngine::pInstance_ = nullptr;
     std::mutex CEngine::Mutex_;
+
+    void PlaybackSound(Core::CSoundEngine& _sound_Engine)
+    {
+        while(1)
+        {
+            _sound_Engine.SoundStream();
+        }
+    }
     
     CEngine::CEngine()
 	{
@@ -37,7 +48,7 @@ namespace GLVM::Core
         Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
         GUI_System          = new ECS::CGUISystem();
         Renderer_System     = new ECS::CRenderSystem();
-        Movement_System     = new ECS::CMovementSystem(Input_Stack_);
+        Movement_System     = new ECS::CMovementSystem(Input_Stack_, g_Sound_Engine);
         Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System    = new ECS::CAnimationSystem();
         pProjectile_System_ = new ECS::CProjectileSystem();
@@ -66,7 +77,7 @@ namespace GLVM::Core
         // GUI_System       = nullptr;
         // Animation_System = nullptr;
 	}
-
+            
     CEngine* CEngine::GetInstance()
     {
         std::lock_guard<std::mutex> lock(Mutex_);
@@ -76,7 +87,7 @@ namespace GLVM::Core
         }
         return pInstance_;
     }
-    
+
 	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
 	{
         ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
@@ -92,7 +103,7 @@ namespace GLVM::Core
 		bool bGame_Loop_Active            = true;
 		Animation_System->Animation_Delta = fAnimation_Delta;
 
-		///< Call of ActivateSystem function must be in this order. 
+		///< Call of ActivateSystem function must be in this order.
 
         pSystem_Manager->ActivateSystem(Movement_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
@@ -103,13 +114,16 @@ namespace GLVM::Core
         pSystem_Manager->ActivateSystem(Renderer_System);
         pSystem_Manager->ActivateSystem(GUI_System);
 
+        std::thread sound_thread(PlaybackSound, std::ref(g_Sound_Engine));
+        sound_thread.detach();
+        
 		while(bGame_Loop_Active)
 		{
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
             
 			Window_->ClearDisplay();
-
+            
             Shader_Program->Use();
 			Shader_Program->SetUniformID();
 
@@ -134,7 +148,7 @@ namespace GLVM::Core
             Physics_System_->fDelta_Time_                 = fDelta_Time_;
 //            std::cout << "Delta: " << fDelta_Time_ << std::endl;
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
-			Animation_System->eEvent_                     = Input_Stack_.Pop();
+            Animation_System->eEvent_                     = Input_Stack_.Pop();
 			Animation_System->Delta_Time                  = fDelta_Time_;
 			Renderer_System->_Shader_Program              = Shader_Program;
             GUI_System->_Shader_Program                   = GUI_Shader_Program_;
@@ -142,6 +156,8 @@ namespace GLVM::Core
             
 			pSystem_Manager->Update();
             Window_->SwapBuffers();
+            
+//            g_Sound_Engine.SoundStream();
 		}
 
         // delete pSystem_Manager;
@@ -159,7 +175,7 @@ namespace GLVM::Core
         // GUI_System       = nullptr;
         // Animation_System = nullptr;
 	}
-
+			
  	void CEngine::LoadTextureData(GLVM::ECS::CTextureComponent& _Texture)
 	{
 		///< Loading and creating texture.
@@ -177,16 +193,13 @@ namespace GLVM::Core
 		// glEnable(GL_BLEND);
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
+
 	void CEngine::GameKill()
 	{
-	   	Window_->Close();
-		delete Window_;
+       Window_->Close();
+        delete Window_;
         delete Chrono_;
 		Window_ = nullptr;
 		Chrono_ = nullptr;
-
-
 	}
 }
-

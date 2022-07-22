@@ -14,6 +14,7 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
 #include "chelik.hpp"
+#include "SoundEngine.hpp"
 
 namespace GLVM::ECS
 {
@@ -24,6 +25,7 @@ namespace GLVM::ECS
 		float _dOffset;
 		Core::EEvents _Anim_Event;
         Core::CStack& Input_Stack_;
+        Core::CSoundEngine& Sound_Engine_;
 
         float fYaw = -90.0f;
         float fPitch = 0.0f;
@@ -31,7 +33,7 @@ namespace GLVM::ECS
         float fLast_Y = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         
-        CMovementSystem(Core::CStack& _input_Stack);
+        CMovementSystem(Core::CStack& _input_Stack, Core::CSoundEngine& _sound_Engine);
         
 		void Update();
 
