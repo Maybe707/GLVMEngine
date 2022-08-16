@@ -15,6 +15,8 @@ namespace GLVM::Time
 	class CTimerCreator
 	{
 	public:
+        ~CTimerCreator() {}
+        
 		IChrono* Create();
 	};
 }

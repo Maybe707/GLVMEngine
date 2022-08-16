@@ -10,12 +10,12 @@
 #include "Engine.hpp"
 #include "EntityManager.hpp"
 #include "Event.hpp"
+#include "ISoundEngine.hpp"
 #include "Stack.hpp"
-#include <alsa/output.h>
 
 namespace GLVM::ECS
 {
-    CMovementSystem::CMovementSystem(Core::CStack& _input_Stack, Core::CSoundEngine& _sound_Engine) :
+    CMovementSystem::CMovementSystem(Core::CStack& _input_Stack, Core::Sound::ISoundEngine* _sound_Engine) :
         Input_Stack_(_input_Stack), Sound_Engine_(_sound_Engine) {}
         
     void CMovementSystem::Update()
@@ -30,7 +30,7 @@ namespace GLVM::ECS
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
 
-        float cameraSpeed = 2.5f * _dOffset;            
+        float cameraSpeed = 5.5f * _dOffset;            
         int counter = 0;
 
         if(fProjectile_Accumulator_ > 0)
@@ -167,11 +167,11 @@ namespace GLVM::ECS
                                                                ECS::STransformComponent, ECS::CTextureComponent,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 
-        Core::CSoundSample* pSound_Sample = new Core::CSoundSample();
+        Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";
         pSound_Sample->uiDuration_ = 5;
         pSound_Sample->uiRate_ = 22050;
-        Sound_Engine_.GetSoundContaier().Push(pSound_Sample);
+        Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
         ECS::CTextureComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_Projectile);
         rTextureProjectile.iWidth_  = 96;
@@ -359,3 +359,5 @@ namespace GLVM::ECS
         return false;
     }
 }
+
+

@@ -109,7 +109,7 @@ namespace GLVM::ECS
 		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
-
+    
 	void CRenderSystem::Update()
 	{
         CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();

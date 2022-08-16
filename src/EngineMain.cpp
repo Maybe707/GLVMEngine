@@ -64,13 +64,28 @@ int main()
 	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
-    TransformWitch2.tPosition[0] = -1.0f;
+    TransformWitch2.tPosition[0] = -0.9f;
     TransformWitch2.tPosition[1] = 0.0f;
     TransformWitch2.tPosition[2] = 0.0f;
     TransformWitch2.fScale = 3.5f;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
 
+    Entity u_iWitch3;
+	EntityManager->CreateEntity(u_iWitch3);
+	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
+	GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
+	TextureWitch3.iWidth_ = 32;
+	TextureWitch3.iHeight_ = 32;
+	TextureWitch3.u_iData_ = witch_dat;
+	GLVM->LoadTextureData(TextureWitch3);
+	GLVM::ECS::STransformComponent& TransformWitch3 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch3);
+//    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
+    TransformWitch3.tPosition[0] = -50.0f;
+    TransformWitch3.tPosition[1] = 1.0f;
+    TransformWitch3.tPosition[2] = 1.0f;
+    TransformWitch3.fScale = 50.5f;
+    
     // Entity u_iWitch3;
 	// EntityManager.CreateEntity(u_iWitch3);
 	// ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);

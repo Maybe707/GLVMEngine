@@ -5,6 +5,7 @@
 #include "Systems/GUISystem.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
+#include "ISoundEngine.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
@@ -60,11 +61,13 @@ namespace GLVM::Core
 {
 	class CEngine
 	{
-        static CEngine* pInstance_;
+        static CEngine*    pInstance_;
         static std::mutex  Mutex_;
         
-		IWindow*       Window_;
-		Time::IChrono* Chrono_;
+		IWindow*             Window_;
+		Time::IChrono*       Chrono_;
+        Sound::ISoundEngine* Sound_Engine_;
+        
 		Shader*        Shader_Program;
         Shader*        GUI_Shader_Program_;
 		float          fDelta_Time_;

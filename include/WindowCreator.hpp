@@ -3,15 +3,16 @@
 
 #include "IWindow.hpp"
 
-/*! \class WindowCreator
-    \brief Create vindow interface
-
-    This class creates a window independent interface.
-    Implemented by means of the factory method.
-*/
-
 namespace GLVM::Core
-{    
+{
+    
+/*!
+  \brief Create vindow interface.
+
+  This class creates a window independent interface.
+  Implemented by means of the factory method.
+*/
+    
     class CWindowCreator
     {
     public:

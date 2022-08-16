@@ -112,14 +112,17 @@ namespace GLVM::ECS
     }
 
     ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
-        
+
+    /****************************!!!!!!!!!!!!!!! RENAME GRAVITY METHOD !!!!!!!!!!!!!!!!*****************/
+    /* SEARCH GRAVITY LOGIC IN MOVEMENT SYSTEM */
+    
     void CPhysicsSystem::Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2)
     {
         // _transform_Component1.tPosition[1] = _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
         // fAcceleration_of_Gravity_ = 0.0f;
         CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
         
-        float cameraSpeed = 2.5f * fDelta_Time_;            
+        float cameraSpeed = 5.5f * fDelta_Time_;            
         
         for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
         {

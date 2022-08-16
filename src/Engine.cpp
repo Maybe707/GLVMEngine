@@ -1,6 +1,8 @@
 #include "Engine.hpp"
+#include "ISoundEngine.hpp"
 #include "ShaderProgram.hpp"
-#include "SoundEngine.hpp"
+#include "ISoundEngine.hpp"
+#include "SoundEngineFactory.hpp"
 #include "SystemManager.hpp"
 #include "Systems/AnimationSystem.hpp"
 #include "Systems/CameraSystem.hpp"
@@ -25,18 +27,19 @@
     exit(1)
 
 GLVM::Core::CEvent g_eEvent;
-GLVM::Core::CSoundEngine g_Sound_Engine;
+//GLVM::Core::CSoundEngine g_Sound_Engine;
 
 namespace GLVM::Core
 {
     CEngine* CEngine::pInstance_ = nullptr;
     std::mutex CEngine::Mutex_;
 
-    void PlaybackSound(Core::CSoundEngine& _sound_Engine)
+    void PlaybackSound(Sound::ISoundEngine* _sound_Engine)
     {
+//        _sound_Engine->SetMasterVolume(10);
         while(1)
         {
-            _sound_Engine.SoundStream();
+            _sound_Engine->SoundStream();
         }
     }
     
@@ -44,11 +47,12 @@ namespace GLVM::Core
 	{
 		Window_             = CWindowCreator().Create();
 		Chrono_             = Time::CTimerCreator().Create();
+        Sound_Engine_       = Sound::CSoundEngineFactory().CreateSoundEngine();
 
         Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
         GUI_System          = new ECS::CGUISystem();
         Renderer_System     = new ECS::CRenderSystem();
-        Movement_System     = new ECS::CMovementSystem(Input_Stack_, g_Sound_Engine);
+        Movement_System     = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
         Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System    = new ECS::CAnimationSystem();
         pProjectile_System_ = new ECS::CProjectileSystem();
@@ -114,7 +118,7 @@ namespace GLVM::Core
         pSystem_Manager->ActivateSystem(Renderer_System);
         pSystem_Manager->ActivateSystem(GUI_System);
 
-        std::thread sound_thread(PlaybackSound, std::ref(g_Sound_Engine));
+        std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
         sound_thread.detach();
         
 		while(bGame_Loop_Active)
