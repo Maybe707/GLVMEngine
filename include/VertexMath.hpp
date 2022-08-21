@@ -69,6 +69,16 @@ public:
 	Vector<T2, var2> operator*(Vector<T2, var2>& vector);
 };
 
+typedef Vector<float, 1> vec1;
+typedef Vector<float, 2> vec2;
+typedef Vector<float, 3> vec3;
+typedef Vector<float, 4> vec4;
+
+typedef Matrix<float, 1> mat1;
+typedef Matrix<float, 2> mat2;
+typedef Matrix<float, 3> mat3;
+typedef Matrix<float, 4> mat4;
+
 template<class T, int var>
 Matrix<T, var> Matrix<T, var>::operator*(Matrix& matrix)
 {
@@ -242,7 +252,7 @@ Matrix<T, var> LookAt(Matrix<T, var> matrix, Vector<T2, var2> vector)
 template <class T, class T2, int var, int var2>
 Matrix<T, var> Translate(Matrix<T, var> matrix, Vector<T2, var2> vector)
 {
-	Matrix<T, var> tempMatrix;
+	Matrix<T, var> tempMatrix(1.0f);
 	tempMatrix = matrix;
 
 	for(int i = 0; i < var; ++i)
@@ -470,8 +480,8 @@ Matrix<T, 4> FPS_View_RH(Vector<T, 3> _eye, float _pitch, float _yaw)
     return tView;
 }
 
-template <class T, int var>
-Matrix<T, var> Rotate(Matrix<T, var> matrix, Vector<T, var> vector, float angle)
+template <class T, int var, int vec_size>
+Matrix<T, var> Rotate(Matrix<T, var> matrix, Vector<T, vec_size> vector, float angle)
 {
     vector = (Normalize(vector));
 

@@ -1,5 +1,5 @@
-#ifndef RENDER_SYSTEM
-#define RENDER_SYSTEM
+#ifndef OPENGL
+#define OPENGL
 
 #include "GLPointer.h"
 #include <GL/gl.h>
@@ -16,14 +16,6 @@
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
 
-#ifdef VULKAN
-#include "
-#endif
-
-#ifdef OPENGL
-#include "GraphicAPI/Opengl.hpp"
-#endif
-
 /*! \class Renderer.
     \brief Render all game objects.
 
@@ -32,13 +24,15 @@
 
 namespace GLVM::ECS
 {    
-    class CRenderSystem : public ISystem
+    class COpenglRenderer : public ISystem
     {
 	public:
-        HelloTriangleApplication* vk_;
+	    GLuint iVbo_;
+		GLuint iVao_;
+		Shader* _Shader_Program;
 
-        CRenderSystem();
-		~CRenderSystem();
+        COpenglRenderer();
+		~COpenglRenderer();
 
 		void Update() override;
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);

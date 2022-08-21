@@ -11,8 +11,6 @@ namespace GLVM::Core
 
     class CWindowX : public IWindow
     {
-        Display* pDisp_;
-        Window Win_;
         int iNum_Fbc_ = 0;
         GLXContext (*pGLXCreateContextAttribsARB_) (Display*, GLXFBConfig,
                                                   GLXContext, Bool, const int*) = 0;
@@ -29,6 +27,8 @@ namespace GLVM::Core
         
 
     public:
+        Display* pDisp_;
+        Window Win_;
         
         CWindowX();
         ~CWindowX();

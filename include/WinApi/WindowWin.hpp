@@ -33,11 +33,12 @@ namespace GLVM::Core
         HGLRC pClassic_Context_;
         
         WNDCLASS window_Class_;
-        HWND pModern_Window_;
         HDC pModern_DC_;
         HGLRC pModern_Context_;
         
     public:
+        HWND pModern_Window_;
+        
         CWindowWin();
 
         void SwapBuffers() override;
