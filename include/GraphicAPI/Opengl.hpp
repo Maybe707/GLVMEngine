@@ -16,25 +16,42 @@
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
 
+#ifdef __linux__
+#include "UnixApi/WindowX.hpp"
+#endif
+
+#ifdef _WIN32
+#include "WinApi/WindowWin.hpp"
+#endif
+
 /*! \class Renderer.
     \brief Render all game objects.
 
     Take a game object to render in DrawSprite method.
 */
 
-namespace GLVM::ECS
+namespace GLVM::Core
 {    
-    class COpenglRenderer : public ISystem
+    class COpenglRenderer
     {
 	public:
+#ifdef __linux__
+        CWindowX Window;
+#endif
+
+#ifdef _WIN32
+        CWindowWin Window;
+#endif
+        
 	    GLuint iVbo_;
 		GLuint iVao_;
 		Shader* _Shader_Program;
+        Shader* GUI_Shader_Program_;
 
         COpenglRenderer();
 		~COpenglRenderer();
 
-		void Update() override;
+		void draw();
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };
 }

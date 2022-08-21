@@ -69,10 +69,13 @@ float aVertex_Box[VERTEX_ARRAY_RANGE] =
     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
 };
 
-namespace GLVM::ECS
+namespace GLVM::Core
 {
     COpenglRenderer::COpenglRenderer()
-	{	
+	{
+		_Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
+        GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
+        
 		// aMatrix_Ortho_[0]  = 2/1280.0f;
 		// //Matrix_Ortho[3]  -= 1;
 		// //Matrix_Ortho[7]  -= 1;
@@ -106,13 +109,18 @@ namespace GLVM::ECS
 
 	COpenglRenderer::~COpenglRenderer()
 	{
+        delete _Shader_Program;
+        _Shader_Program = nullptr;
+        delete GUI_Shader_Program_;
+        GUI_Shader_Program_ = nullptr;
+        
 		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
     
-	void COpenglRenderer::Update()
+	void COpenglRenderer::draw()
 	{
-        CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();

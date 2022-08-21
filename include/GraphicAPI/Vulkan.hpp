@@ -1,5 +1,5 @@
-#ifndef VULKAN_RENDERER
-#define VULKAN_RENDERER
+#ifndef VULKAN
+#define VULKAN
 
 #include <iostream>
 #include <fstream>

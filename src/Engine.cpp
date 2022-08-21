@@ -45,7 +45,8 @@ namespace GLVM::Core
     
     CEngine::CEngine()
 	{
-		Window_             = CWindowCreator().Create();
+//		Window_             = CWindowCreator().Create();
+        Render_System_Interface_ = new ECS::CRenderSystem();
 		Chrono_             = Time::CTimerCreator().Create();
         Sound_Engine_       = Sound::CSoundEngineFactory().CreateSoundEngine();
 
@@ -58,8 +59,8 @@ namespace GLVM::Core
         pProjectile_System_ = new ECS::CProjectileSystem();
         pCamera_System      = new ECS::CCameraSystem();
         
-		Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
-        GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
+		// Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
+        // GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
         
         fDelta_Time_        = 0.0;
         
@@ -154,9 +155,10 @@ namespace GLVM::Core
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
             Animation_System->eEvent_                     = Input_Stack_.Pop();
 			Animation_System->Delta_Time                  = fDelta_Time_;
-			Renderer_System->_Shader_Program              = Shader_Program;
-            GUI_System->_Shader_Program                   = GUI_Shader_Program_;
-            pCamera_System->Shader_Program_               = Shader_Program;
+			// Renderer_System->_Shader_Program              = Shader_Program;
+            // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
+            GUI_System->_Shader_Program                   = Render_System_Interface_->GetGlRendersystem()->GUI_Shader_Program_;
+            pCamera_System->Shader_Program_               = Render_System_Interface_->GetGlRendersystem()->_Shader_Program;
             
 			pSystem_Manager->Update();
             Window_->SwapBuffers();

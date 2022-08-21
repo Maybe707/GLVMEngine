@@ -3,6 +3,7 @@
 
 #include "GLPointer.h"
 #include <GL/gl.h>
+#include "GraphicAPI/Vulkan.hpp"
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
@@ -16,13 +17,17 @@
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
 
-#ifdef VULKAN
-#include "
-#endif
+//#define OPENGL
 
-#ifdef OPENGL
+// #ifdef VULKAN
+// #include "GraphicAPI/Vulkan.hpp"
+// #endif
+
+// #ifdef OPENGL
+// #include "GraphicAPI/Opengl.hpp"
+// #endif
+
 #include "GraphicAPI/Opengl.hpp"
-#endif
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -35,9 +40,21 @@ namespace GLVM::ECS
     class CRenderSystem : public ISystem
     {
 	public:
-        HelloTriangleApplication* vk_;
+#ifdef VULKAN
+        Core::CVulkanRenderer* vk_;
+
+        CRenderSystem(std::vector<Core::Texture> _texture_data);
+        void SetTexture(std::vector<Core::Texture> _texture_data);
+        Core::CVulkanRenderer* GetVkRenderSystem();
+#endif
+
+#ifdef OPENGL
+        Core::COpenglRenderer* gl_;
 
         CRenderSystem();
+        Core::COpenglRenderer* GetGlRendersystem();
+#endif
+
 		~CRenderSystem();
 
 		void Update() override;

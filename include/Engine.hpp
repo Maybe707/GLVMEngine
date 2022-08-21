@@ -54,6 +54,7 @@
 #include <GL/glext.h>
 #include "Constants.hpp"
 #include <mutex>
+#include "Systems/RenderSystem.hpp"
 
 using Entity = unsigned int;
 
@@ -68,10 +69,11 @@ namespace GLVM::Core
 		Time::IChrono*       Chrono_;
         Sound::ISoundEngine* Sound_Engine_;
         
-		Shader*        Shader_Program;
-        Shader*        GUI_Shader_Program_;
-		float          fDelta_Time_;
-		CStack         Input_Stack_;
+		Shader*            Shader_Program;
+        Shader*            GUI_Shader_Program_;
+		float              fDelta_Time_;
+		CStack             Input_Stack_;
+        ECS::CRenderSystem* Render_System_Interface_;
         
 		ECS::CRenderSystem*     Renderer_System;
         ECS::CCollisionSystem*  Collision_System;

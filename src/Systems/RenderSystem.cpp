@@ -1,36 +1,51 @@
 #include "Systems/RenderSystem.hpp"
-#include "ComponentManager.hpp"
-#include "Engine.hpp"
-#include "Event.hpp"
-#include "Components/TextureComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "GLPointer.h"
-#include "VectorContainer.hpp"
-#include "Components/VertexComponent.hpp"
-#include "VertexMath.hpp"
-#include "Components/ViewComponent.hpp"
-#include <GL/gl.h>
-#include <cmath>
-#include "Globals.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 
 namespace GLVM::ECS
 {
+#ifdef VULKAN
+    CRenderSystem::CRenderSystem(std::vector<Core::Texture> _texture_data)
+	{	
+        vk_ = new Core::CVulkanRenderer(_texture_data);
+        vk_->setTextureData(_texture_data);
+        vk_->run();
+	}
+
+    Core::CVulkanRenderer* GetVkRenderSystem() { return vk_; }
+#endif
+
+#ifdef OPENGL
     CRenderSystem::CRenderSystem()
 	{	
-
+        gl_ = new Core::COpenglRenderer();
 	}
 
-	CRenderSystem::~CRenderSystem()
-	{
-		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
-        pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
-	}
+    void CRenderSystem::SetTexture(std::vector<Core::Texture> _texture_data) {
+        delete vk_;
+        vk_ = nullptr;
+        vk_ = new Core::CVulkanRenderer(_texture_data);
+        vk_->setTextureData(_texture_data);
+        vk_->run();
+    }
+
+    Core::COpenglRenderer* GetGlRendersystem() { return gl_; }    
+#endif
+    
+	CRenderSystem::~CRenderSystem() {}
     
 	void CRenderSystem::Update()
 	{
+#ifdef VULKAN
+        vk_->draw();
+#endif
 
+#ifdef OPENGL
+        gl_->draw();
+#endif
 	}
 
+
+    
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
         
