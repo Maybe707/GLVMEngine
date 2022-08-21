@@ -32,7 +32,9 @@ namespace GLVM::Core
         
         CWindowX();
         ~CWindowX();
-
+        
+        Window GetWindow();
+        Display* GetDisplay();
         void CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset) override;
         void SwapBuffers() override;
         void ClearDisplay() override;
