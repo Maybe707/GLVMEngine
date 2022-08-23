@@ -94,7 +94,7 @@ namespace GLVM::Core
         static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method.
         
 		void GameLoop(ECS::CComponentManager& _ComponentManager);
-		void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
+
 		void GameKill();
 //        void PlaybackSound(Core::CSoundEngine& _sound_Engine);
 	};

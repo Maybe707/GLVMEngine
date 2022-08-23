@@ -11,10 +11,10 @@ int main()
 	Entity u_iPlayer;
 	EntityManager->CreateEntity(u_iPlayer);
     ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
-    // GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	// TexturePlayer.iWidth_ = 96; 
-	// TexturePlayer.iHeight_ = 128;
-	// TexturePlayer.u_iData_ = chelik_dat;
+    GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	TexturePlayer.iWidth_ = 96; 
+	TexturePlayer.iHeight_ = 128;
+	TexturePlayer.u_iData_ = chelik_dat;
 	// GLVM->LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager->GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
@@ -44,7 +44,7 @@ int main()
 	TextureWitch.iWidth_ = 32;
 	TextureWitch.iHeight_ = 32;
 	TextureWitch.u_iData_ = witch_dat;
-	GLVM->LoadTextureData(TextureWitch);
+//	GLVM->LoadTextureData(TextureWitch);
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
 //    GLVM::ECS::CColliderComponent& ColliderWitch1 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformWitch.tPosition[0] = 3.0f;
@@ -61,7 +61,7 @@ int main()
 	TextureWitch2.iWidth_ = 32;
 	TextureWitch2.iHeight_ = 32;
 	TextureWitch2.u_iData_ = witch_dat;
-	GLVM->LoadTextureData(TextureWitch2);
+//	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformWitch2.tPosition[0] = -0.9f;
@@ -78,7 +78,7 @@ int main()
 	TextureWitch3.iWidth_ = 32;
 	TextureWitch3.iHeight_ = 32;
 	TextureWitch3.u_iData_ = witch_dat;
-	GLVM->LoadTextureData(TextureWitch3);
+//	GLVM->LoadTextureData(TextureWitch3);
 	GLVM::ECS::STransformComponent& TransformWitch3 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch3);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformWitch3.tPosition[0] = -50.0f;

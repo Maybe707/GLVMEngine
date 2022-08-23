@@ -14,7 +14,7 @@
 #include <set>
 
 #include "VertexMath.hpp"
-#include "witch.h"
+//#include "witch.h"
 //#include "chelik.h"
 
 #ifdef __linux__
@@ -308,5 +308,6 @@ namespace GLVM::Core
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
     };
 
+};
+
 #endif
-}

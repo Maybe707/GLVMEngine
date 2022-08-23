@@ -294,6 +294,9 @@ namespace GLVM::Core
 		return false;
     }
 
+    Window CWindowX::GetWindow() { return Win_; }
+    Display* CWindowX::GetDisplay() { return pDisp_; }
+    
     void CWindowX::Close()
     {
         glXMakeCurrent(pDisp_, None, NULL);

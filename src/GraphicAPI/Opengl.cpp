@@ -131,6 +131,7 @@ namespace GLVM::Core
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
+            LoadTextureData(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
 
             SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
@@ -142,10 +143,28 @@ namespace GLVM::Core
                         
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
 
-//            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL ); 
+//            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
 	}
 
+ 	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTextureComponent& _Texture)
+	{
+		///< Loading and creating texture.
+		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
+		glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
+	
+		///< Setting texture applying parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		///< Loading image, creating texture and generation mipmap-levels
+		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
+		pGLGenerate_Mipmap(GL_TEXTURE_2D);
+
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+    
 	void COpenglRenderer::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
         Matrix<float, 4> tRotation_Matrix(1.0f);

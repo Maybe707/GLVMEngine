@@ -52,6 +52,7 @@ namespace GLVM::Core
 		~COpenglRenderer();
 
 		void draw();
+        void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };
 }

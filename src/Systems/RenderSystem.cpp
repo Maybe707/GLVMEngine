@@ -1,5 +1,4 @@
 #include "Systems/RenderSystem.hpp"
-#include "GraphicAPI/Vulkan.hpp"
 
 namespace GLVM::ECS
 {
@@ -11,7 +10,15 @@ namespace GLVM::ECS
         vk_->run();
 	}
 
-    Core::CVulkanRenderer* GetVkRenderSystem() { return vk_; }
+    void CRenderSystem::SetTexture(std::vector<Core::Texture> _texture_data) {
+        delete vk_;
+        vk_ = nullptr;
+        vk_ = new Core::CVulkanRenderer(_texture_data);
+        vk_->setTextureData(_texture_data);
+        vk_->run();
+    }
+    
+    Core::CVulkanRenderer* CRenderSystem::GetVkRenderSystem() { return vk_; }
 #endif
 
 #ifdef OPENGL
@@ -20,15 +27,7 @@ namespace GLVM::ECS
         gl_ = new Core::COpenglRenderer();
 	}
 
-    void CRenderSystem::SetTexture(std::vector<Core::Texture> _texture_data) {
-        delete vk_;
-        vk_ = nullptr;
-        vk_ = new Core::CVulkanRenderer(_texture_data);
-        vk_->setTextureData(_texture_data);
-        vk_->run();
-    }
-
-    Core::COpenglRenderer* GetGlRendersystem() { return gl_; }    
+    Core::COpenglRenderer* CRenderSystem::GetGlRendersystem() { return gl_; }    
 #endif
     
 	CRenderSystem::~CRenderSystem() {}

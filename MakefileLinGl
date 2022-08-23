@@ -1,6 +1,6 @@
 C = clang
 CC = clang++
-LDFLAGS = -lGL -lX11 -lasound
+LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi
 CXXFLAGS = -c -std=c++17 -g -Wall
 CFLAGS = -c -g -Wall
 INC = -I./include
@@ -10,7 +10,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.
 	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
 	  ./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
 	  ./src/SystemManager.cpp ./src/chelik.cpp ./src/Systems/ProjectileSystem.cpp ./src/Systems/CameraSystem.cpp \
-	  ./src/UnixApi/SoundEngineAlsa.cpp ./src/SoundEngineFactory.cpp
+	  ./src/UnixApi/SoundEngineAlsa.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Opengl.cpp ./src/GraphicAPI/Vulkan.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 

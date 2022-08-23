@@ -47,22 +47,22 @@ namespace GLVM::Core
 	{
 //		Window_             = CWindowCreator().Create();
         Render_System_Interface_ = new ECS::CRenderSystem();
-		Chrono_             = Time::CTimerCreator().Create();
-        Sound_Engine_       = Sound::CSoundEngineFactory().CreateSoundEngine();
+		Chrono_                  = Time::CTimerCreator().Create();
+        Sound_Engine_            = Sound::CSoundEngineFactory().CreateSoundEngine();
 
-        Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
-        GUI_System          = new ECS::CGUISystem();
-        Renderer_System     = new ECS::CRenderSystem();
-        Movement_System     = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
-        Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
-        Animation_System    = new ECS::CAnimationSystem();
-        pProjectile_System_ = new ECS::CProjectileSystem();
-        pCamera_System      = new ECS::CCameraSystem();
+        Collision_System         = new ECS::CCollisionSystem(Input_Stack_);
+        GUI_System               = new ECS::CGUISystem();
+//        Renderer_System          = new ECS::CRenderSystem();
+        Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
+        Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
+        Animation_System         = new ECS::CAnimationSystem();
+        pProjectile_System_      = new ECS::CProjectileSystem();
+        pCamera_System           = new ECS::CCameraSystem();
         
 		// Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
         // GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
         
-        fDelta_Time_        = 0.0;
+        fDelta_Time_             = 0.0;
         
         g_eEvent.SetEvent(eDEFAULT);
 	}
@@ -110,13 +110,15 @@ namespace GLVM::Core
 
 		///< Call of ActivateSystem function must be in this order.
 
+
         pSystem_Manager->ActivateSystem(Movement_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
         pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
         pSystem_Manager->ActivateSystem(pCamera_System);
-        pSystem_Manager->ActivateSystem(Renderer_System);
+        pSystem_Manager->ActivateSystem(Render_System_Interface_);
+        //      pSystem_Manager->ActivateSystem(Renderer_System);
         pSystem_Manager->ActivateSystem(GUI_System);
 
         std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
@@ -127,12 +129,29 @@ namespace GLVM::Core
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
             
-			Window_->ClearDisplay();
+//			Window_->ClearDisplay();
             
-            Shader_Program->Use();
-			Shader_Program->SetUniformID();
+            // Shader_Program->Use();
+			// Shader_Program->SetUniformID();
 
-			while((Window_->HandleEvent(g_eEvent)))
+// 			while((Window_->HandleEvent(g_eEvent)))
+// 			{
+// 				Input_Stack_.ControlInput(g_eEvent);
+//                 if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
+//                     bGame_Loop_Active = false;
+// 			}
+// 			g_eEvent.SetLastEvent(Input_Stack_);
+
+// //            Input_Stack_.PrintStack();
+            
+//             Window_->CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+//                                 g_eEvent.mouse_Pointer_Position_.iPosition_Y,
+//                                 &g_eEvent.mouse_Pointer_Position_.iOffset_X,
+//                                 &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
+
+            Render_System_Interface_->gl_->Window.ClearDisplay();
+            
+			while((Render_System_Interface_->gl_->Window.HandleEvent(g_eEvent)))
 			{
 				Input_Stack_.ControlInput(g_eEvent);
                 if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
@@ -142,7 +161,7 @@ namespace GLVM::Core
 
 //            Input_Stack_.PrintStack();
             
-            Window_->CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+            Render_System_Interface_->gl_->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
                                 g_eEvent.mouse_Pointer_Position_.iPosition_Y,
                                 &g_eEvent.mouse_Pointer_Position_.iOffset_X,
                                 &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
@@ -155,13 +174,14 @@ namespace GLVM::Core
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
             Animation_System->eEvent_                     = Input_Stack_.Pop();
 			Animation_System->Delta_Time                  = fDelta_Time_;
+            
 			// Renderer_System->_Shader_Program              = Shader_Program;
             // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
             GUI_System->_Shader_Program                   = Render_System_Interface_->GetGlRendersystem()->GUI_Shader_Program_;
             pCamera_System->Shader_Program_               = Render_System_Interface_->GetGlRendersystem()->_Shader_Program;
-            
+                        
 			pSystem_Manager->Update();
-            Window_->SwapBuffers();
+            Render_System_Interface_->gl_->Window.SwapBuffers();
             
 //            g_Sound_Engine.SoundStream();
 		}
@@ -182,30 +202,10 @@ namespace GLVM::Core
         // Animation_System = nullptr;
 	}
 			
- 	void CEngine::LoadTextureData(GLVM::ECS::CTextureComponent& _Texture)
-	{
-		///< Loading and creating texture.
-		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
-		glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
-	
-		///< Setting texture applying parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		
-		///< Loading image, creating texture and generation mipmap-levels
-		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
-		pGLGenerate_Mipmap(GL_TEXTURE_2D);
-
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-
 	void CEngine::GameKill()
 	{
-       Window_->Close();
-        delete Window_;
+       Render_System_Interface_->gl_->Window.Close();
         delete Chrono_;
-		Window_ = nullptr;
 		Chrono_ = nullptr;
 	}
 }

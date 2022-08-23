@@ -177,7 +177,7 @@ namespace GLVM::ECS
         rTextureProjectile.iWidth_  = 96;
         rTextureProjectile.iHeight_ = 128;
         rTextureProjectile.u_iData_ = chelik_dat;
-        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
+//        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.2f;
         // rTransformProjectile.tPosition[0] = 0.5f;

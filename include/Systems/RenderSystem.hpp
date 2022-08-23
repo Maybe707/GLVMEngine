@@ -3,7 +3,6 @@
 
 #include "GLPointer.h"
 #include <GL/gl.h>
-#include "GraphicAPI/Vulkan.hpp"
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
@@ -16,6 +15,8 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
+#include "GraphicAPI/Opengl.hpp"
+//#include "SpritesData.hpp"
 
 //#define OPENGL
 
