@@ -1,13 +1,15 @@
 #include "Systems/RenderSystem.hpp"
-#include "Components/TextureComponent.hpp"
-#include "IRenderer.hpp"
+#include "GraphicAPI/Opengl.hpp"
 
 namespace GLVM::ECS
 {
-
     CRenderSystem::CRenderSystem()
 	{
-#ifdef VULKAN
+#ifdef OPENGL_API
+        renderer_instance_ = new Core::COpenglRenderer;
+#endif
+        
+#ifdef VULKAN_API
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
@@ -23,51 +25,25 @@ namespace GLVM::ECS
         }
         
         renderer_instance_ = new Core::CVulkanRenderer(temp_vector);
-        renderer_instance_->setTextureData(temp_vector);
+        renderer_instance_->SetTextureData(temp_vector);
         renderer_instance_->run();
-#endif
-
-#ifdef OPENGL
-        renderer_instance_ = new Core::COpenglRenderer();
 #endif
 	}
 
-#ifdef VULKAN
-    void CRenderSystem::SetTexture(std::vector<ECS::CTextureComponent> _texture_data) {
+#ifdef VULKAN_API
+    void CRenderSystem::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
         delete renderer_instance_;
         renderer_instance_ = nullptr;
         renderer_instance_ = new Core::CVulkanRenderer(_texture_data);
-        renderer_instance_->setTextureData(_texture_data);
+        renderer_instance_->SetTextureData(_texture_data);
         renderer_instance_->run();
     }
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
-    
-	void CRenderSystem::Update()
-	{
-#ifdef VULKAN
-        renderer_instance_->draw();
-#endif
-
-#ifdef OPENGL
-        renderer_instance_->draw();
-#endif
-	}
-
-    Core::IRenderer* CRenderSystem::GetRenderSystemInstance()
-    {
-#ifdef VULKAN
-        return renderer_instance_;
-#endif
-
-#ifdef OPENGL
-        return renderer_instance_;
-#endif
-    }    
-    
+    void CRenderSystem::Update() { renderer_instance_->draw(); }
+    Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
-        
 	}
 }

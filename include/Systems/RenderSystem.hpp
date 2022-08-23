@@ -16,20 +16,11 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
-//#include "SpritesData.hpp"
+#include "Components/TextureComponent.hpp"
+#include "IRenderer.hpp"
 
-//#define OPENGL
-
-// #ifdef VULKAN
-// #include "GraphicAPI/Vulkan.hpp"
-// #endif
-
-// #ifdef OPENGL
-// #include "GraphicAPI/Opengl.hpp"
-// #endif
-
-#include "GraphicAPI/Opengl.hpp"
-//#include "GraphicAPI/Vulkan.hpp"
+//#include "GraphicAPI/Opengl.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -43,24 +34,17 @@ namespace GLVM::ECS
     {
     private:
         Core::IRenderer* renderer_instance_;
-#ifdef VULKAN
-    private:
-//        Core::CVulkanRenderer* vk_;
-
+        
+#ifdef VULKAN_API
     public:
-        void SetTexture(std::vector<ECS::CTextureComponent> _texture_data);
-#endif
-
-#ifdef OPENGL
-    private:
-//        Core::COpenglRenderer* gl_;
+        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
 #endif
 
     public:
+        CRenderSystem();
 		~CRenderSystem();
 
 		void Update() override;
-        CRenderSystem();
         Core::IRenderer* GetRenderSystemInstance();
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };

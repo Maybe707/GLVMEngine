@@ -6,11 +6,10 @@
 #include <GL/glx.h>
 #include "IWindow.hpp"
 
-#define OPENGL
+#define VULKAN_API
 
 namespace GLVM::Core
 {    
-
     class CWindowX : public IWindow
     {
         int iNum_Fbc_ = 0;
@@ -26,7 +25,6 @@ namespace GLVM::Core
 		GLXDrawable Drawable;
         
         //XWindowAttributes gwa_;
-        
 
     public:
         Display* pDisp_;

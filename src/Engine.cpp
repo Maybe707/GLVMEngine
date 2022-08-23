@@ -17,13 +17,13 @@
 #include <mutex>
 #include <thread>
 
-//#define VULKAN
+#define VULKAN_API
 
-#ifdef OPENGL
+#ifdef OPENGL_API
 #define RENDERER_TYPE_PTR COpenglRenderer*
 #endif
 
-#ifdef VULKAN
+#ifdef VULKAN_API
 #define RENDERER_TYPE_PTR CVulkanRenderer*
 #endif
 

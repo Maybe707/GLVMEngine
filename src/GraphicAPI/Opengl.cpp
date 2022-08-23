@@ -73,7 +73,7 @@ namespace GLVM::Core
 {
     COpenglRenderer::COpenglRenderer()
 	{
-		_Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
+		_Shader_Program     = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
         
 		// aMatrix_Ortho_[0]  = 2/1280.0f;

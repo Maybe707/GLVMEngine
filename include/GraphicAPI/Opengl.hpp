@@ -53,8 +53,6 @@ namespace GLVM::Core
 		~COpenglRenderer();
 
 		void draw() override;
-        void setTextureData(std::vector<ECS::CTextureComponent> _texture_data) override;
-        void run() override;
         void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };

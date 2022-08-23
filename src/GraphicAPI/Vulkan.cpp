@@ -89,7 +89,7 @@ namespace GLVM::Core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::setTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
+    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
         texture_data_ = _texture_data;
 
         textureImages.resize(texture_data_.size());

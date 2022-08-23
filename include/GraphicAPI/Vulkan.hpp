@@ -1,5 +1,5 @@
-#ifndef VULKAN
-#define VULKAN
+#ifndef VULKAN_RENDERER
+#define VULKAN_RENDERER
 
 #include <iostream>
 #include <fstream>
@@ -16,8 +16,6 @@
 #include "Components/TextureComponent.hpp"
 #include "IRenderer.hpp"
 #include "VertexMath.hpp"
-//#include "witch.h"
-//#include "chelik.h"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -189,7 +187,7 @@ namespace GLVM::Core
         void draw();
         void createTextureImage();
         void recreateSwapChain();
-        void setTextureData(std::vector<ECS::CTextureComponent> _texture_data);
+        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
         void run();
     
     private:

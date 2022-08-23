@@ -9,12 +9,9 @@
 #include <bits/types/wint_t.h>
 #include <iostream>
 
-
-//#define OPENGL
-
 namespace GLVM::Core
 {
-#ifdef OPENGL
+#ifdef OPENGL_API
     CWindowX::CWindowX()
     {
         const int aAttrib[] =
@@ -309,7 +306,7 @@ namespace GLVM::Core
     }
 #endif
 
-#ifdef VULKAN
+#ifdef VULKAN_API
     CWindowX::CWindowX()
     {
         const int aAttrib[] =
