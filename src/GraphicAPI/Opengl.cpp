@@ -142,7 +142,7 @@ namespace GLVM::Core
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
                         
             glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
-
+            
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
 	}
@@ -188,4 +188,7 @@ namespace GLVM::Core
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 	}
+
+    void COpenglRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {}
+    void COpenglRenderer::run() {}
 }

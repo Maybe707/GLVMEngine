@@ -17,7 +17,7 @@
 #include <mutex>
 #include <thread>
 
-#define VULKAN_API
+#define OPENGL_API
 
 #ifdef OPENGL_API
 #define RENDERER_TYPE_PTR COpenglRenderer*
@@ -26,10 +26,6 @@
 #ifdef VULKAN_API
 #define RENDERER_TYPE_PTR CVulkanRenderer*
 #endif
-
-// #ifdef VULKAN
-// #define RENDERER_TYPE_PTR CVulkanRenderer *
-// #endif
 
 /*******************************************************************
  * Legends never die...
@@ -126,16 +122,15 @@ namespace GLVM::Core
 
 		///< Call of ActivateSystem function must be in this order.
 
-
         pSystem_Manager->ActivateSystem(Movement_System);
 		pSystem_Manager->ActivateSystem(Collision_System);
         pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
-        //      pSystem_Manager->ActivateSystem(pCamera_System);
+        pSystem_Manager->ActivateSystem(pCamera_System);
         pSystem_Manager->ActivateSystem(Render_System_Interface_);
         //      pSystem_Manager->ActivateSystem(Renderer_System);
-//        pSystem_Manager->ActivateSystem(GUI_System);
+        pSystem_Manager->ActivateSystem(GUI_System);
 
         std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
         sound_thread.detach();
@@ -193,8 +188,8 @@ namespace GLVM::Core
             
 			// Renderer_System->_Shader_Program              = Shader_Program;
             // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
-            // GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-            // pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
+            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
                         
 			pSystem_Manager->Update();
             ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();

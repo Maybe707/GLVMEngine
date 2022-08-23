@@ -1,12 +1,11 @@
 #include "Systems/RenderSystem.hpp"
-#include "GraphicAPI/Opengl.hpp"
 
 namespace GLVM::ECS
 {
     CRenderSystem::CRenderSystem()
 	{
 #ifdef OPENGL_API
-        renderer_instance_ = new Core::COpenglRenderer;
+        renderer_instance_ = new Core::COpenglRenderer();
 #endif
         
 #ifdef VULKAN_API

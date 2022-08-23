@@ -4,6 +4,7 @@
 
 int main()
 {
+    GLVM::Core::CEngine*          GLVM             = GLVM::Core::CEngine::GetInstance();
     GLVM::ECS::CEntityManager*    EntityManager = GLVM::ECS::CEntityManager::GetInstance();
     GLVM::ECS::CComponentManager* ComponentManager = GLVM::ECS::CComponentManager::GetInstance();
     
@@ -15,7 +16,7 @@ int main()
 	TexturePlayer.iHeight_ = 96;
 	TexturePlayer.u_iData_ = chelik_dat;
     TexturePlayer.dat_length_ = chelik_dat_len;
-	// GLVM->LoadTextureData(TexturePlayer);
+	//GLVM->LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager->GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager->GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
@@ -100,8 +101,6 @@ int main()
     // TransformWitch3.tPosition[0] = 5.0f;
     // TransformWitch3.tPosition[1] = 1.0f;
     // TransformWitch3.tPosition[2] = 0.0f;
-
-	GLVM::Core::CEngine*          GLVM             = GLVM::Core::CEngine::GetInstance();
     
     ///< Game rendering loop
 	GLVM->GameLoop();

@@ -19,8 +19,8 @@
 #include "Components/TextureComponent.hpp"
 #include "IRenderer.hpp"
 
-//#include "GraphicAPI/Opengl.hpp"
-#include "GraphicAPI/Vulkan.hpp"
+#include "GraphicAPI/Opengl.hpp"
+//#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
