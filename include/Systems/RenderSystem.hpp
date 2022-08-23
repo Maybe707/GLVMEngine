@@ -46,14 +46,14 @@ namespace GLVM::ECS
 
         CRenderSystem(std::vector<Core::Texture> _texture_data);
         void SetTexture(std::vector<Core::Texture> _texture_data);
-        Core::CVulkanRenderer* GetVkRenderSystem();
+        Core::CVulkanRenderer* GetRenderSystemInstance();
 #endif
 
 #ifdef OPENGL
         Core::COpenglRenderer* gl_;
 
         CRenderSystem();
-        Core::COpenglRenderer* GetGlRendersystem();
+        Core::COpenglRenderer* GetRenderSystemInstance();
 #endif
 
 		~CRenderSystem();

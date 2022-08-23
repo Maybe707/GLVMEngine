@@ -177,11 +177,11 @@ namespace GLVM::Core
             
 			// Renderer_System->_Shader_Program              = Shader_Program;
             // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
-            GUI_System->_Shader_Program                   = Render_System_Interface_->GetGlRendersystem()->GUI_Shader_Program_;
-            pCamera_System->Shader_Program_               = Render_System_Interface_->GetGlRendersystem()->_Shader_Program;
+            GUI_System->_Shader_Program                   = Render_System_Interface_->GetRenderSystemInstance()->GUI_Shader_Program_;
+            pCamera_System->Shader_Program_               = Render_System_Interface_->GetRenderSystemInstance()->_Shader_Program;
                         
 			pSystem_Manager->Update();
-            Render_System_Interface_->gl_->Window.SwapBuffers();
+            Render_System_Interface_->GetRenderSystemInstance()->Window.SwapBuffers();
             
 //            g_Sound_Engine.SoundStream();
 		}
@@ -204,7 +204,7 @@ namespace GLVM::Core
 			
 	void CEngine::GameKill()
 	{
-       Render_System_Interface_->gl_->Window.Close();
+        Render_System_Interface_->GetRenderSystemInstance()->Window.Close();
         delete Chrono_;
 		Chrono_ = nullptr;
 	}

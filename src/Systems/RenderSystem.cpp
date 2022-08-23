@@ -18,7 +18,7 @@ namespace GLVM::ECS
         vk_->run();
     }
     
-    Core::CVulkanRenderer* CRenderSystem::GetVkRenderSystem() { return vk_; }
+    Core::CVulkanRenderer* CRenderSystem::GetRenderSystemInstance() { return vk_; }
 #endif
 
 #ifdef OPENGL
@@ -27,7 +27,7 @@ namespace GLVM::ECS
         gl_ = new Core::COpenglRenderer();
 	}
 
-    Core::COpenglRenderer* CRenderSystem::GetGlRendersystem() { return gl_; }    
+    Core::COpenglRenderer* CRenderSystem::GetRenderSystemInstance() { return gl_; }    
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
@@ -43,7 +43,7 @@ namespace GLVM::ECS
 #endif
 	}
 
-
+    
     
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
