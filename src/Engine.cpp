@@ -17,8 +17,6 @@
 #include <mutex>
 #include <thread>
 
-#define OPENGL_API
-
 #ifdef OPENGL_API
 #define RENDERER_TYPE_PTR COpenglRenderer*
 #endif
@@ -64,36 +62,17 @@ namespace GLVM::Core
 
         Collision_System         = new ECS::CCollisionSystem(Input_Stack_);
         GUI_System               = new ECS::CGUISystem();
-//        Renderer_System          = new ECS::CRenderSystem();
         Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
         Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System         = new ECS::CAnimationSystem();
         pProjectile_System_      = new ECS::CProjectileSystem();
         pCamera_System           = new ECS::CCameraSystem();
         
-		// Shader_Program      = new Shader("../Shader.vs", "../Shader.fs");
-        // GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
-        
         fDelta_Time_             = 0.0;
-        
         g_eEvent.SetEvent(eDEFAULT);
 	}
 
-	CEngine::~CEngine()
-	{
-		// delete Renderer_System;
-		// delete Shader_Program;
-		// delete Movement_System;
-        // delete Physics_System_;
-        // delete GUI_System;
-        // delete Animation_System;
-        // Renderer_System  = nullptr;
-        // Shader_Program   = nullptr;
-        // Physics_System_  = nullptr;
-        // Movement_System  = nullptr;
-        // GUI_System       = nullptr;
-        // Animation_System = nullptr;
-	}
+	CEngine::~CEngine() {}
             
     CEngine* CEngine::GetInstance()
     {
@@ -109,13 +88,6 @@ namespace GLVM::Core
 	{
         ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
 
-        // ECS::CCollisionSystem* Collision_System    = new ECS::CCollisionSystem(Input_Stack_);
-        // ECS::CGUISystem*       GUI_System          = new ECS::CGUISystem();
-        // ECS::CRenderSystem*    Renderer_System     = new ECS::CRenderSystem();
-        // ECS::CMovementSystem*  Movement_System     = new ECS::CMovementSystem(Input_Stack_);
-        // ECS::CPhysicsSystem*   Physics_System_     = new ECS::CPhysicsSystem(Input_Stack_);
-        // ECS::CAnimationSystem* Animation_System    = new ECS::CAnimationSystem();
-
 		float fAnimation_Delta            = 0.0f;
 		bool bGame_Loop_Active            = true;
 		Animation_System->Animation_Delta = fAnimation_Delta;
@@ -127,10 +99,9 @@ namespace GLVM::Core
         pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
-        pSystem_Manager->ActivateSystem(pCamera_System);
+//        pSystem_Manager->ActivateSystem(pCamera_System);
         pSystem_Manager->ActivateSystem(Render_System_Interface_);
-        //      pSystem_Manager->ActivateSystem(Renderer_System);
-        pSystem_Manager->ActivateSystem(GUI_System);
+        //      pSystem_Manager->ActivateSystem(GUI_System);
 
         std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
         sound_thread.detach();
@@ -140,26 +111,6 @@ namespace GLVM::Core
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
             
-//			Window_->ClearDisplay();
-            
-            // Shader_Program->Use();
-			// Shader_Program->SetUniformID();
-
-// 			while((Window_->HandleEvent(g_eEvent)))
-// 			{
-// 				Input_Stack_.ControlInput(g_eEvent);
-//                 if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
-//                     bGame_Loop_Active = false;
-// 			}
-// 			g_eEvent.SetLastEvent(Input_Stack_);
-
-// //            Input_Stack_.PrintStack();
-            
-//             Window_->CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
-//                                 g_eEvent.mouse_Pointer_Position_.iPosition_Y,
-//                                 &g_eEvent.mouse_Pointer_Position_.iOffset_X,
-//                                 &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
-
             ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
 			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
@@ -181,36 +132,17 @@ namespace GLVM::Core
 			Movement_System->_Anim_Event                  = g_eEvent.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
             Physics_System_->fDelta_Time_                 = fDelta_Time_;
-//            std::cout << "Delta: " << fDelta_Time_ << std::endl;
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
             Animation_System->eEvent_                     = Input_Stack_.Pop();
 			Animation_System->Delta_Time                  = fDelta_Time_;
-            
-			// Renderer_System->_Shader_Program              = Shader_Program;
-            // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
-            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
+//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
                         
 			pSystem_Manager->Update();
             ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
             
 //            g_Sound_Engine.SoundStream();
 		}
-
-        // delete pSystem_Manager;
-        // delete Renderer_System;
-		// delete Shader_Program;
-		// delete Movement_System;
-        // delete Physics_System_;
-        // delete GUI_System;
-        // delete Animation_System;
-        // pSystem_Manager  = nullptr;
-        // Renderer_System  = nullptr;
-        // Shader_Program   = nullptr;
-        // Physics_System_  = nullptr;
-        // Movement_System  = nullptr;
-        // GUI_System       = nullptr;
-        // Animation_System = nullptr;
 	}
 			
 	void CEngine::GameKill()

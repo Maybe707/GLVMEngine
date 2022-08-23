@@ -4,7 +4,6 @@
 
 int main()
 {
-    GLVM::Core::CEngine*          GLVM             = GLVM::Core::CEngine::GetInstance();
     GLVM::ECS::CEntityManager*    EntityManager = GLVM::ECS::CEntityManager::GetInstance();
     GLVM::ECS::CComponentManager* ComponentManager = GLVM::ECS::CComponentManager::GetInstance();
     
@@ -101,6 +100,8 @@ int main()
     // TransformWitch3.tPosition[0] = 5.0f;
     // TransformWitch3.tPosition[1] = 1.0f;
     // TransformWitch3.tPosition[2] = 0.0f;
+
+    GLVM::Core::CEngine*          GLVM             = GLVM::Core::CEngine::GetInstance();
     
     ///< Game rendering loop
 	GLVM->GameLoop();
