@@ -20,6 +20,7 @@ namespace GLVM::ECS
 		unsigned int iWidth_;
 		unsigned int iHeight_;
 		unsigned int iNrChannels_;
+        unsigned int dat_length_;
 		const unsigned char* u_iData_;
 	};
 }

@@ -3,6 +3,7 @@
 
 #include "GLPointer.h"
 #include <GL/gl.h>
+#include "IRenderer.hpp"
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
@@ -32,7 +33,7 @@
 
 namespace GLVM::Core
 {    
-    class COpenglRenderer
+    class COpenglRenderer : public IRenderer
     {
 	public:
 #ifdef __linux__

@@ -1,24 +1,39 @@
 #include "Systems/RenderSystem.hpp"
+#include "Components/TextureComponent.hpp"
+#include "GraphicAPI/Vulkan.hpp"
+#include "IRenderer.hpp"
 
 namespace GLVM::ECS
 {
 #ifdef VULKAN
-    CRenderSystem::CRenderSystem(std::vector<Core::Texture> _texture_data)
-	{	
-        vk_ = new Core::CVulkanRenderer(_texture_data);
-        vk_->setTextureData(_texture_data);
-        vk_->run();
+    CRenderSystem::CRenderSystem()
+	{
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
+            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
+        unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+
+        std::cout << "Size: " << uiVector_Texture_Size << std::endl;
+        
+        std::vector<ECS::CTextureComponent> temp_vector;
+        for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
+        {
+            unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
+            temp_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
+        }
+        
+        renderer_instance_ = new Core::CVulkanRenderer(temp_vector);
+        renderer_instance_->setTextureData(temp_vector);
+        renderer_instance_->run();
 	}
 
-    void CRenderSystem::SetTexture(std::vector<Core::Texture> _texture_data) {
-        delete vk_;
-        vk_ = nullptr;
-        vk_ = new Core::CVulkanRenderer(_texture_data);
-        vk_->setTextureData(_texture_data);
-        vk_->run();
+    void CRenderSystem::SetTexture(std::vector<ECS::CTextureComponent> _texture_data) {
+        delete renderer_instance_;
+        renderer_instance_ = nullptr;
+        renderer_instance_ = new Core::CVulkanRenderer(_texture_data);
+        renderer_instance_->setTextureData(_texture_data);
+        renderer_instance_->run();
     }
-    
-    Core::CVulkanRenderer* CRenderSystem::GetRenderSystemInstance() { return vk_; }
 #endif
 
 #ifdef OPENGL
@@ -26,8 +41,6 @@ namespace GLVM::ECS
 	{	
         gl_ = new Core::COpenglRenderer();
 	}
-
-    Core::COpenglRenderer* CRenderSystem::GetRenderSystemInstance() { return gl_; }    
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
@@ -35,7 +48,7 @@ namespace GLVM::ECS
 	void CRenderSystem::Update()
 	{
 #ifdef VULKAN
-        vk_->draw();
+        renderer_instance_->draw();
 #endif
 
 #ifdef OPENGL
@@ -43,7 +56,16 @@ namespace GLVM::ECS
 #endif
 	}
 
-    
+    Core::IRenderer* CRenderSystem::GetRenderSystemInstance()
+    {
+#ifdef VULKAN
+        return renderer_instance_;
+#endif
+
+#ifdef OPENGL
+        return gl_;
+#endif
+    }    
     
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{

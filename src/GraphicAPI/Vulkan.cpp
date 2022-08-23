@@ -1,4 +1,5 @@
 #include "GraphicAPI/Vulkan.hpp"
+#include "Components/TextureComponent.hpp"
 
 namespace GLVM::Core
 {    
@@ -18,7 +19,7 @@ namespace GLVM::Core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<Texture> _texture_data) {
+    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data) {
         texture_data_ = _texture_data;
 
         textureImages.resize(texture_data_.size());
@@ -42,10 +43,10 @@ namespace GLVM::Core
 
         for(int i = 0; i < texture_data_.size(); ++i)
         {
-            VkDeviceSize imageSize = texture_data_[i].textureSize_;
-            unsigned char* pixels = texture_data_[i].textureData_;
-            texWidth = 64;
-            texHeight = 64;
+            VkDeviceSize imageSize = texture_data_[i].dat_length_;
+            const unsigned char* pixels = texture_data_[i].u_iData_;
+            texWidth = texture_data_[i].iWidth_;
+            texHeight = texture_data_[i].iHeight_;
 
             if (!pixels) {
                 throw std::runtime_error("failed to load texture image!");
@@ -88,7 +89,7 @@ namespace GLVM::Core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::setTextureData(std::vector<Texture> _texture_data) {
+    void CVulkanRenderer::setTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
         texture_data_ = _texture_data;
 
         textureImages.resize(texture_data_.size());
@@ -510,8 +511,8 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::createGraphicsPipeline() {
-        auto vertShaderCode = readFile("shaders/vert.spv");
-        auto fragShaderCode = readFile("shaders/frag.spv");
+        auto vertShaderCode = readFile("../shaders/vert.spv");
+        auto fragShaderCode = readFile("../shaders/frag.spv");
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

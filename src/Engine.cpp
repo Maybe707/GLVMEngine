@@ -1,5 +1,7 @@
 #include "Engine.hpp"
 #include "ISoundEngine.hpp"
+#include "GraphicAPI/Opengl.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 #include "ShaderProgram.hpp"
 #include "ISoundEngine.hpp"
 #include "SoundEngineFactory.hpp"
@@ -14,7 +16,21 @@
 #include "Systems/RenderSystem.hpp"
 #include <mutex>
 #include <thread>
-                  
+
+#define VULKAN
+
+#ifdef OPENGL
+#define RENDERER_TYPE_PTR COpenglRenderer*
+#endif
+
+#ifdef VULKAN
+#define RENDERER_TYPE_PTR CVulkanRenderer*
+#endif
+
+// #ifdef VULKAN
+// #define RENDERER_TYPE_PTR CVulkanRenderer *
+// #endif
+
 /*******************************************************************
  * Legends never die...
  * You are about to face most terrifying data structures of all time.
@@ -93,7 +109,7 @@ namespace GLVM::Core
         return pInstance_;
     }
 
-	void CEngine::GameLoop(ECS::CComponentManager& _ComponentManager)
+	void CEngine::GameLoop()
 	{
         ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
 
@@ -116,10 +132,10 @@ namespace GLVM::Core
         pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
-        pSystem_Manager->ActivateSystem(pCamera_System);
+        //      pSystem_Manager->ActivateSystem(pCamera_System);
         pSystem_Manager->ActivateSystem(Render_System_Interface_);
         //      pSystem_Manager->ActivateSystem(Renderer_System);
-        pSystem_Manager->ActivateSystem(GUI_System);
+//        pSystem_Manager->ActivateSystem(GUI_System);
 
         std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
         sound_thread.detach();
@@ -149,9 +165,9 @@ namespace GLVM::Core
 //                                 &g_eEvent.mouse_Pointer_Position_.iOffset_X,
 //                                 &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
 
-            Render_System_Interface_->gl_->Window.ClearDisplay();
+            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
-			while((Render_System_Interface_->gl_->Window.HandleEvent(g_eEvent)))
+			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
 			{
 				Input_Stack_.ControlInput(g_eEvent);
                 if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
@@ -161,7 +177,7 @@ namespace GLVM::Core
 
 //            Input_Stack_.PrintStack();
             
-            Render_System_Interface_->gl_->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
                                 g_eEvent.mouse_Pointer_Position_.iPosition_Y,
                                 &g_eEvent.mouse_Pointer_Position_.iOffset_X,
                                 &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
@@ -177,11 +193,11 @@ namespace GLVM::Core
             
 			// Renderer_System->_Shader_Program              = Shader_Program;
             // GUI_System->_Shader_Program                   = GUI_Shader_Program_;
-            GUI_System->_Shader_Program                   = Render_System_Interface_->GetRenderSystemInstance()->GUI_Shader_Program_;
-            pCamera_System->Shader_Program_               = Render_System_Interface_->GetRenderSystemInstance()->_Shader_Program;
+            // GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+            // pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
                         
 			pSystem_Manager->Update();
-            Render_System_Interface_->GetRenderSystemInstance()->Window.SwapBuffers();
+            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
             
 //            g_Sound_Engine.SoundStream();
 		}
@@ -204,7 +220,7 @@ namespace GLVM::Core
 			
 	void CEngine::GameKill()
 	{
-        Render_System_Interface_->GetRenderSystemInstance()->Window.Close();
+        ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.Close();
         delete Chrono_;
 		Chrono_ = nullptr;
 	}

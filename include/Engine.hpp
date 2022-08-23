@@ -87,13 +87,16 @@ namespace GLVM::Core
         CEngine();
         
 	public:
+        GLVM::ECS::CEntityManager*    EntityManager_;
+        GLVM::ECS::CComponentManager* ComponentManager_;
+        
         ~CEngine();
         
         CEngine(CEngine& _engine) = delete;                   ///< Dont need to make cope because of singleton property.
         void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
         static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method.
         
-		void GameLoop(ECS::CComponentManager& _ComponentManager);
+		void GameLoop();
 
 		void GameKill();
 //        void PlaybackSound(Core::CSoundEngine& _sound_Engine);

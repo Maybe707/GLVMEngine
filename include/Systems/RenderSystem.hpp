@@ -3,6 +3,7 @@
 
 #include "GLPointer.h"
 #include <GL/gl.h>
+#include "IRenderer.hpp"
 #include "ISystem.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
@@ -15,7 +16,6 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
-#include "GraphicAPI/Opengl.hpp"
 //#include "SpritesData.hpp"
 
 //#define OPENGL
@@ -28,7 +28,8 @@
 // #include "GraphicAPI/Opengl.hpp"
 // #endif
 
-#include "GraphicAPI/Opengl.hpp"
+//#include "GraphicAPI/Opengl.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -40,25 +41,27 @@ namespace GLVM::ECS
 {    
     class CRenderSystem : public ISystem
     {
-	public:
+    private:
+        Core::IRenderer* renderer_instance_;
 #ifdef VULKAN
-        Core::CVulkanRenderer* vk_;
+    private:
+//        Core::CVulkanRenderer* vk_;
 
-        CRenderSystem(std::vector<Core::Texture> _texture_data);
-        void SetTexture(std::vector<Core::Texture> _texture_data);
-        Core::CVulkanRenderer* GetRenderSystemInstance();
+    public:
+        void SetTexture(std::vector<ECS::CTextureComponent> _texture_data);
 #endif
 
 #ifdef OPENGL
-        Core::COpenglRenderer* gl_;
-
-        CRenderSystem();
-        Core::COpenglRenderer* GetRenderSystemInstance();
+    private:
+//        Core::COpenglRenderer* gl_;
 #endif
 
+    public:
 		~CRenderSystem();
 
 		void Update() override;
+        CRenderSystem();
+        Core::IRenderer* GetRenderSystemInstance();
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
     };
 }

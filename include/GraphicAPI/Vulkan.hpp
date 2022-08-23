@@ -13,6 +13,8 @@
 #include <optional>
 #include <set>
 
+#include "Components/TextureComponent.hpp"
+#include "IRenderer.hpp"
 #include "VertexMath.hpp"
 //#include "witch.h"
 //#include "chelik.h"
@@ -169,31 +171,37 @@ namespace GLVM::Core
         20, 21, 22, 22, 23, 20
     };
 
-    class CVulkanRenderer {
+    class CVulkanRenderer : public IRenderer {
     public:
-        CVulkanRenderer(std::vector<Texture> _texture_data);
+        std::vector<ECS::CTextureComponent> texture_data_;
+        
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+        GLVM::Core::CWindowX Window;
+#endif
+    
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+        GLVM::Core::CWindowWin Window;
+#endif
+        
+        CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data);
         ~CVulkanRenderer();
     
         void draw();
         void createTextureImage();
         void recreateSwapChain();
-        void setTextureData(std::vector<Texture> _texture_data);
+        void setTextureData(std::vector<ECS::CTextureComponent> _texture_data);
         void run();
     
     private:
-        std::vector<Texture> texture_data_;
-
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        GLVM::Core::CWindowX Window;
         VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         VkWin32SurfaceCreateInfoKHR createWin32SurfaceInfo;
-        GLVM::Core::CWindowWin Window;
 #endif
     
         VkSurfaceKHR surface;
