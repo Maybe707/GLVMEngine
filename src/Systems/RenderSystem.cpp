@@ -1,13 +1,13 @@
 #include "Systems/RenderSystem.hpp"
 #include "Components/TextureComponent.hpp"
-#include "GraphicAPI/Vulkan.hpp"
 #include "IRenderer.hpp"
 
 namespace GLVM::ECS
 {
-#ifdef VULKAN
+
     CRenderSystem::CRenderSystem()
 	{
+#ifdef VULKAN
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
@@ -25,8 +25,14 @@ namespace GLVM::ECS
         renderer_instance_ = new Core::CVulkanRenderer(temp_vector);
         renderer_instance_->setTextureData(temp_vector);
         renderer_instance_->run();
+#endif
+
+#ifdef OPENGL
+        renderer_instance_ = new Core::COpenglRenderer();
+#endif
 	}
 
+#ifdef VULKAN
     void CRenderSystem::SetTexture(std::vector<ECS::CTextureComponent> _texture_data) {
         delete renderer_instance_;
         renderer_instance_ = nullptr;
@@ -34,13 +40,6 @@ namespace GLVM::ECS
         renderer_instance_->setTextureData(_texture_data);
         renderer_instance_->run();
     }
-#endif
-
-#ifdef OPENGL
-    CRenderSystem::CRenderSystem()
-	{	
-        gl_ = new Core::COpenglRenderer();
-	}
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
@@ -52,7 +51,7 @@ namespace GLVM::ECS
 #endif
 
 #ifdef OPENGL
-        gl_->draw();
+        renderer_instance_->draw();
 #endif
 	}
 
@@ -63,7 +62,7 @@ namespace GLVM::ECS
 #endif
 
 #ifdef OPENGL
-        return gl_;
+        return renderer_instance_;
 #endif
     }    
     

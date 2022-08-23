@@ -87,8 +87,7 @@ namespace GLVM::Core
         CEngine();
         
 	public:
-        GLVM::ECS::CEntityManager*    EntityManager_;
-        GLVM::ECS::CComponentManager* ComponentManager_;
+
         
         ~CEngine();
         

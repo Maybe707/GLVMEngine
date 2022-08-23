@@ -17,7 +17,7 @@
 #include <mutex>
 #include <thread>
 
-#define VULKAN
+//#define VULKAN
 
 #ifdef OPENGL
 #define RENDERER_TYPE_PTR COpenglRenderer*

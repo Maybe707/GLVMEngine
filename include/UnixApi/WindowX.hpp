@@ -6,6 +6,8 @@
 #include <GL/glx.h>
 #include "IWindow.hpp"
 
+#define OPENGL
+
 namespace GLVM::Core
 {    
 

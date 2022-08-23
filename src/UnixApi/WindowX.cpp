@@ -9,7 +9,7 @@
 #include <bits/types/wint_t.h>
 #include <iostream>
 
-#define VULKAN
+
 //#define OPENGL
 
 namespace GLVM::Core
