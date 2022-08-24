@@ -21,7 +21,7 @@ int main()
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager->GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
     GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager->GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     ColliderPlayer.bPush_Collission = true;
-    TransformPlayer.fScale = 0.5f;
+    TransformPlayer.fScale = 0.1f;
     TransformPlayer.tPosition[0] = 0.1f;
 	TransformPlayer.tPosition[1] = 0.1f;
 	TransformPlayer.tPosition[2] = 0.1f;
@@ -51,7 +51,7 @@ int main()
     TransformWitch.tPosition[0] = 0.3f;
     TransformWitch.tPosition[1] = 0.3f;
     TransformWitch.tPosition[2] = 0.3f;
-    TransformWitch.fScale = 0.5f;
+    TransformWitch.fScale = 0.1f;
     // ColliderWitch1.aColliders_Container_[0].bGround_Collision_ = false;
     // ColliderWitch1.aColliders_Container_[0].bWall_Collision_ = false;
 
@@ -69,7 +69,7 @@ int main()
     TransformWitch2.tPosition[0] = 0.5f;
     TransformWitch2.tPosition[1] = 0.5f;
     TransformWitch2.tPosition[2] = 0.5f;
-    TransformWitch2.fScale = 0.5f;
+    TransformWitch2.fScale = 0.1f;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
 
@@ -87,7 +87,7 @@ int main()
     TransformWitch3.tPosition[0] = 0.7f;
     TransformWitch3.tPosition[1] = 0.7f;
     TransformWitch3.tPosition[2] = 0.7f;
-    TransformWitch3.fScale = 0.5f;
+    TransformWitch3.fScale = 0.1f;
     
     // Entity u_iWitch3;
 	// EntityManager.CreateEntity(u_iWitch3);

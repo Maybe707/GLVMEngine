@@ -1,5 +1,6 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace GLVM::Core
 {    
@@ -1164,7 +1165,7 @@ namespace GLVM::Core
         }
     }
 
-    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, vec3 translateVec) {
+    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ECS::STransformComponent _transformComponent) {
         static auto startTime = std::chrono::high_resolution_clock::now();
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -1178,13 +1179,13 @@ namespace GLVM::Core
         // scaling_matrix = mat4(1.0f);
         // ubo.model = translation_matrix * scaling_matrix;
 
-        ubo.model[0][0] = 1.0f;
-        ubo.model[1][1] = 1.0f;
-        ubo.model[2][2] = 1.0f;
-        ubo.model[3][3] = 1.0f;
-        ubo.model[0][3] = translateVec[0];
-        ubo.model[1][3] = translateVec[1];
-        ubo.model[2][3] = translateVec[2];
+        ubo.model[0][0] = _transformComponent.fScale;
+        ubo.model[1][1] = _transformComponent.fScale;
+        ubo.model[2][2] = _transformComponent.fScale;
+        ubo.model[3][3] = 1.0;
+        ubo.model[0][3] = _transformComponent.tPosition[0];
+        ubo.model[1][3] = _transformComponent.tPosition[1];
+        ubo.model[2][3] = _transformComponent.tPosition[2];
         mat4 mat = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.5), time * 90);
         ubo.model = ubo.model * mat;
         ubo.model.SelfTensorTranspose();
@@ -1227,7 +1228,7 @@ namespace GLVM::Core
         for (int i = 0; i < texture_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
             if(i % 2 == 0)
                 transform_index = i / 2;
-            updateUniformBuffer(currentFrame + i, transform_data_[transform_index].tPosition);
+            updateUniformBuffer(currentFrame + i, transform_data_[transform_index]);
         }
         
         vkResetFences(device, 1, &inFlightFences[currentFrame]);

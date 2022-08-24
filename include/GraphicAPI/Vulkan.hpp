@@ -301,7 +301,7 @@ namespace GLVM::Core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateUniformBuffer(uint32_t currentImage, vec3 translateVec);
+        void updateUniformBuffer(uint32_t currentImage, ECS::STransformComponent _transformComponent);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
