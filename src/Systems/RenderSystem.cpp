@@ -14,7 +14,7 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
-        std::cout << "Size: " << uiVector_Texture_Size << std::endl;
+//        std::cout << "Size: " << uiVector_Texture_Size << std::endl;
         
         std::vector<ECS::CTextureComponent> temp_vector;
         for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
