@@ -38,6 +38,10 @@ namespace GLVM::Core
         vkDeviceWaitIdle(device);
     }
 
+    void CVulkanRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
+        transform_data_ = _transform_data;
+    }
+    
     void CVulkanRenderer::createTextureImage() {
         int texWidth, texHeight, texChannels;
 
@@ -1160,7 +1164,7 @@ namespace GLVM::Core
         }
     }
 
-    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, vec4 translateVec) {
+    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, vec3 translateVec) {
         static auto startTime = std::chrono::high_resolution_clock::now();
 
         auto currentTime = std::chrono::high_resolution_clock::now();
@@ -1219,10 +1223,11 @@ namespace GLVM::Core
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        float rand_val = 0;
-        for (int i = 0; i < texture_data_.size() * 2; i = i +2) {
-            rand_val = (float)i / 7;
-            updateUniformBuffer(currentFrame + i, vec4(rand_val, rand_val, rand_val, 0.0f));
+        int transform_index = 0;
+        for (int i = 0; i < texture_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
+            if(i % 2 == 0)
+                transform_index = i / 2;
+            updateUniformBuffer(currentFrame + i, transform_data_[transform_index].tPosition);
         }
         
         vkResetFences(device, 1, &inFlightFences[currentFrame]);

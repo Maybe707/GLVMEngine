@@ -14,6 +14,7 @@
 #include <set>
 
 #include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "IRenderer.hpp"
 #include "VertexMath.hpp"
 
@@ -172,6 +173,7 @@ namespace GLVM::Core
     class CVulkanRenderer : public IRenderer {
     public:
         std::vector<ECS::CTextureComponent> texture_data_;
+        std::vector<ECS::STransformComponent> transform_data_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         GLVM::Core::CWindowX Window;
@@ -185,6 +187,7 @@ namespace GLVM::Core
         ~CVulkanRenderer();
     
         void draw();
+        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data);
         void createTextureImage();
         void recreateSwapChain();
         void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
@@ -298,7 +301,7 @@ namespace GLVM::Core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateUniformBuffer(uint32_t currentImage, vec4 translateVec);
+        void updateUniformBuffer(uint32_t currentImage, vec3 translateVec);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

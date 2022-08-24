@@ -1,4 +1,7 @@
 #include "Systems/RenderSystem.hpp"
+#include "ComponentManager.hpp"
+#include "Components/TransformComponent.hpp"
+#include "VectorContainer.hpp"
 
 namespace GLVM::ECS
 {
@@ -14,17 +17,25 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
-//        std::cout << "Size: " << uiVector_Texture_Size << std::endl;
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTransform =
+            ECS::GetInnerIDsContainer<ECS::STransformComponent>(*pComponent_Manager);
+        unsigned int uiVector_Transform_Size = pEntity_Container_refTransform->GetSize();
         
-        std::vector<ECS::CTextureComponent> temp_vector;
-        for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
-        {
-            unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
-            temp_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
+        std::vector<ECS::CTextureComponent> temp_texture_vector;
+        for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i) {
+            unsigned int uiEntity_refTexture = (*pEntity_Container_refTexture)[i];
+            temp_texture_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
+        }
+
+        std::vector<ECS::STransformComponent> temp_transform_vector;
+        for(int i = 0, iSize = uiVector_Transform_Size; i < iSize; ++i) {
+            unsigned int uiEntity_refTransform = (*pEntity_Container_refTransform)[i];
+            temp_transform_vector.push_back(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTransform));
         }
         
-        renderer_instance_ = new Core::CVulkanRenderer(temp_vector);
-        renderer_instance_->SetTextureData(temp_vector);
+        renderer_instance_ = new Core::CVulkanRenderer(temp_texture_vector);
+        renderer_instance_->SetTextureData(temp_texture_vector);
+        renderer_instance_->SetTransformData(temp_transform_vector);
         renderer_instance_->run();
 #endif
 	}
@@ -36,6 +47,10 @@ namespace GLVM::ECS
         renderer_instance_ = new Core::CVulkanRenderer(_texture_data);
         renderer_instance_->SetTextureData(_texture_data);
         renderer_instance_->run();
+    }
+
+    void CRenderSystem::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
+        renderer_instance_->SetTransformData(_transform_data); 
     }
 #endif
     

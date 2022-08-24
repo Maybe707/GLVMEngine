@@ -38,6 +38,7 @@ namespace GLVM::ECS
 #ifdef VULKAN_API
     public:
         void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
+        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data);
 #endif
 
     public:
