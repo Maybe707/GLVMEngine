@@ -186,16 +186,21 @@ namespace GLVM::Core
         CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data);
         ~CVulkanRenderer();
     
-        void draw();
-        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data);
+
         void createTextureImage();
         void recreateSwapChain();
-        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
-        void run();
+        void draw() override;
+        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;
+        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) override;
+        void SetViewMatrix(mat4 _viewMatrix) override;
+        void SetProjectionMatrix(mat4 _projectionMatrix) override;
+        void run() override;
     
     private:
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
+        mat4 viewMatrix;
+        mat4 projectionMatrix;
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;

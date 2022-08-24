@@ -2,6 +2,7 @@
 #include "ComponentManager.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VectorContainer.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ECS
 {
@@ -16,26 +17,16 @@ namespace GLVM::ECS
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
-
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTransform =
-            ECS::GetInnerIDsContainer<ECS::STransformComponent>(*pComponent_Manager);
-        unsigned int uiVector_Transform_Size = pEntity_Container_refTransform->GetSize();
         
         std::vector<ECS::CTextureComponent> temp_texture_vector;
         for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i) {
             unsigned int uiEntity_refTexture = (*pEntity_Container_refTexture)[i];
             temp_texture_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
         }
-
-        std::vector<ECS::STransformComponent> temp_transform_vector;
-        for(int i = 0, iSize = uiVector_Transform_Size; i < iSize; ++i) {
-            unsigned int uiEntity_refTransform = (*pEntity_Container_refTransform)[i];
-            temp_transform_vector.push_back(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTransform));
-        }
         
         renderer_instance_ = new Core::CVulkanRenderer(temp_texture_vector);
         renderer_instance_->SetTextureData(temp_texture_vector);
-        renderer_instance_->SetTransformData(temp_transform_vector);
+        SetTransformData();
         renderer_instance_->run();
 #endif
 	}
@@ -49,15 +40,41 @@ namespace GLVM::ECS
         renderer_instance_->run();
     }
 
-    void CRenderSystem::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
-        renderer_instance_->SetTransformData(_transform_data); 
+    void CRenderSystem::SetTransformData() {
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTransform =
+            ECS::GetInnerIDsContainer<ECS::STransformComponent>(*pComponent_Manager);
+        unsigned int uiVector_Transform_Size = pEntity_Container_refTransform->GetSize();
+
+        std::vector<ECS::STransformComponent> temp_transform_vector;
+        for(int i = 0, iSize = uiVector_Transform_Size; i < iSize; ++i) {
+            unsigned int uiEntity_refTransform = (*pEntity_Container_refTransform)[i];
+            temp_transform_vector.push_back(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTransform));
+        }
+        
+        renderer_instance_->SetTransformData(temp_transform_vector); 
     }
+#endif
+
+#ifdef OPENGL_API
+    void CRenderSystem::SetTransformData() {}
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
-    void CRenderSystem::Update() { renderer_instance_->draw(); }
+    void CRenderSystem::Update() {
+        SetTransformData();
+        renderer_instance_->draw();
+    }
     Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    
 	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{
 	}
+
+    void CRenderSystem::SetViewMatrix(mat4 _viewMatrix) {
+        renderer_instance_->SetViewMatrix(_viewMatrix);
+    }
+    
+    void CRenderSystem::SetProjectionMatrix(mat4 _projectionMatrix) {
+        renderer_instance_->SetProjectionMatrix(_projectionMatrix);
+    }
 }

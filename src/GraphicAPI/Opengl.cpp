@@ -189,6 +189,23 @@ namespace GLVM::Core
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 	}
 
+    void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {
+        _Shader_Program->Use();
+        _Shader_Program->SetUniformID();
+        
+        unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
+        pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
+    }
+
+    void COpenglRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
+        unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
+		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
+    }
+    
     void COpenglRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {}
     void COpenglRenderer::run() {}
+
+    void COpenglRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
+        
+    }
 }

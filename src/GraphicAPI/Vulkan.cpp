@@ -42,6 +42,14 @@ namespace GLVM::Core
     void CVulkanRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
         transform_data_ = _transform_data;
     }
+
+    void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
+        viewMatrix = _viewMatrix;
+    }
+    
+    void CVulkanRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
+        projectionMatrix = _projectionMatrix;
+    }
     
     void CVulkanRenderer::createTextureImage() {
         int texWidth, texHeight, texChannels;
@@ -1187,12 +1195,13 @@ namespace GLVM::Core
         ubo.model[1][3] = _transformComponent.tPosition[1];
         ubo.model[2][3] = _transformComponent.tPosition[2];
         mat4 mat = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.5), time * 90);
-        ubo.model = ubo.model * mat;
+//        ubo.model = ubo.model * mat;
         ubo.model.SelfTensorTranspose();
         
 //        ubo.model = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.1), 0.0);
 //        ubo.view = LookAtRH(vec3(2.0f, 2.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.1f));
-        ubo.view = LookAtRH(vec3(0.8f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+//        ubo.view = LookAtRH(vec3(0.8f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+        ubo.view = viewMatrix;
         mat4 tProjection_Matrix(1.0);
         float f = 10, n = 0.1;
         float fov = 90;
@@ -1204,6 +1213,7 @@ namespace GLVM::Core
         tProjection_Matrix[3][2] = -((f * n) / (f - n));
         ubo.proj = tProjection_Matrix;
         ubo.proj[1][1] *= -1;
+        ubo.proj = projectionMatrix;
 
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);

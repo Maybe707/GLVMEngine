@@ -56,6 +56,7 @@ namespace GLVM::Core
     CEngine::CEngine()
 	{
 //		Window_             = CWindowCreator().Create();
+        //   Render_System_Interface_ = new ECS::CRenderSystem();
         Render_System_Interface_ = new ECS::CRenderSystem();
 		Chrono_                  = Time::CTimerCreator().Create();
         Sound_Engine_            = Sound::CSoundEngineFactory().CreateSoundEngine();
@@ -99,7 +100,7 @@ namespace GLVM::Core
         pSystem_Manager->ActivateSystem(pProjectile_System_);
         pSystem_Manager->ActivateSystem(Physics_System_);
 		pSystem_Manager->ActivateSystem(Animation_System);
-//        pSystem_Manager->ActivateSystem(pCamera_System);
+        pSystem_Manager->ActivateSystem(pCamera_System);
         pSystem_Manager->ActivateSystem(Render_System_Interface_);
         //      pSystem_Manager->ActivateSystem(GUI_System);
 
@@ -137,7 +138,8 @@ namespace GLVM::Core
 			Animation_System->Delta_Time                  = fDelta_Time_;
 //            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 //            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
-                        
+            pCamera_System->Render_System_                = Render_System_Interface_;
+            
 			pSystem_Manager->Update();
             ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
             

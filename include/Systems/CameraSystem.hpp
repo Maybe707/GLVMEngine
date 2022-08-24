@@ -6,6 +6,7 @@
 #include "Components/ViewComponent.hpp"
 #include "ShaderProgram.hpp"
 #include "Globals.hpp"
+#include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
 
 namespace GLVM::ECS
@@ -13,6 +14,7 @@ namespace GLVM::ECS
     class CCameraSystem : public ISystem
     {
     public:
+        CRenderSystem* Render_System_;
         Shader* Shader_Program_;
         Matrix<float, 4> tProjection_Matrix{1.0f};
 

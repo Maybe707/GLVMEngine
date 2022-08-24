@@ -1,4 +1,5 @@
 #include "Systems/CameraSystem.hpp"
+#include "Systems/RenderSystem.hpp"
 
 namespace GLVM::ECS
 {
@@ -9,8 +10,8 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
-        Shader_Program_->Use();
-        Shader_Program_->SetUniformID();
+        // Shader_Program_->Use();
+        // Shader_Program_->SetUniformID();
         
         ECS::STransformComponent* Player_Transform_Component;
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
@@ -49,13 +50,10 @@ namespace GLVM::ECS
                                _Player.tPosition + _view_Component.Front_Camera,
                                _view_Component.Up_Camera);
 
-        // tView_Matrix = FPS_View_RH(_Player.tPosition,
-        //                        fPitch,
-        //                        fYaw);
-        
-        unsigned int uiTransform_View = pGLGet_Uniform_Location(Shader_Program_->iID, "aView_Matrix");
-        pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
+        // unsigned int uiTransform_View = pGLGet_Uniform_Location(Shader_Program_->iID, "aView_Matrix");
+        // pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
 
+        Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
     }
 
@@ -70,7 +68,6 @@ namespace GLVM::ECS
         tProjection_Matrix[2][3] = -1;
         tProjection_Matrix[3][2] = -((f * n) / (f - n));
         
-		unsigned int uiTransformt = pGLGet_Uniform_Location(Shader_Program_->iID, "aProjection_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
+        Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}
 }
