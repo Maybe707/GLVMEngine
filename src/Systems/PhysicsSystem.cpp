@@ -81,7 +81,7 @@ namespace GLVM::ECS
     {
         for(int n = 0; n < 5; ++n)
         {
-            float cameraSpeed = static_cast<float>(2.5 * _fDelta_Time);
+            float cameraSpeed = static_cast<float>(5.5 * _fDelta_Time);
             bool bDiagonal_Movement_Availability = false;
             ///< Check diagonal movement.
             bDiagonal_Movement_Availability = FixDiagonalMoveReverse(Input_Stack_,

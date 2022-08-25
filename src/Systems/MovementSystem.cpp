@@ -30,7 +30,7 @@ namespace GLVM::ECS
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
 
-        float cameraSpeed = 0.5f * _dOffset;            
+        float cameraSpeed = 5.5f * _dOffset;            
         int counter = 0;
 
         if(fProjectile_Accumulator_ > 0)
