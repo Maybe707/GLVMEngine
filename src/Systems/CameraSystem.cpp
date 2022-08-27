@@ -59,7 +59,7 @@ namespace GLVM::ECS
 
     void CCameraSystem::SetProjectionMatrix()
 	{
-        float f = 10, n = 0.1;
+        float f = 10, n = -0.7;
         float fov = 90;
         float S = 1 / std::tan((fov/2) * (PI / 180));
         tProjection_Matrix[0][0] = S;
@@ -67,6 +67,15 @@ namespace GLVM::ECS
         tProjection_Matrix[2][2] = -(f / (f - n));
         tProjection_Matrix[2][3] = -1;
         tProjection_Matrix[3][2] = -((f * n) / (f - n));
+        
+        // mat4 fix_matrix(1.0f);
+        // fix_matrix[0][0] = 1.0f;
+        // fix_matrix[1][1] = -1.0f;
+        // fix_matrix[2][2] = 0.5f;
+        // fix_matrix[3][2] = 0.5f;
+        // fix_matrix[3][3] = 1.0f;
+
+        // tProjection_Matrix = tProjection_Matrix * fix_matrix;
         
         Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}

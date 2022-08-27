@@ -1,6 +1,7 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include <cstdlib>
 
 namespace GLVM::Core
 {    
@@ -12,7 +13,7 @@ namespace GLVM::Core
             return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
     }
-
+    
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr) {
@@ -392,7 +393,7 @@ namespace GLVM::Core
         if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
             imageCount = swapChainSupport.capabilities.maxImageCount;
         }
-        std::cout << "Image count: " << imageCount << std::endl;
+
         VkSwapchainCreateInfoKHR createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         createInfo.surface = surface;
@@ -1194,8 +1195,9 @@ namespace GLVM::Core
         ubo.model[0][3] = _transformComponent.tPosition[0];
         ubo.model[1][3] = _transformComponent.tPosition[1];
         ubo.model[2][3] = _transformComponent.tPosition[2];
-        mat4 mat = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.5), time * 90);
-//        ubo.model = ubo.model * mat;
+        mat4 mat = Rotate(mat4(1.0), vec3(0.5, 0.0, 0.0), time * 90);
+        ubo.model = ubo.model * mat;
+
         ubo.model.SelfTensorTranspose();
         
 //        ubo.model = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.1), 0.0);
@@ -1212,8 +1214,8 @@ namespace GLVM::Core
         tProjection_Matrix[2][3] = -1;
         tProjection_Matrix[3][2] = -((f * n) / (f - n));
         ubo.proj = tProjection_Matrix;
-        ubo.proj[1][1] *= -1;
         ubo.proj = projectionMatrix;
+        ubo.proj[1][1] *= -1;
 
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);

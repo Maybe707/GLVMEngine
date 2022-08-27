@@ -4,7 +4,6 @@
 
 int main()
 {
-
     GLVM::ECS::CEntityManager*    EntityManager = GLVM::ECS::CEntityManager::GetInstance();
     GLVM::ECS::CComponentManager* ComponentManager = GLVM::ECS::CComponentManager::GetInstance();
     
