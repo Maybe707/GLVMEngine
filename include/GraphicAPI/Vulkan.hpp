@@ -35,13 +35,20 @@
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-#include "../../../Vulkan-Headers/include/vulkan/vulkan.h"
-#include "../../../Vulkan-Headers/include/vulkan/vulkan_core.h"
+#include "../../../../Vulkan-Headers/include/vulkan/vulkan.h"
+#include "../../../../Vulkan-Headers/include/vulkan/vulkan_core.h"
 #include "WinApi/WindowWin.hpp"
+//#include "WinApi/winVk.hpp"
 #endif
 
+// #ifdef NDEBUG
+// #define WNDCLASS 0xc018
+// #else
+// #define WNDCLASS "static"
+// #endif
+
 namespace GLVM::Core
-{    
+{
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
 
@@ -213,6 +220,7 @@ namespace GLVM::Core
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         GLVM::Core::CWindowWin Window;
+//        GLVM::Core::CWindowVkWin Window{"window", 1920, 1080};
 #endif
         
         CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data);

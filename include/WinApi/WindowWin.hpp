@@ -1,3 +1,6 @@
+#ifndef WINDOW_WIN
+#define WINDOW_WIN
+
 #include "IWindow.hpp"
 #include <stdio.h>
 #include <wchar.h>
@@ -6,6 +9,8 @@
 #include <GL/gl.h>
 #include "glext.h"
 #include "GLPointer.h"
+
+#define VULKAN_API
 
 namespace GLVM::Core
 {
@@ -35,10 +40,9 @@ namespace GLVM::Core
         WNDCLASS window_Class_;
         HDC pModern_DC_;
         HGLRC pModern_Context_;
-        
-    public:
         HWND pModern_Window_;
         
+    public:
         CWindowWin();
 
         void SwapBuffers() override;
@@ -51,4 +55,6 @@ namespace GLVM::Core
         ///< Callback method for events handling.
         static LRESULT CALLBACK MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam);
     }; // namespace GLVM::Core
-}    
+}
+
+#endif

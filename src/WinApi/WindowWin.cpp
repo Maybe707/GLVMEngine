@@ -9,12 +9,9 @@
 #define VK_A 0x41
 #define VK_D 0x44
 
-//#define VULKAN
-#define OPENGL
-
 namespace GLVM::Core
 {
-#ifdef OPENGL
+#ifdef OPENGL_API
     CWindowWin::CWindowWin()
     {
         ///< Create classic window
@@ -138,6 +135,9 @@ namespace GLVM::Core
 		PostQuitMessage(0);
     }
 
+    HWND CWindowWin::GetClassicWindowHWND() { return pClassic_Window_; }
+    HWND CWindowWin::GetModernWindowHWND() { return pModern_Window_; }
+    
     void CWindowWin::CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset)
     {
         POINT point_position{960, 540};
@@ -333,71 +333,43 @@ namespace GLVM::Core
     }
 #endif
 
-#ifdef VULKAN
+#ifdef VULKAN_API
     CWindowWin::CWindowWin()
     {
-        ///< Create classic window
-        pClassic_Window_ = CreateWindowA( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1, NULL, NULL, GetModuleHandle( NULL ), NULL );
-        pClassic_DC_ = GetDC( pClassic_Window_ );
-
-        ///< Set classic pixel format
-        PIXELFORMATDESCRIPTOR classic_Format_Descriptor =
-            {
-                sizeof( classic_Format_Descriptor ), 1, PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-                PFD_TYPE_RGBA, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 8, 0, PFD_MAIN_PLANE,
-                0, 0, 0, 0
-            };
+        const char* _title = "Window class";
+        int _width = 1920, _height = 1080;
         
-        int iClassic_Pixel_Format = ChoosePixelFormat( pClassic_DC_, &classic_Format_Descriptor );
-        SetPixelFormat( pClassic_DC_, iClassic_Pixel_Format, &classic_Format_Descriptor );
-
-        ///< Create final pixel format
-        const int aPixel_Attribs[] =
-            {
-                WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-                WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-                WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-                WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-                WGL_COLOR_BITS_ARB, 32,
-                WGL_DEPTH_BITS_ARB, 24,
-                WGL_STENCIL_BITS_ARB, 8,
-                0
-            };
-
-        const char aClass_Name[] = "Sample Window Class";
-            
-        window_Class_ = { };
-
-        window_Class_.style = WS_VISIBLE;
-//        window_Class_.lpfnWndProc = MainWndProc;
+        // Register the window class for the main window.
+        window_Class_.style = 0;
+//        wc.lpfnWndProc = procedure;
+        window_Class_.lpfnWndProc = MainWndProc;
         window_Class_.cbClsExtra = 0;
         window_Class_.cbWndExtra = 0;
+        window_Class_.hInstance = NULL;
         window_Class_.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        window_Class_.hCursor = LoadCursor(NULL, IDC_SIZE);
-        window_Class_.lpszClassName = (LPCSTR)aClass_Name;
-        window_Class_.hInstance = GetModuleHandleA(NULL);
-        window_Class_.lpszClassName = aClass_Name;
+        window_Class_.hCursor = LoadCursor(NULL, IDC_ARROW);
+        window_Class_.hbrBackground = NULL;
+        window_Class_.lpszMenuName = NULL;
+        window_Class_.lpszClassName = "Window class";
 
-        RegisterClass(&window_Class_);
-        
-        pModern_Window_ = CreateWindowEx(0, aClass_Name, "Sample Window Class", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, GetModuleHandleA(NULL), NULL);
-        ShowWindow(pModern_Window_, SW_SHOW);
-        pModern_DC_ = GetDC( pModern_Window_ );
-        
-        int iModern_Pixel_Format;
-        UINT pFormat_Count;
-        SetPixelFormat( pModern_DC_, iModern_Pixel_Format, &classic_Format_Descriptor );
-		
-        ///< Create modern OpenGL 4.2 context		
-        int aAttributes[] =
-        {
-            WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-            WGL_CONTEXT_MINOR_VERSION_ARB, 2,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-            0
-        };
-		
-		const int kInterval = 1;
+        RegisterClassA(&window_Class_);
+
+        DWORD style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+
+        RECT rect;
+        SetRect(&rect, 0, 0, _width, _height);
+        AdjustWindowRect(&rect, style, FALSE);
+
+        // Create the main window.
+        pModern_Window_ = CreateWindowA("Window class",
+                              _title,
+                              style, CW_USEDEFAULT, CW_USEDEFAULT,
+                              rect.right - rect.left, rect.bottom - rect.top, (HWND)NULL,
+                              (HMENU)NULL, NULL, (LPVOID)NULL);
+
+        // Show the window and paint its contents.
+        ShowWindow(pModern_Window_, SW_SHOWDEFAULT);
+        UpdateWindow(pModern_Window_);
     }
 
     void CWindowWin::SwapBuffers()

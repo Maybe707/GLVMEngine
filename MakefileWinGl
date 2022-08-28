@@ -1,6 +1,6 @@
 CC = x86_64-w64-mingw32-g++
-LDFLAGS = -lgdi32 -lopengl32 -lwinmm
-CXXFLAGS = -c -std=c++17 -g -Wall
+LDFLAGS = -I/home/cyber-demon/.wine/drive_c/VulkanSDK/1.3.224.1/Include -L/home/cyber-demon/.wine/drive_c/VulkanSDK/1.3.224.1/Lib -lopengl32 -lwinmm -lvulkan-1
+CXXFLAGS = -c -std=c++17 -g -Wall -I/home/cyber-demon/.wine/drive_c/VulkanSDK/1.3.224.1/Include
 CFLAGS = -c -g -Wall
 INC = -I./include
 BUILD = build
@@ -9,14 +9,14 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.
 	./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
 	./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
 	./src/SystemManager.cpp ./src/chelik.cpp ./src/Systems/ProjectileSystem.cpp ./src/Systems/CameraSystem.cpp \
-	./src/WinApi/SoundEngineWaveform.cpp ./src/SoundEngineFactory.cpp
+	./src/WinApi/SoundEngineWaveform.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Opengl.cpp ./src/GraphicAPI/Vulkan.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = winGame
 
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(OBJECTS) $(LDFLAGS) -o $(BUILD)/$@
+	$(CC) $(OBJECTS) $(LDFLAGS) -lm -mwindows -o $(BUILD)/$@ -lvulkan-1
 
 $(BUILD)/%.o : ./src/%.cpp
 	mkdir -p $(@D)

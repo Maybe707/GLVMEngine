@@ -134,7 +134,7 @@ namespace GLVM::Core
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         createWin32SurfaceInfo.hwnd = Window.GetModernWindowHWND();
         
-        createWin32SurfaceInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+        createWin32SurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
         createWin32SurfaceInfo.pNext = nullptr;
         createWin32SurfaceInfo.flags = 0;
 #endif
@@ -239,7 +239,7 @@ namespace GLVM::Core
 
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);
-        Window.Close();
+//        Window.Close();
     }
 
     void CVulkanRenderer::createInstance() {
@@ -1196,7 +1196,7 @@ namespace GLVM::Core
         ubo.model[1][3] = _transformComponent.tPosition[1];
         ubo.model[2][3] = _transformComponent.tPosition[2];
         mat4 mat = Rotate(mat4(1.0), vec3(0.5, 0.0, 0.0), time * 90);
-        ubo.model = ubo.model * mat;
+//        ubo.model = ubo.model * mat;
 
         ubo.model.SelfTensorTranspose();
         
@@ -1435,9 +1435,12 @@ namespace GLVM::Core
     }
 
     std::vector<const char*> CVulkanRenderer::getRequiredExtensions() {
-        std::vector<const char*> pRequiredExtentions = {"VK_KHR_xlib_surface",
-            "VK_EXT_acquire_xlib_display", "VK_KHR_display", "VK_KHR_surface",
-            "VK_EXT_direct_mode_display"};
+        // std::vector<const char*> pRequiredExtentions = {"VK_KHR_xlib_surface",
+        //     "VK_EXT_acquire_xlib_display", "VK_KHR_display", "VK_KHR_surface",
+        //     "VK_EXT_direct_mode_display"};
+
+        std::vector<const char*> pRequiredExtentions = {"VK_KHR_win32_surface",
+            "VK_KHR_surface"};
 
         if (enableValidationLayers) {
             pRequiredExtentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
