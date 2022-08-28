@@ -1435,12 +1435,16 @@ namespace GLVM::Core
     }
 
     std::vector<const char*> CVulkanRenderer::getRequiredExtensions() {
-        // std::vector<const char*> pRequiredExtentions = {"VK_KHR_xlib_surface",
-        //     "VK_EXT_acquire_xlib_display", "VK_KHR_display", "VK_KHR_surface",
-        //     "VK_EXT_direct_mode_display"};
+#ifdef VK_USE_PLATFORM_XLIB_KHR
+        std::vector<const char*> pRequiredExtentions = {"VK_KHR_xlib_surface",
+            "VK_EXT_acquire_xlib_display", "VK_KHR_display", "VK_KHR_surface",
+            "VK_EXT_direct_mode_display"};
+#endif
 
+#ifdef VK_USE_PLATFORM_WIN32_KHR
         std::vector<const char*> pRequiredExtentions = {"VK_KHR_win32_surface",
             "VK_KHR_surface"};
+#endif
 
         if (enableValidationLayers) {
             pRequiredExtentions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
