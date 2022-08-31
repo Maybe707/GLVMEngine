@@ -10,7 +10,7 @@
 #include "glext.h"
 #include "GLPointer.h"
 
-#define OPENGL_API
+#define VULKAN_API
 
 namespace GLVM::Core
 {

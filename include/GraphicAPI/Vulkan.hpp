@@ -212,6 +212,7 @@ namespace GLVM::Core
     class CVulkanRenderer : public IRenderer {
     public:
         std::vector<ECS::CTextureComponent> texture_data_;
+        std::vector<ECS::CTextureComponent> texture_load_data_;
         std::vector<ECS::STransformComponent> transform_data_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
@@ -228,6 +229,7 @@ namespace GLVM::Core
     
 
         void createTextureImage();
+        void LoadTextureData();
         void recreateSwapChain();
         void draw() override;
         void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;

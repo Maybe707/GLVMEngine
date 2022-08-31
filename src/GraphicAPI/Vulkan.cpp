@@ -2,6 +2,7 @@
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include <cstdlib>
+#include <vulkan/vulkan_core.h>
 
 namespace GLVM::Core
 {    
@@ -22,13 +23,20 @@ namespace GLVM::Core
     }
 
     CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data) {
-        texture_data_ = _texture_data;
+//        texture_data_ = _texture_data;
 
-        textureImages.resize(texture_data_.size());
-        textureImageMemories.resize(texture_data_.size());
+        texture_data_.resize(_texture_data.size() * 10);
+        for(int i = 0; i < texture_data_.size() / _texture_data.size(); ++i)
+            for(int j = 0; j < _texture_data.size(); ++j) {
+                texture_data_[i * _texture_data.size() + j] = _texture_data[j];
+            }
+        
+        textureImages.resize(texture_data_.size() * 10);
+        textureImageMemories.resize(texture_data_.size() * 10);
 
-        textureImageViews.resize(texture_data_.size());
-        textureSamplers.resize(texture_data_.size());
+        textureImageViews.resize(texture_data_.size() * 10);
+        textureSamplers.resize(texture_data_.size() * 10);
+        LoadTextureData();
     }
     
     CVulkanRenderer::~CVulkanRenderer() {
@@ -50,6 +58,40 @@ namespace GLVM::Core
     
     void CVulkanRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
         projectionMatrix = _projectionMatrix;
+    }
+
+    void CVulkanRenderer::LoadTextureData() {
+        int texWidth, texHeight, texChannels;
+
+        for(int i = 0; i < texture_load_data_.size(); ++i)
+        {
+            VkDeviceSize imageSize = texture_load_data_[i].dat_length_;
+            const unsigned char* pixels = texture_load_data_[i].u_iData_;
+            texWidth = texture_load_data_[i].iWidth_;
+            texHeight = texture_load_data_[i].iHeight_;
+
+            if (!pixels) {
+                throw std::runtime_error("failed to load texture image!");
+            }
+
+            VkBuffer stagingBufferForTextureLoading;
+            VkDeviceMemory stagingBufferMemoryForTextureLoading;
+            createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBufferForTextureLoading, stagingBufferMemoryForTextureLoading);
+
+            void* data;
+            vkMapMemory(device, stagingBufferMemoryForTextureLoading, 0, imageSize, 0, &data);
+            memcpy(data, pixels, static_cast<size_t>(imageSize));
+            vkUnmapMemory(device, stagingBufferMemoryForTextureLoading);
+
+//            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
+
+            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            copyBufferToImage(stagingBufferForTextureLoading, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+            vkDestroyBuffer(device, stagingBufferForTextureLoading, nullptr);
+            vkFreeMemory(device, stagingBufferMemoryForTextureLoading, nullptr);
+        }
     }
     
     void CVulkanRenderer::createTextureImage() {
@@ -105,13 +147,13 @@ namespace GLVM::Core
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
-        texture_data_ = _texture_data;
+        texture_load_data_ = _texture_data;
 
-        textureImages.resize(texture_data_.size());
-        textureImageMemories.resize(texture_data_.size());
+        // textureImages.resize(texture_load_data_.size());
+        // textureImageMemories.resize(texture_load_data_.size());
 
-        textureImageViews.resize(texture_data_.size());
-        textureSamplers.resize(texture_data_.size());
+        // textureImageViews.resize(texture_load_data_.size());
+        // textureSamplers.resize(texture_load_data_.size());
     }
 
     void CVulkanRenderer::run() {
@@ -734,8 +776,8 @@ namespace GLVM::Core
 
             VkSamplerCreateInfo samplerInfo{};
             samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerInfo.magFilter = VK_FILTER_LINEAR;
-            samplerInfo.minFilter = VK_FILTER_LINEAR;
+            samplerInfo.magFilter = VK_FILTER_NEAREST;
+            samplerInfo.minFilter = VK_FILTER_NEAREST;
             samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
             samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
             samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -1141,7 +1183,7 @@ namespace GLVM::Core
 
         vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-        for (int i = 0; i < texture_data_.size() * 2; i = i + 2) {
+        for (int i = 0; i < texture_load_data_.size() * 2; i = i + 2) {
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame + i], 0, nullptr);
             vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
         }
@@ -1235,14 +1277,14 @@ namespace GLVM::Core
         } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
-
+        std::cout << "Number of tex: " << texture_load_data_.size() << std::endl;
         int transform_index = 0;
-        for (int i = 0; i < texture_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
+        for (int i = 0; i < texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
             if(i % 2 == 0)
                 transform_index = i / 2;
+            std::cout << "ITER: " << i << std::endl;
             updateUniformBuffer(currentFrame + i, transform_data_[transform_index]);
         }
-        
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
         vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);

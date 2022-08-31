@@ -20,8 +20,8 @@
 #include "IRenderer.hpp"
 #include <mutex>
 
-#include "GraphicAPI/Opengl.hpp"
-//#include "GraphicAPI/Vulkan.hpp"
+//#include "GraphicAPI/Opengl.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -38,7 +38,7 @@ namespace GLVM::ECS
         
 #ifdef VULKAN_API
     public:
-        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data);
+        void SetTextureData();
 #endif
 
     public:

@@ -14,7 +14,6 @@
 #include "Globals.hpp"
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
-#include "chelik.hpp"
 #include "ISoundEngine.hpp"
 
 namespace GLVM::ECS
@@ -37,37 +36,18 @@ namespace GLVM::ECS
         CMovementSystem(Core::CStack& _input_Stack, Core::Sound::ISoundEngine* _sound_Engine);
         
 		void Update();
-
-        Vector<float, 3> GetDirectionVector(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
-        
         void CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
-                                 float cameraSpeed,
-                                 CViewComponent& view_Component,
-                                 Core::CStack& Input_Stack_,
-                                 int n);
+                                 CViewComponent& view_Component);
         
         bool CompareDirection(Core::CStack& _input_Stack,
                               Core::EEvents _event0,
                               Core::EEvents _event1);
         void DiscardOpposite(Core::CStack& _input_Stack);
-        Vector<float, 3> CalculateVectorRL(STransformComponent _transform_Component,
+        Vector<float, 3> CalculateVectorRL(ECS::CViewComponent& _view_Component);
+        Vector<float, 3> CalculateVectorFB(SMoveComponent& _move_Component,
                                            ECS::CViewComponent& _view_Component,
-                                           SMoveComponent& _move_Component,
-                                           float _camera_Speed,
-                                           Core::EEvents _current_Event);
-        Vector<float, 3> CalculateVectorFB(STransformComponent _transform_Component,
-                                           SMoveComponent& _move_Component,
-                                           float _camera_Speed,
-                                           ECS::CViewComponent& _view_Component,
-                                           Core::CEvent& _event,
-                                           Core::EEvents _current_Event);
-        Vector<float, 3> CalculateForwardVectorProjectile(STransformComponent _transform_Component,
-                                                          SMoveComponent& _move_Component,
-                                                          float _camera_Speed,
-                                                          ECS::CViewComponent& _view_Component,
-                                                          Core::CEvent& _event,
-                                                          Core::EEvents _current_Event);
+                                           Core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
                                            ECS::CViewComponent& _view_Component,
                                            Core::CEvent& _event,

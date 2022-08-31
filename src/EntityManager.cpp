@@ -36,17 +36,16 @@ namespace GLVM::ECS
 
     /**************************************************************************************
      * Dont need to delete real component in this method. Because systems dont work with
-     * component without indices forthat component in ordered container.
+     * component without indices for that component in ordered container.
      **************************************************************************************/
         
-    void CEntityManager::RemoveEntity(Entity_ID& _Entity_ID, CComponentManager& _ComponentManager)
+    void CEntityManager::RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager)
     {
         tRemoved_Entity_Registry_.Push(_Entity_ID);
         tActive_Entity_Registry_[_Entity_ID] = k_iUint_Max;  
-        for(int i = 0, iSize = _ComponentManager.tWorld_IDs_Container.GetSize();
-            i < iSize; ++i)
-        {
-            static_cast<Core::TCVectorContainer<unsigned int>*>(_ComponentManager.tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);
+        for(int i = 0, iSize = _ComponentManager->tWorld_IDs_Container.GetSize();
+            i < iSize; ++i) {
+            static_cast<Core::TCVectorContainer<unsigned int>*>(_ComponentManager->tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);
         }
     }
 }

@@ -66,7 +66,7 @@ namespace GLVM::Core
         Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
         Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
         Animation_System         = new ECS::CAnimationSystem();
-        pProjectile_System_      = new ECS::CProjectileSystem();
+        pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
         pCamera_System           = new ECS::CCameraSystem();
         
         fDelta_Time_             = 0.0;
@@ -96,8 +96,8 @@ namespace GLVM::Core
 		///< Call of ActivateSystem function must be in this order.
 
         pSystem_Manager->ActivateSystem(Movement_System);
-		pSystem_Manager->ActivateSystem(Collision_System);
         pSystem_Manager->ActivateSystem(pProjectile_System_);
+		pSystem_Manager->ActivateSystem(Collision_System);
         pSystem_Manager->ActivateSystem(Physics_System_);
 //		pSystem_Manager->ActivateSystem(Animation_System);
         pSystem_Manager->ActivateSystem(pCamera_System);
@@ -132,10 +132,11 @@ namespace GLVM::Core
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Movement_System->_Anim_Event                  = g_eEvent.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
+            pProjectile_System_->_dOffset                 = fDelta_Time_;
             Physics_System_->fDelta_Time_                 = fDelta_Time_;
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
             Animation_System->eEvent_                     = Input_Stack_.Pop();
-			Animation_System->Delta_Time                  = fDelta_Time_;
+			Animation_System->Delta_Time                  = fDelta_Time_;            
 //            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 //            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
             pCamera_System->Render_System_                = Render_System_Interface_;

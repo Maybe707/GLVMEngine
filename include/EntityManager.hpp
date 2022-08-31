@@ -27,7 +27,7 @@ namespace GLVM::ECS
         
 		void CreateEntity(Entity_ID& _Entity_ID);
 
-        void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager& _ComponentManager);
+        void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager);
 	};
 }
 

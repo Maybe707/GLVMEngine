@@ -5,59 +5,106 @@
 #include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
 #include <Systems/ProjectileSystem.hpp>
+#include "Stack.hpp"
 
 namespace GLVM::ECS
 {
+    CProjectileSystem::CProjectileSystem(Core::CStack& _input_Stack) : Input_Stack_ (_input_Stack)
+    {}
+    
     void CProjectileSystem::Update()
     {
         CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         CEntityManager* pEntity_Manager       = GLVM::ECS::CEntityManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
-            GetInnerIDsContainer<CProjectileComponent>(*pComponent_Manager);
-        unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
-
+    
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
             ECS::GetInnerIDsContainer<ECS::SMoveComponent>(*pComponent_Manager);
+        unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
+
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
             ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
-//        std::cout << "Projectiles size: " << uiVector_Projectile_Size << std::endl;
-        for(int i = 0; i < uiVector_Projectile_Size; ++i)
-        {
+        
+        float cameraSpeed = 5.5f * _dOffset;            
+        int counter = 0;
+
+        if(fProjectile_Accumulator_ > 0)
+            fProjectile_Accumulator_ -= cameraSpeed;
+
+        for(int i = 0; i < u_iVector_Move_Size; ++i) {
+            for(int n = 0; n < 6; ++n) {
+                unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
+                
+                if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON) {
+                    if(fProjectile_Accumulator_ <= 0) {
+                        CalculateProjectile(pComponent_Manager,
+                                            iEntity_refMove,
+                                            view_Component);
+                        fProjectile_Accumulator_ = 2.0;
+                    }
+                }
+            }
+        }
+
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
+            GetInnerIDsContainer<CProjectileComponent>(*pComponent_Manager);
+        unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
+
+        for(int x = 0; x < uiVector_Projectile_Size; ++x) {
+            unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
+            ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
+            rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.2f;
+        }
+
+        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
+            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
+        unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+        
+        for(int i = 0; i < uiVector_Projectile_Size; ++i) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
-            //         std::cout << "Projectile Entities: " << uiEntity_refProjectile << std::endl;
-            
             if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ ||
-                pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_)
-            {
+                pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_) {
                 std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
-//                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, *pComponent_Manager);
-                pComponent_Manager->RemoveComponent<CTextureComponent>(uiEntity_refProjectile);
-//                pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition -= 0.2;
-//                std::cout << "We are finaly here: " << uiEntity_refProjectile << std::endl;
+                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
                 continue;
             }
-            // Vector<float, 3> temp_vec(0.0f);
-            // temp_vec = GetDirectionVector(pComponent_Manager->GetComponent<STransformComponent>(iEntity_refView), view_Component);
-//            pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition += temp_vec * 0.1;
-
-            // ECS::STransformComponent& rTransfromComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
-            // rTransfromComponent.tPosition += rTransfromComponent.tForward * 0.1f;
-            
-            // pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[0] +=
-            //     pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[0] / 10;
-            // pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[1] +=
-            //     pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[1] / 10;
-            // pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[2] +=
-            //     pComponent_Manager->GetComponent<STransformComponent>(uiEntity_refProjectile).tPosition[2] / 10;
         }
     }
 
-    Vector<float, 3> CProjectileSystem::GetDirectionVector(STransformComponent& _Player, CViewComponent& _view_Component)
+    void CProjectileSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
+                                              unsigned int iEntity_refMove,
+                                              CViewComponent& view_Component) {
+        unsigned int uiEntity_Projectile;
+        ECS::CEntityManager::GetInstance()->CreateEntity(uiEntity_Projectile);
+        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
+                                                               ECS::STransformComponent, ECS::CTextureComponent,
+                                                               ECS::CProjectileComponent>(uiEntity_Projectile);
+
+        // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
+        // pSound_Sample->kPath_to_File_ = "../laser2.wav";
+        // pSound_Sample->uiDuration_ = 5;
+        // pSound_Sample->uiRate_ = 22050;
+        // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
+        
+        ECS::CTextureComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_Projectile);
+        rTextureProjectile.iWidth_  = 96;
+        rTextureProjectile.iHeight_ = 128;
+        rTextureProjectile.u_iData_ = chelik_dat;
+//        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
+        ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
+        rTransformProjectile.fScale = 0.2f;
+        Vector<float, 3> vec(0.0f);
+        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tPosition;
+        rTransformProjectile.tForward = GetDirectionVector(view_Component);
+
+        rTransformProjectile.tPosition +=rTransformProjectile.tForward;
+    }
+    
+    Vector<float, 3> CProjectileSystem::GetDirectionVector(ECS::CViewComponent& _view_Component)
     {
-                Matrix<float, 4> tView_Matrix(1.0f);
+        Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;
 
         fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
@@ -80,5 +127,5 @@ namespace GLVM::ECS
         _view_Component.Front_Camera = Normalize(front);
 
         return _view_Component.Front_Camera;
-    }    
+    }
 }
