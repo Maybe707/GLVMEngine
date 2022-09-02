@@ -1192,12 +1192,6 @@ namespace GLVM::Core
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
         
         UniformBufferObject ubo{};
-        mat4 translation_matrix;
-        mat4 scaling_matrix;
-//        ubo.model = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.5), time * 90);
-        // translation_matrix = Translate<float, float, 4, 4>(ubo.model, translateVec);
-        // scaling_matrix = mat4(1.0f);
-        // ubo.model = translation_matrix * scaling_matrix;
 
         ubo.model[0][0] = _transformComponent.fScale;
         ubo.model[1][1] = _transformComponent.fScale;
@@ -1206,28 +1200,18 @@ namespace GLVM::Core
         ubo.model[0][3] = _transformComponent.tPosition[0];
         ubo.model[1][3] = _transformComponent.tPosition[1];
         ubo.model[2][3] = _transformComponent.tPosition[2];
-        mat4 mat = Rotate(mat4(1.0), vec3(0.5, 0.0, 0.0), time * 90);
-//        ubo.model = ubo.model * mat;
-
         ubo.model.SelfTensorTranspose();
         
-//        ubo.model = Rotate(mat4(1.0), vec3(0.0, 0.0, 0.1), 0.0);
-//        ubo.view = LookAtRH(vec3(2.0f, 2.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 0.0f, 0.1f));
-//        ubo.view = LookAtRH(vec3(0.8f, 0.0f, 1.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
         ubo.view = viewMatrix;
-        mat4 tProjection_Matrix(1.0);
-        float f = 10, n = 0.1;
-        float fov = 90;
-        float S = 1 / std::tan((fov/2) * (PI / 180));
-        tProjection_Matrix[0][0] = S;
-        tProjection_Matrix[1][1] = S;
-        tProjection_Matrix[2][2] = -(f / (f - n));
-        tProjection_Matrix[2][3] = -1;
-        tProjection_Matrix[3][2] = -((f * n) / (f - n));
-        ubo.proj = tProjection_Matrix;
         ubo.proj = projectionMatrix;
-        ubo.proj[1][1] *= -1;
 
+        if (_transformComponent.hud) {
+            ubo.view.SelfIdentity();
+            ubo.proj.SelfIdentity();
+        }
+
+        ubo.proj[1][1] *= -1;
+        
         void* data;
         vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
         memcpy(data, &ubo, sizeof(ubo));

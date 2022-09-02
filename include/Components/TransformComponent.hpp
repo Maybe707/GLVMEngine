@@ -13,6 +13,7 @@ namespace GLVM::ECS
         Vector<float, 3> tUp{0.0f, 0.0f, 0.0};
         float fRotate = 0.0f;
         float fScale = 1.0f;
+        bool hud = false;
 	};
 }
 

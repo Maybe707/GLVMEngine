@@ -19,10 +19,16 @@ int main()
     Texture_1.iHeight_ = 32;
     Texture_1.u_iData_ = witch_dat;
     Texture_1.dat_length_ = witch_dat_len;
+    GLVM::ECS::CTexture Texture_2;
+    Texture_2.iWidth_ = 32;
+    Texture_2.iHeight_ = 32;
+    Texture_2.u_iData_ = Crosshair_dat;
+    Texture_2.dat_length_ = Crosshair_dat_len;
 
     std::vector<GLVM::ECS::CTexture> TextureVector;
     TextureVector.push_back(Texture_0);
     TextureVector.push_back(Texture_1);
+    TextureVector.push_back(Texture_2);
     
     GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
     TextureSystem->SetTextureVector(TextureVector);
@@ -83,7 +89,7 @@ int main()
 	EntityManager->CreateEntity(u_iWitch2);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-    TextureWitch2.id_ = 1;
+    TextureWitch2.id_ = 2;
     TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
 	// TextureWitch2.iWidth_ = 32;
 	// TextureWitch2.iHeight_ = 32;
@@ -92,10 +98,11 @@ int main()
 //	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
-    TransformWitch2.tPosition[0] = 0.5f;
-    TransformWitch2.tPosition[1] = -1.5f;
-    TransformWitch2.tPosition[2] = -9.5f;
-    TransformWitch2.fScale = 10.0f;
+    TransformWitch2.tPosition[0] = 0.0f;
+    TransformWitch2.tPosition[1] = 0.0f;
+    TransformWitch2.tPosition[2] = 0.3f;
+    TransformWitch2.fScale = 0.1f;
+    TransformWitch2.hud = true;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
     

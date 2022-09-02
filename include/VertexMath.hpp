@@ -62,7 +62,19 @@ public:
                 this->m_matrix[j][z] = tempMatrix[j][z];
             }
     }
-    
+
+    void SelfIdentity()
+    {
+        for(int i = 0; i < var; ++i)
+            for(int j = 0; j < var; ++j)
+            {
+                if(i == j)
+                    this->m_matrix[i][j] = 1.0f;
+                else
+                    this->m_matrix[i][j] = 0.0f;
+            }
+    }
+        
 	Matrix<T, var> operator*(Matrix& matrix);
 	T* operator[](const int index);
 	template<class T2, int var2>
@@ -573,5 +585,7 @@ Matrix<T, var> Perspective(float fov, float n, float f)
 
 	return tempMatrix;
 }
+
+
 
 #endif
