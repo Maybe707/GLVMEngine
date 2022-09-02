@@ -21,8 +21,8 @@
 #include <mutex>
 #include "TextureManager.hpp"
 
-//#include "GraphicAPI/Opengl.hpp"
-#include "GraphicAPI/Vulkan.hpp"
+#include "GraphicAPI/Opengl.hpp"
+//#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -51,7 +51,6 @@ namespace GLVM::ECS
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(mat4 _viewMatrix);
         void SetProjectionMatrix(mat4 _projectionMatrix);
-        void SetTransformData();
     };
 }
     

@@ -13,71 +13,26 @@ namespace GLVM::ECS
 #endif
         
 #ifdef VULKAN_API
-        // ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        // Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-        //     ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
-        // unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+        GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
         
-        // std::vector<ECS::CTextureComponent> temp_texture_vector;
-        // for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i) {
-        //     unsigned int uiEntity_refTexture = (*pEntity_Container_refTexture)[i];
-        //     temp_texture_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
-        // }
-
-        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
-        
-        renderer_instance_ = new Core::CVulkanRenderer(TextureSystem->GetTextureVector());
-        renderer_instance_->SetTextureData(TextureSystem->GetTextureVector());
-        SetTransformData();
+        renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector());
+        renderer_instance_->SetTextureData(textureManager->GetTextureVector());
         renderer_instance_->run();
 #endif
 	}
 
 #ifdef VULKAN_API
     void CRenderSystem::SetTextureData() {
-        // ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        // Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-        //     ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
-        // unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
-
-        // std::vector<ECS::CTextureComponent> temp_texture_vector;
-        // for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i) {
-        //     unsigned int uiEntity_refTexture = (*pEntity_Container_refTexture)[i];
-        //     temp_texture_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
-        // }
-        // delete renderer_instance_;
-        // renderer_instance_ = nullptr;
-        // renderer_instance_ = new Core::CVulkanRenderer(temp_texture_vector);
-
-        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
-        renderer_instance_->SetTextureData(TextureSystem->GetTextureVector());
-//        renderer_instance_->run();
+        GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
+        renderer_instance_->SetTextureData(textureManager->GetTextureVector());
     }
-
-    void CRenderSystem::SetTransformData() {
-        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTransform =
-            ECS::GetInnerIDsContainer<ECS::STransformComponent>(*pComponent_Manager);
-        unsigned int uiVector_Transform_Size = pEntity_Container_refTransform->GetSize();
-
-        std::vector<ECS::STransformComponent> temp_transform_vector;
-        for(int i = 0, iSize = uiVector_Transform_Size; i < iSize; ++i) {
-            unsigned int uiEntity_refTransform = (*pEntity_Container_refTransform)[i];
-            temp_transform_vector.push_back(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTransform));
-        }
-        
-        renderer_instance_->SetTransformData(temp_transform_vector);
-    }
-#endif
-
-#ifdef OPENGL_API
-    void CRenderSystem::SetTransformData() {}
 #endif
     
 	CRenderSystem::~CRenderSystem() {}
     void CRenderSystem::Update() {
+#ifdef VULKAN_API
         SetTextureData();
-//        SetTransformData();
+#endif
         renderer_instance_->draw();
     }
     Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    

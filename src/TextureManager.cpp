@@ -12,10 +12,6 @@ namespace GLVM::ECS
 
     void CTextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
         textureVector_[_textureID].entitiesOwnsThisTypeOfTexture_.push_back(_entityID);
-
-        // for(int i = 0; i < textureVector_.size(); ++i)
-        //     for(int j = 0; j < textureVector_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j)
-        //         std::cout << "i: " << i << " j: " << j << textureVector_[i].entitiesOwnsThisTypeOfTexture_[j] << std::endl;
     }
 
     CTextureManager* CTextureManager::GetInstance()

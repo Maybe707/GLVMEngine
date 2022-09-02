@@ -234,10 +234,8 @@ namespace GLVM::Core
     
 
         void createTextureImage();
-        void LoadTextureData();
         void recreateSwapChain();
         void draw() override;
-        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;
         void SetTextureData(std::vector<ECS::CTexture> _texture_data) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;

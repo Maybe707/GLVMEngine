@@ -50,50 +50,12 @@ namespace GLVM::Core
         vkDeviceWaitIdle(device);
     }
 
-    void CVulkanRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
-        transform_data_ = _transform_data;
-    }
-
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
         viewMatrix = _viewMatrix;
     }
     
     void CVulkanRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
         projectionMatrix = _projectionMatrix;
-    }
-
-    void CVulkanRenderer::LoadTextureData() {
-//         int texWidth, texHeight, texChannels;
-
-//         for(int i = 0; i < texture_load_data_.size(); ++i)
-//         {
-//             VkDeviceSize imageSize = texture_load_data_[i].dat_length_;
-//             const unsigned char* pixels = texture_load_data_[i].u_iData_;
-//             texWidth = texture_load_data_[i].iWidth_;
-//             texHeight = texture_load_data_[i].iHeight_;
-
-//             if (!pixels) {
-//                 throw std::runtime_error("failed to load texture image!");
-//             }
-
-//             VkBuffer stagingBufferForTextureLoading;
-//             VkDeviceMemory stagingBufferMemoryForTextureLoading;
-//             createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBufferForTextureLoading, stagingBufferMemoryForTextureLoading);
-
-//             void* data;
-//             vkMapMemory(device, stagingBufferMemoryForTextureLoading, 0, imageSize, 0, &data);
-//             memcpy(data, pixels, static_cast<size_t>(imageSize));
-//             vkUnmapMemory(device, stagingBufferMemoryForTextureLoading);
-
-// //            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
-
-//             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-//             copyBufferToImage(stagingBufferForTextureLoading, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-//             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-//             vkDestroyBuffer(device, stagingBufferForTextureLoading, nullptr);
-//             vkFreeMemory(device, stagingBufferMemoryForTextureLoading, nullptr);
-//        }
     }
     
     void CVulkanRenderer::createTextureImage() {
@@ -105,7 +67,7 @@ namespace GLVM::Core
             const unsigned char* pixels = initializeTextureData_[i].u_iData_;
             texWidth = initializeTextureData_[i].iWidth_;
             texHeight = initializeTextureData_[i].iHeight_;
-            std::cout << "i: " << i << std::endl;
+     
             if (!pixels) {
                 throw std::runtime_error("failed to load texture image!");
             }
@@ -1014,9 +976,6 @@ namespace GLVM::Core
             if(i % 2 == 0)
                 textureImageViewsIndex = i / 2;
 
-            std::cout << "Index: " << textureImageViewsIndex << std::endl;
-            std::cout << "i: " << i << std::endl;
-            
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             imageInfo.imageView = textureImageViews[textureImageViewsIndex];

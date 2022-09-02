@@ -102,7 +102,7 @@ namespace GLVM::Core
 //		pSystem_Manager->ActivateSystem(Animation_System);
         pSystem_Manager->ActivateSystem(pCamera_System);
         pSystem_Manager->ActivateSystem(Render_System_Interface_);
-//        pSystem_Manager->ActivateSystem(GUI_System);
+        pSystem_Manager->ActivateSystem(GUI_System);
 
         std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
         sound_thread.detach();
@@ -137,7 +137,7 @@ namespace GLVM::Core
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
             Animation_System->eEvent_                     = Input_Stack_.Pop();
 			Animation_System->Delta_Time                  = fDelta_Time_;            
-//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 //            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
             pCamera_System->Render_System_                = Render_System_Interface_;
             

@@ -14,7 +14,6 @@ namespace GLVM::Core
         virtual ~IRenderer() {}
 
         virtual void draw() = 0;
-        virtual void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) = 0;
         virtual void SetTextureData(std::vector<ECS::CTexture> _texture_data) = 0;
         virtual void SetViewMatrix(mat4 _viewMatrix) = 0;
         virtual void SetProjectionMatrix(mat4 _projectionMatrix) = 0;

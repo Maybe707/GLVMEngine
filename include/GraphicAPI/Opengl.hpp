@@ -60,7 +60,6 @@ namespace GLVM::Core
         void LoadTextureData(GLVM::ECS::CTexture& _Texture);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(mat4 _viewMatrix) override;
-        void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
     };
 }

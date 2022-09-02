@@ -26,15 +26,13 @@ int main()
     
     GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
     TextureSystem->SetTextureVector(TextureVector);
-
-    std::cout << "Size of main vector: " << TextureVector.size() << std::endl;
     
 	Entity u_iPlayer;
 	EntityManager->CreateEntity(u_iPlayer);
-    ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
-    GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-    TexturePlayer.id_ = 0;
-    TextureSystem->BindTexture(u_iPlayer, TexturePlayer.id_);
+    ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
+    // GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+    // TexturePlayer.id_ = 0;
+    // TextureSystem->BindTexture(u_iPlayer, TexturePlayer.id_);
 	// TexturePlayer.iWidth_ = 128; 
 	// TexturePlayer.iHeight_ = 96;
 	// TexturePlayer.u_iData_ = chelik_dat;
@@ -100,11 +98,6 @@ int main()
     TransformWitch2.fScale = 10.0f;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
-
-    std::vector<GLVM::ECS::CTexture> textureVector = TextureSystem->GetTextureVector();
-    
-    std::cout << "Size of chelik vector: " << textureVector[0].entitiesOwnsThisTypeOfTexture_.size() << std::endl;
-    std::cout << "Size of witch vector: " << textureVector[1].entitiesOwnsThisTypeOfTexture_.size() << std::endl;
     
 //     Entity u_iWitch3;
 // 	EntityManager->CreateEntity(u_iWitch3);

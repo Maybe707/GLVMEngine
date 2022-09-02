@@ -208,8 +208,4 @@ namespace GLVM::Core
     
     void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data) {}
     void COpenglRenderer::run() {}
-
-    void COpenglRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {
-        
-    }
 }
