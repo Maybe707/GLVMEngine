@@ -55,6 +55,7 @@
 #include "Constants.hpp"
 #include <mutex>
 #include "Systems/RenderSystem.hpp"
+#include "Systems/TextureSystem.hpp"
 
 using Entity = unsigned int;
 

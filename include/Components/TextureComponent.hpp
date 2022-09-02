@@ -16,12 +16,13 @@ namespace GLVM::ECS
     class CTextureComponent
     {
 	public:
-		GLuint iTexture_;
-		unsigned int iWidth_;
-		unsigned int iHeight_;
-		unsigned int iNrChannels_;
-        unsigned int dat_length_;
-		const unsigned char* u_iData_;
+        unsigned int id_;
+		// GLuint iTexture_;
+		// unsigned int iWidth_;
+		// unsigned int iHeight_;
+		// unsigned int iNrChannels_;
+        // unsigned int dat_length_;
+		// const unsigned char* u_iData_;
 	};
 }
     

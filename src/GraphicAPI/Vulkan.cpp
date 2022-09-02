@@ -1,6 +1,9 @@
 #include "GraphicAPI/Vulkan.hpp"
+#include "ComponentManager.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Texture.hpp"
+#include "VectorContainer.hpp"
 #include <cstdlib>
 #include <vulkan/vulkan_core.h>
 
@@ -22,21 +25,20 @@ namespace GLVM::Core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data) {
-//        texture_data_ = _texture_data;
+    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTexture> _initializeTextureData) {
+        texturePool_ = 10;
 
-        texture_data_.resize(_texture_data.size() * 10);
-        for(int i = 0; i < texture_data_.size() / _texture_data.size(); ++i)
-            for(int j = 0; j < _texture_data.size(); ++j) {
-                texture_data_[i * _texture_data.size() + j] = _texture_data[j];
+        initializeTextureData_.resize(_initializeTextureData.size() * texturePool_);
+        for(int i = 0; i < _initializeTextureData.size(); ++i)
+            for(int j = 0; j < texturePool_; ++j) {
+                initializeTextureData_[j + i * texturePool_] = _initializeTextureData[i];
             }
         
-        textureImages.resize(texture_data_.size() * 10);
-        textureImageMemories.resize(texture_data_.size() * 10);
+        textureImages.resize(initializeTextureData_.size() * texturePool_);
+        textureImageMemories.resize(initializeTextureData_.size() * texturePool_);
 
-        textureImageViews.resize(texture_data_.size() * 10);
-        textureSamplers.resize(texture_data_.size() * 10);
-        LoadTextureData();
+        textureImageViews.resize(initializeTextureData_.size() * texturePool_);
+        textureSamplers.resize(initializeTextureData_.size() * texturePool_);
     }
     
     CVulkanRenderer::~CVulkanRenderer() {
@@ -61,49 +63,49 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::LoadTextureData() {
-        int texWidth, texHeight, texChannels;
+//         int texWidth, texHeight, texChannels;
 
-        for(int i = 0; i < texture_load_data_.size(); ++i)
-        {
-            VkDeviceSize imageSize = texture_load_data_[i].dat_length_;
-            const unsigned char* pixels = texture_load_data_[i].u_iData_;
-            texWidth = texture_load_data_[i].iWidth_;
-            texHeight = texture_load_data_[i].iHeight_;
+//         for(int i = 0; i < texture_load_data_.size(); ++i)
+//         {
+//             VkDeviceSize imageSize = texture_load_data_[i].dat_length_;
+//             const unsigned char* pixels = texture_load_data_[i].u_iData_;
+//             texWidth = texture_load_data_[i].iWidth_;
+//             texHeight = texture_load_data_[i].iHeight_;
 
-            if (!pixels) {
-                throw std::runtime_error("failed to load texture image!");
-            }
+//             if (!pixels) {
+//                 throw std::runtime_error("failed to load texture image!");
+//             }
 
-            VkBuffer stagingBufferForTextureLoading;
-            VkDeviceMemory stagingBufferMemoryForTextureLoading;
-            createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBufferForTextureLoading, stagingBufferMemoryForTextureLoading);
+//             VkBuffer stagingBufferForTextureLoading;
+//             VkDeviceMemory stagingBufferMemoryForTextureLoading;
+//             createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBufferForTextureLoading, stagingBufferMemoryForTextureLoading);
 
-            void* data;
-            vkMapMemory(device, stagingBufferMemoryForTextureLoading, 0, imageSize, 0, &data);
-            memcpy(data, pixels, static_cast<size_t>(imageSize));
-            vkUnmapMemory(device, stagingBufferMemoryForTextureLoading);
+//             void* data;
+//             vkMapMemory(device, stagingBufferMemoryForTextureLoading, 0, imageSize, 0, &data);
+//             memcpy(data, pixels, static_cast<size_t>(imageSize));
+//             vkUnmapMemory(device, stagingBufferMemoryForTextureLoading);
 
-//            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
+// //            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
 
-            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-            copyBufferToImage(stagingBufferForTextureLoading, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+//             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+//             copyBufferToImage(stagingBufferForTextureLoading, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+//             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-            vkDestroyBuffer(device, stagingBufferForTextureLoading, nullptr);
-            vkFreeMemory(device, stagingBufferMemoryForTextureLoading, nullptr);
-        }
+//             vkDestroyBuffer(device, stagingBufferForTextureLoading, nullptr);
+//             vkFreeMemory(device, stagingBufferMemoryForTextureLoading, nullptr);
+//        }
     }
     
     void CVulkanRenderer::createTextureImage() {
         int texWidth, texHeight, texChannels;
 
-        for(int i = 0; i < texture_data_.size(); ++i)
+        for(int i = 0; i < initializeTextureData_.size(); ++i)
         {
-            VkDeviceSize imageSize = texture_data_[i].dat_length_;
-            const unsigned char* pixels = texture_data_[i].u_iData_;
-            texWidth = texture_data_[i].iWidth_;
-            texHeight = texture_data_[i].iHeight_;
-
+            VkDeviceSize imageSize = initializeTextureData_[i].dat_length_;
+            const unsigned char* pixels = initializeTextureData_[i].u_iData_;
+            texWidth = initializeTextureData_[i].iWidth_;
+            texHeight = initializeTextureData_[i].iHeight_;
+            std::cout << "i: " << i << std::endl;
             if (!pixels) {
                 throw std::runtime_error("failed to load texture image!");
             }
@@ -146,7 +148,7 @@ namespace GLVM::Core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {
+    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data) {
         texture_load_data_ = _texture_data;
 
         // textureImages.resize(texture_load_data_.size());
@@ -245,13 +247,13 @@ namespace GLVM::Core
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-        for(int i = 0; i < texture_data_.size(); ++i)
+        for(int i = 0; i < initializeTextureData_.size(); ++i)
         {
             vkDestroySampler(device, textureSamplers[i], nullptr);
             vkDestroyImageView(device, textureImageViews[i], nullptr);
         }
 
-        for (int i = 0; i < texture_data_.size(); ++i)
+        for (int i = 0; i < initializeTextureData_.size(); ++i)
         {
             vkDestroyImage(device, textureImages[i], nullptr);
             vkFreeMemory(device, textureImageMemories[i], nullptr);
@@ -764,12 +766,12 @@ namespace GLVM::Core
 
     void CVulkanRenderer::createTextureImageView() {
 
-        for(int i = 0; i < texture_data_.size(); ++i)
+        for(int i = 0; i < initializeTextureData_.size(); ++i)
             textureImageViews[i] = createImageView(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
     }
 
     void CVulkanRenderer::createTextureSampler() {
-        for(int i = 0; i < texture_data_.size(); ++i)
+        for(int i = 0; i < initializeTextureData_.size(); ++i)
         {
             VkPhysicalDeviceProperties properties{};
             vkGetPhysicalDeviceProperties(physicalDevice, &properties);
@@ -963,10 +965,10 @@ namespace GLVM::Core
     void CVulkanRenderer::createUniformBuffers() {
         VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
-        uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
-        uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * texture_data_.size(); i++) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); i++) {
             createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
         }
     }
@@ -974,15 +976,15 @@ namespace GLVM::Core
     void CVulkanRenderer::createDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
         poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -990,20 +992,20 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::createDescriptorSets() {
-        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * texture_data_.size(), descriptorSetLayout);
+        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
         allocInfo.pSetLayouts = layouts.data();
 
-        descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
         if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate descriptor sets!");
         }
         
         int textureImageViewsIndex = 0;
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * texture_data_.size(); ++i) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
             VkDescriptorBufferInfo bufferInfo{};
             bufferInfo.buffer = uniformBuffers[i];
             bufferInfo.offset = 0;
@@ -1013,6 +1015,7 @@ namespace GLVM::Core
                 textureImageViewsIndex = i / 2;
 
             std::cout << "Index: " << textureImageViewsIndex << std::endl;
+            std::cout << "i: " << i << std::endl;
             
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1124,7 +1127,7 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::createCommandBuffers() {
-        commandBuffers.resize(MAX_FRAMES_IN_FLIGHT * texture_data_.size());
+        commandBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -1183,9 +1186,16 @@ namespace GLVM::Core
 
         vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-        for (int i = 0; i < texture_load_data_.size() * 2; i = i + 2) {
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame + i], 0, nullptr);
-            vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+        // for (int i = 0; i < texture_load_data_.size() * 2; i = i + 2) {
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame + i], 0, nullptr);
+        //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+        // }
+
+        for (int i = 0; i < texture_load_data_.size(); ++i) {
+            for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[texturePool_ * i * MAX_FRAMES_IN_FLIGHT + j + currentFrame * texturePool_], 0, nullptr);
+                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            }
         }
         
         vkCmdEndRenderPass(commandBuffer);
@@ -1277,13 +1287,24 @@ namespace GLVM::Core
         } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
             throw std::runtime_error("failed to acquire swap chain image!");
         }
-        std::cout << "Number of tex: " << texture_load_data_.size() << std::endl;
-        int transform_index = 0;
-        for (int i = 0; i < texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
-            if(i % 2 == 0)
-                transform_index = i / 2;
-            std::cout << "ITER: " << i << std::endl;
-            updateUniformBuffer(currentFrame + i, transform_data_[transform_index]);
+//        std::cout << "Number of tex: " << texture_load_data_.size() << std::endl;
+        // int transform_index = 0;
+        // for (int i = 0; i < texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; i = i +MAX_FRAMES_IN_FLIGHT) {
+        //     if(i % 2 == 0)
+        //         transform_index = i / 2;
+        //     std::cout << "ITER: " << i << std::endl;
+        //     updateUniformBuffer(currentFrame + i, transform_data_[transform_index]);
+        // }
+
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+        Core::TCVectorContainer<ECS::STransformComponent>* pEntity_Container_refTransform =
+            ECS::GetInnerComponentContainer<ECS::STransformComponent>(*pComponent_Manager);
+        
+        for (int i = 0; i < texture_load_data_.size(); ++i) {
+            for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+                ECS::STransformComponent transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+                updateUniformBuffer(texturePool_ * MAX_FRAMES_IN_FLIGHT * i + j + currentFrame * texturePool_, transformComponent);
+            }
         }
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
 
@@ -1550,17 +1571,17 @@ namespace GLVM::Core
 //     HelloTriangleApplication* vk_;
     
 // public:
-//     RenderManager(std::vector<Texture> _texture_data) {
-//         vk_ = new HelloTriangleApplication(_texture_data);
-//         vk_->setTextureData(_texture_data);
+//     RenderManager(std::vector<Texture> _initializeTextureData) {
+//         vk_ = new HelloTriangleApplication(_initializeTextureData);
+//         vk_->setTextureData(_initializeTextureData);
 //         vk_->run();
 //     }
 
-//     void SetTexture(std::vector<Texture> _texture_data) {
+//     void SetTexture(std::vector<Texture> _initializeTextureData) {
 //         delete vk_;
 //         vk_ = nullptr;
-//         vk_ = new HelloTriangleApplication(_texture_data);
-//         vk_->setTextureData(_texture_data);
+//         vk_ = new HelloTriangleApplication(_initializeTextureData);
+//         vk_->setTextureData(_initializeTextureData);
 //         vk_->run();
 //     }
 
@@ -1575,13 +1596,13 @@ namespace GLVM::Core
 //     // app.setTextureData(witch_dat_len, witch_dat);
 //     // app.run();
 
-//     std::vector<Texture> texture_data;
+//     std::vector<Texture> initializeTextureData;
 //     Texture tex0{chelik_dat_len, chelik_dat};
 //     Texture tex1{witch_dat_len, witch_dat};
-//     texture_data.push_back(tex0);
-//     texture_data.push_back(tex1);
+//     initializeTextureData.push_back(tex0);
+//     initializeTextureData.push_back(tex1);
     
-//     RenderManager app(texture_data);
+//     RenderManager app(initializeTextureData);
 
 // //    app.SetTexture(chelik_dat_len, chelik_dat);
     

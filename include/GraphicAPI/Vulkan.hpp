@@ -16,7 +16,10 @@
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "IRenderer.hpp"
+#include "Texture.hpp"
 #include "VertexMath.hpp"
+#include "Systems/TextureSystem.hpp"
+#include "ComponentManager.hpp"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -211,9 +214,11 @@ namespace GLVM::Core
 
     class CVulkanRenderer : public IRenderer {
     public:
-        std::vector<ECS::CTextureComponent> texture_data_;
-        std::vector<ECS::CTextureComponent> texture_load_data_;
+        std::vector<ECS::CTexture> initializeTextureData_;
+        std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::STransformComponent> transform_data_;
+
+        unsigned int texturePool_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         GLVM::Core::CWindowX Window;
@@ -224,7 +229,7 @@ namespace GLVM::Core
 //        GLVM::Core::CWindowVkWin Window{"window", 1920, 1080};
 #endif
         
-        CVulkanRenderer(std::vector<ECS::CTextureComponent> _texture_data);
+        CVulkanRenderer(std::vector<ECS::CTexture> _texture_data);
         ~CVulkanRenderer();
     
 
@@ -233,7 +238,7 @@ namespace GLVM::Core
         void recreateSwapChain();
         void draw() override;
         void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;
-        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) override;
+        void SetTextureData(std::vector<ECS::CTexture> _texture_data) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
         void run() override;

@@ -5,6 +5,7 @@
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "GLPointer.h"
+#include "Texture.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "VertexMath.hpp"
@@ -127,16 +128,19 @@ namespace GLVM::Core
 
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
+
+        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        std::vector<ECS::CTexture> TextureVector = TextureSystem->GetTextureVector();
         
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
-            LoadTextureData(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
+            LoadTextureData(TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
 			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
 
             SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
   			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).iTexture_);
+			glBindTexture(GL_TEXTURE_2D, TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
 			pGLBind_Vertex_Array(iVao_);
 
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
@@ -147,7 +151,7 @@ namespace GLVM::Core
 		}
 	}
 
- 	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTextureComponent& _Texture)
+ 	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTexture& _Texture)
 	{
 		///< Loading and creating texture.
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
@@ -202,7 +206,7 @@ namespace GLVM::Core
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) {}
+    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data) {}
     void COpenglRenderer::run() {}
 
     void COpenglRenderer::SetTransformData(std::vector<ECS::STransformComponent> _transform_data) {

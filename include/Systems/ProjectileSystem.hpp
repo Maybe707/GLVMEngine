@@ -9,6 +9,7 @@
 #include "Components/ViewComponent.hpp"
 #include "chelik.hpp"
 #include "Globals.hpp"
+#include "Systems/TextureSystem.hpp"
 
 namespace GLVM::ECS
 {

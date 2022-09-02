@@ -60,14 +60,18 @@ namespace GLVM::ECS
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+
+        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+
         
         for(int i = 0; i < uiVector_Projectile_Size; ++i) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
             if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ ||
-                pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_) {
-                std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
+               pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_) {
+//                std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
+                GLVM::ECS::CTextureComponent& textureProjectile = pComponent_Manager->GetComponent<GLVM::ECS::CTextureComponent>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
                 continue;
             }
         }
@@ -76,6 +80,8 @@ namespace GLVM::ECS
     void CProjectileSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
                                               unsigned int iEntity_refMove,
                                               CViewComponent& view_Component) {
+        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        
         unsigned int uiEntity_Projectile;
         ECS::CEntityManager::GetInstance()->CreateEntity(uiEntity_Projectile);
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
@@ -89,9 +95,11 @@ namespace GLVM::ECS
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
         ECS::CTextureComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_Projectile);
-        rTextureProjectile.iWidth_  = 96;
-        rTextureProjectile.iHeight_ = 128;
-        rTextureProjectile.u_iData_ = chelik_dat;
+        rTextureProjectile.id_ = 1;
+        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.id_);
+        // rTextureProjectile.iWidth_  = 96;
+        // rTextureProjectile.iHeight_ = 128;
+        // rTextureProjectile.u_iData_ = chelik_dat;
 //        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.2f;

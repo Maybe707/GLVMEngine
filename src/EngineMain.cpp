@@ -1,20 +1,44 @@
 #include "Components/TextureComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
+#include "Systems/TextureSystem.hpp"
+#include "Texture.hpp"
 
 int main()
 {
-    GLVM::ECS::CEntityManager*    EntityManager = GLVM::ECS::CEntityManager::GetInstance();
+    GLVM::ECS::CEntityManager*    EntityManager    = GLVM::ECS::CEntityManager::GetInstance();
     GLVM::ECS::CComponentManager* ComponentManager = GLVM::ECS::CComponentManager::GetInstance();
+
+    GLVM::ECS::CTexture Texture_0;
+    Texture_0.iWidth_ = 128;
+    Texture_0.iHeight_ = 96;
+    Texture_0.u_iData_ = chelik_dat;
+    Texture_0.dat_length_ = chelik_dat_len;
+    GLVM::ECS::CTexture Texture_1;
+    Texture_1.iWidth_ = 32;
+    Texture_1.iHeight_ = 32;
+    Texture_1.u_iData_ = witch_dat;
+    Texture_1.dat_length_ = witch_dat_len;
+
+    std::vector<GLVM::ECS::CTexture> TextureVector;
+    TextureVector.push_back(Texture_0);
+    TextureVector.push_back(Texture_1);
+    
+    GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+    TextureSystem->SetTextureVector(TextureVector);
+
+    std::cout << "Size of main vector: " << TextureVector.size() << std::endl;
     
 	Entity u_iPlayer;
 	EntityManager->CreateEntity(u_iPlayer);
     ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::SMoveComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::SAnimationMoveComponent, GLVM::ECS::CViewComponent, GLVM::ECS::STransformComponent, GLVM::ECS::CRigidBodyComponent, GLVM::ECS::SEventComponent>(u_iPlayer);
     GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
-	TexturePlayer.iWidth_ = 128; 
-	TexturePlayer.iHeight_ = 96;
-	TexturePlayer.u_iData_ = chelik_dat;
-    TexturePlayer.dat_length_ = chelik_dat_len;
+    TexturePlayer.id_ = 0;
+    TextureSystem->BindTexture(u_iPlayer, TexturePlayer.id_);
+	// TexturePlayer.iWidth_ = 128; 
+	// TexturePlayer.iHeight_ = 96;
+	// TexturePlayer.u_iData_ = chelik_dat;
+    // TexturePlayer.dat_length_ = chelik_dat_len;
 //	GLVM->LoadTextureData(TexturePlayer);
 	GLVM::ECS::STransformComponent& TransformPlayer = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iPlayer);
     GLVM::ECS::CViewComponent& ViewPlayer = ComponentManager->GetComponent<GLVM::ECS::CViewComponent>(u_iPlayer);
@@ -41,10 +65,12 @@ int main()
 	EntityManager->CreateEntity(u_iWitch);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch);
 	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
-	TextureWitch.iWidth_ = 32;
-	TextureWitch.iHeight_ = 32;
-	TextureWitch.u_iData_ = witch_dat;
-    TextureWitch.dat_length_ = witch_dat_len;
+    TextureWitch.id_ = 1;
+    TextureSystem->BindTexture(u_iWitch, TextureWitch.id_);
+	// TextureWitch.iWidth_ = 32;
+	// TextureWitch.iHeight_ = 32;
+	// TextureWitch.u_iData_ = witch_dat;
+    // TextureWitch.dat_length_ = witch_dat_len;
 //	GLVM->LoadTextureData(TextureWitch);
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
 //    GLVM::ECS::CColliderComponent& ColliderWitch1 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
@@ -59,10 +85,12 @@ int main()
 	EntityManager->CreateEntity(u_iWitch2);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-	TextureWitch2.iWidth_ = 32;
-	TextureWitch2.iHeight_ = 32;
-	TextureWitch2.u_iData_ = witch_dat;
-    TextureWitch2.dat_length_ = witch_dat_len;
+    TextureWitch2.id_ = 1;
+    TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
+	// TextureWitch2.iWidth_ = 32;
+	// TextureWitch2.iHeight_ = 32;
+	// TextureWitch2.u_iData_ = witch_dat;
+    // TextureWitch2.dat_length_ = witch_dat_len;
 //	GLVM->LoadTextureData(TextureWitch2);
 	GLVM::ECS::STransformComponent& TransformWitch2 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch2);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
@@ -73,6 +101,11 @@ int main()
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
 
+    std::vector<GLVM::ECS::CTexture> textureVector = TextureSystem->GetTextureVector();
+    
+    std::cout << "Size of chelik vector: " << textureVector[0].entitiesOwnsThisTypeOfTexture_.size() << std::endl;
+    std::cout << "Size of witch vector: " << textureVector[1].entitiesOwnsThisTypeOfTexture_.size() << std::endl;
+    
 //     Entity u_iWitch3;
 // 	EntityManager->CreateEntity(u_iWitch3);
 // 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);

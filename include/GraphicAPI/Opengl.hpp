@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include "IRenderer.hpp"
 #include "ISystem.hpp"
+#include "Texture.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "ComponentManager.hpp"
@@ -16,6 +17,7 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
+#include "Systems/TextureSystem.hpp"
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"
@@ -53,9 +55,9 @@ namespace GLVM::Core
 		~COpenglRenderer();
 
 		void draw() override;
-        void SetTextureData(std::vector<ECS::CTextureComponent> _texture_data) override;
+        void SetTextureData(std::vector<ECS::CTexture> _texture_data) override;
         void run() override;
-        void LoadTextureData(GLVM::ECS::CTextureComponent& _Texture);
+        void LoadTextureData(GLVM::ECS::CTexture& _Texture);
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetTransformData(std::vector<ECS::STransformComponent> _transform_data) override;
