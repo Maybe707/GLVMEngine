@@ -1,5 +1,5 @@
-#ifndef TEXTURE_SYSTEM
-#define TEXTURE_SYSTEM
+#ifndef TEXTURE_MANAGER
+#define TEXTURE_MANAGER
 
 #include <vector>
 #include "Texture.hpp"
@@ -11,17 +11,17 @@ typedef unsigned int Texture_ID;
 
 namespace GLVM::ECS
 {
-    class CTextureSystem
+    class CTextureManager
     {
-        static CTextureSystem* pInstance_;
+        static CTextureManager* pInstance_;
         static std::mutex  Mutex_;
         
         std::vector<CTexture> textureVector_;
     public:
-        CTextureSystem();
+        CTextureManager();
 
         void SetTextureVector(std::vector<CTexture> _textureVector);
-        static CTextureSystem* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
+        static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
         std::vector<CTexture>& GetTextureVector();
         void UnbindTexture(CTextureComponent _textureComponent, Entity _entity);

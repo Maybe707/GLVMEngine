@@ -1,16 +1,16 @@
-#include "Systems/TextureSystem.hpp"
+#include "TextureManager.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Texture.hpp"
 #include <iostream>
 
 namespace GLVM::ECS
 {
-    CTextureSystem* CTextureSystem::pInstance_ = nullptr;
-    std::mutex CTextureSystem::Mutex_;
+    CTextureManager* CTextureManager::pInstance_ = nullptr;
+    std::mutex CTextureManager::Mutex_;
     
-    CTextureSystem::CTextureSystem() {}
+    CTextureManager::CTextureManager() {}
 
-    void CTextureSystem::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
+    void CTextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
         textureVector_[_textureID].entitiesOwnsThisTypeOfTexture_.push_back(_entityID);
 
         // for(int i = 0; i < textureVector_.size(); ++i)
@@ -18,21 +18,21 @@ namespace GLVM::ECS
         //         std::cout << "i: " << i << " j: " << j << textureVector_[i].entitiesOwnsThisTypeOfTexture_[j] << std::endl;
     }
 
-    CTextureSystem* CTextureSystem::GetInstance()
+    CTextureManager* CTextureManager::GetInstance()
     {
         std::lock_guard<std::mutex> lock(Mutex_);
         if(pInstance_ == nullptr) {
-            pInstance_ = new CTextureSystem();
+            pInstance_ = new CTextureManager();
         }
         return pInstance_;
     }
 
-    void CTextureSystem::SetTextureVector(std::vector<CTexture> _textureVector) {
+    void CTextureManager::SetTextureVector(std::vector<CTexture> _textureVector) {
         textureVector_ = _textureVector;
     }
 
-    std::vector<CTexture>& CTextureSystem::GetTextureVector() { return textureVector_; }
-    void CTextureSystem::UnbindTexture(CTextureComponent _textureComponent, Entity _entity) {
+    std::vector<CTexture>& CTextureManager::GetTextureVector() { return textureVector_; }
+    void CTextureManager::UnbindTexture(CTextureComponent _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.id_].entitiesOwnsThisTypeOfTexture_;
         for (int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)

@@ -17,7 +17,7 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
-#include "Systems/TextureSystem.hpp"
+#include "TextureManager.hpp"
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"

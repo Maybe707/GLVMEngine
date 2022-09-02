@@ -19,7 +19,7 @@
 #include "Components/TextureComponent.hpp"
 #include "IRenderer.hpp"
 #include <mutex>
-#include "Systems/TextureSystem.hpp"
+#include "TextureManager.hpp"
 
 //#include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"

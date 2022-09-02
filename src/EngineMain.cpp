@@ -1,7 +1,7 @@
 #include "Components/TextureComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
-#include "Systems/TextureSystem.hpp"
+#include "TextureManager.hpp"
 #include "Texture.hpp"
 
 int main()
@@ -24,7 +24,7 @@ int main()
     TextureVector.push_back(Texture_0);
     TextureVector.push_back(Texture_1);
     
-    GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+    GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
     TextureSystem->SetTextureVector(TextureVector);
 
     std::cout << "Size of main vector: " << TextureVector.size() << std::endl;

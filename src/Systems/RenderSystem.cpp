@@ -24,7 +24,7 @@ namespace GLVM::ECS
         //     temp_texture_vector.push_back(pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture));
         // }
 
-        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
         renderer_instance_ = new Core::CVulkanRenderer(TextureSystem->GetTextureVector());
         renderer_instance_->SetTextureData(TextureSystem->GetTextureVector());
@@ -49,7 +49,7 @@ namespace GLVM::ECS
         // renderer_instance_ = nullptr;
         // renderer_instance_ = new Core::CVulkanRenderer(temp_texture_vector);
 
-        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         renderer_instance_->SetTextureData(TextureSystem->GetTextureVector());
 //        renderer_instance_->run();
     }

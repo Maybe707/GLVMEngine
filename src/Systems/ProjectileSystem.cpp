@@ -61,7 +61,7 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
-        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
 
         
         for(int i = 0; i < uiVector_Projectile_Size; ++i) {
@@ -80,7 +80,7 @@ namespace GLVM::ECS
     void CProjectileSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
                                               unsigned int iEntity_refMove,
                                               CViewComponent& view_Component) {
-        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile;
         ECS::CEntityManager::GetInstance()->CreateEntity(uiEntity_Projectile);

@@ -129,7 +129,7 @@ namespace GLVM::Core
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
 
-        GLVM::ECS::CTextureSystem*    TextureSystem    = GLVM::ECS::CTextureSystem::GetInstance();
+        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         std::vector<ECS::CTexture> TextureVector = TextureSystem->GetTextureVector();
         
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)

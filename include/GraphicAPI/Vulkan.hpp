@@ -18,7 +18,7 @@
 #include "IRenderer.hpp"
 #include "Texture.hpp"
 #include "VertexMath.hpp"
-#include "Systems/TextureSystem.hpp"
+#include "TextureManager.hpp"
 #include "ComponentManager.hpp"
 
 #ifdef __linux__
