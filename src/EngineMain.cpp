@@ -19,19 +19,25 @@ int main()
     Texture_1.iHeight_ = 32;
     Texture_1.u_iData_ = witch_dat;
     Texture_1.dat_length_ = witch_dat_len;
-    GLVM::ECS::CTexture Texture_2;
-    Texture_2.iWidth_ = 32;
-    Texture_2.iHeight_ = 32;
-    Texture_2.u_iData_ = Crosshair_dat;
-    Texture_2.dat_length_ = Crosshair_dat_len;
 
     std::vector<GLVM::ECS::CTexture> TextureVector;
     TextureVector.push_back(Texture_0);
     TextureVector.push_back(Texture_1);
-    TextureVector.push_back(Texture_2);
     
-    GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
+    GLVM::ECS::CTextureManager* TextureSystem = GLVM::ECS::CTextureManager::GetInstance();
     TextureSystem->SetTextureVector(TextureVector);
+
+    GLVM::ECS::CTexture hudTexture_0;
+    hudTexture_0.iWidth_ = 32;
+    hudTexture_0.iHeight_ = 32;
+    hudTexture_0.u_iData_ = Crosshair_dat;
+    hudTexture_0.dat_length_ = Crosshair_dat_len;
+    
+    std::vector<GLVM::ECS::CTexture> hudTextureVector;
+    hudTextureVector.push_back(hudTexture_0);
+    
+    GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
+    hudTextureManager->SetTextureVector(hudTextureVector);
     
 	Entity u_iPlayer;
 	EntityManager->CreateEntity(u_iPlayer);
@@ -89,8 +95,8 @@ int main()
 	EntityManager->CreateEntity(u_iWitch2);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-    TextureWitch2.id_ = 2;
-    TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
+    TextureWitch2.id_ = 0;
+    hudTextureManager->BindTexture(u_iWitch2, TextureWitch2.id_);
 	// TextureWitch2.iWidth_ = 32;
 	// TextureWitch2.iHeight_ = 32;
 	// TextureWitch2.u_iData_ = witch_dat;

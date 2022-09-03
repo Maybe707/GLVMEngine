@@ -15,6 +15,9 @@ namespace GLVM::ECS
     {
         static CTextureManager* pInstance_;
         static std::mutex  Mutex_;
+
+        static CTextureManager* pHUDInstance_;
+        static std::mutex  HUDMutex_;
         
         std::vector<CTexture> textureVector_;
     public:
@@ -22,6 +25,7 @@ namespace GLVM::ECS
 
         void SetTextureVector(std::vector<CTexture> _textureVector);
         static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
+        static CTextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
         std::vector<CTexture>& GetTextureVector();
         void UnbindTexture(CTextureComponent _textureComponent, Entity _entity);

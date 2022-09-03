@@ -25,14 +25,19 @@ namespace GLVM::Core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTexture> _initializeTextureData) {
+    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTexture> _initializeTextureData, std::vector<ECS::CTexture> _initializeHUDTextureData) {
         texturePool_ = 10;
+        unsigned int mainTexturesQuantity = _initializeTextureData.size() * texturePool_;
+        unsigned int hudTexturesQuantity = _initializeHUDTextureData.size();
 
-        initializeTextureData_.resize(_initializeTextureData.size() * texturePool_);
+        initializeTextureData_.resize(mainTexturesQuantity + hudTexturesQuantity);
         for(int i = 0; i < _initializeTextureData.size(); ++i)
             for(int j = 0; j < texturePool_; ++j) {
                 initializeTextureData_[j + i * texturePool_] = _initializeTextureData[i];
             }
+
+        for(int n = mainTexturesQuantity; n < mainTexturesQuantity + hudTexturesQuantity; ++n)
+            initializeTextureData_[n] = _initializeHUDTextureData[n];
         
         textureImages.resize(initializeTextureData_.size() * texturePool_);
         textureImageMemories.resize(initializeTextureData_.size() * texturePool_);
@@ -162,8 +167,10 @@ namespace GLVM::Core
         createSwapChain();
         createImageViews();
         createRenderPass();
-        createDescriptorSetLayout();
-        createGraphicsPipeline();
+        createDescriptorSetLayout(descriptorSetLayout);
+        createDescriptorSetLayout(descriptorSetLayoutHUD);
+        createGraphicsPipeline(graphicsPipeline, pipelineLayout, descriptorSetLayout, vertShaderMain_, fragShaderMain_);
+        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
         createCommandPool();
         createDepthResources();
         createFramebuffers();
@@ -505,7 +512,7 @@ namespace GLVM::Core
         }
     }
 
-    void CVulkanRenderer::createDescriptorSetLayout() {
+    void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout) {
         VkDescriptorSetLayoutBinding uboLayoutBinding{};
         uboLayoutBinding.binding = 0;
         uboLayoutBinding.descriptorCount = 1;
@@ -526,14 +533,14 @@ namespace GLVM::Core
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
         layoutInfo.pBindings = bindings.data();
 
-        if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+        if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor set layout!");
         }
     }
 
-    void CVulkanRenderer::createGraphicsPipeline() {
-        auto vertShaderCode = readFile("../shaders/vert.spv");
-        auto fragShaderCode = readFile("../shaders/frag.spv");
+    void CVulkanRenderer::createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, const char* _vertShader, const char* _fragShader) {
+        auto vertShaderCode = readFile(_vertShader);
+        auto fragShaderCode = readFile(_fragShader);
 
         VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
         VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -624,9 +631,9 @@ namespace GLVM::Core
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
+        pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout;
 
-        if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+        if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");
         }
 
@@ -647,7 +654,7 @@ namespace GLVM::Core
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-        if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+        if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_graphicsPipeline) != VK_SUCCESS) {
             throw std::runtime_error("failed to create graphics pipeline!");
         }
 
@@ -1153,6 +1160,40 @@ namespace GLVM::Core
         for (int i = 0; i < texture_load_data_.size(); ++i) {
             for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[texturePool_ * i * MAX_FRAMES_IN_FLIGHT + j + currentFrame * texturePool_], 0, nullptr);
+                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            }
+        }
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
+
+        VkViewport viewportHUD{};
+        viewportHUD.x = 0.0f;
+        viewportHUD.y = 0.0f;
+        viewportHUD.width = (float) swapChainExtent.width;
+        viewportHUD.height = (float) swapChainExtent.height;
+        viewportHUD.minDepth = 0.0f;
+        viewportHUD.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
+
+        VkRect2D scissorHUD{};
+        scissorHUD.offset = {0, 0};
+        scissorHUD.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
+
+        VkBuffer vertexBuffersHUD[] = {vertexBuffer};
+        VkDeviceSize offsetsHUD[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
+
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+        // for (int i = 0; i < texture_load_data_.size() * 2; i = i + 2) {
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame + i], 0, nullptr);
+        //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+        // }
+
+        for (int i = 0; i < texture_load_data_.size(); ++i) {
+            for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[texturePool_ * i * MAX_FRAMES_IN_FLIGHT + j + currentFrame * texturePool_], 0, nullptr);
                 vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
             }
         }

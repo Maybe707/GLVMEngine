@@ -216,8 +216,15 @@ namespace GLVM::Core
     public:
         std::vector<ECS::CTexture> initializeTextureData_;
         std::vector<ECS::CTexture> texture_load_data_;
+        std::vector<ECS::CTexture> hudTexture_load_data_;
         std::vector<ECS::STransformComponent> transform_data_;
 
+        const char* vertShaderMain_ = "../shaders/vert.spv";
+        const char* fragShaderMain_ = "../shaders/frag.spv";
+
+        const char* vertShaderHUD_ = "../hudShaders/vert.spv";
+        const char* fragShaderHUD_ = "../hudShaders/frag.spv";
+        
         unsigned int texturePool_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
@@ -229,7 +236,7 @@ namespace GLVM::Core
 //        GLVM::Core::CWindowVkWin Window{"window", 1920, 1080};
 #endif
         
-        CVulkanRenderer(std::vector<ECS::CTexture> _texture_data);
+        CVulkanRenderer(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _initializeHUDTextureData);
         ~CVulkanRenderer();
     
 
@@ -272,9 +279,13 @@ namespace GLVM::Core
 
         VkRenderPass renderPass;
         VkDescriptorSetLayout descriptorSetLayout;
+        VkDescriptorSetLayout descriptorSetLayoutHUD;
 //    std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
+
+        VkPipelineLayout pipelineLayoutHUD;
+        VkPipeline graphicsPipelineHUD;
 
         VkCommandPool commandPool;
 
@@ -324,8 +335,8 @@ namespace GLVM::Core
         void createSwapChain();
         void createImageViews();
         void createRenderPass();
-        void createDescriptorSetLayout();
-        void createGraphicsPipeline();
+        void createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout);
+        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, const char* _vertShader, const char* _fragShader);
         void createFramebuffers();
         void createCommandPool();
         void createDepthResources();
