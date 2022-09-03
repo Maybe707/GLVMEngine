@@ -36,13 +36,13 @@ namespace GLVM::Core
             for(int j = 0; j < texturePool_; ++j) {
                 initializeTextureData_[j + i * texturePool_] = _initializeTextureData[i];
             }
-
+        
         unsigned int hud_counter = 0;
         for(int n = mainTexturesQuantity; n < mainTexturesQuantity + hudTexturesQuantity; ++n) {
             initializeTextureData_[n] = _initializeHUDTextureData[hud_counter];
             ++hud_counter;
         }
-        
+        std::cout << "size: " << mainTexturesQuantity + hudTexturesQuantity << std::endl;
         textureImages.resize(mainTexturesQuantity + hudTexturesQuantity);
         textureImageMemories.resize(mainTexturesQuantity + hudTexturesQuantity);
 
@@ -80,7 +80,7 @@ namespace GLVM::Core
             if (!pixels) {
                 throw std::runtime_error("failed to load texture image!");
             }
-            
+
             VkBuffer stagingBuffer;
             VkDeviceMemory stagingBufferMemory;
             createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
@@ -89,7 +89,7 @@ namespace GLVM::Core
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
             memcpy(data, pixels, static_cast<size_t>(imageSize));
             vkUnmapMemory(device, stagingBufferMemory);
-
+            std::cout << "i: " << i << std::endl;
             createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
 
             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -1193,7 +1193,7 @@ namespace GLVM::Core
         vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); ++n) {
+        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
             vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
         }
@@ -1291,7 +1291,7 @@ namespace GLVM::Core
 
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
-        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); ++n) {
+        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
             ECS::STransformComponent transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
             updateUniformBuffer(n + currentFrame, transformComponent);
             ++hudCounter;
