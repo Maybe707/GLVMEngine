@@ -212,6 +212,25 @@ namespace GLVM::Core
         20, 21, 22, 22, 23, 20
     };
 
+    const std::vector<Vertex> hudVertices = {
+        {{0.1f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-0.1f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{0.1f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{-0.1f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+
+        {{0.5f, -0.1f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
+        {{-0.5f, -0.1f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
+        {{0.5f, 0.1f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
+        {{-0.5f, 0.1f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+    };
+    
+// Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
+
+    const std::vector<uint16_t> hudIndices = {
+        0, 1, 2, 2, 1, 3,
+        4, 5, 6, 6, 5, 7
+    };
+    
     class CVulkanRenderer : public IRenderer {
     public:
         std::vector<ECS::CTexture> initializeTextureData_;
@@ -277,10 +296,10 @@ namespace GLVM::Core
         std::vector<VkImageView> swapChainImageViews;
         std::vector<VkFramebuffer> swapChainFramebuffers;
 
+        //    std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
         VkRenderPass renderPass;
         VkDescriptorSetLayout descriptorSetLayout;
         VkDescriptorSetLayout descriptorSetLayoutHUD;
-//    std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
 
@@ -306,6 +325,11 @@ namespace GLVM::Core
         VkDeviceMemory vertexBufferMemory;
         VkBuffer indexBuffer;
         VkDeviceMemory indexBufferMemory;
+
+        VkBuffer hudVertexBuffer;
+        VkDeviceMemory hudVertexBufferMemory;
+        VkBuffer hudIndexBuffer;
+        VkDeviceMemory hudIndexBufferMemory;
 
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
@@ -349,8 +373,8 @@ namespace GLVM::Core
         void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
         void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-        void createVertexBuffer();
-        void createIndexBuffer();
+        void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
+        void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
         void createUniformBuffers();
         void createDescriptorPool();
         void createDescriptorSets();
