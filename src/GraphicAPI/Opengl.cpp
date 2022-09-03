@@ -206,6 +206,6 @@ namespace GLVM::Core
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data) {}
+    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {}
     void COpenglRenderer::run() {}
 }

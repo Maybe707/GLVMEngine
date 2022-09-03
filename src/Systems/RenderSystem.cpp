@@ -1,6 +1,7 @@
 #include "Systems/RenderSystem.hpp"
 #include "ComponentManager.hpp"
 #include "Components/TransformComponent.hpp"
+#include "TextureManager.hpp"
 #include "VectorContainer.hpp"
 #include "VertexMath.hpp"
 
@@ -14,9 +15,10 @@ namespace GLVM::ECS
         
 #ifdef VULKAN_API
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
+        GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
         
-        renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector());
-        renderer_instance_->SetTextureData(textureManager->GetTextureVector());
+        renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+        renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
         renderer_instance_->run();
 #endif
 	}
@@ -24,7 +26,9 @@ namespace GLVM::ECS
 #ifdef VULKAN_API
     void CRenderSystem::SetTextureData() {
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
-        renderer_instance_->SetTextureData(textureManager->GetTextureVector());
+        GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
+        
+        renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
     }
 #endif
     
