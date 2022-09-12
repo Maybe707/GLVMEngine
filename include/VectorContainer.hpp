@@ -33,8 +33,28 @@ namespace GLVM::Core
 		T& operator[](const unsigned int _iIndex);
         void Print();
         TCVectorContainer& operator=(const TCVectorContainer<T>& _vector);
+        bool operator==(const char* _string);
+        void Clear();
 	};
 
+    template <class T>
+    void TCVectorContainer<T>::Clear() {
+        delete [] aVector_Container_;
+		aVector_Container_ = nullptr;
+    }
+
+    template <class T>
+    bool TCVectorContainer<T>::operator==(const char* _string) {
+        for (int i = 0; i < iSize_; ++i) {
+            if (aVector_Container_[i] == _string[i])
+                continue;
+            else
+                return false;
+        }
+
+        return true;
+    }
+    
     template <class T>
     TCVectorContainer<T>& TCVectorContainer<T>::operator=(const TCVectorContainer<T>& _vector)
     {
@@ -56,21 +76,16 @@ namespace GLVM::Core
     template <class T>
     TCVectorContainer<T>::TCVectorContainer(const TCVectorContainer<T>& _vector)
     {
+        
+        
         T* aVector_Container = new T[_vector.iSize_];
         iSize_ = _vector.iSize_;
         
         for(int i = 0; i < _vector.iSize_; ++i)
             aVector_Container[i] = _vector.aVector_Container_[i];
 
-
-        // T* aTemp_Vector_Container_ = new T[_vector.iSize_];
-        // this->iSize_ = _vector.iSize_;
-        
-        // for(int i = 0; i < _vector.iSize_; ++i)
-        //     aTemp_Vector_Container_[i] = _vector.aVector_Container_[i];
-        // delete [] this->aVector_Container_;
-        // this->aVector_Container_ = nullptr;
-        // this->aVector_Container_ = aTemp_Vector_Container_;
+        delete [] this->aVector_Container_;
+        this->aVector_Container_ = aVector_Container;
 
     }
     

@@ -4,6 +4,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Texture.hpp"
 #include "VectorContainer.hpp"
+#include "WavefrontObjParser.hpp"
 #include <cstdlib>
 #include <vulkan/vulkan_core.h>
 
@@ -59,6 +60,68 @@ namespace GLVM::Core
         vkDeviceWaitIdle(device);
     }
 
+    void CVulkanRenderer::loadWavefrontObj(const char* _filePath) {
+        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
+
+        wavefrontObjParser->ReadFile(_filePath);
+        wavefrontObjParser->ParseFile();
+
+        unsigned int coordinateVerticesSize = wavefrontObjParser->getCoordinateVertices().GetSize();
+        for (int i = 0; i < coordinateVerticesSize; ++i)
+            for (int j = 0; j < 3; ++j) {
+                std::cout << wavefrontObjParser->getCoordinateVertices()[i][j] << std::fixed << " ";
+                if (j == 2)
+                    std::cout << std::endl;
+            }
+
+        std::cout << std::endl;
+    
+        unsigned int textureVerticesSize = wavefrontObjParser->getTextureVertices().GetSize();
+        for (int i = 0; i < textureVerticesSize; ++i)
+            for (int j = 0; j < 3; ++j) {
+                std::cout << wavefrontObjParser->getTextureVertices()[i][j] << " ";
+                if (j == 2)
+                    std::cout << std::endl;
+            }
+
+        std::cout << std::endl;
+
+        unsigned int faceVerticesSize1 = wavefrontObjParser->getFaces().GetSize();
+        for (int i = 0; i < faceVerticesSize1; ++i)
+            for (int j = 0; j < 3; ++j) {
+                std::cout << wavefrontObjParser->getFaces()[i][0][j] << " ";
+                std::cout << wavefrontObjParser->getFaces()[i][1][j] << " ";
+                std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
+                if (j == 2)
+                    std::cout << std::endl;
+            }
+        
+        unsigned int vertexIndex = 0;
+        unsigned int textureIndex = 0;
+        unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
+        for (int i = 0; i < faceVerticesSize; ++i)
+            for (int j = 0; j < 3; ++j) {
+                vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
+//                std::cout << "vertex index: " << vertexIndex + 1 << std::endl;
+                indicesContainer_.push_back(i * 3 + j);
+//                indicesContainer_.push_back(vertexIndex);
+                SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
+//                std::cout << "texture index: " << textureIndex + 1 << std::endl;
+                SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
+                // Vertex ver{{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}};
+                // verticesContainer_.resize(10000);
+                // verticesContainer_[vertexIndex] = ver;
+                verticesContainer_.push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
+//                std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
+                // if (j == 2)
+                //     std::cout << std::endl;
+            }
+
+        // for (int c = 0; c < indicesContainer_.size(); ++c)
+        //     std::cout << "index: " << indicesContainer_[c] << std::endl;
+    }
+    
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
         viewMatrix = _viewMatrix;
     }
@@ -89,7 +152,7 @@ namespace GLVM::Core
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
             memcpy(data, pixels, static_cast<size_t>(imageSize));
             vkUnmapMemory(device, stagingBufferMemory);
-            std::cout << "i: " << i << std::endl;
+//            std::cout << "i: " << i << std::endl;
             createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
 
             transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -182,8 +245,8 @@ namespace GLVM::Core
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-        createVertexBuffer(vertexBuffer, vertexBufferMemory, vertices);
-        createIndexBuffer(indexBuffer, indexBufferMemory, indices);
+        createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
+        createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
         createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
         createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
         createUniformBuffers();
@@ -592,6 +655,7 @@ namespace GLVM::Core
         rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+//        rasterizer.polygonMode = VK_POLYGON_MODE_POINT;
         rasterizer.lineWidth = 1.0f;
 //        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
         rasterizer.cullMode = 0;
@@ -1166,7 +1230,7 @@ namespace GLVM::Core
         for (int i = 0; i < texture_load_data_.size(); ++i) {
             for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[texturePool_ * i * MAX_FRAMES_IN_FLIGHT + j + currentFrame * texturePool_], 0, nullptr);
-                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainer_.size()), 1, 0, 0, 0);
             }
         }
 
@@ -1289,6 +1353,8 @@ namespace GLVM::Core
             }
         }
 
+        // Needed to skip images that intended to game objects that counts according to *texturePool_*.
+        
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
         for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {

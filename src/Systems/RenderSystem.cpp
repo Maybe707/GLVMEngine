@@ -19,6 +19,7 @@ namespace GLVM::ECS
         
         renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+        renderer_instance_->loadWavefrontObj("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/untitled.obj");
         renderer_instance_->run();
 #endif
 	}
