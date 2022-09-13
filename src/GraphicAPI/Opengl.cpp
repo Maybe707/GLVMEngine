@@ -1,5 +1,6 @@
 #include "GraphicAPI/Opengl.hpp"
 #include "ComponentManager.hpp"
+#include "Constants.hpp"
 #include "Engine.hpp"
 #include "Event.hpp"
 #include "Components/TextureComponent.hpp"
@@ -8,21 +9,26 @@
 #include "Texture.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
+#include "VertexData.hpp"
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <cmath>
 #include "Globals.hpp"
 
-float fBase_Array[30] =
-{
-	// координаты        // текстурные координаты
-	0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // верхняя правая вершина
-	0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // нижняя правая вершина
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // нижняя левая вершина
-	-0.5f,  0.5f, 0.0f,   0.0f, 1.0f,  // верхняя левая вершина
-	0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
-	-0.5f, -0.5f, 0.0f,   0.0f, 0.0f
+int indicesBuffer[36] = {
+    4, 2, 0,
+    2, 7, 3,
+    6, 5, 7,
+    1, 7, 5,
+    0, 3, 1,
+    4, 1, 5,
+    4, 6, 2,
+    2, 6, 7,
+    6, 4, 5,
+    1, 3, 7,
+    0, 2, 3,
+    4, 0, 1
 };
 
 float aVertex_Box[VERTEX_ARRAY_RANGE] =
@@ -85,21 +91,26 @@ namespace GLVM::Core
 		// aMatrix_Ortho_[15] = 1.0f;
 		// //Matrix_Ortho[14] = -m_zn/(m_zf-m_zn);
 
-		float aVertices_[VERTEX_ARRAY_RANGE];
+		float aVertices_[8];
 		
-        for(int i = BASE_ARRAY_COUNTER_VALUE; i < VERTEX_ARRAY_RANGE; ++i)
+        for(int i = BASE_ARRAY_COUNTER_VALUE; i < 8; ++i)
             aVertices_[i] = aVertex_Box[i];
 		
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
- 
+  
+        pGLGen_Buffers(1, &iEbo_);
+        
         ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
         
         pGLBind_Vertex_Array(iVao_);
 		
 		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
         pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_DYNAMIC_DRAW);
-		
+
+        pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
+        pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesBuffer), indicesBuffer, GL_STATIC_DRAW);
+        
         pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
@@ -145,12 +156,24 @@ namespace GLVM::Core
 
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
                         
-            glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
+//            glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
+
+//            pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
+            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
             
 //            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 		}
 	}
 
+    void COpenglRenderer::loadWavefrontObj(const char* _filePath) {
+        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
+
+        wavefrontObjParser->ReadFile(_filePath);
+        wavefrontObjParser->ParseFile();
+
+        
+    }
+    
  	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTexture& _Texture)
 	{
 		///< Loading and creating texture.

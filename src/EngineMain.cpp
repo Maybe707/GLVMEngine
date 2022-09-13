@@ -81,7 +81,7 @@ int main()
 	EntityManager->CreateEntity(u_iWitch);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch);
 	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
-    TextureWitch.id_ = 0;
+    TextureWitch.id_ = 1;
     TextureSystem->BindTexture(u_iWitch, TextureWitch.id_);
 	// TextureWitch.iWidth_ = 32;
 	// TextureWitch.iHeight_ = 32;
@@ -153,7 +153,7 @@ int main()
 	GLVM::ECS::STransformComponent& TransformHud1 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iHud1);
 //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     TransformHud1.tPosition[0] = 0.0f;
-    TransformHud1.tPosition[1] = 0.5f;
+    TransformHud1.tPosition[1] = 0.0f;
     TransformHud1.tPosition[2] = 0.3f;
     TransformHud1.fScale = 0.1f;
 //    TransformHud1.hud = true;

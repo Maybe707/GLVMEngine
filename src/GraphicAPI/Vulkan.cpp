@@ -66,35 +66,35 @@ namespace GLVM::Core
         wavefrontObjParser->ReadFile(_filePath);
         wavefrontObjParser->ParseFile();
 
-        unsigned int coordinateVerticesSize = wavefrontObjParser->getCoordinateVertices().GetSize();
-        for (int i = 0; i < coordinateVerticesSize; ++i)
-            for (int j = 0; j < 3; ++j) {
-                std::cout << wavefrontObjParser->getCoordinateVertices()[i][j] << std::fixed << " ";
-                if (j == 2)
-                    std::cout << std::endl;
-            }
+        // unsigned int coordinateVerticesSize = wavefrontObjParser->getCoordinateVertices().GetSize();
+        // for (int i = 0; i < coordinateVerticesSize; ++i)
+        //     for (int j = 0; j < 3; ++j) {
+        //         std::cout << wavefrontObjParser->getCoordinateVertices()[i][j] << std::fixed << " ";
+        //         if (j == 2)
+        //             std::cout << std::endl;
+        //     }
 
-        std::cout << std::endl;
+        // std::cout << std::endl;
     
-        unsigned int textureVerticesSize = wavefrontObjParser->getTextureVertices().GetSize();
-        for (int i = 0; i < textureVerticesSize; ++i)
-            for (int j = 0; j < 3; ++j) {
-                std::cout << wavefrontObjParser->getTextureVertices()[i][j] << " ";
-                if (j == 2)
-                    std::cout << std::endl;
-            }
+        // unsigned int textureVerticesSize = wavefrontObjParser->getTextureVertices().GetSize();
+        // for (int i = 0; i < textureVerticesSize; ++i)
+        //     for (int j = 0; j < 3; ++j) {
+        //         std::cout << wavefrontObjParser->getTextureVertices()[i][j] << " ";
+        //         if (j == 2)
+        //             std::cout << std::endl;
+        //     }
 
-        std::cout << std::endl;
+        // std::cout << std::endl;
 
-        unsigned int faceVerticesSize1 = wavefrontObjParser->getFaces().GetSize();
-        for (int i = 0; i < faceVerticesSize1; ++i)
-            for (int j = 0; j < 3; ++j) {
-                std::cout << wavefrontObjParser->getFaces()[i][0][j] << " ";
-                std::cout << wavefrontObjParser->getFaces()[i][1][j] << " ";
-                std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
-                if (j == 2)
-                    std::cout << std::endl;
-            }
+        // unsigned int faceVerticesSize1 = wavefrontObjParser->getFaces().GetSize();
+        // for (int i = 0; i < faceVerticesSize1; ++i)
+        //     for (int j = 0; j < 3; ++j) {
+        //         std::cout << wavefrontObjParser->getFaces()[i][0][j] << " ";
+        //         std::cout << wavefrontObjParser->getFaces()[i][1][j] << " ";
+        //         std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
+        //         if (j == 2)
+        //             std::cout << std::endl;
+        //     }
         
         unsigned int vertexIndex = 0;
         unsigned int textureIndex = 0;
@@ -654,6 +654,7 @@ namespace GLVM::Core
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
+//        rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
 //        rasterizer.polygonMode = VK_POLYGON_MODE_POINT;
         rasterizer.lineWidth = 1.0f;

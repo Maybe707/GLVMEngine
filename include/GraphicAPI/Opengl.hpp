@@ -18,6 +18,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
 #include "TextureManager.hpp"
+#include "WavefrontObjParser.hpp"
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"
@@ -48,6 +49,7 @@ namespace GLVM::Core
         
 	    GLuint iVbo_;
 		GLuint iVao_;
+        GLuint iEbo_;
 		Shader* _Shader_Program;
         Shader* GUI_Shader_Program_;
 
@@ -55,6 +57,7 @@ namespace GLVM::Core
 		~COpenglRenderer();
 
 		void draw() override;
+        void loadWavefrontObj(const char* _filePath) override;
         void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) override;
         void run() override;
         void LoadTextureData(GLVM::ECS::CTexture& _Texture);
