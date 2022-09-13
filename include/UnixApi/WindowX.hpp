@@ -6,7 +6,7 @@
 #include <GL/glx.h>
 #include "IWindow.hpp"
 
-#define VULKAN_API
+#define OPENGL_API
 
 namespace GLVM::Core
 {    

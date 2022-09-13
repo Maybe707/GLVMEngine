@@ -147,7 +147,7 @@ namespace GLVM::Core
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
             LoadTextureData(TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), &(pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_), GL_DYNAMIC_DRAW);
+			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.size()), (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.data()), GL_DYNAMIC_DRAW);
 
             SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
   			pGLActive_Texture(GL_TEXTURE10);

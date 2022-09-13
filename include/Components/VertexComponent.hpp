@@ -1,6 +1,8 @@
 #ifndef VERTEX_COMPONENT
 #define VERTEX_COMPONENT
 
+#include <vector>
+
 namespace GLVM::ECS
 {
 	struct SVertexComponent
@@ -16,7 +18,19 @@ namespace GLVM::ECS
 		// 	-0.5f, -0.5f, 0.0f,   0.0f, 0.75f
 		// };
 
-        float aVertex_[40] = {
+                
+        // float aVertex_[40] = {
+        //     0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        //     0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        //     0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        //     0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        //     -0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        //     -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+        //     -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+        //     -0.5f, 0.5f, -0.5f, 1.0f, 1.0f
+        // };
+
+        std::vector<float> aVertex_ {
             0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
             0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
             0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
