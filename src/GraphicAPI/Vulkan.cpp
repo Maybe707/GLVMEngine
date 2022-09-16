@@ -2,9 +2,11 @@
 #include "ComponentManager.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include "Texture.hpp"
 #include "VectorContainer.hpp"
 #include "WavefrontObjParser.hpp"
+#include <cstddef>
 #include <cstdlib>
 #include <vulkan/vulkan_core.h>
 
@@ -60,66 +62,41 @@ namespace GLVM::Core
         vkDeviceWaitIdle(device);
     }
 
-    void CVulkanRenderer::loadWavefrontObj(const char* _filePath) {
-        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
+    void CVulkanRenderer::loadWavefrontObj() {
+        for (int m = 0; m < pathsArray_.size(); ++m) {
+            CWaveFrontObjParser parser;
+            CWaveFrontObjParser* wavefrontObjParser = &parser;
+            
+            wavefrontObjParser->ReadFile(pathsArray_[m]);
+            wavefrontObjParser->ParseFile();
 
-        wavefrontObjParser->ReadFile(_filePath);
-        wavefrontObjParser->ParseFile();
+            aIndices_.emplace_back();
+            aVertices_.emplace_back();
+            
+            unsigned int vertexIndex = 0;
+            unsigned int textureIndex = 0;
+            unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
+            for (int i = 0; i < faceVerticesSize; ++i)
+                for (int j = 0; j < 3; ++j) {
+                    vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
+                    aIndices_[m].push_back(i * 3 + j);
+                    SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                    textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
+                    SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
+                    aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
+                }
 
-        // unsigned int coordinateVerticesSize = wavefrontObjParser->getCoordinateVertices().GetSize();
-        // for (int i = 0; i < coordinateVerticesSize; ++i)
-        //     for (int j = 0; j < 3; ++j) {
-        //         std::cout << wavefrontObjParser->getCoordinateVertices()[i][j] << std::fixed << " ";
-        //         if (j == 2)
-        //             std::cout << std::endl;
-        //     }
+            vertexBufferContainer.emplace_back();
+            vertexBufferMemoryContainer.emplace_back();
+            createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
 
-        // std::cout << std::endl;
-    
-        // unsigned int textureVerticesSize = wavefrontObjParser->getTextureVertices().GetSize();
-        // for (int i = 0; i < textureVerticesSize; ++i)
-        //     for (int j = 0; j < 3; ++j) {
-        //         std::cout << wavefrontObjParser->getTextureVertices()[i][j] << " ";
-        //         if (j == 2)
-        //             std::cout << std::endl;
-        //     }
-
-        // std::cout << std::endl;
-
-        // unsigned int faceVerticesSize1 = wavefrontObjParser->getFaces().GetSize();
-        // for (int i = 0; i < faceVerticesSize1; ++i)
-        //     for (int j = 0; j < 3; ++j) {
-        //         std::cout << wavefrontObjParser->getFaces()[i][0][j] << " ";
-        //         std::cout << wavefrontObjParser->getFaces()[i][1][j] << " ";
-        //         std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
-        //         if (j == 2)
-        //             std::cout << std::endl;
-        //     }
-        
-        unsigned int vertexIndex = 0;
-        unsigned int textureIndex = 0;
-        unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
-        for (int i = 0; i < faceVerticesSize; ++i)
-            for (int j = 0; j < 3; ++j) {
-                vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
-//                std::cout << "vertex index: " << vertexIndex + 1 << std::endl;
-                indicesContainer_.push_back(i * 3 + j);
-//                indicesContainer_.push_back(vertexIndex);
-                SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
-                textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
-//                std::cout << "texture index: " << textureIndex + 1 << std::endl;
-                SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
-                // Vertex ver{{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}};
-                // verticesContainer_.resize(10000);
-                // verticesContainer_[vertexIndex] = ver;
-                verticesContainer_.push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
-//                std::cout << wavefrontObjParser->getFaces()[i][2][j] << " ";
-                // if (j == 2)
-                //     std::cout << std::endl;
-            }
-
-        // for (int c = 0; c < indicesContainer_.size(); ++c)
-        //     std::cout << "index: " << indicesContainer_[c] << std::endl;
+            indexBufferContainer.emplace_back();
+            indexBufferMemoryContaner.emplace_back();
+            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+            
+            // for (int c = 0; c < indicesContainer_.size(); ++c)
+            //     std::cout << "index: " << indicesContainer_[c] << std::endl;
+        }
     }
     
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
@@ -193,6 +170,11 @@ namespace GLVM::Core
         // textureSamplers.resize(texture_load_data_.size());
     }
 
+    void CVulkanRenderer::SetVertexData(std::vector<const char*> _pathsArray) {
+        for (int i = 0; i < _pathsArray.size(); ++i)
+            pathsArray_.push_back(_pathsArray[i]);
+    }
+    
     void CVulkanRenderer::run() {
         initWindow();
         initVulkan();
@@ -245,8 +227,9 @@ namespace GLVM::Core
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-        createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
-        createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
+        // createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
+        // createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
+        loadWavefrontObj();
         createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
         createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
         createUniformBuffers();
@@ -300,11 +283,13 @@ namespace GLVM::Core
 
         vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
 
-        vkDestroyBuffer(device, indexBuffer, nullptr);
-        vkFreeMemory(device, indexBufferMemory, nullptr);
+        for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
+            vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
+            vkFreeMemory(device, indexBufferMemoryContaner[i], nullptr);
 
-        vkDestroyBuffer(device, vertexBuffer, nullptr);
-        vkFreeMemory(device, vertexBufferMemory, nullptr);
+            vkDestroyBuffer(device, vertexBufferContainer[i], nullptr);
+            vkFreeMemory(device, vertexBufferMemoryContainer[i], nullptr);
+        }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -1217,21 +1202,46 @@ namespace GLVM::Core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        VkBuffer vertexBuffers[] = {vertexBuffer};
-        VkDeviceSize offsets[] = {0};
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+        // if (currentFrame == 1)
+        //     ++uiCounter;
+        
+        // if (uiCounter == vertexBufferContainer.size())
+        //      uiCounter = 0;
+        
+        // VkBuffer& vertexBuffer = vertexBufferContainer[uiCounter];
+        // VkBuffer& indexBuffer = indexBufferContainer[uiCounter];
+        
+        // VkBuffer vertexBuffers[] = {vertexBufferContainer[uiCounter]};
+        // VkDeviceSize offsets[] = {0};
+        // vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-        vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        // vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiCounter], 0, VK_INDEX_TYPE_UINT16);
 
         // for (int i = 0; i < texture_load_data_.size() * 2; i = i + 2) {
         //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame + i], 0, nullptr);
         //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
         // }
 
+        /* MAX_FRAMES_IN_FLIGHT doubles texture pool and then j + currentFrame * texturePool
+         * choose specific texture. */
+
+        ECS::CComponentManager* componentManager = ECS::CComponentManager::GetInstance();
+
+        
         for (int i = 0; i < texture_load_data_.size(); ++i) {
             for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+                unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+                unsigned int uiVertexId = componentManager->GetComponent<ECS::SVertexComponent>(uiEntity).vkVertexId_;
+                
+                VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+                VkDeviceSize offsets[] = {0};
+                vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+                vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
+
+                unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
                 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[texturePool_ * i * MAX_FRAMES_IN_FLIGHT + j + currentFrame * texturePool_], 0, nullptr);
-                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainer_.size()), 1, 0, 0, 0);
+                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
             }
         }
 

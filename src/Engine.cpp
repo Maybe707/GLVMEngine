@@ -6,7 +6,6 @@
 #include "ISoundEngine.hpp"
 #include "SoundEngineFactory.hpp"
 #include "SystemManager.hpp"
-#include "Systems/AnimationSystem.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/GUISystem.hpp"
@@ -65,7 +64,6 @@ namespace GLVM::Core
         GUI_System               = new ECS::CGUISystem();
         Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
         Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
-        Animation_System         = new ECS::CAnimationSystem();
         pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
         pCamera_System           = new ECS::CCameraSystem();
         
@@ -89,9 +87,7 @@ namespace GLVM::Core
 	{
         ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
 
-		float fAnimation_Delta            = 0.0f;
 		bool bGame_Loop_Active            = true;
-		Animation_System->Animation_Delta = fAnimation_Delta;
 
 		///< Call of ActivateSystem function must be in this order.
 
@@ -116,6 +112,7 @@ namespace GLVM::Core
             
 			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
 			{
+//                std::cout << g_eEvent.GetEvent() << std::endl;
 				Input_Stack_.ControlInput(g_eEvent);
                 if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
                     bGame_Loop_Active = false;
@@ -135,8 +132,6 @@ namespace GLVM::Core
             pProjectile_System_->_dOffset                 = fDelta_Time_;
             Physics_System_->fDelta_Time_                 = fDelta_Time_;
             Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
-            Animation_System->eEvent_                     = Input_Stack_.Pop();
-			Animation_System->Delta_Time                  = fDelta_Time_;            
 //            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 //            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
             pCamera_System->Render_System_                = Render_System_Interface_;

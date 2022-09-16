@@ -1,6 +1,7 @@
 #include "Systems/RenderSystem.hpp"
 #include "ComponentManager.hpp"
 #include "Components/TransformComponent.hpp"
+#include "MeshManager.hpp"
 #include "TextureManager.hpp"
 #include "VectorContainer.hpp"
 #include "VertexMath.hpp"
@@ -16,10 +17,12 @@ namespace GLVM::ECS
 #ifdef VULKAN_API
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
         GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
+        GLVM::Core::CMeshManager*   meshManager = GLVM::Core::CMeshManager::GetInstance();
         
         renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
-        renderer_instance_->loadWavefrontObj("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/untitled.obj");
+        renderer_instance_->SetVertexData(meshManager->pathsArray_);
+//        renderer_instance_->loadWavefrontObj("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/untitled.obj");
         renderer_instance_->run();
 #endif
 	}

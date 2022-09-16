@@ -17,6 +17,8 @@ namespace GLVM::ECS
     {
 	public:
         unsigned int id_;
+        unsigned int vkInnerId_; ///< This field using to choose specific instance of texture image in Vulkan.
+        
 		// GLuint iTexture_;
 		// unsigned int iWidth_;
 		// unsigned int iHeight_;

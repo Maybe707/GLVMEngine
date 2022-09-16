@@ -9,14 +9,12 @@ namespace GLVM::Core
 	class CStack
 	{
 		int iHead_ = 0;
-		static const int iStack_Range_ = 5;
+		static const int iStack_Range_ = 6;
 		EEvents aStack_[iStack_Range_] = {};
 	public:
 		void Push(const EEvents& _Event)
 		{
-
-			for(int i = 0; i < iHead_; ++i)
-			{
+			for(int i = 0; i < iHead_; ++i) {
 				if(aStack_[iHead_ - 1] == _Event)
 					return;
 			}

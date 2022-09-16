@@ -10,6 +10,9 @@ namespace GLVM::ECS
 {
     struct CTexture
     {
+        unsigned int vkAvailableInnerId_ = 0; ///< This field using to choose specific instance of texture image in Vulkan.
+        unsigned int vkInnerIdLimit_ = 10;
+        
         GLuint iTexture_;
         std::vector<Entity> entitiesOwnsThisTypeOfTexture_;
         unsigned int id_;

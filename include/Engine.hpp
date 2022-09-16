@@ -19,7 +19,6 @@
 #include "Components/TextureComponent.hpp"
 #include "VectorContainer.hpp"
 #include "Systems/CollisionSystem.hpp"
-#include "Systems/AnimationSystem.hpp"
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -78,7 +77,6 @@ namespace GLVM::Core
         
 		ECS::CRenderSystem*     Renderer_System;
         ECS::CCollisionSystem*  Collision_System;
-		ECS::CAnimationSystem*  Animation_System;
 		ECS::CMovementSystem*   Movement_System;
         ECS::CPhysicsSystem*    Physics_System_;
         ECS::CProjectileSystem* pProjectile_System_;

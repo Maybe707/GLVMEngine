@@ -4,20 +4,20 @@
 
 namespace GLVM::Core
 {
-    CWaveFrontObjParser* CWaveFrontObjParser::pInstance_ = nullptr;
-    std::mutex CWaveFrontObjParser::Mutex_;
+    // CWaveFrontObjParser* CWaveFrontObjParser::pInstance_ = nullptr;
+    // std::mutex CWaveFrontObjParser::Mutex_;
     
     CWaveFrontObjParser::CWaveFrontObjParser() {}
 
-    CWaveFrontObjParser* CWaveFrontObjParser::GetInstance()
-    {
-        std::lock_guard<std::mutex> lock(Mutex_);
-        if(pInstance_ == nullptr)
-        {
-            pInstance_ = new CWaveFrontObjParser();
-        }
-        return pInstance_;
-    }
+    // CWaveFrontObjParser* CWaveFrontObjParser::GetInstance()
+    // {
+    //     std::lock_guard<std::mutex> lock(Mutex_);
+    //     if(pInstance_ == nullptr)
+    //     {
+    //         pInstance_ = new CWaveFrontObjParser();
+    //     }
+    //     return pInstance_;
+    // }
     
     GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
     GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }

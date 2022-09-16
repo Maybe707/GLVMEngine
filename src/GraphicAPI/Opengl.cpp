@@ -6,6 +6,7 @@
 #include "Components/TextureComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "GLPointer.h"
+#include "MeshManager.hpp"
 #include "Texture.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
@@ -140,14 +141,16 @@ namespace GLVM::Core
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
 
-        GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
+        ECS::CTextureManager* TextureSystem = ECS::CTextureManager::GetInstance();
+        Core::CMeshManager* MeshManager     = Core::CMeshManager::GetInstance();   
+        
         std::vector<ECS::CTexture> TextureVector = TextureSystem->GetTextureVector();
         
 		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
 		{
             unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
             LoadTextureData(TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.size()), (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.data()), GL_DYNAMIC_DRAW);
+//			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.size()), (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.data()), GL_DYNAMIC_DRAW);
 
             SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
   			pGLActive_Texture(GL_TEXTURE10);
@@ -165,10 +168,13 @@ namespace GLVM::Core
 		}
 	}
 
-    void COpenglRenderer::loadWavefrontObj(const char* _filePath) {
-        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
+    void COpenglRenderer::loadWavefrontObj() {
+//        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
 
-        wavefrontObjParser->ReadFile(_filePath);
+        CWaveFrontObjParser parser;
+        CWaveFrontObjParser* wavefrontObjParser = &parser;
+        
+        wavefrontObjParser->ReadFile("");
         wavefrontObjParser->ParseFile();
 
         
@@ -230,5 +236,7 @@ namespace GLVM::Core
     }
     
     void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {}
+    void COpenglRenderer::SetVertexData(std::vector<const char*> _pathsArray) {}
+    
     void COpenglRenderer::run() {}
 }

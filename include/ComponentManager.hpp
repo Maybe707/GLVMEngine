@@ -7,7 +7,7 @@
 #include "VectorContainer.hpp"
 #include <iostream>
 #include "IContainer.hpp"
-#include "Components/VertexComponent.hpp"
+//#include "Components/VertexComponent.hpp"
 #include <mutex>
 
 typedef unsigned int Entity_ID;

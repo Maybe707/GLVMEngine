@@ -57,6 +57,7 @@ namespace GLVM::ECS
                                                                   cameraSpeed,
                                                                   view_Component,
                                                                   g_eEvent);
+                std::cout << Input_Stack_[n] << std::endl;
                 if(bDiagonal_Movement_Availability)
                     break;
                 switch(Input_Stack_[n])

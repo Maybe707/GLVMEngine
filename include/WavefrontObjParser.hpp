@@ -60,8 +60,8 @@ namespace GLVM::Core
     
     class CWaveFrontObjParser
     {
-        static CWaveFrontObjParser* pInstance_;
-        static std::mutex  Mutex_;
+        // static CWaveFrontObjParser* pInstance_;
+        // static std::mutex  Mutex_;
         
         GLVM::Core::TCVectorContainer<SVertex> coordinateVertices_;
         GLVM::Core::TCVectorContainer<SVertex> textureVertices_;
@@ -73,7 +73,7 @@ namespace GLVM::Core
     public:
         CWaveFrontObjParser();
 
-        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
+//        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         
         GLVM::Core::TCVectorContainer<SVertex> getCoordinateVertices();
         GLVM::Core::TCVectorContainer<SVertex> getTextureVertices();

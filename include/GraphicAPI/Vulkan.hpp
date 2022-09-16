@@ -21,6 +21,7 @@
 #include "VertexMath.hpp"
 #include "TextureManager.hpp"
 #include "ComponentManager.hpp"
+#include "WavefrontObjParser.hpp"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -95,7 +96,7 @@ namespace GLVM::Core
         std::vector<VkSurfaceFormatKHR> formats;
         std::vector<VkPresentModeKHR> presentModes;
     };
-
+    
     struct Vertex {
         vec3 pos;
         vec3 color;
@@ -138,6 +139,17 @@ namespace GLVM::Core
         alignas(16) mat4 proj;
     };
 
+    class CVertexObject
+    {
+    public:
+        const char* k_cPath_;
+        
+        std::vector<float> aVertex_ {
+        };
+
+
+    };
+    
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 //         {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -235,9 +247,9 @@ namespace GLVM::Core
         std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
         std::vector<ECS::STransformComponent> transform_data_;
-
-        std::vector<Vertex> verticesContainer_;
-        std::vector<uint16_t> indicesContainer_;
+        std::vector<const char*> pathsArray_;
+        std::vector<std::vector<Core::Vertex>> aVertices_;
+        std::vector<std::vector<uint16_t>> aIndices_;
         
         const char* vertShaderMain_ = "../shaders/vert.spv";
         const char* fragShaderMain_ = "../shaders/frag.spv";
@@ -253,7 +265,6 @@ namespace GLVM::Core
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         GLVM::Core::CWindowWin Window;
-//        GLVM::Core::CWindowVkWin Window{"window", 1920, 1080};
 #endif
         
         CVulkanRenderer(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _initializeHUDTextureData);
@@ -262,8 +273,9 @@ namespace GLVM::Core
         void createTextureImage();
         void recreateSwapChain();
         void draw() override;
-        void loadWavefrontObj(const char* _filePath) override;
+        void loadWavefrontObj() override;
         void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) override;
+        void SetVertexData(std::vector<const char*> _pathsArray) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
         void run() override;
@@ -297,7 +309,6 @@ namespace GLVM::Core
         std::vector<VkImageView> swapChainImageViews;
         std::vector<VkFramebuffer> swapChainFramebuffers;
 
-        //    std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
         VkRenderPass renderPass;
         VkDescriptorSetLayout descriptorSetLayout;
         VkDescriptorSetLayout descriptorSetLayoutHUD;
@@ -313,19 +324,20 @@ namespace GLVM::Core
         VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
 
-        // VkImage textureImage;
-        // VkDeviceMemory textureImageMemory;
-        //    VkImageView textureImageView;
-        //    VkSampler textureSampler;
         std::vector<VkImage> textureImages;
         std::vector<VkDeviceMemory> textureImageMemories;
         std::vector<VkImageView> textureImageViews;
         std::vector<VkSampler> textureSamplers;
 
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
+        // VkBuffer vertexBuffer;
+        // VkDeviceMemory vertexBufferMemory;
+        // VkBuffer indexBuffer;
+        // VkDeviceMemory indexBufferMemory;
+
+        std::vector<VkBuffer> vertexBufferContainer;
+        std::vector<VkDeviceMemory> vertexBufferMemoryContainer;
+        std::vector<VkBuffer> indexBufferContainer;
+        std::vector<VkDeviceMemory> indexBufferMemoryContaner;
 
         VkBuffer hudVertexBuffer;
         VkDeviceMemory hudVertexBufferMemory;
