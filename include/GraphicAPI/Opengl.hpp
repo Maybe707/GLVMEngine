@@ -46,8 +46,6 @@ namespace GLVM::Core {
 #endif
 
 		GLuint iVbo_;
-		// GLuint iVao_;
-		// GLuint iEbo_;
 		Shader* _Shader_Program;
 		Shader* GUI_Shader_Program_;
 
@@ -55,9 +53,9 @@ namespace GLVM::Core {
         std::vector<ECS::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_;
 		std::vector<std::vector<unsigned int>> aIndices_;
+		std::vector<GLuint> VBOcontainer_;
 		std::vector<GLuint> VAOcontainer_;
 		std::vector<GLuint> EBOcontainer_;
-//		std::vector<std::vector<float>> aVertices_;
 
 		COpenglRenderer();
 		~COpenglRenderer();

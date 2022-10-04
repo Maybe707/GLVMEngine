@@ -85,6 +85,7 @@ namespace GLVM::Core
 
 	void COpenglRenderer::SetVertices(std::vector<unsigned int>& _aIndices,
 									  std::vector<float>& _aVertices) {
+		GLuint iVbo_;
 		GLuint iVao_;
 		GLuint iEbo_;
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
@@ -106,6 +107,7 @@ namespace GLVM::Core
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		VAOcontainer_.push_back(iVbo_);
 		VAOcontainer_.push_back(iVao_);
 		EBOcontainer_.push_back(iEbo_);
 	}
