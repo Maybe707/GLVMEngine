@@ -250,7 +250,7 @@ namespace GLVM::Core
         std::vector<const char*> pathsArray_;
         std::vector<std::vector<Core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
-        
+
         const char* vertShaderMain_ = "../shaders/vert.spv";
         const char* fragShaderMain_ = "../shaders/frag.spv";
 
@@ -275,7 +275,7 @@ namespace GLVM::Core
         void draw() override;
         void loadWavefrontObj() override;
         void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) override;
-        void SetVertexData(std::vector<const char*> _pathsArray) override;
+        void SetMeshData(std::vector<const char*> _pathsArray) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
         void run() override;

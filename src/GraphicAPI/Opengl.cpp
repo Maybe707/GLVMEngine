@@ -17,65 +17,10 @@
 #include <cmath>
 #include "Globals.hpp"
 
-int indicesBuffer[36] = {
-    4, 2, 0,
-    2, 7, 3,
-    6, 5, 7,
-    1, 7, 5,
-    0, 3, 1,
-    4, 1, 5,
-    4, 6, 2,
-    2, 6, 7,
-    6, 4, 5,
-    1, 3, 7,
-    0, 2, 3,
-    4, 0, 1
-};
-
-float aVertex_Box[VERTEX_ARRAY_RANGE] =
-{
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <thread>
 
 namespace GLVM::Core
 {
@@ -83,39 +28,7 @@ namespace GLVM::Core
 	{
 		_Shader_Program     = new Shader("../Shader.vs", "../Shader.fs");
         GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
-        
-		// aMatrix_Ortho_[0]  = 2/1280.0f;
-		// //Matrix_Ortho[3]  -= 1;
-		// //Matrix_Ortho[7]  -= 1;
-		// aMatrix_Ortho_[5]  = 2/1280.0f;
-		// aMatrix_Ortho_[10] = 1/(600.0f-0.0f);
-		// aMatrix_Ortho_[15] = 1.0f;
-		// //Matrix_Ortho[14] = -m_zn/(m_zf-m_zn);
 
-		float aVertices_[8];
-		
-        for(int i = BASE_ARRAY_COUNTER_VALUE; i < 8; ++i)
-            aVertices_[i] = aVertex_Box[i];
-		
-		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
-        pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
-  
-        pGLGen_Buffers(1, &iEbo_);
-        
-        ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
-        
-        pGLBind_Vertex_Array(iVao_);
-		
-		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(aVertices_), aVertices_, GL_DYNAMIC_DRAW);
-
-        pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
-        pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicesBuffer), indicesBuffer, GL_STATIC_DRAW);
-        
-        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
-        pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
-		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
         glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, 1920, 1080);
 	}
@@ -140,44 +53,88 @@ namespace GLVM::Core
 
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
-
-        ECS::CTextureManager* TextureSystem = ECS::CTextureManager::GetInstance();
-        Core::CMeshManager* MeshManager     = Core::CMeshManager::GetInstance();   
         
-        std::vector<ECS::CTexture> TextureVector = TextureSystem->GetTextureVector();
-        
-		for(int i = 0, iSize = uiVector_Texture_Size; i < iSize; ++i)
-		{
-            unsigned int uiEntity_refTexture= (*pEntity_Container_refTexture)[i];
-            LoadTextureData(TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
-//			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.size()), (pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).aVertex_.data()), GL_DYNAMIC_DRAW);
+		for(int i = 0; i < texture_load_data_.size(); ++i)
+			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
+				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
+				LoadTextureData(texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
+				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				pGLActive_Texture(GL_TEXTURE10);
+//				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
+				pGLBind_Vertex_Array(iVao_);
+				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+			}
 
-            SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
-  			pGLActive_Texture(GL_TEXTURE10);
-			glBindTexture(GL_TEXTURE_2D, TextureVector[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
-			pGLBind_Vertex_Array(iVao_);
-
-//            glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-                        
-//            glDrawArrays(GL_TRIANGLES, BASE_INDEX_VERTEX_ARRAY, NUMBER_OF_DROWING_VERTEXES);
-
-//            pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
-            glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-            
-//            glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-		}
+		for(int i = 0; i < hudTexture_load_data_.size(); ++i)
+			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
+				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
+				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
+				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				pGLActive_Texture(GL_TEXTURE10);
+//				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
+				pGLBind_Vertex_Array(iVao_);
+				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+			}
 	}
 
+	void COpenglRenderer::SetVertices(std::vector<unsigned int>& _aIndices,
+									  std::vector<float>& _aVertices) {
+		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
+        pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
+  
+        pGLGen_Buffers(1, &iEbo_);
+        
+        ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
+        
+        pGLBind_Vertex_Array(iVao_);
+		
+		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
+        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * _aVertices.size(), _aVertices.data(), GL_DYNAMIC_DRAW);
+
+        pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
+        pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _aIndices.size(), _aIndices.data(), GL_STATIC_DRAW);
+        
+        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
+        pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+	}
+	
     void COpenglRenderer::loadWavefrontObj() {
-//        GLVM::Core::CWaveFrontObjParser* wavefrontObjParser = GLVM::Core::CWaveFrontObjParser::GetInstance();
+        for (int m = 0; m < pathsArray_.size(); ++m) {
+            CWaveFrontObjParser parser;
+            CWaveFrontObjParser* wavefrontObjParser = &parser;
 
-        CWaveFrontObjParser parser;
-        CWaveFrontObjParser* wavefrontObjParser = &parser;
-        
-        wavefrontObjParser->ReadFile("");
-        wavefrontObjParser->ParseFile();
+            wavefrontObjParser->ReadFile(pathsArray_[m]);
+            wavefrontObjParser->ParseFile();
 
-        
+            aIndices_.emplace_back();
+            aVertices_.emplace_back();
+            
+            unsigned int vertexIndex = 0;
+            unsigned int textureIndex = 0;
+            unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
+            for (int i = 0; i < faceVerticesSize; ++i)
+                for (int j = 0; j < 3; ++j) {
+                    vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
+                    aIndices_[m].push_back(i * 3 + j);
+                    SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                    textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
+                    SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
+                    // aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
+					// std::cout << "v0: " << vertex[0] << " v1: " << vertex[1] << " v2: " << vertex[2]
+					// 		  << " t0: " << texture[0] << " t1: " << texture[1] << std::endl;
+					aVertices_[m].push_back(vertex[0]);
+					aVertices_[m].push_back(vertex[1]);
+					aVertices_[m].push_back(vertex[2]);
+					aVertices_[m].push_back(texture[0]);
+					aVertices_[m].push_back(texture[1]);
+                }
+        }
     }
     
  	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTexture& _Texture)
@@ -235,8 +192,17 @@ namespace GLVM::Core
 		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {}
-    void COpenglRenderer::SetVertexData(std::vector<const char*> _pathsArray) {}
+    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {
+		texture_load_data_ = _texture_data;
+		hudTexture_load_data_ = _hud_texture_data;
+	}
+	
+    void COpenglRenderer::SetMeshData(std::vector<const char*> _pathsArray) {
+		for (int i = 0; i < _pathsArray.size(); ++i)
+            pathsArray_.push_back(_pathsArray[i]);
+	}
     
-    void COpenglRenderer::run() {}
+    void COpenglRenderer::run() {
+		loadWavefrontObj();
+	}
 }

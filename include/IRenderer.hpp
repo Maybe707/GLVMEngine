@@ -16,7 +16,7 @@ namespace GLVM::Core
         virtual void draw() = 0;
         virtual void loadWavefrontObj() = 0;
         virtual void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) = 0;
-        virtual void SetVertexData(std::vector<const char*> _pathsArray) = 0;
+        virtual void SetMeshData(std::vector<const char*> _pathsArray) = 0;
         virtual void SetViewMatrix(mat4 _viewMatrix) = 0;
         virtual void SetProjectionMatrix(mat4 _projectionMatrix) = 0;
         virtual void run() = 0;

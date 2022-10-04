@@ -10,37 +10,33 @@ namespace GLVM::ECS
 {
     CRenderSystem::CRenderSystem()
 	{
-#ifdef OPENGL_API
-        renderer_instance_ = new Core::COpenglRenderer();
-#endif
-        
-#ifdef VULKAN_API
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
         GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
         GLVM::Core::CMeshManager*   meshManager = GLVM::Core::CMeshManager::GetInstance();
-        
+		
+#ifdef VULKAN_API        
         renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
-        renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
-        renderer_instance_->SetVertexData(meshManager->pathsArray_);
-//        renderer_instance_->loadWavefrontObj("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/untitled.obj");
-        renderer_instance_->run();
 #endif
+		
+#ifdef OPENGL_API
+        renderer_instance_ = new Core::COpenglRenderer();
+#endif
+
+        renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+        renderer_instance_->SetMeshData(meshManager->pathsArray_);
+        renderer_instance_->run();
 	}
 
-#ifdef VULKAN_API
     void CRenderSystem::SetTextureData() {
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
         GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
         
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
     }
-#endif
     
 	CRenderSystem::~CRenderSystem() {}
     void CRenderSystem::Update() {
-#ifdef VULKAN_API
         SetTextureData();
-#endif
         renderer_instance_->draw();
     }
     Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    

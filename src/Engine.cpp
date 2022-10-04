@@ -31,7 +31,7 @@
  *******************************************************************
  *****************  👑  !!!  DESTRUCTOR_3000  !!!  👑  *************/
 
-#define DESTRUCTOR_3000 \
+#define DESTRUCTOR_3000													\
     std::cout << "You have been destructurized. [=]___[=]" << std::endl; \
     exit(1)
 
@@ -45,108 +45,108 @@ namespace GLVM::Core
 
     void PlaybackSound(Sound::ISoundEngine* _sound_Engine)
     {
-//        _sound_Engine->SetMasterVolume(10);
+		//        _sound_Engine->SetMasterVolume(10);
         while(1)
-        {
-            _sound_Engine->SoundStream();
-        }
+		{
+			_sound_Engine->SoundStream();
+		}
     }
     
     CEngine::CEngine()
-	{
-//		Window_             = CWindowCreator().Create();
-        //   Render_System_Interface_ = new ECS::CRenderSystem();
-        Render_System_Interface_ = new ECS::CRenderSystem();
+    {
+		//		Window_             = CWindowCreator().Create();
+		//   Render_System_Interface_ = new ECS::CRenderSystem();
+		Render_System_Interface_ = new ECS::CRenderSystem();
 		Chrono_                  = Time::CTimerCreator().Create();
-        Sound_Engine_            = Sound::CSoundEngineFactory().CreateSoundEngine();
+		Sound_Engine_            = Sound::CSoundEngineFactory().CreateSoundEngine();
 
-        Collision_System         = new ECS::CCollisionSystem(Input_Stack_);
-        GUI_System               = new ECS::CGUISystem();
-        Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
-        Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
-        pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
-        pCamera_System           = new ECS::CCameraSystem();
+		Collision_System         = new ECS::CCollisionSystem(Input_Stack_);
+		GUI_System               = new ECS::CGUISystem();
+		Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
+		Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
+		pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
+		pCamera_System           = new ECS::CCameraSystem();
         
-        fDelta_Time_             = 0.0;
-        g_eEvent.SetEvent(eDEFAULT);
-	}
+		fDelta_Time_             = 0.0;
+		g_eEvent.SetEvent(eDEFAULT);
+    }
 
-	CEngine::~CEngine() {}
+    CEngine::~CEngine() {}
             
     CEngine* CEngine::GetInstance()
     {
-        std::lock_guard<std::mutex> lock(Mutex_);
-        if(pInstance_ == nullptr)
-        {
-            pInstance_ = new CEngine();
-        }
-        return pInstance_;
+		std::lock_guard<std::mutex> lock(Mutex_);
+		if(pInstance_ == nullptr)
+		{
+			pInstance_ = new CEngine();
+		}
+		return pInstance_;
     }
 
-	void CEngine::GameLoop()
-	{
-        ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
+    void CEngine::GameLoop()
+    {
+		ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
 
 		bool bGame_Loop_Active            = true;
 
 		///< Call of ActivateSystem function must be in this order.
 
-        pSystem_Manager->ActivateSystem(Movement_System);
-        pSystem_Manager->ActivateSystem(pProjectile_System_);
+		pSystem_Manager->ActivateSystem(Movement_System);
+		pSystem_Manager->ActivateSystem(pProjectile_System_);
 		pSystem_Manager->ActivateSystem(Collision_System);
-        pSystem_Manager->ActivateSystem(Physics_System_);
-//		pSystem_Manager->ActivateSystem(Animation_System);
-        pSystem_Manager->ActivateSystem(pCamera_System);
-        pSystem_Manager->ActivateSystem(Render_System_Interface_);
-//        pSystem_Manager->ActivateSystem(GUI_System);
+		pSystem_Manager->ActivateSystem(Physics_System_);
+		//		pSystem_Manager->ActivateSystem(Animation_System);
+		pSystem_Manager->ActivateSystem(pCamera_System);
+		pSystem_Manager->ActivateSystem(Render_System_Interface_);
+		//        pSystem_Manager->ActivateSystem(GUI_System);
 
-        std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
-        sound_thread.detach();
+		std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
+		sound_thread.detach();
         
 		while(bGame_Loop_Active)
 		{
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
             
-            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
+			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
 			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
 			{
-//                std::cout << g_eEvent.GetEvent() << std::endl;
+				//                std::cout << g_eEvent.GetEvent() << std::endl;
 				Input_Stack_.ControlInput(g_eEvent);
-                if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
-                    bGame_Loop_Active = false;
+				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
+					bGame_Loop_Active = false;
 			}
 			g_eEvent.SetLastEvent(Input_Stack_);
 
-//            Input_Stack_.PrintStack();
+			//            Input_Stack_.PrintStack();
             
-            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
-                                g_eEvent.mouse_Pointer_Position_.iPosition_Y,
-                                &g_eEvent.mouse_Pointer_Position_.iOffset_X,
-                                &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
-            
+			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+																										g_eEvent.mouse_Pointer_Position_.iPosition_Y,
+																										&g_eEvent.mouse_Pointer_Position_.iOffset_X,
+																										&g_eEvent.mouse_Pointer_Position_.iOffset_Y);
+
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Movement_System->_Anim_Event                  = g_eEvent.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
-            pProjectile_System_->_dOffset                 = fDelta_Time_;
-            Physics_System_->fDelta_Time_                 = fDelta_Time_;
-            Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
-//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
-            pCamera_System->Render_System_                = Render_System_Interface_;
+			pProjectile_System_->_dOffset                 = fDelta_Time_;
+			Physics_System_->fDelta_Time_                 = fDelta_Time_;
+			Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
+			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+			//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
+			pCamera_System->Render_System_                = Render_System_Interface_;
             
 			pSystem_Manager->Update();
-            ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
+			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
             
-//            g_Sound_Engine.SoundStream();
+			//            g_Sound_Engine.SoundStream();
 		}
-	}
+    }
     
-	void CEngine::GameKill()
-	{
-        ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.Close();
-        delete Chrono_;
+    void CEngine::GameKill()
+    {
+		((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.Close();
+		delete Chrono_;
 		Chrono_ = nullptr;
-	}
+    }
 }

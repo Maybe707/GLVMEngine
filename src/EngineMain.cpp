@@ -17,7 +17,7 @@ int main()
     MeshManager->SetMesh("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/cone.obj");
     MeshManager->SetMesh("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/monkey.obj");
     MeshManager->SetMesh("/home/cyber-demon/cyberDemonCode/rpgeshechkaMain/GLVM/waveFrontObj/xyz.obj");
-    
+
     GLVM::ECS::CTexture Texture_0;
     Texture_0.iWidth_ = 128;
     Texture_0.iHeight_ = 96;
@@ -28,10 +28,16 @@ int main()
     Texture_1.iHeight_ = 32;
     Texture_1.u_iData_ = witch_dat;
     Texture_1.dat_length_ = witch_dat_len;
-
+	GLVM::ECS::CTexture Texture_2;
+	Texture_2.iWidth_ = 32;
+	Texture_2.iHeight_ = 32;
+	Texture_2.u_iData_ = gray_dat;
+	Texture_2.dat_length_ = gray_dat_len;
+	
     std::vector<GLVM::ECS::CTexture> TextureVector;
     TextureVector.push_back(Texture_0);
     TextureVector.push_back(Texture_1);
+	TextureVector.push_back(Texture_2);
     
     GLVM::ECS::CTextureManager* TextureSystem = GLVM::ECS::CTextureManager::GetInstance();
     TextureSystem->SetTextureVector(TextureVector);
@@ -92,7 +98,7 @@ int main()
 	EntityManager->CreateEntity(u_iWitch);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch);
 	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
-    TextureWitch.id_ = 1;
+    TextureWitch.id_ = 2;
     TextureSystem->BindTexture(u_iWitch, TextureWitch.id_);
 	// TextureWitch.iWidth_ = 32;
 	// TextureWitch.iHeight_ = 32;
@@ -114,7 +120,7 @@ int main()
 	EntityManager->CreateEntity(u_iWitch2);
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
-    TextureWitch2.id_ = 1;
+    TextureWitch2.id_ = 2;
     GLVM::ECS::SVertexComponent& VertexWitch2 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
     VertexWitch2.vkVertexId_ = 2;
     TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
@@ -159,7 +165,7 @@ int main()
 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iHud1);
 	GLVM::ECS::CTextureComponent& TextureHud1 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iHud1);
     GLVM::ECS::SVertexComponent& VertexHud1 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iHud1);
-    VertexHud1.vkVertexId_ = 2;
+    VertexHud1.vkVertexId_ = 0;
     TextureHud1.id_ = 0;
     hudTextureManager->BindTexture(u_iHud1, TextureHud1.id_);
 	// TextureWitch2.iWidth_ = 32;

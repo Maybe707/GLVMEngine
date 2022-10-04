@@ -21,8 +21,8 @@
 #include <mutex>
 #include "TextureManager.hpp"
 
-//#include "GraphicAPI/Opengl.hpp"
-#include "GraphicAPI/Vulkan.hpp"
+#include "GraphicAPI/Opengl.hpp"
+//#include "GraphicAPI/Vulkan.hpp"
 
 /*! \class Renderer.
     \brief Render all game objects.
@@ -37,17 +37,13 @@ namespace GLVM::ECS
     private:
         Core::IRenderer* renderer_instance_;
         
-#ifdef VULKAN_API
-    public:
-        void SetTextureData();
-#endif
-
     public:
         CRenderSystem();
 		~CRenderSystem();
 
 		void Update() override;
         Core::IRenderer* GetRenderSystemInstance();
+		void SetTextureData();
         void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
         void SetViewMatrix(mat4 _viewMatrix);
         void SetProjectionMatrix(mat4 _projectionMatrix);

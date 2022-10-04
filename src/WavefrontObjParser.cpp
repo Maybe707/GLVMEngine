@@ -114,14 +114,14 @@ namespace GLVM::Core
         GLVM::Core::TCVectorContainer<char> word;
         
         unsigned int uiWordsContainerSize = _wordsContainer.GetSize();
+
         for (int i = 1; i < uiWordsContainerSize; ++i) {
             unsigned int counter = 0;
             wordsInnerContainer = Split(_wordsContainer[i].GetVectorContainer(), '/', '\0', counter);
-            
+
             for (int j = 0; j < wordsInnerContainer.GetSize(); ++j) {
 
                 word = wordsInnerContainer[j];
-
                 int iValue = ParseInteger(word);
 
                 face[j].Push(iValue);
