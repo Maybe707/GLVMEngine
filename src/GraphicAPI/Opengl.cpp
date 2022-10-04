@@ -39,8 +39,10 @@ namespace GLVM::Core
         _Shader_Program = nullptr;
         delete GUI_Shader_Program_;
         GUI_Shader_Program_ = nullptr;
-        
-		pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
+
+		for (int i = 0; i < VAOcontainer_.size(); ++i)
+			pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &VAOcontainer_[i]);
+		
         pGLDelete_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
 	}
     
@@ -58,12 +60,12 @@ namespace GLVM::Core
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
+//				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
 				LoadTextureData(texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 //				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
-				pGLBind_Vertex_Array(iVao_);
+				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 
@@ -71,18 +73,20 @@ namespace GLVM::Core
 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
+//				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
 				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 //				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
-				pGLBind_Vertex_Array(iVao_);
+				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 	}
 
 	void COpenglRenderer::SetVertices(std::vector<unsigned int>& _aIndices,
 									  std::vector<float>& _aVertices) {
+		GLuint iVao_;
+		GLuint iEbo_;
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
   
@@ -102,6 +106,8 @@ namespace GLVM::Core
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		VAOcontainer_.push_back(iVao_);
+		EBOcontainer_.push_back(iEbo_);
 	}
 	
     void COpenglRenderer::loadWavefrontObj() {
@@ -112,8 +118,9 @@ namespace GLVM::Core
             wavefrontObjParser->ReadFile(pathsArray_[m]);
             wavefrontObjParser->ParseFile();
 
+			std::vector<float> aVertexes;
             aIndices_.emplace_back();
-            aVertices_.emplace_back();
+//            aVertices_.emplace_back();
             
             unsigned int vertexIndex = 0;
             unsigned int textureIndex = 0;
@@ -128,12 +135,13 @@ namespace GLVM::Core
                     // aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
 					// std::cout << "v0: " << vertex[0] << " v1: " << vertex[1] << " v2: " << vertex[2]
 					// 		  << " t0: " << texture[0] << " t1: " << texture[1] << std::endl;
-					aVertices_[m].push_back(vertex[0]);
-					aVertices_[m].push_back(vertex[1]);
-					aVertices_[m].push_back(vertex[2]);
-					aVertices_[m].push_back(texture[0]);
-					aVertices_[m].push_back(texture[1]);
+					aVertexes.push_back(vertex[0]);
+					aVertexes.push_back(vertex[1]);
+					aVertexes.push_back(vertex[2]);
+					aVertexes.push_back(texture[0]);
+					aVertexes.push_back(texture[1]);
                 }
+			SetVertices(aIndices_[m], aVertexes);
         }
     }
     
