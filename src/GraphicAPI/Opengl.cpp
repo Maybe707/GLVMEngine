@@ -26,8 +26,8 @@ namespace GLVM::Core
 {
     COpenglRenderer::COpenglRenderer()
 	{
-		_Shader_Program     = new Shader("../Shader.vs", "../Shader.fs");
-        GUI_Shader_Program_ = new Shader("../GUIShader.vs", "../GUIShader.fs");
+		_Shader_Program     = new Shader("../GLshaders/Shader.vs", "../GLshaders/Shader.fs");
+        lightShaderProgram_ = new Shader("../GLshaders/LightShader.vs", "../GLshaders/LightShader.fs");
 
         glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, 1920, 1080);
@@ -37,8 +37,8 @@ namespace GLVM::Core
 	{
         delete _Shader_Program;
         _Shader_Program = nullptr;
-        delete GUI_Shader_Program_;
-        GUI_Shader_Program_ = nullptr;
+        delete lightShaderProgram_;
+        lightShaderProgram_ = nullptr;
 
 		for (int i = 0; i < VAOcontainer_.size(); ++i)
 			pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &VAOcontainer_[i]);

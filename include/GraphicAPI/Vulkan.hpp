@@ -251,11 +251,11 @@ namespace GLVM::Core
         std::vector<std::vector<Core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
 
-        const char* vertShaderMain_ = "../shaders/vert.spv";
-        const char* fragShaderMain_ = "../shaders/frag.spv";
+        const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
+        const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
 
-        const char* vertShaderHUD_ = "../hudShaders/vert.spv";
-        const char* fragShaderHUD_ = "../hudShaders/frag.spv";
+        const char* vertShaderHUD_ = "../VKshaders/hudShaders/vert.spv";
+        const char* fragShaderHUD_ = "../VKshaders/hudShaders/frag.spv";
         
         unsigned int texturePool_;
         

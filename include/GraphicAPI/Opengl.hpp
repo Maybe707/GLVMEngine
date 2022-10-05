@@ -47,7 +47,7 @@ namespace GLVM::Core {
 
 		GLuint iVbo_;
 		Shader* _Shader_Program;
-		Shader* GUI_Shader_Program_;
+		Shader* lightShaderProgram_;
 
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
