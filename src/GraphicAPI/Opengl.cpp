@@ -190,16 +190,22 @@ namespace GLVM::Core
 	}
 
     void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {
-        _Shader_Program->Use();
-        _Shader_Program->SetUniformID();
+        // _Shader_Program->Use();
+        // _Shader_Program->SetUniformID();
         
-        unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
-        pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
+        unsigned int uniformLocationViewWorld = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
+        pGLUniform_Matrix4fv(uniformLocationViewWorld, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
+
+		unsigned int uniformLocationViewLight = pGLGet_Uniform_Location(lightShaderProgram_->iID, "aView_Matrix");
+        pGLUniform_Matrix4fv(uniformLocationViewLight, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
     }
 
     void COpenglRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
-        unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
+        unsigned int uniformLocationProjectionWorld = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
+		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
+
+		unsigned int uniformLocationProjectionLight = pGLGet_Uniform_Location(lightShaderProgram_->iID, "aProjection_Matrix");
+		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
     void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {
