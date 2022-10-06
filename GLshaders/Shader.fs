@@ -2,14 +2,32 @@
 out vec4 FragColor;
 
 in vec2 TexCoord;
+in vec3 FragmentPosition;
+in vec3 Normal;
+
+uniform vec3 lightColor;
+uniform vec3 objectColor;
+uniform vec3 lightPosition;
+
 // Texture sampler
 uniform sampler2D tex;
 
 void main()
 {
-	vec3 lightColor = vec3(0.33, 0.42, 0.18);
-	vec3 objectColor = vec3(1.0, 0.5, 0.31);
-	vec3 resultColor = lightColor * objectColor;
-    FragColor = texture(tex, TexCoord) * vec4(resultColor, 1.0);
-//    FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+	float ambientStrength = 0.3;
+    vec3 ambient = ambientStrength * lightColor;
+
+//    FragColor = vec4(result, 1.0);
+	// vec3 resultColor = lightColor * objectColor;
+
+
+	
+	vec3 normal = normalize(Normal);
+	vec3 lightDirection = normalize(lightPosition - FragmentPosition);
+
+	float difference = max(dot(normal, lightDirection), 0.0);
+    vec3 diffuse = difference * lightColor;
+
+	vec3 result = (ambient + diffuse) * objectColor;
+    FragColor = texture(tex, TexCoord) * vec4(result, 1.0);
 }

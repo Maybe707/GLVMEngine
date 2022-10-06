@@ -47,11 +47,11 @@ namespace GLVM::Core {
 
 		GLuint iVbo_;
 		Shader* _Shader_Program;
-		Shader* lightShaderProgram_;
 
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_;
+		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		std::vector<GLuint> VBOcontainer_;
 		std::vector<GLuint> VAOcontainer_;
@@ -65,7 +65,7 @@ namespace GLVM::Core {
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
 		void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) override;
-		void SetMeshData(std::vector<const char *> _pathsArray) override;
+		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
 		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
 		void SetModelMatrix(Shader *_Shader_Program,

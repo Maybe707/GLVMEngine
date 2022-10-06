@@ -1,4 +1,5 @@
 #include "Components/TextureComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Engine.hpp"
 #include "MeshManager.hpp"
@@ -76,12 +77,12 @@ int main()
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager->GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
     GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager->GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     GLVM::ECS::SVertexComponent& VertexPlayer = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
-    VertexPlayer.vkVertexId_ = 4;
+    VertexPlayer.vkVertexId_ = 1;
     ColliderPlayer.bPush_Collission = true;
-    TransformPlayer.fScale = 0.2f;
+    TransformPlayer.fScale = 0.1f;
     TransformPlayer.tPosition[0] = 0.1f;
 	TransformPlayer.tPosition[1] = 0.1f;
-	TransformPlayer.tPosition[2] = 0.1f;
+	TransformPlayer.tPosition[2] = -1.0f;
     ViewPlayer.Front_Camera[0] = 0.0f;
     ViewPlayer.Front_Camera[1] = 0.0f;
     ViewPlayer.Front_Camera[2] = -1.0f;
@@ -108,11 +109,11 @@ int main()
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
 //    GLVM::ECS::CColliderComponent& ColliderWitch1 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     GLVM::ECS::SVertexComponent& VertexWitch = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
-    VertexWitch.vkVertexId_ = 3;
+    VertexWitch.vkVertexId_ = 0;
     TransformWitch.tPosition[0] = 0.3f;
     TransformWitch.tPosition[1] = 0.3f;
     TransformWitch.tPosition[2] = 0.3f;
-    TransformWitch.fScale = 5.0f;
+    TransformWitch.fScale = 0.1f;
     // ColliderWitch1.aColliders_Container_[0].bGround_Collision_ = false;
     // ColliderWitch1.aColliders_Container_[0].bWall_Collision_ = false;
 
@@ -122,7 +123,7 @@ int main()
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
     TextureWitch2.id_ = 2;
     GLVM::ECS::SVertexComponent& VertexWitch2 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
-    VertexWitch2.vkVertexId_ = 2;
+    VertexWitch2.vkVertexId_ = 0;
     TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
 	// TextureWitch2.iWidth_ = 32;
 	// TextureWitch2.iHeight_ = 32;
@@ -134,7 +135,7 @@ int main()
     TransformWitch2.tPosition[0] = 0.0f;
     TransformWitch2.tPosition[1] = 0.0f;
     TransformWitch2.tPosition[2] = 10.3f;
-    TransformWitch2.fScale = 10.0f;
+    TransformWitch2.fScale = 0.1f;
 //    TransformWitch2.hud = true;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
@@ -160,29 +161,43 @@ int main()
 // //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 // //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
 
-    Entity u_iHud1;
-	EntityManager->CreateEntity(u_iHud1);
-	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iHud1);
-	GLVM::ECS::CTextureComponent& TextureHud1 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iHud1);
-    GLVM::ECS::SVertexComponent& VertexHud1 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iHud1);
-    VertexHud1.vkVertexId_ = 0;
-    TextureHud1.id_ = 0;
-    hudTextureManager->BindTexture(u_iHud1, TextureHud1.id_);
-	// TextureWitch2.iWidth_ = 32;
-	// TextureWitch2.iHeight_ = 32;
-	// TextureWitch2.u_iData_ = witch_dat;
-    // TextureWitch2.dat_length_ = witch_dat_len;
-//	GLVM->LoadTextureData(TextureWitch2);
-	GLVM::ECS::STransformComponent& TransformHud1 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iHud1);
-//    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
-    TransformHud1.tPosition[0] = 0.0f;
-    TransformHud1.tPosition[1] = 0.0f;
-    TransformHud1.tPosition[2] = 0.3f;
-    TransformHud1.fScale = 0.1f;
+//     Entity u_iHud1;
+// 	EntityManager->CreateEntity(u_iHud1);
+// 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iHud1);
+// 	GLVM::ECS::CTextureComponent& TextureHud1 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iHud1);
+//     GLVM::ECS::SVertexComponent& VertexHud1 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iHud1);
+//     VertexHud1.vkVertexId_ = 0;
+//     TextureHud1.id_ = 0;
+//     hudTextureManager->BindTexture(u_iHud1, TextureHud1.id_);
+// 	// TextureWitch2.iWidth_ = 32;
+// 	// TextureWitch2.iHeight_ = 32;
+// 	// TextureWitch2.u_iData_ = witch_dat;
+//     // TextureWitch2.dat_length_ = witch_dat_len;
+// //	GLVM->LoadTextureData(TextureWitch2);
+// 	GLVM::ECS::STransformComponent& TransformHud1 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iHud1);
+// //    GLVM::ECS::CColliderComponent& ColliderWitch2 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
+//     TransformHud1.tPosition[0] = 0.0f;
+//     TransformHud1.tPosition[1] = 0.0f;
+//     TransformHud1.tPosition[2] = 0.3f;
+//     TransformHud1.fScale = 0.1f;
 //    TransformHud1.hud = true;
 //    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
 //    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
-    
+
+	Entity light0;
+	EntityManager->CreateEntity(light0);
+	ComponentManager->CreateComponent<GLVM::ECS::CTextureComponent, GLVM::ECS::SVertexComponent, GLVM::ECS::STransformComponent>(light0);
+	GLVM::ECS::SVertexComponent& vertexLight0 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(light0);
+	GLVM::ECS::CTextureComponent& textureLight0 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(light0);
+	textureLight0.id_ = 0;
+	TextureSystem->BindTexture(light0, textureLight0.id_);
+	vertexLight0.vkVertexId_ = 1;
+	GLVM::ECS::STransformComponent& transformLight0 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(light0);
+	transformLight0.tPosition[0] =  0.5f;
+	transformLight0.tPosition[1] =  0.3f;
+	transformLight0.tPosition[2] = -0.9f;
+	transformLight0.fScale = 0.1f;
+	
 //     Entity u_iWitch3;
 // 	EntityManager->CreateEntity(u_iWitch3);
 // 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);

@@ -96,13 +96,13 @@ namespace GLVM::ECS
             }
         }
 
-        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n) {
-            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-            ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
-            Vector<float, 3> vec(0.0f);
-            vec[1] = -1.0f;
-            rTransform_Component.tPosition += vec * cameraSpeed;
-        }
+        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n) {
+        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
+        //     ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
+        //     Vector<float, 3> vec(0.0f);
+        //     vec[1] = -1.0f;
+        //     rTransform_Component.tPosition += vec * cameraSpeed;
+        // }
     }
 
     bool CMovementSystem::CompareDirection(Core::CStack& _input_Stack,

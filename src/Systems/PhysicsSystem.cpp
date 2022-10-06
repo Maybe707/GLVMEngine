@@ -123,7 +123,7 @@ namespace GLVM::ECS
         CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
         
         float cameraSpeed = 5.5f * fDelta_Time_;            
-        
+
         for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
         {
             int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];

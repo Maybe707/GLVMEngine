@@ -21,6 +21,7 @@ namespace GLVM::Core
     
     GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
     GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
+	GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getNormals() { return normals_; }
     GLVM::Core::TCVectorContainer<SFace> CWaveFrontObjParser::getFaces() { return faces_; }
     
     void CWaveFrontObjParser::ReadFile(const char* _filePath) {
@@ -40,6 +41,13 @@ namespace GLVM::Core
         }
 
         pWavefrontObjFileData = sWavefrontObjFileData.c_str();
+
+		// for (int i = 0; i < sWavefrontObjFileData.size(); ++i) {
+		// 	if (sWavefrontObjFileData[i] == '\n')
+		// 		std::cout << sWavefrontObjFileData[i] << std::endl;
+		// 	else
+		// 		std::cout << sWavefrontObjFileData[i];
+		// }
     }
     
     void CWaveFrontObjParser::ParseFile() {
@@ -57,6 +65,11 @@ namespace GLVM::Core
             if (line[0] == "vt") {
                 SVertex vertex = ParseVertices(line);
                 textureVertices_.Push(vertex);
+                ++uiTextureVerticesIndex;
+            }
+			if (line[0] == "vn") {
+                SVertex vertex = ParseVertices(line);
+                normals_.Push(vertex);
                 ++uiTextureVerticesIndex;
             }
             if (line[0] == "f") {

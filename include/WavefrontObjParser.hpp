@@ -65,6 +65,7 @@ namespace GLVM::Core
         
         GLVM::Core::TCVectorContainer<SVertex> coordinateVertices_;
         GLVM::Core::TCVectorContainer<SVertex> textureVertices_;
+		GLVM::Core::TCVectorContainer<SVertex> normals_;
         GLVM::Core::TCVectorContainer<SFace> faces_;
 
         std::string sWavefrontObjFileData;
@@ -77,6 +78,7 @@ namespace GLVM::Core
         
         GLVM::Core::TCVectorContainer<SVertex> getCoordinateVertices();
         GLVM::Core::TCVectorContainer<SVertex> getTextureVertices();
+		GLVM::Core::TCVectorContainer<SVertex> getNormals();
         GLVM::Core::TCVectorContainer<SFace> getFaces();
         
         void ReadFile(const char* _filePath);

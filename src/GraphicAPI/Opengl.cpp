@@ -16,6 +16,7 @@
 #include <GL/gl.h>
 #include <cmath>
 #include "Globals.hpp"
+#include "WavefrontObjParser.hpp"
 
 #include <chrono>
 #include <cstdint>
@@ -27,7 +28,6 @@ namespace GLVM::Core
     COpenglRenderer::COpenglRenderer()
 	{
 		_Shader_Program     = new Shader("../GLshaders/Shader.vs", "../GLshaders/Shader.fs");
-        lightShaderProgram_ = new Shader("../GLshaders/LightShader.vs", "../GLshaders/LightShader.fs");
 
         glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, 1920, 1080);
@@ -37,8 +37,6 @@ namespace GLVM::Core
 	{
         delete _Shader_Program;
         _Shader_Program = nullptr;
-        delete lightShaderProgram_;
-        lightShaderProgram_ = nullptr;
 
 		for (int i = 0; i < VAOcontainer_.size(); ++i)
 			pGLDelete_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &VAOcontainer_[i]);
@@ -55,16 +53,18 @@ namespace GLVM::Core
 
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
-        
+
+		_Shader_Program->SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		_Shader_Program->SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		_Shader_Program->SetVec3("lightPosition", 0.5f, 0.3f, -0.9f);
+		
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-//				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
 				LoadTextureData(texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
-//				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
@@ -73,11 +73,9 @@ namespace GLVM::Core
 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-//				SetVertices(aIndices_[uiVertexId], aVertices_[uiVertexId]);
 				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
-//				glBindTexture(GL_TEXTURE_2D, texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
@@ -103,11 +101,14 @@ namespace GLVM::Core
         pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
         pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _aIndices.size(), _aIndices.data(), GL_STATIC_DRAW);
         
-        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)VERTEX_OFFSET);
+        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, SIZE_OF_VERTEX_DATA * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
+		pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-		VAOcontainer_.push_back(iVbo_);
+		pGLVertex_Attrib_Pointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(2);
+
+		VBOcontainer_.push_back(iVbo_);
 		VAOcontainer_.push_back(iVao_);
 		EBOcontainer_.push_back(iEbo_);
 	}
@@ -120,12 +121,12 @@ namespace GLVM::Core
             wavefrontObjParser->ReadFile(pathsArray_[m]);
             wavefrontObjParser->ParseFile();
 
-			std::vector<float> aVertexes;
+			aVertexes_.emplace_back();
             aIndices_.emplace_back();
-//            aVertices_.emplace_back();
             
             unsigned int vertexIndex = 0;
             unsigned int textureIndex = 0;
+			unsigned int normalIndex = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
             for (int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
@@ -134,16 +135,22 @@ namespace GLVM::Core
                     SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
                     textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
                     SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
-                    // aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
-					// std::cout << "v0: " << vertex[0] << " v1: " << vertex[1] << " v2: " << vertex[2]
-					// 		  << " t0: " << texture[0] << " t1: " << texture[1] << std::endl;
-					aVertexes.push_back(vertex[0]);
-					aVertexes.push_back(vertex[1]);
-					aVertexes.push_back(vertex[2]);
-					aVertexes.push_back(texture[0]);
-					aVertexes.push_back(texture[1]);
+					normalIndex = wavefrontObjParser->getFaces()[i][2][j] - 1;
+					SVertex normal = wavefrontObjParser->getNormals()[normalIndex];
+					aVertexes_[m].push_back(vertex[0]);
+					aVertexes_[m].push_back(vertex[1]);
+					aVertexes_[m].push_back(vertex[2]);
+					aVertexes_[m].push_back(texture[0]);
+					aVertexes_[m].push_back(texture[1]);
+					aVertexes_[m].push_back(normal[0]);
+					aVertexes_[m].push_back(normal[1]);
+					aVertexes_[m].push_back(normal[2]);
+
+					// std::cout << "v0: " << vertex[0] << " v1: " << vertex[1] << " v2: " << vertex[2] <<
+					// 	" t0: " << texture[0] << " t1: " << texture[1] << " n0: " << normal[0] <<
+					// 	" n1: " << normal[1] << " n2: " << normal[2] << std::endl;
                 }
-			SetVertices(aIndices_[m], aVertexes);
+			SetVertices(aIndices_[m], aVertexes_[m]);
         }
     }
     
@@ -190,21 +197,12 @@ namespace GLVM::Core
 	}
 
     void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {
-        // _Shader_Program->Use();
-        // _Shader_Program->SetUniformID();
-        
         unsigned int uniformLocationViewWorld = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
         pGLUniform_Matrix4fv(uniformLocationViewWorld, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
-
-		unsigned int uniformLocationViewLight = pGLGet_Uniform_Location(lightShaderProgram_->iID, "aView_Matrix");
-        pGLUniform_Matrix4fv(uniformLocationViewLight, NUMBER_OF_MATRICES, GL_FALSE, &_viewMatrix[0][0]);
     }
 
     void COpenglRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {
         unsigned int uniformLocationProjectionWorld = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
-		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
-
-		unsigned int uniformLocationProjectionLight = pGLGet_Uniform_Location(lightShaderProgram_->iID, "aProjection_Matrix");
 		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     

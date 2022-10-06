@@ -20,6 +20,10 @@ void Shader::SetFloat(const std::string& name, float value) const
 {
 	pGLUniform1f(pGLGet_Uniform_Location(iID, name.c_str()), value);
 }
+void Shader::SetVec3(const std::string &name, float x, float y, float z) const
+{ 
+	pGLUniform3f(pGLGet_Uniform_Location(iID, name.c_str()), x, y, z); 
+}
 void Shader::SetUniformID()
 {
 	pGLUniform1i(pGLGet_Uniform_Location(iID, "tex"), 10);
