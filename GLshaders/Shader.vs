@@ -7,6 +7,7 @@ layout (location = 2) in vec3 aNormal;
 out vec2 TexCoord;
 out vec3 FragmentPosition;
 out vec3 Normal;
+
 //uniform mat4 aRotate_Matrix;
 uniform mat4 aModel_Matrix;
 uniform mat4 aView_Matrix;

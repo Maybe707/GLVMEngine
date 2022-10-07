@@ -157,7 +157,7 @@ namespace GLVM::Core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {
+    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) {
         texture_load_data_ = _texture_data;
         hudTexture_load_data_ = _hud_texture_data;
 

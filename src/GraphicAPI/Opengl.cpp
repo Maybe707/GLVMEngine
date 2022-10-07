@@ -47,22 +47,30 @@ namespace GLVM::Core
 	void COpenglRenderer::draw()
 	{
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-            ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
-        unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+        // Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
+        //     ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
+        // unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
 
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
 
 		_Shader_Program->SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
 		_Shader_Program->SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		_Shader_Program->SetVec3("lightPosition", 0.5f, 0.3f, -0.9f);
+		_Shader_Program->SetVec3("lightPosition", 1.5f, 1.5f, 2.9f);
+		_Shader_Program->SetVec3("viewPosition", playerViewComponent.Position[0],
+								 playerViewComponent.Position[1],
+								 playerViewComponent.Position[2]);
 		
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				LoadTextureData(texture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
+				unsigned int textureID = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_;
+				LoadTextureData(texture_load_data_[textureID]);
+//				LoadTextureData(texture_load_data_[i]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
@@ -206,7 +214,7 @@ namespace GLVM::Core
 		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) {
+    void COpenglRenderer::SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) {
 		texture_load_data_ = _texture_data;
 		hudTexture_load_data_ = _hud_texture_data;
 	}

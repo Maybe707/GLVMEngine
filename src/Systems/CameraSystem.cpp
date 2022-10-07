@@ -1,5 +1,6 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/RenderSystem.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ECS
 {
@@ -25,7 +26,7 @@ namespace GLVM::ECS
     void CCameraSystem::SetViewMatrix(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-        const float kSensitivity = 0.1f;
+        const float kSensitivity = 0.05f;
 
         fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
         fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
@@ -45,13 +46,14 @@ namespace GLVM::ECS
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         _view_Component.Front_Camera = Normalize(front);
- 
-        tView_Matrix = FPSview(_Player.tPosition,
-                               _Player.tPosition + _view_Component.Front_Camera,
-                               _view_Component.Up_Camera);
 
-        // unsigned int uiTransform_View = pGLGet_Uniform_Location(Shader_Program_->iID, "aView_Matrix");
-        // pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
+        tView_Matrix = LookAtMain(_Player.tPosition,
+								  _Player.tPosition + _view_Component.Front_Camera,
+								  _view_Component.Up_Camera);
+		
+ 		_view_Component.Position[0] = _Player.tPosition[0];
+		_view_Component.Position[1] = _Player.tPosition[1];
+		_view_Component.Position[2] = _Player.tPosition[2];
 
         Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
@@ -59,24 +61,7 @@ namespace GLVM::ECS
 
     void CCameraSystem::SetProjectionMatrix()
 	{
-        float f = 10, n = -0.7;
-        float fov = 90;
-        float S = 1 / std::tan((fov/2) * (PI / 180));
-        tProjection_Matrix[0][0] = S;
-        tProjection_Matrix[1][1] = S;
-        tProjection_Matrix[2][2] = -(f / (f - n));
-        tProjection_Matrix[2][3] = -1;
-        tProjection_Matrix[3][2] = -((f * n) / (f - n));
-        
-        // mat4 fix_matrix(1.0f);
-        // fix_matrix[0][0] = 1.0f;
-        // fix_matrix[1][1] = -1.0f;
-        // fix_matrix[2][2] = 0.5f;
-        // fix_matrix[3][2] = 0.5f;
-        // fix_matrix[3][3] = 1.0f;
-
-        // tProjection_Matrix = tProjection_Matrix * fix_matrix;
-        
+		tProjection_Matrix = Perspective(Radians(45.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
         Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}
 }

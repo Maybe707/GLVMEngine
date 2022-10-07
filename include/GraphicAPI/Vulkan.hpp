@@ -274,7 +274,7 @@ namespace GLVM::Core
         void recreateSwapChain();
         void draw() override;
         void loadWavefrontObj() override;
-        void SetTextureData(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _hud_texture_data) override;
+        void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
         void SetMeshData(std::vector<const char*> _pathsArray) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
