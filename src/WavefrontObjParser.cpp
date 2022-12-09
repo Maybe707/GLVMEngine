@@ -1,5 +1,6 @@
 #include "WavefrontObjParser.hpp"
 #include "VectorContainer.hpp"
+#include <chrono>
 #include <iterator>
 
 namespace GLVM::Core
@@ -19,10 +20,10 @@ namespace GLVM::Core
     //     return pInstance_;
     // }
     
-    GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
-    GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
-	GLVM::Core::TCVectorContainer<SVertex> CWaveFrontObjParser::getNormals() { return normals_; }
-    GLVM::Core::TCVectorContainer<SFace> CWaveFrontObjParser::getFaces() { return faces_; }
+    GLVM::Core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
+    GLVM::Core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
+	GLVM::Core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getNormals() { return normals_; }
+    GLVM::Core::TCVectorContainer<SFace>& CWaveFrontObjParser::getFaces() { return faces_; }
     
     void CWaveFrontObjParser::ReadFile(const char* _filePath) {
         const char* _pWavefrontObjFile = _filePath;
@@ -55,6 +56,12 @@ namespace GLVM::Core
         unsigned int uiTextureVerticesIndex = 0;
         unsigned int uiFacesIndex = 0;
         while(pWavefrontObjFileData[uiCounter] != '\0') {
+
+        // static auto startTime = std::chrono::high_resolution_clock::now();
+
+        // auto currentTime = std::chrono::high_resolution_clock::now();
+        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
             GLVM::Core::TCVectorContainer<TCVectorContainer<char>> line = Split(pWavefrontObjFileData, ' ', '\n', uiCounter);
             
             if (line[0] == "v") {

@@ -76,10 +76,10 @@ namespace GLVM::Core
 
 //        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         
-        GLVM::Core::TCVectorContainer<SVertex> getCoordinateVertices();
-        GLVM::Core::TCVectorContainer<SVertex> getTextureVertices();
-		GLVM::Core::TCVectorContainer<SVertex> getNormals();
-        GLVM::Core::TCVectorContainer<SFace> getFaces();
+        GLVM::Core::TCVectorContainer<SVertex>& getCoordinateVertices();
+        GLVM::Core::TCVectorContainer<SVertex>& getTextureVertices();
+		GLVM::Core::TCVectorContainer<SVertex>& getNormals();
+        GLVM::Core::TCVectorContainer<SFace>& getFaces();
         
         void ReadFile(const char* _filePath);
         void ParseFile();

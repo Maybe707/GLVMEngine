@@ -1,7 +1,7 @@
 C = clang
 CC = clang++
 LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi
-CXXFLAGS = -c -std=c++17 -g -Wall
+CXXFLAGS = -c -std=c++17 -O2 -Wall
 CFLAGS = -c -g -Wall
 INC = -I./include
 BUILD = build

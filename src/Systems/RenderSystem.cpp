@@ -13,7 +13,7 @@ namespace GLVM::ECS
         GLVM::ECS::CTextureManager* textureManager = GLVM::ECS::CTextureManager::GetInstance();
         GLVM::ECS::CTextureManager* hudTextureManager = GLVM::ECS::CTextureManager::GetHUDInstance();
         GLVM::Core::CMeshManager*   meshManager = GLVM::Core::CMeshManager::GetInstance();
-		
+
 #ifdef VULKAN_API        
         renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
 #endif

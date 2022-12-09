@@ -8,7 +8,7 @@
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
 #include <cstdlib>
-#include <vulkan/vulkan_core.h>
+//#include <vulkan/vulkan_core.h>
 
 namespace GLVM::Core
 {    
@@ -231,6 +231,7 @@ namespace GLVM::Core
         createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
         createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
         createUniformBuffers();
+
         createDescriptorPool();
         createDescriptorSets();
         createCommandBuffers();
@@ -1334,7 +1335,7 @@ namespace GLVM::Core
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<ECS::STransformComponent>* pEntity_Container_refTransform =
             ECS::GetInnerComponentContainer<ECS::STransformComponent>(*pComponent_Manager);
-        
+
         for (int i = 0; i < texture_load_data_.size(); ++i) {
             for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 ECS::STransformComponent transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
@@ -1352,7 +1353,7 @@ namespace GLVM::Core
             ++hudCounter;
         }
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
-
+	//	std::cout << "ti kto???? " << std::endl;        
         vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
 

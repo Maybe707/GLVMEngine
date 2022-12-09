@@ -410,16 +410,16 @@ Vector<T, 3> Normalize(Vector<T, 3> _vector)
 // }
 
 template <typename T>
-Matrix<T, 4> Perspective(T fov, T aspect, T near, T far) {
-	T const tanHalfFov = std::tan(fov / static_cast<T>(2));
+Matrix<T, 4> Perspective(T _fov, T _aspect, T _near, T _far) {
+	T const tanHalfFov = std::tan(_fov / static_cast<T>(2));
 
 	mat4 Result(static_cast<T>(0));
 
-	Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
+	Result[0][0] = static_cast<T>(1) / (_aspect * tanHalfFov);
 	Result[1][1] = static_cast<T>(1) / (tanHalfFov);
-	Result[2][2] = far / (near - far);
+	Result[2][2] = _far / (_near - _far);
 	Result[2][3] = - static_cast<T>(1);
-	Result[3][2] = -(far * near) / (far - near);
+	Result[3][2] = -(_far * _near) / (_far - _near);
 	return Result;
 }
 

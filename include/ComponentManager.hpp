@@ -18,7 +18,7 @@ namespace GLVM::ECS
 	{
         static CComponentManager* pInstance_;
         static std::mutex  Mutex_;
-        
+		
         CComponentManager();
         ~CComponentManager();
         
@@ -49,7 +49,7 @@ namespace GLVM::ECS
 			Core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
 				new Core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
 			tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
-            
+			
 			++s_iComponents_Container_ID;
 			return s_iLocal_Container_ID;
 		}

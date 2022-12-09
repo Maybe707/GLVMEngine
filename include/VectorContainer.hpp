@@ -13,7 +13,7 @@ namespace GLVM::Core
 	{
 		unsigned int iSize_ = 0;
 		unsigned int iCapacity_ = 0;
-		unsigned int iExpander_ = 10;
+		unsigned int iExpander_ = 1000;
 		T* aVector_Container_ = new T[iSize_];
 	public:
         TCVectorContainer() {}

@@ -57,7 +57,7 @@ namespace GLVM::Core
         _Shader_Program->Use();
         _Shader_Program->SetUniformID();
 
-		_Shader_Program->SetVec3("objectColor", 1.0f, 0.5f, 0.31f);
+		_Shader_Program->SetVec3("objectColor", 0.5f, 0.3f, 0.41f);
 		_Shader_Program->SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
 		_Shader_Program->SetVec3("lightPosition", 1.5f, 1.5f, 2.9f);
 		_Shader_Program->SetVec3("viewPosition", playerViewComponent.Position[0],
@@ -127,8 +127,9 @@ namespace GLVM::Core
             CWaveFrontObjParser* wavefrontObjParser = &parser;
 
             wavefrontObjParser->ReadFile(pathsArray_[m]);
+			std::cout << "Read" << std::endl;
             wavefrontObjParser->ParseFile();
-
+			std::cout << "Parse" << std::endl;
 			aVertexes_.emplace_back();
             aIndices_.emplace_back();
             
@@ -153,10 +154,6 @@ namespace GLVM::Core
 					aVertexes_[m].push_back(normal[0]);
 					aVertexes_[m].push_back(normal[1]);
 					aVertexes_[m].push_back(normal[2]);
-
-					// std::cout << "v0: " << vertex[0] << " v1: " << vertex[1] << " v2: " << vertex[2] <<
-					// 	" t0: " << texture[0] << " t1: " << texture[1] << " n0: " << normal[0] <<
-					// 	" n1: " << normal[1] << " n2: " << normal[2] << std::endl;
                 }
 			SetVertices(aIndices_[m], aVertexes_[m]);
         }
@@ -196,7 +193,7 @@ namespace GLVM::Core
 		tTranslation_Matrix[3][1] = _transform_Component.tPosition[1];
 		tTranslation_Matrix[3][2] = _transform_Component.tPosition[2];
         tTranslation_Matrix[3][3] = 1.0f;
-        
+		
         tModel_Matrix = tScaling_Matrix * tTranslation_Matrix;
 //		tModel_Matrix = tTranslation_Matrix * tScaling_Matrix;
         

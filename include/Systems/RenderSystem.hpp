@@ -32,22 +32,22 @@
 
 namespace GLVM::ECS
 {    
-    class CRenderSystem : public ISystem
-    {
-    private:
-        Core::IRenderer* renderer_instance_;
+  class CRenderSystem : public ISystem
+  {
+  private:
+    Core::IRenderer* renderer_instance_;
         
-    public:
-        CRenderSystem();
-		~CRenderSystem();
-
-		void Update() override;
-        Core::IRenderer* GetRenderSystemInstance();
-		void SetTextureData();
-        void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
-        void SetViewMatrix(mat4 _viewMatrix);
-        void SetProjectionMatrix(mat4 _projectionMatrix);
-    };
+  public:
+    CRenderSystem();
+    ~CRenderSystem();
+    
+    void Update() override;
+    Core::IRenderer* GetRenderSystemInstance();
+    void SetTextureData();
+    void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
+    void SetViewMatrix(mat4 _viewMatrix);
+    void SetProjectionMatrix(mat4 _projectionMatrix);
+  };
 }
     
 #endif
