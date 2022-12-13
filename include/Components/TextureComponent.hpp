@@ -13,7 +13,7 @@ namespace GLVM::ECS
         \brief Creates sprites for game objects.
     */
     
-    class CTextureComponent
+    class SMaterialComponent
     {
 	public:
         unsigned int id_;

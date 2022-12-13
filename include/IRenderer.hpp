@@ -2,7 +2,7 @@
 #define IRENDERER
 
 #include <vector>
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Texture.hpp"
 

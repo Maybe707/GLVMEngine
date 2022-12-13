@@ -3,7 +3,7 @@
 
 #include "ComponentManager.hpp"
 #include "Components/AnimationMoveComponent.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
@@ -19,6 +19,7 @@
 #include "WavefrontObjParser.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include "ShaderProgram.hpp"
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"

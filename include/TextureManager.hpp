@@ -4,7 +4,7 @@
 #include <vector>
 #include "Texture.hpp"
 #include <mutex>
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 
 typedef unsigned int Entity_ID;
 typedef unsigned int Texture_ID;
@@ -28,7 +28,7 @@ namespace GLVM::ECS
         static CTextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
         std::vector<CTexture>& GetTextureVector();
-        void UnbindTexture(CTextureComponent _textureComponent, Entity _entity);
+        void UnbindTexture(Core::SMaterialComponent _textureComponent, Entity _entity);
     };
 }
 

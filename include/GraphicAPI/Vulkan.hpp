@@ -13,7 +13,7 @@
 #include <optional>
 #include <set>
 
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "IRenderer.hpp"
 #include "Texture.hpp"

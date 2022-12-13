@@ -2,7 +2,7 @@
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/MoveComponent.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ProjectileComponent.hpp"

@@ -1,6 +1,6 @@
 #include "Components/LightComponent.hpp"
 #include "Components/MaterialComponent.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Engine.hpp"
@@ -75,7 +75,7 @@ int main()
     GLVM::ECS::CRigidBodyComponent& GravityPlayer = ComponentManager->GetComponent<GLVM::ECS::CRigidBodyComponent>(u_iPlayer);
     GLVM::ECS::CColliderComponent& ColliderPlayer = ComponentManager->GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     GLVM::ECS::SVertexComponent& VertexPlayer = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iPlayer);
-	// GLVM::ECS::CTextureComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iPlayer);
+	// GLVM::Core::SMaterialComponent& TexturePlayer = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iPlayer);
     // TexturePlayer.id_ = 2;
     // TextureSystem->BindTexture(u_iPlayer, TexturePlayer.id_);
     VertexPlayer.vkVertexId_ = 0;
@@ -98,8 +98,8 @@ int main()
     
 	Entity u_iWitch;
 	EntityManager->CreateEntity(u_iWitch);
-	ComponentManager->CreateComponent<GLVM::Core::SMaterialComponent, GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch);
-	GLVM::ECS::CTextureComponent& TextureWitch = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch);
+	ComponentManager->CreateComponent<GLVM::Core::SMaterialComponent, GLVM::ECS::SVertexComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch);
+	GLVM::Core::SMaterialComponent& TextureWitch = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch);
 	GLVM::Core::SMaterialComponent& materialWitch = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch);
 	materialWitch.ambient[0] = 0.25f;
 	materialWitch.ambient[1] = 0.25f;
@@ -131,8 +131,8 @@ int main()
 
     Entity u_iWitch2;
 	EntityManager->CreateEntity(u_iWitch2);
-	ComponentManager->CreateComponent<GLVM::Core::SMaterialComponent, GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
-	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
+	ComponentManager->CreateComponent<GLVM::Core::SMaterialComponent, GLVM::ECS::SVertexComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch2);
+	GLVM::Core::SMaterialComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch2);
     TextureWitch2.id_ = 4;
     GLVM::ECS::SVertexComponent& VertexWitch2 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
     VertexWitch2.vkVertexId_ = 0;
@@ -165,8 +165,8 @@ int main()
 
 //     Entity u_iWitch3;
 // 	EntityManager->CreateEntity(u_iWitch3);
-// 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
-// 	GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
+// 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::Core::SMaterialComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
+// 	GLVM::Core::SMaterialComponent& TextureWitch3 = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch3);
 //     TextureWitch3.id_ = 0;
 //     hudTextureManager->BindTexture(u_iWitch3, TextureWitch3.id_);
 // 	// TextureWitch2.iWidth_ = 32;
@@ -186,8 +186,8 @@ int main()
 
     Entity u_iHud1;
 	EntityManager->CreateEntity(u_iHud1);
-	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iHud1);
-	GLVM::ECS::CTextureComponent& TextureHud1 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iHud1);
+	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::Core::SMaterialComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iHud1);
+	GLVM::Core::SMaterialComponent& TextureHud1 = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iHud1);
     GLVM::ECS::SVertexComponent& VertexHud1 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iHud1);
     VertexHud1.vkVertexId_ = 0;
     TextureHud1.id_ = 0;
@@ -209,8 +209,8 @@ int main()
 
 	Entity light0;
 	EntityManager->CreateEntity(light0);
-	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::Core::SLightComponent, GLVM::ECS::STransformComponent>(light0);
-	GLVM::ECS::CTextureComponent& textureLight0 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(light0);
+	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::Core::SMaterialComponent, GLVM::Core::SLightComponent, GLVM::ECS::STransformComponent>(light0);
+	GLVM::Core::SMaterialComponent& textureLight0 = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(light0);
 	GLVM::Core::SLightComponent& Light0 = ComponentManager->GetComponent<GLVM::Core::SLightComponent>(light0);
 	GLVM::ECS::STransformComponent& transformLight0 = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(light0);
 	GLVM::ECS::SVertexComponent& vertexLight0 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(light0);
@@ -236,8 +236,8 @@ int main()
 	
 //     Entity u_iWitch3;
 // 	EntityManager->CreateEntity(u_iWitch3);
-// 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
-// 	GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
+// 	ComponentManager->CreateComponent<GLVM::ECS::SVertexComponent, GLVM::Core::SMaterialComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
+// 	GLVM::Core::SMaterialComponent& TextureWitch3 = ComponentManager->GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch3);
 // 	TextureWitch3.iWidth_ = 32;
 // 	TextureWitch3.iHeight_ = 32;
 // 	TextureWitch3.u_iData_ = witch_dat;
@@ -252,8 +252,8 @@ int main()
     
     // Entity u_iWitch3;
 	// EntityManager.CreateEntity(u_iWitch3);
-	// ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::ECS::CTextureComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
-	// GLVM::ECS::CTextureComponent& TextureWitch3 = ComponentManager.GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch3);
+	// ComponentManager.CreateComponent<GLVM::ECS::SVertexComponent, GLVM::Core::SMaterialComponent, GLVM::ECS::CColliderComponent, GLVM::ECS::STransformComponent>(u_iWitch3);
+	// GLVM::Core::SMaterialComponent& TextureWitch3 = ComponentManager.GetComponent<GLVM::Core::SMaterialComponent>(u_iWitch3);
 	// TextureWitch3.iWidth_ = 32;
 	// TextureWitch3.iHeight_ = 32;
 	// TextureWitch3.u_iData_ = witch_dat;

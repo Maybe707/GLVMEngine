@@ -1,6 +1,6 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "ComponentManager.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Texture.hpp"

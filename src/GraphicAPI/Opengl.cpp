@@ -5,7 +5,7 @@
 #include "Constants.hpp"
 #include "Engine.hpp"
 #include "Event.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "GLPointer.h"
 #include "MeshManager.hpp"
@@ -51,7 +51,7 @@ namespace GLVM::Core
 	{
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         // Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-        //     ECS::GetInnerIDsContainer<ECS::CTextureComponent>(*pComponent_Manager);
+        //     ECS::GetInnerIDsContainer<Core::SMaterialComponent>(*pComponent_Manager);
         // unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
@@ -124,7 +124,7 @@ namespace GLVM::Core
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				unsigned int textureID = pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_;
+				unsigned int textureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).id_;
 				LoadTextureData(texture_load_data_[textureID]);
 //				LoadTextureData(texture_load_data_[i]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
@@ -144,7 +144,7 @@ namespace GLVM::Core
 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::CTextureComponent>(uiEntity_refTexture).id_]);
+				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).id_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);

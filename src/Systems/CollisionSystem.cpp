@@ -3,7 +3,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
 #include "Event.hpp"

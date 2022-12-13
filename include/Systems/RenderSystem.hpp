@@ -8,7 +8,7 @@
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "ComponentManager.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include <GL/glext.h>
 #include "Components/AnimationMoveComponent.hpp"
@@ -16,7 +16,7 @@
 #include "Event.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Constants.hpp"
-#include "Components/TextureComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "IRenderer.hpp"
 #include <mutex>
 #include "TextureManager.hpp"
