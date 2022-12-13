@@ -109,6 +109,9 @@ namespace GLVM::Core
 		// _Shader_Program->SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
 		// _Shader_Program->SetVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
 		// _Shader_Program->SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+
+		
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefLight = ECS::GetInnerIDsContainer<Core::SLightComponent>(*pComponent_Manager);
 		unsigned int LightComponentContainerSize = pEntityContainerRefLight->GetSize();
 		for(int x = 0; x < LightComponentContainerSize; ++x) {
@@ -124,18 +127,28 @@ namespace GLVM::Core
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				unsigned int textureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).id_;
-				LoadTextureData(texture_load_data_[textureID]);
+				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
+				unsigned int specularTextureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
+				std::cout << "I: " << i << std::endl;
+				std::cout << "diffuse id: " << diffuseTextureID << std::endl;
+				LoadTextureData(texture_load_data_[diffuseTextureID]);
+				std::cout << "specular id: " << specularTextureID << std::endl;
+				LoadTextureData(texture_load_data_[specularTextureID]);
 //				LoadTextureData(texture_load_data_[i]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+//				glEnable(GL_BLEND);
 				pGLActive_Texture(GL_TEXTURE10);
-//				pGLActive_Texture(GL_TEXTURE11);
+				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
+				std::cout << "index 1: " << texture_load_data_[diffuseTextureID].iTexture_ << std::endl;
+				pGLActive_Texture(GL_TEXTURE11);
+				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
+				std::cout << "index 2: " << texture_load_data_[specularTextureID].iTexture_ << std::endl;
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				Core::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture);
 				_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);
 				_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
 				// _Shader_Program->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
-				_Shader_Program->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
+//				_Shader_Program->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
 				
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
@@ -144,7 +157,7 @@ namespace GLVM::Core
 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).id_]);
+				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
@@ -226,16 +239,17 @@ namespace GLVM::Core
 	{
 		///< Loading and creating texture.
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
+		std::cout << "index inside load function: " << _Texture.iTexture_ << std::endl;
 		glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
-	
-		///< Setting texture applying parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
 		///< Loading image, creating texture and generation mipmap-levels
 		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
 		pGLGenerate_Mipmap(GL_TEXTURE_2D);
 
+		///< Setting texture applying parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
 		// glEnable(GL_BLEND);
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}

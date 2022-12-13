@@ -16,7 +16,8 @@ namespace GLVM::ECS
 
         _Shader_Program->Use();
 //		_Shader_Program->SetUniformID("tex", 10);
-        _Shader_Program->SetUniformID("material.diffuse", 10);
+		_Shader_Program->SetUniformID("material.diffuse", GL_TEXTURE10);
+		_Shader_Program->SetUniformID("material.specular", GL_TEXTURE11);
         
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);

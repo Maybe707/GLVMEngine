@@ -95,8 +95,8 @@ namespace GLVM::ECS
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
 		Core::SMaterialComponent& rTextureProjectile = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_Projectile);
-        rTextureProjectile.id_ = 1;
-        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.id_);
+        rTextureProjectile.diffuseTextureID_ = 1;
+        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
