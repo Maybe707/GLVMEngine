@@ -24,9 +24,9 @@ void Shader::SetVec3(const std::string &name, float x, float y, float z) const
 { 
 	pGLUniform3f(pGLGet_Uniform_Location(iID, name.c_str()), x, y, z); 
 }
-void Shader::SetUniformID()
+void Shader::SetUniformID(const char* _uniformIdentificator, unsigned int _id)
 {
-	pGLUniform1i(pGLGet_Uniform_Location(iID, "tex"), 10);
+	pGLUniform1i(pGLGet_Uniform_Location(iID, _uniformIdentificator), _id);
 }
 	
 ///< Functions for exmination of shaders errors

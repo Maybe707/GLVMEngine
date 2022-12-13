@@ -17,6 +17,6 @@ void main()
 {
     gl_Position = aProjection_Matrix * aView_Matrix * aModel_Matrix * vec4(aPos.x, aPos.y, aPos.z, 1.0);
 	FragmentPosition = vec3(aModel_Matrix * vec4(aPos.x, aPos.y, aPos.z, 1.0));
-	TexCoord = vec2(aTexCoord.x, aTexCoord.y);
+ 	TexCoord = vec2(aTexCoord.x, aTexCoord.y);	
 	Normal = aNormal;
 }

@@ -1,0 +1,18 @@
+#ifndef MATERIAL_COMPONENT
+#define MATERIAL_COMPONENT
+
+#include "VertexMath.hpp"
+
+namespace GLVM::Core
+{
+	struct SMaterialComponent
+	{
+		vec3 ambient;
+		// vec3 diffuse;
+//		unsigned int diffuse;
+		vec3 specular;
+		float shininess;
+	};
+}
+
+#endif

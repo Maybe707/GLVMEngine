@@ -15,7 +15,8 @@ namespace GLVM::ECS
         Matrix<float, 4> tView_Matrix(1.0f);
 
         _Shader_Program->Use();
-        _Shader_Program->SetUniformID();
+//		_Shader_Program->SetUniformID("tex", 10);
+        _Shader_Program->SetUniformID("material.diffuse", 10);
         
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
@@ -25,7 +26,7 @@ namespace GLVM::ECS
         
         unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
 		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
-
+		
         float aCrosshair_Vertices[] =
         {
             -0.1, 0.5, 0.0,

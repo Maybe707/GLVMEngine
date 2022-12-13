@@ -1,5 +1,7 @@
 #include "GraphicAPI/Opengl.hpp"
 #include "ComponentManager.hpp"
+#include "Components/LightComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Constants.hpp"
 #include "Engine.hpp"
 #include "Event.hpp"
@@ -21,6 +23,7 @@
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
+#include <ratio>
 #include <thread>
 
 namespace GLVM::Core
@@ -55,14 +58,67 @@ namespace GLVM::Core
 		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
 
         _Shader_Program->Use();
-        _Shader_Program->SetUniformID();
+//		_Shader_Program->SetUniformID("tex", 10);
+		_Shader_Program->SetUniformID("material.diffuse", 10);
+		_Shader_Program->SetUniformID("material.specular", 11);
 
-		_Shader_Program->SetVec3("objectColor", 0.5f, 0.3f, 0.41f);
-		_Shader_Program->SetVec3("lightColor", 1.0f, 1.0f, 1.0f);
-		_Shader_Program->SetVec3("lightPosition", 1.5f, 1.5f, 2.9f);
+		// auto start = std::chrono::system_clock::now();
+		// auto time_now = std::chrono::duration_cast<std::chrono::milliseconds>(start.time_since_epoch());
+		// double current_time = time_now.count();
+		// current_time /= 1000.0f;
+		// std::cout << "time: " << current_time  << std::endl;
+		// vec3 lightColor;
+		// lightColor[0] = std::sin(current_time * 2.0f);
+		// lightColor[1] = std::sin(current_time * 0.7f);
+		// lightColor[2] = std::sin(current_time * 1.3f);
+
+		// vec3 diffuseColor = lightColor * vec3(0.5f);
+		// vec3 ambientColor = diffuseColor * vec3(0.2f);
+		
+//		_Shader_Program->SetVec3("light.position", 1.5f, 1.5f, 2.9f);
 		_Shader_Program->SetVec3("viewPosition", playerViewComponent.Position[0],
 								 playerViewComponent.Position[1],
 								 playerViewComponent.Position[2]);
+
+		// Chrome material.
+		// _Shader_Program->SetVec3("material.ambient", 0.25f, 0.25f, 0.25f);
+		// _Shader_Program->SetVec3("material.diffuse", 0.4f, 0.4f, 0.4f);
+		// _Shader_Program->SetVec3("material.specular", 0.774597f, 0.774597f, 0.774597f);
+		// _Shader_Program->SetFloat("material.shininess", 128.0f * 0.6f);
+
+		// !!!!!!!!!!!!!!!!!!!!!!
+		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefMaterial = ECS::GetInnerIDsContainer<Core::SMaterialComponent>(*pComponent_Manager);
+		// unsigned int MaterialComponentContainerSize = pEntityContainerRefMaterial->GetSize();
+		// for(int v = 0; v < MaterialComponentContainerSize; ++v) {
+		// 	unsigned int uiMaterialEntity = (*pEntityContainerRefMaterial)[v];
+		// 	Core::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiMaterialEntity);
+		// 	_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);
+		// 	_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
+		// 	_Shader_Program->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
+		// 	_Shader_Program->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
+		// }
+
+		// Black rubber material.
+		// _Shader_Program->SetVec3("material.ambient", 0.02f, 0.02f, 0.02f);
+		// _Shader_Program->SetVec3("material.diffuse", 0.01f, 0.01f, 0.01f);
+		// _Shader_Program->SetVec3("material.specular", 0.4f, 0.4f, 0.4f);
+		// _Shader_Program->SetFloat("material.shininess", 128.0f * 0.078125f);
+
+		// _Shader_Program->SetVec3("light.ambient",  ambientColor[0], ambientColor[1], ambientColor[2]);
+		// _Shader_Program->SetVec3("light.diffuse",  diffuseColor[0], diffuseColor[1], diffuseColor[2]); // darken diffuse light a bit
+		// _Shader_Program->SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
+		// _Shader_Program->SetVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
+		// _Shader_Program->SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefLight = ECS::GetInnerIDsContainer<Core::SLightComponent>(*pComponent_Manager);
+		unsigned int LightComponentContainerSize = pEntityContainerRefLight->GetSize();
+		for(int x = 0; x < LightComponentContainerSize; ++x) {
+			unsigned int uiLightEntity = (*pEntityContainerRefLight)[x];
+			Core::SLightComponent& lightComponent = pComponent_Manager->GetComponent<Core::SLightComponent>(uiLightEntity);
+			_Shader_Program->SetVec3("light.position", lightComponent.position[0], lightComponent.position[1], lightComponent.position[2]);
+			_Shader_Program->SetVec3("light.ambient",  lightComponent.ambient[0], lightComponent.ambient[1], lightComponent.ambient[2]);
+			_Shader_Program->SetVec3("light.diffuse",  lightComponent.diffuse[0], lightComponent.diffuse[1], lightComponent.diffuse[2]); // darken diffuse light a bit
+			_Shader_Program->SetVec3("light.specular", lightComponent.specular[0], lightComponent.specular[1], lightComponent.specular[2]);
+		}
 		
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
@@ -73,7 +129,14 @@ namespace GLVM::Core
 //				LoadTextureData(texture_load_data_[i]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
+				pGLActive_Texture(GL_TEXTURE11);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+				Core::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture);
+				_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);
+				_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
+				// _Shader_Program->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
+				_Shader_Program->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
+				
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 
