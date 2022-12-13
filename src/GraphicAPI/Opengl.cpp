@@ -129,7 +129,7 @@ namespace GLVM::Core
 //				LoadTextureData(texture_load_data_[i]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
-				pGLActive_Texture(GL_TEXTURE11);
+//				pGLActive_Texture(GL_TEXTURE11);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				Core::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture);
 				_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);

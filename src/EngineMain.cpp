@@ -20,10 +20,10 @@ int main()
     MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/sphere.obj");
     MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/cone.obj");
     MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/monkey.obj");
-    MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/xyz.obj");
+//    MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/xyz.obj");
 //	MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/shaman.obj");
 //	MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/shama_final.obj");
-	MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/F.obj");
+//	MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/F.obj");
 //	MeshManager->SetMesh("/home/cyberdemon/cyberDemonCode/GLVMEngine/waveFrontObj/sphere_test.obj");
 	
     GLVM::ECS::CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
@@ -111,7 +111,7 @@ int main()
 	materialWitch.specular[1] = 0.774597f;
 	materialWitch.specular[2] = 0.774597f;
 	materialWitch.shininess = 128.0f * 0.6f;
-    TextureWitch.id_ = 4;
+    TextureWitch.id_ = 3;
     TextureSystem->BindTexture(u_iWitch, TextureWitch.id_);
 	// TextureWitch.iWidth_ = 32;
 	// TextureWitch.iHeight_ = 32;
@@ -121,7 +121,7 @@ int main()
 	GLVM::ECS::STransformComponent& TransformWitch = ComponentManager->GetComponent<GLVM::ECS::STransformComponent>(u_iWitch);
 //    GLVM::ECS::CColliderComponent& ColliderWitch1 = ComponentManager.GetComponent<GLVM::ECS::CColliderComponent>(u_iPlayer);
     GLVM::ECS::SVertexComponent& VertexWitch = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch);
-    VertexWitch.vkVertexId_ = 5;
+    VertexWitch.vkVertexId_ = 0;
     TransformWitch.tPosition[0] = 0.3f;
     TransformWitch.tPosition[1] = 0.3f;
     TransformWitch.tPosition[2] = 0.3f;
@@ -135,7 +135,7 @@ int main()
 	GLVM::ECS::CTextureComponent& TextureWitch2 = ComponentManager->GetComponent<GLVM::ECS::CTextureComponent>(u_iWitch2);
     TextureWitch2.id_ = 4;
     GLVM::ECS::SVertexComponent& VertexWitch2 = ComponentManager->GetComponent<GLVM::ECS::SVertexComponent>(u_iWitch2);
-    VertexWitch2.vkVertexId_ = 5;
+    VertexWitch2.vkVertexId_ = 0;
     TextureSystem->BindTexture(u_iWitch2, TextureWitch2.id_);
 	// TextureWitch2.iWidth_ = 32;
 	// TextureWitch2.iHeight_ = 32;
