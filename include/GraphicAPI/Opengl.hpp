@@ -20,6 +20,7 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "ShaderProgram.hpp"
+#include "ToString.hpp"
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"
@@ -68,7 +69,7 @@ namespace GLVM::Core {
 		void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
+//		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
 		void SetModelMatrix(Shader *_Shader_Program,
 							ECS::STransformComponent& _transform_Component);
 		void SetViewMatrix(mat4 _viewMatrix) override;

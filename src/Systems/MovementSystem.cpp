@@ -93,9 +93,18 @@ namespace GLVM::ECS
                 default:
                     break;
                 }
+				Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+				unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
+				for(int x = 0; x < spotLightComponentContainerSize; ++x) {
+					unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
+					ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
+					spotLightComponent.direction = rTransformComponent.tForward;
+					spotLightComponent.position  = rTransformComponent.tPosition;
+				}
             }
         }
 
+		
         // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n) {
         //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
         //     ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);

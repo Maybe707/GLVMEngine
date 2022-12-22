@@ -1,4 +1,5 @@
 #include "EntityManager.hpp"
+#include "ComponentManager.hpp"
 
 namespace GLVM::ECS
 {
@@ -18,8 +19,10 @@ namespace GLVM::ECS
         return pInstance_;
     }
     
-    void CEntityManager::CreateEntity(Entity_ID& _Entity_ID)
+    [[nodiscard]] Entity_ID CEntityManager::CreateEntity()
     {
+		Entity_ID _Entity_ID;
+		
         if(tRemoved_Entity_Registry_.GetSize() > k_iNull)    ///< Check out wether or not free ID in removed entities registry.
         {
             _Entity_ID = tRemoved_Entity_Registry_.GetFirstItem();
@@ -31,7 +34,9 @@ namespace GLVM::ECS
             tActive_Entity_Registry_.Push(u_iID);
             _Entity_ID = u_iID;
             ++u_iID;
+
         }
+		return _Entity_ID;
     }
 
     /**************************************************************************************

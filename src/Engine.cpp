@@ -142,7 +142,7 @@ namespace GLVM::Core
 			//            g_Sound_Engine.SoundStream();
 		}
     }
-    
+
     void CEngine::GameKill()
     {
 		((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.Close();

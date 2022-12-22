@@ -3,7 +3,7 @@
 
 #include "VertexMath.hpp"
 
-namespace GLVM::Core
+namespace GLVM::ECS
 {
 	struct SMaterialComponent
 	{

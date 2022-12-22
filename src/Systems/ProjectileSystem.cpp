@@ -58,7 +58,7 @@ namespace GLVM::ECS
         }
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-            ECS::GetInnerIDsContainer<Core::SMaterialComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::SMaterialComponent>(*pComponent_Manager);
         unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
 
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
@@ -71,7 +71,7 @@ namespace GLVM::ECS
                pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_) {
 //                std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-                GLVM::Core::SMaterialComponent& textureProjectile = pComponent_Manager->GetComponent<GLVM::Core::SMaterialComponent>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
+                GLVM::ECS::SMaterialComponent& textureProjectile = pComponent_Manager->GetComponent<GLVM::ECS::SMaterialComponent>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
                 continue;
             }
         }
@@ -82,10 +82,9 @@ namespace GLVM::ECS
                                               CViewComponent& view_Component) {
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
-        unsigned int uiEntity_Projectile;
-        ECS::CEntityManager::GetInstance()->CreateEntity(uiEntity_Projectile);
+        unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
-                                                               ECS::STransformComponent, Core::SMaterialComponent,
+                                                               ECS::STransformComponent, ECS::SMaterialComponent,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 
         // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
@@ -94,7 +93,7 @@ namespace GLVM::ECS
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
-		Core::SMaterialComponent& rTextureProjectile = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_Projectile);
+		ECS::SMaterialComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_Projectile);
         rTextureProjectile.diffuseTextureID_ = 1;
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;

@@ -5,6 +5,8 @@
 #include "Texture.hpp"
 #include <mutex>
 #include "Components/MaterialComponent.hpp"
+#include "GLPointer.h"
+#include "Constants.hpp"
 
 typedef unsigned int Entity_ID;
 typedef unsigned int Texture_ID;
@@ -27,8 +29,9 @@ namespace GLVM::ECS
         static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         static CTextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
+		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
         std::vector<CTexture>& GetTextureVector();
-        void UnbindTexture(Core::SMaterialComponent _textureComponent, Entity _entity);
+        void UnbindTexture(ECS::SMaterialComponent _textureComponent, Entity _entity);
     };
 }
 

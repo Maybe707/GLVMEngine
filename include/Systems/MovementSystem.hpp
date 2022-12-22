@@ -15,6 +15,7 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
 #include "ISoundEngine.hpp"
+#include "Components/SpotLightComponent.hpp"
 
 namespace GLVM::ECS
 {

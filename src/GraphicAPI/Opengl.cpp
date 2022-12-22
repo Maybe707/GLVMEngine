@@ -1,7 +1,9 @@
 #include "GraphicAPI/Opengl.hpp"
 #include "ComponentManager.hpp"
-#include "Components/LightComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
+#include "Components/SpotLightComponent.hpp"
 #include "Constants.hpp"
 #include "Engine.hpp"
 #include "Event.hpp"
@@ -10,6 +12,7 @@
 #include "GLPointer.h"
 #include "MeshManager.hpp"
 #include "Texture.hpp"
+#include "ToString.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "VertexData.hpp"
@@ -30,7 +33,7 @@ namespace GLVM::Core
 {
     COpenglRenderer::COpenglRenderer()
 	{
-		_Shader_Program     = new Shader("../GLshaders/Shader.vs", "../GLshaders/Shader.fs");
+		_Shader_Program = new Shader("../GLshaders/Shader.vs", "../GLshaders/Shader.fs");
 
         glEnable(GL_DEPTH_TEST);
 		glViewport(0, 0, 1920, 1080);
@@ -112,39 +115,107 @@ namespace GLVM::Core
 
 
 		
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefLight = ECS::GetInnerIDsContainer<Core::SLightComponent>(*pComponent_Manager);
-		unsigned int LightComponentContainerSize = pEntityContainerRefLight->GetSize();
-		for(int x = 0; x < LightComponentContainerSize; ++x) {
-			unsigned int uiLightEntity = (*pEntityContainerRefLight)[x];
-			Core::SLightComponent& lightComponent = pComponent_Manager->GetComponent<Core::SLightComponent>(uiLightEntity);
-			_Shader_Program->SetVec3("light.position", lightComponent.position[0], lightComponent.position[1], lightComponent.position[2]);
-			_Shader_Program->SetVec3("light.ambient",  lightComponent.ambient[0], lightComponent.ambient[1], lightComponent.ambient[2]);
-			_Shader_Program->SetVec3("light.diffuse",  lightComponent.diffuse[0], lightComponent.diffuse[1], lightComponent.diffuse[2]); // darken diffuse light a bit
-			_Shader_Program->SetVec3("light.specular", lightComponent.specular[0], lightComponent.specular[1], lightComponent.specular[2]);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
+		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
+		for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
+			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
+			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
+			_Shader_Program->SetVec3("directionalLight.direction", directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
+
+			_Shader_Program->SetVec3("directionalLight.ambient",  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
+			_Shader_Program->SetVec3("directionalLight.diffuse",  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
+			_Shader_Program->SetVec3("directionalLight.specular", directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);
 		}
-		
+
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
+		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
+		_Shader_Program->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
+		for(int x = 0; x < pointLightComponentContainerSize; ++x) {
+			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
+			Core::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(uiPointLightEntity);
+			std::string leftString = "pointLights[";
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+									 pointLightComponent.position[0],
+									 pointLightComponent.position[1],
+									 pointLightComponent.position[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
+									 pointLightComponent.ambient[0],
+									 pointLightComponent.ambient[1],
+									 pointLightComponent.ambient[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
+									 pointLightComponent.diffuse[0],
+									 pointLightComponent.diffuse[1],
+									 pointLightComponent.diffuse[2]); // darken diffuse light a bit
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
+									 pointLightComponent.specular[0],
+									 pointLightComponent.specular[1],
+									 pointLightComponent.specular[2]);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
+									  pointLightComponent.constant);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
+									  pointLightComponent.linear);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
+									  pointLightComponent.quadratic);
+		}
+
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+		unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
+		_Shader_Program->SetInt("spotLightsArraySize", spotLightComponentContainerSize);
+		for(int x = 0; x < spotLightComponentContainerSize; ++x) {
+			unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
+			ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
+			std::string leftString = "spotLights[";
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+									 spotLightComponent.position[0],
+									 spotLightComponent.position[1],
+									 spotLightComponent.position[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"),
+									 spotLightComponent.direction[0],
+									 spotLightComponent.direction[1],
+									 spotLightComponent.direction[2]);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].cutOff"),
+									  std::cos(Radians(spotLightComponent.cutOff)));
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].outerCutOff"),
+									  std::cos(Radians(spotLightComponent.outerCutOff)));
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
+									 spotLightComponent.ambient[0],
+									 spotLightComponent.ambient[1],
+									 spotLightComponent.ambient[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
+									 spotLightComponent.diffuse[0],
+									 spotLightComponent.diffuse[1],
+									 spotLightComponent.diffuse[2]); // darken diffuse light a bit
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
+									 spotLightComponent.specular[0],
+									 spotLightComponent.specular[1],
+									 spotLightComponent.specular[2]);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
+									  spotLightComponent.constant);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
+									  spotLightComponent.linear);
+			_Shader_Program->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
+									  spotLightComponent.quadratic);
+		}
+
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
-				unsigned int specularTextureID = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
-				std::cout << "I: " << i << std::endl;
+				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
+				unsigned int specularTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
 				std::cout << "diffuse id: " << diffuseTextureID << std::endl;
-				LoadTextureData(texture_load_data_[diffuseTextureID]);
-				std::cout << "specular id: " << specularTextureID << std::endl;
-				LoadTextureData(texture_load_data_[specularTextureID]);
-//				LoadTextureData(texture_load_data_[i]);
+				std::cout << "Texture id in renderer: " << texture_load_data_[diffuseTextureID].iTexture_ << std::endl;
+				// LoadTextureData(texture_load_data_[diffuseTextureID]);
+				// LoadTextureData(texture_load_data_[specularTextureID]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
-//				glEnable(GL_BLEND);
 				pGLActive_Texture(GL_TEXTURE10);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
-				std::cout << "index 1: " << texture_load_data_[diffuseTextureID].iTexture_ << std::endl;
 				pGLActive_Texture(GL_TEXTURE11);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
-				std::cout << "index 2: " << texture_load_data_[specularTextureID].iTexture_ << std::endl;
+				std::cout << "vao container size: " << VAOcontainer_.size() << std::endl;
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				Core::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture);
+				std::cout << "i: " << i << " j: " << j << std::endl;
+				ECS::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture);
 				_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);
 				_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
 				// _Shader_Program->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
@@ -157,7 +228,7 @@ namespace GLVM::Core
 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<Core::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
+//				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				pGLActive_Texture(GL_TEXTURE10);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
@@ -203,9 +274,7 @@ namespace GLVM::Core
             CWaveFrontObjParser* wavefrontObjParser = &parser;
 
             wavefrontObjParser->ReadFile(pathsArray_[m]);
-			std::cout << "Read" << std::endl;
             wavefrontObjParser->ParseFile();
-			std::cout << "Parse" << std::endl;
 			aVertexes_.emplace_back();
             aIndices_.emplace_back();
             
@@ -235,24 +304,23 @@ namespace GLVM::Core
         }
     }
     
- 	void COpenglRenderer::LoadTextureData(GLVM::ECS::CTexture& _Texture)
-	{
-		///< Loading and creating texture.
-		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
-		std::cout << "index inside load function: " << _Texture.iTexture_ << std::endl;
-		glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
+ 	// void COpenglRenderer::LoadTextureData(GLVM::ECS::CTexture& _Texture)
+	// {
+	// 	///< Loading and creating texture.
+	// 	glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
+	// 	glBindTexture(GL_TEXTURE_2D, _Texture.iTexture_);
 		
-		///< Loading image, creating texture and generation mipmap-levels
-		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
-		pGLGenerate_Mipmap(GL_TEXTURE_2D);
+	// 	///< Loading image, creating texture and generation mipmap-levels
+	// 	glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
+	// 	pGLGenerate_Mipmap(GL_TEXTURE_2D);
 
-		///< Setting texture applying parameters
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	// 	///< Setting texture applying parameters
+	// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	// 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
+	// 	// glEnable(GL_BLEND);
+	// 	// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	// }
     
 	void COpenglRenderer::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
 	{

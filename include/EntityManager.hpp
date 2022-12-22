@@ -25,7 +25,7 @@ namespace GLVM::ECS
         void operator=(const CEntityManager& _entity_Manager) = delete;     ///< Dont need assignment operator because of singleton property.
         static CEntityManager* GetInstance();                      ///< It possibly to get only one instance of this class whith this method.
         
-		void CreateEntity(Entity_ID& _Entity_ID);
+		[[nodiscard]] Entity_ID CreateEntity();
 
         void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager);
 	};

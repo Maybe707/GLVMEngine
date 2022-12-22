@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "Components/SpotLightComponent.hpp"
 #include "GLPointer.h"
 #include "Systems/GUISystem.hpp"
 #include "IChrono.hpp"
@@ -46,15 +47,31 @@
 #include "Systems/GUISystem.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "VectorContainer.hpp"
 #include "Components/VertexComponent.hpp"
 #include "IContainer.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "Constants.hpp"
+#include <X11/X.h>
 #include <mutex>
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"
+
+namespace GLVM::ECS::Components
+{    
+	typedef STransformComponent     transform;
+	typedef SVertexComponent        vertex;
+	typedef SMoveComponent          movement;
+	typedef CColliderComponent      collider;
+	typedef SAnimationMoveComponent animation;
+	typedef CViewComponent          camera;
+	typedef CRigidBodyComponent     rigidBody;
+	typedef SEventComponent         event;
+	typedef SMaterialComponent      material;
+	typedef SSpotLightComponent     spotLight;
+}
 
 using Entity = unsigned int;
 
@@ -92,7 +109,7 @@ namespace GLVM::Core
         
         CEngine(CEngine& _engine) = delete;                   ///< Dont need to make cope because of singleton property.
         void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
-        static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method.
+        static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
 		void GameLoop();
 
