@@ -117,6 +117,7 @@ namespace GLVM::Core
 		
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
+		_Shader_Program->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 		for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
 			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
