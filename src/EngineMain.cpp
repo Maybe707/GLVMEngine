@@ -90,122 +90,57 @@ int main()
 	transformWitch2 = { .tPosition = { 2.5f, 0.3f, 0.0f }, .fScale = 1.0f };
 	vertexWitch2.vkVertexId_ = 0;
     TextureManager->BindTexture(uiWitch2, materialWitch2.diffuseTextureID_);
-
 	
-//     Entity u_iHud1;
-// 	EntityManager->CreateEntity(u_iHud1);
-// 	ComponentManager->CreateComponent<vertex, material, collider, transform>(u_iHud1);
-// 	material& TextureHud1 = ComponentManager->GetComponent<material>(u_iHud1);
-//     vertex& VertexHud1 = ComponentManager->GetComponent<vertex>(u_iHud1);
-//     VertexHud1.vkVertexId_ = 0;
-//     TextureHud1.diffuseTextureID_ = 0;
-//     hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
-// 	// TextureWitch2.iWidth_ = 32;
-// 	// TextureWitch2.iHeight_ = 32;
-// 	// TextureWitch2.u_iData_ = witch_dat;
-//     // TextureWitch2.dat_length_ = witch_dat_len;
-// //	GLVM->LoadTextureData(TextureWitch2);
-// 	transform& TransformHud1 = ComponentManager->GetComponent<transform>(u_iHud1);
-// //    collider& ColliderWitch2 = ComponentManager.GetComponent<collider>(u_iPlayer);
-//     TransformHud1.tPosition[0] = 0.0f;
-//     TransformHud1.tPosition[1] = 0.0f;
-//     TransformHud1.tPosition[2] = 0.3f;
-//     TransformHud1.fScale = 0.1f;
-//    TransformHud1.hud = true;
-//    std::cout << "GROUND: " <<  ColliderWitch2.aColliders_Container_[0].bGround_Collision_ << std::endl;
-//    std::cout << "WALL: " << ColliderWitch2.aColliders_Container_[0].bWall_Collision_ << std::endl;
+    Entity u_iHud1 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, collider, transform>(u_iHud1);
+	material & TextureHud1   = ComponentManager->GetComponent<material>(u_iHud1);
+    vertex   & VertexHud1    = ComponentManager->GetComponent<vertex>(u_iHud1);
+	transform& TransformHud1 = ComponentManager->GetComponent<transform>(u_iHud1);
+    VertexHud1.vkVertexId_ = 0;
+	TextureHud1 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+    hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
+	TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
 
-// 	Entity light0 = EntityManager->CreateEntity();
-// 	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(light0);
-// 	material& textureLight0 = ComponentManager->GetComponent<material>(light0);
-// 	SDirectionalLightComponent& Light0 = ComponentManager->GetComponent<SDirectionalLightComponent>(light0);
-// 	transform& transformLight0 = ComponentManager->GetComponent<transform>(light0);
-// 	vertex& vertexLight0 = ComponentManager->GetComponent<vertex>(light0);
-// 	textureLight0.diffuseTextureID_  = 1;
-// 	textureLight0.specularTextureID_ = 1;
-// 	TextureManager->BindTexture(light0, textureLight0.diffuseTextureID_);
-// //	TextureManager->BindTexture(light0, textureLight0.specularTextureID_);
-// 	vertexLight0.vkVertexId_ = 0;
-// 	Light0.ambient[0]            =  0.2f;
-// 	Light0.ambient[1]            =  0.2f;
-// 	Light0.ambient[2]            =  0.2f;
-// 	Light0.diffuse[0]            =  0.5f;
-// 	Light0.diffuse[1]            =  0.5f;
-// 	Light0.diffuse[2]            =  0.5f;
-// 	Light0.specular[0]           =  1.0f;
-// 	Light0.specular[1]           =  1.0f;
-// 	Light0.specular[2]           =  1.0f;
-// 	Light0.direction[0]          = 0.2f;
-// 	Light0.direction[1]          = 0.0f;
-// 	Light0.direction[2]          = -0.3f;
-// 	transformLight0.tPosition[0] =  1.5f;
-// 	transformLight0.tPosition[1] =  1.3f;
-// 	transformLight0.tPosition[2] =  2.9f;
-// 	transformLight0.fScale = 0.1f;
+	Entity directionalLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
+	material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
+	SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
+	transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
+	vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
+	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
+	vertexDirectionalLight0.vkVertexId_ = 0;
+	directionalLightComponent0 = {.direction = {0.2f, 0.0f, -0.3f}, .ambient = {0.2f, 0.2f, 0.2f},
+		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
+	transformDirectionalLight0 = { .tPosition = { 1.5f, 1.3f, 2.9f }, .fScale = 0.1f };
 
-// 	Entity pointLight0;
-// 	EntityManager->CreateEntity(pointLight0);
-// 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
-// 	material& texturePointLight0 = ComponentManager->GetComponent<material>(pointLight0);
-// 	SPointLightComponent& pointLightComponent0 = ComponentManager->GetComponent<SPointLightComponent>(pointLight0);
-// 	transform& transformPointLight0 = ComponentManager->GetComponent<transform>(pointLight0);
-// 	vertex& vertexPointLight0 = ComponentManager->GetComponent<vertex>(pointLight0);
-// 	texturePointLight0.diffuseTextureID_  = 1;
-// 	texturePointLight0.specularTextureID_ = 1;
-// 	TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
-// //	TextureManager->BindTexture(light0, textureLight0.specularTextureID_);
-// 	vertexPointLight0.vkVertexId_ = 0;
-// 	pointLightComponent0.ambient[0]   =  0.2f;
-// 	pointLightComponent0.ambient[1]   =  0.2f;
-// 	pointLightComponent0.ambient[2]   =  0.2f;
-// 	pointLightComponent0.diffuse[0]   =  0.5f;
-// 	pointLightComponent0.diffuse[1]   =  0.5f;
-// 	pointLightComponent0.diffuse[2]   =  0.5f;
-// 	pointLightComponent0.specular[0]  =  1.0f;
-// 	pointLightComponent0.specular[1]  =  1.0f;
-// 	pointLightComponent0.specular[2]  =  1.0f;
-// 	pointLightComponent0.position[0]  =  0.3f;
-// 	pointLightComponent0.position[1]  =  1.3f;
-// 	pointLightComponent0.position[2]  =  1.7f;
-// 	pointLightComponent0.constant     =  1.0f;
-// 	pointLightComponent0.linear       =  0.09f;
-// 	pointLightComponent0.quadratic    =  0.032f;
-// 	transformPointLight0.tPosition[0] =  0.3f;
-// 	transformPointLight0.tPosition[1] =  1.3f;
-// 	transformPointLight0.tPosition[2] =  1.7f;
-// 	transformPointLight0.fScale       =  0.1f;
+	Entity pointLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
+	material            & texturePointLight0   = ComponentManager->GetComponent<material>(pointLight0);
+	SPointLightComponent& pointLightComponent0 = ComponentManager->GetComponent<SPointLightComponent>(pointLight0);
+	transform           & transformPointLight0 = ComponentManager->GetComponent<transform>(pointLight0);
+	vertex              & vertexPointLight0    = ComponentManager->GetComponent<vertex>(pointLight0);
+	texturePointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	vertexPointLight0.vkVertexId_ = 0;
+	TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
+	pointLightComponent0 = { .position = { 0.3f, 1.3f, 1.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+		.linear = 0.09f, .quadratic = 0.1f };
+	transformPointLight0 = { .tPosition = { 0.3f, 1.3f, 1.7f }, .fScale = 0.1f };
 
-// 	Entity pointLight1;
-// 	EntityManager->CreateEntity(pointLight1);
-// 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
-// 	material& texturePointLight1 = ComponentManager->GetComponent<material>(pointLight1);
-// 	SPointLightComponent& pointLightComponent1 = ComponentManager->GetComponent<SPointLightComponent>(pointLight1);
-// 	transform& transformPointLight1 = ComponentManager->GetComponent<transform>(pointLight1);
-// 	vertex& vertexPointLight1 = ComponentManager->GetComponent<vertex>(pointLight1);
-// 	texturePointLight1.diffuseTextureID_  = 1;
-// 	texturePointLight1.specularTextureID_ = 1;
-// 	TextureManager->BindTexture(pointLight1, texturePointLight1.diffuseTextureID_);
-// //	TextureManager->BindTexture(light0, textureLight0.specularTextureID_);
-// 	vertexPointLight1.vkVertexId_ = 0;
-// 	pointLightComponent1.ambient[0]   =  0.2f;
-// 	pointLightComponent1.ambient[1]   =  0.2f;
-// 	pointLightComponent1.ambient[2]   =  0.2f;
-// 	pointLightComponent1.diffuse[0]   =  0.5f;
-// 	pointLightComponent1.diffuse[1]   =  0.5f;
-// 	pointLightComponent1.diffuse[2]   =  0.5f;
-// 	pointLightComponent1.specular[0]  =  1.0f;
-// 	pointLightComponent1.specular[1]  =  1.0f;
-// 	pointLightComponent1.specular[2]  =  1.0f;
-// 	pointLightComponent1.position[0]  =  1.2f;
-// 	pointLightComponent1.position[1]  =  1.3f;
-// 	pointLightComponent1.position[2]  =  1.5f;
-// 	pointLightComponent1.constant     =  1.0f;
-// 	pointLightComponent1.linear       =  0.09f;
-// 	pointLightComponent1.quadratic    =  0.032f;
-// 	transformPointLight1.tPosition[0] =  1.2f;
-// 	transformPointLight1.tPosition[1] =  1.3f;
-// 	transformPointLight1.tPosition[2] =  1.5f;
-// 	transformPointLight1.fScale       =  0.1f;
+	// Entity pointLight1 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
+	// material& texturePointLight1 = ComponentManager->GetComponent<material>(pointLight1);
+	// SPointLightComponent& pointLightComponent1 = ComponentManager->GetComponent<SPointLightComponent>(pointLight1);
+	// transform& transformPointLight1 = ComponentManager->GetComponent<transform>(pointLight1);
+	// vertex& vertexPointLight1 = ComponentManager->GetComponent<vertex>(pointLight1);
+	// texturePointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	// TextureManager->BindTexture(pointLight1, texturePointLight1.diffuseTextureID_);
+	// vertexPointLight1.vkVertexId_ = 0;
+	// pointLightComponent1 = { .position = { 1.2f, 1.3f, 1.5f }, .ambient = { 0.2f, 0.2f, 0.2f },
+	// 	.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+	// 	.linear = 0.09f, .quadratic = 0.032f };
+	// transformPointLight1 = { .tPosition = { 1.2f, 1.3f, 1.5f }, .fScale = 0.1f };
 
 	Entity spotLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, spotLight, transform>(spotLight0);
@@ -223,8 +158,6 @@ int main()
 		.specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
 		.linear = 0.09f, .quadratic = 0.032f };
 	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.1f };
-	
-
     
     ///< Game rendering loop
 	GLVM->GameLoop();

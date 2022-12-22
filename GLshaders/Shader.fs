@@ -50,7 +50,7 @@ struct SpotLight {
 #define POINT_LIGHTS_NUMBER 128
 #define SPOT_LIGHTS_NUMBER  128
 
-uniform int              directionalArraySize;
+uniform int              directionalLightsArraySize;
 uniform int              pointLightsArraySize;
 uniform int              spotLightsArraySize;
 uniform Material         material;
@@ -74,7 +74,7 @@ void main()
 	// Compute directional lighting
 	vec3 result;
 	
-	if (directionalArraySize > 0) {
+	if (directionalLightsArraySize > 0) {
 		result += ComputeDirectionalLight(directionalLight, normal, viewDirection);
 	}
 	// Compute point lights
@@ -107,8 +107,9 @@ void main()
 // 		result += ambient + diffuse + specular;
 // 		FragColor = vec4(result, 1.0);
 // 	}
-
-	result += ComputeSpotLight(spotLights[0], normal, FragmentPosition, viewDirection); 
+	if (spotLightsArraySize > 0) {
+		result += ComputeSpotLight(spotLights[0], normal, FragmentPosition, viewDirection);
+	}
 	
 // 		vec3 ambient = light.ambient * material.ambient;
 	
