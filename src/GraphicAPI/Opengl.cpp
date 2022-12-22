@@ -112,8 +112,6 @@ namespace GLVM::Core
 		// _Shader_Program->SetVec3("light.ambient",  0.2f, 0.2f, 0.2f);
 		// _Shader_Program->SetVec3("light.diffuse",  0.5f, 0.5f, 0.5f); // darken diffuse light a bit
 		// _Shader_Program->SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-
 		
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
@@ -121,11 +119,12 @@ namespace GLVM::Core
 		for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
 			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
-			_Shader_Program->SetVec3("directionalLight.direction", directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
+			std::string leftString = "directionalLights[";
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"), directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
 
-			_Shader_Program->SetVec3("directionalLight.ambient",  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
-			_Shader_Program->SetVec3("directionalLight.diffuse",  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
-			_Shader_Program->SetVec3("directionalLight.specular", directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
+			_Shader_Program->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"), directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);
 		}
 
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
@@ -204,8 +203,6 @@ namespace GLVM::Core
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
 				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
 				unsigned int specularTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
-				std::cout << "diffuse id: " << diffuseTextureID << std::endl;
-				std::cout << "Texture id in renderer: " << texture_load_data_[diffuseTextureID].iTexture_ << std::endl;
 				// LoadTextureData(texture_load_data_[diffuseTextureID]);
 				// LoadTextureData(texture_load_data_[specularTextureID]);
 				SetModelMatrix(_Shader_Program, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
@@ -213,9 +210,7 @@ namespace GLVM::Core
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE11);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
-				std::cout << "vao container size: " << VAOcontainer_.size() << std::endl;
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				std::cout << "i: " << i << " j: " << j << std::endl;
 				ECS::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture);
 				_Shader_Program->SetFloat("material.shininess", materialComponent.shininess);
 				_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
