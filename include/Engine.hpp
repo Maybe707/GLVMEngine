@@ -54,7 +54,6 @@
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "Constants.hpp"
-#include <X11/X.h>
 #include <mutex>
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"

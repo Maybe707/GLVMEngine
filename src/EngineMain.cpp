@@ -112,7 +112,7 @@ int main()
 	vertexDirectionalLight0.vkVertexId_ = 0;
 	directionalLightComponent0 = {.direction = {0.2f, 0.0f, -0.3f}, .ambient = {0.2f, 0.2f, 0.2f},
 		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	transformDirectionalLight0 = { .tPosition = { 1.5f, 1.3f, 2.9f }, .fScale = 0.1f };
+	transformDirectionalLight0 = { .tPosition = { 1.5f, 1.3f, 2.9f }, .fScale = 0.3f };
 
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
@@ -123,10 +123,10 @@ int main()
 	texturePointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	vertexPointLight0.vkVertexId_ = 0;
 	TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
-	pointLightComponent0 = { .position = { 0.3f, 1.3f, 1.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
+	pointLightComponent0 = { .position = { 1.0f, 0.3f, 1.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
 		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
 		.linear = 0.09f, .quadratic = 0.1f };
-	transformPointLight0 = { .tPosition = { 0.3f, 1.3f, 1.7f }, .fScale = 0.1f };
+	transformPointLight0 = { .tPosition = { 1.0f, 0.3f, 2.7f }, .fScale = 0.3f };
 
 	// Entity pointLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
@@ -157,7 +157,7 @@ int main()
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f },
 		.specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
 		.linear = 0.09f, .quadratic = 0.032f };
-	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.1f };
+	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
     
     ///< Game rendering loop
 	GLVM->GameLoop();
