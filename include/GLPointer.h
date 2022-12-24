@@ -99,6 +99,12 @@ EXTERN void (*pGLUniform_Matrix4fv)(GLint, GLsizei, GLboolean,
 
 EXTERN void (*pGLActive_Texture)(GLenum);
 
+EXTERN void (*pGLGen_Framebuffers)(GLsizei n, GLuint *ids);
+
+EXTERN void (*pGLBind_Framebuffer)(GLenum target, GLuint framebuffer);
+
+EXTERN void (*pGLFramebuffer_Texture2D)(GLenum target, GLenum atachment, GLenum textarget, GLuint texture, GLint level);
+
 #ifdef __linux__
 EXTERN void (*pGLXSwap_Interval_EXT)(Display *, GLXDrawable, int);
 #endif

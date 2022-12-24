@@ -35,8 +35,23 @@ namespace GLVM::Core
 	{
 		_Shader_Program = new Shader("../GLshaders/Shader.vs", "../GLshaders/Shader.fs");
 
+		pGLGen_Framebuffers(1, &depthMapFBO);
+		glGenTextures(1, &depthMapTexture);
+		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		pGLFramebuffer_Texture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMapTexture, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+		
         glEnable(GL_DEPTH_TEST);
-		glViewport(0, 0, 1920, 1080);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
 
 	COpenglRenderer::~COpenglRenderer()
@@ -148,6 +163,20 @@ namespace GLVM::Core
 									  spotLightComponent.quadratic);
 		}
 
+		// Render to depth map
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, depthMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		// configureMatrices();
+		// renderScene();
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+		// Render scene as normal with shodow mapping (using depth map)
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// configureMatrices();
+		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
+		// renderScene();
+		
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];

@@ -47,9 +47,15 @@ namespace GLVM::Core {
 		CWindowWin Window;
 #endif
 
-		GLuint iVbo_;
+		const unsigned int SCREEN_WIDTH = 1920;
+		const unsigned int SCREEN_HEIGHT = 1080;
 		Shader* _Shader_Program;
-
+		GLuint iVbo_;
+		unsigned int depthMapFBO;
+		unsigned int depthMapTexture;
+		const unsigned int SHADOW_WIDTH  = 1024;
+		const unsigned int SHADOW_HEIGHT = 1024;
+		
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_;

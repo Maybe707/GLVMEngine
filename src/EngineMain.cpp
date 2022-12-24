@@ -91,15 +91,15 @@ int main()
 	vertexWitch2.vkVertexId_ = 0;
     TextureManager->BindTexture(uiWitch2, materialWitch2.diffuseTextureID_);
 	
-    Entity u_iHud1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<vertex, material, collider, transform>(u_iHud1);
-	material & TextureHud1   = ComponentManager->GetComponent<material>(u_iHud1);
-    vertex   & VertexHud1    = ComponentManager->GetComponent<vertex>(u_iHud1);
-	transform& TransformHud1 = ComponentManager->GetComponent<transform>(u_iHud1);
-    VertexHud1.vkVertexId_ = 0;
-	TextureHud1 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
-    hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
-	TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
+    // Entity u_iHud1 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<vertex, material, collider, transform>(u_iHud1);
+	// material & TextureHud1   = ComponentManager->GetComponent<material>(u_iHud1);
+    // vertex   & VertexHud1    = ComponentManager->GetComponent<vertex>(u_iHud1);
+	// transform& TransformHud1 = ComponentManager->GetComponent<transform>(u_iHud1);
+    // VertexHud1.vkVertexId_ = 0;
+	// TextureHud1 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+    // hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
+	// TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
 
 	Entity directionalLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
