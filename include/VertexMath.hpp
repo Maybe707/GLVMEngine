@@ -611,16 +611,24 @@ Matrix<T, var> Ortho(float w, float h, float zn, float zf)
 	return tempMatrix;
 }
 
-template <class T, int size>
-Matrix<T, size> ortho(T left, T right, T bottom, T top) {
-	Matrix<T, size> tempMatrix(static_cast<T>(1));
+template <class T>
+Matrix<T, 4> ortho(T left, T right, T bottom, T top, T nearVal, T farVal) {
+//	Matrix<T, 4> tempMatrix(static_cast<T>(1));
 	
+	// tempMatrix[0][0] = static_cast<T>(2) / (right - left);
+	// tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
+	// tempMatrix[2][2] = - static_cast<T>(1);
+	// tempMatrix[3][0] = - (right + left) / (right - left);
+	// tempMatrix[3][1] = - (top + bottom) / (top - bottom);
+
+	Matrix<float, 4> tempMatrix(1);
 	tempMatrix[0][0] = static_cast<T>(2) / (right - left);
 	tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
-	tempMatrix[2][2] = - static_cast<T>(1);
+	tempMatrix[2][2] = - static_cast<T>(2) / (farVal - nearVal);
 	tempMatrix[3][0] = - (right + left) / (right - left);
 	tempMatrix[3][1] = - (top + bottom) / (top - bottom);
-
+	tempMatrix[3][2] = - (farVal + nearVal) / (farVal - nearVal);
+	
 	return tempMatrix;
 }
 

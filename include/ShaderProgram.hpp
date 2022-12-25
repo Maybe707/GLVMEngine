@@ -87,7 +87,7 @@ public:
     void SetInt(const std::string& name, int value) const;
     void SetFloat(const std::string& name, float value) const;
 	void SetVec3(const std::string &name, float x, float y, float z) const;
-	void SetUniformID(const char* _uniformIdentificator, unsigned int _id);
+	void SetUniformID(const char* _uniformIdentificator, int _id);
 	
 private:
     void CheckCompileErrors(unsigned int shader, std::string type);

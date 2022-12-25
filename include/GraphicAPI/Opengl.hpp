@@ -47,10 +47,15 @@ namespace GLVM::Core {
 		CWindowWin Window;
 #endif
 
-		const unsigned int SCREEN_WIDTH = 1920;
+		const unsigned int SCREEN_WIDTH  = 1920;
 		const unsigned int SCREEN_HEIGHT = 1080;
 		Shader* _Shader_Program;
-		GLuint iVbo_;
+		Shader* shadowMappingDepth_;
+		Shader* debugQuadDepth_;
+		GLuint quadVAO_;
+		GLuint quadVBO_;
+		GLuint planeVAO_;
+		GLuint planeVBO_;
 		unsigned int depthMapFBO;
 		unsigned int depthMapTexture;
 		const unsigned int SHADOW_WIDTH  = 1024;
@@ -69,13 +74,14 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
+		void RenderScene();
+		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
 		void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-//		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
 		void SetModelMatrix(Shader *_Shader_Program,
 							ECS::STransformComponent& _transform_Component);
 		void SetViewMatrix(mat4 _viewMatrix) override;
