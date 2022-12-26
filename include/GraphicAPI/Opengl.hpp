@@ -74,7 +74,7 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
-		void RenderScene();
+		void RenderScene(Shader* _shader);
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);

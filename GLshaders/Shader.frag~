@@ -1,9 +1,12 @@
 #version 410 core
 out vec4 FragColor;
 
-in vec2 TexCoord;
-in vec3 FragmentPosition;
-in vec3 Normal;
+in VS_OUT {
+	vec3 FragmentPosition;
+	vec3 Normal;
+	vec2 TextureCoords;
+	vec4 FragmentPositionLightSpace;
+} fs_in;
 
 struct Material {
     vec3      ambient;
@@ -51,6 +54,7 @@ struct SpotLight {
 #define POINT_LIGHTS_NUMBER       64
 #define SPOT_LIGHTS_NUMBER        32
 
+uniform sampler2D        shadowMap;
 uniform int              directionalLightsArraySize;
 uniform int              pointLightsArraySize;
 uniform int              spotLightsArraySize;
@@ -63,11 +67,12 @@ uniform vec3             viewPosition;
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
+float ComputeShadow(vec4 fragmentPositionLightSpace);
 
 void main()
 {
-	vec3 normal        = normalize(Normal);
-	vec3 viewDirection = normalize(viewPosition - FragmentPosition);
+	vec3 normal        = normalize(fs_in.Normal);
+	vec3 viewDirection = normalize(viewPosition - fs_in.FragmentPosition);
 	
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	// Compute directional lighting	
@@ -75,11 +80,15 @@ void main()
 		result += ComputeDirectionalLight(directionalLights[f], normal, viewDirection);
 	// Compute point lights
 	for (int i = 0; i < pointLightsArraySize; ++i)
-		result += ComputePointLight(pointLights[i], normal, FragmentPosition, viewDirection);
+		result += ComputePointLight(pointLights[i], normal, fs_in.FragmentPosition, viewDirection);
 	// Compute spot light
 	for (int j = 0; j < spotLightsArraySize; ++j) 
-		result += ComputeSpotLight(spotLights[j], normal, FragmentPosition, viewDirection);
+		result += ComputeSpotLight(spotLights[j], normal, fs_in.FragmentPosition, viewDirection);
 
+	// Compute shadow
+	float shadow = ComputeShadow(fs_in.FragmentPositionLightSpace);
+	result = result * (1.0 - shadow);
+	
 	FragColor = vec4(result, 1.0);
 }
 
@@ -92,8 +101,8 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// combine results
 	vec3 ambient  = light.ambient * material.ambient;
-	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, TexCoord));
-	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, TexCoord));
+	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.TextureCoords));
+	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.TextureCoords));
 
 	return (ambient + diffuse + specular);
 }
@@ -111,8 +120,8 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 
 	// combine results
 	vec3 ambient  = light.ambient * material.ambient;
-	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, TexCoord));
-	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, TexCoord));
+	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.TextureCoords));
+	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.TextureCoords));
 
 	ambient  *= attenuation;
 	diffuse  *= attenuation;
@@ -137,11 +146,26 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 	// combine results
 	vec3 ambient  = light.ambient * material.ambient;
-	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, TexCoord));
-	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, TexCoord));
+	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.TextureCoords));
+	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.TextureCoords));
 //	ambient  *= attenuation * intensity;
     diffuse  *= attenuation * intensity;
     specular *= attenuation * intensity;
 	
     return (ambient + diffuse + specular);
+}
+
+float ComputeShadow(vec4 fragmentPositionLightSpace) {
+	// Perform perspective devide
+	vec3 projectiveCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
+	// Transform to [0.1] range
+	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
+	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
+	float closestDepth         = texture(shadowMap, projectiveCoordinates.xy).r;
+	// Get depth of current fragment from light's perspective
+	float currentDepth         = projectiveCoordinates.z;
+	// Check whether current fragment position is in shadow
+	float shadow               = currentDepth > closestDepth ? 1.0 : 0.0;
+
+	return shadow;
 }

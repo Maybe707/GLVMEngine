@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include "GLPointer.h"
+#include "VertexMath.hpp"
 
 /*! \class Shader
     \brief Class for creating shader program
@@ -88,6 +89,7 @@ public:
     void SetFloat(const std::string& name, float value) const;
 	void SetVec3(const std::string &name, float x, float y, float z) const;
 	void SetUniformID(const char* _uniformIdentificator, int _id);
+	void SetMat4(const std::string &name, mat4 &mat) const;
 	
 private:
     void CheckCompileErrors(unsigned int shader, std::string type);

@@ -41,7 +41,7 @@ int main()
 		.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
     
     std::vector<CTexture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
-
+	
     TextureManager->SetTextureVector(TextureVector);
 
     CTexture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
@@ -66,7 +66,7 @@ int main()
     vertex   & vertexPlayer    = ComponentManager->GetComponent<vertex>(uiPlayer);
     vertexPlayer.vkVertexId_        = 0;
     colliderPlayer.bPush_Collission = true;
-	transformPlayer  = { .tPosition = { 0.0f, 0.3f, -1.0f }, .fScale = 0.1f };
+	transformPlayer  = { .tPosition = { 0.0f, 1.3f, 0.0f }, .fScale = 0.1f };
 	viewPlayer       = { .Front_Camera = { 0.0f, 0.0f, -1.0f }, .Up_Camera = { 0.0f, 1.0f, 0.0f } };
     
 	Entity uiWitch = EntityManager->CreateEntity();
@@ -76,7 +76,7 @@ int main()
     vertex   & vertexWitch    = ComponentManager->GetComponent<vertex>(uiWitch);
 	materialWitch  = { .diffuseTextureID_ = 3, .specularTextureID_ = 4, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch = { .tPosition = { 0.0f, 0.5f, 0.0f }, .fScale = 1.0f };
+	transformWitch = { .tPosition = { 0.0f, -2.5f, 0.0f }, .fScale = 2.0f };
     TextureManager->BindTexture(uiWitch, materialWitch.diffuseTextureID_);
     vertexWitch.vkVertexId_ = 0;
 	
@@ -87,7 +87,7 @@ int main()
 	transform& transformWitch2 = ComponentManager->GetComponent<transform>(uiWitch2);
 	materialWitch2 = { .diffuseTextureID_ = 3, .specularTextureID_ = 4, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch2 = { .tPosition = { 2.5f, 0.7f, 0.0f }, .fScale = 1.0f };
+	transformWitch2 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 1.0f };
 	vertexWitch2.vkVertexId_ = 0;
     TextureManager->BindTexture(uiWitch2, materialWitch2.diffuseTextureID_);
 	
@@ -110,9 +110,9 @@ int main()
 	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
 	vertexDirectionalLight0.vkVertexId_ = 0;
-	directionalLightComponent0 = {.direction = {0.2f, 0.0f, -0.3f}, .ambient = {0.2f, 0.2f, 0.2f},
+	directionalLightComponent0 = {.direction = {0.0f, -3.0f, 0.0f}, .ambient = {0.2f, 0.2f, 0.2f},
 		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	transformDirectionalLight0 = { .tPosition = { 1.5f, 1.3f, 2.9f }, .fScale = 0.3f };
+	transformDirectionalLight0 = { .tPosition = { -4.0f, 10.0f, -3.0f }, .fScale = 0.3f };
 
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);

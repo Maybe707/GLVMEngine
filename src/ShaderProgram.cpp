@@ -1,4 +1,5 @@
 #include "ShaderProgram.hpp"
+#include "GLPointer.h"
 
 #define ARRAY_INFO_LOG_RANGE 1024
 
@@ -28,7 +29,12 @@ void Shader::SetUniformID(const char* _uniformIdentificator, int _id)
 {
 	pGLUniform1i(pGLGet_Uniform_Location(iID, _uniformIdentificator), _id);
 }
-	
+
+void Shader::SetMat4(const std::string &name, mat4 &mat) const
+{
+	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 ///< Functions for exmination of shaders errors
 void Shader::CheckCompileErrors(unsigned int shader, std::string type)
 {
