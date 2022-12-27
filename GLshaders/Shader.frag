@@ -108,7 +108,8 @@ void main()
     float spec = 0.0;
     vec3 halfwayDir = normalize(lightDir + viewDir);  
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-    vec3 specular = spec * lightColor;    
+    vec3 specular = spec * lightColor;
+//	specular = vec3(0.0, 0.0, 0.0);
     // calculate shadow
     float shadow = ComputeShadow(fs_in.FragmentPositionLightSpace);                      
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
@@ -191,7 +192,7 @@ float ComputeShadow(vec4 fragmentPositionLightSpace) {
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.Normal);
 	vec3 lightDir = normalize(lightPos - fs_in.FragmentPosition);
-	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.01);
+	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
 	return shadow;

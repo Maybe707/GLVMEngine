@@ -141,7 +141,10 @@ namespace GLVM::Core
             // glBindTexture(GL_TEXTURE_2D, 1);
 			// pGLBind_Vertex_Array(planeVAO_);
 			// glDrawArrays(GL_TRIANGLES, 0, 6);
+			// glEnable(GL_CULL_FACE);
+			// glCullFace(GL_FRONT);
 			RenderScene(shadowMappingDepth_);
+//			glCullFace(GL_BACK);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 		}
 
@@ -282,7 +285,6 @@ namespace GLVM::Core
 				_Shader_Program->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
 				// _Shader_Program->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
 //				_Shader_Program->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
-				
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 

@@ -1,6 +1,8 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace GLVM::ECS
 {
