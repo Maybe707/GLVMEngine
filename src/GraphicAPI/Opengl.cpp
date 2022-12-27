@@ -109,13 +109,13 @@ namespace GLVM::Core
 		pGLEnable_Vertex_Attrib_Array(2);
 		pGLVertex_Attrib_Pointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		pGLBind_Vertex_Array(0);
-		
+
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		Matrix<float, 4> lightProjection(1.0f), lightView(1.0f), lightSpaceMatrix(1.0f);
-		float nearPlane = 1.0f, farPlane = 7.5f;
-//		vec3 lightPosition = { -4.0f, 5.0f, -3.0f };
+		float nearPlane = 1.0f, farPlane = 17.5f;
+//		vec3 lightPosition = { 3.0f, 5.0f, 1.0f };
 		vec3 lightPosition = playerViewComponent.Position;
 		vec3 directionVector = { 0.0f, 0.0f, 0.0f };
 		vec3 lightUpVector = { 0.0f, 1.0f, 0.0f };
@@ -134,9 +134,9 @@ namespace GLVM::Core
 //			glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, depthMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			Matrix<float, 4> model(1.0f);
-			unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(shadowMappingDepth_->iID, "aModel_Matrix");
-			pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
+			// Matrix<float, 4> model(1.0f);
+			// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(shadowMappingDepth_->iID, "aModel_Matrix");
+			// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
 			// glActiveTexture(GL_TEXTURE0);
             // glBindTexture(GL_TEXTURE_2D, 1);
 			// pGLBind_Vertex_Array(planeVAO_);
@@ -156,8 +156,6 @@ namespace GLVM::Core
 		_Shader_Program->SetVec3("viewPosition", playerViewComponent.Position[0],
 								 playerViewComponent.Position[1],
 								 playerViewComponent.Position[2]);
-		_Shader_Program->SetMat4("aLight_Space_Matrix", lightProjection);
-
 		
 		// _Shader_Program->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
@@ -241,15 +239,18 @@ namespace GLVM::Core
 		// 							  spotLightComponent.quadratic);
 		// }
 
-		_Shader_Program->SetVec3("lightPos", -4.0f, 10.0f, -3.0f);
+		_Shader_Program->SetVec3("lightPos", lightPosition.m_vector[0], lightPosition.m_vector[1], lightPosition.m_vector[2]);
 		_Shader_Program->SetMat4("aLight_Space_Matrix", lightSpaceMatrix);
 		glActiveTexture(GL_TEXTURE7);
 		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 		glActiveTexture(GL_TEXTURE8);
 //		glBindTexture(GL_TEXTURE_2D, texture_load_data_[0].entitiesOwnsThisTypeOfTexture_[0]);
 	    glBindTexture(GL_TEXTURE_2D, 5);
+		// Matrix<float, 4> model(1.0f);
+		// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
+		// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
 		// pGLBind_Vertex_Array(planeVAO_);
-		// glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		RenderScene(_Shader_Program);
 
 		// debugQuadDepth_->Use();

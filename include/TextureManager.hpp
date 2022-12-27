@@ -24,7 +24,7 @@ namespace GLVM::ECS
         std::vector<CTexture> textureVector_;
     public:
         CTextureManager();
-
+		
         void SetTextureVector(std::vector<CTexture> _textureVector);
         static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         static CTextureManager* GetHUDInstance();

@@ -32,5 +32,5 @@ void main()
 //	vs_out.Normal                     = aNormal;
 	vs_out.TextureCoords              = aTextureCoords;
 	vs_out.FragmentPositionLightSpace = aLight_Space_Matrix * vec4(vs_out.FragmentPosition, 1.0);
-	gl_Position                       = aProjection_Matrix * aView_Matrix * aModel_Matrix * vec4(vs_out.FragmentPosition, 1.0);
+	gl_Position                       = aProjection_Matrix * aView_Matrix * aModel_Matrix * vec4(aPosition, 1.0);
 }

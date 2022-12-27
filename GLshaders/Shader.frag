@@ -55,8 +55,8 @@ struct SpotLight {
 #define SPOT_LIGHTS_NUMBER        32
 
 uniform vec3             lightPos;
-uniform sampler2D        diffuseTexture;
 uniform sampler2D        shadowMap;
+uniform sampler2D        diffuseTexture;
 uniform int              directionalLightsArraySize;
 uniform int              pointLightsArraySize;
 uniform int              spotLightsArraySize;
