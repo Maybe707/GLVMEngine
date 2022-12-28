@@ -28,7 +28,7 @@ int main()
     MeshManager->SetMesh("../waveFrontObj/sphere.obj");
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
-	MeshManager->SetMesh("../waveFrontObj/big_plain.obj");
+	MeshManager->SetMesh("../waveFrontObj/very_big_plain.obj");
     CEngine* GLVM = CEngine::GetInstance();	
     CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
@@ -124,18 +124,18 @@ int main()
     // hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
 	// TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
 
-	Entity directionalLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
-	material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
-	SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
-	transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
-	vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
-	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
-	vertexDirectionalLight0.vkVertexId_ = 0;
-	directionalLightComponent0 = {.direction = {0.0f, -3.0f, 0.0f}, .ambient = {0.2f, 0.2f, 0.2f},
-		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	transformDirectionalLight0 = { .tPosition = { 3.0f, 5.0f, 1.0f }, .fScale = 0.3f };
+	// Entity directionalLight0 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
+	// material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
+	// SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
+	// transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
+	// vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
+	// materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	// TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
+	// vertexDirectionalLight0.vkVertexId_ = 0;
+	// directionalLightComponent0 = {.direction = {0.0f, -3.0f, 0.0f}, .ambient = {0.2f, 0.2f, 0.2f},
+	// 	.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
+	// transformDirectionalLight0 = { .tPosition = { 3.0f, 5.0f, 1.0f }, .fScale = 0.3f };
 
 	// Entity pointLight0 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);

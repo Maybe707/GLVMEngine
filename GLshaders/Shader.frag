@@ -191,9 +191,32 @@ float ComputeShadow(vec4 fragmentPositionLightSpace) {
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.Normal);
+//	vec3 lightDir = normalize(lightPos - fs_in.FragmentPositionLightSpace.xyz);
 	vec3 lightDir = normalize(lightPos - fs_in.FragmentPosition);
 	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+//	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
+	// PCF
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(shadowMap, 0);
+	for (int x = -1; x <= 1; ++x)
+	{
+		for (int y = -1; y <= 1; ++y)
+		{
+			float pcfDepth = texture(shadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+	shadow /= 9.0;
+	
+	if (projectiveCoordinates.z > 1.0)
+		shadow = 0.0;
+
+	// if (projectiveCoordinates.x > 1.0 || projectiveCoordinates.x < -1.0)
+	// 	shadow = 0.0;
+
+	// if (projectiveCoordinates.y > 1.0 || projectiveCoordinates.y < -1.0)
+	// 	shadow = 0.0;
+		
 	return shadow;
 }
