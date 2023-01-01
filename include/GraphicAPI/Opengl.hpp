@@ -49,8 +49,8 @@ namespace GLVM::Core {
 
 		const unsigned int SCREEN_WIDTH  = 1920;
 		const unsigned int SCREEN_HEIGHT = 1080;
-		Shader* _Shader_Program;
-		Shader* shadowMappingDepth_;
+		Shader* coreShaderProgram;
+		Shader* planeShadowMapShaderProgram;
 		Shader* debugQuadDepth_;
 		GLuint quadVAO_;
 		GLuint quadVBO_;
@@ -82,8 +82,7 @@ namespace GLVM::Core {
 		void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-		void SetModelMatrix(Shader *_Shader_Program,
-							ECS::STransformComponent& _transform_Component);
+		void SetModelMatrix(Shader* shaderProgram_, ECS::STransformComponent& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
 	};
