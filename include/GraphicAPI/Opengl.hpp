@@ -51,6 +51,7 @@ namespace GLVM::Core {
 		const unsigned int SCREEN_HEIGHT = 1080;
 		Shader* coreShaderProgram;
 		Shader* planeShadowMapShaderProgram;
+		Shader* cubeShadowMapShaderProgram;
 		Shader* debugQuadDepth_;
 		GLuint quadVAO_;
 		GLuint quadVBO_;

@@ -37,9 +37,11 @@ namespace GLVM::Core
 {
     COpenglRenderer::COpenglRenderer()
 	{
-		coreShaderProgram     = new Shader("../GLshaders/CoreShader.vert", "../GLshaders/CoreShader.frag");
+		coreShaderProgram           = new Shader("../GLshaders/CoreShader.vert", "../GLshaders/CoreShader.frag");
 		planeShadowMapShaderProgram = new Shader("../GLshaders/PlaneShadowMap.vert", "../GLshaders/PlaneShadowMap.frag");
-		debugQuadDepth_     = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
+		// cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
+		// 	                                     "../GLshaders/CubeShadowMap.geom");
+		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 
 		pGLGen_Framebuffers(1, &depthMapFBO);
 		glGenTextures(1, &depthMapTexture);
