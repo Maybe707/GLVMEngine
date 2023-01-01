@@ -75,7 +75,7 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
-		void RenderScene(Shader* _shader);
+		void RenderScene(Shader* shaderProgram_);
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
@@ -83,7 +83,7 @@ namespace GLVM::Core {
 		void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-		void SetModelMatrix(Shader* shaderProgram_, ECS::STransformComponent& transformComponent_);
+		mat4 SetModelMatrix(ECS::STransformComponent& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
 	};

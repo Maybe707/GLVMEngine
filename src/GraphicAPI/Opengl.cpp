@@ -39,8 +39,8 @@ namespace GLVM::Core
 	{
 		coreShaderProgram           = new Shader("../GLshaders/CoreShader.vert", "../GLshaders/CoreShader.frag");
 		planeShadowMapShaderProgram = new Shader("../GLshaders/PlaneShadowMap.vert", "../GLshaders/PlaneShadowMap.frag");
-		// cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
-		// 	                                     "../GLshaders/CubeShadowMap.geom");
+		cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
+			                                     "../GLshaders/CubeShadowMap.geom");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 
 		pGLGen_Framebuffers(1, &depthMapFBO);
@@ -249,7 +249,7 @@ namespace GLVM::Core
 		// }
 
 		coreShaderProgram->SetVec3("lightPos", lightPosition.m_vector[0], lightPosition.m_vector[1], lightPosition.m_vector[2]);
-		coreShaderProgram->SetMat4("aLight_Space_Matrix", lightSpaceMatrix);
+		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 		glActiveTexture(GL_TEXTURE7);
 		glBindTexture(GL_TEXTURE_2D, depthMapTexture);
 		glActiveTexture(GL_TEXTURE8);
@@ -271,16 +271,18 @@ namespace GLVM::Core
 		// RenderQuad();
 	}
 
-	void COpenglRenderer::RenderScene(Shader* _shader) {
+	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
 		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-
+		mat4 modelMatrix(1.0f);
+			
 		for(int i = 0; i < texture_load_data_.size(); ++i)
 			for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
 				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
 				unsigned int specularTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
-				SetModelMatrix(_shader, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE5);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE5);
@@ -299,7 +301,8 @@ namespace GLVM::Core
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
 //				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
-				SetModelMatrix(coreShaderProgram, pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE5);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
@@ -407,27 +410,26 @@ namespace GLVM::Core
         }
     }
     
-	void COpenglRenderer::SetModelMatrix(Shader* shaderProgram_, ECS::STransformComponent& transformComponent_)
+	mat4 COpenglRenderer::SetModelMatrix(ECS::STransformComponent& transformComponent_)
 	{
-        Matrix<float, 4> tRotation_Matrix(1.0f);
-        Matrix<float, 4> tModel_Matrix(1.0f);
-        Matrix<float, 4> tScaling_Matrix(1.0f);
-        Matrix<float, 4> tTranslation_Matrix(1.0f);
+        mat4 rotationMatrix(1.0f);
+        mat4 modelMatrix(1.0f);
+        mat4 scalingMatrix(1.0f);
+        mat4 translationMatrix(1.0f);
 
-        tScaling_Matrix[0][0] = transformComponent_.fScale;
-        tScaling_Matrix[1][1] = transformComponent_.fScale;
-        tScaling_Matrix[2][2] = transformComponent_.fScale;
-		tScaling_Matrix[3][3] = 1.0f;
+        scalingMatrix[0][0] = transformComponent_.fScale;
+        scalingMatrix[1][1] = transformComponent_.fScale;
+        scalingMatrix[2][2] = transformComponent_.fScale;
+		scalingMatrix[3][3] = 1.0f;
         
-        tTranslation_Matrix[3][0] = transformComponent_.tPosition[0];
-		tTranslation_Matrix[3][1] = transformComponent_.tPosition[1];
-		tTranslation_Matrix[3][2] = transformComponent_.tPosition[2];
-        tTranslation_Matrix[3][3] = 1.0f;
+        translationMatrix[3][0] = transformComponent_.tPosition[0];
+		translationMatrix[3][1] = transformComponent_.tPosition[1];
+		translationMatrix[3][2] = transformComponent_.tPosition[2];
+        translationMatrix[3][3] = 1.0f;
 		
-        tModel_Matrix = tScaling_Matrix * tTranslation_Matrix;
-        
-        unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(shaderProgram_->iID, "aModel_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
+        modelMatrix = scalingMatrix * translationMatrix;
+
+		return modelMatrix;
 	}
 
     void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {

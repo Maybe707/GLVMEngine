@@ -1,7 +1,6 @@
 #ifndef SHADER_PROGRAM
 #define SHADER_PROGRAM
 
-#include <GL/glext.h>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -22,34 +21,34 @@ public:
 
     Shader(const char* vertexShaderPath_, const char* fragmentShaderPath_, const char* geometryShaderPath_ = nullptr)
     {
-        std::string sVertex_Code;
-        std::string sFragment_Code;
+        std::string vertexShaderCode;
+        std::string fragmentShaderCode;
 		std::string geometryShaderCode;
-        std::ifstream Vertex_Shader_File;
-        std::ifstream Fragment_Shader_File;
+        std::ifstream vertexShaderFile;
+        std::ifstream fragmentShaderFile;
 		std::ifstream geometryShaderFile;
 
-        Vertex_Shader_File.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-        Fragment_Shader_File.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        vertexShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
+        fragmentShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 		geometryShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
         try
         {
             /// Open files
-            Vertex_Shader_File.open(vertexShaderPath_);
-            Fragment_Shader_File.open(fragmentShaderPath_);
+            vertexShaderFile.open(vertexShaderPath_);
+            fragmentShaderFile.open(fragmentShaderPath_);
             std::stringstream Vertex_Shader_Stream, Fragment_Shader_Stream;
 
             /// Read file buffers
-            Vertex_Shader_Stream << Vertex_Shader_File.rdbuf();
-            Fragment_Shader_Stream << Fragment_Shader_File.rdbuf();
+            Vertex_Shader_Stream << vertexShaderFile.rdbuf();
+            Fragment_Shader_Stream << fragmentShaderFile.rdbuf();
 
             /// Close files
-            Vertex_Shader_File.close();
-            Fragment_Shader_File.close();
+            vertexShaderFile.close();
+            fragmentShaderFile.close();
 
             /// Converting to string varibale thread data
-            sVertex_Code = Vertex_Shader_Stream.str();
-            sFragment_Code = Fragment_Shader_Stream.str();
+            vertexShaderCode = Vertex_Shader_Stream.str();
+            fragmentShaderCode = Fragment_Shader_Stream.str();
 
 			/// If geometry shader path is present, also load a geometry shader
 			if (geometryShaderPath_ != nullptr) {
@@ -64,21 +63,21 @@ public:
         {
             std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
         }
-        const char* pVertex_Shader_Code   = sVertex_Code.c_str();
-        const char* pFragment_Shader_Code = sFragment_Code.c_str();
+        const char* pVertexShaderCode   = vertexShaderCode.c_str();
+        const char* pFragmentShaderCode = fragmentShaderCode.c_str();
 
         /// Shaders compilation
         GLuint uiVertex, uiFragment, uiGeometryShaderID;
 
         /// Vertex shader
         uiVertex = pGLCreate_Shader(GL_VERTEX_SHADER);
-        pGLShader_Source(uiVertex, 1, &pVertex_Shader_Code, NULL);
+        pGLShader_Source(uiVertex, 1, &pVertexShaderCode, NULL);
         pGLCompile_Shader(uiVertex);
         CheckCompileErrors(uiVertex, "VERTEX");
 
         /// Fragment shader
         uiFragment = pGLCreate_Shader(GL_FRAGMENT_SHADER);
-        pGLShader_Source(uiFragment, 1, &pFragment_Shader_Code, NULL);
+        pGLShader_Source(uiFragment, 1, &pFragmentShaderCode, NULL);
         pGLCompile_Shader(uiFragment);
         CheckCompileErrors(uiFragment, "FRAGMENT");
 

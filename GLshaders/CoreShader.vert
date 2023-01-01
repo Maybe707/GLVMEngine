@@ -16,21 +16,21 @@ out VS_OUT {
 } vs_out;
 
 //uniform mat4 aRotate_Matrix;
-uniform mat4 aModel_Matrix;
+uniform mat4 modelMatrix;
 uniform mat4 aView_Matrix;
 uniform mat4 aProjection_Matrix;
-uniform mat4 aLight_Space_Matrix;
+uniform mat4 lightSpaceMatrix;
 
 void main()
 {
-    // gl_Position = aProjection_Matrix * aView_Matrix * aModel_Matrix * vec4(aPosition.x, aPosition.y, aPosition.z, 1.0);
-	// FragmentPosition = vec3(aModel_Matrix * vec4(aPosition.x, aPosition.y, aPosition.z, 1.0));
+    // gl_Position = aProjection_Matrix * aView_Matrix * modelMatrix * vec4(aPosition.x, aPosition.y, aPosition.z, 1.0);
+	// FragmentPosition = vec3(modelMatrix * vec4(aPosition.x, aPosition.y, aPosition.z, 1.0));
  	// TextureCoord = vec2(aTextureCoord.x, aTextureCoord.y);	
 	// Normal = aNormal;
-	vs_out.FragmentPosition           = vec3(aModel_Matrix * vec4(aPosition, 1.0));
-	vs_out.Normal                     = transpose(inverse(mat3(aModel_Matrix))) * aNormal;
+	vs_out.FragmentPosition           = vec3(modelMatrix * vec4(aPosition, 1.0));
+	vs_out.Normal                     = transpose(inverse(mat3(modelMatrix))) * aNormal;
 //	vs_out.Normal                     = aNormal;
 	vs_out.TextureCoords              = aTextureCoords;
-	vs_out.FragmentPositionLightSpace = aLight_Space_Matrix * vec4(vs_out.FragmentPosition, 1.0);
-	gl_Position                       = aProjection_Matrix * aView_Matrix * aModel_Matrix * vec4(aPosition, 1.0);
+	vs_out.FragmentPositionLightSpace = lightSpaceMatrix * vec4(vs_out.FragmentPosition, 1.0);
+	gl_Position                       = aProjection_Matrix * aView_Matrix * modelMatrix * vec4(aPosition, 1.0);
 }
