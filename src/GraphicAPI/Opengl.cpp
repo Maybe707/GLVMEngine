@@ -250,16 +250,16 @@ namespace GLVM::Core
 
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
-		glm::vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
-		glm::mat4 projectionMatrixCubeShadowMap = glm::perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
-        std::vector<glm::mat4> cubeShadowMapTransforms;
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3( 1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3(-1.0f,  0.0f,  0.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3( 0.0f,  1.0f,  0.0f), glm::vec3(0.0f,  0.0f,  1.0f)));
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3( 0.0f, -1.0f,  0.0f), glm::vec3(0.0f,  0.0f, -1.0f)));
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3( 0.0f,  0.0f,  1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-        cubeShadowMapTransforms.push_back(projectionMatrixCubeShadowMap * glm::lookAt(positionVectorPointLight, positionVectorPointLight + glm::vec3( 0.0f,  0.0f, -1.0f), glm::vec3(0.0f, -1.0f,  0.0f)));
-
+		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
+		mat4 projectionMatrixCubeShadowMap = Perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
+        std::vector<mat4> cubeShadowMapTransforms;
+        cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
