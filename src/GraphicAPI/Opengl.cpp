@@ -136,32 +136,6 @@ namespace GLVM::Core
 		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
 		// unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
-// 		// set up vertex data (and buffer(s)) and configure vertex attributes
-// 		// ------------------------------------------------------------------
-// 		float planeVertices[] = {
-// 			// positions            // normals         // texcoords
-// 			25.0f, 0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-// 			-25.0f, 0.5f,  25.0f,  0.0f, 1.0f, 0.0f,   0.0f,  0.0f,
-// 			-25.0f, 0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-
-// 			25.0f, 0.5f,  25.0f,  0.0f, 1.0f, 0.0f,  25.0f,  0.0f,
-// 			-25.0f, 0.5f, -25.0f,  0.0f, 1.0f, 0.0f,   0.0f, 25.0f,
-// 			25.0f, 0.5f, -25.0f,  0.0f, 1.0f, 0.0f,  25.0f, 25.0f
-// 		};
-// 		// plane VAO
-// 		pGLGen_Vertex_Arrays(1, &planeVAO_);
-// 		pGLGen_Buffers(1, &planeVBO_);
-// 		pGLBind_Vertex_Array(planeVAO_);
-// 		pGLBind_Buffer(GL_ARRAY_BUFFER, planeVBO_);
-// 		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(planeVertices), planeVertices, GL_STATIC_DRAW);
-// 		pGLEnable_Vertex_Attrib_Array(0);
-// 		pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-// 		pGLEnable_Vertex_Attrib_Array(1);
-// 		pGLVertex_Attrib_Pointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-// 		pGLEnable_Vertex_Attrib_Array(2);
-// 		pGLVertex_Attrib_Pointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-// 		pGLBind_Vertex_Array(0);
-
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -184,17 +158,7 @@ namespace GLVM::Core
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			// Matrix<float, 4> model(1.0f);
-			// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(flatShadowMapShaderProgram->iID, "aModel_Matrix");
-			// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
-			// glActiveTexture(GL_TEXTURE9);
-            // glBindTexture(GL_TEXTURE_2D, 6);
-			// pGLBind_Vertex_Array(planeVAO_);
-			// glDrawArrays(GL_TRIANGLES, 0, 6);
-			// glEnable(GL_CULL_FACE);
-			// glCullFace(GL_FRONT);
 			renderScene(*flatShadowMapShaderProgram);
-//			glCullFace(GL_BACK);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
 
