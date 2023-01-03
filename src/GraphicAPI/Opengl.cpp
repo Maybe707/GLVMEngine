@@ -140,7 +140,8 @@ namespace GLVM::Core
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 17.5f;
-		vec3 positionVectorDirectionalLight  = playerTransformComponent.tPosition;
+//		vec3 positionVectorDirectionalLight  = playerTransformComponent.tPosition;
+		vec3 positionVectorDirectionalLight  = { 2.0f, 3.0f, 0.0f };
 		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
@@ -162,21 +163,6 @@ namespace GLVM::Core
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
 
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-        coreShaderProgram->Use();
-		// coreShaderProgram->SetUniformID("material.diffuse", 5);
-		// coreShaderProgram->SetUniformID("material.specular", 6);
-		// coreShaderProgram->SetUniformID("flatShadowMap", 7);
-		// coreShaderProgram->SetUniformID("cubeShadowMap", 8);
-		// coreShaderProgram->SetUniformID("diffuseTexture", 9);
-		ComputeProjectionMatrix(coreShaderProgram);
-		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
-		coreShaderProgram->SetVec3("viewPosition", positionVectorDirectionalLight[0],
-								   positionVectorDirectionalLight[1],
-								   positionVectorDirectionalLight[2]);
-		
 		// coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
 		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
@@ -258,24 +244,6 @@ namespace GLVM::Core
 		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
 		// 							  spotLightComponent.quadratic);
 		// }
-
-		coreShaderProgram->SetVec3("lightPos", positionVectorDirectionalLight.m_vector[0],
-								   positionVectorDirectionalLight.m_vector[1],
-								   positionVectorDirectionalLight.m_vector[2]);
-		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
-		glActiveTexture(GL_TEXTURE2);
-//		glBindTexture(GL_TEXTURE_2D, texture_load_data_[0].entitiesOwnsThisTypeOfTexture_[0]);
-	    glBindTexture(GL_TEXTURE_2D, woodTexture);
-		// glActiveTexture(GL_TEXTURE8);
-		// glBindTexture(GL_TEXTURE_2D, cubeShadowMapFBO);
-		// Matrix<float, 4> model(1.0f);
-		// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(coreShaderProgram->iID, "aModel_Matrix");
-		// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
-		// pGLBind_Vertex_Array(planeVAO_);
-//		glDrawArrays(GL_TRIANGLES, 0, 6);
-		renderScene(*coreShaderProgram);
 		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -313,10 +281,13 @@ namespace GLVM::Core
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
 		coreShaderProgram->SetInt("shadows", shadows);
 		coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTexture);
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, woodTexture);
 		renderScene(*coreShaderProgram);
 
 		Window.SwapBuffers();
