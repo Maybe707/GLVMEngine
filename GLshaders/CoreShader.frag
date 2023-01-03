@@ -114,8 +114,9 @@ void main()
     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
     vec3 specular = spec * lightColor;
     // calculate shadow
-//    float shadow = ComputeDirectionalShadow(fs_in.fragmentPositionLightSpace);
-	float shadow = ComputePointShadow(fs_in.fragmentPosition);
+	float shadow = 0.0;
+    shadow += ComputeDirectionalShadow(fs_in.fragmentPositionLightSpace);
+	shadow += ComputePointShadow(fs_in.fragmentPosition);
     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
 	
 //	fragColor = vec4(vec3(shadow / farPlane), 1.0);
@@ -209,7 +210,7 @@ float ComputeDirectionalShadow(vec4 fragmentPositionLightSpace) {
 		for (int y = -1; y <= 1; ++y)
 		{
 			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
-			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
 		}
 	}
 	shadow /= 9.0;
@@ -237,7 +238,7 @@ float ComputePointShadow(vec3 fragmentPosition) {
 	float currentDepth         = length(fragmentToLight);
 	// Test for shadows
 	float bias                 = 0.05;
-	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+	float shadow               = currentDepth - bias > closestDepth ? 0.5 : 0.0;
 
 //	return closestDepth;
 	return shadow;

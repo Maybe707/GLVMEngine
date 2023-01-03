@@ -51,28 +51,28 @@ namespace GLVM::Core
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 
 		woodTexture = loadTexture("/home/cyberdemon/cyberDemonCode/GLVMEngine/textures/container2.png");
-		
-		// pGLGen_Framebuffers(1, &flatShadowMapFBO);
-		// glGenTextures(1, &flatShadowMapTexture);
-		// glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
-		// glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		// // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-		// // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		// float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
-		// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-
-		// pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
-		// pGLFramebuffer_Texture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, flatShadowMapTexture, 0);
-		// glDrawBuffer(GL_NONE);
-		// glReadBuffer(GL_NONE);
-		// pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);		
 
         glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
+		
+		pGLGen_Framebuffers(1, &flatShadowMapFBO);
+		glGenTextures(1, &flatShadowMapTexture);
+		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
+		// glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
+		pGLFramebuffer_Texture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, flatShadowMapTexture, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);		
 		
 		pGLGen_Framebuffers(1, &cubeShadowMapFBO);
 		glGenTextures(1, &cubeShadowMapTexture);
@@ -162,60 +162,56 @@ namespace GLVM::Core
 // 		pGLVertex_Attrib_Pointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 // 		pGLBind_Vertex_Array(0);
 
-// 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-//         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-// 		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 17.5f;
-// 		vec3 positionVectorDirectionalLight  = playerViewComponent.Position;
-// 		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
-// 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
-// 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
-// 		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
-// 		// 	Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
-// 			mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-// 			mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
-// 																	  directionVectorDirectionalLight,
-// 																	  upVectorDirectionalLight);
-// 			mat4 lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
-// 			// Render scene from light's point of view
-// 			flatShadowMapShaderProgram->Use();
-// 			flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-// 			// Render to depth map
-// 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-// 			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
-// 			glClear(GL_DEPTH_BUFFER_BIT);
-// 			// Matrix<float, 4> model(1.0f);
-// 			// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(flatShadowMapShaderProgram->iID, "aModel_Matrix");
-// 			// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
-// 			glActiveTexture(GL_TEXTURE9);
-//             glBindTexture(GL_TEXTURE_2D, 6);
-// 			// pGLBind_Vertex_Array(planeVAO_);
-// 			// glDrawArrays(GL_TRIANGLES, 0, 6);
-// 			// glEnable(GL_CULL_FACE);
-// 			// glCullFace(GL_FRONT);
-// 			renderScene(flatShadowMapShaderProgram);
-// //			glCullFace(GL_BACK);
-// 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-// //		}
+		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 17.5f;
+		vec3 positionVectorDirectionalLight  = playerTransformComponent.tPosition;
+		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
+		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
+		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
+		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
+		// 	Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
+			mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+			mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
+																	  directionVectorDirectionalLight,
+																	  upVectorDirectionalLight);
+			mat4 lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
+			// Render scene from light's point of view
+			flatShadowMapShaderProgram->Use();
+			flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+			// Render to depth map
+			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			// Matrix<float, 4> model(1.0f);
+			// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(flatShadowMapShaderProgram->iID, "aModel_Matrix");
+			// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
+			// glActiveTexture(GL_TEXTURE9);
+            // glBindTexture(GL_TEXTURE_2D, 6);
+			// pGLBind_Vertex_Array(planeVAO_);
+			// glDrawArrays(GL_TRIANGLES, 0, 6);
+			// glEnable(GL_CULL_FACE);
+			// glCullFace(GL_FRONT);
+			renderScene(*flatShadowMapShaderProgram);
+//			glCullFace(GL_BACK);
+			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+//		}
 
-// 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-// 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-//         coreShaderProgram->Use();
-// 		coreShaderProgram->SetUniformID("material.diffuse", 5);
-// 		coreShaderProgram->SetUniformID("material.specular", 6);
-// 		coreShaderProgram->SetUniformID("flatShadowMap", 7);
-// 		coreShaderProgram->SetUniformID("cubeShadowMap", 8);
-// 		coreShaderProgram->SetUniformID("diffuseTexture", 9);
-// 		ComputeProjectionMatrix(coreShaderProgram);
-// 		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
-// 		coreShaderProgram->SetVec3("viewPosition", playerViewComponent.Position[0],
-// 								 playerViewComponent.Position[1],
-// 								 playerViewComponent.Position[2]);
-		// coreShaderProgram->SetVec3("viewPosition", playerTransformComponent.tPosition[0],
-		// 						   playerTransformComponent.tPosition[1],
-		// 						   playerTransformComponent.tPosition[2]);
-
+        coreShaderProgram->Use();
+		// coreShaderProgram->SetUniformID("material.diffuse", 5);
+		// coreShaderProgram->SetUniformID("material.specular", 6);
+		// coreShaderProgram->SetUniformID("flatShadowMap", 7);
+		// coreShaderProgram->SetUniformID("cubeShadowMap", 8);
+		// coreShaderProgram->SetUniformID("diffuseTexture", 9);
+		ComputeProjectionMatrix(coreShaderProgram);
+		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
+		coreShaderProgram->SetVec3("viewPosition", positionVectorDirectionalLight[0],
+								   positionVectorDirectionalLight[1],
+								   positionVectorDirectionalLight[2]);
 		
 		// coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
@@ -299,24 +295,24 @@ namespace GLVM::Core
 		// 							  spotLightComponent.quadratic);
 		// }
 
-// 		coreShaderProgram->SetVec3("lightPos", positionVectorDirectionalLight.m_vector[0],
-// 								   positionVectorDirectionalLight.m_vector[1],
-// 								   positionVectorDirectionalLight.m_vector[2]);
-// 		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-// 		glActiveTexture(GL_TEXTURE7);
-// 		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
-// 		glActiveTexture(GL_TEXTURE9);
-// //		glBindTexture(GL_TEXTURE_2D, texture_load_data_[0].entitiesOwnsThisTypeOfTexture_[0]);
-// 	    glBindTexture(GL_TEXTURE_2D, 6);
-// 		// glActiveTexture(GL_TEXTURE8);
-// 		// glBindTexture(GL_TEXTURE_2D, cubeShadowMapFBO);
-// 		// Matrix<float, 4> model(1.0f);
-// 		// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(coreShaderProgram->iID, "aModel_Matrix");
-// 		// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
-// 		// pGLBind_Vertex_Array(planeVAO_);
-// //		glDrawArrays(GL_TRIANGLES, 0, 6);
-// 		renderScene(coreShaderProgram);
-//		glEnable(GL_CULL_FACE);
+		coreShaderProgram->SetVec3("lightPos", positionVectorDirectionalLight.m_vector[0],
+								   positionVectorDirectionalLight.m_vector[1],
+								   positionVectorDirectionalLight.m_vector[2]);
+		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
+		glActiveTexture(GL_TEXTURE2);
+//		glBindTexture(GL_TEXTURE_2D, texture_load_data_[0].entitiesOwnsThisTypeOfTexture_[0]);
+	    glBindTexture(GL_TEXTURE_2D, woodTexture);
+		// glActiveTexture(GL_TEXTURE8);
+		// glBindTexture(GL_TEXTURE_2D, cubeShadowMapFBO);
+		// Matrix<float, 4> model(1.0f);
+		// unsigned int uiTransformt_Loc_Model = pGLGet_Uniform_Location(coreShaderProgram->iID, "aModel_Matrix");
+		// pGLUniform_Matrix4fv(uiTransformt_Loc_Model, NUMBER_OF_MATRICES, GL_FALSE, &model[0][0]);
+		// pGLBind_Vertex_Array(planeVAO_);
+//		glDrawArrays(GL_TRIANGLES, 0, 6);
+		renderScene(*coreShaderProgram);
+		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -377,17 +373,18 @@ void COpenglRenderer::renderScene(const Shader& shader)
 {
     // room cube
     glm::mat4 model = glm::mat4(1.0f);
-    model = glm::scale(model, glm::vec3(5.0f));
-    shader.SetMat4("modelMatrix", model);
-    glDisable(GL_CULL_FACE); // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
-    shader.SetInt("reverseNormals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
-    renderCube();
-    shader.SetInt("reverseNormals", 0); // and of course disable it
-    glEnable(GL_CULL_FACE);
+    // model = glm::scale(model, glm::vec3(5.0f));
+    // shader.SetMat4("modelMatrix", model);
+    // glDisable(GL_CULL_FACE); // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
+    // shader.SetInt("reverseNormals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
+    // renderCube();
+    // shader.SetInt("reverseNormals", 0); // and of course disable it
+    // glEnable(GL_CULL_FACE);
     // cubes
+	shader.SetInt("reverseNormals", 0); // and of course disable it
     model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(4.0f, -3.5f, 0.0));
-    model = glm::scale(model, glm::vec3(0.5f));
+    model = glm::translate(model, glm::vec3(4.0f, -13.5f, 0.0));
+    model = glm::scale(model, glm::vec3(13.5f));
     shader.SetMat4("modelMatrix", model);
     renderCube();
     model = glm::mat4(1.0f);
@@ -402,7 +399,6 @@ void COpenglRenderer::renderScene(const Shader& shader)
     shader.SetMat4("modelMatrix", model);
     renderCube();
     model = glm::mat4(1.0f);
-	std::cout << timeAccumulator << std::endl;
     model = glm::translate(model, glm::vec3(-1.5f, 1.0f + timeAccumulator, 1.5));
 	model = glm::rotate(model, glm::radians(5.0f + (timeAccumulator * 100)), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::scale(model, glm::vec3(0.5f));
