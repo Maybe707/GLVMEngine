@@ -122,17 +122,6 @@ namespace GLVM::Core
 		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
 		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
 
-		auto start = std::chrono::system_clock::now();
-		// Some computation here
-		auto end = std::chrono::system_clock::now();
- 
-		std::chrono::duration<double> elapsed_seconds = end-start;
-		std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-		// float currentTime  = elapsed_seconds.count() * 100000; 
-		// std::cout << "finished computation at " << std::ctime(&end_time)
-		// 		  << "elapsed time: " << currentTime << "s"
-		// 		  << std::endl;
-
 		if ( timeAccumulator > 1.0f ) {
 			timeFlag = true;
 		} else if ( timeAccumulator < 0.0f ) {
@@ -140,9 +129,9 @@ namespace GLVM::Core
 		}
 
 		if (timeFlag)
-			timeAccumulator -= elapsed_seconds.count() * 100000;
+			timeAccumulator -= 0.001;
 		else
-			timeAccumulator += elapsed_seconds.count() * 100000;	
+			timeAccumulator += 0.001;	
 		
 		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
 		// unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
