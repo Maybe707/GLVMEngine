@@ -283,8 +283,8 @@ namespace GLVM::Core
     private:
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
-        mat4 viewMatrix;
-        mat4 projectionMatrix;
+		mat4 viewMatrix;
+		mat4 projectionMatrix;
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;

@@ -4,7 +4,7 @@ layout (triangle_strip, max_vertices=18) out;
 
 uniform mat4 shadowMatrices[6];
 
-out vec4 FragmentPosition; ///< FragmentPosition from GS (output per emitvertex)
+out vec4 fragmentPosition; ///< FragmentPosition from GS (output per emitvertex)
 
 void main()
 {
@@ -13,8 +13,8 @@ void main()
 		gl_Layer = face; ///< Built-in variable that specifies to which face we render.
 		for(int i = 0; i < 3; ++i)
 		{
-			FragmentPosition = gl_in[i].gl_Position;
-			gl_Position = shadowMatrices[face] * FragmentPosition;
+			fragmentPosition = gl_in[i].gl_Position;
+			gl_Position = shadowMatrices[face] * fragmentPosition;
 			EmitVertex();
 		}
 		EndPrimitive();

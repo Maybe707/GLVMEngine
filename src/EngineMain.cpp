@@ -29,6 +29,8 @@ int main()
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/very_big_plain.obj");
+	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
+//	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
     CEngine* GLVM = CEngine::GetInstance();	
     CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
@@ -67,7 +69,7 @@ int main()
     vertex   & vertexPlayer    = ComponentManager->GetComponent<vertex>(uiPlayer);
     vertexPlayer.vkVertexId_        = 0;
     colliderPlayer.bPush_Collission = true;
-	transformPlayer  = { .tPosition = { 3.0f, 0.7f, 0.0f }, .fScale = 0.1f };
+	transformPlayer  = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 0.1f };
 	viewPlayer       = { .Front_Camera = { 0.0f, 0.0f, -1.0f }, .Up_Camera = { 0.0f, 1.0f, 0.0f } };
 
 	Entity plain0 = EntityManager->CreateEntity();
@@ -99,8 +101,8 @@ int main()
 	transform& transformWitch2 = ComponentManager->GetComponent<transform>(uiWitch2);
 	materialWitch2 = { .diffuseTextureID_ = 3, .specularTextureID_ = 4, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch2 = { .tPosition = { 3.7f, 0.5f, 0.0f }, .fScale = 1.0f };
-	vertexWitch2.vkVertexId_ = 0;
+	transformWitch2 = { .tPosition = { 3.7f, 0.0f, 0.0f }, .fScale = 1.0f };
+	vertexWitch2.vkVertexId_ = 5;
     TextureManager->BindTexture(uiWitch2, materialWitch2.diffuseTextureID_);
 
 	Entity uiWitch3 = EntityManager->CreateEntity();

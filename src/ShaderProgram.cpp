@@ -23,7 +23,11 @@ void Shader::SetFloat(const std::string& name, float value) const
 }
 void Shader::SetVec3(const std::string &name, float x, float y, float z) const
 { 
-	pGLUniform3f(pGLGet_Uniform_Location(iID, name.c_str()), x, y, z); 
+	pGLUniform3f(pGLGet_Uniform_Location(iID, name.c_str()), x, y, z);
+}
+void Shader::SetVec3(const std::string &name, const glm::vec3& vector) const
+{ 
+	pGLUniform3fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, &vector[0]); 
 }
 void Shader::SetUniformID(const char* _uniformIdentificator, int _id)
 {
@@ -31,6 +35,11 @@ void Shader::SetUniformID(const char* _uniformIdentificator, int _id)
 }
 
 void Shader::SetMat4(const std::string &name, mat4 &mat) const
+{
+	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
+void Shader::SetMat4(const std::string &name, glm::mat4 &mat) const
 {
 	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }

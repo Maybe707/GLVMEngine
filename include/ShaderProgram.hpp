@@ -7,6 +7,7 @@
 #include <iostream>
 #include "GLPointer.h"
 #include "VertexMath.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
 /*! \class Shader
     \brief Class for creating shader program
@@ -95,7 +96,7 @@ public:
         pGLAttach_Shader(iID, uiVertex);
         pGLAttach_Shader(iID, uiFragment);
 		if (geometryShaderPath_ != nullptr)
-			pGLAttach_Shader(iID, uiFragment);
+			pGLAttach_Shader(iID, uiGeometryShaderID);
         pGLLink_Program(iID);
         CheckCompileErrors(iID, "PROGRAM");
 
@@ -111,8 +112,10 @@ public:
     void SetInt(const std::string& name, int value) const;
     void SetFloat(const std::string& name, float value) const;
 	void SetVec3(const std::string &name, float x, float y, float z) const;
+	void SetVec3(const std::string &name, const glm::vec3& vector) const;
 	void SetUniformID(const char* _uniformIdentificator, int _id);
 	void SetMat4(const std::string &name, mat4 &mat) const;
+	void SetMat4(const std::string &name, glm::mat4 &mat) const;
 	
 private:
     void CheckCompileErrors(unsigned int shader, std::string type);

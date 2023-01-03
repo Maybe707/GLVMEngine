@@ -1,6 +1,9 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/geometric.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -52,18 +55,18 @@ namespace GLVM::ECS
         tView_Matrix = LookAtMain(_Player.tPosition,
 								  _Player.tPosition + _view_Component.Front_Camera,
 								  _view_Component.Up_Camera);
-		
+
  		_view_Component.Position[0] = _Player.tPosition[0];
 		_view_Component.Position[1] = _Player.tPosition[1];
 		_view_Component.Position[2] = _Player.tPosition[2];
 
-        Render_System_->SetViewMatrix(tView_Matrix);
+		Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
     }
 
     void CCameraSystem::SetProjectionMatrix()
 	{
-		tProjection_Matrix = Perspective(Radians(45.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+		tProjection_Matrix = Perspective(Radians(90.0f), (float)1024 / (float)1024, 1.0f, 25.0f);
         Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}
 }

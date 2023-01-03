@@ -98,7 +98,7 @@ namespace GLVM::Core
     }
     
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
-        viewMatrix = _viewMatrix;
+        viewMatrix = _viewMatrix; // 
     }
     
     void CVulkanRenderer::SetProjectionMatrix(mat4 _projectionMatrix) {

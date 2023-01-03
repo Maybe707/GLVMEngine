@@ -91,6 +91,12 @@ EXTERN_C void Initializer()
 	pGLBind_Framebuffer = (void (*)(GLenum target, GLuint framebuffer))GET_PROC_ADDRESS((const GLubyte *)"glBindFramebuffer");
 
 	pGLFramebuffer_Texture2D = (void (*)(GLenum target, GLenum atachment, GLenum textarget, GLuint texture, GLint level))GET_PROC_ADDRESS((const GLubyte *)"glFramebufferTexture2D");
+
+	pGLFramebuffer_Texture = (void (*)(GLenum target, GLenum attachment, GLuint texture, GLint level))GET_PROC_ADDRESS((const GLubyte *)"glFramebufferTexture");
+
+	pGLUniform3fv = (void (*)(GLint location, GLsizei count, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform3fv");
+
+	pGLUniformMatrix4fv = (void (*)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniformMatrix4fv");
 	
 #ifdef __linux__
 pGLXSwap_Interval_EXT = (void (*)(Display*, GLXDrawable, int))GET_PROC_ADDRESS((const GLubyte *)"glXSwapIntervalEXT");

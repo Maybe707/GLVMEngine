@@ -50,18 +50,26 @@ namespace GLVM::Core {
 		const unsigned int SCREEN_WIDTH  = 1920;
 		const unsigned int SCREEN_HEIGHT = 1080;
 		Shader* coreShaderProgram;
-		Shader* planeShadowMapShaderProgram;
+		Shader* flatShadowMapShaderProgram;
 		Shader* cubeShadowMapShaderProgram;
 		Shader* debugQuadDepth_;
 		GLuint quadVAO_;
 		GLuint quadVBO_;
 		GLuint planeVAO_;
 		GLuint planeVBO_;
-		unsigned int depthMapFBO;
-		unsigned int depthMapTexture;
+		unsigned int flatShadowMapFBO;
+		unsigned int cubeShadowMapFBO;
+		unsigned int flatShadowMapTexture;
+		unsigned int cubeShadowMapTexture;
 		const unsigned int SHADOW_WIDTH  = 1024;
 		const unsigned int SHADOW_HEIGHT = 1024;
-		
+		float fYaw = -90.0f;
+        float fPitch = 0.0f;
+		unsigned int woodTexture;
+		glm::vec3 positionVectorPointLight{1.0f, 3.0f, 0.0f};
+		bool shadows = true;
+		float timeAccumulator = 0.0f;
+		bool timeFlag = false;
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_;
@@ -86,6 +94,11 @@ namespace GLVM::Core {
 		mat4 SetModelMatrix(ECS::STransformComponent& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
+		void ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
+		void ComputeProjectionMatrix(Shader* shaderProgram);
+		void renderScene(const Shader& shader);
+		void renderCube();
+		unsigned int loadTexture(char const * path);
 	};
 } // namespace GLVM::Core
 
