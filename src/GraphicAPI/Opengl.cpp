@@ -49,7 +49,7 @@ namespace GLVM::Core
 			                                     "../GLshaders/CubeShadowMap.geom");
 		// cubeShadowMapShaderProgram  = new Shader("/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.vs", "/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.fs", "/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.gs");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
-
+		
 		woodTexture = loadTexture("/home/cyberdemon/cyberDemonCode/GLVMEngine/textures/container2.png");
 
         glEnable(GL_DEPTH_TEST);
@@ -95,6 +95,8 @@ namespace GLVM::Core
 		coreShaderProgram->SetInt("flatShadowMap", 0);
 		coreShaderProgram->SetInt("cubeShadowMap", 1);
 		coreShaderProgram->SetInt("diffuseTexture", 2);
+		coreShaderProgram->SetInt("material.diffuse", 3);
+		coreShaderProgram->SetInt("material.specular", 4);
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
@@ -133,162 +135,164 @@ namespace GLVM::Core
 		else
 			timeAccumulator += 0.001;	
 		
-		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
-		// unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
+		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 25.0f;
-		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
-		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
-//		vec3 positionVectorDirectionalLight  = { 5.0f, 5.0f, 1.0f };
-		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
-		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
-		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
-		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
-		// 	Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
-			mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-			mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
-																	  directionVectorDirectionalLight,
-																	  upVectorDirectionalLight);
-			mat4 lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
-			// Render scene from light's point of view
-			flatShadowMapShaderProgram->Use();
-			flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-			// Render to depth map
-			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			RenderScene(flatShadowMapShaderProgram);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+// 		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 25.0f;
+// 		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
+// 		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
+// //		vec3 positionVectorDirectionalLight  = { 5.0f, 5.0f, 1.0f };
+// 		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
+// 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
+// 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
+// 		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
+// 		// 	Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
+// 			mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+// 			mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
+// 																	  directionVectorDirectionalLight,
+// 																	  upVectorDirectionalLight);
+// 			mat4 lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
+// 			// Render scene from light's point of view
+// 			flatShadowMapShaderProgram->Use();
+// 			flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+// 			// Render to depth map
+// 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+// 			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
+// 			glClear(GL_DEPTH_BUFFER_BIT);
+// 			RenderScene(flatShadowMapShaderProgram);
+// 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
-
-		// coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
-		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
-		// 	unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
-		// 	Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
-		// 	std::string leftString = "directionalLights[";
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"), directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
-
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"), directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);
-		// }
-
-		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
-		// unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
-		// coreShaderProgram->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
-		// for(int x = 0; x < pointLightComponentContainerSize; ++x) {
-		// 	unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
-		// 	Core::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(uiPointLightEntity);
-		// 	std::string leftString = "pointLights[";
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
-		// 							 pointLightComponent.position[0],
-		// 							 pointLightComponent.position[1],
-		// 							 pointLightComponent.position[2]);
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
-		// 							 pointLightComponent.ambient[0],
-		// 							 pointLightComponent.ambient[1],
-		// 							 pointLightComponent.ambient[2]);
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
-		// 							 pointLightComponent.diffuse[0],
-		// 							 pointLightComponent.diffuse[1],
-		// 							 pointLightComponent.diffuse[2]); // darken diffuse light a bit
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
-		// 							 pointLightComponent.specular[0],
-		// 							 pointLightComponent.specular[1],
-		// 							 pointLightComponent.specular[2]);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
-		// 							  pointLightComponent.constant);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
-		// 							  pointLightComponent.linear);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
-		// 							  pointLightComponent.quadratic);
-		// }
-
-		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
-		// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
-		// coreShaderProgram->SetInt("spotLightsArraySize", spotLightComponentContainerSize);
-		// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
-		// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
-		// 	ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
-		// 	std::string leftString = "spotLights[";
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
-		// 							 spotLightComponent.position[0],
-		// 							 spotLightComponent.position[1],
-		// 							 spotLightComponent.position[2]);
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"),
-		// 							 spotLightComponent.direction[0],
-		// 							 spotLightComponent.direction[1],
-		// 							 spotLightComponent.direction[2]);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].cutOff"),
-		// 							  std::cos(Radians(spotLightComponent.cutOff)));
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].outerCutOff"),
-		// 							  std::cos(Radians(spotLightComponent.outerCutOff)));
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
-		// 							 spotLightComponent.ambient[0],
-		// 							 spotLightComponent.ambient[1],
-		// 							 spotLightComponent.ambient[2]);
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
-		// 							 spotLightComponent.diffuse[0],
-		// 							 spotLightComponent.diffuse[1],
-		// 							 spotLightComponent.diffuse[2]); // darken diffuse light a bit
-		// 	coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
-		// 							 spotLightComponent.specular[0],
-		// 							 spotLightComponent.specular[1],
-		// 							 spotLightComponent.specular[2]);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
-		// 							  spotLightComponent.constant);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
-		// 							  spotLightComponent.linear);
-		// 	coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
-		// 							  spotLightComponent.quadratic);
-		// }
 		
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		float nearPlaneCubeShadowMap = 1.0f;
-		float farPlaneCubeShadowMap  = 25.0f;
-		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
-		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
-        vector<mat4> cubeShadowMapTransforms;
-        cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		
-		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		cubeShadowMapShaderProgram->Use();
-		for (unsigned int i = 0; i < 6; ++i)
-                cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(i) + "]", cubeShadowMapTransforms[i]);
-		cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
-		cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
-		RenderScene(cubeShadowMapShaderProgram);
-		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-
-		// Render scene as normal
-		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		coreShaderProgram->Use();
-		ComputeProjectionMatrix(coreShaderProgram);
-		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
-		coreShaderProgram->SetVec3("lightPos", positionVectorPointLight);
+		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
-		coreShaderProgram->SetInt("shadows", shadows);
-		coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
-		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTexture);
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, woodTexture);
+		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
+		for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
+			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
+			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
+			std::string leftString = "directionalLights[";
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"), directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
+
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"), directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);
+		}
+
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
+		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
+		coreShaderProgram->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
+		for(int x = 0; x < pointLightComponentContainerSize; ++x) {
+			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
+			Core::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(uiPointLightEntity);
+			std::string leftString = "pointLights[";
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+									 pointLightComponent.position[0],
+									 pointLightComponent.position[1],
+									 pointLightComponent.position[2]);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
+									 pointLightComponent.ambient[0],
+									 pointLightComponent.ambient[1],
+									 pointLightComponent.ambient[2]);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
+									 pointLightComponent.diffuse[0],
+									 pointLightComponent.diffuse[1],
+									 pointLightComponent.diffuse[2]); // darken diffuse light a bit
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
+									 pointLightComponent.specular[0],
+									 pointLightComponent.specular[1],
+									 pointLightComponent.specular[2]);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
+									  pointLightComponent.constant);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
+									  pointLightComponent.linear);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
+									  pointLightComponent.quadratic);
+		}
+
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+		unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
+		coreShaderProgram->SetInt("spotLightsArraySize", spotLightComponentContainerSize);
+		for(int x = 0; x < spotLightComponentContainerSize; ++x) {
+			unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
+			ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
+			std::string leftString = "spotLights[";
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+									 spotLightComponent.position[0],
+									 spotLightComponent.position[1],
+									 spotLightComponent.position[2]);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"),
+									 spotLightComponent.direction[0],
+									 spotLightComponent.direction[1],
+									 spotLightComponent.direction[2]);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].cutOff"),
+									  std::cos(Radians(spotLightComponent.cutOff)));
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].outerCutOff"),
+									  std::cos(Radians(spotLightComponent.outerCutOff)));
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
+									 spotLightComponent.ambient[0],
+									 spotLightComponent.ambient[1],
+									 spotLightComponent.ambient[2]);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
+									 spotLightComponent.diffuse[0],
+									 spotLightComponent.diffuse[1],
+									 spotLightComponent.diffuse[2]); // darken diffuse light a bit
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
+									 spotLightComponent.specular[0],
+									 spotLightComponent.specular[1],
+									 spotLightComponent.specular[2]);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].constant"),
+									  spotLightComponent.constant);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].linear"),
+									  spotLightComponent.linear);
+			coreShaderProgram->SetFloat(ConcatIntBetweenTwoStrings(leftString, x, "].quadratic"),
+									  spotLightComponent.quadratic);
+		}
+		
+		// glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// float nearPlaneCubeShadowMap = 1.0f;
+		// float farPlaneCubeShadowMap  = 25.0f;
+		// positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
+		// mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
+        // vector<mat4> cubeShadowMapTransforms;
+        // cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+		// cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
+		// cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		
+		// glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		// pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBO);
+		// glClear(GL_DEPTH_BUFFER_BIT);
+		// cubeShadowMapShaderProgram->Use();
+		// for (unsigned int i = 0; i < 6; ++i)
+        //         cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(i) + "]", cubeShadowMapTransforms[i]);
+		// cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
+		// cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
+		// RenderScene(cubeShadowMapShaderProgram);
+		// pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+
+		// // Render scene as normal
+		// glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// coreShaderProgram->Use();
+		// ComputeProjectionMatrix(coreShaderProgram);
+		// ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
+		// coreShaderProgram->SetVec3("lightPos", positionVectorPointLight);
+		// coreShaderProgram->SetVec3("viewPosition", viewPosition);
+		// coreShaderProgram->SetInt("shadows", shadows);
+		// coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
+		// coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+		// glActiveTexture(GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
+		// glActiveTexture(GL_TEXTURE1);
+		// glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTexture);
+		// glActiveTexture(GL_TEXTURE2);
+		// glBindTexture(GL_TEXTURE_2D, woodTexture);
 		RenderScene(coreShaderProgram);
 
 		Window.SwapBuffers();
@@ -315,14 +319,14 @@ namespace GLVM::Core
 				// if (j != 1)
 				// 	modelMatrix = Translate(modelMatrix, vec3(timeAccumulator * 5, 0.0f, 0.0f));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE5);
+				pGLActive_Texture(GL_TEXTURE3);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
-				pGLActive_Texture(GL_TEXTURE5);
+				pGLActive_Texture(GL_TEXTURE4);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				ECS::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture);
-				coreShaderProgram->SetFloat("material.shininess", materialComponent.shininess);
-				coreShaderProgram->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
+				shaderProgram_->SetFloat("material.shininess", materialComponent.shininess);
+				shaderProgram_->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
 				// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
 //				coreShaderProgram->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
@@ -335,7 +339,7 @@ namespace GLVM::Core
 //				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
 				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE5);
+				pGLActive_Texture(GL_TEXTURE3);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
@@ -499,7 +503,7 @@ namespace GLVM::Core
             fPitch = 89.0f;
         if(fPitch < -89.0f)
             fPitch = -89.0f;
-
+		
 		vec3 front;
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
@@ -510,9 +514,9 @@ namespace GLVM::Core
 								  _Player.tPosition + _view_Component.Front_Camera,
 								  _view_Component.Up_Camera);
 
- 		// _view_Component.Position[0] = _Player.tPosition[0];
-		// _view_Component.Position[1] = _Player.tPosition[1];
-		// _view_Component.Position[2] = _Player.tPosition[2];
+ 		_view_Component.Position[0] = _Player.tPosition[0];
+		_view_Component.Position[1] = _Player.tPosition[1];
+		_view_Component.Position[2] = _Player.tPosition[2];
 
 		shaderProgram->SetMat4("viewMatrix", tView_Matrix);
     }
