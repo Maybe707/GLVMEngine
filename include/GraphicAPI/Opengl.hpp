@@ -83,6 +83,10 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
+		void ComputeDirectionalLight();
+		void ComputePointLight();
+		void ComputeSpotLight();
+		void EvaluateFlatShadowMap( vec3 positionVectorDirectionalLight_, vec3 viewPosition_ );
 		void RenderScene(Shader* shaderProgram_);
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
