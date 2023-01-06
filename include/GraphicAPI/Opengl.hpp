@@ -66,7 +66,7 @@ namespace GLVM::Core {
 		float fYaw = -90.0f;
         float fPitch = 0.0f;
 		unsigned int woodTexture;
-		vec3 positionVectorPointLight{1.0f, 3.0f, 0.0f};
+		vec3 positionVectorPointLight{1.0f, 5.0f, 1.0f};
 		bool shadows = true;
 		float timeAccumulator = 0.0f;
 		bool timeFlag = false;

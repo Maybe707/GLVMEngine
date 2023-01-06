@@ -88,9 +88,9 @@ int main()
 	material & materialWitch  = ComponentManager->GetComponent<material>(uiWitch);
 	transform& transformWitch = ComponentManager->GetComponent<transform>(uiWitch);
     vertex   & vertexWitch    = ComponentManager->GetComponent<vertex>(uiWitch);
-	materialWitch  = { .diffuseTextureID_ = 3, .specularTextureID_ = 4, .ambient = { 0.05f, 0.05f, 0.0f },
+	materialWitch  = { .diffuseTextureID_ = 3, .specularTextureID_ = 3, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch = { .tPosition = { 0.0f, 0.5f, 0.0f }, .fScale = 1.0f };
+	transformWitch = { .tPosition = { 5.0f, 3.0f, 1.0f }, .fScale = 0.5f };
     TextureManager->BindTexture(uiWitch, materialWitch.diffuseTextureID_);
     vertexWitch.vkVertexId_ = 0;
 	

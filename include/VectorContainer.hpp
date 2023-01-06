@@ -4,10 +4,15 @@
 #include "Constants.hpp"
 #include "IContainer.hpp"
 #include <iostream>
+#include "VertexMath.hpp"
 
 namespace GLVM::Core
 {
 
+	template <class T>
+	class TCVectorContainer;
+	template <class T> using vector = GLVM::Core::TCVectorContainer<T>;
+	
 	template<class T>
 	class TCVectorContainer : public IContainer
 	{

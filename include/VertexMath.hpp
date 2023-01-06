@@ -267,8 +267,11 @@ Matrix<T, var> Translate(Matrix<T, var> matrix, Vector<T2, var2> vector)
 	Matrix<T, var> tempMatrix(1.0f);
 	tempMatrix = matrix;
 
+	// for(int i = 0; i < var; ++i)
+	// 	tempMatrix[i][var-1] += vector[i];
+
 	for(int i = 0; i < var; ++i)
-		tempMatrix[i][var-1] = vector[i];
+		tempMatrix[var-1][i] += vector[i];
 
 	return tempMatrix;
 }

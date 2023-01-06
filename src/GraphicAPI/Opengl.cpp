@@ -139,9 +139,10 @@ namespace GLVM::Core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 17.5f;
-//		vec3 positionVectorDirectionalLight  = playerTransformComponent.tPosition;
-		vec3 positionVectorDirectionalLight  = { 2.0f, 3.0f, 0.0f };
+		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 25.0f;
+		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
+		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
+//		vec3 positionVectorDirectionalLight  = { 5.0f, 5.0f, 1.0f };
 		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
 		// for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
@@ -159,7 +160,7 @@ namespace GLVM::Core
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
-			renderScene(*flatShadowMapShaderProgram);
+			RenderScene(flatShadowMapShaderProgram);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
 
@@ -250,15 +251,15 @@ namespace GLVM::Core
 
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
-		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
-		mat4 projectionMatrixCubeShadowMap = Perspective(glm::radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
-        std::vector<mat4> cubeShadowMapTransforms;
-        cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		cubeShadowMapTransforms.push_back(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
+        vector<mat4> cubeShadowMapTransforms;
+        cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
 		
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBO);
@@ -268,7 +269,7 @@ namespace GLVM::Core
                 cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(i) + "]", cubeShadowMapTransforms[i]);
 		cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
 		cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
-		renderScene(*cubeShadowMapShaderProgram);
+		RenderScene(cubeShadowMapShaderProgram);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 
 		// Render scene as normal
@@ -288,7 +289,7 @@ namespace GLVM::Core
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTexture);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, woodTexture);
-		renderScene(*coreShaderProgram);
+		RenderScene(coreShaderProgram);
 
 		Window.SwapBuffers();
 		// debugQuadDepth_->Use();
@@ -300,128 +301,6 @@ namespace GLVM::Core
 		// RenderQuad();
 	}
 
-void renderCube();
-
-// renders the 3D scene
-// --------------------
-void COpenglRenderer::renderScene(const Shader& shader)
-{
-    // room cube
-    glm::mat4 model = glm::mat4(1.0f);
-    // model = glm::scale(model, glm::vec3(5.0f));
-    // shader.SetMat4("modelMatrix", model);
-    // glDisable(GL_CULL_FACE); // note that we disable culling here since we render 'inside' the cube instead of the usual 'outside' which throws off the normal culling methods.
-    // shader.SetInt("reverseNormals", 1); // A small little hack to invert normals when drawing cube from the inside so lighting still works.
-    // renderCube();
-    // shader.SetInt("reverseNormals", 0); // and of course disable it
-    // glEnable(GL_CULL_FACE);
-    // cubes
-	shader.SetInt("reverseNormals", 0); // and of course disable it
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(4.0f, -13.5f, 0.0));
-    model = glm::scale(model, glm::vec3(13.5f));
-    shader.SetMat4("modelMatrix", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(2.0f, 3.0f, 1.0));
-    model = glm::scale(model, glm::vec3(0.75f));
-    shader.SetMat4("modelMatrix", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-3.0f, -1.0f + timeAccumulator, 0.0));
-	model = glm::rotate(model, glm::radians(5.0f + (timeAccumulator * 100)), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.SetMat4("modelMatrix", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.5f, 1.0f + timeAccumulator, 1.5));
-	model = glm::rotate(model, glm::radians(5.0f + (timeAccumulator * 100)), glm::vec3(0.0f, 1.0f, 0.0f));
-    model = glm::scale(model, glm::vec3(0.5f));
-    shader.SetMat4("modelMatrix", model);
-    renderCube();
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-1.5f, 2.0f, -3.0));
-    model = glm::rotate(model, glm::radians(60.0f), glm::normalize(glm::vec3(1.0, 0.0, 1.0)));
-    model = glm::scale(model, glm::vec3(0.75f));
-    shader.SetMat4("modelMatrix", model);
-    renderCube();
-}
-
-// renderCube() renders a 1x1 3D cube in NDC.
-// -------------------------------------------------
-unsigned int cubeVAO = 0;
-unsigned int cubeVBO = 0;
-void COpenglRenderer::renderCube()
-{
-    // initialize (if necessary)
-    if (cubeVAO == 0)
-		{
-			float vertices[] = {
-				// back face
-				-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-				1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-				1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right         
-				1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
-				-1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
-				-1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
-				// front face
-				-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-				1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
-				1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-				1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
-				-1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
-				-1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
-				// left face
-				-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-				-1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
-				-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-				-1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
-				-1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-				-1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
-				// right face
-				1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-				1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-				1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right         
-				1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
-				1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
-				1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left     
-				// bottom face
-				-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-				1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
-				1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-				1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
-				-1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
-				-1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
-				// top face
-				-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-				1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-				1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right     
-				1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
-				-1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
-				-1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left        
-			};
-			pGLGen_Vertex_Arrays(1, &cubeVAO);
-			pGLGen_Buffers(1, &cubeVBO);
-			// fill buffer
-			pGLBind_Buffer(GL_ARRAY_BUFFER, cubeVBO);
-			pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-			// link vertex attributes
-			pGLBind_Vertex_Array(cubeVAO);
-			pGLEnable_Vertex_Attrib_Array(0);
-			pGLVertex_Attrib_Pointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-			pGLEnable_Vertex_Attrib_Array(1);
-			pGLVertex_Attrib_Pointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-			pGLEnable_Vertex_Attrib_Array(2);
-			pGLVertex_Attrib_Pointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-			pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
-			pGLBind_Vertex_Array(0);
-		}
-    // render Cube
-    pGLBind_Vertex_Array(cubeVAO);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
-    pGLBind_Vertex_Array(0);
-}
-	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
 		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
@@ -433,6 +312,8 @@ void COpenglRenderer::renderCube()
 				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_;
 				unsigned int specularTextureID = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).specularTextureID_;
 				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+				// if (j != 1)
+				// 	modelMatrix = Translate(modelMatrix, vec3(timeAccumulator * 5, 0.0f, 0.0f));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE5);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
@@ -513,12 +394,6 @@ void COpenglRenderer::renderCube()
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 		pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(2);
-        // pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)VERTEX_OFFSET);
-        // pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		// pGLVertex_Attrib_Pointer(LAYOUT_1, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(TEXTURE_OFFSET * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-		// pGLVertex_Attrib_Pointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(2);
 
 		VBOcontainer_.push_back(iVbo_);
 		VAOcontainer_.push_back(iVao_);
@@ -609,8 +484,7 @@ void COpenglRenderer::renderCube()
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
     {
-//        Matrix<float, 4> tView_Matrix(1.0f);
-		glm::mat4 tView_Matrix(1.0f);
+        Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.05f;
 
         fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
@@ -626,91 +500,63 @@ void COpenglRenderer::renderCube()
         if(fPitch < -89.0f)
             fPitch = -89.0f;
 
-//        Vector<float, 3> front;
-		glm::vec3 front;
+		vec3 front;
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-//        _view_Component.Front_Camera = Normalize(front);
-		_view_Component.Front_Camera.m_vector[0] = glm::normalize(front).x;
-		_view_Component.Front_Camera.m_vector[1] = glm::normalize(front).y;
-		_view_Component.Front_Camera.m_vector[2] = glm::normalize(front).z;
+        _view_Component.Front_Camera = Normalize(front);
 
-        // tView_Matrix = LookAtMain(_Player.tPosition,
-		// 						  _Player.tPosition + _view_Component.Front_Camera,
-		// 						  _view_Component.Up_Camera);
+        tView_Matrix = LookAtMain(_Player.tPosition,
+								  _Player.tPosition + _view_Component.Front_Camera,
+								  _view_Component.Up_Camera);
 
-		glm::vec3 positionVector(1.0f);
-		positionVector.x = _Player.tPosition.m_vector[0];
-		positionVector.y = _Player.tPosition.m_vector[1];
-		positionVector.z = _Player.tPosition.m_vector[2];
-
-		glm::vec3 frontVector(1.0f);
-		frontVector.x = _view_Component.Front_Camera.m_vector[0];
-		frontVector.y = _view_Component.Front_Camera.m_vector[1];
-		frontVector.z = _view_Component.Front_Camera.m_vector[2];
-
-		glm::vec3 upVector(1.0f);
-		upVector.x = _view_Component.Up_Camera.m_vector[0];
-		upVector.y = _view_Component.Up_Camera.m_vector[1];
-		upVector.z = _view_Component.Up_Camera.m_vector[2];
-
-		
-        tView_Matrix = glm::lookAt(positionVector,
-								   positionVector + frontVector,
-								   upVector);
-
-		
  		// _view_Component.Position[0] = _Player.tPosition[0];
 		// _view_Component.Position[1] = _Player.tPosition[1];
 		// _view_Component.Position[2] = _Player.tPosition[2];
 
 		shaderProgram->SetMat4("viewMatrix", tView_Matrix);
-//		coreShaderProgram->SetMat4("viewMatrix", tView_Matrix);
     }
 
-void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
-//		tProjection_Matrix = Perspective(Radians(90.0f), (float)1024 / (float)1024, 1.0f, 25.0f);
-	glm::mat4 tProjection_Matrix = glm::perspective(glm::radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
-	shaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
-//		coreShaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
-}
+	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
+		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+		shaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
+	}
 
-unsigned int COpenglRenderer::loadTexture(char const * path)
-{
-    unsigned int textureID;
-    glGenTextures(1, &textureID);
+	unsigned int COpenglRenderer::loadTexture(char const * path)
+	{
+		unsigned int textureID;
+		glGenTextures(1, &textureID);
 
-    int width, height, nrComponents;
-    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
-    if (data)
-		{
-			GLenum format;
-			if (nrComponents == 1)
-				format = GL_RED;
-			else if (nrComponents == 3)
-				format = GL_RGB;
-			else if (nrComponents == 4)
-				format = GL_RGBA;
+		int width, height, nrComponents;
+		unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+		if (data)
+			{
+				GLenum format;
+				if (nrComponents == 1)
+					format = GL_RED;
+				else if (nrComponents == 3)
+					format = GL_RGB;
+				else if (nrComponents == 4)
+					format = GL_RGBA;
 
-			glBindTexture(GL_TEXTURE_2D, textureID);
-			glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
-			pGLGenerate_Mipmap(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, textureID);
+				glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+				pGLGenerate_Mipmap(GL_TEXTURE_2D);
 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT); // for this tutorial: use GL_CLAMP_TO_EDGE to prevent semi-transparent borders. Due to interpolation it takes texels from next repeat 
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, format == GL_RGBA ? GL_CLAMP_TO_EDGE : GL_REPEAT);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-			stbi_image_free(data);
-		}
-    else
-		{
-			std::cout << "Texture failed to load at path: " << path << std::endl;
-			stbi_image_free(data);
-		}
+				stbi_image_free(data);
+			}
+		else
+			{
+				std::cout << "Texture failed to load at path: " << path << std::endl;
+				stbi_image_free(data);
+			}
 
-    return textureID;
-}
+		return textureID;
+	}
 
 }
