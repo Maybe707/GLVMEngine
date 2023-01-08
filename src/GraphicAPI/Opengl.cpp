@@ -137,10 +137,12 @@ namespace GLVM::Core
 
 		EvaluateFlatShadowMap();
 		EvaluateCubeShadowMap();
+
+		coreShaderProgram->Use();
 		
-		// ComputeDirectionalLight();
-		// ComputePointLight();
-		// ComputeSpotLight();
+		ComputeDirectionalLight();
+		ComputePointLight();
+		ComputeSpotLight();
  
 		
 	    EvaluateCoreShader();
@@ -221,6 +223,9 @@ namespace GLVM::Core
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
 		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+		
+//		viewPosition = playerViewComponent.Position;
+		viewPosition = playerTransformComponent.tPosition;
 		
 		// Render scene as normal
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);

@@ -88,9 +88,9 @@ int main()
 	material & materialWitch  = ComponentManager->GetComponent<material>(uiWitch);
 	transform& transformWitch = ComponentManager->GetComponent<transform>(uiWitch);
     vertex   & vertexWitch    = ComponentManager->GetComponent<vertex>(uiWitch);
-	materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	materialWitch  = { .diffuseTextureID_ = 0, .specularTextureID_ = 0, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch = { .tPosition = { 5.0f, 3.0f, 1.0f }, .fScale = 0.5f };
+	transformWitch = { .tPosition = { 5.0f, 1.5f, 1.0f }, .fScale = 0.5f };
     TextureManager->BindTexture(uiWitch, materialWitch.diffuseTextureID_);
     vertexWitch.vkVertexId_ = 0;
 	
@@ -110,9 +110,9 @@ int main()
 	material & materialWitch3  = ComponentManager->GetComponent<material>(uiWitch3);
 	vertex   & vertexWitch3    = ComponentManager->GetComponent<vertex>(uiWitch3);
 	transform& transformWitch3 = ComponentManager->GetComponent<transform>(uiWitch3);
-	materialWitch3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	materialWitch3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch3 = { .tPosition = { 2.7f, 2.5f, 3.0f }, .fScale = 1.0f };
+	transformWitch3 = { .tPosition = { 8.7f, 2.5f, 3.0f }, .fScale = 1.0f };
 	vertexWitch3.vkVertexId_ = 1;
     TextureManager->BindTexture(uiWitch3, materialWitch3.diffuseTextureID_);
 	
@@ -126,18 +126,18 @@ int main()
     // hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
 	// TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
 
-	// Entity directionalLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
-	// material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
-	// SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
-	// transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
-	// vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
-	// materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	// TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
-	// vertexDirectionalLight0.vkVertexId_ = 0;
-	// directionalLightComponent0 = { .direction = {0.0f, -3.0f, 0.0f}, .ambient = {0.2f, 0.2f, 0.2f },
-	// 	.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	// transformDirectionalLight0 = { .tPosition = { 3.0f, 5.0f, 1.0f }, .fScale = 0.3f };
+	Entity directionalLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
+	material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
+	SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
+	transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
+	vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
+	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
+	vertexDirectionalLight0.vkVertexId_ = 0;
+	directionalLightComponent0 = { .direction = { -2.0f,  0.0f, 0.0f}, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
+	transformDirectionalLight0 = { .tPosition = { 3.0f, 5.0f, 1.0f }, .fScale = 0.3f };
 
 	// Entity pointLight0 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
@@ -167,22 +167,22 @@ int main()
 	// 	.linear = 0.09f, .quadratic = 0.032f };
 	// transformPointLight1 = { .tPosition = { 1.2f, 1.3f, 1.5f }, .fScale = 0.1f };
 
-	Entity spotLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<vertex, material, spotLight, transform>(spotLight0);
-	material & textureSpotLight0   = ComponentManager->GetComponent<material>(spotLight0);
-	spotLight& spotLightComponent0 = ComponentManager->GetComponent<spotLight>(spotLight0);
-	transform& transformSpotLight0 = ComponentManager->GetComponent<transform>(spotLight0);
-	vertex   & vertexSpotLight0    = ComponentManager->GetComponent<vertex>(spotLight0);
-	textureSpotLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	TextureManager->BindTexture(spotLight0, textureSpotLight0.diffuseTextureID_);
-	vertexSpotLight0.vkVertexId_ = 0;
-//	spotLightComponent0.position     =  TransformPlayer.tPosition;
-//	spotLightComponent0.direction    =  TransformPlayer.tForward;
-	spotLightComponent0 = { .cutOff = 12.5f, .outerCutOff = 17.5f,
-		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { -1.5f, 2.5f, 0.5f },
-		.specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
-		.linear = 0.09f, .quadratic = 0.032f };
-	transformSpotLight0 = { .tPosition = { -1.5f, 2.5f, 0.5f }, .fScale = 0.3f };
+// 	Entity spotLight0 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<vertex, material, spotLight, transform>(spotLight0);
+// 	material & textureSpotLight0   = ComponentManager->GetComponent<material>(spotLight0);
+// 	spotLight& spotLightComponent0 = ComponentManager->GetComponent<spotLight>(spotLight0);
+// 	transform& transformSpotLight0 = ComponentManager->GetComponent<transform>(spotLight0);
+// 	vertex   & vertexSpotLight0    = ComponentManager->GetComponent<vertex>(spotLight0);
+// 	textureSpotLight0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+// //	TextureManager->BindTexture(spotLight0, textureSpotLight0.diffuseTextureID_);
+// 	vertexSpotLight0.vkVertexId_ = 0;
+// //	spotLightComponent0.position     =  TransformPlayer.tPosition;
+// //	spotLightComponent0.direction    =  TransformPlayer.tForward;
+// 	spotLightComponent0 = { .cutOff = 12.5f, .outerCutOff = 17.5f,
+// 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f },
+// 		.specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+// 		.linear = 0.09f, .quadratic = 0.032f };
+// 	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
     
     ///< Game rendering loop
 	GLVM->GameLoop();
