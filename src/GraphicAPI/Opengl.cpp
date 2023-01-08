@@ -557,6 +557,7 @@ namespace GLVM::Core
 								  _Player.tPosition + _view_Component.Front_Camera,
 								  _view_Component.Up_Camera);
 
+
  		// _view_Component.Position[0] = _Player.tPosition[0];
 		// _view_Component.Position[1] = _Player.tPosition[1];
 		// _view_Component.Position[2] = _Player.tPosition[2];
