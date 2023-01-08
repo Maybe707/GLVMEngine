@@ -63,10 +63,16 @@ namespace GLVM::Core {
 		unsigned int cubeShadowMapTexture;
 		const unsigned int SHADOW_WIDTH  = 1024;
 		const unsigned int SHADOW_HEIGHT = 1024;
-		float fYaw = -90.0f;
+		float fYaw   = -90.0f;
         float fPitch = 0.0f;
 		unsigned int woodTexture;
+		vec3 viewPosition{1.0f};
+		mat4 lightSpaceMatrix{1.0f};
 		vec3 positionVectorPointLight{1.0f, 5.0f, 1.0f};
+		float nearPlaneFlatShadowMap = 1.0f;
+		float farPlaneFlatShadowMap = 25.0f;
+		float nearPlaneCubeShadowMap = 1.0f;
+		float farPlaneCubeShadowMap  = 25.0f;
 		bool shadows = true;
 		float timeAccumulator = 0.0f;
 		bool timeFlag = false;
@@ -86,7 +92,10 @@ namespace GLVM::Core {
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		void EvaluateFlatShadowMap( vec3 positionVectorDirectionalLight_, vec3 viewPosition_ );
+		void EvaluateFlatShadowMap();
+		void EvaluateCubeShadowMap();
+		void EvaluateCoreShader();
+		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,

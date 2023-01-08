@@ -134,13 +134,34 @@ namespace GLVM::Core
 			timeAccumulator -= 0.001;
 		else
 			timeAccumulator += 0.001;	
+
+		EvaluateFlatShadowMap();
+		EvaluateCubeShadowMap();
+		
+		// ComputeDirectionalLight();
+		// ComputePointLight();
+		// ComputeSpotLight();
+ 
+		
+	    EvaluateCoreShader();
+		RenderScene(coreShaderProgram);
+
+		Window.SwapBuffers();
+	}
+
+	void COpenglRenderer::EvaluateFlatShadowMap() {
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
 		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		float nearPlaneFlatShadowMap = 1.0f, farPlaneFlatShadowMap = 25.0f;
 		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
-		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
+//		vec3 viewPosition(playerViewComponent.Position.m_vector[0], playerViewComponent.Position.m_vector[1], playerViewComponent.Position.m_vector[2]);
+		viewPosition = playerViewComponent.Position;
 //		vec3 positionVectorDirectionalLight  = { 5.0f, 5.0f, 1.0f };
 		vec3 directionVectorDirectionalLight = { 0.0f, 0.0f, 0.0f };
 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
@@ -154,7 +175,7 @@ namespace GLVM::Core
 		mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
 													 directionVectorDirectionalLight,
 													 upVectorDirectionalLight);
-		mat4 lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
+		lightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
 		// Render scene from light's point of view
 		flatShadowMapShaderProgram->Use();
 		flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
@@ -165,17 +186,12 @@ namespace GLVM::Core
 		RenderScene(flatShadowMapShaderProgram);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
-		
-		ComputeDirectionalLight();
-		ComputePointLight();
-		ComputeSpotLight();
- 
-		
+	}
+
+	void COpenglRenderer::EvaluateCubeShadowMap() {
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		float nearPlaneCubeShadowMap = 1.0f;
-		float farPlaneCubeShadowMap  = 25.0f;
 		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
 		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
         vector<mat4> cubeShadowMapTransforms;
@@ -191,12 +207,21 @@ namespace GLVM::Core
 		glClear(GL_DEPTH_BUFFER_BIT);
 		cubeShadowMapShaderProgram->Use();
 		for (unsigned int i = 0; i < 6; ++i)
-                cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(i) + "]", cubeShadowMapTransforms[i]);
+			cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(i) + "]", cubeShadowMapTransforms[i]);
 		cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
 		cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
 		RenderScene(cubeShadowMapShaderProgram);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 
+	}
+
+	void COpenglRenderer::EvaluateCoreShader() {
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+		
 		// Render scene as normal
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -215,26 +240,18 @@ namespace GLVM::Core
 		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTexture);
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, woodTexture);
-		RenderScene(coreShaderProgram);
 
-		Window.SwapBuffers();
-		// debugQuadDepth_->Use();
-		// debugQuadDepth_->SetFloat("nearPlane", nearPlane);
-		// debugQuadDepth_->SetFloat("farPlane", farPlane);
-		// glActiveTexture(GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, depthMapTexture);
-
-		// RenderQuad();
 	}
 
-	void COpenglRenderer::EvaluateFlatShadowMap( vec3 positionVectorDirectionalLight_, vec3 viewPosition_ ) {
-        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
-		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
-		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+	void COpenglRenderer::EvaluateFlatDebugShader() {
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-
+		debugQuadDepth_->Use();
+		debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
+		debugQuadDepth_->SetFloat("farPlane", farPlaneFlatShadowMap);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
 	}
 	
 	void COpenglRenderer::ComputeDirectionalLight() {
@@ -540,13 +557,9 @@ namespace GLVM::Core
 								  _Player.tPosition + _view_Component.Front_Camera,
 								  _view_Component.Up_Camera);
 
-		// tView_Matrix = LookAtMain(_Player.tPosition,
-		// 						  vec3(0.0f, 0.0f, 0.0f),
-		// 						  _view_Component.Up_Camera);
-
- 		_view_Component.Position[0] = _Player.tPosition[0];
-		_view_Component.Position[1] = _Player.tPosition[1];
-		_view_Component.Position[2] = _Player.tPosition[2];
+ 		// _view_Component.Position[0] = _Player.tPosition[0];
+		// _view_Component.Position[1] = _Player.tPosition[1];
+		// _view_Component.Position[2] = _Player.tPosition[2];
 
 		shaderProgram->SetMat4("viewMatrix", tView_Matrix);
     }

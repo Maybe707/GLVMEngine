@@ -13,6 +13,7 @@
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
+#include <limits>
 #include <mutex>
 #include <thread>
 
@@ -102,12 +103,15 @@ namespace GLVM::Core
 
 		std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
 		sound_thread.detach();
-        
+
+		
 		while(bGame_Loop_Active)
 		{
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
-            
+
+//			FPScounter();
+			
 			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
 			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
@@ -143,6 +147,16 @@ namespace GLVM::Core
 		}
     }
 
+	void CEngine::FPScounter() {
+		++fpsCounter;
+		fpsAccumulator += fDelta_Time_;
+		if (fpsAccumulator > 1.0f) {
+			std::cout << "FPS: " << fpsCounter << std::endl;
+			fpsCounter = 0;
+			fpsAccumulator = 0;
+		}
+	}
+	
     void CEngine::GameKill()
     {
 		((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.Close();

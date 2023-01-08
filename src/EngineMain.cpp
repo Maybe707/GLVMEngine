@@ -179,10 +179,10 @@ int main()
 //	spotLightComponent0.position     =  TransformPlayer.tPosition;
 //	spotLightComponent0.direction    =  TransformPlayer.tForward;
 	spotLightComponent0 = { .cutOff = 12.5f, .outerCutOff = 17.5f,
-		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f },
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { -1.5f, 2.5f, 0.5f },
 		.specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
 		.linear = 0.09f, .quadratic = 0.032f };
-	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
+	transformSpotLight0 = { .tPosition = { -1.5f, 2.5f, 0.5f }, .fScale = 0.3f };
     
     ///< Game rendering loop
 	GLVM->GameLoop();

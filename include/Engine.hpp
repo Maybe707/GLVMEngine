@@ -81,24 +81,27 @@ namespace GLVM::Core
         static CEngine*    pInstance_;
         static std::mutex  Mutex_;
         
-		IWindow*             Window_;
-		Time::IChrono*       Chrono_;
-        Sound::ISoundEngine* Sound_Engine_;
-        
-		Shader*            Shader_Program;
-        Shader*            GUI_Shader_Program_;
+		IWindow             * Window_;
+		Time::IChrono       * Chrono_;
+        Sound::ISoundEngine * Sound_Engine_;
+
 		float              fDelta_Time_;
 		CStack             Input_Stack_;
-        ECS::CRenderSystem* Render_System_Interface_;
+		Shader             * Shader_Program;
+        Shader             * GUI_Shader_Program_;
+        ECS::CRenderSystem * Render_System_Interface_;
         
-		ECS::CRenderSystem*     Renderer_System;
-        ECS::CCollisionSystem*  Collision_System;
-		ECS::CMovementSystem*   Movement_System;
-        ECS::CPhysicsSystem*    Physics_System_;
-        ECS::CProjectileSystem* pProjectile_System_;
-        ECS::CGUISystem*        GUI_System;
-        ECS::CCameraSystem*     pCamera_System;
+        ECS::CCollisionSystem  * Collision_System;
+		ECS::CMovementSystem   * Movement_System;
+        ECS::CPhysicsSystem    * Physics_System_;
+        ECS::CProjectileSystem * pProjectile_System_;
+        ECS::CGUISystem        * GUI_System;
+        ECS::CCameraSystem     * pCamera_System;
 
+		/// For FPS counting
+		unsigned int fpsCounter = 0;
+		double fpsAccumulator   = 0;
+		
         CEngine();
         
 	public:
@@ -111,7 +114,7 @@ namespace GLVM::Core
         static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
 		void GameLoop();
-
+		void FPScounter();
 		void GameKill();
 //        void PlaybackSound(Core::CSoundEngine& _sound_Engine);
 	};
