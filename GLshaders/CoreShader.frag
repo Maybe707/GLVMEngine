@@ -161,9 +161,9 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.textureCoords));
 	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.textureCoords));
 
-	ambient  *= attenuation;
-	diffuse  *= attenuation;
-	specular *= attenuation;
+	// ambient  *= attenuation;
+	// diffuse  *= attenuation;
+	// specular *= attenuation;
 
 	return (ambient + diffuse + specular);
 }
@@ -222,8 +222,8 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLigh
 	}
 	shadow /= 9.0;
 	
-	if (projectiveCoordinates.z > 1.0)
-		shadow = 0.0;
+	// if (projectiveCoordinates.z > 1.0)
+	// 	shadow = 0.0;
 
 	// if (projectiveCoordinates.x > 1.0 || projectiveCoordinates.x < -1.0)
 	// 	shadow = 0.0;
@@ -237,74 +237,61 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLigh
 float ComputePointShadow(PointLight light, vec3 fragmentPosition) {
 	// Get vector between fragment position and light position
 	vec3 fragmentToLight       = fragmentPosition - light.position;
-	// Get the fragment to light vector to sample from the shadow map
-	float closestDepth         = texture(cubeShadowMap, fragmentToLight).r;
-	// It is currently in linear range between [0,1], let's re-transform it back to original depth value
-	closestDepth              *= farPlane;
+	// // Get the fragment to light vector to sample from the shadow map
+	// float closestDepth         = texture(cubeShadowMap, fragmentToLight).r;
+	// // It is currently in linear range between [0,1], let's re-transform it back to original depth value
+	// closestDepth              *= farPlane;
 	// Now get current linear depth as the length between the fragment and light position
 	float currentDepth         = length(fragmentToLight);
-	// Test for shadows
-	float bias                 = 0.05;
-	float shadow               = currentDepth - bias > closestDepth ? 0.5 : 0.0;
+	// Test for shadows simple
+	// float bias                 = 0.05;
+	// float shadow               = currentDepth - bias > closestDepth ? 0.5 : 0.0;
+
+	// Test for shadows full solid cube of offsets
+	// float bias    = 0.05;
+	// float shadow  = 0.0;
+	// float samples = 4.0;
+	// float offset  = 0.1;
+	// for(float x = -offset; x < offset; x += offset / (samples * 0.5))
+	// 	{
+	// 		for(float y = -offset; y < offset; y += offset / (samples * 0.5))
+	// 			{
+	// 				for(float z = -offset; z < offset; z += offset / (samples * 0.5))
+	// 					{
+	// 						float closestDepth = texture(cubeShadowMap, fragmentToLight + vec3(x, y, z)).r;
+	// 						closestDepth *= farPlane; ///< undo mapping [0;1]
+	// 						if(currentDepth - bias > closestDepth)
+	// 							shadow += 1.0;
+	// 					}
+	// 			}
+	// 	}
+	// shadow /= (samples * samples * samples);
+
+	// Test for shadows ranged cube of offsets
+	vec3 sampleOffsetDirections[20] = vec3[]
+		(
+			vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+			vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
+			vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
+			vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
+			vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
+		);  
+	
+	float shadow  = 0.0;
+	float bias    = 0.15;
+	float samples = 20;
+	float viewDistance = length(viewPosition - fragmentPosition);
+	float diskRadius   = (1.0 + (viewDistance / farPlane)) / 25.0;
+	for(int i = 0; i < samples; ++i)
+		{
+			float closestDepth = texture(cubeShadowMap, fragmentToLight + sampleOffsetDirections[i] *
+										 diskRadius).r;
+			closestDepth *= farPlane; // undo mapping [0;1]
+			if(currentDepth - bias > closestDepth)
+				shadow += 1.0;
+		}
+	shadow /= float(samples);
 
 //	return closestDepth;
 	return shadow;
 }
-
-// float ComputeDirectionalShadow(vec4 fragmentPositionLightSpace) {
-// 	// Perform perspective devide
-// 	vec3 projectiveCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
-// 	// Transform to [0.1] range
-// 	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
-// 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
-// 	float closestDepth         = texture(flatShadowMap, projectiveCoordinates.xy).r;
-// 	// Get depth of current fragment from light's perspective
-// 	float currentDepth         = projectiveCoordinates.z;
-// 	// Check whether current fragment position is in shadow
-// 	vec3 normal = normalize(fs_in.normal);
-// //	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionLightSpace.xyz);
-// 	vec3 lightDir = normalize(lightPos - fs_in.fragmentPosition);
-// 	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
-// //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-
-// 	// PCF
-// 	float shadow = 0.0;
-// 	vec2 texelSize = 1.0 / textureSize(flatShadowMap, 0);
-// 	for (int x = -1; x <= 1; ++x)
-// 	{
-// 		for (int y = -1; y <= 1; ++y)
-// 		{
-// 			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
-// 			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
-// 		}
-// 	}
-// 	shadow /= 9.0;
-	
-// 	if (projectiveCoordinates.z > 1.0)
-// 		shadow = 0.0;
-
-// 	// if (projectiveCoordinates.x > 1.0 || projectiveCoordinates.x < -1.0)
-// 	// 	shadow = 0.0;
-
-// 	// if (projectiveCoordinates.y > 1.0 || projectiveCoordinates.y < -1.0)
-// 	// 	shadow = 0.0;
-		
-// 	return shadow;
-// }
-
-// float ComputePointShadow(vec3 fragmentPosition) {
-// 	// Get vector between fragment position and light position
-// 	vec3 fragmentToLight       = fragmentPosition - lightPos;
-// 	// Get the fragment to light vector to sample from the shadow map
-// 	float closestDepth         = texture(cubeShadowMap, fragmentToLight).r;
-// 	// It is currently in linear range between [0,1], let's re-transform it back to original depth value
-// 	closestDepth              *= farPlane;
-// 	// Now get current linear depth as the length between the fragment and light position
-// 	float currentDepth         = length(fragmentToLight);
-// 	// Test for shadows
-// 	float bias                 = 0.05;
-// 	float shadow               = currentDepth - bias > closestDepth ? 0.5 : 0.0;
-
-// //	return closestDepth;
-// 	return shadow;
-// }

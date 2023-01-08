@@ -191,10 +191,18 @@ namespace GLVM::Core
 	}
 
 	void COpenglRenderer::EvaluateCubeShadowMap() {
+        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
+		positionVectorPointLight = vec3( 0.0f, 3.3f, 2.7f );
+//		positionVectorPointLight = playerTransformComponent.tPosition;
+//		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
 		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
         vector<mat4> cubeShadowMapTransforms;
         cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
@@ -286,11 +294,20 @@ namespace GLVM::Core
 		for(int x = 0; x < pointLightComponentContainerSize; ++x) {
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
 			Core::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(uiPointLightEntity);
+			
+			Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+			unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+			ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+			
 			std::string leftString = "pointLights[";
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
 									   pointLightComponent.position[0],
 									   pointLightComponent.position[1],
 									   pointLightComponent.position[2]);
+			// coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+			// 						   playerTransformComponent.tPosition[0],
+			// 						   playerTransformComponent.tPosition[1],
+			// 						   playerTransformComponent.tPosition[2]);
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
 									   pointLightComponent.ambient[0],
 									   pointLightComponent.ambient[1],

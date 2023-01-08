@@ -46,7 +46,7 @@ int main()
     std::vector<CTexture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
 	
     TextureManager->SetTextureVector(TextureVector);
-
+	
     CTexture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
 		.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
     // CTexture hudTexture_1;
@@ -148,10 +148,10 @@ int main()
 	texturePointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	vertexPointLight0.vkVertexId_ = 0;
 	TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
-	pointLightComponent0 = { .position = { 3.0f, 1.3f, 5.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
+	pointLightComponent0 = { .position = { 0.0f, 3.3f, 2.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
 		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
 		.linear = 0.09f, .quadratic = 0.1f };
-	transformPointLight0 = { .tPosition = { 3.0f, 1.3f, 5.7f }, .fScale = 0.3f };
+	transformPointLight0 = { .tPosition = { 0.0f, 3.3f, 2.7f }, .fScale = 0.3f };
 
 	// Entity pointLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);

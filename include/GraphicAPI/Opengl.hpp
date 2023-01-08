@@ -68,7 +68,7 @@ namespace GLVM::Core {
 		unsigned int woodTexture;
 		vec3 viewPosition{1.0f};
 		mat4 lightSpaceMatrix{1.0f};
-		vec3 positionVectorPointLight{1.0f, 5.0f, 1.0f};
+		vec3 positionVectorPointLight{0.0f, 3.3f, 2.7f};
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
 		float nearPlaneCubeShadowMap = 1.0f;
