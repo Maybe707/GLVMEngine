@@ -166,9 +166,6 @@ namespace GLVM::Core
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
 		
-		coreShaderProgram->SetVec3("viewPosition", viewPosition);
-		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-		
 		ComputeDirectionalLight();
 		ComputePointLight();
 		ComputeSpotLight();
@@ -519,7 +516,7 @@ namespace GLVM::Core
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-        const float kSensitivity = 0.05f;
+        const float kSensitivity = 0.1f;
 
         fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
         fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
@@ -533,7 +530,6 @@ namespace GLVM::Core
             fPitch = 89.0f;
         if(fPitch < -89.0f)
             fPitch = -89.0f;
-		
 		vec3 front;
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
@@ -543,6 +539,10 @@ namespace GLVM::Core
         tView_Matrix = LookAtMain(_Player.tPosition,
 								  _Player.tPosition + _view_Component.Front_Camera,
 								  _view_Component.Up_Camera);
+
+		// tView_Matrix = LookAtMain(_Player.tPosition,
+		// 						  vec3(0.0f, 0.0f, 0.0f),
+		// 						  _view_Component.Up_Camera);
 
  		_view_Component.Position[0] = _Player.tPosition[0];
 		_view_Component.Position[1] = _Player.tPosition[1];

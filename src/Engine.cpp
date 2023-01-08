@@ -65,7 +65,7 @@ namespace GLVM::Core
 		Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
 		Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
 		pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
-		pCamera_System           = new ECS::CCameraSystem();
+//		pCamera_System           = new ECS::CCameraSystem();
         
 		fDelta_Time_             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -96,7 +96,7 @@ namespace GLVM::Core
 		pSystem_Manager->ActivateSystem(Collision_System);
 		pSystem_Manager->ActivateSystem(Physics_System_);
 		//		pSystem_Manager->ActivateSystem(Animation_System);
-		pSystem_Manager->ActivateSystem(pCamera_System);
+//		pSystem_Manager->ActivateSystem(pCamera_System);
 		pSystem_Manager->ActivateSystem(Render_System_Interface_);
 //		pSystem_Manager->ActivateSystem(GUI_System);
 
@@ -134,7 +134,7 @@ namespace GLVM::Core
 			Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
-			pCamera_System->Render_System_                = Render_System_Interface_;
+//			pCamera_System->Render_System_                = Render_System_Interface_;
             
 			pSystem_Manager->Update();
 //			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.SwapBuffers();
