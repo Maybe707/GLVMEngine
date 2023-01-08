@@ -270,8 +270,8 @@ namespace GLVM::Core
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
 			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
 			std::string leftString = "directionalLights[";
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"), directionalLightComponent.position[0], directionalLightComponent.position[1], directionalLightComponent.position[2]);
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"), directionalLightComponent.direction[0], directionalLightComponent.direction[1], directionalLightComponent.direction[2]);
-
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),  directionalLightComponent.ambient[0], directionalLightComponent.ambient[1], directionalLightComponent.ambient[2]);
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),  directionalLightComponent.diffuse[0], directionalLightComponent.diffuse[1], directionalLightComponent.diffuse[2]); // darken diffuse light a bit
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"), directionalLightComponent.specular[0], directionalLightComponent.specular[1], directionalLightComponent.specular[2]);

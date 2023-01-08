@@ -28,7 +28,7 @@ int main()
     MeshManager->SetMesh("../waveFrontObj/sphere.obj");
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
-	MeshManager->SetMesh("../waveFrontObj/very_big_plain.obj");
+	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 //	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
     CEngine* GLVM = CEngine::GetInstance();	
@@ -79,7 +79,7 @@ int main()
     vertex   & vertexPlain0    = ComponentManager->GetComponent<vertex>(plain0);
 	materialPlain0  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformPlain0 = { .tPosition = { 0.0f, -0.5f, 0.0f }, .fScale = 1.0f };
+	transformPlain0 = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
     TextureManager->BindTexture(plain0, materialPlain0.diffuseTextureID_);
     vertexPlain0.vkVertexId_ = 4;
     
@@ -135,23 +135,23 @@ int main()
 	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
 	vertexDirectionalLight0.vkVertexId_ = 0;
-	directionalLightComponent0 = { .direction = { -2.0f,  0.0f, 0.0f}, .ambient = { 0.2f, 0.2f, 0.2f },
-		.diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	transformDirectionalLight0 = { .tPosition = { 3.0f, 5.0f, 1.0f }, .fScale = 0.3f };
+	directionalLightComponent0 = { .position = { 10.0f, 7.0f, 1.0f }, .direction = { 2.0f,  -3.5f, .0f},
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
+	transformDirectionalLight0 = { .tPosition = { 10.0f, 7.0f, 1.0f }, .fScale = 0.3f };
 
-	// Entity pointLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
-	// material            & texturePointLight0   = ComponentManager->GetComponent<material>(pointLight0);
-	// SPointLightComponent& pointLightComponent0 = ComponentManager->GetComponent<SPointLightComponent>(pointLight0);
-	// transform           & transformPointLight0 = ComponentManager->GetComponent<transform>(pointLight0);
-	// vertex              & vertexPointLight0    = ComponentManager->GetComponent<vertex>(pointLight0);
-	// texturePointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	// vertexPointLight0.vkVertexId_ = 0;
-	// TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
-	// pointLightComponent0 = { .position = { 3.0f, 1.3f, 5.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
-	// 	.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
-	// 	.linear = 0.09f, .quadratic = 0.1f };
-	// transformPointLight0 = { .tPosition = { 3.0f, 1.3f, 5.7f }, .fScale = 0.3f };
+	Entity pointLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
+	material            & texturePointLight0   = ComponentManager->GetComponent<material>(pointLight0);
+	SPointLightComponent& pointLightComponent0 = ComponentManager->GetComponent<SPointLightComponent>(pointLight0);
+	transform           & transformPointLight0 = ComponentManager->GetComponent<transform>(pointLight0);
+	vertex              & vertexPointLight0    = ComponentManager->GetComponent<vertex>(pointLight0);
+	texturePointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	vertexPointLight0.vkVertexId_ = 0;
+	TextureManager->BindTexture(pointLight0, texturePointLight0.diffuseTextureID_);
+	pointLightComponent0 = { .position = { 3.0f, 1.3f, 5.7f }, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+		.linear = 0.09f, .quadratic = 0.1f };
+	transformPointLight0 = { .tPosition = { 3.0f, 1.3f, 5.7f }, .fScale = 0.3f };
 
 	// Entity pointLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
