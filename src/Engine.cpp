@@ -110,7 +110,7 @@ namespace GLVM::Core
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
 
-//			FPScounter();
+			FPScounter();
 			
 			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
