@@ -85,23 +85,6 @@ namespace GLVM::Core
 	{
 		InitilizeCubeShadowMap();
 		
-        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
-		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
-		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
-
-		if ( timeAccumulator > 1.0f ) {
-			timeFlag = true;
-		} else if ( timeAccumulator < 0.0f ) {
-			timeFlag = false;
-		}
-
-		if (timeFlag)
-			timeAccumulator -= 0.001;
-		else
-			timeAccumulator += 0.001;	
-
 		EvaluateFlatShadowMap();
 		EvaluateCubeShadowMap();
 
@@ -162,7 +145,14 @@ namespace GLVM::Core
 			float distance = VectorLength(playerTransformComponent.tPosition, lightComponent.position);
 			// std::cout << "I: " << i << std::endl;
 			// std::cout << "distance: " << distance << std::endl;
-			if ( distance < 3.0f ) {
+			if ( distance < 4.5f ) {
+				/*************************************************************
+				// glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);            *
+				// pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);    *
+				// glClear(GL_DEPTH_BUFFER_BIT);                             *
+				// RenderScene(flatShadowMapShaderProgram);                  *
+				// pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);*******************/
+				
 				cubeShadowMapFBOcontainer.emplace_back();
 				cubeShadowMapTextureContainer.emplace_back();
 				sampledPointLightIndicesOfEntityIDcontainer.push_back(i);
@@ -183,7 +173,7 @@ namespace GLVM::Core
 				glDrawBuffer(GL_NONE);
 				glReadBuffer(GL_NONE);
 				pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-
+				
 				coreShaderProgram->Use();
 				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, framebufferAndTextureCounter, "]"), i);
 				++framebufferAndTextureCounter;

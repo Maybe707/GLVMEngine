@@ -126,18 +126,18 @@ int main()
     // hudTextureManager->BindTexture(u_iHud1, TextureHud1.diffuseTextureID_);
 	// TransformHud1 = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,.hud = true };
 
-	// Entity directionalLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
-	// material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
-	// SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
-	// transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
-	// vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
-	// materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	// TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
-	// vertexDirectionalLight0.vkVertexId_ = 0;
-	// directionalLightComponent0 = { .position = { 10.0f, 7.0f, 1.0f }, .direction = { 2.0f,  -3.5f, .0f},
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	// transformDirectionalLight0 = { .tPosition = { 10.0f, 7.0f, 1.0f }, .fScale = 0.3f };
+	Entity directionalLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SDirectionalLightComponent, transform>(directionalLight0);
+	material                  & materialDirectionalLight0  = ComponentManager->GetComponent<material>(directionalLight0);
+	SDirectionalLightComponent& directionalLightComponent0          = ComponentManager->GetComponent<SDirectionalLightComponent>(directionalLight0);
+	transform                 & transformDirectionalLight0 = ComponentManager->GetComponent<transform>(directionalLight0);
+	vertex                    & vertexDirectionalLight0    = ComponentManager->GetComponent<vertex>(directionalLight0);
+	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
+	vertexDirectionalLight0.vkVertexId_ = 0;
+	directionalLightComponent0 = { .position = { 10.0f, 7.0f, 1.0f }, .direction = { 2.0f,  -3.5f, .0f},
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
+	transformDirectionalLight0 = { .tPosition = { 10.0f, 7.0f, 1.0f }, .fScale = 0.3f };
 
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);
@@ -153,20 +153,35 @@ int main()
 		.linear = 0.09f, .quadratic = 0.1f };
 	transformPointLight0 = { .tPosition = { 0.0f, 3.3f, 2.7f }, .fScale = 0.3f };
 
-	// Entity pointLight1 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
-	// material& texturePointLight1 = ComponentManager->GetComponent<material>(pointLight1);
-	// SPointLightComponent& pointLightComponent1 = ComponentManager->GetComponent<SPointLightComponent>(pointLight1);
-	// transform& transformPointLight1 = ComponentManager->GetComponent<transform>(pointLight1);
-	// vertex& vertexPointLight1 = ComponentManager->GetComponent<vertex>(pointLight1);
-	// texturePointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	// TextureManager->BindTexture(pointLight1, texturePointLight1.diffuseTextureID_);
-	// vertexPointLight1.vkVertexId_ = 0;
-	// pointLightComponent1 = { .position = { 1.2f, 1.3f, 1.5f }, .ambient = { 0.2f, 0.2f, 0.2f },
-	// 	.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
-	// 	.linear = 0.09f, .quadratic = 0.032f };
-	// transformPointLight1 = { .tPosition = { 1.2f, 1.3f, 1.5f }, .fScale = 0.1f };
+	Entity pointLight1 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight1);
+	material& texturePointLight1 = ComponentManager->GetComponent<material>(pointLight1);
+	SPointLightComponent& pointLightComponent1 = ComponentManager->GetComponent<SPointLightComponent>(pointLight1);
+	transform& transformPointLight1 = ComponentManager->GetComponent<transform>(pointLight1);
+	vertex& vertexPointLight1 = ComponentManager->GetComponent<vertex>(pointLight1);
+	texturePointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	TextureManager->BindTexture(pointLight1, texturePointLight1.diffuseTextureID_);
+	vertexPointLight1.vkVertexId_ = 0;
+	pointLightComponent1 = { .position = { 5.2f, 3.3f, 3.5f }, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+		.linear = 0.09f, .quadratic = 0.032f };
+	transformPointLight1 = { .tPosition = { 5.2f, 3.3f, 3.5f }, .fScale = 0.3f };
 
+	Entity pointLight2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight2);
+	material& texturePointLight2 = ComponentManager->GetComponent<material>(pointLight2);
+	SPointLightComponent& pointLightComponent2 = ComponentManager->GetComponent<SPointLightComponent>(pointLight2);
+	transform& transformPointLight2 = ComponentManager->GetComponent<transform>(pointLight2);
+	vertex& vertexPointLight2 = ComponentManager->GetComponent<vertex>(pointLight2);
+	texturePointLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	TextureManager->BindTexture(pointLight2, texturePointLight2.diffuseTextureID_);
+	vertexPointLight2.vkVertexId_ = 0;
+	pointLightComponent2 = { .position = { 9.2f, 3.3f, 7.5f }, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f,
+		.linear = 0.09f, .quadratic = 0.032f };
+	transformPointLight2 = { .tPosition = { 9.2f, 3.3f, 7.5f }, .fScale = 0.3f };
+
+	
 // 	Entity spotLight0 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<vertex, material, spotLight, transform>(spotLight0);
 // 	material & textureSpotLight0   = ComponentManager->GetComponent<material>(spotLight0);

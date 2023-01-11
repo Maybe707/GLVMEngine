@@ -78,8 +78,6 @@ namespace GLVM::Core {
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
 		bool shadows = true;
-		float timeAccumulator = 0.0f;
-		bool timeFlag = false;
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_;

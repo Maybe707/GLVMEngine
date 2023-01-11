@@ -93,19 +93,22 @@ void main()
 	}
 	// Compute point lights
 	int pointLightIndicesCounter    = 0;
-	int pointLightIndexAccumulator = -1;
+	int pointLightIndexAccumulator  = -1;
 	if(cubeShadowMapArraySize > 0)
 		pointLightIndexAccumulator  = cubeShadowMapComponentIndices[pointLightIndicesCounter];
 
-	float shadow = 0;
+	float shadow = 0.0;
 	for (int i = 0; i < pointLightsArraySize; ++i) {
-		if(i == pointLightIndexAccumulator) {
-			shadow = ComputePointShadow(pointLights[i], fs_in.fragmentPosition, cubeShadowMapArray[i]);
+		if(i == pointLightIndexAccumulator && pointLightIndicesCounter != cubeShadowMapArraySize) {
+			shadow = ComputePointShadow(pointLights[i], fs_in.fragmentPosition,
+										cubeShadowMapArray[pointLightIndicesCounter]);
 			++pointLightIndicesCounter;
 			pointLightIndexAccumulator = cubeShadowMapComponentIndices[pointLightIndicesCounter];
 		}
 		vec3 light = ComputePointLight(pointLights[i], normal, fs_in.fragmentPosition, viewDirection);
 		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
 	}
 	// Compute spot light
 	for (int j = 0; j < spotLightsArraySize; ++j) 
