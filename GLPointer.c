@@ -97,7 +97,9 @@ EXTERN_C void Initializer()
 	pGLUniform3fv = (void (*)(GLint location, GLsizei count, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform3fv");
 
 	pGLUniformMatrix4fv = (void (*)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniformMatrix4fv");
-	
+
+	pGLUniform1iv = (void (*)(GLint location, GLsizei count, const GLint* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform1iv");
+
 #ifdef __linux__
 pGLXSwap_Interval_EXT = (void (*)(Display*, GLXDrawable, int))GET_PROC_ADDRESS((const GLubyte *)"glXSwapIntervalEXT");
 #endif

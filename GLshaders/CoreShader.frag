@@ -51,16 +51,19 @@ struct SpotLight {
 	float quadratic;
 };
 
-#define DIRECTIONAL_LIGHTS_NUMBER 32
-#define POINT_LIGHTS_NUMBER       64
-#define SPOT_LIGHTS_NUMBER        32
+#define DIRECTIONAL_LIGHTS_NUMBER              32
+#define POINT_LIGHTS_NUMBER                    32
+#define SPOT_LIGHTS_NUMBER                     32
+#define CUBE_SHADOW_MAP_ARRAY_SIZE             32
+#define CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
 
 uniform bool             shadows;
 uniform float            farPlane;
 uniform vec3             lightPos;
 uniform sampler2D        flatShadowMap;
-uniform samplerCube      cubeShadowMap;
-uniform sampler2D        diffuseTexture;
+uniform int              cubeShadowMapArraySize;
+uniform int              cubeShadowMapComponentIndices[CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE];
+uniform samplerCube      cubeShadowMapArray[CUBE_SHADOW_MAP_ARRAY_SIZE];
 uniform int              directionalLightsArraySize;
 uniform int              pointLightsArraySize;
 uniform int              spotLightsArraySize;
@@ -74,7 +77,7 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLightSpace);
-float ComputePointShadow(PointLight light, vec3 fragmentPosition);
+float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap);
 
 void main()
 {
@@ -89,8 +92,18 @@ void main()
 		result += (1.0 - shadow) * light;
 	}
 	// Compute point lights
+	int pointLightIndicesCounter    = 0;
+	int pointLightIndexAccumulator = -1;
+	if(cubeShadowMapArraySize > 0)
+		pointLightIndexAccumulator  = cubeShadowMapComponentIndices[pointLightIndicesCounter];
+
+	float shadow = 0;
 	for (int i = 0; i < pointLightsArraySize; ++i) {
-		float shadow = ComputePointShadow(pointLights[i], fs_in.fragmentPosition);
+		if(i == pointLightIndexAccumulator) {
+			shadow = ComputePointShadow(pointLights[i], fs_in.fragmentPosition, cubeShadowMapArray[i]);
+			++pointLightIndicesCounter;
+			pointLightIndexAccumulator = cubeShadowMapComponentIndices[pointLightIndicesCounter];
+		}
 		vec3 light = ComputePointLight(pointLights[i], normal, fs_in.fragmentPosition, viewDirection);
 		result += (1.0 - shadow) * light;
 	}
@@ -103,31 +116,6 @@ void main()
 	// result = result * (1.0 - shadow);
 	
 	fragColor = vec4(result, 1.0);
-
-// 	vec3 color = texture(diffuseTexture, fs_in.textureCoords).rgb;
-//     vec3 normal = normalize(fs_in.normal);
-//     vec3 lightColor = vec3(0.3);
-//     // ambient
-//     vec3 ambient = 0.3 * lightColor;
-//     // diffuse
-//     vec3 lightDir = normalize(lightPos - fs_in.fragmentPosition);
-//     float diff = max(dot(lightDir, normal), 0.0);
-//     vec3 diffuse = diff * lightColor;
-//     // specular
-//     vec3 viewDir = normalize(viewPosition - fs_in.fragmentPosition);
-//     vec3 reflectDir = reflect(-lightDir, normal);
-//     float spec = 0.0;
-//     vec3 halfwayDir = normalize(lightDir + viewDir);  
-//     spec = pow(max(dot(normal, halfwayDir), 0.0), 64.0);
-//     vec3 specular = spec * lightColor;
-//     // calculate shadow
-// 	float shadow = 0.0;
-//     shadow += ComputeDirectionalShadow(fs_in.fragmentPositionLightSpace);
-// 	shadow += ComputePointShadow(fs_in.fragmentPosition);
-//     vec3 lighting = (ambient + (1.0 - shadow) * (diffuse + specular)) * color;    
-	
-// //	fragColor = vec4(vec3(shadow / farPlane), 1.0);
-// 	fragColor = vec4(lighting, 1.0);
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {
@@ -234,7 +222,7 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLigh
 	return shadow;
 }
 
-float ComputePointShadow(PointLight light, vec3 fragmentPosition) {
+float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap) {
 	// Get vector between fragment position and light position
 	vec3 fragmentToLight       = fragmentPosition - light.position;
 	// // Get the fragment to light vector to sample from the shadow map

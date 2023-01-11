@@ -367,11 +367,11 @@ T Dot(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 }
 
 template <typename T>
-T Hypotenuse(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
+T VectorLength(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 {
-    float _x_axis = _vector2[0] - _vector1[0];
-    float _y_axis = _vector2[1] - _vector1[1];
-    float _z_axis = _vector2[2] - _vector1[2];
+    T _x_axis = _vector2[0] - _vector1[0];
+    T _y_axis = _vector2[1] - _vector1[1];
+    T _z_axis = _vector2[2] - _vector1[2];
     return std::sqrt(_x_axis * _x_axis + _y_axis * _y_axis + _z_axis * _z_axis);
 }
 

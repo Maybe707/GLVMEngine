@@ -1,5 +1,6 @@
 #include "ShaderProgram.hpp"
 #include "GLPointer.h"
+#include <GL/gl.h>
 
 #define ARRAY_INFO_LOG_RANGE 1024
 
@@ -16,6 +17,10 @@ void Shader::SetBool(const std::string& name, bool value) const
 void Shader::SetInt(const std::string& name, int value) const
 {
 	pGLUniform1i(pGLGet_Uniform_Location(iID, name.c_str()), value);
+}
+void Shader::SetInt(const std::string& name, GLsizei count, const GLint* value) const
+{
+	pGLUniform1iv(pGLGet_Uniform_Location(iID, name.c_str()), count, value);
 }
 void Shader::SetFloat(const std::string& name, float value) const
 {

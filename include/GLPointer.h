@@ -111,6 +111,8 @@ EXTERN void (*pGLUniform3fv)(GLint location, GLsizei count, const GLfloat* value
 
 EXTERN void (*pGLUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
 
+EXTERN void (*pGLUniform1iv)(GLint location, GLsizei count, const GLint* value);
+
 #ifdef __linux__
 EXTERN void (*pGLXSwap_Interval_EXT)(Display *, GLXDrawable, int);
 #endif

@@ -58,8 +58,12 @@ namespace GLVM::Core {
 		GLuint planeVAO_;
 		GLuint planeVBO_;
 		unsigned int flatShadowMapFBO;
+		std::vector<unsigned int> cubeShadowMapFBOcontainer;
 		unsigned int cubeShadowMapFBO;
 		unsigned int flatShadowMapTexture;
+		std::vector<unsigned int> cubeShadowMapTextureContainer;
+		std::vector<unsigned int> sampledPointLightIndicesOfEntityIDcontainer; ///< We need indices of entity IDs in IDs container for sampling cube shadow maps in core shader.
+		std::vector<unsigned int> sampledPointLightEntityIDcontainer;
 		unsigned int cubeShadowMapTexture;
 		const unsigned int SHADOW_WIDTH  = 1024;
 		const unsigned int SHADOW_HEIGHT = 1024;
@@ -89,6 +93,8 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
+		void InitializeFlatShadowMap();
+		void InitilizeCubeShadowMap();
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
