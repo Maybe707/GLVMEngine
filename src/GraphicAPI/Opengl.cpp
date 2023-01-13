@@ -44,24 +44,22 @@ namespace GLVM::Core
     COpenglRenderer::COpenglRenderer()
 	{
 		coreShaderProgram           = new Shader("../GLshaders/CoreShader.vert", "../GLshaders/CoreShader.frag");
-		// coreShaderProgram           = new Shader("/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows.vs", "/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows.fs");
-		flatShadowMapShaderProgram = new Shader("../GLshaders/FlatShadowMap.vert", "../GLshaders/FlatShadowMap.frag");
+		flatShadowMapShaderProgram  = new Shader("../GLshaders/FlatShadowMap.vert", "../GLshaders/FlatShadowMap.frag");
  		cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
 			                                     "../GLshaders/CubeShadowMap.geom");
-		// cubeShadowMapShaderProgram  = new Shader("/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.vs", "/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.fs", "/home/cyberdemon/cyberDemonCode/Opengl/shadowMappingPointLights/src/point_shadows_depth.gs");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 		
-		woodTexture = loadTexture("/home/cyberdemon/cyberDemonCode/GLVMEngine/textures/container2.png");
+//		woodTexture = loadTexture("/home/cyberdemon/cyberDemonCode/GLVMEngine/textures/container2.png");
 
         glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
-		InitializeFlatShadowMap();
-
 		coreShaderProgram->Use();
-		coreShaderProgram->SetInt("flatShadowMap", 0);
+		coreShaderProgram->SetInt("flatShadowMap", 16);
 		coreShaderProgram->SetInt("material.diffuse", 1);
 		coreShaderProgram->SetInt("material.specular", 2);
+		
+		InitializeFlatShadowMap();
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
@@ -84,7 +82,7 @@ namespace GLVM::Core
 	void COpenglRenderer::draw()
 	{
 		InitilizeCubeShadowMap();
-		
+
 		EvaluateFlatShadowMap();
 		EvaluateCubeShadowMap();
 
@@ -119,7 +117,7 @@ namespace GLVM::Core
 		pGLFramebuffer_Texture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, flatShadowMapTexture, 0);
 		glDrawBuffer(GL_NONE);
 		glReadBuffer(GL_NONE);
-		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);		
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void COpenglRenderer::InitilizeCubeShadowMap() {
@@ -143,15 +141,9 @@ namespace GLVM::Core
 			Core::SPointLightComponent& lightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(lightEntityID);
 
 			float distance = VectorLength(playerTransformComponent.tPosition, lightComponent.position);
-			// std::cout << "I: " << i << std::endl;
-			// std::cout << "distance: " << distance << std::endl;
 			if ( distance < 4.5f ) {
-				/*************************************************************
-				// glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);            *
-				// pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);    *
-				// glClear(GL_DEPTH_BUFFER_BIT);                             *
-				// RenderScene(flatShadowMapShaderProgram);                  *
-				// pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);*******************/
+				// pGLActive_Texture(GL_TEXTURE1);
+				// glBindTexture(GL_TEXTURE_2D, 1);
 				
 				cubeShadowMapFBOcontainer.emplace_back();
 				cubeShadowMapTextureContainer.emplace_back();
@@ -167,17 +159,17 @@ namespace GLVM::Core
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); 
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
 				// Attach depth texture as FBO's depth buffer
 				pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBOcontainer[framebufferAndTextureCounter]);
 				pGLFramebuffer_Texture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeShadowMapTextureContainer[framebufferAndTextureCounter], 0);
 				glDrawBuffer(GL_NONE);
 				glReadBuffer(GL_NONE);
 				pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-				
+
 				coreShaderProgram->Use();
 				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, framebufferAndTextureCounter, "]"), i);
 				++framebufferAndTextureCounter;
-//				std::cout << "CLASSIC DEBUG METHOD!" << std::endl;
 			}
 		}
 		int cubeShadowMapArrayUniform[framebufferAndTextureCounter];
@@ -279,7 +271,7 @@ namespace GLVM::Core
 		// Render scene as normal
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		coreShaderProgram->Use();
+//		coreShaderProgram->Use();
 		ComputeProjectionMatrix(coreShaderProgram);
 		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
 		coreShaderProgram->SetVec3("lightPos", positionVectorPointLight);
@@ -288,7 +280,7 @@ namespace GLVM::Core
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
 		coreShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
 
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE16);
 		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
 		unsigned int cubeShadowMapTextureIndex = 0;
 		for ( int i = 3; i < cubeShadowMapTextureContainer.size() + 3; ++i ) {
@@ -439,17 +431,17 @@ namespace GLVM::Core
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 
-		for(int i = 0; i < hudTexture_load_data_.size(); ++i)
-			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
-//				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
-				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
-				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE3);
-				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-			}
+// 		for(int i = 0; i < hudTexture_load_data_.size(); ++i)
+// 			for (int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+// 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+//                 unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
+// //				LoadTextureData(hudTexture_load_data_[pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture).diffuseTextureID_]);
+// 				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
+// 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
+// 				pGLActive_Texture(GL_TEXTURE3);
+// 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+// 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+// 			}
 	}
 
 	void COpenglRenderer::RenderQuad()
