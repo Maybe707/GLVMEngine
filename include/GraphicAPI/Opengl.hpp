@@ -47,6 +47,7 @@ namespace GLVM::Core {
 		CWindowWin Window;
 #endif
 
+//		unsigned int appropriateLightComponentIndex = 0;
 		const unsigned int SCREEN_WIDTH  = 1920;
 		const unsigned int SCREEN_HEIGHT = 1080;
 		Shader* coreShaderProgram;
@@ -62,7 +63,7 @@ namespace GLVM::Core {
 		unsigned int cubeShadowMapFBO;
 		unsigned int flatShadowMapTexture;
 		std::vector<unsigned int> cubeShadowMapTextureContainer;
-		std::vector<unsigned int> sampledPointLightIndicesOfEntityIDcontainer; ///< We need indices of entity IDs in IDs container for sampling cube shadow maps in core shader.
+//		std::vector<unsigned int> sampledPointLightIndicesOfEntityIDcontainer; ///< We need indices of entity IDs in IDs container for sampling cube shadow maps in core shader.
 		std::vector<unsigned int> sampledPointLightEntityIDcontainer;
 		unsigned int cubeShadowMapTexture;
 		const unsigned int SHADOW_WIDTH  = 1024;

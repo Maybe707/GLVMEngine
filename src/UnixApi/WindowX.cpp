@@ -127,7 +127,7 @@ namespace GLVM::Core
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
 		Drawable = glXGetCurrentDrawable();
 		Initializer();
-		const int kInterval = 0;
+		const int kInterval = 1;
 
 		if (Drawable)
 		{

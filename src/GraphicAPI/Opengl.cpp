@@ -56,9 +56,10 @@ namespace GLVM::Core
 
 		coreShaderProgram->Use();
 		coreShaderProgram->SetInt("flatShadowMap", 16);
-		coreShaderProgram->SetInt("material.diffuse", 1);
-		coreShaderProgram->SetInt("material.specular", 2);
-		
+		coreShaderProgram->SetInt("material.diffuse", 17);
+		coreShaderProgram->SetInt("material.specular", 18);
+
+		InitilizeCubeShadowMap();		
 		InitializeFlatShadowMap();
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -81,8 +82,6 @@ namespace GLVM::Core
     
 	void COpenglRenderer::draw()
 	{
-		InitilizeCubeShadowMap();
-
 		EvaluateFlatShadowMap();
 		EvaluateCubeShadowMap();
 
@@ -102,6 +101,7 @@ namespace GLVM::Core
 	void COpenglRenderer::InitializeFlatShadowMap() {
 		pGLGen_Framebuffers(1, &flatShadowMapFBO);
 		glGenTextures(1, &flatShadowMapTexture);
+		glActiveTexture(GL_TEXTURE16);
 		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -113,6 +113,10 @@ namespace GLVM::Core
 		float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
+		int currentActiveTexture;
+		glGetIntegerv(GL_ACTIVE_TEXTURE, &currentActiveTexture);
+		std::cout << "Flat texture unit: " << currentActiveTexture << std::endl;
+
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, flatShadowMapFBO);
 		pGLFramebuffer_Texture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, flatShadowMapTexture, 0);
 		glDrawBuffer(GL_NONE);
@@ -121,37 +125,17 @@ namespace GLVM::Core
 	}
 
 	void COpenglRenderer::InitilizeCubeShadowMap() {
-		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
-		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
-		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
-		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
-		unsigned int framebufferAndTextureCounter = 0;
-		std::string leftString = "cubeShadowMapComponentIndices[";
-
-		cubeShadowMapFBOcontainer.clear();
-		cubeShadowMapTextureContainer.clear();
-		sampledPointLightIndicesOfEntityIDcontainer.clear();
-		sampledPointLightEntityIDcontainer.clear();
+		unsigned int lightSourcesNumber = 16;
+		coreShaderProgram->Use();
 		
-		for ( int i = 0; i < pointLightComponentContainerSize; ++i ) {
-			unsigned int lightEntityID = (*pEntityContainerRefPointLight)[i];
-			Core::SPointLightComponent& lightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(lightEntityID);
-
-			float distance = VectorLength(playerTransformComponent.tPosition, lightComponent.position);
-			if ( distance < 4.5f ) {
-				// pGLActive_Texture(GL_TEXTURE1);
-				// glBindTexture(GL_TEXTURE_2D, 1);
-				
+		for ( int i = 0; i < lightSourcesNumber; ++i ) {
 				cubeShadowMapFBOcontainer.emplace_back();
 				cubeShadowMapTextureContainer.emplace_back();
-				sampledPointLightIndicesOfEntityIDcontainer.push_back(i);
-				sampledPointLightEntityIDcontainer.push_back(lightEntityID);
-				pGLGen_Framebuffers(1, &cubeShadowMapFBOcontainer[framebufferAndTextureCounter]);
-				glGenTextures(1, &cubeShadowMapTextureContainer[framebufferAndTextureCounter]);
-				glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTextureContainer[framebufferAndTextureCounter]);
+
+				pGLGen_Framebuffers(1, &cubeShadowMapFBOcontainer[i]);
+				glGenTextures(1, &cubeShadowMapTextureContainer[i]);
+				glActiveTexture(GL_TEXTURE0 + i);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, cubeShadowMapTextureContainer[i]);
 				for (unsigned int j = 0; j < 6; ++j)
 					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + j, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -160,25 +144,22 @@ namespace GLVM::Core
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 				glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
+				int currentActiveTexture;
+				glGetIntegerv(GL_ACTIVE_TEXTURE, &currentActiveTexture);
+				std::cout << "Cube texture unit: " << currentActiveTexture << std::endl;
+				
 				// Attach depth texture as FBO's depth buffer
-				pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBOcontainer[framebufferAndTextureCounter]);
-				pGLFramebuffer_Texture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeShadowMapTextureContainer[framebufferAndTextureCounter], 0);
+				pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBOcontainer[i]);
+				pGLFramebuffer_Texture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeShadowMapTextureContainer[i], 0);
 				glDrawBuffer(GL_NONE);
 				glReadBuffer(GL_NONE);
 				pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-
-				coreShaderProgram->Use();
-				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, framebufferAndTextureCounter, "]"), i);
-				++framebufferAndTextureCounter;
 			}
-		}
-		int cubeShadowMapArrayUniform[framebufferAndTextureCounter];
-		unsigned int cubeShadowMapArrayUniformCounter = 0;
-		for ( int i = 3; i < (framebufferAndTextureCounter + 3); ++i)
-			cubeShadowMapArrayUniform[cubeShadowMapArrayUniformCounter++] = i;
+		int cubeShadowMapArrayUniform[lightSourcesNumber];
+		for ( int i = 0; i < lightSourcesNumber; ++i )
+			cubeShadowMapArrayUniform[i] = i;
 
-		coreShaderProgram->SetInt("cubeShadowMapArray", framebufferAndTextureCounter, cubeShadowMapArrayUniform);
-		coreShaderProgram->SetInt("cubeShadowMapArraySize", framebufferAndTextureCounter);
+		coreShaderProgram->SetInt("cubeShadowMapArray", lightSourcesNumber, cubeShadowMapArrayUniform);
 	}
 	
 	void COpenglRenderer::EvaluateFlatShadowMap() {
@@ -221,41 +202,68 @@ namespace GLVM::Core
 	}
 
 	void COpenglRenderer::EvaluateCubeShadowMap() {
+		// ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+		// Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		// ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		// ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+
+
+		
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
 		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
-		
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for ( int i = 0; i < sampledPointLightEntityIDcontainer.size(); ++i) {
-			unsigned int entityID = sampledPointLightEntityIDcontainer[i];
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
+		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
+		std::string leftString = "cubeShadowMapComponentIndices[";
+
+		sampledPointLightEntityIDcontainer.clear();
+		
+
+		unsigned int appropriateLightComponentIndex = 0;
+		for ( int i = 0; i < pointLightComponentContainerSize; ++i) {
+			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
 			Core::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<Core::SPointLightComponent>(entityID);
-			positionVectorPointLight = pointLightComponent.position;
+			float distance = VectorLength(playerTransformComponent.tPosition, pointLightComponent.position);
+
+			if ( distance < 4.5f ) {
+				glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				sampledPointLightEntityIDcontainer.push_back(i);
+				positionVectorPointLight = pointLightComponent.position;
 //		positionVectorPointLight = playerTransformComponent.tPosition;
 //		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
-			mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
-			vector<mat4> cubeShadowMapTransforms;
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		
-			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBOcontainer[i]);
-			glClear(GL_DEPTH_BUFFER_BIT);
-			cubeShadowMapShaderProgram->Use();
-			for (unsigned int j = 0; j < 6; ++j)
-				cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(j) + "]", cubeShadowMapTransforms[j]);
-			cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
-			cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
-			RenderScene(cubeShadowMapShaderProgram);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+				mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
+				vector<mat4> cubeShadowMapTransforms;
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  -1.0f)) * projectionMatrixCubeShadowMap);
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+
+				glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+				pGLBind_Framebuffer(GL_FRAMEBUFFER, cubeShadowMapFBOcontainer[appropriateLightComponentIndex]);
+				glClear(GL_DEPTH_BUFFER_BIT);
+				cubeShadowMapShaderProgram->Use();
+				for (unsigned int j = 0; j < 6; ++j)
+					cubeShadowMapShaderProgram->SetMat4("shadowMatrices[" + std::to_string(j) + "]", cubeShadowMapTransforms[j]);
+				cubeShadowMapShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
+				cubeShadowMapShaderProgram->SetVec3("lightPosition", positionVectorPointLight);
+				RenderScene(cubeShadowMapShaderProgram);
+				pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+
+				coreShaderProgram->Use();
+				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, appropriateLightComponentIndex, "]"), i);
+				++appropriateLightComponentIndex;
+			}
 		}
+		coreShaderProgram->Use();
+		coreShaderProgram->SetInt("cubeShadowMapArraySize", appropriateLightComponentIndex);
 	}
 
 	void COpenglRenderer::EvaluateCoreShader() {
@@ -282,10 +290,10 @@ namespace GLVM::Core
 
 		glActiveTexture(GL_TEXTURE16);
 		glBindTexture(GL_TEXTURE_2D, flatShadowMapTexture);
-		unsigned int cubeShadowMapTextureIndex = 0;
-		for ( int i = 3; i < cubeShadowMapTextureContainer.size() + 3; ++i ) {
+		for ( int i = 0; i < sampledPointLightEntityIDcontainer.size(); ++i ) {
+			std::cout << "Size: " << sampledPointLightEntityIDcontainer.size() << std::endl;
 			glActiveTexture( GL_TEXTURE0 + i );
-			glBindTexture( GL_TEXTURE_CUBE_MAP, cubeShadowMapTextureContainer[cubeShadowMapTextureIndex++] );
+			glBindTexture( GL_TEXTURE_CUBE_MAP, cubeShadowMapTextureContainer[i] );
 		}
 	}
 
@@ -418,9 +426,9 @@ namespace GLVM::Core
 				// if (j != 1)
 				// 	modelMatrix = Translate(modelMatrix, vec3(timeAccumulator * 5, 0.0f, 0.0f));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE1);
+				pGLActive_Texture(GL_TEXTURE17);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
-				pGLActive_Texture(GL_TEXTURE2);
+				pGLActive_Texture(GL_TEXTURE18);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				ECS::SMaterialComponent& materialComponent = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_refTexture);
