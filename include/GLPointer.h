@@ -107,6 +107,8 @@ EXTERN void (*pGLFramebuffer_Texture2D)(GLenum target, GLenum atachment, GLenum 
 
 EXTERN void (*pGLFramebuffer_Texture)(GLenum target, GLenum attachment, GLuint texture, GLint level);
 
+EXTERN void (*pGLUniform1fv)(GLint location, GLsizei count, const GLfloat* value);
+
 EXTERN void (*pGLUniform3fv)(GLint location, GLsizei count, const GLfloat* value);
 
 EXTERN void (*pGLUniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);

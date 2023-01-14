@@ -87,6 +87,9 @@ namespace GLVM::Core {
 		std::vector<GLuint> VBOcontainer_;
 		std::vector<GLuint> VAOcontainer_;
 		std::vector<GLuint> EBOcontainer_;
+		unsigned int directionalLightUniformLocations[5];
+		unsigned int pointLightUniformLocations[7];
+		unsigned int spotLightUniformLocations[10];
 
 		COpenglRenderer();
 		~COpenglRenderer();
@@ -116,7 +119,6 @@ namespace GLVM::Core {
 		void ComputeProjectionMatrix(Shader* shaderProgram);
 		void renderScene(const Shader& shader);
 		void renderCube();
-		unsigned int loadTexture(char const * path);
 	};
 } // namespace GLVM::Core
 

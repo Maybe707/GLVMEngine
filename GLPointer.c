@@ -94,6 +94,8 @@ EXTERN_C void Initializer()
 
 	pGLFramebuffer_Texture = (void (*)(GLenum target, GLenum attachment, GLuint texture, GLint level))GET_PROC_ADDRESS((const GLubyte *)"glFramebufferTexture");
 
+	pGLUniform1fv = (void (*)(GLint location, GLsizei count, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform1fv");
+	
 	pGLUniform3fv = (void (*)(GLint location, GLsizei count, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform3fv");
 
 	pGLUniformMatrix4fv = (void (*)(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value))GET_PROC_ADDRESS((const GLubyte *)"glUniformMatrix4fv");
