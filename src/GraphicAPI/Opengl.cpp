@@ -49,13 +49,6 @@ namespace GLVM::Core
 			                                     "../GLshaders/CubeShadowMap.geom");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 
-		unsigned int coreShaderID = coreShaderProgram->iID;
-		directionalLightUniformLocations[0] = pGLGet_Uniform_Location(coreShaderID, "directionalLights.position");
-		directionalLightUniformLocations[1] = pGLGet_Uniform_Location(coreShaderID, "directionalLights.direction");
-		directionalLightUniformLocations[2] = pGLGet_Uniform_Location(coreShaderID, "directionalLights.ambient");
-		directionalLightUniformLocations[3] = pGLGet_Uniform_Location(coreShaderID, "directionalLights.diffuse");
-		directionalLightUniformLocations[4] = pGLGet_Uniform_Location(coreShaderID, "directionalLights.specular");
-		
         glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
@@ -323,26 +316,22 @@ namespace GLVM::Core
 
 		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 
-		vec3 positionContainer[directionalLightComponentContainerSize];
-		vec3 directionContainer[directionalLightComponentContainerSize];
-		vec3 ambientContainer[directionalLightComponentContainerSize];
-		vec3 diffuseContainer[directionalLightComponentContainerSize];
-		vec3 specularContainer[directionalLightComponentContainerSize];
-		
 		for(int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
 			Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightEntity);
-			positionContainer[x]  = directionalLightComponent.position;
-			directionContainer[x] = directionalLightComponent.direction;
-			ambientContainer[x]   = directionalLightComponent.ambient;
-			diffuseContainer[x]   = directionalLightComponent.diffuse;
-			specularContainer[x]  = directionalLightComponent.specular;
+			std::string leftString = "directionalLights[";
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
+									   directionalLightComponent.position);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].direction"),
+										directionalLightComponent.direction);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
+									   directionalLightComponent.ambient);
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
+									   directionalLightComponent.diffuse); // darken diffuse light a bit
+			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].specular"),
+									   directionalLightComponent.specular);
+
 		}
-		pGLUniform3fv(directionalLightUniformLocations[0], directionalLightComponentContainerSize, &positionContainer[0][0]);
-		pGLUniform3fv(directionalLightUniformLocations[1], directionalLightComponentContainerSize, &directionContainer[0][0]);
-		pGLUniform3fv(directionalLightUniformLocations[2], directionalLightComponentContainerSize, &ambientContainer[0][0]);
-		pGLUniform3fv(directionalLightUniformLocations[3], directionalLightComponentContainerSize, &diffuseContainer[0][0]);
-		pGLUniform3fv(directionalLightUniformLocations[4], directionalLightComponentContainerSize, &specularContainer[0][0]);
 	}
 
 	void COpenglRenderer::ComputePointLight() {

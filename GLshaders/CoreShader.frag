@@ -1,6 +1,12 @@
 #version 410 core
 out vec4 fragColor;
 
+#define DIRECTIONAL_LIGHTS_NUMBER              32
+#define POINT_LIGHTS_NUMBER                    32
+#define SPOT_LIGHTS_NUMBER                     32
+#define CUBE_SHADOW_MAP_ARRAY_SIZE             32
+#define CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
+
 in VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
@@ -15,28 +21,13 @@ struct Material {
     float     shininess;
 }; 
 
-// struct DirectionalLight {
-// 	vec3 position;
-// 	vec3 direction;
-  
-//     vec3 ambient;
-//     vec3 diffuse;
-//     vec3 specular;
-// };
-
-#define DIRECTIONAL_LIGHTS_NUMBER              32
-#define POINT_LIGHTS_NUMBER                    32
-#define SPOT_LIGHTS_NUMBER                     32
-#define CUBE_SHADOW_MAP_ARRAY_SIZE             32
-#define CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
-
 struct DirectionalLight {
-	vec3 position[DIRECTIONAL_LIGHTS_NUMBER];
-	vec3 direction[DIRECTIONAL_LIGHTS_NUMBER];
+	vec3 position;
+	vec3 direction;
   
-    vec3 ambient[DIRECTIONAL_LIGHTS_NUMBER];
-    vec3 diffuse[DIRECTIONAL_LIGHTS_NUMBER];
-    vec3 specular[DIRECTIONAL_LIGHTS_NUMBER];
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
 };
 
 struct PointLight {
@@ -66,8 +57,6 @@ struct SpotLight {
 	float quadratic;
 };
 
-
-
 uniform bool             shadows;
 uniform float            farPlane;
 //uniform vec3             lightPos;
@@ -80,16 +69,16 @@ uniform int              pointLightsArraySize;
 uniform int              spotLightsArraySize;
 uniform Material         material;
 //uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
-uniform DirectionalLight directionalLights;
+uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 uniform PointLight       pointLights[POINT_LIGHTS_NUMBER];
 uniform SpotLight        spotLights[SPOT_LIGHTS_NUMBER];
 uniform vec3             viewPosition;
 
 //vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
-vec3 ComputeDirectionalLight(int lightIndex, vec3 normal, vec3 viewDirection);
+vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
-float ComputeDirectionalShadow(int lightIndex, vec4 fragmentPositionLightSpace);
+float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLightSpace);
 float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap);
 
 void main()
@@ -100,8 +89,8 @@ void main()
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	// Compute directional lighting	
 	for (int f = 0; f < directionalLightsArraySize; ++f) {
-		float shadow = ComputeDirectionalShadow(f, fs_in.fragmentPositionLightSpace);
-		vec3 light  = ComputeDirectionalLight(f, normal, viewDirection);
+		float shadow = ComputeDirectionalShadow(directionalLights[f], fs_in.fragmentPositionLightSpace);
+		vec3 light  = ComputeDirectionalLight(directionalLights[f], normal, viewDirection);
 		result += (1.0 - shadow) * light;
 	}
 	// Compute point lights
@@ -134,17 +123,17 @@ void main()
 	fragColor = vec4(result, 1.0);
 }
 
-vec3 ComputeDirectionalLight(int lightIndex, vec3 normal, vec3 viewDirection) {
-	vec3 lightDirection = normalize(-directionalLights.direction[lightIndex]);
+vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {
+	vec3 lightDirection = normalize(-light.direction);
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
 	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// combine results
-	vec3 ambient  = directionalLights.ambient[lightIndex] * material.ambient;
-	vec3 diffuse  = directionalLights.diffuse[lightIndex] * difference * vec3(texture(material.diffuse, fs_in.textureCoords));
-	vec3 specular = directionalLights.specular[lightIndex] * specularComponent * vec3(texture(material.specular, fs_in.textureCoords));
+	vec3 ambient  = light.ambient * material.ambient;
+	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.textureCoords));
+	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.textureCoords));
 
 	return (ambient + diffuse + specular);
 }
@@ -197,7 +186,7 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
     return (ambient + diffuse + specular);
 }
 
-float ComputeDirectionalShadow(int lightIndex, vec4 fragmentPositionLightSpace) {
+float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionLightSpace) {
 	// Perform perspective devide
 	vec3 projectiveCoordinates = fragmentPositionLightSpace.xyz / fragmentPositionLightSpace.w;
 	// Transform to [0.1] range
@@ -209,7 +198,7 @@ float ComputeDirectionalShadow(int lightIndex, vec4 fragmentPositionLightSpace) 
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.normal);
 //	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionLightSpace.xyz);
-	vec3 lightDir = normalize(directionalLights.position[lightIndex] - fs_in.fragmentPosition);
+	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
 	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
