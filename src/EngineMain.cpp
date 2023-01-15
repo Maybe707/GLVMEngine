@@ -135,9 +135,9 @@ int main()
 	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
 	vertexDirectionalLight0.vkVertexId_ = 0;
-	directionalLightComponent0 = { .position = { 10.0f, 7.0f, 1.0f }, .direction = { 2.0f,  -3.5f, .0f},
+	directionalLightComponent0 = { .position = { -10.0f, 7.0f, 1.0f }, .direction = { 2.0f,  -3.5f, .0f},
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
-	transformDirectionalLight0 = { .tPosition = { 10.0f, 7.0f, 1.0f }, .fScale = 0.3f };
+	transformDirectionalLight0 = { .tPosition = { -10.0f, 7.0f, 1.0f }, .fScale = 0.3f };
 
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<vertex, material, SPointLightComponent, transform>(pointLight0);

@@ -19,7 +19,7 @@ out VS_OUT {
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform mat4 lightSpaceMatrix;
+uniform mat4 directionalLightSpaceMatrix;
 
 uniform bool reverseNormals;
 
@@ -37,6 +37,6 @@ void main()
     else
         vs_out.normal = transpose(inverse(mat3(modelMatrix))) * normal;
 	vs_out.textureCoords              = textureCoordinates;
-	vs_out.fragmentPositionLightSpace = lightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+	vs_out.fragmentPositionLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
 	gl_Position                       = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }

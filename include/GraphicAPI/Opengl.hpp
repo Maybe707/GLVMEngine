@@ -50,30 +50,25 @@ namespace GLVM::Core {
 //		unsigned int appropriateLightComponentIndex = 0;
 		const unsigned int SCREEN_WIDTH  = 1920;
 		const unsigned int SCREEN_HEIGHT = 1080;
+		const unsigned int SHADOW_WIDTH  = 1024;
+		const unsigned int SHADOW_HEIGHT = 1024;
 		Shader* coreShaderProgram;
 		Shader* flatShadowMapShaderProgram;
 		Shader* cubeShadowMapShaderProgram;
 		Shader* debugQuadDepth_;
 		GLuint quadVAO_;
 		GLuint quadVBO_;
-		GLuint planeVAO_;
-		GLuint planeVBO_;
-		unsigned int flatShadowMapFBO;
-		std::vector<unsigned int> cubeShadowMapFBOcontainer;
-		unsigned int cubeShadowMapFBO;
-		unsigned int flatShadowMapTexture;
-		std::vector<unsigned int> cubeShadowMapTextureContainer;
-//		std::vector<unsigned int> sampledPointLightIndicesOfEntityIDcontainer; ///< We need indices of entity IDs in IDs container for sampling cube shadow maps in core shader.
-		std::vector<unsigned int> sampledPointLightEntityIDcontainer;
-		unsigned int cubeShadowMapTexture;
-		const unsigned int SHADOW_WIDTH  = 1024;
-		const unsigned int SHADOW_HEIGHT = 1024;
+		unsigned int directionalLightFlatShadowMapFBO;
+		std::vector<unsigned int> pointLightCubeShadowMapFBOcontainer;
+		std::vector<unsigned int> spotLightFlatShadowMapFBOContainer;
+		unsigned int directionalLightFlatShadowMapTexture;
+		std::vector<unsigned int> pointLightCubeShadowMapTextureContainer;
+		std::vector<unsigned int> spotLightFlatShadowMapTextureContainer;
+		std::vector<unsigned int> sampledPointLightEntityIDcontainer; ///< Sampled depend on distance from light source to object entity IDs for poit light shadow map.
+		float borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; ///< Border color for fix shadow issue in flat shadow map in long range.
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
-		unsigned int woodTexture;
-		vec3 viewPosition{1.0f};
-		mat4 lightSpaceMatrix{1.0f};
-		vec3 positionVectorPointLight{0.0f, 3.3f, 2.7f};
+		mat4 directionalLightSpaceMatrix{1.0f};
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
 		float nearPlaneCubeShadowMap = 1.0f;
@@ -95,12 +90,13 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
-		void InitializeFlatShadowMap();
-		void InitilizeCubeShadowMap();
+		void InitializeShadowMapData(unsigned int& fbo_, unsigned int& texture_, GLenum textureTarget_,
+									 GLint clampType_, GLenum textureUnit_);
+		void AllocateTexture(GLenum textureTarget_, GLint clampType_ );
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		void EvaluateFlatShadowMap();
+		void EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix);
 		void EvaluateCubeShadowMap();
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
