@@ -65,10 +65,13 @@ namespace GLVM::Core {
 		std::vector<unsigned int> pointLightCubeShadowMapTextureContainer;
 		std::vector<unsigned int> spotLightFlatShadowMapTextureContainer;
 		std::vector<unsigned int> sampledPointLightEntityIDcontainer; ///< Sampled depend on distance from light source to object entity IDs for poit light shadow map.
+		std::vector<unsigned int> sampledSpotLightEntityIDcontainer;
 		float borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; ///< Border color for fix shadow issue in flat shadow map in long range.
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
 		mat4 directionalLightSpaceMatrix{1.0f};
+		mat4 spotLightSpaceMatrixContainer[8];
+		unsigned int spotLightComponentContainerSize;
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
 		float nearPlaneCubeShadowMap = 1.0f;

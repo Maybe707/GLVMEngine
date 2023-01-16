@@ -6,13 +6,17 @@ layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 textureCoordinates;
 
+#define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
+
 out vec2 textureCoords;
+out int spotLightSpaceMatrixArraySize;
 
 out VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
-	vec4 fragmentPositionLightSpace;
+	vec4 fragmentPositionPointLightSpace;
+	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 } vs_out;
 
 //uniform mat4 aRotate_Matrix;
@@ -20,6 +24,8 @@ uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
 uniform mat4 directionalLightSpaceMatrix;
+uniform mat4 spotLightSpaceMatrixContainer[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+uniform int spotLightSpaceMatrixContainerSize;
 
 uniform bool reverseNormals;
 
@@ -37,6 +43,10 @@ void main()
     else
         vs_out.normal = transpose(inverse(mat3(modelMatrix))) * normal;
 	vs_out.textureCoords              = textureCoordinates;
-	vs_out.fragmentPositionLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+	vs_out.fragmentPositionPointLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+	for (int j = 0; j < spotLightSpaceMatrixContainerSize; ++j) 
+		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * vec4(vs_out.fragmentPosition, 1.0);
+
+	spotLightSpaceMatrixArraySize     = spotLightSpaceMatrixContainerSize;
 	gl_Position                       = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }

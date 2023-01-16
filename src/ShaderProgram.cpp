@@ -44,6 +44,11 @@ void Shader::SetMat4(const std::string &name, mat4 &mat) const
 	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
 }
 
+void Shader::SetMat4(const std::string &name, unsigned int matrixNumber, mat4 &mat) const
+{
+	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 void Shader::SetMat4(const std::string &name, glm::mat4 &mat) const
 {
 	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
