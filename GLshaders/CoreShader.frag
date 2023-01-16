@@ -150,7 +150,7 @@ void main()
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {
-	vec3 lightDirection = normalize(-light.direction);
+	vec3 lightDirection = normalize(light.direction);
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading

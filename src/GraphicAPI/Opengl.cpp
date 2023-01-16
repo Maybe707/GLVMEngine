@@ -138,9 +138,9 @@ namespace GLVM::Core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//		vec3 positionVectorDirectionalLight = directionalLightComponent.position;
+		vec3 positionVectorDirectionalLight = directionalLightComponent.position;
 		vec3 directionVectorDirectionalLight = directionalLightComponent.direction;
-		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
+//		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
 		mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,

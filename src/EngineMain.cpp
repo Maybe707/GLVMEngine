@@ -90,7 +90,7 @@ int main()
     vertex   & vertexWitch    = ComponentManager->GetComponent<vertex>(uiWitch);
 	materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch = { .tPosition = { 5.0f, 1.0f, 4.0f }, .fScale = 1.5f };
+	transformWitch = { .tPosition = { 0.5f, 1.0f, 0.5f }, .fScale = 0.5f };
     TextureManager->BindTexture(uiWitch, materialWitch.diffuseTextureID_);
     vertexWitch.vkVertexId_ = 0;
 	
@@ -101,7 +101,7 @@ int main()
 	transform& transformWitch2 = ComponentManager->GetComponent<transform>(uiWitch2);
 	materialWitch2 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch2 = { .tPosition = { 10.5f, 0.5f, 1.5f }, .fScale = 1.0f };
+	transformWitch2 = { .tPosition = { 5.5f, 0.5f, 1.5f }, .fScale = 1.0f };
 	vertexWitch2.vkVertexId_ = 0;
     TextureManager->BindTexture(uiWitch2, materialWitch2.diffuseTextureID_);
 
@@ -112,7 +112,7 @@ int main()
 	transform& transformWitch3 = ComponentManager->GetComponent<transform>(uiWitch3);
 	materialWitch3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformWitch3 = { .tPosition = { 8.7f, 2.5f, 3.0f }, .fScale = 1.0f };
+	transformWitch3 = { .tPosition = { 3.7f, 2.5f, 3.0f }, .fScale = 1.0f };
 	vertexWitch3.vkVertexId_ = 1;
     TextureManager->BindTexture(uiWitch3, materialWitch3.diffuseTextureID_);
 	
@@ -135,7 +135,7 @@ int main()
 	materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0.diffuseTextureID_);
 	vertexDirectionalLight0.vkVertexId_ = 0;
-	directionalLightComponent0 = { .position = { 2.0f, 5.0f, -8.0f }, .direction = { 1.0f, -2.5f, 0.0f},
+	directionalLightComponent0 = { .position = { 2.0f, 5.0f, -8.0f }, .direction = { 0.0f, 1.5f, -1.0f},
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f}, .specular = {1.0f, 1.0f, 1.0f}};
 	transformDirectionalLight0 = { .tPosition = { 2.0f, 5.0f, -8.0f }, .fScale = 0.3f };
 
