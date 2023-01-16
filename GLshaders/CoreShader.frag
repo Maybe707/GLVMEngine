@@ -1,6 +1,6 @@
 #version 410 core
 out vec4 fragColor;
-out int spotLightSpaceMatrixArraySize;
+flat in int spotLightSpaceMatrixArraySize;
 
 #define DIRECTIONAL_LIGHTS_NUMBER                          32
 #define POINT_LIGHTS_NUMBER                                32
@@ -9,13 +9,13 @@ out int spotLightSpaceMatrixArraySize;
 #define SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE              8
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE             8
 #define POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
-#define SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE  32
+#define SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE  8
 
 in VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
-	vec4 fragmentPositionPointLightSpace;
+	vec4 fragmentPositionDirectionalLightSpace;
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 } fs_in;
 
@@ -65,6 +65,7 @@ struct SpotLight {
 uniform bool             shadows;
 uniform float            farPlane;
 uniform sampler2D        directionalLightFlatShadowMap;
+uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE];
 uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE];
 uniform int              pointLightCubeShadowMapArraySize;
 uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE];
@@ -81,7 +82,7 @@ uniform vec3             viewPosition;
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
-float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionPointLightSpace);
+float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace);
 float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap);
 float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sampler2D flatShadowMap);
 
@@ -93,7 +94,7 @@ void main()
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	// Compute directional lighting	
 	for (int f = 0; f < directionalLightsArraySize; ++f) {
-		float shadow = ComputeDirectionalShadow(directionalLights[f], fs_in.fragmentPositionPointLightSpace);
+		float shadow = ComputeDirectionalShadow(directionalLights[f], fs_in.fragmentPositionDirectionalLightSpace);
 		vec3 light  = ComputeDirectionalLight(directionalLights[f], normal, viewDirection);
 		result += (1.0 - shadow) * light;
 	}
@@ -117,12 +118,28 @@ void main()
 			shadow = 0.0;
 	}
 	// Compute spot light
-	for (int j = 0; j < spotLightSpaceMatrixArraySize; ++j) {
+	int spotLightIndicesCounter    = 0;
+	int spotLightIndexAccumulator  = -1;
+	int spotLightArraySize = spotLightSpaceMatrixArraySize;
+	if(spotLightArraySize > 0)
+		spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
+
+	for (int j = 0; j < spotLightArraySize; ++j) {
+		// vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
+		// float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
+		// if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightArraySize) {
+		// 	shadow = ComputeSpotShadow(spotLights[j], fs_in.fragmentPositionSpotLightSpace[j],
+		// 								spotLightFlatShadowMapArray[spotLightIndicesCounter]);
+		// 	++spotLightIndicesCounter;
+		// 	spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
+		// }
+		// vec3 light = ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
+		// result += (1.0 - shadow) * light;
+		// if(shadow > 0.0)
+		// 	shadow = 0.0;
+		// result += light;
+
 		result += ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
-		vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
-		float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
-		// if(spotLights[j] > theta)
-		// 	shadow = ComputeSpotShadow(spotLights[j], fragmentPositionSpotLightSpace, 
 	}
 
 	// Compute shadow
@@ -195,9 +212,9 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
     return (ambient + diffuse + specular);
 }
 
-float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionPointLightSpace) {
+float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace) {
 	// Perform perspective devide
-	vec3 projectiveCoordinates = fragmentPositionPointLightSpace.xyz / fragmentPositionPointLightSpace.w;
+	vec3 projectiveCoordinates = fragmentPositionDirectionalLightSpace.xyz / fragmentPositionDirectionalLightSpace.w;
 	// Transform to [0.1] range
 	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
@@ -208,7 +225,7 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionPoin
 	vec3 normal = normalize(fs_in.normal);
 //	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionPointLightSpace.xyz);
 	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
-	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+	float bias                 = max(0.01 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
 	// PCF
@@ -304,7 +321,7 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	// Transform to [0.1] range
 	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
-	float closestDepth         = texture(directionalLightFlatShadowMap, projectiveCoordinates.xy).r;
+	float closestDepth         = texture(flatShadowMap, projectiveCoordinates.xy).r;
 	// Get depth of current fragment from light's perspective
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
@@ -316,12 +333,12 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 
 	// PCF
 	float shadow = 0.0;
-	vec2 texelSize = 1.0 / textureSize(directionalLightFlatShadowMap, 0);
+	vec2 texelSize = 1.0 / textureSize(flatShadowMap, 0);
 	for (int x = -1; x <= 1; ++x)
 	{
 		for (int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = texture(directionalLightFlatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
+			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
 			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
 		}
 	}

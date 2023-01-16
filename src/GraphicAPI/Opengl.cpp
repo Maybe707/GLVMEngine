@@ -52,6 +52,9 @@ namespace GLVM::Core
         glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
+		debugQuadDepth_->Use();
+		debugQuadDepth_->SetInt("depthMap", 30);
+		
 		coreShaderProgram->Use();
 		coreShaderProgram->SetInt("directionalLightFlatShadowMap", 24);
 		coreShaderProgram->SetInt("material.diffuse", 25);
@@ -64,7 +67,7 @@ namespace GLVM::Core
 			pointLightCubeShadowMapFBOcontainer.emplace_back();
 			pointLightCubeShadowMapTextureContainer.emplace_back();
 			InitializeShadowMapData(pointLightCubeShadowMapFBOcontainer[i], pointLightCubeShadowMapTextureContainer[i],
-									GL_TEXTURE_CUBE_MAP, GL_CLAMP_TO_EDGE, GL_TEXTURE0 + i);
+									GL_TEXTURE_CUBE_MAP, GL_CLAMP_TO_EDGE);
 		}
 		int pointLightArrayUniformIndices[pointLightSourcesNumber];
 		for ( int i = 0; i < pointLightSourcesNumber; ++i )
@@ -73,22 +76,26 @@ namespace GLVM::Core
 		coreShaderProgram->Use();
 		coreShaderProgram->SetInt("pointLightCubeShadowMapArray", pointLightSourcesNumber, pointLightArrayUniformIndices);
 
- 		unsigned int spottLightSourcesNumber = 8;
+ 		unsigned int spotLightSourcesNumber = 8;
 
-		for ( int i = 0; i < spottLightSourcesNumber; ++i ) {
+		for ( int i = 0; i < spotLightSourcesNumber; ++i ) {
 			spotLightFlatShadowMapFBOContainer.emplace_back();
 			spotLightFlatShadowMapTextureContainer.emplace_back();
 			InitializeShadowMapData(spotLightFlatShadowMapFBOContainer[i], spotLightFlatShadowMapTextureContainer[i],
-									GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_TEXTURE16 + i);
+									GL_TEXTURE_2D, GL_CLAMP_TO_BORDER);
 		}
-		int spotLightArrayUniformIndices[spottLightSourcesNumber];
-		for ( int i = 0; i < spottLightSourcesNumber; ++i )
-			spotLightArrayUniformIndices[i] = i;
+		unsigned int spotLightCouner = 0;
+		int spotLightArrayUniformIndices[spotLightSourcesNumber];
+		for ( int i = 16; i < (pointLightSourcesNumber + spotLightSourcesNumber); ++i ) {
+			spotLightArrayUniformIndices[spotLightCouner] = i;
+			++spotLightCouner;
+		}
 
-		coreShaderProgram->SetInt("spotLightFlatShadowMapArray", spottLightSourcesNumber, spotLightArrayUniformIndices);
+		coreShaderProgram->Use();
+		coreShaderProgram->SetInt("spotLightFlatShadowMapArray", spotLightSourcesNumber, spotLightArrayUniformIndices);
 
 		InitializeShadowMapData(directionalLightFlatShadowMapFBO, directionalLightFlatShadowMapTexture,
-								GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, GL_TEXTURE24);
+								GL_TEXTURE_2D, GL_CLAMP_TO_BORDER);
 		
 //		InitializeFlatShadowMap();
 
@@ -119,12 +126,21 @@ namespace GLVM::Core
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<Core::SDirectionalLightComponent>(*pComponent_Manager);
 		unsigned int uiDirectionalLightsEntity = (*pEntityContainerRefDirectionalLight)[0];
 		Core::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<Core::SDirectionalLightComponent>(uiDirectionalLightsEntity);
+
+		/// Player
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
+
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<Core::SPointLightComponent>(*pComponent_Manager);
 		
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		vec3 positionVectorDirectionalLight = directionalLightComponent.position;
+//		vec3 positionVectorDirectionalLight = directionalLightComponent.position;
 		vec3 directionVectorDirectionalLight = directionalLightComponent.direction;
+		vec3 positionVectorDirectionalLight = playerTransformComponent.tPosition;
 		vec3 upVectorDirectionalLight        = { 0.0f, 1.0f, 0.0f };
 		mat4 projectionMatrixDirectionalLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		mat4 viewMatrixDirectionalLight = LookAtMain(positionVectorDirectionalLight,
@@ -133,25 +149,49 @@ namespace GLVM::Core
 		directionalLightSpaceMatrix = viewMatrixDirectionalLight * projectionMatrixDirectionalLight;
 		// Render scene from light's point of view
 		flatShadowMapShaderProgram->Use();
-		EvaluateFlatShadowMap("lightSpaceMatrix", directionalLightSpaceMatrix);
+		EvaluateFlatShadowMap("lightSpaceMatrix", directionalLightSpaceMatrix, directionalLightFlatShadowMapFBO, GL_TEXTURE0);
 
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+		std::string leftString = "spotLightFlatShadowMapComponentIndices[";
+		unsigned int appropriateLightComponentIndex = 0;
 		spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 		for(int x = 0; x < spotLightComponentContainerSize; ++x) {
-			unsigned int uiSpotLightEntity = (*pEntityContainerRefDirectionalLight)[x];
+			unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
 			ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
 			vec3 positionVectorSpotLight  = spotLightComponent.position;
 			vec3 directionVectorSpotLight = spotLightComponent.direction;
 			vec3 upVectorSpotLight        = { 0.0f, 1.0f, 0.0f };
-			mat4 projectionMatrixSpotLight = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+//			mat4 projectionMatrixSpotLight = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+			mat4 projectionMatrixSpotLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 			mat4 viewMatrixSpotLight = LookAtMain(positionVectorSpotLight,
 														 directionVectorSpotLight,
 														 upVectorSpotLight);
 
 			mat4 spotLightSpaceMatrix = viewMatrixSpotLight * projectionMatrixSpotLight;
-			EvaluateFlatShadowMap("lightSpaceMatrix", spotLightSpaceMatrix);
-			spotLightSpaceMatrixContainer[x] = spotLightSpaceMatrix;
+			flatShadowMapShaderProgram->Use();
+			EvaluateFlatShadowMap("lightSpaceMatrix", spotLightSpaceMatrix, spotLightFlatShadowMapFBOContainer[appropriateLightComponentIndex], GL_TEXTURE10);
+			spotLightSpaceMatrixContainer[appropriateLightComponentIndex] = spotLightSpaceMatrix;
+
+			coreShaderProgram->Use();
+			coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, appropriateLightComponentIndex, "]"), x);
+				++appropriateLightComponentIndex;
 		}
+
+		coreShaderProgram->Use();
+		coreShaderProgram->SetMat4("spotLightSpaceMatrixContainer", appropriateLightComponentIndex, spotLightSpaceMatrixContainer[0]);
+		coreShaderProgram->SetInt("spotLightSpaceMatrixContainerSize", appropriateLightComponentIndex);
+		spotLightComponentContainerSize = appropriateLightComponentIndex;
+		
+// 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+//         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		
+// 		debugQuadDepth_->Use();
+// 		debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
+// 		debugQuadDepth_->SetFloat("fatPlane", farPlaneFlatShadowMap);
+// 		glActiveTexture(GL_TEXTURE30);
+// 		glBindTexture(GL_TEXTURE_2D, spotLightFlatShadowMapFBOContainer[0]);
+// //		glBindTexture(GL_TEXTURE_2D, directionalLightFlatShadowMapTexture);
+// 		RenderQuad();
 		
 		EvaluateCubeShadowMap();		
 		coreShaderProgram->Use();
@@ -168,10 +208,10 @@ namespace GLVM::Core
 	}
 
 	void COpenglRenderer::InitializeShadowMapData(unsigned int& fbo_, unsigned int& texture_, GLenum textureTarget_,
-												  GLint clampType_, GLenum textureUnit_) {
+												  GLint clampType_) {
 				pGLGen_Framebuffers(1, &fbo_);
 				glGenTextures(1, &texture_);
-				glActiveTexture(textureUnit_);
+				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(textureTarget_, texture_);
 				AllocateTexture(textureTarget_, clampType_);
 				
@@ -211,13 +251,17 @@ namespace GLVM::Core
 		}
 	}
 	
-	void COpenglRenderer::EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix) {
+	void COpenglRenderer::EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix,
+		                                        unsigned int& fbo_, GLenum textureUnit_) {
 		flatShadowMapShaderProgram->SetMat4(uniformLayout, lightSpaceMatrix);
 		// Render to depth map
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-		pGLBind_Framebuffer(GL_FRAMEBUFFER, directionalLightFlatShadowMapFBO);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, fbo_);
 		glClear(GL_DEPTH_BUFFER_BIT);
+		glActiveTexture(textureUnit_);
+//		glCullFace(GL_FRONT);
 		RenderScene(flatShadowMapShaderProgram);
+//		glCullFace(GL_BACK);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 //		}
 	}

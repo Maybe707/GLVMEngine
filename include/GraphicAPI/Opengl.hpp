@@ -94,12 +94,12 @@ namespace GLVM::Core {
 
 		void draw() override;
 		void InitializeShadowMapData(unsigned int& fbo_, unsigned int& texture_, GLenum textureTarget_,
-									 GLint clampType_, GLenum textureUnit_);
+									 GLint clampType_);
 		void AllocateTexture(GLenum textureTarget_, GLint clampType_ );
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		void EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix);
+		void EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix, unsigned int& fbo_, GLenum textureUnit_);
 		void EvaluateCubeShadowMap();
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();

@@ -93,14 +93,14 @@ namespace GLVM::ECS
                 default:
                     break;
                 }
-				Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
-				unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
-				for(int x = 0; x < spotLightComponentContainerSize; ++x) {
-					unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
-					ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
-					spotLightComponent.direction = rTransformComponent.tForward;
-					spotLightComponent.position  = rTransformComponent.tPosition;
-				}
+				// Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
+				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
+				// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
+				// 	ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
+				// 	spotLightComponent.direction = rTransformComponent.tForward;
+				// 	spotLightComponent.position  = rTransformComponent.tPosition;
+				// }
             }
         }
 

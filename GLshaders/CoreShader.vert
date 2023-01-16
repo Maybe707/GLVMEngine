@@ -9,13 +9,13 @@ layout (location = 2) in vec2 textureCoordinates;
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
 
 out vec2 textureCoords;
-out int spotLightSpaceMatrixArraySize;
+flat out int spotLightSpaceMatrixArraySize;
 
 out VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
-	vec4 fragmentPositionPointLightSpace;
+	vec4 fragmentPositionDirectionalLightSpace;
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 } vs_out;
 
@@ -43,7 +43,7 @@ void main()
     else
         vs_out.normal = transpose(inverse(mat3(modelMatrix))) * normal;
 	vs_out.textureCoords              = textureCoordinates;
-	vs_out.fragmentPositionPointLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+	vs_out.fragmentPositionDirectionalLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
 	for (int j = 0; j < spotLightSpaceMatrixContainerSize; ++j) 
 		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * vec4(vs_out.fragmentPosition, 1.0);
 
