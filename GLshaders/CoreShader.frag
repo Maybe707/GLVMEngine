@@ -72,6 +72,7 @@ uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHT_CUB
 uniform samplerCube      pointLightCubeShadowMapArray[POINT_LIGHT_CUBE_SHADOW_MAP_ARRAY_SIZE];
 uniform int              directionalLightsArraySize;
 uniform int              pointLightsArraySize;
+//uniform int              spotLightArraySize;
 uniform Material         material;
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 uniform PointLight       pointLights[POINT_LIGHTS_NUMBER];
@@ -120,26 +121,27 @@ void main()
 	// Compute spot light
 	int spotLightIndicesCounter    = 0;
 	int spotLightIndexAccumulator  = -1;
-	int spotLightArraySize = spotLightSpaceMatrixArraySize;
-	if(spotLightArraySize > 0)
+//	int spotLightArraySize = spotLightSpaceMatrixArraySize;
+//	int spotLightArraySize = 1;
+	if(spotLightSpaceMatrixArraySize > 0)
 		spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
 
-	for (int j = 0; j < spotLightArraySize; ++j) {
-		// vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
-		// float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
-		// if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightArraySize) {
-		// 	shadow = ComputeSpotShadow(spotLights[j], fs_in.fragmentPositionSpotLightSpace[j],
-		// 								spotLightFlatShadowMapArray[spotLightIndicesCounter]);
-		// 	++spotLightIndicesCounter;
-		// 	spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
-		// }
-		// vec3 light = ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
-		// result += (1.0 - shadow) * light;
-		// if(shadow > 0.0)
-		// 	shadow = 0.0;
-		// result += light;
+	for (int j = 0; j < spotLightSpaceMatrixArraySize; ++j) {
+		vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
+		float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
+		if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightSpaceMatrixArraySize) {
+			shadow = ComputeSpotShadow(spotLights[j], fs_in.fragmentPositionSpotLightSpace[j],
+										spotLightFlatShadowMapArray[spotLightIndicesCounter]);
+			
+			++spotLightIndicesCounter;
+			spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
+		}
+		vec3 light = ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
 
-		result += ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
+//		result += ComputeSpotLight(spotLights[j], normal, fs_in.fragmentPosition, viewDirection);
 	}
 
 	// Compute shadow
@@ -147,6 +149,7 @@ void main()
 	// result = result * (1.0 - shadow);
 	
 	fragColor = vec4(result, 1.0);
+//	fragColor = vec4(spotLightArraySize, spotLightArraySize ,spotLightArraySize, 1.0);
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {

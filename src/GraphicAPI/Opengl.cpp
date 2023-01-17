@@ -169,12 +169,13 @@ namespace GLVM::Core
 
 			mat4 spotLightSpaceMatrix = viewMatrixSpotLight * projectionMatrixSpotLight;
 			flatShadowMapShaderProgram->Use();
-			EvaluateFlatShadowMap("lightSpaceMatrix", spotLightSpaceMatrix, spotLightFlatShadowMapFBOContainer[appropriateLightComponentIndex], GL_TEXTURE10);
+			EvaluateFlatShadowMap("lightSpaceMatrix", spotLightSpaceMatrix, spotLightFlatShadowMapFBOContainer[appropriateLightComponentIndex], GL_TEXTURE0);
 			spotLightSpaceMatrixContainer[appropriateLightComponentIndex] = spotLightSpaceMatrix;
 
+			sampledSpotLightEntityIDcontainer.push_back(x);
 			coreShaderProgram->Use();
 			coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings(leftString, appropriateLightComponentIndex, "]"), x);
-				++appropriateLightComponentIndex;
+			++appropriateLightComponentIndex;
 		}
 
 		coreShaderProgram->Use();
@@ -340,6 +341,7 @@ namespace GLVM::Core
 		
 //		viewPosition = playerViewComponent.Position;
 		vec3 viewPosition = playerTransformComponent.tPosition;
+		bool reverseNormalsFlag = false;
 		
 		// Render scene as normal
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -348,12 +350,14 @@ namespace GLVM::Core
 		ComputeProjectionMatrix(coreShaderProgram);
 		ComputeViewMatrix(coreShaderProgram, playerTransformComponent, playerViewComponent);
 		coreShaderProgram->SetInt("shadows", shadows);
+		coreShaderProgram->SetBool("reverseNormals", reverseNormalsFlag);
 		coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
 		coreShaderProgram->SetMat4("directionalLightSpaceMatrix", directionalLightSpaceMatrix);
 		coreShaderProgram->SetInt("spotLightSpaceMatrixContainerSize", spotLightComponentContainerSize);
 		coreShaderProgram->SetMat4("spotLightSpaceMatrixContainer", spotLightComponentContainerSize,
 								   spotLightSpaceMatrixContainer[0]);
+//		coreShaderProgram->SetInt("spotLightArraySize", spotLightComponentContainerSize);
 
 		glActiveTexture(GL_TEXTURE24);
 		glBindTexture(GL_TEXTURE_2D, directionalLightFlatShadowMapTexture);
