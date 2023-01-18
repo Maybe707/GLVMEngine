@@ -184,18 +184,22 @@ namespace GLVM::Core
 		coreShaderProgram->SetMat4("spotLightSpaceMatrixContainer", appropriateLightComponentIndex, spotLightSpaceMatrixContainer[0]);
 		coreShaderProgram->SetInt("spotLightSpaceMatrixContainerSize", appropriateLightComponentIndex);
 		spotLightComponentContainerSize = appropriateLightComponentIndex;
+
+		/*!
+		\brief DEBUG
+		====================================================================
+		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		
-// 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-//         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-// 		debugQuadDepth_->Use();
-// 		debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
-// 		debugQuadDepth_->SetFloat("fatPlane", farPlaneFlatShadowMap);
-// 		glActiveTexture(GL_TEXTURE30);
-// 		glBindTexture(GL_TEXTURE_2D, spotLightFlatShadowMapFBOContainer[0]);
-// //		glBindTexture(GL_TEXTURE_2D, directionalLightFlatShadowMapTexture);
-// 		RenderQuad();
-		
+		debugQuadDepth_->Use();
+		debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
+		debugQuadDepth_->SetFloat("fatPlane", farPlaneFlatShadowMap);
+		glActiveTexture(GL_TEXTURE30);
+		glBindTexture(GL_TEXTURE_2D, spotLightFlatShadowMapFBOContainer[0]);
+		RenderQuad();
+		====================================================================
+        */
+
 		EvaluateCubeShadowMap();		
 		coreShaderProgram->Use();
 		
