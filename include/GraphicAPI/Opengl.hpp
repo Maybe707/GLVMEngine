@@ -7,6 +7,8 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
+#include "Components/SpotLightComponent.hpp"
 #include "Constants.hpp"
 #include "Event.hpp"
 #include "GLPointer.h"
@@ -99,13 +101,22 @@ namespace GLVM::Core {
 		~COpenglRenderer();
 
 		void draw() override;
+		void AllocateTextureMemory(std::vector<unsigned int>& shadowMapFBOcontainer,
+								   std::vector<unsigned int>& shadowMapTextureContainer,
+								   GLenum textureTarget, GLint clampType,
+								   unsigned int lightSourceNumber,
+			                       std::string shadowMapArrayType,
+								   unsigned int textureUnitBaseIndex);
 		void InitializeShadowMapData(unsigned int& fbo_, unsigned int& texture_, GLenum textureTarget_,
 									 GLint clampType_);
 		void AllocateTexture(GLenum textureTarget_, GLint clampType_ );
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		void EvaluateFlatShadowMap(std::string uniformLayout, mat4 lightSpaceMatrix, unsigned int& fbo_, GLenum textureUnit_);
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, Core::SDirectionalLightComponent& directionalLightComponent,
+			                       mat4 projectionMatrixLight);
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::SSpotLightComponent& directionalLightComponent,
+								   mat4 projectionMatrixLight);
 		void EvaluateCubeShadowMap();
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
