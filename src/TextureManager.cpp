@@ -37,7 +37,7 @@ namespace GLVM::ECS
     
     void CTextureManager::SetTextureVector(std::vector<CTexture> _textureVector) {
         textureVector_ = _textureVector;
-		for ( int i = 0; i < textureVector_.size(); ++i ) {
+		for ( unsigned int i = 0; i < textureVector_.size(); ++i ) {
 			LoadTextureData(textureVector_[i]);
 		}
     }
@@ -63,7 +63,7 @@ namespace GLVM::ECS
     std::vector<CTexture>& CTextureManager::GetTextureVector() { return textureVector_; }
     void CTextureManager::UnbindTexture(ECS::SMaterialComponent _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
-        for (int i = 0; i < textureVector.size(); ++i) {
+        for (unsigned int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)
                 textureVector.erase(textureVector.begin() + i);
             else

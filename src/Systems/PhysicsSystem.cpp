@@ -74,7 +74,6 @@ namespace GLVM::ECS
     }
     
     void CPhysicsSystem::Repel(STransformComponent& _transform_Component,
-                                 SMoveComponent& _move_Component,
                                  float& _fDelta_Time,
                                  CViewComponent& _view_Component,
                                  Core::CEvent& _event)
@@ -116,7 +115,7 @@ namespace GLVM::ECS
     /****************************!!!!!!!!!!!!!!! RENAME GRAVITY METHOD !!!!!!!!!!!!!!!!*****************/
     /* SEARCH GRAVITY LOGIC IN MOVEMENT SYSTEM */
     
-    void CPhysicsSystem::Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2)
+    void CPhysicsSystem::Gravity()
     {
         // _transform_Component1.tPosition[1] = _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 + _transform_Component1.fScale / 2;
         // fAcceleration_of_Gravity_ = 0.0f;
@@ -146,9 +145,7 @@ namespace GLVM::ECS
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
             ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*pComponent_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refRigidBody =
             ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager);
-        unsigned int uiVector_RigidBody_Size = pEntity_Container_refRigidBody->GetSize();
             
         for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
         {
@@ -157,16 +154,13 @@ namespace GLVM::ECS
                 if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_
                     && pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
                 {
-                    unsigned int uiCollider = pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).uiGround_Collider_;
-                    Gravity(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
-                            pComponent_Manager->GetComponent<ECS::STransformComponent>(uiCollider));
+                    Gravity();
                     pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
                 if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_
                     && pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
                 {
                     Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
-                          pComponent_Manager->GetComponent<ECS::SMoveComponent>(uiEntity_refCollider),
                           fDelta_Time_,
                           pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refCollider),
                           g_eEvent);

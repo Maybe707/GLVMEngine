@@ -15,7 +15,7 @@ inline char* ReverseString( char* string, unsigned int size ) {
     char element0;
 	char element1;
 
-	for ( int i = 0; i < size / 2; ++i) {
+	for ( unsigned int i = 0; i < size / 2; ++i) {
 		element0 = string[i];
 		element1 = string[size - i - 1];
 

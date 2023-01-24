@@ -27,12 +27,11 @@ namespace GLVM::ECS
         ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
         
         float cameraSpeed = 5.5f * _dOffset;            
-        int counter = 0;
 
         if(fProjectile_Accumulator_ > 0)
             fProjectile_Accumulator_ -= cameraSpeed;
 
-        for(int i = 0; i < u_iVector_Move_Size; ++i) {
+        for(unsigned int i = 0; i < u_iVector_Move_Size; ++i) {
             for(int n = 0; n < 6; ++n) {
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 
@@ -51,20 +50,16 @@ namespace GLVM::ECS
             GetInnerIDsContainer<CProjectileComponent>(*pComponent_Manager);
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
-        for(int x = 0; x < uiVector_Projectile_Size; ++x) {
+        for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
             ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
             rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.2f;
         }
 
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refTexture =
-            ECS::GetInnerIDsContainer<ECS::SMaterialComponent>(*pComponent_Manager);
-        unsigned int uiVector_Texture_Size = pEntity_Container_refTexture->GetSize();
-
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
 
         
-        for(int i = 0; i < uiVector_Projectile_Size; ++i) {
+        for(unsigned int i = 0; i < uiVector_Projectile_Size; ++i) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
             if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ ||

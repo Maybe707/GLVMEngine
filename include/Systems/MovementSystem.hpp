@@ -46,8 +46,7 @@ namespace GLVM::ECS
                               Core::EEvents _event1);
         void DiscardOpposite(Core::CStack& _input_Stack);
         Vector<float, 3> CalculateVectorRL(ECS::CViewComponent& _view_Component);
-        Vector<float, 3> CalculateVectorFB(SMoveComponent& _move_Component,
-                                           ECS::CViewComponent& _view_Component,
+        Vector<float, 3> CalculateVectorFB(ECS::CViewComponent& _view_Component,
                                            Core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
                                            ECS::CViewComponent& _view_Component,

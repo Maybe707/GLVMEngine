@@ -52,9 +52,9 @@ namespace GLVM::Core
     }
     
     void CWaveFrontObjParser::ParseFile() {
-        unsigned int uiCoordinateVerticesIndex = 0;
-        unsigned int uiTextureVerticesIndex = 0;
-        unsigned int uiFacesIndex = 0;
+        // unsigned int uiCoordinateVerticesIndex = 0;
+        // unsigned int uiTextureVerticesIndex = 0;
+        // unsigned int uiFacesIndex = 0;
         while(pWavefrontObjFileData[uiCounter] != '\0') {
 
         // static auto startTime = std::chrono::high_resolution_clock::now();
@@ -67,23 +67,23 @@ namespace GLVM::Core
             if (line[0] == "v") {
                 SVertex vertex = ParseVertices(line);
                 coordinateVertices_.Push(vertex);
-                ++uiCoordinateVerticesIndex;
+//                ++uiCoordinateVerticesIndex;
             }
             if (line[0] == "vt") {
                 SVertex vertex = ParseVertices(line);
                 textureVertices_.Push(vertex);
-                ++uiTextureVerticesIndex;
+//                ++uiTextureVerticesIndex;
             }
 			if (line[0] == "vn") {
                 SVertex vertex = ParseVertices(line);
                 normals_.Push(vertex);
-                ++uiTextureVerticesIndex;
+//                ++uiTextureVerticesIndex;
             }
             if (line[0] == "f") {
                 SFace face = ParseFaces(line);
                 faces_.Push(face);
                                 
-                ++uiFacesIndex;
+//                ++uiFacesIndex;
             }
         }
     }
@@ -120,7 +120,7 @@ namespace GLVM::Core
         unsigned int uiVertexIndex = 0;
 
         unsigned int uiWordsContainerSize = _wordsContainer.GetSize();
-        for (int i = 1; i < uiWordsContainerSize; ++i) {
+        for (unsigned int i = 1; i < uiWordsContainerSize; ++i) {
             float floatNumber = ParseFloating(_wordsContainer[i]);
             vertex[uiVertexIndex++] = floatNumber;
         }
@@ -135,7 +135,7 @@ namespace GLVM::Core
         
         unsigned int uiWordsContainerSize = _wordsContainer.GetSize();
 
-        for (int i = 1; i < uiWordsContainerSize; ++i) {
+        for (unsigned int i = 1; i < uiWordsContainerSize; ++i) {
             unsigned int counter = 0;
             wordsInnerContainer = Split(_wordsContainer[i].GetVectorContainer(), '/', '\0', counter);
 
@@ -160,7 +160,7 @@ namespace GLVM::Core
         bool negateFlag = false;
 
         unsigned int baseContainerSize = baseContainer.GetSize();
-        for (int i = 0; i < baseContainerSize; ++i) {
+        for (unsigned int i = 0; i < baseContainerSize; ++i) {
             if (negateFlag && i == 0)
                 continue;
             else if (baseContainer[i] == -5 && i == 0)
@@ -189,7 +189,7 @@ namespace GLVM::Core
         if (baseContainer[0] == -3)
             negateFlag = true;
 
-        for (int i = 0; i < baseContainerSize; ++i) {
+        for (unsigned int i = 0; i < baseContainerSize; ++i) {
             if (negateFlag && i == 0)
                 continue;
             else if (baseContainer[i] == -5 && i == 0)
@@ -211,11 +211,11 @@ namespace GLVM::Core
         }
 
         unsigned int integerPartContainerSize = integerPartContainer.GetSize();
-        for (int i = 0; i < integerPartContainerSize; ++i)
+        for (unsigned int i = 0; i < integerPartContainerSize; ++i)
             integerPart += integerPartContainer[i] * std::pow(10, (integerPartContainerSize - 1) - i);
 
         unsigned int floatingPartContainerSize = floatingPartContainer.GetSize();
-        for (int i = 0; i < floatingPartContainerSize; ++i)
+        for (unsigned int i = 0; i < floatingPartContainerSize; ++i)
             floatingPart += floatingPartContainer[i] / std::pow(10, i + 1);
 
         float result = 0;

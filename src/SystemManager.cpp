@@ -31,7 +31,7 @@ namespace GLVM::ECS
 
     void CSystemManager::Update()
     {
-        for(int i = 0; i < s_iSystem_ID; ++i)
+        for(unsigned int i = 0; i < s_iSystem_ID; ++i)
             tSystemContainer[i]->Update();
     }
 }

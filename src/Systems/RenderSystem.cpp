@@ -40,7 +40,7 @@ namespace GLVM::ECS
         renderer_instance_->draw();
     }
     Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    
-	void CRenderSystem::SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component)
+	void CRenderSystem::SetModelMatrix()
 	{
 	}
 

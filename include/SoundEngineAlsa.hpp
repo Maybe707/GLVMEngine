@@ -15,7 +15,7 @@ namespace GLVM::Core::Sound
         TCVectorContainer<CSoundSample*> tSound_Contaier;
     public:
         void SoundStream() override;
-        void PlaybackSoundSample(CSoundSample& _sound_sample);
+        void PlaybackSoundSample(CSoundSample& _sound_sample) override;
         void SetMasterVolume(long _lVolume) override;
         TCVectorContainer<CSoundSample*>& GetSoundContainer() override;
     };

@@ -8,6 +8,7 @@
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
 #include <cstdlib>
+#include <vulkan/vulkan_core.h>
 //#include <vulkan/vulkan_core.h>
 
 namespace GLVM::Core
@@ -35,13 +36,13 @@ namespace GLVM::Core
 
         initializeTextureData_.resize(mainTexturesQuantity + hudTexturesQuantity);
 
-        for(int i = 0; i < _initializeTextureData.size(); ++i)
-            for(int j = 0; j < texturePool_; ++j) {
+        for(unsigned int i = 0; i < _initializeTextureData.size(); ++i)
+            for(unsigned int j = 0; j < texturePool_; ++j) {
                 initializeTextureData_[j + i * texturePool_] = _initializeTextureData[i];
             }
         
         unsigned int hud_counter = 0;
-        for(int n = mainTexturesQuantity; n < mainTexturesQuantity + hudTexturesQuantity; ++n) {
+        for(unsigned int n = mainTexturesQuantity; n < mainTexturesQuantity + hudTexturesQuantity; ++n) {
             initializeTextureData_[n] = _initializeHUDTextureData[hud_counter];
             ++hud_counter;
         }
@@ -63,7 +64,7 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::loadWavefrontObj() {
-        for (int m = 0; m < pathsArray_.size(); ++m) {
+        for (unsigned int m = 0; m < pathsArray_.size(); ++m) {
             CWaveFrontObjParser parser;
             CWaveFrontObjParser* wavefrontObjParser = &parser;
             
@@ -77,7 +78,7 @@ namespace GLVM::Core
             unsigned int textureIndex = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
 
-            for (int i = 0; i < faceVerticesSize; ++i)
+            for (unsigned int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
                     vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
 					aIndices_[m].push_back(i * 3 + j);
@@ -106,9 +107,9 @@ namespace GLVM::Core
     }
     
     void CVulkanRenderer::createTextureImage() {
-        int texWidth, texHeight, texChannels;
+        int texWidth, texHeight;
 
-        for(int i = 0; i < initializeTextureData_.size(); ++i)
+        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
             VkDeviceSize imageSize = initializeTextureData_[i].dat_length_;
             const unsigned char* pixels = initializeTextureData_[i].u_iData_;
@@ -130,9 +131,9 @@ namespace GLVM::Core
 //            std::cout << "i: " << i << std::endl;
             createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
 
-            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
             copyBufferToImage(stagingBuffer, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-            transitionImageLayout(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
             vkDestroyBuffer(device, stagingBuffer, nullptr);
             vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -140,7 +141,7 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::recreateSwapChain() {
-        int width = 0, height = 0;
+        // int width = 0, height = 0;
         // glfwGetFramebufferSize(window, &width, &height);
         // while (width == 0 || height == 0) {
         //     glfwGetFramebufferSize(window, &width, &height);
@@ -169,7 +170,7 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray) {
-        for (int i = 0; i < _pathsArray.size(); ++i)
+        for (unsigned int i = 0; i < _pathsArray.size(); ++i)
             pathsArray_.push_back(_pathsArray[i]);
     }
     
@@ -268,13 +269,13 @@ namespace GLVM::Core
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-        for(int i = 0; i < initializeTextureData_.size(); ++i)
+        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
             vkDestroySampler(device, textureSamplers[i], nullptr);
             vkDestroyImageView(device, textureImageViews[i], nullptr);
         }
 
-        for (int i = 0; i < initializeTextureData_.size(); ++i)
+        for (unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
             vkDestroyImage(device, textureImages[i], nullptr);
             vkFreeMemory(device, textureImageMemories[i], nullptr);
@@ -790,12 +791,12 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::createTextureImageView() {
-        for(int i = 0; i < initializeTextureData_.size(); ++i)
+        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
             textureImageViews[i] = createImageView(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
     }
 
     void CVulkanRenderer::createTextureSampler() {
-        for(int i = 0; i < initializeTextureData_.size(); ++i)
+        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
             VkPhysicalDeviceProperties properties{};
             vkGetPhysicalDeviceProperties(physicalDevice, &properties);
@@ -876,7 +877,7 @@ namespace GLVM::Core
         vkBindImageMemory(device, image, imageMemory, 0);
     }
 
-    void CVulkanRenderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+    void CVulkanRenderer::transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
         VkImageMemoryBarrier barrier{};
@@ -1207,8 +1208,8 @@ namespace GLVM::Core
         ECS::CComponentManager* componentManager = ECS::CComponentManager::GetInstance();
 
         
-        for (int i = 0; i < texture_load_data_.size(); ++i) {
-            for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+        for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
+            for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = componentManager->GetComponent<ECS::SVertexComponent>(uiEntity).vkVertexId_;
                 
@@ -1247,7 +1248,7 @@ namespace GLVM::Core
         vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
+        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
             vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
             vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
         }
@@ -1281,11 +1282,6 @@ namespace GLVM::Core
     }
 
     void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ECS::STransformComponent _transformComponent) {
-        static auto startTime = std::chrono::high_resolution_clock::now();
-
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-        
         UniformBufferObject ubo{};
 
         ubo.model[0][0] = _transformComponent.fScale;
@@ -1336,8 +1332,8 @@ namespace GLVM::Core
         Core::TCVectorContainer<ECS::STransformComponent>* pEntity_Container_refTransform =
             ECS::GetInnerComponentContainer<ECS::STransformComponent>(*pComponent_Manager);
 
-        for (int i = 0; i < texture_load_data_.size(); ++i) {
-            for (int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+        for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
+            for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 ECS::STransformComponent transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
                 updateUniformBuffer(texturePool_ * MAX_FRAMES_IN_FLIGHT * i + j + currentFrame * texturePool_, transformComponent);
             }
@@ -1347,7 +1343,7 @@ namespace GLVM::Core
         
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
-        for (int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
+        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
             ECS::STransformComponent transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
             updateUniformBuffer(n + currentFrame, transformComponent);
             ++hudCounter;
@@ -1439,14 +1435,15 @@ namespace GLVM::Core
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
         } else {
-            int width, height;
-//            glfwGetFramebufferSize(window, &width, &height);
+            // int width = 0, height = 0;
+            // glfwGetFramebufferSize(window, &width, &height);
 
-            VkExtent2D actualExtent = {
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height)
-            };
+            // VkExtent2D actualExtent = {
+            //     static_cast<uint32_t>(width),
+            //     static_cast<uint32_t>(height)
+            // };
 
+			VkExtent2D actualExtent;
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
@@ -1606,6 +1603,9 @@ namespace GLVM::Core
     }
 
     VKAPI_ATTR VkBool32 VKAPI_CALL CVulkanRenderer::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+		std::cout << messageSeverity << std::endl;
+		std::cout << messageType << std::endl;
+		std::cout << pUserData << std::endl;
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;

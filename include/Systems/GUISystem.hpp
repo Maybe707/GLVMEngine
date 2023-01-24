@@ -18,7 +18,6 @@ namespace GLVM::ECS
 
     public:
         void Update() override;
-        void LoadCrosshairTexture(const unsigned char* _kTexture_Data);
 
         Shader* _Shader_Program;
     };

@@ -58,20 +58,26 @@ namespace GLVM::Core {
 		Shader* debugQuadDepth_;
 		GLuint quadVAO_;
 		GLuint quadVBO_;
-		unsigned int directionalLightFlatShadowMapFBO;
+
+		/// Directional light
+		std::vector<unsigned int> directionalLightFlatShadowMapFBOcontainer;
+		std::vector<unsigned int> directionalLightFlatShadowMapTextureContainer;
+		std::vector<unsigned int> sampledDirectionalLightEntityIDcontainer; ///< Sampled depend on distance from light source to object entity IDs for poit light shadow map.
+
+		/// Point light
 		std::vector<unsigned int> pointLightCubeShadowMapFBOcontainer;
-		std::vector<unsigned int> spotLightFlatShadowMapFBOContainer;
-		unsigned int directionalLightFlatShadowMapTexture;
 		std::vector<unsigned int> pointLightCubeShadowMapTextureContainer;
-		std::vector<unsigned int> spotLightFlatShadowMapTextureContainer;
 		std::vector<unsigned int> sampledPointLightEntityIDcontainer; ///< Sampled depend on distance from light source to object entity IDs for poit light shadow map.
+
+		/// Spot light
+		std::vector<unsigned int> spotLightFlatShadowMapTextureContainer;
+		std::vector<unsigned int> spotLightFlatShadowMapFBOContainer;
 		std::vector<unsigned int> sampledSpotLightEntityIDcontainer;
 		float borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; ///< Border color for fix shadow issue in flat shadow map in long range.
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
-		mat4 directionalLightSpaceMatrix{1.0f};
 		mat4 spotLightSpaceMatrixContainer[8];
-		unsigned int spotLightComponentContainerSize;
+		mat4 directionalLightSpaceMatrixContainer[4];
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
 		float nearPlaneCubeShadowMap = 1.0f;
@@ -79,7 +85,7 @@ namespace GLVM::Core {
 		bool shadows = true;
 		std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
-		std::vector<const char*> pathsArray_;
+		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		std::vector<GLuint> VBOcontainer_;

@@ -81,14 +81,11 @@ namespace GLVM::Core
         static CEngine*    pInstance_;
         static std::mutex  Mutex_;
         
-		IWindow             * Window_;
 		Time::IChrono       * Chrono_;
         Sound::ISoundEngine * Sound_Engine_;
 
 		float              fDelta_Time_;
 		CStack             Input_Stack_;
-		Shader             * Shader_Program;
-        Shader             * GUI_Shader_Program_;
         ECS::CRenderSystem * Render_System_Interface_;
         
         ECS::CCollisionSystem  * Collision_System;
@@ -96,7 +93,6 @@ namespace GLVM::Core
         ECS::CPhysicsSystem    * Physics_System_;
         ECS::CProjectileSystem * pProjectile_System_;
         ECS::CGUISystem        * GUI_System;
-        ECS::CCameraSystem     * pCamera_System;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;

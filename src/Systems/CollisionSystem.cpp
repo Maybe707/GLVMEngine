@@ -49,8 +49,6 @@ namespace GLVM::ECS
             ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*_Component_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
 //        std::cout << "Vector size: " << uiVector_Collider_Size << std::endl;
-        CEntityManager* _Entity_Manager = CEntityManager::GetInstance();
-        unsigned int Entity_Manager_Size = _Entity_Manager->tActive_Entity_Registry_.GetSize();
         //std::cout << "Entities: " << Entity_Manager_Size << std::endl;
         
 		for(int i = 0, iSize = uiVector_Collider_Size; i < iSize; ++i)

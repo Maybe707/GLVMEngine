@@ -36,13 +36,12 @@ namespace GLVM::ECS
         // if(fProjectile_Accumulator_ > 0)
         //     fProjectile_Accumulator_ -= cameraSpeed;
         
-        for(int i = 0; i < u_iVector_Move_Size; ++i) {
+        for(unsigned int i = 0; i < u_iVector_Move_Size; ++i) {
             for(int n = 0; n < 6; ++n) {
                 bool bDiagonal_Movement_Availability = false;
                 
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 ECS::STransformComponent& rTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove);
-                ECS::SMoveComponent& rMoveComponent = pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove);
                 
                 // if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON) {
                 //     if(fProjectile_Accumulator_ <= 0) {
@@ -74,15 +73,13 @@ namespace GLVM::ECS
                     break;
                 case Core::EEvents::eMOVE_BACKWARD:
                     rTransformComponent.tForward =
-                        CalculateVectorFB(rMoveComponent,
-                                          view_Component,
+                        CalculateVectorFB(view_Component,
                                           g_eEvent);
                     rTransformComponent.tPosition -= rTransformComponent.tForward * cameraSpeed;
                     break;
                 case Core::EEvents::eMOVE_FORWARD:
                     rTransformComponent.tForward =
-                        CalculateVectorFB(rMoveComponent,
-                                          view_Component,
+                        CalculateVectorFB(view_Component,
                                           g_eEvent);
                     rTransformComponent.tPosition += rTransformComponent.tForward * cameraSpeed;
                     break;
@@ -148,8 +145,7 @@ namespace GLVM::ECS
         return tNormalized_Vector;
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorFB(SMoveComponent& _move_Component,
-                                                        ECS::CViewComponent& _view_Component,
+    Vector<float, 3> CMovementSystem::CalculateVectorFB(ECS::CViewComponent& _view_Component,
                                                         Core::CEvent& _event) {
         Vector<float, 3> front(0.0f);
         front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));

@@ -24,7 +24,7 @@ namespace GLVM::ECS
         
         ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
         
-        void Gravity(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);
+        void Gravity();
 
         /*! This update searching for refering to colliders entities and check their
          *  transform components for collision, and if collision detected check if
@@ -33,7 +33,6 @@ namespace GLVM::ECS
          
         void Update() override;
         void Repel(STransformComponent& _transform_Component,
-                   SMoveComponent& _move_Component,
                    float& _fDelta_Time,
                    CViewComponent& _view_Component,
                    Core::CEvent& _event);

@@ -44,7 +44,7 @@ namespace GLVM::ECS
     void Update() override;
     Core::IRenderer* GetRenderSystemInstance();
     void SetTextureData();
-    void SetModelMatrix(Shader* _Shader_Program, ECS::STransformComponent& _transform_Component);
+    void SetModelMatrix();
 	  void SetViewMatrix(mat4 _viewMatrix);
 	  void SetProjectionMatrix(mat4 _projectionMatrix);
   };

@@ -67,9 +67,4 @@ namespace GLVM::ECS
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
         pGLBind_Vertex_Array(0);         
     }
-
-    void CGUISystem::LoadCrosshairTexture(const unsigned char* _kTexture_Data)
-    {
-        
-    }
 }

@@ -7,15 +7,17 @@ layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 textureCoordinates;
 
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
+#define DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 4
 
 out vec2 textureCoords;
-flat out int spotLightSpaceMatrixArraySize;
+// flat out int spotLightSpaceMatrixArraySize;
+// flat out int directionalLightSpaceMatrixArraySize;
 
 out VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
-	vec4 fragmentPositionDirectionalLightSpace;
+	vec4 fragmentPositionDirectionalLightSpace[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 } vs_out;
 
@@ -23,9 +25,12 @@ out VS_OUT {
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;
-uniform mat4 directionalLightSpaceMatrix;
-uniform mat4 spotLightSpaceMatrixContainer[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+
+uniform mat4 directionalLightSpaceMatrixContainer[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 uniform int spotLightSpaceMatrixContainerSize;
+
+uniform mat4 spotLightSpaceMatrixContainer[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+uniform int directionalLightSpaceMatrixContainerSize;
 
 uniform bool reverseNormals;
 
@@ -43,10 +48,12 @@ void main()
     else
         vs_out.normal = transpose(inverse(mat3(modelMatrix))) * normal;
 	vs_out.textureCoords              = textureCoordinates;
-	vs_out.fragmentPositionDirectionalLightSpace = directionalLightSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+	for (int i = 0; i < directionalLightSpaceMatrixContainerSize; ++i) 
+		vs_out.fragmentPositionDirectionalLightSpace[i] = directionalLightSpaceMatrixContainer[i] * vec4(vs_out.fragmentPosition, 1.0);
 	for (int j = 0; j < spotLightSpaceMatrixContainerSize; ++j) 
 		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * vec4(vs_out.fragmentPosition, 1.0);
 
-	spotLightSpaceMatrixArraySize     = spotLightSpaceMatrixContainerSize;
-	gl_Position                       = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+	// spotLightSpaceMatrixArraySize        = spotLightSpaceMatrixContainerSize;
+	// directionalLightSpaceMatrixArraySize = directionalLightSpaceMatrixContainerSize;
+	gl_Position                          = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }
