@@ -176,7 +176,7 @@ namespace GLVM::Core
 		Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
 		unsigned int appropriateSpotLightComponentIndex = 0;
 		sampledSpotLightEntityIDcontainer.clear();
-		mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		for ( int i = 0; i < pEntityContainerRefSpotLight->GetSize(); ++i ) {
 			unsigned int uiSpotLightsEntity = (*pEntityContainerRefSpotLight)[i];
 			ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightsEntity);
