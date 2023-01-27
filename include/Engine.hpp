@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "Components/DirectionalLightComponent.hpp"
 #include "Components/SpotLightComponent.hpp"
 #include "GLPointer.h"
 #include "Systems/GUISystem.hpp"
@@ -60,16 +61,18 @@
 
 namespace GLVM::ECS::components
 {    
-	typedef STransformComponent     transform;
-	typedef SVertexComponent        vertex;
-	typedef SMoveComponent          movement;
-	typedef CColliderComponent      collider;
-	typedef SAnimationMoveComponent animation;
-	typedef CViewComponent          camera;
-	typedef CRigidBodyComponent     rigidBody;
-	typedef SEventComponent         event;
-	typedef SMaterialComponent      material;
-	typedef SSpotLightComponent     spotLight;
+	typedef STransformComponent        transform;
+	typedef SVertexComponent           vertex;
+	typedef SMoveComponent             movement;
+	typedef CColliderComponent         collider;
+	typedef SAnimationMoveComponent    animation;
+	typedef CViewComponent             camera;
+	typedef CRigidBodyComponent        rigidBody;
+	typedef SEventComponent            event;
+	typedef SMaterialComponent         material;
+	typedef SDirectionalLightComponent directionalLight;
+	typedef SPointLightComponent       pointLight;
+	typedef SSpotLightComponent        spotLight;
 }
 
 using Entity = unsigned int;
