@@ -17,11 +17,11 @@ int main()
 {
 	using namespace GLVM::Core;
 	using namespace GLVM::ECS;
-	using namespace GLVM::ECS::Components;
+	using namespace GLVM::ECS::components;
 	
     CEntityManager   * EntityManager     = CEntityManager::GetInstance();
 	CComponentManager* ComponentManager  = CComponentManager::GetInstance();
-    CMeshManager     * MeshManager       = CMeshManager::GetInstance();
+	CMeshManager     * MeshManager       = CMeshManager::GetInstance();
 	CTextureManager  * TextureManager    = CTextureManager::GetInstance();
 	CTextureManager  * hudTextureManager = CTextureManager::GetHUDInstance();
     MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");

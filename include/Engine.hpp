@@ -58,7 +58,7 @@
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"
 
-namespace GLVM::ECS::Components
+namespace GLVM::ECS::components
 {    
 	typedef STransformComponent     transform;
 	typedef SVertexComponent        vertex;
