@@ -4,6 +4,7 @@
 #include "ComponentManager.hpp"
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
@@ -116,8 +117,8 @@ namespace GLVM::Core {
 		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, Core::SDirectionalLightComponent& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
 		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::SSpotLightComponent& directionalLightComponent,
-								   mat4 projectionMatrixLight);
-		void EvaluateCubeShadowMap();
+			                       mat4 projectionMatrixLight);
+		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, Core::SPointLightComponent& pointLightComponent);
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);

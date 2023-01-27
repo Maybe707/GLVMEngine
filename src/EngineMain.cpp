@@ -13,12 +13,12 @@
 #include "Texture.hpp"
 #include <math.h>
 
-using namespace GLVM::Core;
-using namespace GLVM::ECS;
-using namespace GLVM::ECS::Components;
-
 int main()
 {
+	using namespace GLVM::Core;
+	using namespace GLVM::ECS;
+	using namespace GLVM::ECS::Components;
+	
     CEntityManager   * EntityManager     = CEntityManager::GetInstance();
 	CComponentManager* ComponentManager  = CComponentManager::GetInstance();
     CMeshManager     * MeshManager       = CMeshManager::GetInstance();
