@@ -15,16 +15,14 @@
 
 int main()
 {
-	using namespace GLVM::Core;
-	using namespace GLVM::ECS;
-//	using namespace GLVM::ECS::components;
+	using namespace GLVM;
 	namespace cm = GLVM::ECS::components;
 	
-    CEntityManager   * EntityManager     = CEntityManager::GetInstance();
-	CComponentManager* ComponentManager  = CComponentManager::GetInstance();
-	CMeshManager     * MeshManager       = CMeshManager::GetInstance();
-	CTextureManager  * TextureManager    = CTextureManager::GetInstance();
-	CTextureManager  * hudTextureManager = CTextureManager::GetHUDInstance();
+	ECS::CEntityManager   * EntityManager     = ECS::CEntityManager::GetInstance();
+	ECS::CComponentManager* ComponentManager  = ECS::CComponentManager::GetInstance();
+	Core::CMeshManager    * MeshManager       = Core::CMeshManager::GetInstance();
+	ECS::CTextureManager  * TextureManager    = ECS::CTextureManager::GetInstance();
+	ECS::CTextureManager  * hudTextureManager = ECS::CTextureManager::GetHUDInstance();
     MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
     MeshManager->SetMesh("../waveFrontObj/sphere.obj");
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
@@ -32,23 +30,23 @@ int main()
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 //	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-    CEngine* GLVM = CEngine::GetInstance();	
-    CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
+	Core::CEngine* GLVM = Core::CEngine::GetInstance();	
+	ECS::CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
-    CTexture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
+	ECS::CTexture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
 		.dat_length_ = witch_dat_len, .u_iData_ = witch_dat };
-    CTexture Texture_2{ .iWidth_ = 32, .iHeight_ = 32,
+	ECS::CTexture Texture_2{ .iWidth_ = 32, .iHeight_ = 32,
 		.dat_length_ = gray_dat_len, .u_iData_ = gray_dat };
-	CTexture Texture_3{ .iWidth_ = 500, .iHeight_ = 500,
+	ECS::CTexture Texture_3{ .iWidth_ = 500, .iHeight_ = 500,
 		.dat_length_ = container2_dat_len, .u_iData_ = container2_dat };
-	CTexture Texture_4{ .iWidth_ = 500, .iHeight_ = 500,
+	ECS::CTexture Texture_4{ .iWidth_ = 500, .iHeight_ = 500,
 		.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
     
-    std::vector<CTexture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
+    std::vector<ECS::CTexture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
 	
     TextureManager->SetTextureVector(TextureVector);
 	
-    CTexture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
+	ECS::CTexture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
 		.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
     // CTexture hudTexture_1;
     // hudTexture_1.iWidth_ = 32;
@@ -56,7 +54,7 @@ int main()
     // hudTexture_1.u_iData_ = witch_dat;
     // hudTexture_1.dat_length_ = witch_dat_len;
     
-    std::vector<CTexture> hudTextureVector;
+    std::vector<ECS::CTexture> hudTextureVector;
     hudTextureVector.push_back(hudTexture_0);
     //    hudTextureVector.push_back(hudTexture_1);
 
