@@ -78,7 +78,7 @@ namespace GLVM::ECS
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
-        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::collider,
+        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::vertex, ECS::collider,
                                                                ECS::STransformComponent, ECS::material,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 

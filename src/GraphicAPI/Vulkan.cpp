@@ -1211,7 +1211,7 @@ namespace GLVM::Core
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = componentManager->GetComponent<ECS::SVertexComponent>(uiEntity).vkVertexId_;
+                unsigned int uiVertexId = componentManager->GetComponent<ECS::vertex>(uiEntity).vkVertexId_;
                 
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
                 VkDeviceSize offsets[] = {0};

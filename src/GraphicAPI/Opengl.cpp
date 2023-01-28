@@ -486,7 +486,7 @@ namespace GLVM::Core
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::vertex>(uiEntity_refTexture).vkVertexId_;
 				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ECS::material>(uiEntity_refTexture).diffuseTextureID_;
 				unsigned int specularTextureID = pComponent_Manager->GetComponent<ECS::material>(uiEntity_refTexture).specularTextureID_;
 				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
@@ -507,7 +507,7 @@ namespace GLVM::Core
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::SVertexComponent>(uiEntity_refTexture).vkVertexId_;
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<ECS::vertex>(uiEntity_refTexture).vkVertexId_;
 				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refTexture));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE30);

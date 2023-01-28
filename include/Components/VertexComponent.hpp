@@ -7,7 +7,7 @@
 
 namespace GLVM::ECS
 {
-	struct SVertexComponent
+	struct vertex
 	{
         unsigned int vkVertexId_;
 	};

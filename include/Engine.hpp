@@ -62,7 +62,7 @@
 namespace GLVM::ECS::components
 {    
 	typedef STransformComponent        transform;
-	typedef SVertexComponent           vertex;
+	typedef vertex           vertex;
 	typedef move             movement;
 	typedef collider         collider;
 	typedef SAnimationMoveComponent    animation;
