@@ -39,7 +39,7 @@
   Take a game object to render in DrawSprite method.
 */
 
-namespace GLVM::Core {
+namespace GLVM::core {
 	class COpenglRenderer : public IRenderer {
 	public:
 #ifdef __linux__
@@ -137,6 +137,6 @@ namespace GLVM::Core {
 		void renderScene(const Shader& shader);
 		void renderCube();
 	};
-} // namespace GLVM::Core
+} // namespace GLVM::core
 
 #endif

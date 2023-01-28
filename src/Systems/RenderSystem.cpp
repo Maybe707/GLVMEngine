@@ -12,14 +12,14 @@ namespace GLVM::ecs
 	{
         GLVM::ecs::CTextureManager* textureManager = GLVM::ecs::CTextureManager::GetInstance();
         GLVM::ecs::CTextureManager* hudTextureManager = GLVM::ecs::CTextureManager::GetHUDInstance();
-        GLVM::Core::CMeshManager*   meshManager = GLVM::Core::CMeshManager::GetInstance();
+        GLVM::core::CMeshManager*   meshManager = GLVM::core::CMeshManager::GetInstance();
 
 #ifdef VULKAN_API        
-        renderer_instance_ = new Core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+        renderer_instance_ = new core::CVulkanRenderer(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
 #endif
 		
 #ifdef OPENGL_API
-        renderer_instance_ = new Core::COpenglRenderer();
+        renderer_instance_ = new core::COpenglRenderer();
 #endif
 
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
@@ -39,7 +39,7 @@ namespace GLVM::ecs
         SetTextureData();
         renderer_instance_->draw();
     }
-    Core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    
+    core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    
 	void CRenderSystem::SetModelMatrix()
 	{
 	}

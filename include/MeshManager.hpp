@@ -7,7 +7,7 @@
 
 typedef unsigned int Mesh_ID;
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     class CMeshManager
     {

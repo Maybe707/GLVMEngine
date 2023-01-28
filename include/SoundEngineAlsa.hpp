@@ -8,7 +8,7 @@
 #include <bits/types/FILE.h>
 #include "ISoundEngine.hpp"
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {
     class CSoundEngineAlsa : public ISoundEngine
     {

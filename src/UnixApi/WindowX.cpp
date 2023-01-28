@@ -9,7 +9,7 @@
 #include <bits/types/wint_t.h>
 #include <iostream>
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 #ifdef OPENGL_API
     CWindowX::CWindowX()
@@ -269,19 +269,19 @@ namespace GLVM::Core
                 switch(ulKey)
                 {
                 case XK_a:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_A);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
                 case XK_d:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_D);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_D);
                     break;
                 case XK_s:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_S);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_S);
                     break;
                 case XK_w:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_W);
                     break;
                 case XK_space:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_JUMP);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
                     break;
                 }
 				break;
@@ -482,19 +482,19 @@ namespace GLVM::Core
                 switch(ulKey)
                 {
                 case XK_a:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_A);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
                 case XK_d:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_D);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_D);
                     break;
                 case XK_s:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_S);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_S);
                     break;
                 case XK_w:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_W);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_W);
                     break;
                 case XK_space:
-                    _Event.SetEvent(GLVM::Core::eKEYRELEASE_JUMP);
+                    _Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
                     break;
                 }
 				break;

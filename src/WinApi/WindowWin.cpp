@@ -9,7 +9,7 @@
 #define VK_A 0x41
 #define VK_D 0x44
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 #ifdef OPENGL_API
     CWindowWin::CWindowWin()

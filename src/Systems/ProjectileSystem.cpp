@@ -9,7 +9,7 @@
 
 namespace GLVM::ecs
 {
-    CProjectileSystem::CProjectileSystem(Core::CStack& _input_Stack) : Input_Stack_ (_input_Stack)
+    CProjectileSystem::CProjectileSystem(core::CStack& _input_Stack) : Input_Stack_ (_input_Stack)
     {}
     
     void CProjectileSystem::Update()
@@ -17,11 +17,11 @@ namespace GLVM::ecs
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         CEntityManager* pEntity_Manager       = GLVM::ecs::CEntityManager::GetInstance();
     
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
+        core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
             ecs::GetInnerIDsContainer<ecs::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+        core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
             ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         ecs::beholder& view_Component = pComponent_Manager->GetComponent<ecs::beholder>(iEntity_refView);
@@ -35,7 +35,7 @@ namespace GLVM::ecs
             for(int n = 0; n < 6; ++n) {
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 
-                if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON) {
+                if(Input_Stack_.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                     if(fProjectile_Accumulator_ <= 0) {
                         CalculateProjectile(pComponent_Manager,
                                             iEntity_refMove,
@@ -46,7 +46,7 @@ namespace GLVM::ecs
             }
         }
 
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
+        core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
             GetInnerIDsContainer<projectile>(*pComponent_Manager);
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
@@ -82,7 +82,7 @@ namespace GLVM::ecs
                                                                ecs::transform, ecs::material,
                                                                ecs::projectile>(uiEntity_Projectile);
 
-        // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
+        // core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         // pSound_Sample->kPath_to_File_ = "../laser2.wav";
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
@@ -94,7 +94,7 @@ namespace GLVM::ecs
         // rTextureProjectile.iWidth_  = 96;
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
-//        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
+//        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         ecs::transform& rTransformProjectile = pComponent_Manager->GetComponent<ecs::transform>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.2f;
         Vector<float, 3> vec(0.0f);

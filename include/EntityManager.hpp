@@ -18,8 +18,8 @@ namespace GLVM::ecs
         
     public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
 		inline static Entity_ID u_iID = 0;		
- 		Core::TCVectorContainer<Entity_ID> tRemoved_Entity_Registry_;
-		Core::TCVectorContainer<Entity_ID> tActive_Entity_Registry_;
+ 		core::TCVectorContainer<Entity_ID> tRemoved_Entity_Registry_;
+		core::TCVectorContainer<Entity_ID> tActive_Entity_Registry_;
 
         CEntityManager(CEntityManager& _entity_Manager) = delete;           ///< Dont need to make cope because of singleton property.
         void operator=(const CEntityManager& _entity_Manager) = delete;     ///< Dont need assignment operator because of singleton property.

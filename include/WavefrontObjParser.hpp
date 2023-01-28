@@ -16,7 +16,7 @@
 #include <chrono>
 #include <thread>
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     struct SVertex
     {
@@ -40,11 +40,11 @@ namespace GLVM::Core
 
     struct SFace
     {
-        GLVM::Core::TCVectorContainer<int> vertexIndex;
-        GLVM::Core::TCVectorContainer<int> textureIndex;
-        GLVM::Core::TCVectorContainer<int> normalIndex;
+        GLVM::core::TCVectorContainer<int> vertexIndex;
+        GLVM::core::TCVectorContainer<int> textureIndex;
+        GLVM::core::TCVectorContainer<int> normalIndex;
 
-        GLVM::Core::TCVectorContainer<int>& operator[](const unsigned int _iIndex) {
+        GLVM::core::TCVectorContainer<int>& operator[](const unsigned int _iIndex) {
             assert(_iIndex < 3 && _iIndex >= 0 && "Wrong index");
             switch(_iIndex) {
             default:
@@ -63,10 +63,10 @@ namespace GLVM::Core
         // static CWaveFrontObjParser* pInstance_;
         // static std::mutex  Mutex_;
         
-        GLVM::Core::TCVectorContainer<SVertex> coordinateVertices_;
-        GLVM::Core::TCVectorContainer<SVertex> textureVertices_;
-		GLVM::Core::TCVectorContainer<SVertex> normals_;
-        GLVM::Core::TCVectorContainer<SFace> faces_;
+        GLVM::core::TCVectorContainer<SVertex> coordinateVertices_;
+        GLVM::core::TCVectorContainer<SVertex> textureVertices_;
+		GLVM::core::TCVectorContainer<SVertex> normals_;
+        GLVM::core::TCVectorContainer<SFace> faces_;
 
         std::string sWavefrontObjFileData;
         const char* pWavefrontObjFileData;
@@ -76,18 +76,18 @@ namespace GLVM::Core
 
 //        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         
-        GLVM::Core::TCVectorContainer<SVertex>& getCoordinateVertices();
-        GLVM::Core::TCVectorContainer<SVertex>& getTextureVertices();
-		GLVM::Core::TCVectorContainer<SVertex>& getNormals();
-        GLVM::Core::TCVectorContainer<SFace>& getFaces();
+        GLVM::core::TCVectorContainer<SVertex>& getCoordinateVertices();
+        GLVM::core::TCVectorContainer<SVertex>& getTextureVertices();
+		GLVM::core::TCVectorContainer<SVertex>& getNormals();
+        GLVM::core::TCVectorContainer<SFace>& getFaces();
         
         void ReadFile(const char* _filePath);
         void ParseFile();
-        GLVM::Core::TCVectorContainer<TCVectorContainer<char>> Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter);
-        SVertex ParseVertices(GLVM::Core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
-        SFace ParseFaces(GLVM::Core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
-        int ParseInteger(GLVM::Core::TCVectorContainer<char> _word);
-        float ParseFloating(GLVM::Core::TCVectorContainer<char> _word);
+        GLVM::core::TCVectorContainer<TCVectorContainer<char>> Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter);
+        SVertex ParseVertices(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
+        SFace ParseFaces(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
+        int ParseInteger(GLVM::core::TCVectorContainer<char> _word);
+        float ParseFloating(GLVM::core::TCVectorContainer<char> _word);
     };
 }
 

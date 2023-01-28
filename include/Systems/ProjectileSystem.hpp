@@ -21,11 +21,11 @@ namespace GLVM::ecs
         float fLast_X = 1920.0f / 2.0f;
         float fLast_Y = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
-        Core::CStack&              Input_Stack_;
+        core::CStack&              Input_Stack_;
         float                      fProjectile_Accumulator_ = 2.0f; 
 		float                      _dOffset;
 
-        CProjectileSystem(Core::CStack& _input_Stack);
+        CProjectileSystem(core::CStack& _input_Stack);
         void Update() override;
         void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,

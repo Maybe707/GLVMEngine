@@ -4,7 +4,7 @@
 #include "Event.hpp"
 #include <iostream>
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 	class CStack
 	{

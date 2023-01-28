@@ -3,7 +3,7 @@
 
 //#include "Stack.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 
 	class CStack;

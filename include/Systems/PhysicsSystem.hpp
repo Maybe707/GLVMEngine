@@ -18,9 +18,9 @@ namespace GLVM::ecs
     public:
         float fAcceleration_of_Gravity_;
         float fDelta_Time_;
-        Core::CStack& Input_Stack_;
+        core::CStack& Input_Stack_;
 
-        CPhysicsSystem(Core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
+        CPhysicsSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
         
         ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
         
@@ -35,7 +35,7 @@ namespace GLVM::ecs
         void Repel(transform& _transform_Component,
                    float& _fDelta_Time,
                    beholder& _view_Component,
-                   Core::CEvent& _event);
+                   core::CEvent& _event);
     };
 }
 

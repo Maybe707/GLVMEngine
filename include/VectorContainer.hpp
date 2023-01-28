@@ -6,12 +6,12 @@
 #include <iostream>
 #include "VertexMath.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 
 	template <class T>
 	class TCVectorContainer;
-	template <class T> using vector = GLVM::Core::TCVectorContainer<T>;
+	template <class T> using vector = GLVM::core::TCVectorContainer<T>;
 	
 	template<class T>
 	class TCVectorContainer : public IContainer

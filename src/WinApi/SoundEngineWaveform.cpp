@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <fstream>
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {
     void CSoundEngineWaveform::SoundStream()
     {

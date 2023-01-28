@@ -1,3 +1,3 @@
 #include "Event.hpp"
 
-extern GLVM::Core::CEvent g_eEvent;
+extern GLVM::core::CEvent g_eEvent;

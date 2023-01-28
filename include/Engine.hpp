@@ -26,7 +26,6 @@
 #include "Components/ColliderComponent.hpp"
 #include "IWindow.hpp"
 #include "Components/MaterialComponent.hpp"
-#include "Components/TransformComponent.hpp"
 #include "VertexData.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Components/MoveComponent.hpp"
@@ -77,7 +76,7 @@ namespace GLVM::ecs::components
 
 using Entity = unsigned int;
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 	class CEngine
 	{
@@ -115,7 +114,7 @@ namespace GLVM::Core
 		void GameLoop();
 		void FPScounter();
 		void GameKill();
-//        void PlaybackSound(Core::CSoundEngine& _sound_Engine);
+//        void PlaybackSound(core::CSoundEngine& _sound_Engine);
 	};
 		
 }

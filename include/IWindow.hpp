@@ -3,7 +3,7 @@
 
 #include "Event.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {    
 
     class IWindow

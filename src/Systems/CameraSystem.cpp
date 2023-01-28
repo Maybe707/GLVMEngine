@@ -12,7 +12,7 @@ namespace GLVM::ecs
     void CCameraSystem::Update()
     {
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+        core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
             ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         

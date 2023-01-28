@@ -20,11 +20,11 @@ namespace GLVM::ecs
 	class CAnimationSystem : public ecs::ISystem
 	{
 	public:
-		Core::EEvents eSave_Event_;
+		core::EEvents eSave_Event_;
 		static const int anim_index_array = 3;
 		int anim_count = 0;
-//		Core::CStack& _Inputs;
-		Core::EEvents eEvent_;
+//		core::CStack& _Inputs;
+		core::EEvents eEvent_;
 		double Animation_Delta;
 		double Delta_Time;
 		float* Vertex_Animation[ANIM_PER_AXIS_NUMBER][anim_index_array] =
@@ -45,7 +45,7 @@ namespace GLVM::ecs
 		void Update() override
 		{
             CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
-            Core::TCVectorContainer<unsigned int>* pEntity_Container_refAnimationMove =
+            core::TCVectorContainer<unsigned int>* pEntity_Container_refAnimationMove =
                 ecs::GetInnerIDsContainer<ecs::animation>(*pComponent_Manager);
             unsigned int uiVector_AnimationMove_Size = pEntity_Container_refAnimationMove->GetSize();
 
@@ -57,7 +57,7 @@ namespace GLVM::ecs
 				if(eEvent_ != eSave_Event_)
 					Animation_Delta = 0.31f;
 				eSave_Event_ = eEvent_;
-				if(eEvent_ == Core::eMOVE_BACKWARD)
+				if(eEvent_ == core::eMOVE_BACKWARD)
 				{
 					Animation_Delta += Delta_Time;
 					if(Animation_Delta > 0.3f)
@@ -82,7 +82,7 @@ namespace GLVM::ecs
 						Animation_Delta = 0;
 						}
 					}
-					else if(eEvent_ == Core::EEvents::eMOVE_LEFT)
+					else if(eEvent_ == core::EEvents::eMOVE_LEFT)
 					{
 						Animation_Delta += Delta_Time;
 						if(Animation_Delta > 0.3f)
@@ -107,7 +107,7 @@ namespace GLVM::ecs
 							Animation_Delta = 0;
 						}
 					}
-					else if(eEvent_ == Core::EEvents::eMOVE_RIGHT)
+					else if(eEvent_ == core::EEvents::eMOVE_RIGHT)
 					{
 						Animation_Delta += Delta_Time;
 						if(Animation_Delta > 0.3f)
@@ -132,7 +132,7 @@ namespace GLVM::ecs
 							Animation_Delta = 0;
 						}
 					}
-					else if(eEvent_ == Core::EEvents::eMOVE_FORWARD)
+					else if(eEvent_ == core::EEvents::eMOVE_FORWARD)
 					{
 						Animation_Delta += Delta_Time;
 						if(Animation_Delta > 0.3f)

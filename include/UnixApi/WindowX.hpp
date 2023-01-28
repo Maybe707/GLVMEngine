@@ -9,7 +9,7 @@
 #define OPENGL_API
 //#define VULKAN_API
 
-namespace GLVM::Core
+namespace GLVM::core
 {    
     class CWindowX : public IWindow
     {

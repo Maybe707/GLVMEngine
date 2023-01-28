@@ -35,14 +35,14 @@ namespace GLVM::ecs
   class CRenderSystem : public ISystem
   {
   private:
-    Core::IRenderer* renderer_instance_;
+    core::IRenderer* renderer_instance_;
         
   public:
     CRenderSystem();
     ~CRenderSystem();
     
     void Update() override;
-    Core::IRenderer* GetRenderSystemInstance();
+    core::IRenderer* GetRenderSystemInstance();
     void SetTextureData();
     void SetModelMatrix();
 	  void SetViewMatrix(mat4 _viewMatrix);

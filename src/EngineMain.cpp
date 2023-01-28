@@ -20,7 +20,7 @@ int main()
 	
 	ecs::CEntityManager   * EntityManager     = ecs::CEntityManager::GetInstance();
 	ecs::CComponentManager* ComponentManager  = ecs::CComponentManager::GetInstance();
-	Core::CMeshManager    * MeshManager       = Core::CMeshManager::GetInstance();
+	core::CMeshManager    * MeshManager       = core::CMeshManager::GetInstance();
 	ecs::CTextureManager  * TextureManager    = ecs::CTextureManager::GetInstance();
 	ecs::CTextureManager  * hudTextureManager = ecs::CTextureManager::GetHUDInstance();
     MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
@@ -30,7 +30,7 @@ int main()
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 //	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-	Core::CEngine* GLVM = Core::CEngine::GetInstance();	
+	core::CEngine* GLVM = core::CEngine::GetInstance();	
 	ecs::CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::CTexture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,

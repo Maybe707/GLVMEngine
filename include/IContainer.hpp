@@ -2,7 +2,7 @@
 #define ICONTAINER
 
 
-namespace GLVM::Core
+namespace GLVM::core
 {
 	class IContainer
 	{

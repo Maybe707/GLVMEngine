@@ -5,7 +5,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {
     class CSoundEngineWaveform : public ISoundEngine
     {

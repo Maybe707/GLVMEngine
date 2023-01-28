@@ -1,7 +1,7 @@
 #include "MeshManager.hpp"
 #include "Components/VertexComponent.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {    
     CMeshManager* CMeshManager::pInstance_ = nullptr;
     std::mutex CMeshManager::Mutex_;

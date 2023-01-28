@@ -8,7 +8,7 @@ namespace GLVM::ecs
 	class collider
 	{
     public:
-//        Core::TCVectorContainer<Collider> aColliders_Container_;
+//        core::TCVectorContainer<Collider> aColliders_Container_;
         bool bGround_Collision_ = false;
         bool bWall_Collision_ = false;
         bool bPush_Collission = false;

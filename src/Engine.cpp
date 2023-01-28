@@ -36,10 +36,10 @@
     std::cout << "You have been destructurized. [=]___[=]" << std::endl; \
     exit(1)
 
-GLVM::Core::CEvent g_eEvent;
-//GLVM::Core::CSoundEngine g_Sound_Engine;
+GLVM::core::CEvent g_eEvent;
+//GLVM::core::CSoundEngine g_Sound_Engine;
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     CEngine* CEngine::pInstance_ = nullptr;
     std::mutex CEngine::Mutex_;

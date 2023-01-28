@@ -24,9 +24,9 @@ namespace GLVM::ecs
 	public:
         float                      fProjectile_Accumulator_ = 2.0f; 
 		float                      _dOffset;
-		Core::EEvents              _Anim_Event;
-        Core::CStack&              Input_Stack_;
-        Core::Sound::ISoundEngine* Sound_Engine_;
+		core::EEvents              _Anim_Event;
+        core::CStack&              Input_Stack_;
+        core::Sound::ISoundEngine* Sound_Engine_;
 
         float fYaw        = -90.0f;
         float fPitch      = 0.0f;
@@ -34,29 +34,29 @@ namespace GLVM::ecs
         float fLast_Y     = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         
-        CMovementSystem(Core::CStack& _input_Stack, Core::Sound::ISoundEngine* _sound_Engine);
+        CMovementSystem(core::CStack& _input_Stack, core::Sound::ISoundEngine* _sound_Engine);
         
 		void Update();
         void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
                                  beholder& view_Component);
         
-        bool CompareDirection(Core::CStack& _input_Stack,
-                              Core::EEvents _event0,
-                              Core::EEvents _event1);
-        void DiscardOpposite(Core::CStack& _input_Stack);
+        bool CompareDirection(core::CStack& _input_Stack,
+                              core::EEvents _event0,
+                              core::EEvents _event1);
+        void DiscardOpposite(core::CStack& _input_Stack);
         Vector<float, 3> CalculateVectorRL(ecs::beholder& _view_Component);
         Vector<float, 3> CalculateVectorFB(ecs::beholder& _view_Component,
-                                           Core::CEvent& _event);
+                                           core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
                                            ecs::beholder& _view_Component,
-                                           Core::CEvent& _event,
+                                           core::CEvent& _event,
                                            Vector<float, 3>& _temp_Vector);
-        bool FixDiagonalMove(Core::CStack& _input_Stack,
+        bool FixDiagonalMove(core::CStack& _input_Stack,
                                          transform& _transform_Component,
                                          float _camera_Speed,
                                          ecs::beholder& _view_Component,
-                                         Core::CEvent& _event);
+                                         core::CEvent& _event);
 	};
 }
 

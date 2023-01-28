@@ -1,7 +1,7 @@
 #include "Event.hpp"
 #include "Stack.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     CEvent::CEvent()
     {
@@ -21,20 +21,20 @@ namespace GLVM::Core
 	{
 		switch(_Stack.Pop())
 		{
-		case GLVM::Core::eMOVE_RIGHT:
-			SetEvent(GLVM::Core::EEvents::eMOVE_RIGHT);
+		case GLVM::core::eMOVE_RIGHT:
+			SetEvent(GLVM::core::EEvents::eMOVE_RIGHT);
 			break;
-		case GLVM::Core::eMOVE_LEFT:
-			SetEvent(GLVM::Core::EEvents::eMOVE_LEFT);
+		case GLVM::core::eMOVE_LEFT:
+			SetEvent(GLVM::core::EEvents::eMOVE_LEFT);
 			break;
-		case GLVM::Core::eMOVE_BACKWARD:
-			SetEvent(GLVM::Core::EEvents::eMOVE_BACKWARD);
+		case GLVM::core::eMOVE_BACKWARD:
+			SetEvent(GLVM::core::EEvents::eMOVE_BACKWARD);
 			break;
-		case GLVM::Core::eMOVE_FORWARD:
-			SetEvent(GLVM::Core::EEvents::eMOVE_FORWARD);
+		case GLVM::core::eMOVE_FORWARD:
+			SetEvent(GLVM::core::EEvents::eMOVE_FORWARD);
 			break;
-        case GLVM::Core::eMOUSE_LEFT_BUTTON:
-			SetEvent(GLVM::Core::EEvents::eMOUSE_LEFT_BUTTON);
+        case GLVM::core::eMOUSE_LEFT_BUTTON:
+			SetEvent(GLVM::core::EEvents::eMOUSE_LEFT_BUTTON);
 			break;
 		default:
 			break;

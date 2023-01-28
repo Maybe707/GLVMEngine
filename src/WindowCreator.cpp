@@ -8,7 +8,7 @@
 #include "WinApi/WindowWin.hpp"
 #endif
 
-namespace GLVM::Core
+namespace GLVM::core
 {    
         IWindow* CWindowCreator::Create()
         {

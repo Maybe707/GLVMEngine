@@ -7,7 +7,7 @@ namespace GLVM::ecs
 	struct move
 	{
         float fVelocity_;
-		Core::EEvents eEvent_ = Core::EEvents::eDEFAULT;
+		core::EEvents eEvent_ = core::EEvents::eDEFAULT;
 	};
 }
 

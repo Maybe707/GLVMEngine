@@ -8,7 +8,7 @@
 #include "SoundEngineWaveform.hpp"
 #endif
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {
     ISoundEngine* CSoundEngineFactory::CreateSoundEngine()
     {

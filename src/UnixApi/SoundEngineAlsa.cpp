@@ -1,6 +1,6 @@
 #include "SoundEngineAlsa.hpp"
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {    
     void CSoundEngineAlsa::SoundStream()
     {

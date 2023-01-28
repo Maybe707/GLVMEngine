@@ -52,7 +52,7 @@
 // #define WNDCLASS "static"
 // #endif
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
@@ -248,7 +248,7 @@ namespace GLVM::Core
         std::vector<ecs::CTexture> hudTexture_load_data_;
         std::vector<ecs::transform> transform_data_;
         std::vector<const char*> pathsArray_;
-        std::vector<std::vector<Core::Vertex>> aVertices_;
+        std::vector<std::vector<core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
 
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
@@ -260,11 +260,11 @@ namespace GLVM::Core
         unsigned int texturePool_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        GLVM::Core::CWindowX Window;
+        GLVM::core::CWindowX Window;
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        GLVM::Core::CWindowWin Window;
+        GLVM::core::CWindowWin Window;
 #endif
         
         CVulkanRenderer(std::vector<ecs::CTexture> _texture_data, std::vector<ecs::CTexture> _initializeHUDTextureData);

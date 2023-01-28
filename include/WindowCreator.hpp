@@ -3,7 +3,7 @@
 
 #include "IWindow.hpp"
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     
 /*!

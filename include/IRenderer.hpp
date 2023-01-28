@@ -8,7 +8,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace GLVM::Core
+namespace GLVM::core
 {
     class IRenderer
     {

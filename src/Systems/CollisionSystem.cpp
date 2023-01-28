@@ -45,7 +45,7 @@ namespace GLVM::ecs
 	void CCollisionSystem::Update()
 	{
         CComponentManager* _Component_Manager = CComponentManager::GetInstance();
-        Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
+        core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
             ecs::GetInnerIDsContainer<ecs::collider>(*_Component_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
 //        std::cout << "Vector size: " << uiVector_Collider_Size << std::endl;

@@ -11,7 +11,7 @@
 #include <vulkan/vulkan_core.h>
 //#include <vulkan/vulkan_core.h>
 
-namespace GLVM::Core
+namespace GLVM::core
 {    
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
         auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -1329,7 +1329,7 @@ namespace GLVM::Core
         }
 
         ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        Core::TCVectorContainer<ecs::transform>* pEntity_Container_refTransform =
+        core::TCVectorContainer<ecs::transform>* pEntity_Container_refTransform =
             ecs::GetInnerComponentContainer<ecs::transform>(*pComponent_Manager);
 
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {

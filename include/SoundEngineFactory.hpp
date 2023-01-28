@@ -3,7 +3,7 @@
 
 #include "ISoundEngine.hpp"
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {    
 /*!
   \brief Create sound engine enterface.

@@ -3,7 +3,7 @@
 
 #include "VectorContainer.hpp"
 
-namespace GLVM::Core::Sound
+namespace GLVM::core::Sound
 {
     struct CSoundSample
     {
