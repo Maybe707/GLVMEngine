@@ -46,7 +46,7 @@ namespace GLVM::ECS
 	{
         CComponentManager* _Component_Manager = CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
-            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*_Component_Manager);
+            ECS::GetInnerIDsContainer<ECS::collider>(*_Component_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
 //        std::cout << "Vector size: " << uiVector_Collider_Size << std::endl;
         //std::cout << "Entities: " << Entity_Manager_Size << std::endl;
@@ -69,17 +69,17 @@ namespace GLVM::ECS
 
 				if(bUpper_Actor_Check_Flag && bBox_Collider_Flag)
                 {
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiCompared_Entity_refCollider).bGround_Collision_ = true;
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
+                    _Component_Manager->GetComponent<ECS::collider>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::collider>(uiCompared_Entity_refCollider).bGround_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::collider>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
                     
                 if(bBox_Collider_Flag)
                 {
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiCompared_Entity_refCollider).bWall_Collision_ = true;
-                    _Component_Manager->GetComponent<ECS::CColliderComponent>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
+                    _Component_Manager->GetComponent<ECS::collider>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::collider>(uiCompared_Entity_refCollider).bWall_Collision_ = true;
+                    _Component_Manager->GetComponent<ECS::collider>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
 			}

@@ -143,7 +143,7 @@ namespace GLVM::ECS
     {
         CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
-            ECS::GetInnerIDsContainer<ECS::CColliderComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::collider>(*pComponent_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
             ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager);
             
@@ -151,20 +151,20 @@ namespace GLVM::ECS
         {
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
                 
-                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_
-                    && pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
+                if(pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bGround_Collision_
+                    && pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bPush_Collission)
                 {
                     Gravity();
-                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bGround_Collision_ = false;
+                    pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
-                if(pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_
-                    && pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bPush_Collission)
+                if(pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bWall_Collision_
+                    && pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bPush_Collission)
                 {
                     Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
                           fDelta_Time_,
                           pComponent_Manager->GetComponent<ECS::beholder>(uiEntity_refCollider),
                           g_eEvent);
-                    pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ = false;
+                    pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bWall_Collision_ = false;
                 }
         }
 

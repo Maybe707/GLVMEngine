@@ -62,9 +62,9 @@ namespace GLVM::ECS
         for(unsigned int i = 0; i < uiVector_Projectile_Size; ++i) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
-            if(pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ ||
-               pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bGround_Collision_) {
-//                std::cout << "FLAG: " << pComponent_Manager->GetComponent<CColliderComponent>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
+            if(pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bWall_Collision_ ||
+               pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bGround_Collision_) {
+//                std::cout << "FLAG: " << pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
                 GLVM::ECS::SMaterialComponent& textureProjectile = pComponent_Manager->GetComponent<GLVM::ECS::SMaterialComponent>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
                 continue;
@@ -78,7 +78,7 @@ namespace GLVM::ECS
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
-        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::CColliderComponent,
+        ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::collider,
                                                                ECS::STransformComponent, ECS::SMaterialComponent,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 

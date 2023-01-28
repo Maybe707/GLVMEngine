@@ -5,16 +5,7 @@
 
 namespace GLVM::ECS
 {
-    struct Collider
-    {
-        bool bGround_Collision_ = false;
-        bool bWall_Collision_ = false;
-
-        unsigned int uiGround_Collider_ = 0;
-        unsigned int uiWall_Collider_ = 0;
-    };
-    
-	class CColliderComponent
+	class collider
 	{
     public:
 //        Core::TCVectorContainer<Collider> aColliders_Container_;
