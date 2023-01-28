@@ -25,16 +25,16 @@ namespace GLVM::ecs
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
-		void Repel(transform& _transform_Component,
-                   move& _move_Component,
-                                 float& _fDelta_Time,
-                                 beholder& _view_Component,
-                                 core::CEvent& _event);
-        bool Gravity(transform& _transform_Component, event& _event_Component);
-		bool BoxCollider(transform& _transform_Component1, transform& _transform_Component2);
+		void Repel(components::transform& _transform_Component,
+                   components::move& _move_Component,
+				   float& _fDelta_Time,
+				   components::beholder& _view_Component,
+				   core::CEvent& _event);
+        bool Gravity(components::transform& _transform_Component, components::event& _event_Component);
+		bool BoxCollider(components::transform& _transform_Component1, components::transform& _transform_Component2);
 		void Update() override;
-        bool UpperActorCheck(transform& _transform_Component1,
-                             transform& _transform_Component2);
+        bool UpperActorCheck(components::transform& _transform_Component1,
+                             components::transform& _transform_Component2);
     };
 }
 	

@@ -29,8 +29,8 @@ namespace GLVM::ecs
         void Update() override;
         void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
-                                 beholder& view_Component);
-        Vector<float, 3> GetDirectionVector(ecs::beholder& _view_Component);
+                                 components::beholder& view_Component);
+        Vector<float, 3> GetDirectionVector(components::beholder& _view_Component);
     };
 }
 

@@ -3,7 +3,7 @@
 
 #include "VertexMath.hpp"
 
-namespace GLVM::ecs
+namespace GLVM::ecs::components
 {
 	struct directionalLight
 	{

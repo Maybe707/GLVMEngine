@@ -14,17 +14,19 @@ namespace GLVM::ecs
     
     void CProjectileSystem::Update()
     {
+		namespace cm = GLVM::ecs::components;
+		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         CEntityManager* pEntity_Manager       = GLVM::ecs::CEntityManager::GetInstance();
     
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetInnerIDsContainer<ecs::move>(*pComponent_Manager);
+            ecs::GetInnerIDsContainer<cm::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
+            ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-        ecs::beholder& view_Component = pComponent_Manager->GetComponent<ecs::beholder>(iEntity_refView);
+        cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
         float cameraSpeed = 5.5f * _dOffset;            
 
@@ -47,12 +49,12 @@ namespace GLVM::ecs
         }
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
-            GetInnerIDsContainer<projectile>(*pComponent_Manager);
+            GetInnerIDsContainer<cm::projectile>(*pComponent_Manager);
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
-            ecs::transform& rTransformProjectile = pComponent_Manager->GetComponent<ecs::transform>(uiEntity_refProjectile);
+            cm::transform& rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
             rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.2f;
         }
 
@@ -62,11 +64,11 @@ namespace GLVM::ecs
         for(unsigned int i = 0; i < uiVector_Projectile_Size; ++i) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             
-            if(pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bWall_Collision_ ||
-               pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bGround_Collision_) {
+            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bWall_Collision_ ||
+               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bGround_Collision_) {
 //                std::cout << "FLAG: " << pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-                GLVM::ecs::material& textureProjectile = pComponent_Manager->GetComponent<GLVM::ecs::material>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
+                cm::material& textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
                 continue;
             }
         }
@@ -74,13 +76,14 @@ namespace GLVM::ecs
 
     void CProjectileSystem::CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                               unsigned int iEntity_refMove,
-                                              beholder& view_Component) {
-        GLVM::ecs::CTextureManager*    TextureSystem    = GLVM::ecs::CTextureManager::GetInstance();
+												components::beholder& view_Component) {
+		namespace cm = GLVM::ecs::components;
+        GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ecs::CEntityManager::GetInstance()->CreateEntity();
-        ecs::CComponentManager::GetInstance()->CreateComponent<ecs::vertex, ecs::collider,
-                                                               ecs::transform, ecs::material,
-                                                               ecs::projectile>(uiEntity_Projectile);
+        ecs::CComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
+                                                               cm::transform, cm::material,
+                                                               cm::projectile>(uiEntity_Projectile);
 
         // core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         // pSound_Sample->kPath_to_File_ = "../laser2.wav";
@@ -88,23 +91,23 @@ namespace GLVM::ecs
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
-		ecs::material& rTextureProjectile = pComponent_Manager->GetComponent<ecs::material>(uiEntity_Projectile);
+		cm::material& rTextureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_Projectile);
         rTextureProjectile.diffuseTextureID_ = 1;
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
-        ecs::transform& rTransformProjectile = pComponent_Manager->GetComponent<ecs::transform>(uiEntity_Projectile);
+        cm::transform& rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.2f;
         Vector<float, 3> vec(0.0f);
-        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refMove).tPosition;
+        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove).tPosition;
         rTransformProjectile.tForward = GetDirectionVector(view_Component);
 
         rTransformProjectile.tPosition +=rTransformProjectile.tForward;
     }
     
-    Vector<float, 3> CProjectileSystem::GetDirectionVector(ecs::beholder& _view_Component)
+    Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;

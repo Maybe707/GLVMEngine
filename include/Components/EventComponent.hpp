@@ -3,7 +3,7 @@
 
 #include "../Event.hpp"
 
-namespace GLVM::ecs
+namespace GLVM::ecs::components
 {
 	struct event
 	{

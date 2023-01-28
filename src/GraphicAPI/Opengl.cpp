@@ -94,18 +94,18 @@ namespace GLVM::core
 		using namespace GLVM;
 		namespace cm = GLVM::ecs::components;
 		
-		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		ecs::CComponentManager* pComponent_Manager = ecs::CComponentManager::GetInstance();
 				
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<ecs::directionalLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int appropriateDirectionalLightComponentIndex = 0;
 		sampledDirectionalLightEntityIDcontainer.clear();
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		for ( int i = 0; i < pEntityContainerRefDirectionalLight->GetSize(); ++i ) {
 			unsigned int uiDirectionalLightsEntity = (*pEntityContainerRefDirectionalLight)[i];
-			ecs::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<ecs::directionalLight>(uiDirectionalLightsEntity);
+			cm::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<cm::directionalLight>(uiDirectionalLightsEntity);
 
 			directionalLightSpaceMatrixContainer[appropriateDirectionalLightComponentIndex] =
 				EvaluateFlatShadowMap(directionalLightFlatShadowMapFBOcontainer[i],
@@ -118,13 +118,13 @@ namespace GLVM::core
 			++appropriateDirectionalLightComponentIndex;
 		}
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<ecs::spotLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int appropriateSpotLightComponentIndex = 0;
 		sampledSpotLightEntityIDcontainer.clear();
 		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		for ( int i = 0; i < pEntityContainerRefSpotLight->GetSize(); ++i ) {
 			unsigned int uiSpotLightsEntity = (*pEntityContainerRefSpotLight)[i];
-			ecs::spotLight& spotLightComponent = pComponent_Manager->GetComponent<ecs::spotLight>(uiSpotLightsEntity);
+			cm::spotLight& spotLightComponent = pComponent_Manager->GetComponent<cm::spotLight>(uiSpotLightsEntity);
 
 			spotLightSpaceMatrixContainer[appropriateSpotLightComponentIndex] =
 				EvaluateFlatShadowMap(spotLightFlatShadowMapFBOContainer[i],
@@ -137,18 +137,18 @@ namespace GLVM::core
 			++appropriateSpotLightComponentIndex;
 		}
 		
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ecs::transform& playerTransformComponent = pComponent_Manager->GetComponent<ecs::transform>(uiPlayerEntity);
+		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<ecs::pointLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
 		sampledPointLightEntityIDcontainer.clear();
 		unsigned int appropriatePointLightComponentIndex = 0;
 		for ( unsigned int i = 0; i < pointLightComponentContainerSize; ++i ) {
 			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
-			ecs::pointLight& pointLightComponent = pComponent_Manager->GetComponent<ecs::pointLight>(entityID);
+			cm::pointLight& pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(entityID);
 			float distance = VectorLength(playerTransformComponent.tPosition, pointLightComponent.position);
 
 			if ( distance < 4.5f ) {
@@ -261,11 +261,35 @@ namespace GLVM::core
 			break;
 		}
 	}
-	
-	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::directionalLight& directionalLightComponent, mat4 projectionMatrixLight) {
+
+	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::directionalLight& directionalLightComponent, mat4 projectionMatrixLight) {
+		vec3 positionVectorLight = directionalLightComponent.position;
+		vec3 directionVectorLight = directionalLightComponent.direction;
+		vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
+										  directionVectorLight,
+										  { 0.0f, 1.0f, 0.0f });
+		mat4 lightSpaceMatrix = viewMatrixLight * projectionMatrixLight;
+		// Render scene from light's point of view
+		flatShadowMapShaderProgram->Use();
+		flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
+		// Render to depth map
+		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+		glClear(GL_DEPTH_BUFFER_BIT);
+//		glCullFace(GL_FRONT);
+		RenderScene(flatShadowMapShaderProgram);
+//		glCullFace(GL_BACK);
+		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
+
+		return lightSpaceMatrix;
+	}
+
+	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::spotLight& directionalLightComponent, mat4 projectionMatrixLight) {
 			vec3 positionVectorLight = directionalLightComponent.position;
 			vec3 directionVectorLight = directionalLightComponent.direction;
 			vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
+
 			mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 														 directionVectorLight,
 														 { 0.0f, 1.0f, 0.0f });
@@ -284,32 +308,8 @@ namespace GLVM::core
 
 			return lightSpaceMatrix;
 	}
-
-	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::spotLight& directionalLightComponent, mat4 projectionMatrixLight) {
-			vec3 positionVectorLight = directionalLightComponent.position;
-			vec3 directionVectorLight = directionalLightComponent.direction;
-			vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
-
-			mat4 viewMatrixLight = LookAtMain(positionVectorLight,
-														 directionVectorLight,
-														 { 0.0f, 1.0f, 0.0f });
-			mat4 lightSpaceMatrix = viewMatrixLight * projectionMatrixLight;
-			// Render scene from light's point of view
-			flatShadowMapShaderProgram->Use();
-			flatShadowMapShaderProgram->SetMat4("lightSpaceMatrix", lightSpaceMatrix);
-			// Render to depth map
-			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, shadowMapFBO);
-			glClear(GL_DEPTH_BUFFER_BIT);
-//		glCullFace(GL_FRONT);
-			RenderScene(flatShadowMapShaderProgram);
-//		glCullFace(GL_BACK);
-			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
-
-			return lightSpaceMatrix;
-	}
 	
-	void COpenglRenderer::EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::pointLight& pointLightComponent) {
+	void COpenglRenderer::EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::components::pointLight& pointLightComponent) {
 				vec3 positionVectorPointLight = pointLightComponent.position;
 //		positionVectorPointLight = playerTransformComponent.tPosition;
 //		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
@@ -335,11 +335,12 @@ namespace GLVM::core
 	}
 
 	void COpenglRenderer::EvaluateCoreShader() {
-        ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
+		namespace cm = GLVM::ecs::components;
+        ecs::CComponentManager* pComponent_Manager = ecs::CComponentManager::GetInstance();
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ecs::beholder& playerViewComponent = pComponent_Manager->GetComponent<ecs::beholder>(uiPlayerEntity);
-		ecs::transform& playerTransformComponent = pComponent_Manager->GetComponent<ecs::transform>(uiPlayerEntity);
+		cm::beholder& playerViewComponent = pComponent_Manager->GetComponent<cm::beholder>(uiPlayerEntity);
+		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 		
 //		viewPosition = playerViewComponent.Position;
 		vec3 viewPosition = playerTransformComponent.tPosition;
@@ -390,15 +391,16 @@ namespace GLVM::core
 	}
 	
 	void COpenglRenderer::ComputeDirectionalLight() {
+		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<ecs::directionalLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
 		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 
 		for(unsigned int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
-			ecs::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<ecs::directionalLight>(uiDirectionalLightEntity);
+			cm::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
 			std::string leftString = "directionalLights[";
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
 									   directionalLightComponent.position);
@@ -415,13 +417,14 @@ namespace GLVM::core
 	}
 
 	void COpenglRenderer::ComputePointLight() {
+		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<ecs::pointLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 		coreShaderProgram->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
 		for(unsigned int x = 0; x < pointLightComponentContainerSize; ++x) {
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
-			ecs::pointLight& pointLightComponent = pComponent_Manager->GetComponent<ecs::pointLight>(uiPointLightEntity);
+			cm::pointLight& pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiPointLightEntity);
 			
 			// core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
 			// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
@@ -448,13 +451,14 @@ namespace GLVM::core
 	}
 
 	void COpenglRenderer::ComputeSpotLight() {
+		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<ecs::spotLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 		coreShaderProgram->SetInt("spotLightsArraySize", spotLightComponentContainerSize);
 		for(unsigned int x = 0; x < spotLightComponentContainerSize; ++x) {
 			unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
-			ecs::spotLight& spotLightComponent = pComponent_Manager->GetComponent<ecs::spotLight>(uiSpotLightEntity);
+			cm::spotLight& spotLightComponent = pComponent_Manager->GetComponent<cm::spotLight>(uiSpotLightEntity);
 			std::string leftString = "spotLights[";
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
 									   spotLightComponent.position);
@@ -480,23 +484,24 @@ namespace GLVM::core
 	}
 	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
+		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
 			
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<ecs::vertex>(uiEntity_refTexture).vkVertexId_;
-				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<ecs::material>(uiEntity_refTexture).diffuseTextureID_;
-				unsigned int specularTextureID = pComponent_Manager->GetComponent<ecs::material>(uiEntity_refTexture).specularTextureID_;
-				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ecs::transform>(uiEntity_refTexture));
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture).vkVertexId_;
+				unsigned int diffuseTextureID = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture).diffuseTextureID_;
+				unsigned int specularTextureID = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture).specularTextureID_;
+				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE28);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE29);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				ecs::material& materialComponent = pComponent_Manager->GetComponent<ecs::material>(uiEntity_refTexture);
+				cm::material& materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 				shaderProgram_->SetFloat("material.shininess", materialComponent.shininess);
 				shaderProgram_->SetVec3("material.ambient",  materialComponent.ambient[0], materialComponent.ambient[1], materialComponent.ambient[2]);
 				// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
@@ -507,8 +512,8 @@ namespace GLVM::core
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<ecs::vertex>(uiEntity_refTexture).vkVertexId_;
-				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<ecs::transform>(uiEntity_refTexture));
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture).vkVertexId_;
+				modelMatrix = SetModelMatrix(pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE30);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
@@ -611,7 +616,7 @@ namespace GLVM::core
         }
     }
     
-	mat4 COpenglRenderer::SetModelMatrix(ecs::transform& transformComponent_)
+	mat4 COpenglRenderer::SetModelMatrix(ecs::components::transform& transformComponent_)
 	{
         mat4 rotationMatrix(1.0f);
         mat4 modelMatrix(1.0f);
@@ -657,7 +662,7 @@ namespace GLVM::core
 		loadWavefrontObj();
 	}
 
-	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::transform& _Player, ecs::beholder& _view_Component)
+	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& _Player, ecs::components::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;

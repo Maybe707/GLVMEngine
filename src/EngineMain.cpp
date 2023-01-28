@@ -6,6 +6,7 @@
 #include "Components/SpotLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Engine.hpp"
 #include "MeshManager.hpp"
 #include "SpritesData.hpp"
@@ -61,9 +62,9 @@ int main()
     hudTextureManager->SetTextureVector(hudTextureVector);
 	
     Entity uiPlayer = EntityManager->CreateEntity();
-    ComponentManager->CreateComponent<cm::vertex, cm::movement, cm::collider, cm::animation, cm::camera, cm::transform, cm::rigidBody, cm::event>(uiPlayer);
+    ComponentManager->CreateComponent<cm::vertex, cm::move, cm::collider, cm::animation, cm::beholder, cm::transform, cm::rigidBody, cm::event>(uiPlayer);
 	cm::transform& transformPlayer = ComponentManager->GetComponent<cm::transform>(uiPlayer);
-    cm::camera   & viewPlayer      = ComponentManager->GetComponent<cm::camera>(uiPlayer);
+    cm::beholder   & viewPlayer      = ComponentManager->GetComponent<cm::beholder>(uiPlayer);
     cm::collider & colliderPlayer  = ComponentManager->GetComponent<cm::collider>(uiPlayer);
     cm::vertex   & vertexPlayer    = ComponentManager->GetComponent<cm::vertex>(uiPlayer);
     vertexPlayer.vkVertexId_        = 0;

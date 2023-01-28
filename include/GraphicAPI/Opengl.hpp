@@ -114,11 +114,11 @@ namespace GLVM::core {
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::directionalLight& directionalLightComponent,
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::directionalLight& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
-		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::spotLight& directionalLightComponent,
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::spotLight& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
-		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::pointLight& pointLightComponent);
+		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::components::pointLight& pointLightComponent);
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
@@ -129,10 +129,10 @@ namespace GLVM::core {
 		void SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-		mat4 SetModelMatrix(ecs::transform& transformComponent_);
+		mat4 SetModelMatrix(ecs::components::transform& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
-		void ComputeViewMatrix(Shader* shaderProgram, ecs::transform& _Player, ecs::beholder& _view_Component);
+		void ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& _Player, ecs::components::beholder& _view_Component);
 		void ComputeProjectionMatrix(Shader* shaderProgram);
 		void renderScene(const Shader& shader);
 		void renderCube();

@@ -34,29 +34,29 @@ namespace GLVM::ecs
         float fLast_Y     = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         
-        CMovementSystem(core::CStack& _input_Stack, core::Sound::ISoundEngine* _sound_Engine);
-        
+        CMovementSystem( core::CStack& _input_Stack, core::Sound::ISoundEngine* _sound_Engine );
+
 		void Update();
-        void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
-                                 unsigned int iEntity_refMove,
-                                 beholder& view_Component);
+        void CalculateProjectile( ecs::CComponentManager* pComponent_Manager,
+                                  unsigned int iEntity_refMove,
+                                  components::beholder& view_Component );
         
         bool CompareDirection(core::CStack& _input_Stack,
                               core::EEvents _event0,
                               core::EEvents _event1);
         void DiscardOpposite(core::CStack& _input_Stack);
-        Vector<float, 3> CalculateVectorRL(ecs::beholder& _view_Component);
-        Vector<float, 3> CalculateVectorFB(ecs::beholder& _view_Component,
+        Vector<float, 3> CalculateVectorRL(components::beholder& _view_Component);
+        Vector<float, 3> CalculateVectorFB(components::beholder& _view_Component,
                                            core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
-                                           ecs::beholder& _view_Component,
+                                           components::beholder& _view_Component,
                                            core::CEvent& _event,
                                            Vector<float, 3>& _temp_Vector);
         bool FixDiagonalMove(core::CStack& _input_Stack,
-                                         transform& _transform_Component,
-                                         float _camera_Speed,
-                                         ecs::beholder& _view_Component,
-                                         core::CEvent& _event);
+							 components::transform& _transform_Component,
+							 float _camera_Speed,
+							 components::beholder& _view_Component,
+							 core::CEvent& _event);
 	};
 }
 

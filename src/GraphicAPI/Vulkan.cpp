@@ -1206,12 +1206,10 @@ namespace GLVM::core
          * choose specific texture. */
 
         ecs::CComponentManager* componentManager = ecs::CComponentManager::GetInstance();
-
-        
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = componentManager->GetComponent<ecs::vertex>(uiEntity).vkVertexId_;
+                unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity).vkVertexId_;
                 
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
                 VkDeviceSize offsets[] = {0};
@@ -1281,7 +1279,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ecs::transform _transformComponent) {
+    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent) {
         UniformBufferObject ubo{};
 
         ubo.model[0][0] = _transformComponent.fScale;
@@ -1316,6 +1314,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::drawFrame() {
+		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -1329,12 +1328,12 @@ namespace GLVM::core
         }
 
         ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        core::TCVectorContainer<ecs::transform>* pEntity_Container_refTransform =
-            ecs::GetInnerComponentContainer<ecs::transform>(*pComponent_Manager);
+        core::TCVectorContainer<cm::transform>* pEntity_Container_refTransform =
+            ecs::GetInnerComponentContainer<cm::transform>(*pComponent_Manager);
 
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-                ecs::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+                cm::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
                 updateUniformBuffer(texturePool_ * MAX_FRAMES_IN_FLIGHT * i + j + currentFrame * texturePool_, transformComponent);
             }
         }
@@ -1344,7 +1343,7 @@ namespace GLVM::core
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
         for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
-            ecs::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
+            cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
             updateUniformBuffer(n + currentFrame, transformComponent);
             ++hudCounter;
         }

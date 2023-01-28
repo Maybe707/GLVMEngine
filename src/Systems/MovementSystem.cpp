@@ -20,15 +20,17 @@ namespace GLVM::ecs
         
     void CMovementSystem::Update()
     {
+		namespace cm = GLVM::ecs::components;
+		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetInnerIDsContainer<ecs::move>(*pComponent_Manager);
+            ecs::GetInnerIDsContainer<cm::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
+            ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-        ecs::beholder& view_Component = pComponent_Manager->GetComponent<ecs::beholder>(iEntity_refView);
+		cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
 
         float cameraSpeed = 5.5f * _dOffset;            
         // int counter = 0;
@@ -41,7 +43,7 @@ namespace GLVM::ecs
                 bool bDiagonal_Movement_Availability = false;
                 
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
-                ecs::transform& rTransformComponent = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refMove);
+				cm::transform& rTransformComponent = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove);
                 
                 // if(Input_Stack_.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                 //     if(fProjectile_Accumulator_ <= 0) {
@@ -84,8 +86,8 @@ namespace GLVM::ecs
                     rTransformComponent.tPosition += rTransformComponent.tForward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
-                    pComponent_Manager->GetComponent<ecs::transform>(iEntity_refMove).tPosition[1] += 1.0f;
-                    pComponent_Manager->GetComponent<ecs::move>(iEntity_refMove).eEvent_ = core::EEvents::eJUMP;
+                    pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove).tPosition[1] += 1.0f;
+                    pComponent_Manager->GetComponent<cm::move>(iEntity_refMove).eEvent_ = core::EEvents::eJUMP;
                     break;
                 default:
                     break;
@@ -140,12 +142,12 @@ namespace GLVM::ecs
         }
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorRL(ecs::beholder& _view_Component) {
+    Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& _view_Component) {
         Vector<float, 3> tNormalized_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera));
         return tNormalized_Vector;
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorFB(ecs::beholder& _view_Component,
+    Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& _view_Component,
                                                         core::CEvent& _event) {
         Vector<float, 3> front(0.0f);
         front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
@@ -155,7 +157,7 @@ namespace GLVM::ecs
     }
 
     void CMovementSystem::CalculatePerdendicularVectors(float _camera_Speed,
-                                                        ecs::beholder& _view_Component,
+                                                        components::beholder& _view_Component,
                                                         core::CEvent& _event,
                                                         Vector<float, 3>& _temp_Vector) {
         Vector<float, 3> front(0.0f);
@@ -167,9 +169,9 @@ namespace GLVM::ecs
     }
         
     bool CMovementSystem::FixDiagonalMove(core::CStack& _input_Stack,
-                                          transform& _transform_Component,
+                                          components::transform& _transform_Component,
                                           float _camera_Speed,
-                                          ecs::beholder& _view_Component,
+                                          components::beholder& _view_Component,
                                           core::CEvent& _event) {
         Vector<float, 3> temp_Vector(0.0f);
         if(CompareDirection(_input_Stack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT))

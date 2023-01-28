@@ -58,22 +58,6 @@
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"
 
-namespace GLVM::ecs::components
-{    
-	typedef transform        transform;
-	typedef vertex           vertex;
-	typedef move             movement;
-	typedef collider         collider;
-	typedef animation    animation;
-	typedef beholder             camera;
-	typedef rigidBody        rigidBody;
-	typedef event            event;
-	typedef material         material;
-	typedef directionalLight directionalLight;
-	typedef pointLight       pointLight;
-	typedef spotLight        spotLight;
-}
-
 using Entity = unsigned int;
 
 namespace GLVM::core
