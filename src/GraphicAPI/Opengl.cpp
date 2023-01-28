@@ -137,7 +137,7 @@ namespace GLVM::Core
 			++appropriateSpotLightComponentIndex;
 		}
 		
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
 
@@ -336,9 +336,9 @@ namespace GLVM::Core
 
 	void COpenglRenderer::EvaluateCoreShader() {
         ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		ECS::CViewComponent& playerViewComponent = pComponent_Manager->GetComponent<ECS::CViewComponent>(uiPlayerEntity);
+		ECS::beholder& playerViewComponent = pComponent_Manager->GetComponent<ECS::beholder>(uiPlayerEntity);
 		ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
 		
 //		viewPosition = playerViewComponent.Position;
@@ -423,7 +423,7 @@ namespace GLVM::Core
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
 			ECS::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<ECS::SPointLightComponent>(uiPointLightEntity);
 			
-			// Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+			// Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
 			// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 			// ECS::STransformComponent& playerTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiPlayerEntity);
 
@@ -657,7 +657,7 @@ namespace GLVM::Core
 		loadWavefrontObj();
 	}
 
-	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
+	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;

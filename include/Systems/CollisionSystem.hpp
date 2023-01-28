@@ -28,7 +28,7 @@ namespace GLVM::ECS
 		void Repel(STransformComponent& _transform_Component,
                    SMoveComponent& _move_Component,
                                  float& _fDelta_Time,
-                                 CViewComponent& _view_Component,
+                                 beholder& _view_Component,
                                  Core::CEvent& _event);
         bool Gravity(STransformComponent& _transform_Component, SEventComponent& _event_Component);
 		bool BoxCollider(STransformComponent& _transform_Component1, STransformComponent& _transform_Component2);

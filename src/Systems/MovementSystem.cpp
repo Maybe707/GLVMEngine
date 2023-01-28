@@ -26,9 +26,9 @@ namespace GLVM::ECS
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-        ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
+        ECS::beholder& view_Component = pComponent_Manager->GetComponent<ECS::beholder>(iEntity_refView);
 
         float cameraSpeed = 5.5f * _dOffset;            
         // int counter = 0;
@@ -140,12 +140,12 @@ namespace GLVM::ECS
         }
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorRL(ECS::CViewComponent& _view_Component) {
+    Vector<float, 3> CMovementSystem::CalculateVectorRL(ECS::beholder& _view_Component) {
         Vector<float, 3> tNormalized_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera));
         return tNormalized_Vector;
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorFB(ECS::CViewComponent& _view_Component,
+    Vector<float, 3> CMovementSystem::CalculateVectorFB(ECS::beholder& _view_Component,
                                                         Core::CEvent& _event) {
         Vector<float, 3> front(0.0f);
         front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
@@ -155,7 +155,7 @@ namespace GLVM::ECS
     }
 
     void CMovementSystem::CalculatePerdendicularVectors(float _camera_Speed,
-                                                        ECS::CViewComponent& _view_Component,
+                                                        ECS::beholder& _view_Component,
                                                         Core::CEvent& _event,
                                                         Vector<float, 3>& _temp_Vector) {
         Vector<float, 3> front(0.0f);
@@ -169,7 +169,7 @@ namespace GLVM::ECS
     bool CMovementSystem::FixDiagonalMove(Core::CStack& _input_Stack,
                                           STransformComponent& _transform_Component,
                                           float _camera_Speed,
-                                          ECS::CViewComponent& _view_Component,
+                                          ECS::beholder& _view_Component,
                                           Core::CEvent& _event) {
         Vector<float, 3> temp_Vector(0.0f);
         if(CompareDirection(_input_Stack, Core::EEvents::eMOVE_BACKWARD, Core::EEvents::eMOVE_RIGHT))

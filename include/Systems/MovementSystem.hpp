@@ -39,23 +39,23 @@ namespace GLVM::ECS
 		void Update();
         void CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
-                                 CViewComponent& view_Component);
+                                 beholder& view_Component);
         
         bool CompareDirection(Core::CStack& _input_Stack,
                               Core::EEvents _event0,
                               Core::EEvents _event1);
         void DiscardOpposite(Core::CStack& _input_Stack);
-        Vector<float, 3> CalculateVectorRL(ECS::CViewComponent& _view_Component);
-        Vector<float, 3> CalculateVectorFB(ECS::CViewComponent& _view_Component,
+        Vector<float, 3> CalculateVectorRL(ECS::beholder& _view_Component);
+        Vector<float, 3> CalculateVectorFB(ECS::beholder& _view_Component,
                                            Core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
-                                           ECS::CViewComponent& _view_Component,
+                                           ECS::beholder& _view_Component,
                                            Core::CEvent& _event,
                                            Vector<float, 3>& _temp_Vector);
         bool FixDiagonalMove(Core::CStack& _input_Stack,
                                          STransformComponent& _transform_Component,
                                          float _camera_Speed,
-                                         ECS::CViewComponent& _view_Component,
+                                         ECS::beholder& _view_Component,
                                          Core::CEvent& _event);
 	};
 }

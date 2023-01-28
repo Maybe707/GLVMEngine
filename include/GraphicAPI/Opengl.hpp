@@ -132,7 +132,7 @@ namespace GLVM::Core {
 		mat4 SetModelMatrix(ECS::STransformComponent& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
-		void ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component);
+		void ComputeViewMatrix(Shader* shaderProgram, ECS::STransformComponent& _Player, ECS::beholder& _view_Component);
 		void ComputeProjectionMatrix(Shader* shaderProgram);
 		void renderScene(const Shader& shader);
 		void renderCube();

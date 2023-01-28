@@ -27,7 +27,7 @@ namespace GLVM::ECS
     }
     
     void CalculatePerdendicularVectors(float _camera_Speed,
-                                       ECS::CViewComponent& _view_Component,
+                                       ECS::beholder& _view_Component,
                                        Core::CEvent& _event,
                                        Vector<float, 3>& _temp_Vector)
     {
@@ -42,7 +42,7 @@ namespace GLVM::ECS
     bool FixDiagonalMoveReverse(Core::CStack& _input_Stack,
                                 STransformComponent& _transform_Component,
                                 float _camera_Speed,
-                                ECS::CViewComponent& _view_Component,
+                                ECS::beholder& _view_Component,
                                 Core::CEvent& _event)
     {
         Vector<float, 3> temp_Vector(0.0f);
@@ -75,7 +75,7 @@ namespace GLVM::ECS
     
     void CPhysicsSystem::Repel(STransformComponent& _transform_Component,
                                  float& _fDelta_Time,
-                                 CViewComponent& _view_Component,
+                                 beholder& _view_Component,
                                  Core::CEvent& _event)
     {
         for(int n = 0; n < 5; ++n)
@@ -162,7 +162,7 @@ namespace GLVM::ECS
                 {
                     Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
                           fDelta_Time_,
-                          pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refCollider),
+                          pComponent_Manager->GetComponent<ECS::beholder>(uiEntity_refCollider),
                           g_eEvent);
                     pComponent_Manager->GetComponent<ECS::CColliderComponent>(uiEntity_refCollider).bWall_Collision_ = false;
                 }

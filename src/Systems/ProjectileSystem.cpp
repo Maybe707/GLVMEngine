@@ -22,9 +22,9 @@ namespace GLVM::ECS
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-        ECS::CViewComponent& view_Component = pComponent_Manager->GetComponent<ECS::CViewComponent>(iEntity_refView);
+        ECS::beholder& view_Component = pComponent_Manager->GetComponent<ECS::beholder>(iEntity_refView);
         
         float cameraSpeed = 5.5f * _dOffset;            
 
@@ -74,7 +74,7 @@ namespace GLVM::ECS
 
     void CProjectileSystem::CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
                                               unsigned int iEntity_refMove,
-                                              CViewComponent& view_Component) {
+                                              beholder& view_Component) {
         GLVM::ECS::CTextureManager*    TextureSystem    = GLVM::ECS::CTextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
@@ -104,7 +104,7 @@ namespace GLVM::ECS
         rTransformProjectile.tPosition +=rTransformProjectile.tForward;
     }
     
-    Vector<float, 3> CProjectileSystem::GetDirectionVector(ECS::CViewComponent& _view_Component)
+    Vector<float, 3> CProjectileSystem::GetDirectionVector(ECS::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;

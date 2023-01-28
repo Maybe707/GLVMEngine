@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-    class CViewComponent
+    class beholder
     {
     public:
         Vector<float, 3> Front_Camera{0.0f, 0.0, 0.0f};

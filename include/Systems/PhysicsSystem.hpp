@@ -34,7 +34,7 @@ namespace GLVM::ECS
         void Update() override;
         void Repel(STransformComponent& _transform_Component,
                    float& _fDelta_Time,
-                   CViewComponent& _view_Component,
+                   beholder& _view_Component,
                    Core::CEvent& _event);
     };
 }

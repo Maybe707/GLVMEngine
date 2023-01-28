@@ -13,7 +13,7 @@ namespace GLVM::ECS
     {
         CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::CViewComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
         // Shader_Program_->Use();
@@ -24,11 +24,11 @@ namespace GLVM::ECS
         {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
             Player_Transform_Component = &(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refView));
-            SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<ECS::CViewComponent>(uiEntity_refView));
+            SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<ECS::beholder>(uiEntity_refView));
         }
     }
     
-    void CCameraSystem::SetViewMatrix(ECS::STransformComponent& _Player, ECS::CViewComponent& _view_Component)
+    void CCameraSystem::SetViewMatrix(ECS::STransformComponent& _Player, ECS::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.05f;
