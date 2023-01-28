@@ -99,13 +99,16 @@ namespace GLVM::core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight =
+			ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int appropriateDirectionalLightComponentIndex = 0;
 		sampledDirectionalLightEntityIDcontainer.clear();
-		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		for ( int i = 0; i < pEntityContainerRefDirectionalLight->GetSize(); ++i ) {
 			unsigned int uiDirectionalLightsEntity = (*pEntityContainerRefDirectionalLight)[i];
-			cm::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<cm::directionalLight>(uiDirectionalLightsEntity);
+			cm::directionalLight& directionalLightComponent = pComponent_Manager->
+				GetComponent<cm::directionalLight>(uiDirectionalLightsEntity);
 
 			directionalLightSpaceMatrixContainer[appropriateDirectionalLightComponentIndex] =
 				EvaluateFlatShadowMap(directionalLightFlatShadowMapFBOcontainer[i],
@@ -115,13 +118,18 @@ namespace GLVM::core
 			coreShaderProgram->Use();
 			coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("directionalLightFlatShadowMapComponentIndices[",
 																 appropriateDirectionalLightComponentIndex, "]"), i);
+			
 			++appropriateDirectionalLightComponentIndex;
 		}
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight =
+			ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int appropriateSpotLightComponentIndex = 0;
 		sampledSpotLightEntityIDcontainer.clear();
-		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f),
+													 (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT,
+													 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		
 		for ( int i = 0; i < pEntityContainerRefSpotLight->GetSize(); ++i ) {
 			unsigned int uiSpotLightsEntity = (*pEntityContainerRefSpotLight)[i];
 			cm::spotLight& spotLightComponent = pComponent_Manager->GetComponent<cm::spotLight>(uiSpotLightsEntity);
@@ -137,11 +145,15 @@ namespace GLVM::core
 			++appropriateSpotLightComponentIndex;
 		}
 		
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefView =
+			ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+		
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight =
+			ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
+		
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
 		sampledPointLightEntityIDcontainer.clear();
@@ -156,7 +168,8 @@ namespace GLVM::core
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				sampledPointLightEntityIDcontainer.push_back(i);
 				
-				EvaluateCubeShadowMap(pointLightCubeShadowMapFBOcontainer[appropriatePointLightComponentIndex], pointLightComponent);
+				EvaluateCubeShadowMap(pointLightCubeShadowMapFBOcontainer[appropriatePointLightComponentIndex],
+									  pointLightComponent);
 				
 				coreShaderProgram->Use();
 				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("pointLightCubeShadowMapComponentIndices[",
@@ -164,6 +177,7 @@ namespace GLVM::core
 				++appropriatePointLightComponentIndex;
 			}
 		}
+		
 		coreShaderProgram->Use();
 		coreShaderProgram->SetInt("pointLightCubeShadowMapArraySize", appropriatePointLightComponentIndex);
 		

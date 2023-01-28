@@ -6,18 +6,18 @@ out vec4 fragColor;
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
-#define POINT_LIGHT_CUBE_SHADOW_MAP_ARRAY_SIZE             32
-#define SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE              8
-#define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE             8
-#define POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
-#define SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE  8
+//#define POINT_LIGHT_CUBE_SHADOW_MAP_ARRAY_SIZE             32
+//#define SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE              8
+//#define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE             8
+//#define POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
+//#define SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE  8
 
 in VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
 	vec4 fragmentPositionDirectionalLightSpace[DIRECTIONAL_LIGHTS_NUMBER];
-	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHTS_NUMBER];
 } fs_in;
 
 struct Material {
@@ -75,13 +75,13 @@ uniform int              directionalLightFlatShadowMapArraySize;
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 
 uniform int              pointLightCubeShadowMapArraySize;
-uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE];
-uniform samplerCube      pointLightCubeShadowMapArray[POINT_LIGHT_CUBE_SHADOW_MAP_ARRAY_SIZE];
+uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHTS_NUMBER];
+uniform samplerCube      pointLightCubeShadowMapArray[POINT_LIGHTS_NUMBER];
 uniform int              pointLightsArraySize;
 uniform PointLight       pointLights[POINT_LIGHTS_NUMBER];
 
-uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE];
-uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE];
+uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHTS_NUMBER];
+uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHTS_NUMBER];
 uniform int              spotLightArraySize;
 uniform SpotLight        spotLights[SPOT_LIGHTS_NUMBER];
 
@@ -150,7 +150,7 @@ void main()
 	for (int j = 0; j < spotLightArraySize; ++j) {
 		vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
 		float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
-		if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightArraySize) {
+		if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightArraySize) {    ///< DELETE GOVNO!!!!!!!
 			shadow = ComputeSpotShadow(spotLights[j], fs_in.fragmentPositionSpotLightSpace[j],
 										spotLightFlatShadowMapArray[spotLightIndicesCounter]);
 			

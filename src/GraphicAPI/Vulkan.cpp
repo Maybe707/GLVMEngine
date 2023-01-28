@@ -1348,7 +1348,6 @@ namespace GLVM::core
             ++hudCounter;
         }
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
-	//	std::cout << "ti kto???? " << std::endl;        
         vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
 
