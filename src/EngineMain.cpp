@@ -98,7 +98,7 @@ int main()
 	cm::material & materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
 	cm::vertex   & vertexWitch2    = ComponentManager->GetComponent<cm::vertex>(uiWitch2);
 	cm::transform& transformWitch2 = ComponentManager->GetComponent<cm::transform>(uiWitch2);
-	materialWitch2 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	materialWitch2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 	transformWitch2 = { .tPosition = { 5.5f, 0.5f, 1.5f }, .fScale = 1.0f };
 	vertexWitch2.vkVertexId_ = 5;

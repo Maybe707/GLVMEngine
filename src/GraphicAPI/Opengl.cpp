@@ -91,6 +91,9 @@ namespace GLVM::Core
 	}
     
 	void COpenglRenderer::draw() {
+		using namespace GLVM;
+		namespace cm = GLVM::ECS::components;
+		
 		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
 				
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
