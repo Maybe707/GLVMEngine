@@ -61,7 +61,7 @@ namespace GLVM::ECS
 	}
 	
     std::vector<CTexture>& CTextureManager::GetTextureVector() { return textureVector_; }
-    void CTextureManager::UnbindTexture(ECS::SMaterialComponent _textureComponent, Entity _entity) {
+    void CTextureManager::UnbindTexture(ECS::material _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
         for (unsigned int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)

@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-	struct SMaterialComponent
+	struct material
 	{
 		unsigned int diffuseTextureID_;
 		unsigned int specularTextureID_;

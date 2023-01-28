@@ -66,7 +66,7 @@ namespace GLVM::ECS
                pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bGround_Collision_) {
 //                std::cout << "FLAG: " << pComponent_Manager->GetComponent<collider>(uiEntity_refProjectile).bWall_Collision_ << std::endl;
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-                GLVM::ECS::SMaterialComponent& textureProjectile = pComponent_Manager->GetComponent<GLVM::ECS::SMaterialComponent>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
+                GLVM::ECS::material& textureProjectile = pComponent_Manager->GetComponent<GLVM::ECS::material>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
                 continue;
             }
         }
@@ -79,7 +79,7 @@ namespace GLVM::ECS
         
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::SVertexComponent, ECS::collider,
-                                                               ECS::STransformComponent, ECS::SMaterialComponent,
+                                                               ECS::STransformComponent, ECS::material,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 
         // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
@@ -88,7 +88,7 @@ namespace GLVM::ECS
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
         
-		ECS::SMaterialComponent& rTextureProjectile = pComponent_Manager->GetComponent<ECS::SMaterialComponent>(uiEntity_Projectile);
+		ECS::material& rTextureProjectile = pComponent_Manager->GetComponent<ECS::material>(uiEntity_Projectile);
         rTextureProjectile.diffuseTextureID_ = 1;
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;

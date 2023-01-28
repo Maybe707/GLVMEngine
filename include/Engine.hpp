@@ -69,7 +69,7 @@ namespace GLVM::ECS::components
 	typedef beholder             camera;
 	typedef CRigidBodyComponent        rigidBody;
 	typedef event            event;
-	typedef SMaterialComponent         material;
+	typedef material         material;
 	typedef SDirectionalLightComponent directionalLight;
 	typedef SPointLightComponent       pointLight;
 	typedef SSpotLightComponent        spotLight;

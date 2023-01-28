@@ -31,7 +31,7 @@ namespace GLVM::ECS
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
 		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
         std::vector<CTexture>& GetTextureVector();
-        void UnbindTexture(ECS::SMaterialComponent _textureComponent, Entity _entity);
+        void UnbindTexture(ECS::material _textureComponent, Entity _entity);
     };
 }
 

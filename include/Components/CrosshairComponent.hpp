@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-	struct SCrosshairComponent
+	struct crosshair
 	{
 	
 	};
