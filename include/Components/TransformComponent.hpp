@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {    
-	struct STransformComponent
+	struct transform
 	{
         Vector<float, 3> tPosition{0.0f, 0.0f, 0.0f};
         Vector<float, 3> tForward{0.0f, 0.0f, 0.0};

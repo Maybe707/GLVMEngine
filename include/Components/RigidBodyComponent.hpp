@@ -3,7 +3,7 @@
 
 namespace GLVM::ECS
 {
-	class CRigidBodyComponent
+	class rigidBody
 	{
     public:
         float fMass_;

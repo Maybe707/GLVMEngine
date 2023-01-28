@@ -41,7 +41,7 @@ namespace GLVM::ECS
                 bool bDiagonal_Movement_Availability = false;
                 
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
-                ECS::STransformComponent& rTransformComponent = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove);
+                ECS::transform& rTransformComponent = pComponent_Manager->GetComponent<ECS::transform>(iEntity_refMove);
                 
                 // if(Input_Stack_.SearchElement(Core::EEvents::eMOUSE_LEFT_BUTTON) == Core::EEvents::eMOUSE_LEFT_BUTTON) {
                 //     if(fProjectile_Accumulator_ <= 0) {
@@ -84,17 +84,17 @@ namespace GLVM::ECS
                     rTransformComponent.tPosition += rTransformComponent.tForward * cameraSpeed;
                     break;
                 case Core::EEvents::eJUMP:
-                    pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tPosition[1] += 1.0f;
+                    pComponent_Manager->GetComponent<ECS::transform>(iEntity_refMove).tPosition[1] += 1.0f;
                     pComponent_Manager->GetComponent<ECS::move>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                     break;
                 default:
                     break;
                 }
-				// Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::SSpotLightComponent>(*pComponent_Manager);
+				// Core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ECS::GetInnerIDsContainer<ECS::spotLight>(*pComponent_Manager);
 				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
 				// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
-				// 	ECS::SSpotLightComponent& spotLightComponent = pComponent_Manager->GetComponent<ECS::SSpotLightComponent>(uiSpotLightEntity);
+				// 	ECS::spotLight& spotLightComponent = pComponent_Manager->GetComponent<ECS::spotLight>(uiSpotLightEntity);
 				// 	spotLightComponent.direction = rTransformComponent.tForward;
 				// 	spotLightComponent.position  = rTransformComponent.tPosition;
 				// }
@@ -102,9 +102,9 @@ namespace GLVM::ECS
         }
 
 		
-        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n) {
-        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-        //     ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
+        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager)->GetSize(); ++n) {
+        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager))[n];
+        //     ECS::transform& rTransform_Component = pComponent_Manager->GetComponent<ECS::transform>(iEntity_refRigidBody);
         //     Vector<float, 3> vec(0.0f);
         //     vec[1] = -1.0f;
         //     rTransform_Component.tPosition += vec * cameraSpeed;
@@ -167,7 +167,7 @@ namespace GLVM::ECS
     }
         
     bool CMovementSystem::FixDiagonalMove(Core::CStack& _input_Stack,
-                                          STransformComponent& _transform_Component,
+                                          transform& _transform_Component,
                                           float _camera_Speed,
                                           ECS::beholder& _view_Component,
                                           Core::CEvent& _event) {

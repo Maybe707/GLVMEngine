@@ -246,7 +246,7 @@ namespace GLVM::Core
         std::vector<ECS::CTexture> initializeTextureData_;
         std::vector<ECS::CTexture> texture_load_data_;
         std::vector<ECS::CTexture> hudTexture_load_data_;
-        std::vector<ECS::STransformComponent> transform_data_;
+        std::vector<ECS::transform> transform_data_;
         std::vector<const char*> pathsArray_;
         std::vector<std::vector<Core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
@@ -399,7 +399,7 @@ namespace GLVM::Core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateUniformBuffer(uint32_t currentImage, ECS::STransformComponent _transformComponent);
+        void updateUniformBuffer(uint32_t currentImage, ECS::transform _transformComponent);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

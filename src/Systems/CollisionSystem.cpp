@@ -15,8 +15,8 @@
 
 namespace GLVM::ECS
 {
-	bool CCollisionSystem::BoxCollider(STransformComponent& _transform_Component1,
-                                       STransformComponent& _transform_Component2)
+	bool CCollisionSystem::BoxCollider(transform& _transform_Component1,
+                                       transform& _transform_Component2)
 	{
         if(_transform_Component1.tPosition[0] + _transform_Component1.fScale / 2 > _transform_Component2.tPosition[0] - _transform_Component2.fScale / 2 &&
            _transform_Component1.tPosition[0] - _transform_Component1.fScale / 2 < _transform_Component2.tPosition[0] + _transform_Component2.fScale / 2 &&
@@ -31,8 +31,8 @@ namespace GLVM::ECS
 		return false;
 	}
 
-    bool CCollisionSystem::UpperActorCheck(STransformComponent& _transform_Component1,
-                                           STransformComponent& _transform_Component2)
+    bool CCollisionSystem::UpperActorCheck(transform& _transform_Component1,
+                                           transform& _transform_Component2)
     {
         if((_transform_Component1.tPosition[1] - _transform_Component1.fScale / 2) > (_transform_Component2.tPosition[1] + (_transform_Component2.fScale / 2  - 0.2f)))
         {
@@ -63,9 +63,9 @@ namespace GLVM::ECS
                 // if(uiCompared_Entity_refCollider == 0)
                 //     continue;
                 
-                bool bBox_Collider_Flag = BoxCollider(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider),
-                                                      _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
-                bool bUpper_Actor_Check_Flag = UpperActorCheck(_Component_Manager->GetComponent<ECS::STransformComponent>(uiBacktracking_Entity_refCollider), _Component_Manager->GetComponent<ECS::STransformComponent>(uiCompared_Entity_refCollider));
+                bool bBox_Collider_Flag = BoxCollider(_Component_Manager->GetComponent<ECS::transform>(uiBacktracking_Entity_refCollider),
+                                                      _Component_Manager->GetComponent<ECS::transform>(uiCompared_Entity_refCollider));
+                bool bUpper_Actor_Check_Flag = UpperActorCheck(_Component_Manager->GetComponent<ECS::transform>(uiBacktracking_Entity_refCollider), _Component_Manager->GetComponent<ECS::transform>(uiCompared_Entity_refCollider));
 
 				if(bUpper_Actor_Check_Flag && bBox_Collider_Flag)
                 {

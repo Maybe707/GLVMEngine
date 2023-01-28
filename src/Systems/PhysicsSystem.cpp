@@ -40,7 +40,7 @@ namespace GLVM::ECS
     }
         
     bool FixDiagonalMoveReverse(Core::CStack& _input_Stack,
-                                STransformComponent& _transform_Component,
+                                transform& _transform_Component,
                                 float _camera_Speed,
                                 ECS::beholder& _view_Component,
                                 Core::CEvent& _event)
@@ -73,7 +73,7 @@ namespace GLVM::ECS
         return false;
     }
     
-    void CPhysicsSystem::Repel(STransformComponent& _transform_Component,
+    void CPhysicsSystem::Repel(transform& _transform_Component,
                                  float& _fDelta_Time,
                                  beholder& _view_Component,
                                  Core::CEvent& _event)
@@ -123,11 +123,11 @@ namespace GLVM::ECS
         
         float cameraSpeed = 5.5f * fDelta_Time_;            
 
-        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
+        for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager)->GetSize(); ++n)
         {
-            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-            //    pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
-            ECS::STransformComponent& rTransform_Component = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody);
+            int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager))[n];
+            //    pComponent_Manager->GetComponent<ECS::transform>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
+            ECS::transform& rTransform_Component = pComponent_Manager->GetComponent<ECS::transform>(iEntity_refRigidBody);
             Vector<float, 3> vec(0.0f);
             vec[1] = -1.0f;
             rTransform_Component.tPosition -= vec * cameraSpeed;
@@ -145,7 +145,7 @@ namespace GLVM::ECS
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refCollider =
             ECS::GetInnerIDsContainer<ECS::collider>(*pComponent_Manager);
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
-            ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager);
             
         for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
         {
@@ -160,7 +160,7 @@ namespace GLVM::ECS
                 if(pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bWall_Collision_
                     && pComponent_Manager->GetComponent<ECS::collider>(uiEntity_refCollider).bPush_Collission)
                 {
-                    Repel(pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refCollider),
+                    Repel(pComponent_Manager->GetComponent<ECS::transform>(uiEntity_refCollider),
                           fDelta_Time_,
                           pComponent_Manager->GetComponent<ECS::beholder>(uiEntity_refCollider),
                           g_eEvent);
@@ -170,10 +170,10 @@ namespace GLVM::ECS
 
         ///< Forcing all entities that had gravity component falling down.
 
-        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager)->GetSize(); ++n)
+        // for(int n = 0; n < ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager)->GetSize(); ++n)
         // {
-        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::CRigidBodyComponent>(*pComponent_Manager))[n];
-        //     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
+        //     int iEntity_refRigidBody = (*ECS::GetInnerIDsContainer<ECS::rigidBody>(*pComponent_Manager))[n];
+        //     pComponent_Manager->GetComponent<ECS::transform>(iEntity_refRigidBody).tPosition[1] -= fAcceleration_of_Gravity_;
         // }
 
 

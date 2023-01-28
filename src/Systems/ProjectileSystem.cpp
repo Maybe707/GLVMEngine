@@ -52,7 +52,7 @@ namespace GLVM::ECS
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
-            ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_refProjectile);
+            ECS::transform& rTransformProjectile = pComponent_Manager->GetComponent<ECS::transform>(uiEntity_refProjectile);
             rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.2f;
         }
 
@@ -79,7 +79,7 @@ namespace GLVM::ECS
         
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::vertex, ECS::collider,
-                                                               ECS::STransformComponent, ECS::material,
+                                                               ECS::transform, ECS::material,
                                                                ECS::CProjectileComponent>(uiEntity_Projectile);
 
         // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
@@ -95,10 +95,10 @@ namespace GLVM::ECS
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        Core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
-        ECS::STransformComponent& rTransformProjectile = pComponent_Manager->GetComponent<ECS::STransformComponent>(uiEntity_Projectile);
+        ECS::transform& rTransformProjectile = pComponent_Manager->GetComponent<ECS::transform>(uiEntity_Projectile);
         rTransformProjectile.fScale = 0.2f;
         Vector<float, 3> vec(0.0f);
-        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tPosition;
+        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<ECS::transform>(iEntity_refMove).tPosition;
         rTransformProjectile.tForward = GetDirectionVector(view_Component);
 
         rTransformProjectile.tPosition +=rTransformProjectile.tForward;

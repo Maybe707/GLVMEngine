@@ -61,18 +61,18 @@
 
 namespace GLVM::ECS::components
 {    
-	typedef STransformComponent        transform;
+	typedef transform        transform;
 	typedef vertex           vertex;
 	typedef move             movement;
 	typedef collider         collider;
 	typedef SAnimationMoveComponent    animation;
 	typedef beholder             camera;
-	typedef CRigidBodyComponent        rigidBody;
+	typedef rigidBody        rigidBody;
 	typedef event            event;
 	typedef material         material;
 	typedef SDirectionalLightComponent directionalLight;
 	typedef SPointLightComponent       pointLight;
-	typedef SSpotLightComponent        spotLight;
+	typedef spotLight        spotLight;
 }
 
 using Entity = unsigned int;

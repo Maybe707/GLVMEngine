@@ -53,7 +53,7 @@ namespace GLVM::ECS
                                            Core::CEvent& _event,
                                            Vector<float, 3>& _temp_Vector);
         bool FixDiagonalMove(Core::CStack& _input_Stack,
-                                         STransformComponent& _transform_Component,
+                                         transform& _transform_Component,
                                          float _camera_Speed,
                                          ECS::beholder& _view_Component,
                                          Core::CEvent& _event);

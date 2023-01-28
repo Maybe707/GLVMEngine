@@ -26,7 +26,7 @@ namespace GLVM::ECS
         bool bFirst_Mouse = true;
 
         void Update() override;
-        void SetViewMatrix(ECS::STransformComponent& _Player, ECS::beholder& _view_Component);
+        void SetViewMatrix(ECS::transform& _Player, ECS::beholder& _view_Component);
         void SetProjectionMatrix();
     };
 }

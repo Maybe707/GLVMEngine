@@ -32,7 +32,7 @@ namespace GLVM::ECS
          */
          
         void Update() override;
-        void Repel(STransformComponent& _transform_Component,
+        void Repel(transform& _transform_Component,
                    float& _fDelta_Time,
                    beholder& _view_Component,
                    Core::CEvent& _event);
