@@ -141,14 +141,14 @@ namespace GLVM::Core
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		ECS::transform& playerTransformComponent = pComponent_Manager->GetComponent<ECS::transform>(uiPlayerEntity);
 
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<ECS::SPointLightComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<ECS::pointLight>(*pComponent_Manager);
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
 		sampledPointLightEntityIDcontainer.clear();
 		unsigned int appropriatePointLightComponentIndex = 0;
 		for ( unsigned int i = 0; i < pointLightComponentContainerSize; ++i ) {
 			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
-			ECS::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<ECS::SPointLightComponent>(entityID);
+			ECS::pointLight& pointLightComponent = pComponent_Manager->GetComponent<ECS::pointLight>(entityID);
 			float distance = VectorLength(playerTransformComponent.tPosition, pointLightComponent.position);
 
 			if ( distance < 4.5f ) {
@@ -309,7 +309,7 @@ namespace GLVM::Core
 			return lightSpaceMatrix;
 	}
 	
-	void COpenglRenderer::EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ECS::SPointLightComponent& pointLightComponent) {
+	void COpenglRenderer::EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ECS::pointLight& pointLightComponent) {
 				vec3 positionVectorPointLight = pointLightComponent.position;
 //		positionVectorPointLight = playerTransformComponent.tPosition;
 //		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
@@ -416,12 +416,12 @@ namespace GLVM::Core
 
 	void COpenglRenderer::ComputePointLight() {
 		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<ECS::SPointLightComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ECS::GetInnerIDsContainer<ECS::pointLight>(*pComponent_Manager);
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 		coreShaderProgram->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
 		for(unsigned int x = 0; x < pointLightComponentContainerSize; ++x) {
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
-			ECS::SPointLightComponent& pointLightComponent = pComponent_Manager->GetComponent<ECS::SPointLightComponent>(uiPointLightEntity);
+			ECS::pointLight& pointLightComponent = pComponent_Manager->GetComponent<ECS::pointLight>(uiPointLightEntity);
 			
 			// Core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
 			// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];

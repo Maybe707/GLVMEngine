@@ -71,7 +71,7 @@ namespace GLVM::ECS::components
 	typedef event            event;
 	typedef material         material;
 	typedef SDirectionalLightComponent directionalLight;
-	typedef SPointLightComponent       pointLight;
+	typedef pointLight       pointLight;
 	typedef spotLight        spotLight;
 }
 

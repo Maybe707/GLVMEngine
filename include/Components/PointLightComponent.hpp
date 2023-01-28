@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-	struct SPointLightComponent
+	struct pointLight
 	{
 		vec3 position;
 

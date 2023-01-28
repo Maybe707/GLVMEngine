@@ -118,7 +118,7 @@ namespace GLVM::Core {
 			                       mat4 projectionMatrixLight);
 		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::spotLight& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
-		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ECS::SPointLightComponent& pointLightComponent);
+		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ECS::pointLight& pointLightComponent);
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
