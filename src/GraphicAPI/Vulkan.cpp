@@ -29,7 +29,7 @@ namespace GLVM::Core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<ECS::CTexture> _initializeTextureData, std::vector<ECS::CTexture> _initializeHUDTextureData) {
+    CVulkanRenderer::CVulkanRenderer(std::vector<ecs::CTexture> _initializeTextureData, std::vector<ecs::CTexture> _initializeHUDTextureData) {
         texturePool_ = 10;
         unsigned int mainTexturesQuantity = _initializeTextureData.size() * texturePool_;
         unsigned int hudTexturesQuantity = _initializeHUDTextureData.size();
@@ -158,7 +158,7 @@ namespace GLVM::Core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) {
+    void CVulkanRenderer::SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) {
         texture_load_data_ = _texture_data;
         hudTexture_load_data_ = _hud_texture_data;
 
@@ -1205,13 +1205,13 @@ namespace GLVM::Core
         /* MAX_FRAMES_IN_FLIGHT doubles texture pool and then j + currentFrame * texturePool
          * choose specific texture. */
 
-        ECS::CComponentManager* componentManager = ECS::CComponentManager::GetInstance();
+        ecs::CComponentManager* componentManager = ecs::CComponentManager::GetInstance();
 
         
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = componentManager->GetComponent<ECS::vertex>(uiEntity).vkVertexId_;
+                unsigned int uiVertexId = componentManager->GetComponent<ecs::vertex>(uiEntity).vkVertexId_;
                 
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
                 VkDeviceSize offsets[] = {0};
@@ -1281,7 +1281,7 @@ namespace GLVM::Core
         }
     }
 
-    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ECS::transform _transformComponent) {
+    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ecs::transform _transformComponent) {
         UniformBufferObject ubo{};
 
         ubo.model[0][0] = _transformComponent.fScale;
@@ -1328,13 +1328,13 @@ namespace GLVM::Core
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-        Core::TCVectorContainer<ECS::transform>* pEntity_Container_refTransform =
-            ECS::GetInnerComponentContainer<ECS::transform>(*pComponent_Manager);
+        ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+        Core::TCVectorContainer<ecs::transform>* pEntity_Container_refTransform =
+            ecs::GetInnerComponentContainer<ecs::transform>(*pComponent_Manager);
 
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-                ECS::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+                ecs::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
                 updateUniformBuffer(texturePool_ * MAX_FRAMES_IN_FLIGHT * i + j + currentFrame * texturePool_, transformComponent);
             }
         }
@@ -1344,7 +1344,7 @@ namespace GLVM::Core
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
         for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
-            ECS::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
+            ecs::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
             updateUniformBuffer(n + currentFrame, transformComponent);
             ++hudCounter;
         }

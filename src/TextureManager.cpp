@@ -3,7 +3,7 @@
 #include "Texture.hpp"
 #include <iostream>
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     CTextureManager* CTextureManager::pInstance_ = nullptr;
     std::mutex CTextureManager::Mutex_;
@@ -42,7 +42,7 @@ namespace GLVM::ECS
 		}
     }
 
- 	void CTextureManager::LoadTextureData(GLVM::ECS::CTexture& _Texture)
+ 	void CTextureManager::LoadTextureData(GLVM::ecs::CTexture& _Texture)
 	{
 		///< Loading and creating texture.
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
@@ -61,7 +61,7 @@ namespace GLVM::ECS
 	}
 	
     std::vector<CTexture>& CTextureManager::GetTextureVector() { return textureVector_; }
-    void CTextureManager::UnbindTexture(ECS::material _textureComponent, Entity _entity) {
+    void CTextureManager::UnbindTexture(ecs::material _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
         for (unsigned int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)

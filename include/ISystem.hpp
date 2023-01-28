@@ -4,7 +4,7 @@
 #include "ComponentManager.hpp"
 #include "Event.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class ISystem
 	{

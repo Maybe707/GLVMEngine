@@ -86,8 +86,8 @@ namespace GLVM::Core {
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
 		bool shadows = true;
-		std::vector<ECS::CTexture> texture_load_data_;
-        std::vector<ECS::CTexture> hudTexture_load_data_;
+		std::vector<ecs::CTexture> texture_load_data_;
+        std::vector<ecs::CTexture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
@@ -114,11 +114,11 @@ namespace GLVM::Core {
 		void ComputeDirectionalLight();
 		void ComputePointLight();
 		void ComputeSpotLight();
-		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::directionalLight& directionalLightComponent,
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::directionalLight& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
-		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::spotLight& directionalLightComponent,
+		mat4 EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::spotLight& directionalLightComponent,
 			                       mat4 projectionMatrixLight);
-		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ECS::pointLight& pointLightComponent);
+		void EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::pointLight& pointLightComponent);
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
@@ -126,13 +126,13 @@ namespace GLVM::Core {
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
-		void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
+		void SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
-		mat4 SetModelMatrix(ECS::transform& transformComponent_);
+		mat4 SetModelMatrix(ecs::transform& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
-		void ComputeViewMatrix(Shader* shaderProgram, ECS::transform& _Player, ECS::beholder& _view_Component);
+		void ComputeViewMatrix(Shader* shaderProgram, ecs::transform& _Player, ecs::beholder& _view_Component);
 		void ComputeProjectionMatrix(Shader* shaderProgram);
 		void renderScene(const Shader& shader);
 		void renderCube();

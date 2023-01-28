@@ -59,7 +59,7 @@
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"
 
-namespace GLVM::ECS::components
+namespace GLVM::ecs::components
 {    
 	typedef transform        transform;
 	typedef vertex           vertex;
@@ -89,13 +89,13 @@ namespace GLVM::Core
 
 		float              fDelta_Time_;
 		CStack             Input_Stack_;
-        ECS::CRenderSystem * Render_System_Interface_;
+        ecs::CRenderSystem * Render_System_Interface_;
         
-        ECS::CCollisionSystem  * Collision_System;
-		ECS::CMovementSystem   * Movement_System;
-        ECS::CPhysicsSystem    * Physics_System_;
-        ECS::CProjectileSystem * pProjectile_System_;
-        ECS::CGUISystem        * GUI_System;
+        ecs::CCollisionSystem  * Collision_System;
+		ecs::CMovementSystem   * Movement_System;
+        ecs::CPhysicsSystem    * Physics_System_;
+        ecs::CProjectileSystem * pProjectile_System_;
+        ecs::CGUISystem        * GUI_System;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;

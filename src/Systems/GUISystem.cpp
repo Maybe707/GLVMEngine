@@ -2,7 +2,7 @@
 #include <GL/gl.h>
 
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     void CGUISystem::Update()
     {

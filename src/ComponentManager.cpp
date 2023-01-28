@@ -1,6 +1,6 @@
 #include "ComponentManager.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     CComponentManager* CComponentManager::pInstance_ = nullptr;
     std::mutex CComponentManager::Mutex_;

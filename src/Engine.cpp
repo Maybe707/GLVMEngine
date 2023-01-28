@@ -56,17 +56,17 @@ namespace GLVM::Core
     CEngine::CEngine()
     {
 		//		Window_             = CWindowCreator().Create();
-		//   Render_System_Interface_ = new ECS::CRenderSystem();
-		Render_System_Interface_ = new ECS::CRenderSystem();
+		//   Render_System_Interface_ = new ecs::CRenderSystem();
+		Render_System_Interface_ = new ecs::CRenderSystem();
 		Chrono_                  = Time::CTimerCreator().Create();
 		Sound_Engine_            = Sound::CSoundEngineFactory().CreateSoundEngine();
 
-		Collision_System         = new ECS::CCollisionSystem(Input_Stack_);
-		GUI_System               = new ECS::CGUISystem();
-		Movement_System          = new ECS::CMovementSystem(Input_Stack_, Sound_Engine_);
-		Physics_System_          = new ECS::CPhysicsSystem(Input_Stack_);
-		pProjectile_System_      = new ECS::CProjectileSystem(Input_Stack_);
-//		pCamera_System           = new ECS::CCameraSystem();
+		Collision_System         = new ecs::CCollisionSystem(Input_Stack_);
+		GUI_System               = new ecs::CGUISystem();
+		Movement_System          = new ecs::CMovementSystem(Input_Stack_, Sound_Engine_);
+		Physics_System_          = new ecs::CPhysicsSystem(Input_Stack_);
+		pProjectile_System_      = new ecs::CProjectileSystem(Input_Stack_);
+//		pCamera_System           = new ecs::CCameraSystem();
         
 		fDelta_Time_             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -86,7 +86,7 @@ namespace GLVM::Core
 
     void CEngine::GameLoop()
     {
-		ECS::CSystemManager*   pSystem_Manager     = ECS::CSystemManager::GetInstance();
+		ecs::CSystemManager*   pSystem_Manager     = ecs::CSystemManager::GetInstance();
 
 		bool bGame_Loop_Active            = true;
 

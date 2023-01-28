@@ -3,7 +3,7 @@
 
 #include "VectorContainer.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class collider
 	{

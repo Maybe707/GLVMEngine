@@ -11,7 +11,7 @@
 typedef unsigned int Entity_ID;
 typedef unsigned int Texture_ID;
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class CTextureManager
     {
@@ -29,9 +29,9 @@ namespace GLVM::ECS
         static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         static CTextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
-		void LoadTextureData(GLVM::ECS::CTexture& _Texture);
+		void LoadTextureData(GLVM::ecs::CTexture& _Texture);
         std::vector<CTexture>& GetTextureVector();
-        void UnbindTexture(ECS::material _textureComponent, Entity _entity);
+        void UnbindTexture(ecs::material _textureComponent, Entity _entity);
     };
 }
 

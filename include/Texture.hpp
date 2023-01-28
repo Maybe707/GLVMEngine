@@ -6,7 +6,7 @@
 
 typedef unsigned int Entity;
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     struct CTexture
     {

@@ -1,7 +1,7 @@
 #ifndef RIGIDBODY_COMPONENT
 #define RIGIDBODY_COMPONENT
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class rigidBody
 	{

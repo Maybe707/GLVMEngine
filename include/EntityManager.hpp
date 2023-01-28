@@ -6,7 +6,7 @@
 
 typedef unsigned int Entity_ID;  
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class CEntityManager
 	{

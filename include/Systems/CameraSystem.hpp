@@ -9,7 +9,7 @@
 #include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class CCameraSystem : public ISystem
     {
@@ -26,7 +26,7 @@ namespace GLVM::ECS
         bool bFirst_Mouse = true;
 
         void Update() override;
-        void SetViewMatrix(ECS::transform& _Player, ECS::beholder& _view_Component);
+        void SetViewMatrix(ecs::transform& _Player, ecs::beholder& _view_Component);
         void SetProjectionMatrix();
     };
 }

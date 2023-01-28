@@ -15,7 +15,7 @@
 #include "Components/ViewComponent.hpp"
 #include <mutex>
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class CCollisionSystem : public ISystem
 	{   

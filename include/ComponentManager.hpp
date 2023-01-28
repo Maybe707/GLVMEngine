@@ -12,7 +12,7 @@
 
 typedef unsigned int Entity_ID;
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class CComponentManager
 	{
@@ -100,13 +100,13 @@ namespace GLVM::ECS
 	};
 
 	template <typename Component_Type>
-	Core::TCVectorContainer<Component_Type>* GetInnerComponentContainer(ECS::CComponentManager& _Component_Manager)
+	Core::TCVectorContainer<Component_Type>* GetInnerComponentContainer(ecs::CComponentManager& _Component_Manager)
 	{
 		return static_cast<Core::TCVectorContainer<Component_Type>*>(_Component_Manager.tWorld_Components_Container_[_Component_Manager.CreateComponentContainer<Component_Type>()]);
 	}
 
 	template <typename Component_Type>
-	Core::TCVectorContainer<Entity_ID>* GetInnerIDsContainer(ECS::CComponentManager& _Component_Manager)
+	Core::TCVectorContainer<Entity_ID>* GetInnerIDsContainer(ecs::CComponentManager& _Component_Manager)
 	{
 		return static_cast<Core::TCVectorContainer<Entity_ID>*>(_Component_Manager.tWorld_IDs_Container[_Component_Manager.CreateComponentContainer<Component_Type>()]);
     }

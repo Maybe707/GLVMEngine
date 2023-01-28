@@ -9,7 +9,7 @@
 #include "VertexMath.hpp"
 #include <GL/gl.h>
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class CGUISystem : public ISystem
     {

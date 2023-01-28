@@ -30,7 +30,7 @@
     Take a game object to render in DrawSprite method.
 */
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {    
   class CRenderSystem : public ISystem
   {

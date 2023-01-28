@@ -7,28 +7,28 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     void CCameraSystem::Update()
     {
-        CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
+        CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ECS::GetInnerIDsContainer<ECS::beholder>(*pComponent_Manager);
+            ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
         // Shader_Program_->Use();
         // Shader_Program_->SetUniformID();
         
-        ECS::transform* Player_Transform_Component;
+        ecs::transform* Player_Transform_Component;
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
         {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
-            Player_Transform_Component = &(pComponent_Manager->GetComponent<ECS::transform>(uiEntity_refView));
-            SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<ECS::beholder>(uiEntity_refView));
+            Player_Transform_Component = &(pComponent_Manager->GetComponent<ecs::transform>(uiEntity_refView));
+            SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<ecs::beholder>(uiEntity_refView));
         }
     }
     
-    void CCameraSystem::SetViewMatrix(ECS::transform& _Player, ECS::beholder& _view_Component)
+    void CCameraSystem::SetViewMatrix(ecs::transform& _Player, ecs::beholder& _view_Component)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.05f;

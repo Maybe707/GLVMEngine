@@ -17,7 +17,7 @@
 #include "ISoundEngine.hpp"
 #include "Components/SpotLightComponent.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class CMovementSystem : public ISystem
 	{
@@ -37,7 +37,7 @@ namespace GLVM::ECS
         CMovementSystem(Core::CStack& _input_Stack, Core::Sound::ISoundEngine* _sound_Engine);
         
 		void Update();
-        void CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
+        void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
                                  beholder& view_Component);
         
@@ -45,17 +45,17 @@ namespace GLVM::ECS
                               Core::EEvents _event0,
                               Core::EEvents _event1);
         void DiscardOpposite(Core::CStack& _input_Stack);
-        Vector<float, 3> CalculateVectorRL(ECS::beholder& _view_Component);
-        Vector<float, 3> CalculateVectorFB(ECS::beholder& _view_Component,
+        Vector<float, 3> CalculateVectorRL(ecs::beholder& _view_Component);
+        Vector<float, 3> CalculateVectorFB(ecs::beholder& _view_Component,
                                            Core::CEvent& _event);
         void CalculatePerdendicularVectors(float _camera_Speed,
-                                           ECS::beholder& _view_Component,
+                                           ecs::beholder& _view_Component,
                                            Core::CEvent& _event,
                                            Vector<float, 3>& _temp_Vector);
         bool FixDiagonalMove(Core::CStack& _input_Stack,
                                          transform& _transform_Component,
                                          float _camera_Speed,
-                                         ECS::beholder& _view_Component,
+                                         ecs::beholder& _view_Component,
                                          Core::CEvent& _event);
 	};
 }

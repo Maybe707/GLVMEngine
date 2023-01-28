@@ -11,7 +11,7 @@
 #include "Globals.hpp"
 #include "TextureManager.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class CProjectileSystem : public ISystem
     {
@@ -27,10 +27,10 @@ namespace GLVM::ECS
 
         CProjectileSystem(Core::CStack& _input_Stack);
         void Update() override;
-        void CalculateProjectile(ECS::CComponentManager* pComponent_Manager,
+        void CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
                                  unsigned int iEntity_refMove,
                                  beholder& view_Component);
-        Vector<float, 3> GetDirectionVector(ECS::beholder& _view_Component);
+        Vector<float, 3> GetDirectionVector(ecs::beholder& _view_Component);
     };
 }
 

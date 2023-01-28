@@ -2,7 +2,7 @@
 #define MOVE_COMPONENT
 
 #include "Event.hpp"
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	struct move
 	{

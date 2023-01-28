@@ -1,7 +1,7 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     CEntityManager* CEntityManager::pInstance_ = nullptr;
     std::mutex CEntityManager::Mutex_;

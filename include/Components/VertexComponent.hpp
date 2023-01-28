@@ -5,7 +5,7 @@
 // #include <iostream>
 // #include "GraphicAPI/Vulkan.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	struct vertex
 	{

@@ -3,7 +3,7 @@
 
 #include "VertexMath.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {    
 	struct transform
 	{

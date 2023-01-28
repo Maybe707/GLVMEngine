@@ -4,7 +4,7 @@
 #include "VertexMath.hpp"
 #include "Components/VertexComponent.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class projectile
     {

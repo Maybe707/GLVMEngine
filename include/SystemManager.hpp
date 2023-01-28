@@ -5,7 +5,7 @@
 #include "VectorContainer.hpp"
 #include <mutex>
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
 	class CSystemManager : public ISystem
 	{

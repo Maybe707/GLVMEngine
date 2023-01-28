@@ -243,10 +243,10 @@ namespace GLVM::Core
     
     class CVulkanRenderer : public IRenderer {
     public:
-        std::vector<ECS::CTexture> initializeTextureData_;
-        std::vector<ECS::CTexture> texture_load_data_;
-        std::vector<ECS::CTexture> hudTexture_load_data_;
-        std::vector<ECS::transform> transform_data_;
+        std::vector<ecs::CTexture> initializeTextureData_;
+        std::vector<ecs::CTexture> texture_load_data_;
+        std::vector<ecs::CTexture> hudTexture_load_data_;
+        std::vector<ecs::transform> transform_data_;
         std::vector<const char*> pathsArray_;
         std::vector<std::vector<Core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
@@ -267,14 +267,14 @@ namespace GLVM::Core
         GLVM::Core::CWindowWin Window;
 #endif
         
-        CVulkanRenderer(std::vector<ECS::CTexture> _texture_data, std::vector<ECS::CTexture> _initializeHUDTextureData);
+        CVulkanRenderer(std::vector<ecs::CTexture> _texture_data, std::vector<ecs::CTexture> _initializeHUDTextureData);
         ~CVulkanRenderer();
 
         void createTextureImage();
         void recreateSwapChain();
         void draw() override;
         void loadWavefrontObj() override;
-        void SetTextureData(std::vector<ECS::CTexture>& _texture_data, std::vector<ECS::CTexture>& _hud_texture_data) override;
+        void SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) override;
         void SetMeshData(std::vector<const char*> _pathsArray) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
@@ -399,7 +399,7 @@ namespace GLVM::Core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateUniformBuffer(uint32_t currentImage, ECS::transform _transformComponent);
+        void updateUniformBuffer(uint32_t currentImage, ecs::transform _transformComponent);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

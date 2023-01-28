@@ -1,6 +1,6 @@
 #include "SystemManager.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     CSystemManager* CSystemManager::pInstance_ = nullptr;
     std::mutex CSystemManager::Mutex_;

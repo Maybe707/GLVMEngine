@@ -11,7 +11,7 @@
 #include "Stack.hpp"
 #include "Components/ViewComponent.hpp"
 
-namespace GLVM::ECS
+namespace GLVM::ecs
 {
     class CPhysicsSystem : public ISystem
     {
