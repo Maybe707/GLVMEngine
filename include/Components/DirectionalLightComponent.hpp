@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-	struct SDirectionalLightComponent
+	struct directionalLight
 	{
 		vec3 position;
 		vec3 direction;

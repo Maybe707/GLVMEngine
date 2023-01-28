@@ -46,7 +46,7 @@ namespace GLVM::ECS
 		{
             CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
             Core::TCVectorContainer<unsigned int>* pEntity_Container_refAnimationMove =
-                ECS::GetInnerIDsContainer<ECS::SAnimationMoveComponent>(*pComponent_Manager);
+                ECS::GetInnerIDsContainer<ECS::animation>(*pComponent_Manager);
             unsigned int uiVector_AnimationMove_Size = pEntity_Container_refAnimationMove->GetSize();
 
             

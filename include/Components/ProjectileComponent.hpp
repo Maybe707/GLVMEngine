@@ -6,7 +6,7 @@
 
 namespace GLVM::ECS
 {
-    class CProjectileComponent
+    class projectile
     {
     public:
         bool bCollision_Status_ = false;

@@ -47,7 +47,7 @@ namespace GLVM::ECS
         }
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
-            GetInnerIDsContainer<CProjectileComponent>(*pComponent_Manager);
+            GetInnerIDsContainer<projectile>(*pComponent_Manager);
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
@@ -80,7 +80,7 @@ namespace GLVM::ECS
         unsigned int uiEntity_Projectile = ECS::CEntityManager::GetInstance()->CreateEntity();
         ECS::CComponentManager::GetInstance()->CreateComponent<ECS::vertex, ECS::collider,
                                                                ECS::transform, ECS::material,
-                                                               ECS::CProjectileComponent>(uiEntity_Projectile);
+                                                               ECS::projectile>(uiEntity_Projectile);
 
         // Core::Sound::CSoundSample* pSound_Sample = new Core::Sound::CSoundSample();
         // pSound_Sample->kPath_to_File_ = "../laser2.wav";

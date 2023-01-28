@@ -99,13 +99,13 @@ namespace GLVM::Core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<ECS::SDirectionalLightComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<ECS::directionalLight>(*pComponent_Manager);
 		unsigned int appropriateDirectionalLightComponentIndex = 0;
 		sampledDirectionalLightEntityIDcontainer.clear();
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f, nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		for ( int i = 0; i < pEntityContainerRefDirectionalLight->GetSize(); ++i ) {
 			unsigned int uiDirectionalLightsEntity = (*pEntityContainerRefDirectionalLight)[i];
-			ECS::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<ECS::SDirectionalLightComponent>(uiDirectionalLightsEntity);
+			ECS::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<ECS::directionalLight>(uiDirectionalLightsEntity);
 
 			directionalLightSpaceMatrixContainer[appropriateDirectionalLightComponentIndex] =
 				EvaluateFlatShadowMap(directionalLightFlatShadowMapFBOcontainer[i],
@@ -262,7 +262,7 @@ namespace GLVM::Core
 		}
 	}
 	
-	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::SDirectionalLightComponent& directionalLightComponent, mat4 projectionMatrixLight) {
+	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ECS::directionalLight& directionalLightComponent, mat4 projectionMatrixLight) {
 			vec3 positionVectorLight = directionalLightComponent.position;
 			vec3 directionVectorLight = directionalLightComponent.direction;
 			vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
@@ -391,14 +391,14 @@ namespace GLVM::Core
 	
 	void COpenglRenderer::ComputeDirectionalLight() {
 		ECS::CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
-		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<ECS::SDirectionalLightComponent>(*pComponent_Manager);
+		Core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ECS::GetInnerIDsContainer<ECS::directionalLight>(*pComponent_Manager);
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
 		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
 
 		for(unsigned int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
-			ECS::SDirectionalLightComponent& directionalLightComponent = pComponent_Manager->GetComponent<ECS::SDirectionalLightComponent>(uiDirectionalLightEntity);
+			ECS::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<ECS::directionalLight>(uiDirectionalLightEntity);
 			std::string leftString = "directionalLights[";
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
 									   directionalLightComponent.position);

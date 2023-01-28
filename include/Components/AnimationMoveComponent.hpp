@@ -3,7 +3,7 @@
 
 namespace GLVM::ECS
 {
-	struct SAnimationMoveComponent
+	struct animation
 	{
 		
 	};
