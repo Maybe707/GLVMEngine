@@ -63,12 +63,12 @@ namespace GLVM::ECS::components
 {    
 	typedef STransformComponent        transform;
 	typedef SVertexComponent           vertex;
-	typedef SMoveComponent             movement;
+	typedef move             movement;
 	typedef CColliderComponent         collider;
 	typedef SAnimationMoveComponent    animation;
 	typedef beholder             camera;
 	typedef CRigidBodyComponent        rigidBody;
-	typedef SEventComponent            event;
+	typedef event            event;
 	typedef SMaterialComponent         material;
 	typedef SDirectionalLightComponent directionalLight;
 	typedef SPointLightComponent       pointLight;

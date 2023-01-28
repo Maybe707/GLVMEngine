@@ -22,7 +22,7 @@ namespace GLVM::ECS
     {
         CComponentManager* pComponent_Manager = GLVM::ECS::CComponentManager::GetInstance();
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ECS::GetInnerIDsContainer<ECS::SMoveComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
@@ -85,7 +85,7 @@ namespace GLVM::ECS
                     break;
                 case Core::EEvents::eJUMP:
                     pComponent_Manager->GetComponent<ECS::STransformComponent>(iEntity_refMove).tPosition[1] += 1.0f;
-                    pComponent_Manager->GetComponent<ECS::SMoveComponent>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
+                    pComponent_Manager->GetComponent<ECS::move>(iEntity_refMove).eEvent_ = Core::EEvents::eJUMP;
                     break;
                 default:
                     break;

@@ -4,7 +4,7 @@
 #include "Event.hpp"
 namespace GLVM::ECS
 {
-	struct SMoveComponent
+	struct move
 	{
         float fVelocity_;
 		Core::EEvents eEvent_ = Core::EEvents::eDEFAULT;

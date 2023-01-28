@@ -18,7 +18,7 @@ namespace GLVM::ECS
         CEntityManager* pEntity_Manager       = GLVM::ECS::CEntityManager::GetInstance();
     
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ECS::GetInnerIDsContainer<ECS::SMoveComponent>(*pComponent_Manager);
+            ECS::GetInnerIDsContainer<ECS::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         Core::TCVectorContainer<unsigned int>* pEntity_Container_refView =

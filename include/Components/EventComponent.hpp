@@ -5,7 +5,7 @@
 
 namespace GLVM::ECS
 {
-	struct SEventComponent
+	struct event
 	{
 		Core::EEvents eEvent_;
 	};
