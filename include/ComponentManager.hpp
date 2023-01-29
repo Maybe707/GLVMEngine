@@ -106,7 +106,7 @@ namespace GLVM::ecs
 	}
 
 	template <typename Component_Type>
-	core::TCVectorContainer<Entity_ID>* GetInnerIDsContainer(ecs::CComponentManager& _Component_Manager)
+	core::TCVectorContainer<Entity_ID>* GetEntityContainer(ecs::CComponentManager& _Component_Manager)
 	{
 		return static_cast<core::TCVectorContainer<Entity_ID>*>(_Component_Manager.tWorld_IDs_Container[_Component_Manager.CreateComponentContainer<Component_Type>()]);
     }

@@ -100,7 +100,7 @@ namespace GLVM::core
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight =
-			ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
+			ecs::GetEntityContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int appropriateDirectionalLightComponentIndex = 0;
 		sampledDirectionalLightEntityIDcontainer.clear();
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
@@ -123,7 +123,7 @@ namespace GLVM::core
 		}
 
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight =
-			ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
+			ecs::GetEntityContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int appropriateSpotLightComponentIndex = 0;
 		sampledSpotLightEntityIDcontainer.clear();
 		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f),
@@ -146,13 +146,13 @@ namespace GLVM::core
 		}
 		
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefView =
-			ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+			ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
 		
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight =
-			ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
+			ecs::GetEntityContainer<cm::pointLight>(*pComponent_Manager);
 		
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
@@ -351,7 +351,7 @@ namespace GLVM::core
 	void COpenglRenderer::EvaluateCoreShader() {
 		namespace cm = GLVM::ecs::components;
         ecs::CComponentManager* pComponent_Manager = ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		cm::beholder& playerViewComponent = pComponent_Manager->GetComponent<cm::beholder>(uiPlayerEntity);
 		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
@@ -407,7 +407,7 @@ namespace GLVM::core
 	void COpenglRenderer::ComputeDirectionalLight() {
 		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetInnerIDsContainer<cm::directionalLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight = ecs::GetEntityContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
 		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
@@ -433,14 +433,14 @@ namespace GLVM::core
 	void COpenglRenderer::ComputePointLight() {
 		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetInnerIDsContainer<cm::pointLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight = ecs::GetEntityContainer<cm::pointLight>(*pComponent_Manager);
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 		coreShaderProgram->SetInt("pointLightsArraySize", pointLightComponentContainerSize);
 		for(unsigned int x = 0; x < pointLightComponentContainerSize; ++x) {
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
 			cm::pointLight& pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiPointLightEntity);
 			
-			// core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetInnerIDsContainer<ecs::beholder>(*pComponent_Manager);
+			// core::TCVectorContainer<unsigned int>* pEntityContainerRefView = ecs::GetEntityContainer<ecs::beholder>(*pComponent_Manager);
 			// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 			// ecs::transform& playerTransformComponent = pComponent_Manager->GetComponent<ecs::transform>(uiPlayerEntity);
 
@@ -467,7 +467,7 @@ namespace GLVM::core
 	void COpenglRenderer::ComputeSpotLight() {
 		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<cm::spotLight>(*pComponent_Manager);
+		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 		coreShaderProgram->SetInt("spotLightsArraySize", spotLightComponentContainerSize);
 		for(unsigned int x = 0; x < spotLightComponentContainerSize; ++x) {

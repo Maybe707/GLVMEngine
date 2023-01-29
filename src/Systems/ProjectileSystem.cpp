@@ -20,11 +20,11 @@ namespace GLVM::ecs
         CEntityManager* pEntity_Manager       = GLVM::ecs::CEntityManager::GetInstance();
     
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetInnerIDsContainer<cm::move>(*pComponent_Manager);
+            ecs::GetEntityContainer<cm::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
@@ -49,7 +49,7 @@ namespace GLVM::ecs
         }
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
-            GetInnerIDsContainer<cm::projectile>(*pComponent_Manager);
+            GetEntityContainer<cm::projectile>(*pComponent_Manager);
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {

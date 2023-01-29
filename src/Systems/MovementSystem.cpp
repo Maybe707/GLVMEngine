@@ -24,11 +24,11 @@ namespace GLVM::ecs
 		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetInnerIDsContainer<cm::move>(*pComponent_Manager);
+            ecs::GetEntityContainer<cm::move>(*pComponent_Manager);
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
 		cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
 
@@ -92,7 +92,7 @@ namespace GLVM::ecs
                 default:
                     break;
                 }
-				// core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetInnerIDsContainer<ecs::spotLight>(*pComponent_Manager);
+				// core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
 				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
 				// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
@@ -104,8 +104,8 @@ namespace GLVM::ecs
         }
 
 		
-        // for(int n = 0; n < ecs::GetInnerIDsContainer<ecs::rigidBody>(*pComponent_Manager)->GetSize(); ++n) {
-        //     int iEntity_refRigidBody = (*ecs::GetInnerIDsContainer<ecs::rigidBody>(*pComponent_Manager))[n];
+        // for(int n = 0; n < ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager)->GetSize(); ++n) {
+        //     int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
         //     ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
         //     Vector<float, 3> vec(0.0f);
         //     vec[1] = -1.0f;

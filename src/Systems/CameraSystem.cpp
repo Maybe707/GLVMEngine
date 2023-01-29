@@ -15,7 +15,7 @@ namespace GLVM::ecs
 		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetInnerIDsContainer<cm::beholder>(*pComponent_Manager);
+            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
         // Shader_Program_->Use();
