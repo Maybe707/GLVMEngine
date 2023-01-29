@@ -6,11 +6,6 @@ out vec4 fragColor;
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
-//#define POINT_LIGHT_CUBE_SHADOW_MAP_ARRAY_SIZE             32
-//#define SPOT_LIGHT_FLAT_SHADOW_MAP_ARRAY_SIZE              8
-//#define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE             8
-//#define POINT_LIGHT_CUBE_SHADOW_MAP_COMPONENT_INDICES_SIZE 32
-//#define SPOT_LIGHT_FLAT_SHADOW_MAP_COMPONENT_INDICES_SIZE  8
 
 in VS_OUT {
 	vec3 fragmentPosition;
@@ -68,22 +63,23 @@ uniform float            farPlane;
 uniform Material         material;
 uniform vec3             viewPosition;
 
+uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 uniform sampler2D        directionalLightFlatShadowMapArray[DIRECTIONAL_LIGHTS_NUMBER];
 uniform int              directionalLightFlatShadowMapComponentIndices[DIRECTIONAL_LIGHTS_NUMBER];
+uniform int              sampledDirectionalShadowOrdinalNumbersArraySize;
 uniform int              directionalLightsArraySize;
-uniform int              directionalLightFlatShadowMapArraySize;
-uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 
-uniform int              pointLightCubeShadowMapArraySize;
-uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHTS_NUMBER];
-uniform samplerCube      pointLightCubeShadowMapArray[POINT_LIGHTS_NUMBER];
-uniform int              pointLightsArraySize;
 uniform PointLight       pointLights[POINT_LIGHTS_NUMBER];
+uniform samplerCube      pointLightCubeShadowMapArray[POINT_LIGHTS_NUMBER];
+uniform int              pointLightCubeShadowMapComponentIndices[POINT_LIGHTS_NUMBER];
+uniform int              sampledPointShadowOrdinalNumbersArraySize;
+uniform int              pointLightsArraySize;
 
-uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHTS_NUMBER];
-uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHTS_NUMBER];
-uniform int              spotLightArraySize;
 uniform SpotLight        spotLights[SPOT_LIGHTS_NUMBER];
+uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHTS_NUMBER];
+uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHTS_NUMBER];
+uniform int              sampledSpotLightOrdinalNumbersArraySize;
+uniform int              spotLightArraySize;
 
 //vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
@@ -102,12 +98,12 @@ void main()
 	// Compute directional lighting
 	int directionalLightIndicesCounter    = 0;
 	int directionalLightIndexAccumulator  = -1;
-	if(directionalLightFlatShadowMapArraySize > 0)
+	if(sampledDirectionalShadowOrdinalNumbersArraySize > 0)
 		directionalLightIndexAccumulator  = directionalLightFlatShadowMapComponentIndices[directionalLightIndicesCounter];
 
 	float shadow = 0.0;
 	for (int f = 0; f < directionalLightsArraySize; ++f) {
-		if(f == directionalLightIndexAccumulator && directionalLightIndicesCounter != directionalLightFlatShadowMapArraySize) {
+		if(f == directionalLightIndexAccumulator && directionalLightIndicesCounter != sampledDirectionalShadowOrdinalNumbersArraySize) {
 			shadow = ComputeDirectionalShadow(directionalLights[f], fs_in.fragmentPositionDirectionalLightSpace[f],
 			                                    directionalLightFlatShadowMapArray[f]);
 			++directionalLightIndicesCounter;
@@ -122,12 +118,12 @@ void main()
 	// Compute point lights
 	int pointLightIndicesCounter    = 0;
 	int pointLightIndexAccumulator  = -1;
-	if(pointLightCubeShadowMapArraySize > 0)
+	if(sampledPointShadowOrdinalNumbersArraySize > 0)
 		pointLightIndexAccumulator  = pointLightCubeShadowMapComponentIndices[pointLightIndicesCounter];
 
 	shadow = 0.0;
 	for (int i = 0; i < pointLightsArraySize; ++i) {
-		if(i == pointLightIndexAccumulator && pointLightIndicesCounter != pointLightCubeShadowMapArraySize) {
+		if(i == pointLightIndexAccumulator && pointLightIndicesCounter != sampledPointShadowOrdinalNumbersArraySize) {
 			shadow = ComputePointShadow(pointLights[i], fs_in.fragmentPosition,
 										pointLightCubeShadowMapArray[pointLightIndicesCounter]);
 			++pointLightIndicesCounter;

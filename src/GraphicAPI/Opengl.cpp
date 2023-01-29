@@ -99,6 +99,8 @@ namespace GLVM::core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		coreShaderProgram->Use();
+		
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefDirectionalLight =
 			ecs::GetEntityContainer<cm::directionalLight>(*pComponent_Manager);
 		unsigned int appropriateDirectionalLightComponentIndex = 0;
@@ -122,6 +124,9 @@ namespace GLVM::core
 			++appropriateDirectionalLightComponentIndex;
 		}
 
+		coreShaderProgram->SetInt("sampledDirectionalShadowOrdinalNumbersArraySize",
+								  sampledDirectionalLightEntityIDcontainer.size());
+		
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight =
 			ecs::GetEntityContainer<cm::spotLight>(*pComponent_Manager);
 		unsigned int appropriateSpotLightComponentIndex = 0;
@@ -144,16 +149,16 @@ namespace GLVM::core
 																 appropriateSpotLightComponentIndex, "]"), i);
 			++appropriateSpotLightComponentIndex;
 		}
+
+		// coreShaderProgram->SetInt("directionalLightFlatShadowMapArraySize",
+		// 						  sampledDirectionalLightEntityIDcontainer.size());
 		
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefView =
 			ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
-		
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		cm::transform& playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
-
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefPointLight =
 			ecs::GetEntityContainer<cm::pointLight>(*pComponent_Manager);
-		
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
 		sampledPointLightEntityIDcontainer.clear();
@@ -178,8 +183,7 @@ namespace GLVM::core
 			}
 		}
 		
-		coreShaderProgram->Use();
-		coreShaderProgram->SetInt("pointLightCubeShadowMapArraySize", appropriatePointLightComponentIndex);
+		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize", sampledPointLightEntityIDcontainer.size());
 		
 		ComputeDirectionalLight();
 		ComputePointLight();
@@ -370,8 +374,7 @@ namespace GLVM::core
 		coreShaderProgram->SetBool("reverseNormals", reverseNormalsFlag);
 		coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
-		coreShaderProgram->SetInt("directionalLightFlatShadowMapArraySize",
-								  directionalLightFlatShadowMapFBOcontainer.size());
+
 		coreShaderProgram->SetInt("directionalLightSpaceMatrixContainerSize",
 								  sampledDirectionalLightEntityIDcontainer.size());
 		coreShaderProgram->SetMat4("directionalLightSpaceMatrixContainer",
@@ -416,7 +419,6 @@ namespace GLVM::core
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
 
 		coreShaderProgram->SetInt("directionalLightsArraySize", directionalLightComponentContainerSize);
-
 		for(unsigned int x = 0; x < directionalLightComponentContainerSize; ++x) {
 			unsigned int uiDirectionalLightEntity = (*pEntityContainerRefDirectionalLight)[x];
 			cm::directionalLight& directionalLightComponent = pComponent_Manager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
