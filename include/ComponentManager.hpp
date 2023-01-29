@@ -53,9 +53,7 @@ namespace GLVM::ecs
         CComponentManager(CComponentManager& _component_Manager) = delete;         ///< Dont need to make cope because of singleton property.
         void operator=(const CComponentManager& _component_Manager) = delete;      ///< Dont need assignment operator because of singleton property.
        static CComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
-        
-
-        
+                
 		template <typename Component_Type>
 		void CreateComponent(const Entity_ID& _u_iEntity)
 		{

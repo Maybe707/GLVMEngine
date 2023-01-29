@@ -3,6 +3,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
@@ -104,13 +105,15 @@ namespace GLVM::ecs
         }
 
 		
-        // for(int n = 0; n < ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager)->GetSize(); ++n) {
-        //     int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
-        //     ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
-        //     Vector<float, 3> vec(0.0f);
-        //     vec[1] = -1.0f;
-        //     rTransform_Component.tPosition += vec * cameraSpeed;
-        // }
+        for(int n = 0; n < pComponent_Manager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
+//            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
+			int iEntity_refRigidBody = (*pComponent_Manager->GetEntityContainer<cm::rigidBody>())[n];
+//            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
+			cm::transform& rTransform_Component = pComponent_Manager->GetComponent<cm::transform>(iEntity_refRigidBody);
+            Vector<float, 3> vec(0.0f);
+            vec[1] = -1.0f;
+            rTransform_Component.tPosition += vec * cameraSpeed;
+        }
     }
 
     bool CMovementSystem::CompareDirection(core::CStack& _input_Stack,

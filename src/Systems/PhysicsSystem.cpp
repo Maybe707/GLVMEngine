@@ -156,6 +156,7 @@ namespace GLVM::ecs
                 if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_
                     && pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bPush_Collission)
                 {
+					std::cout << "check: " << pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_ << std::endl;
                     Gravity();
                     pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_ = false;
                 }

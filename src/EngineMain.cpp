@@ -24,7 +24,8 @@ int main()
 	core::CMeshManager    * MeshManager       = core::CMeshManager::GetInstance();
 	ecs::CTextureManager  * TextureManager    = ecs::CTextureManager::GetInstance();
 	ecs::CTextureManager  * hudTextureManager = ecs::CTextureManager::GetHUDInstance();
-    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
+//    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
+	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
     MeshManager->SetMesh("../waveFrontObj/sphere.obj");
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
@@ -64,7 +65,7 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, cm::move, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 0.1f };
+	ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 1.0f };
     ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .Front_Camera = { 0.0f, 0.0f, -1.0f },
 		.Up_Camera = { 0.0f, 1.0f, 0.0f } };
     ComponentManager->GetComponent<cm::collider>(uiPlayer).bPush_Collission = true;
@@ -83,7 +84,7 @@ int main()
     
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
-	ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f }, .fScale = 0.5f };
+	ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f }, .fScale = 1.0f };
     ComponentManager->GetComponent<cm::vertex>(uiWitch).vkVertexId_ = 0;
 	cm::material & materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
@@ -92,9 +93,9 @@ int main()
 
     Entity uiWitch2 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
-	ComponentManager->GetComponent<cm::vertex>(uiWitch2).vkVertexId_ = 5;
+	ComponentManager->GetComponent<cm::vertex>(uiWitch2).vkVertexId_ = 0;
 	ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
-		= { 5.5f, 0.5f, 1.5f }, .fScale = 1.0f };
+		= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };
 	cm::material & materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
 	materialWitch2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -102,8 +103,8 @@ int main()
 
 	Entity uiWitch3 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch3);
-	ComponentManager->GetComponent<cm::vertex>(uiWitch3).vkVertexId_ = 1;
-	ComponentManager->GetComponent<cm::transform>(uiWitch3) = { .tPosition = { 3.7f, 2.5f, 3.0f }, .fScale = 1.0f };
+	ComponentManager->GetComponent<cm::vertex>(uiWitch3).vkVertexId_ = 0;
+	ComponentManager->GetComponent<cm::transform>(uiWitch3) = { .tPosition = { 3.7f, 2.5f, 3.0f }, .fScale = 4.0f };
 	cm::material & materialWitch3  = ComponentManager->GetComponent<cm::material>(uiWitch3);
 	materialWitch3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
