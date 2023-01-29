@@ -65,7 +65,7 @@ uniform vec3             viewPosition;
 
 uniform DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 uniform sampler2D        directionalLightFlatShadowMapArray[DIRECTIONAL_LIGHTS_NUMBER];
-uniform int              directionalLightFlatShadowMapComponentIndices[DIRECTIONAL_LIGHTS_NUMBER];
+uniform int              sampledShadowOrdinalNumbers[DIRECTIONAL_LIGHTS_NUMBER];
 uniform int              sampledDirectionalShadowOrdinalNumbersArraySize;
 uniform int              directionalLightsArraySize;
 
@@ -78,7 +78,7 @@ uniform int              pointLightsArraySize;
 uniform SpotLight        spotLights[SPOT_LIGHTS_NUMBER];
 uniform sampler2D        spotLightFlatShadowMapArray[SPOT_LIGHTS_NUMBER];
 uniform int              spotLightFlatShadowMapComponentIndices[SPOT_LIGHTS_NUMBER];
-uniform int              sampledSpotLightOrdinalNumbersArraySize;
+uniform int              sampledSpotShadowOrdinalNumbersArraySize;
 uniform int              spotLightArraySize;
 
 //vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
@@ -99,7 +99,7 @@ void main()
 	int directionalLightIndicesCounter    = 0;
 	int directionalLightIndexAccumulator  = -1;
 	if(sampledDirectionalShadowOrdinalNumbersArraySize > 0)
-		directionalLightIndexAccumulator  = directionalLightFlatShadowMapComponentIndices[directionalLightIndicesCounter];
+		directionalLightIndexAccumulator  = sampledShadowOrdinalNumbers[directionalLightIndicesCounter];
 
 	float shadow = 0.0;
 	for (int f = 0; f < directionalLightsArraySize; ++f) {
@@ -107,7 +107,7 @@ void main()
 			shadow = ComputeDirectionalShadow(directionalLights[f], fs_in.fragmentPositionDirectionalLightSpace[f],
 			                                    directionalLightFlatShadowMapArray[f]);
 			++directionalLightIndicesCounter;
-			directionalLightIndexAccumulator = directionalLightFlatShadowMapComponentIndices[directionalLightIndicesCounter];
+			directionalLightIndexAccumulator = sampledShadowOrdinalNumbers[directionalLightIndicesCounter];
 		}
 
 		vec3 light  = ComputeDirectionalLight(directionalLights[f], normal, viewDirection);
@@ -139,14 +139,14 @@ void main()
 	int spotLightIndexAccumulator  = -1;
 //	int spotLightArraySize = spotLightSpaceMatrixArraySize;
 //	int spotLightArraySize = 1;
-	if(spotLightArraySize > 0)
+	if(sampledSpotShadowOrdinalNumbersArraySize > 0)
 		spotLightIndexAccumulator = spotLightFlatShadowMapComponentIndices[spotLightIndicesCounter];
 
 	shadow = 0.0;
 	for (int j = 0; j < spotLightArraySize; ++j) {
 		vec3 lightDirection = normalize(spotLights[j].position - fs_in.fragmentPosition);
 		float theta         = dot(lightDirection, normalize(-spotLights[j].direction));
-		if(j == spotLightIndexAccumulator && spotLightIndicesCounter != spotLightArraySize) {    ///< DELETE GOVNO!!!!!!!
+		if(j == spotLightIndexAccumulator && spotLightIndicesCounter != sampledSpotShadowOrdinalNumbersArraySize) {    ///< DELETE GOVNO!!!!!!!
 			shadow = ComputeSpotShadow(spotLights[j], fs_in.fragmentPositionSpotLightSpace[j],
 										spotLightFlatShadowMapArray[spotLightIndicesCounter]);
 			

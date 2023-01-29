@@ -53,7 +53,8 @@ void main()
 	for (int j = 0; j < spotLightSpaceMatrixContainerSize; ++j) 
 		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * vec4(vs_out.fragmentPosition, 1.0);
 
+//	vs_out.normal = normalize(vs_out.normal);
 	// spotLightSpaceMatrixArraySize        = spotLightSpaceMatrixContainerSize;
 	// directionalLightSpaceMatrixArraySize = directionalLightSpaceMatrixContainerSize;
-	gl_Position                          = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }

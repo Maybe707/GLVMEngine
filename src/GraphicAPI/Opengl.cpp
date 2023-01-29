@@ -118,7 +118,7 @@ namespace GLVM::core
 
 			sampledDirectionalLightEntityIDcontainer.push_back(i);
 			coreShaderProgram->Use();
-			coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("directionalLightFlatShadowMapComponentIndices[",
+			coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("sampledShadowOrdinalNumbers[",
 																 appropriateDirectionalLightComponentIndex, "]"), i);
 			
 			++appropriateDirectionalLightComponentIndex;
@@ -150,8 +150,8 @@ namespace GLVM::core
 			++appropriateSpotLightComponentIndex;
 		}
 
-		// coreShaderProgram->SetInt("directionalLightFlatShadowMapArraySize",
-		// 						  sampledDirectionalLightEntityIDcontainer.size());
+		coreShaderProgram->SetInt("sampledSpotShadowOrdinalNumbersArraySize",
+								  sampledSpotLightEntityIDcontainer.size());
 		
 		core::TCVectorContainer<unsigned int>* pEntityContainerRefView =
 			ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
@@ -183,7 +183,8 @@ namespace GLVM::core
 			}
 		}
 		
-		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize", sampledPointLightEntityIDcontainer.size());
+		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize",
+								  sampledPointLightEntityIDcontainer.size());
 		
 		ComputeDirectionalLight();
 		ComputePointLight();
