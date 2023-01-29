@@ -370,8 +370,13 @@ namespace GLVM::core
 		coreShaderProgram->SetBool("reverseNormals", reverseNormalsFlag);
 		coreShaderProgram->SetFloat("farPlane", farPlaneCubeShadowMap);
 		coreShaderProgram->SetVec3("viewPosition", viewPosition);
-		coreShaderProgram->SetInt("directionalLightSpaceMatrixContainerSize", sampledDirectionalLightEntityIDcontainer.size());
-		coreShaderProgram->SetMat4("directionalLightSpaceMatrixContainer", sampledDirectionalLightEntityIDcontainer.size(), directionalLightSpaceMatrixContainer[0]);
+		coreShaderProgram->SetInt("directionalLightFlatShadowMapArraySize",
+								  directionalLightFlatShadowMapFBOcontainer.size());
+		coreShaderProgram->SetInt("directionalLightSpaceMatrixContainerSize",
+								  sampledDirectionalLightEntityIDcontainer.size());
+		coreShaderProgram->SetMat4("directionalLightSpaceMatrixContainer",
+								   sampledDirectionalLightEntityIDcontainer.size(),
+								   directionalLightSpaceMatrixContainer[0]);
 		coreShaderProgram->SetInt("spotLightSpaceMatrixContainerSize", sampledSpotLightEntityIDcontainer.size());
 		coreShaderProgram->SetMat4("spotLightSpaceMatrixContainer", sampledSpotLightEntityIDcontainer.size(),
 								   spotLightSpaceMatrixContainer[0]);
