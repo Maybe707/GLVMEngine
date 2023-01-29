@@ -24,11 +24,11 @@ namespace GLVM::ecs
 		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetEntityContainer<cm::move>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::move>();
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
 		cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
 

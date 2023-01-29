@@ -3,6 +3,7 @@
 #include "Components/ProjectileComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "EntityManager.hpp"
 #include <Systems/ProjectileSystem.hpp>
 #include "Stack.hpp"
@@ -20,11 +21,11 @@ namespace GLVM::ecs
         CEntityManager* pEntity_Manager       = GLVM::ecs::CEntityManager::GetInstance();
     
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
-            ecs::GetEntityContainer<cm::move>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::move>();
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
@@ -49,7 +50,7 @@ namespace GLVM::ecs
         }
 
         core::TCVectorContainer<unsigned int>* pEntity_Container_refProjectile =
-            GetEntityContainer<cm::projectile>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::projectile>();
         unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {

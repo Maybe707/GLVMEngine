@@ -21,6 +21,29 @@ namespace GLVM::ecs
 		
         CComponentManager();
         ~CComponentManager();
+
+		template <typename Component_Type>
+		unsigned int CreateComponentContainer()
+			{
+				static unsigned int s_iLocal_Container_ID = 0;
+				static bool s_bExist_Component_Container_Flag = false;
+				if(s_bExist_Component_Container_Flag)  
+					return s_iLocal_Container_ID;
+                                                                                                                
+				s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
+				s_bExist_Component_Container_Flag = true;
+            
+				core::TCVectorContainer<Component_Type>* pComponent_Container =
+					new core::TCVectorContainer<Component_Type>;    ///< Create component container of current type.
+				tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
+            
+				core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
+					new core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
+				tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
+			
+				++s_iComponents_Container_ID;
+				return s_iLocal_Container_ID;
+			}
         
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
@@ -31,28 +54,7 @@ namespace GLVM::ecs
         void operator=(const CComponentManager& _component_Manager) = delete;      ///< Dont need assignment operator because of singleton property.
        static CComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
         
-		template <typename Component_Type>
-		unsigned int CreateComponentContainer()
-		{
-			static unsigned int s_iLocal_Container_ID = 0;
-			static bool s_bExist_Component_Container_Flag = false;
-			if(s_bExist_Component_Container_Flag)  
-				return s_iLocal_Container_ID;
-                                                                                                                
-			s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
-			s_bExist_Component_Container_Flag = true;
-            
-			core::TCVectorContainer<Component_Type>* pComponent_Container =
-				new core::TCVectorContainer<Component_Type>;    ///< Create component container of current type.
-			tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
-            
-			core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
-				new core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
-			tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
-			
-			++s_iComponents_Container_ID;
-			return s_iLocal_Container_ID;
-		}
+
         
 		template <typename Component_Type>
 		void CreateComponent(const Entity_ID& _u_iEntity)
@@ -97,19 +99,21 @@ namespace GLVM::ecs
 		}
 		
 		unsigned int GetContainerID();
+
+		template <typename Component_Type>
+		core::TCVectorContainer<Component_Type>* GetComponentContainer()
+			{
+				return static_cast<core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[CreateComponentContainer<Component_Type>()]);
+			}
+
+		template <typename Component_Type>
+		core::TCVectorContainer<Entity_ID>* GetEntityContainer()
+			{
+				return static_cast<core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()]);
+			}
 	};
 
-	template <typename Component_Type>
-	core::TCVectorContainer<Component_Type>* GetComponentContainer(ecs::CComponentManager& _Component_Manager)
-	{
-		return static_cast<core::TCVectorContainer<Component_Type>*>(_Component_Manager.tWorld_Components_Container_[_Component_Manager.CreateComponentContainer<Component_Type>()]);
-	}
 
-	template <typename Component_Type>
-	core::TCVectorContainer<Entity_ID>* GetEntityContainer(ecs::CComponentManager& _Component_Manager)
-	{
-		return static_cast<core::TCVectorContainer<Entity_ID>*>(_Component_Manager.tWorld_IDs_Container[_Component_Manager.CreateComponentContainer<Component_Type>()]);
-    }
 }
 
 #endif

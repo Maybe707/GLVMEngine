@@ -1329,7 +1329,7 @@ namespace GLVM::core
 
         ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<cm::transform>* pEntity_Container_refTransform =
-            ecs::GetComponentContainer<cm::transform>(*pComponent_Manager);
+			pComponent_Manager->GetComponentContainer<cm::transform>();
 
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {

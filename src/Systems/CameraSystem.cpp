@@ -1,4 +1,5 @@
 #include "Systems/CameraSystem.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
 #include <glm/ext/matrix_clip_space.hpp>
@@ -15,7 +16,7 @@ namespace GLVM::ecs
 		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
-            ecs::GetEntityContainer<cm::beholder>(*pComponent_Manager);
+			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
         // Shader_Program_->Use();
