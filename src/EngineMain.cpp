@@ -72,16 +72,16 @@ int main()
 	transformPlayer  = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 0.1f };
 	viewPlayer       = { .Front_Camera = { 0.0f, 0.0f, -1.0f }, .Up_Camera = { 0.0f, 1.0f, 0.0f } };
 
+	// cm::transform& transformPlain0 = ComponentManager->GetComponent<cm::transform>(plain0);
+    // cm::vertex   & vertexPlain0    = ComponentManager->GetComponent<cm::vertex>(plain0);
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform>(plain0);
-	cm::material & materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
-	cm::transform& transformPlain0 = ComponentManager->GetComponent<cm::transform>(plain0);
-    cm::vertex   & vertexPlain0    = ComponentManager->GetComponent<cm::vertex>(plain0);
-	materialPlain0  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	cm::material & materialPlain0 = ComponentManager->GetComponent<cm::material>(plain0);
+	materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-	transformPlain0 = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
+	ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
+    ComponentManager->GetComponent<cm::vertex>(plain0).vkVertexId_ = 4;
     TextureManager->BindTexture(plain0, materialPlain0.diffuseTextureID_);
-    vertexPlain0.vkVertexId_ = 4;
     
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);

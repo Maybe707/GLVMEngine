@@ -100,7 +100,7 @@ namespace GLVM::ecs
 	};
 
 	template <typename Component_Type>
-	core::TCVectorContainer<Component_Type>* GetInnerComponentContainer(ecs::CComponentManager& _Component_Manager)
+	core::TCVectorContainer<Component_Type>* GetComponentContainer(ecs::CComponentManager& _Component_Manager)
 	{
 		return static_cast<core::TCVectorContainer<Component_Type>*>(_Component_Manager.tWorld_Components_Container_[_Component_Manager.CreateComponentContainer<Component_Type>()]);
 	}
