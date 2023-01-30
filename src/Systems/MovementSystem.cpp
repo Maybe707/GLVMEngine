@@ -119,11 +119,8 @@ namespace GLVM::ecs
     bool CMovementSystem::CompareDirection(core::CStack& _input_Stack,
                                            core::EEvents _event0,
                                            core::EEvents _event1) {
-        core::EEvents eTemp_Event0;
-        core::EEvents eTemp_Event1;
-
-        eTemp_Event0 = _input_Stack.SearchElement(_event0);
-        eTemp_Event1 = _input_Stack.SearchElement(_event1);
+		core::EEvents eTemp_Event0; = _input_Stack.SearchElement(_event0);
+        core::EEvents eTemp_Event1; = _input_Stack.SearchElement(_event1);
             
         if((eTemp_Event0 == _event0) && (eTemp_Event1 == _event1))
             return true;

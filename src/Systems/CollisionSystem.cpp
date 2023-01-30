@@ -30,7 +30,7 @@ namespace GLVM::ecs
         
 		return false;
 	}
-
+	
     bool CCollisionSystem::UpperActorCheck(components::transform& _transform_Component1,
                                            components::transform& _transform_Component2) {
         if((_transform_Component1.tPosition[1] - _transform_Component1.fScale / 2) > (_transform_Component2.tPosition[1] + (_transform_Component2.fScale / 2  - (_transform_Component2.fScale / 10)))) {
