@@ -68,23 +68,27 @@ namespace GLVM::ecs
                     rTransformComponent.tRight =
                         CalculateVectorRL(view_Component);
                     rTransformComponent.tPosition -= rTransformComponent.tRight * cameraSpeed;
+					rTransformComponent.frameHorizontalMovement += rTransformComponent.tRight * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
                     rTransformComponent.tRight =
                         CalculateVectorRL(view_Component);
                     rTransformComponent.tPosition += rTransformComponent.tRight * cameraSpeed;
+					rTransformComponent.frameHorizontalMovement -= rTransformComponent.tRight * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     rTransformComponent.tForward =
                         CalculateVectorFB(view_Component,
                                           g_eEvent);
                     rTransformComponent.tPosition -= rTransformComponent.tForward * cameraSpeed;
+					rTransformComponent.frameHorizontalMovement += rTransformComponent.tForward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
                     rTransformComponent.tForward =
                         CalculateVectorFB(view_Component,
                                           g_eEvent);
                     rTransformComponent.tPosition += rTransformComponent.tForward * cameraSpeed;
+					rTransformComponent.frameHorizontalMovement -= rTransformComponent.tForward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
                     pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove).tPosition[1] += 1.0f;
@@ -113,14 +117,15 @@ namespace GLVM::ecs
             Vector<float, 3> vec(0.0f);
             vec[1] = -1.0f;
             rTransform_Component.tPosition += vec * cameraSpeed;
+			rTransform_Component.frameVerticalMovement -= vec * cameraSpeed;
         }
     }
 
     bool CMovementSystem::CompareDirection(core::CStack& _input_Stack,
                                            core::EEvents _event0,
                                            core::EEvents _event1) {
-		core::EEvents eTemp_Event0; = _input_Stack.SearchElement(_event0);
-        core::EEvents eTemp_Event1; = _input_Stack.SearchElement(_event1);
+		core::EEvents eTemp_Event0 = _input_Stack.SearchElement(_event0);
+        core::EEvents eTemp_Event1 = _input_Stack.SearchElement(_event1);
             
         if((eTemp_Event0 == _event0) && (eTemp_Event1 == _event1))
             return true;
@@ -178,24 +183,28 @@ namespace GLVM::ecs
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
             _transform_Component.tPosition -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
+			_transform_Component.frameHorizontalMovement += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
             _transform_Component.tPosition += Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
+			_transform_Component.frameHorizontalMovement -= Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
             _transform_Component.tPosition += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
+			_transform_Component.frameHorizontalMovement -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
             return true;
         }
         if(CompareDirection(_input_Stack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT))
         {
             CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
             _transform_Component.tPosition -= Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
+			_transform_Component.frameHorizontalMovement += Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
             return true;
         }
         return false;
