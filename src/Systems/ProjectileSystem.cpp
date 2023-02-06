@@ -1,4 +1,4 @@
-#include "ComponentManager.hpp"
+ #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "Components/MaterialComponent.hpp"
@@ -91,21 +91,22 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
-        
+		pComponent_Manager->GetComponent<cm::vertex>(uiEntity_Projectile).vkVertexId_ = 1;
 		cm::material& rTextureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_Projectile);
-        rTextureProjectile.diffuseTextureID_ = 1;
+		rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         cm::transform& rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile.fScale = 0.2f;
-        Vector<float, 3> vec(0.0f);
+        rTransformProjectile.fScale = 0.1f;
+//        Vector<float, 3> vec(0.0f);
         rTransformProjectile.tPosition = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove).tPosition;
         rTransformProjectile.tForward = GetDirectionVector(view_Component);
 
-        rTransformProjectile.tPosition +=rTransformProjectile.tForward;
+        rTransformProjectile.tPosition += rTransformProjectile.tForward;
     }
     
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& _view_Component)

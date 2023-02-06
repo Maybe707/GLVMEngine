@@ -513,7 +513,8 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
-			
+
+		
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -526,6 +527,7 @@ namespace GLVM::core
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE29);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
+				std::cout << uiVertexId << std::endl;
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				cm::material& materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 				shaderProgram_->SetFloat("material.shininess", materialComponent.shininess);

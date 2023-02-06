@@ -133,20 +133,6 @@ namespace GLVM::ecs
             return false;
     }
         
-    void CMovementSystem::DiscardOpposite(core::CStack& _input_Stack)
-    {
-        if(CompareDirection(_input_Stack, core::EEvents::eMOVE_LEFT, core::EEvents::eMOVE_RIGHT))
-        {
-            _input_Stack.Remove(core::EEvents::eMOVE_LEFT);
-            _input_Stack.Remove(core::EEvents::eMOVE_RIGHT);
-        }
-        if(CompareDirection(_input_Stack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_FORWARD))
-        {
-            _input_Stack.Remove(core::EEvents::eMOVE_BACKWARD);
-            _input_Stack.Remove(core::EEvents::eMOVE_FORWARD);
-        }
-    }
-
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& _view_Component) {
         Vector<float, 3> tNormalized_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera));
         return tNormalized_Vector;

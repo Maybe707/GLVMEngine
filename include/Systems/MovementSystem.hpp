@@ -44,7 +44,6 @@ namespace GLVM::ecs
         bool CompareDirection(core::CStack& _input_Stack,
                               core::EEvents _event0,
                               core::EEvents _event1);
-        void DiscardOpposite(core::CStack& _input_Stack);
         Vector<float, 3> CalculateVectorRL(components::beholder& _view_Component);
         Vector<float, 3> CalculateVectorFB(components::beholder& _view_Component,
                                            core::CEvent& _event);

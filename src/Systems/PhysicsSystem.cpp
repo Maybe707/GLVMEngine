@@ -149,14 +149,13 @@ namespace GLVM::ecs
 			pComponent_Manager->GetEntityContainer<cm::collider>();
         unsigned int uiVector_Collider_Size = pEntity_Container_refCollider->GetSize();
             
-        for(int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
+        for(unsigned int i = 0, iSize_External = uiVector_Collider_Size; i < iSize_External; ++i)
         {
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
 				cm::transform& transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refCollider);                
                 if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_
                     && pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bPush_Collission)
                 {
-					std::cout << "check: " << pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_ << std::endl;
 //                    Gravity();
 					transformComponent.tPosition += transformComponent.frameVerticalMovement; 
 					transformComponent.frameVerticalMovement = 0;
