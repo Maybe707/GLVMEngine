@@ -1,5 +1,6 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
+#include "VectorContainer.hpp"
 
 namespace GLVM::ecs
 {
@@ -48,9 +49,12 @@ namespace GLVM::ecs
     {
         tRemoved_Entity_Registry_.Push(_Entity_ID);
         tActive_Entity_Registry_[_Entity_ID] = k_iUint_Max;  
-        for(int i = 0, iSize = _ComponentManager->tWorld_IDs_Container.GetSize();
-            i < iSize; ++i) {
+        for(int i = 0, iSize = _ComponentManager->tWorld_IDs_Container.GetSize(); i < iSize; ++i) {
             static_cast<core::TCVectorContainer<unsigned int>*>(_ComponentManager->tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);
         }
+
+		// for(int j = 0, iSize = _ComponentManager->tWorld_Components_Container_.GetSize(); j < iSize; ++j) {
+		// 	static_cast<core::TCVectorContainer<void>*>(_ComponentManager->tWorld_Components_Container_[j])->
+		// }
     }
 }

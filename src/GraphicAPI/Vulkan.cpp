@@ -8,7 +8,6 @@
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
 #include <cstdlib>
-#include <vulkan/vulkan_core.h>
 //#include <vulkan/vulkan_core.h>
 
 namespace GLVM::core

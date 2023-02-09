@@ -20,21 +20,15 @@
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
-#include <X11/X.h>
 #include <cmath>
 #include "Globals.hpp"
 #include "WavefrontObjParser.hpp"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
-#include <glm/trigonometric.hpp>
 #include <ratio>
 #include <thread>
-#include <vulkan/vulkan_core.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -194,7 +188,7 @@ namespace GLVM::core
 	    EvaluateCoreShader();
 		RenderScene(coreShaderProgram);
 
-		Window.SwapBuffers();
+//		Window.SwapBuffers();
 
 		/*!
 		  \brief DEBUG
@@ -241,7 +235,7 @@ namespace GLVM::core
 												  GLint clampType_) {
 				pGLGen_Framebuffers(1, &fbo_);
 				glGenTextures(1, &texture_);
-				glActiveTexture(GL_TEXTURE0);
+				pGLActive_Texture(GL_TEXTURE0);
 				glBindTexture(textureTarget_, texture_);
 				AllocateTexture(textureTarget_, clampType_);
 				
@@ -388,17 +382,17 @@ namespace GLVM::core
 		coreShaderProgram->SetInt("spotLightArraySize", sampledSpotLightEntityIDcontainer.size());
 
 		for ( unsigned int i = 0; i < sampledPointLightEntityIDcontainer.size(); ++i ) {
-			glActiveTexture( GL_TEXTURE0 + i );
+			pGLActive_Texture( GL_TEXTURE0 + i );
 			glBindTexture( GL_TEXTURE_CUBE_MAP, pointLightCubeShadowMapTextureContainer[i] );
 		}
 
 		for ( unsigned int i = 0; i < sampledSpotLightEntityIDcontainer.size(); ++i ) {
-			glActiveTexture( GL_TEXTURE16 + i );
+			pGLActive_Texture( GL_TEXTURE16 + i );
 			glBindTexture( GL_TEXTURE_2D, spotLightFlatShadowMapTextureContainer[i] );
 		}
 
 		for ( unsigned int i = 0; i < sampledDirectionalLightEntityIDcontainer.size(); ++i ) {
-			glActiveTexture( GL_TEXTURE24 + i );
+			pGLActive_Texture( GL_TEXTURE24 + i );
 			glBindTexture( GL_TEXTURE_2D, directionalLightFlatShadowMapTextureContainer[i] );
 		}
 	}
@@ -410,7 +404,7 @@ namespace GLVM::core
 		debugQuadDepth_->Use();
 		debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
 		debugQuadDepth_->SetFloat("farPlane", farPlaneFlatShadowMap);
-		glActiveTexture(GL_TEXTURE0);
+		pGLActive_Texture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, directionalLightFlatShadowMapTextureContainer[0]);
 	}
 	

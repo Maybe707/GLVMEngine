@@ -4,6 +4,10 @@
 
 namespace GLVM::ecs
 {
+	CGUISystem::CGUISystem() {
+		_Shader_Program = new Shader("../GLshaders/GUI.vert", "../GLshaders/GUI.frag");		
+	}
+	
     void CGUISystem::Update()
     {
         Matrix<float, 4> tModel_Matrix(1.0);
@@ -16,34 +20,68 @@ namespace GLVM::ecs
 
         _Shader_Program->Use();
 //		_Shader_Program->SetUniformID("tex", 10);
-		_Shader_Program->SetUniformID("material.diffuse", GL_TEXTURE10);
-		_Shader_Program->SetUniformID("material.specular", GL_TEXTURE11);
-        
-        unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "aModel_Matrix");
+		// _Shader_Program->SetUniformID("material.diffuse", GL_TEXTURE10);
+		// _Shader_Program->SetUniformID("material.specular", GL_TEXTURE11);
+		
+        unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 
-		unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "aProjection_Matrix");
-		pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
+		// unsigned int uiTransformt = pGLGet_Uniform_Location(_Shader_Program->iID, "projectionMatrix");
+		// pGLUniform_Matrix4fv(uiTransformt, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
         
-        unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "aView_Matrix");
-		pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
+        // unsigned int uiTransform_View = pGLGet_Uniform_Location(_Shader_Program->iID, "viewMatrix");
+		// pGLUniform_Matrix4fv(uiTransform_View, NUMBER_OF_MATRICES, GL_FALSE, &tView_Matrix[0][0]);
 		
+        // float aCrosshair_Vertices[] =
+        // {
+        //     -0.1, 0.5, 0.0,
+        //     0.1, 0.5, 0.0,
+        //     -0.1, -0.5, 0.0,
+        //     0.1, 0.5, 0.0,
+        //     -0.1, -0.5, 0.0,
+        //     0.1, -0.5, 0.0,
+        //     -0.5, 0.1, 0.0,
+        //     0.5, 0.1, 0.0,
+        //     -0.5, -0.1, 0.0,
+        //     0.5, 0.1, 0.0,
+        //     -0.5, -0.1, 0.0,
+        //     0.5, -0.1, 0.0,
+        // }; 
+
         float aCrosshair_Vertices[] =
         {
-            -0.1, 0.5, 0.0,
-            0.1, 0.5, 0.0,
-            -0.1, -0.5, 0.0,
-            0.1, 0.5, 0.0,
-            -0.1, -0.5, 0.0,
-            0.1, -0.5, 0.0,
-            -0.5, 0.1, 0.0,
-            0.5, 0.1, 0.0,
-            -0.5, -0.1, 0.0,
-            0.5, 0.1, 0.0,
-            -0.5, -0.1, 0.0,
-            0.5, -0.1, 0.0,
+			// -0.1, 0.5, 0.0,
+            // 0.1, 0.5, 0.0,
+            // -0.1, -0.5, 0.0,
+            // 0.1, 0.5, 0.0,
+            // -0.1, -0.5, 0.0,
+            // 0.1, -0.5, 0.0,
+
+			// -0.5, 0.5, 0.0,
+			// 0.5, -0.5, 0.0,
+			// 0.5, 0.5, 0.0
+			
+			// 0.1, 0.2, 0.0,
+			// 0.1, 0.0, 0.0,
+			// 0.0, 0.0, 0.0
+
+			-0.1, 0.5, 0.0,
+			0.1, -0.5, 0.0,
+			0.1, 0.5, 0.0,
+			-0.1, 0.5, 0.0,
+			-0.1, -0.5, 0.0,
+			0.1, -0.5, 0.0,
+			-0.5, 0.1, 0.0,
+		    0.5, -0.1, 0.0,
+			0.5, 0.1, 0.0,
+			-0.5, 0.1, 0.0,
+			-0.5, -0.1, 0.0,
+			0.5, -0.1, 0.0
         }; 
 
+//		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        // glClear(GL_DEPTH_BUFFER_BIT);
+//		std::cout << "Clear: " << glGetError() << std::endl;
         pGLGen_Vertex_Arrays(1, &iVao_Crosshair_);
         pGLGen_Buffers(1, &iVbo_Crosshair_);
         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
@@ -59,6 +97,7 @@ namespace GLVM::ecs
         glClear(GL_DEPTH_BUFFER_BIT);
         
         glDrawArrays(GL_TRIANGLES, 0, 12);
+//		std::cout << "Draw: " << glGetError() << std::endl;
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 

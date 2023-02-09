@@ -62,17 +62,18 @@ namespace GLVM::core
             
         window_Class_ = { };
 
-        window_Class_.style = WS_VISIBLE;
+//        window_Class_.style = WS_VISIBLE;
+		window_Class_.style = CS_DBLCLKS | CS_PARENTDC;
         window_Class_.lpfnWndProc = MainWndProc;
         window_Class_.cbClsExtra = 0;
         window_Class_.cbWndExtra = 0;
         window_Class_.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        window_Class_.hCursor = LoadCursor(NULL, IDC_SIZE);
+        window_Class_.hCursor = LoadCursor(NULL, IDC_ARROW);
         window_Class_.lpszClassName = (LPCSTR)aClass_Name;
         window_Class_.hInstance = GetModuleHandleA(NULL);
         window_Class_.lpszClassName = aClass_Name;
 
-        RegisterClass(&window_Class_);
+        RegisterClassA(&window_Class_);
         
         pModern_Window_ = CreateWindowEx(0, aClass_Name, "Sample Window Class", WS_OVERLAPPEDWINDOW, 0, 0, 1920, 1080, NULL, NULL, GetModuleHandleA(NULL), NULL);
         ShowWindow(pModern_Window_, SW_SHOW);

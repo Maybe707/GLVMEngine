@@ -49,10 +49,10 @@ void Shader::SetMat4(const std::string &name, unsigned int matrixNumber, mat4 &m
 	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), matrixNumber, GL_FALSE, &mat[0][0]);
 }
 
-void Shader::SetMat4(const std::string &name, glm::mat4 &mat) const
-{
-	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
-}
+// void Shader::SetMat4(const std::string &name, glm::mat4 &mat) const
+// {
+// 	pGLUniform_Matrix4fv(pGLGet_Uniform_Location(iID, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+// }
 
 ///< Functions for exmination of shaders errors
 void Shader::CheckCompileErrors(unsigned int shader, std::string type)

@@ -17,6 +17,7 @@ namespace GLVM::ecs
 		GLuint iVao_Crosshair_;
 
     public:
+		CGUISystem();
         void Update() override;
 
         Shader* _Shader_Program;

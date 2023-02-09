@@ -109,12 +109,11 @@ int main()
 	materialWitch3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch3, materialWitch3.diffuseTextureID_);
-	
+
     // Entity u_iHud1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
     // ComponentManager->GetComponent<cm::vertex>(u_iHud1).vkVertexId_ = 0;
-	// ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.1f ,
-	// 	.hud = true };
+	// ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0, 0.0f, 0.0f }, .fScale = 0.1f , .hud = true };
 	// cm::material & materialHud0   = ComponentManager->GetComponent<cm::material>(u_iHud1);
 	// materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
     // hudTextureManager->BindTexture(u_iHud1, materialHud0.diffuseTextureID_);
