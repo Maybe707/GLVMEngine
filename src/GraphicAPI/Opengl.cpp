@@ -521,7 +521,6 @@ namespace GLVM::core
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE29);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
-				std::cout << uiVertexId << std::endl;
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				cm::material& materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 				shaderProgram_->SetFloat("material.shininess", materialComponent.shininess);

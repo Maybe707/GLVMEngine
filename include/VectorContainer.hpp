@@ -18,7 +18,7 @@ namespace GLVM::core
 	{
 		unsigned int iSize_ = 0;
 		unsigned int iCapacity_ = 0;
-		unsigned int iExpander_ = 1000;
+		unsigned int iExpander_ = 10;
 		T* aVector_Container_ = new T[iSize_];
 	public:
         TCVectorContainer() {}
@@ -159,37 +159,78 @@ namespace GLVM::core
 		if(iSize_ < 1)
 			return;
 
-		bool bRemove_Flag = false;
+		// bool foundedFlag = false;
 		
-		int iTemp_Index = 0;
-//		T aTemp_Vector_Container[iCapacity_];
-		T* aTemp_Vector_Container = new T[iCapacity_];
-		if(iCapacity_ > 0)
-		{
-			for(unsigned int i = 0; i < iCapacity_; ++i)
-				aTemp_Vector_Container[i] = aVector_Container_[i];
-		}
+		// unsigned int oldSize = iSize_;
+		// for (unsigned int i = 0; i < iSize_; ++i) {
+		// 	if (_Item == aVector_Container_[i]) {
+		// 		--iSize_;
+		// 		foundedFlag = true;
+		// 	} 
+			    
+		// 	if ( foundedFlag )
+		// 		aVector_Container_[i] = aVector_Container_[i + 1];
+		// }
+
+		// if ( foundedFlag )
+		// 	aVector_Container_[oldSize - 1] = k_iNull;
 		
-		for(unsigned int j = 0; j < iCapacity_; ++j)
-		{
-			if(_Item == aVector_Container_[j])
-			{
-				bRemove_Flag = true;
-				continue;
+		// if ( oldSize == iSize_ )
+		// 	std::cout << "Vector dong contain this element" << std::endl;
+
+		unsigned int secondCounter = 0;
+		unsigned int oldSize = iSize_;
+		for ( unsigned int i = 0; i < iSize_; ++i) {
+			if ( _Item == aVector_Container_[i] ) {
+				--iSize_;
+				secondCounter = i;
+				break;
 			}
-
-			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
-			++iTemp_Index;
 		}
 
-		if(bRemove_Flag)
-		{
-			--iSize_;
-			aVector_Container_[iSize_] = k_iNull;
+		if ( oldSize == iSize_ ) {
+			std::cout << "Vector dont contain this element" << std::endl;
+			return;
+		}
+		
+		for ( unsigned int j = secondCounter; j < oldSize; ++j ) {
+			std::cout << "J: " << j << std::endl;
+			aVector_Container_[j] = aVector_Container_[j + 1];
 		}
 
-		delete [] aTemp_Vector_Container;
-		aTemp_Vector_Container = nullptr;
+		aVector_Container_[iSize_] = k_iNull;
+		
+// 		bool bRemove_Flag = false;
+		
+// 		int iTemp_Index = 0;
+// //		T aTemp_Vector_Container[iCapacity_];
+// 		T* aTemp_Vector_Container = new T[iCapacity_];
+// 		if(iCapacity_ > 0)
+// 		{
+// 			for(unsigned int i = 0; i < iCapacity_; ++i)
+// 				aTemp_Vector_Container[i] = aVector_Container_[i];
+// 		}
+		
+// 		for(unsigned int j = 0; j < iCapacity_; ++j)
+// 		{
+// 			if(_Item == aVector_Container_[j])
+// 			{
+// 				bRemove_Flag = true;
+// 				continue;
+// 			}
+
+// 			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
+// 			++iTemp_Index;
+// 		}
+
+// 		if(bRemove_Flag)
+// 		{
+// 			--iSize_;
+// //			aVector_Container_[iSize_] = k_iNull;
+// 		}
+
+// 		delete [] aTemp_Vector_Container;
+// 		aTemp_Vector_Container = nullptr;
 	}
 
 	template<class T>
@@ -296,7 +337,7 @@ namespace GLVM::core
     template<class T>
     void TCVectorContainer<T>::Print()
     {
-        for(int i = 0; i < iCapacity_; ++i)
+        for(unsigned int i = 0; i < iCapacity_; ++i)
             std::cout << aVector_Container_[i] << std::endl;
 
         std::cout << "End of container" << std::endl;
