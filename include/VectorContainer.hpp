@@ -185,7 +185,7 @@ namespace GLVM::core
 		if(bRemove_Flag)
 		{
 			--iSize_;
-//			aVector_Container_[iSize_] = k_iNull;
+			aVector_Container_[iSize_] = k_iNull;
 		}
 
 		delete [] aTemp_Vector_Container;

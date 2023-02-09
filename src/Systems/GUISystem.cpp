@@ -11,9 +11,9 @@ namespace GLVM::ecs
     void CGUISystem::Update()
     {
         Matrix<float, 4> tModel_Matrix(1.0);
-        tModel_Matrix[0][0] = 0.1;
-        tModel_Matrix[1][1] = 0.1;
-        tModel_Matrix[2][2] = 0.1;
+        tModel_Matrix[0][0] = 0.05;
+        tModel_Matrix[1][1] = 0.05;
+        tModel_Matrix[2][2] = 0.05;
 //        tModel_Matrix[3][2] = -0.5;
         Matrix<float, 4> tProjection_Matrix(1.0f);
         Matrix<float, 4> tView_Matrix(1.0f);

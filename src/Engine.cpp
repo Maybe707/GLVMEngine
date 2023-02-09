@@ -99,7 +99,7 @@ namespace GLVM::core
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 //		pSystem_Manager->ActivateSystem(pCamera_System);
 		pSystem_Manager->ActivateSystem(Render_System_Interface_);
-//		pSystem_Manager->ActivateSystem(GUI_System);
+		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
 		sound_thread.detach();
