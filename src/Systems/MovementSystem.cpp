@@ -22,7 +22,7 @@ namespace GLVM::ecs
     void CMovementSystem::Update()
     {
 		namespace cm = GLVM::ecs::components;
-		
+
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
         core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
 			pComponent_Manager->GetEntityContainer<cm::move>();

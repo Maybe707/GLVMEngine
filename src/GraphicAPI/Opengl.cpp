@@ -610,7 +610,7 @@ namespace GLVM::core
             wavefrontObjParser->ParseFile();
 			aVertexes_.emplace_back();
             aIndices_.emplace_back();
-            
+
             unsigned int vertexIndex = 0;
             unsigned int textureIndex = 0;
 			unsigned int normalIndex = 0;

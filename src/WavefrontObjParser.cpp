@@ -63,7 +63,7 @@ namespace GLVM::core
         // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
             GLVM::core::TCVectorContainer<TCVectorContainer<char>> line = Split(pWavefrontObjFileData, ' ', '\n', uiCounter);
-            
+		   
             if (line[0] == "v") {
                 SVertex vertex = ParseVertices(line);
                 coordinateVertices_.Push(vertex);

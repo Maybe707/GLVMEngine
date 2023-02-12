@@ -3,12 +3,50 @@
 
 #include "Constants.hpp"
 #include "IContainer.hpp"
+#include <cstddef>
 #include <iostream>
 #include "VertexMath.hpp"
+#include <assert.h>
+#include "Iterator.hpp"
 
 namespace GLVM::core
 {
+	template <class T>
+	class TCVectorContainer;
 
+	template <class T>
+	class VectorIterator : public Iterator<T>
+	{
+		T* begin;
+		T* end;
+		
+	public:
+		VectorIterator(TCVectorContainer<T>& vector) {
+			begin = vector.GetVectorContainer();
+		    end   = vector.GetVectorContainer() + (vector.GetSize() - 1);
+		}
+	
+		bool Next() override {
+			if ( ValidStatus() ) {
+				begin += 1;
+				return true;
+			} else
+				return false;
+		}
+
+ 		bool ValidStatus() override {
+			return end >= begin;
+		}
+	
+		T& Current() override {
+			return *begin;
+		}
+		
+		T& Last() override {
+			return *end;
+		}
+	};
+	
 	template <class T>
 	class TCVectorContainer;
 	template <class T> using vector = GLVM::core::TCVectorContainer<T>;
@@ -19,12 +57,15 @@ namespace GLVM::core
 		unsigned int iSize_ = 0;
 		unsigned int iCapacity_ = 0;
 		unsigned int iExpander_ = 10;
-		T* aVector_Container_ = new T[iSize_];
+		unsigned char* aVector_Container_ = nullptr;
 	public:
         TCVectorContainer() {}
         TCVectorContainer(const TCVectorContainer<T>& _vector);
         ~TCVectorContainer();
-		void Push(const T _Item);
+		void Push(T _Item);
+		void Pop();
+		void Swap(T& firstElement, T& secondElement);
+		VectorIterator<T> Find(T& element);
 		void Insert(const T _Item, const unsigned int _Index);
 		void RemoveItem(const T _Item);
         void RemoveObject(const T _Item);
@@ -38,20 +79,28 @@ namespace GLVM::core
 		T& operator[](const unsigned int _iIndex);
         void Print();
         TCVectorContainer& operator=(const TCVectorContainer<T>& _vector);
-        bool operator==(const char* _string);
-        void Clear();
+        bool operator==(const char* string_);
+//        void Clear();
 	};
 
-    template <class T>
-    void TCVectorContainer<T>::Clear() {
-        delete [] aVector_Container_;
-		aVector_Container_ = nullptr;
-    }
+    // template <class T>
+    // void TCVectorContainer<T>::Clear() {
+    //     delete [] aVector_Container_;
+	// 	aVector_Container_ = nullptr;
+    // }
 
     template <class T>
-    bool TCVectorContainer<T>::operator==(const char* _string) {
+    bool TCVectorContainer<T>::operator==(const char* string_) {
+		char tempSymbol = '2';
+		unsigned int strSize = 0;
+		while(tempSymbol != '\0') {
+			tempSymbol = string_[strSize];
+			++strSize;
+		}
+		
         for (unsigned int i = 0; i < iSize_; ++i) {
-            if (aVector_Container_[i] == _string[i])
+			T& element = *(T*)&aVector_Container_[i * sizeof(T)];
+            if (element == string_[i])
                 continue;
             else
                 return false;
@@ -61,42 +110,50 @@ namespace GLVM::core
     }
     
     template <class T>
-    TCVectorContainer<T>& TCVectorContainer<T>::operator=(const TCVectorContainer<T>& _vector)
+    TCVectorContainer<T>& TCVectorContainer<T>::operator=([[maybe_unused]] const TCVectorContainer<T>& _vector)
     {
         if(this == &_vector)
             return *this;
 
-        T* aTemp_Vector_Container_ = new T[_vector.iSize_];
-        this->iSize_ = _vector.iSize_;
-        
-        for(unsigned int i = 0; i < _vector.iSize_; ++i)
-            aTemp_Vector_Container_[i] = _vector.aVector_Container_[i];
-        delete [] this->aVector_Container_;
-        this->aVector_Container_ = nullptr;
-        this->aVector_Container_ = aTemp_Vector_Container_;
+		for(unsigned int j = 0; j < this->iSize_; ++j) {
+			T& destinationElement = *(T*)&this->aVector_Container_[j * sizeof(T)];
+			destinationElement.~T();
+		}
+
+		delete [] this->aVector_Container_;
+
+		iCapacity_ = _vector.iCapacity_;
+		iSize_     = _vector.iSize_;
+		this->aVector_Container_ = new unsigned char[iCapacity_ * sizeof(T)];
+		
+        for(unsigned int i = 0; i < _vector.iSize_; ++i) {
+			T& sourceElement = *(T*)&_vector.aVector_Container_[i * sizeof(T)];
+			new (&aVector_Container_[i * sizeof(T)]) T(sourceElement);
+		}
 
         return *this;
     }
 
     template <class T>
-    TCVectorContainer<T>::TCVectorContainer(const TCVectorContainer<T>& _vector)
+    TCVectorContainer<T>::TCVectorContainer([[maybe_unused]] const TCVectorContainer<T>& _vector)
     {
-        
-        
-        T* aVector_Container = new T[_vector.iSize_];
-        iSize_ = _vector.iSize_;
-        
-        for(unsigned int i = 0; i < _vector.iSize_; ++i)
-            aVector_Container[i] = _vector.aVector_Container_[i];
-
-        delete [] this->aVector_Container_;
-        this->aVector_Container_ = aVector_Container;
-
+		iSize_     = _vector.iSize_;
+	    iCapacity_ = _vector.iSize_;
+		this->aVector_Container_ = new unsigned char[iCapacity_ * sizeof(T)];
+		
+        for(unsigned int i = 0; i < _vector.iSize_; ++i) {
+			T& sourceElement = *(T*)&_vector.aVector_Container_[i * sizeof(T)];
+			new (&aVector_Container_[i * sizeof(T)]) T(sourceElement);
+		}
     }
     
 	template<class T>
 	TCVectorContainer<T>::~TCVectorContainer()
 	{
+		for ( unsigned int i = 0; i < iSize_; ++i) {
+			T& element = *(T*)&aVector_Container_[i * sizeof(T)];
+			element.~T();
+		}
 		delete [] aVector_Container_;
 		aVector_Container_ = nullptr;
 	}
@@ -104,29 +161,75 @@ namespace GLVM::core
     /// Push element on top of the container.
     
 	template<class T>
-	void TCVectorContainer<T>::Push(const T _Item)
+	void TCVectorContainer<T>::Push(T _Item)
 	{
 		if(iSize_ == iCapacity_)
-		{
-			T* aTemp_Vector_Container = new T[iCapacity_ + iExpander_];
-			for(unsigned int i = 0; i < iCapacity_; ++i)
-				aTemp_Vector_Container[i] = aVector_Container_[i];
+			{
+				unsigned char* aTemp_Vector_Container = new unsigned char[(iCapacity_ + iExpander_) * sizeof(T)];
+				for(unsigned int i = 0; i < iCapacity_; ++i) {
+					T& element = *(T*)&aVector_Container_[i * sizeof(T)];
+					new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
+					element.~T();
+				}
 
-			delete [] aVector_Container_;
-			aVector_Container_ = aTemp_Vector_Container;
+				delete [] aVector_Container_;
+				aVector_Container_ = aTemp_Vector_Container;
 
-			iCapacity_ += iExpander_;
+				iCapacity_ += iExpander_;
 			
-			aVector_Container_[iSize_] = _Item;
-			++iSize_;
-			return;
-		}
+				new (&aVector_Container_[iSize_ * sizeof(T)]) T(_Item);
+				++iSize_;
+				return;
+			}
 
-		aVector_Container_[iSize_] = _Item;
+		new (&aVector_Container_[iSize_ * sizeof(T)]) T(_Item);
 		++iSize_;
-		return;
 	}
 
+	template <class T>
+	void TCVectorContainer<T>::Pop() {
+		if ( iSize_ < 1 )
+			return;
+
+		T& element = *(T*)&aVector_Container_[(iSize_ - 1) * sizeof(T)];
+		element.~T();
+		--iSize_;
+	}
+
+	template <class T>
+	void TCVectorContainer<T>::Swap(T& firstElement, T& secondElement) {
+		if ( iSize_ < 1)
+			return;
+
+		std::cout << "first element: " << firstElement << std::endl;
+		std::cout << "second element: " << secondElement << std::endl;
+		
+		if ( &firstElement == &secondElement ) {
+		    return;
+		}
+		
+		T tempElement = firstElement;
+		firstElement  = secondElement;
+		secondElement  = tempElement;
+	}
+
+	template <class T>
+	VectorIterator<T> TCVectorContainer<T>::Find(T& element) {
+		VectorIterator<T> iterator(*this);
+		if ( !iterator.ValidStatus() ) {
+			std::cout << "Vector is empty. Retern iterator with pointer on end" << std::endl;
+			return iterator;
+		}
+
+		do {
+			if ( iterator.Current() == element )
+				return iterator;
+		} while ( iterator.Next() );
+
+		std::cout << "Vector dont contain this element" << std::endl;
+		return iterator;
+	}
+	
     /// Insert element into chosen cell.
     
 	template<typename T>
@@ -134,22 +237,24 @@ namespace GLVM::core
 	{
 		if(_Index >= iCapacity_)
 		{
-			unsigned int u_iTemp_Capacity = iCapacity_;
-			iCapacity_ = (_Index + iExpander_);
-			T* aTemp_Vector_Container_ = new T[iCapacity_];
+			unsigned int u_iTemp_Capacity = _Index + iExpander_;
+			unsigned char* aTemp_Vector_Container_ = new unsigned char[u_iTemp_Capacity * sizeof(T)];
 
-			for(unsigned int j = 0; j < u_iTemp_Capacity; ++j)
-				aTemp_Vector_Container_[j] = aVector_Container_[j];
+			for(unsigned int j = 0; j < iCapacity_; ++j) {
+				T& element = *(T*)&aVector_Container_[j * sizeof(T)];
+				new (&aTemp_Vector_Container_[j * sizeof(T)]) T(element);
+				element.~T();
+			}
 
+			new (&aTemp_Vector_Container_[_Index * sizeof(T)]) T(_Item);
 			delete [] aVector_Container_;
-            aVector_Container_ = nullptr;
 			aVector_Container_ = aTemp_Vector_Container_;
-
-            // delete [] aTemp_Vector_Container_;
-            // aTemp_Vector_Container_ = nullptr;
+			++iSize_;
+			iCapacity_ = u_iTemp_Capacity;
+			return;
 		}
 
-		aVector_Container_[_Index] = _Item;
+		new (&aVector_Container_[_Index * sizeof(T)]) T(_Item);
 		++iSize_;
 	}
 	
@@ -159,120 +264,35 @@ namespace GLVM::core
 		if(iSize_ < 1)
 			return;
 
-		// bool foundedFlag = false;
-		
-		// unsigned int oldSize = iSize_;
-		// for (unsigned int i = 0; i < iSize_; ++i) {
-		// 	if (_Item == aVector_Container_[i]) {
-		// 		--iSize_;
-		// 		foundedFlag = true;
-		// 	} 
-			    
-		// 	if ( foundedFlag )
-		// 		aVector_Container_[i] = aVector_Container_[i + 1];
+		// unsigned int i = 0;
+		// for ( i = 0; i < iSize_; ++i) {
+		// 	if ( _Item == aVector_Container_[i] )
+		// 		break;
 		// }
 
-		// if ( foundedFlag )
-		// 	aVector_Container_[oldSize - 1] = k_iNull;
-		
-		// if ( oldSize == iSize_ )
-		// 	std::cout << "Vector dong contain this element" << std::endl;
+		// for ( ; i < iSize_ - 1; ++i )
+		// 	aVector_Container_[i] = aVector_Container_[i + 1];
 
-		unsigned int secondCounter = 0;
-		unsigned int oldSize = iSize_;
-		for ( unsigned int i = 0; i < iSize_; ++i) {
+		// if ( i == iSize_ ) {
+		// 	std::cout << "Vector dont contain this element" << std::endl;
+		// 	return;
+		// }
+
+		// --iSize_;
+		// aVector_Container_[iSize_] = k_iNull;
+
+		for ( unsigned int i = 0; i < iSize_; ++i ) {
 			if ( _Item == aVector_Container_[i] ) {
+				aVector_Container_[i] = aVector_Container_[iSize_ - 1];
+				aVector_Container_[iSize_ - 1] = k_iNull;
 				--iSize_;
-				secondCounter = i;
-				break;
+				return;
 			}
 		}
 
-		if ( oldSize == iSize_ ) {
-			std::cout << "Vector dont contain this element" << std::endl;
-			return;
-		}
-		
-		for ( unsigned int j = secondCounter; j < oldSize; ++j ) {
-			std::cout << "J: " << j << std::endl;
-			aVector_Container_[j] = aVector_Container_[j + 1];
-		}
-
-		aVector_Container_[iSize_] = k_iNull;
-		
-// 		bool bRemove_Flag = false;
-		
-// 		int iTemp_Index = 0;
-// //		T aTemp_Vector_Container[iCapacity_];
-// 		T* aTemp_Vector_Container = new T[iCapacity_];
-// 		if(iCapacity_ > 0)
-// 		{
-// 			for(unsigned int i = 0; i < iCapacity_; ++i)
-// 				aTemp_Vector_Container[i] = aVector_Container_[i];
-// 		}
-		
-// 		for(unsigned int j = 0; j < iCapacity_; ++j)
-// 		{
-// 			if(_Item == aVector_Container_[j])
-// 			{
-// 				bRemove_Flag = true;
-// 				continue;
-// 			}
-
-// 			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
-// 			++iTemp_Index;
-// 		}
-
-// 		if(bRemove_Flag)
-// 		{
-// 			--iSize_;
-// //			aVector_Container_[iSize_] = k_iNull;
-// 		}
-
-// 		delete [] aTemp_Vector_Container;
-// 		aTemp_Vector_Container = nullptr;
+		std::cout << "Vector dont contain this element" << std::endl;
 	}
 
-	template<class T>
-	void TCVectorContainer<T>::RemoveObject(const T _Item)
-	{
-		if(iSize_ < 1)
-			return;
-
-		bool bRemove_Flag = false;
-		
-		int iTemp_Index = 0;
-//		T aTemp_Vector_Container[iCapacity_];
-		T* aTemp_Vector_Container = new T[iCapacity_];
-		if(iCapacity_ > 0)
-		{
-			for(unsigned int i = 0; i < iCapacity_; ++i)
-				aTemp_Vector_Container[i] = aVector_Container_[i];
-		}
-		
-		for(unsigned int j = 0; j < iCapacity_; ++j)
-		{
-			if(_Item == aVector_Container_[j])
-			{
-                delete aVector_Container_[j];
-                aVector_Container_[j] = nullptr;
-				bRemove_Flag = true;
-				continue;
-			}
-
-			aVector_Container_[iTemp_Index] = aTemp_Vector_Container[j];
-			++iTemp_Index;
-		}
-
-		if(bRemove_Flag)
-		{
-			--iSize_;
-            aVector_Container_[iSize_] = nullptr;
-		}
-
-		delete [] aTemp_Vector_Container;
-		aTemp_Vector_Container = nullptr;
-	}
     
 	template<class T>
 	void TCVectorContainer<T>::RemoveFirstItem()
@@ -280,22 +300,27 @@ namespace GLVM::core
 		if(iSize_ < 1)
 			return;
 
-//		T aTemp_Vector_Container[iCapacity_];
-//		T* aTemp_Vector_Container = new T[iCapacity_];
-		if(iCapacity_ > 0)
-		{
-			for(unsigned int i = 0; i < (iSize_-1); ++i)
-				aVector_Container_[i] = aVector_Container_[i+1];
+		// if(iSize_ > 0)
+		// {
+		// 	for(unsigned int i = 0; i < (iSize_-1); ++i)
+		// 		aVector_Container_[i] = aVector_Container_[i+1];
+		// }
+		
+		unsigned char* aTemp_Vector_Container = new unsigned char[iSize_ * sizeof(T)];
+		for(unsigned int i = 0; i < iSize_; ++i) {
+			T& element = *(T*)&aVector_Container_[i * sizeof(T)];
+			new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
+			element.~T();
 		}
-		
-		// for(unsigned int j = 0; j < (iCapacity_-1); ++j)
-		// 	aVector_Container_[j] = aTemp_Vector_Container[j];
 
-		// delete [] aTemp_Vector_Container;
-		// aTemp_Vector_Container = nullptr;
-		
-		--iSize_;
-		aVector_Container_[iSize_] = k_iNull;
+		delete [] this->aVector_Container_;
+
+		--iSize_;				
+		aVector_Container_ = new unsigned char[iSize_ * sizeof(T)];
+        for(unsigned int i = 0; i < iSize_; ++i) {
+			T& sourceElement = *(T*)&aTemp_Vector_Container[(i + 1) * sizeof(T)];
+			new (&aVector_Container_[i * sizeof(T)]) T(sourceElement);
+		}
 	}
 	
 	template<class T>
@@ -309,19 +334,19 @@ namespace GLVM::core
 	template<class T>
 	T& TCVectorContainer<T>::GetFirstItem()
 	{
-		return aVector_Container_[k_iNull];
+		return *(T*)&aVector_Container_[0];
 	}
 
 	template<class T>
 	T& TCVectorContainer<T>::GetHead()
 	{
-		return aVector_Container_[iSize_-1];
+		return *(T*)&aVector_Container_[(iSize_ - 1) * sizeof(T)];
 	}
 
 	template<class T>
 	T* TCVectorContainer<T>::GetVectorContainer()
 	{
-		return aVector_Container_;
+		return (T*)aVector_Container_;
 	}
 
 	template<typename T>
@@ -331,14 +356,14 @@ namespace GLVM::core
 	template<typename T>
 	T& TCVectorContainer<T>::operator[](const unsigned int _iIndex)
 	{
-		return aVector_Container_[_iIndex];
+		return *(T*)&aVector_Container_[_iIndex * sizeof(T)];
 	}
 
     template<class T>
     void TCVectorContainer<T>::Print()
     {
         for(unsigned int i = 0; i < iCapacity_; ++i)
-            std::cout << aVector_Container_[i] << std::endl;
+            std::cout << (T)aVector_Container_[i * sizeof(T)] << std::endl;
 
         std::cout << "End of container" << std::endl;
     }

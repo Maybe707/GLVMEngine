@@ -40,7 +40,7 @@ namespace GLVM::ecs
 				core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
 					new core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
 				tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
-			
+//				std::cout << typeid(Component_Type).name() << std::endl;			
 				++s_iComponents_Container_ID;
 				return s_iLocal_Container_ID;
 			}

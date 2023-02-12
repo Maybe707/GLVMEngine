@@ -48,12 +48,18 @@ namespace GLVM::ecs
     void CEntityManager::RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager)
     {
         for(int i = 0, iSize = _ComponentManager->tWorld_IDs_Container.GetSize(); i < iSize; ++i) {
-            static_cast<core::TCVectorContainer<unsigned int>*>(_ComponentManager->tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);
+            // static_cast<core::TCVectorContainer<unsigned int>*>(_ComponentManager->tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);
+			core::TCVectorContainer<unsigned int>& vector =
+				*(static_cast<core::TCVectorContainer<unsigned int>*>
+				  (_ComponentManager->tWorld_IDs_Container[i]));
+			core::VectorIterator<unsigned int> iterator = vector.Find(_Entity_ID);
+			if ( !iterator.ValidStatus() )
+				continue;
+
+			vector.Swap(iterator.Current(), vector.GetHead());
+			vector.Pop();
         }
 		tActive_Entity_Registry_[_Entity_ID] = k_iUint_Max;  
-        tRemoved_Entity_Registry_.Push(_Entity_ID);
-		// for(int j = 0, iSize = _ComponentManager->tWorld_Components_Container_.GetSize(); j < iSize; ++j) {
-		// 	static_cast<core::TCVectorContainer<unsigned int>*>(_ComponentManager->tWorld_Components_Container_[j])->Rem
-		// }
+		tRemoved_Entity_Registry_.Push(_Entity_ID);
     }
 }
