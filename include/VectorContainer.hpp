@@ -68,7 +68,6 @@ namespace GLVM::core
 		VectorIterator<T> Find(T& element);
 		void Insert(const T _Item, const unsigned int _Index);
 		void RemoveItem(const T _Item);
-        void RemoveObject(const T _Item);
 		void RemoveFirstItem();
 		T& GetItem(const T _Item);
 		T& GetFirstItem();
@@ -80,14 +79,7 @@ namespace GLVM::core
         void Print();
         TCVectorContainer& operator=(const TCVectorContainer<T>& _vector);
         bool operator==(const char* string_);
-//        void Clear();
 	};
-
-    // template <class T>
-    // void TCVectorContainer<T>::Clear() {
-    //     delete [] aVector_Container_;
-	// 	aVector_Container_ = nullptr;
-    // }
 
     template <class T>
     bool TCVectorContainer<T>::operator==(const char* string_) {
@@ -110,7 +102,7 @@ namespace GLVM::core
     }
     
     template <class T>
-    TCVectorContainer<T>& TCVectorContainer<T>::operator=([[maybe_unused]] const TCVectorContainer<T>& _vector)
+    TCVectorContainer<T>& TCVectorContainer<T>::operator=(const TCVectorContainer<T>& _vector)
     {
         if(this == &_vector)
             return *this;
@@ -135,7 +127,7 @@ namespace GLVM::core
     }
 
     template <class T>
-    TCVectorContainer<T>::TCVectorContainer([[maybe_unused]] const TCVectorContainer<T>& _vector)
+    TCVectorContainer<T>::TCVectorContainer(const TCVectorContainer<T>& _vector)
     {
 		iSize_     = _vector.iSize_;
 	    iCapacity_ = _vector.iSize_;
@@ -192,6 +184,7 @@ namespace GLVM::core
 			return;
 
 		T& element = *(T*)&aVector_Container_[(iSize_ - 1) * sizeof(T)];
+		element = 0;                                                     ///< For debug purpoese only!!!
 		element.~T();
 		--iSize_;
 	}
@@ -299,12 +292,6 @@ namespace GLVM::core
 	{
 		if(iSize_ < 1)
 			return;
-
-		// if(iSize_ > 0)
-		// {
-		// 	for(unsigned int i = 0; i < (iSize_-1); ++i)
-		// 		aVector_Container_[i] = aVector_Container_[i+1];
-		// }
 		
 		unsigned char* aTemp_Vector_Container = new unsigned char[iSize_ * sizeof(T)];
 		for(unsigned int i = 0; i < iSize_; ++i) {
@@ -323,14 +310,6 @@ namespace GLVM::core
 		}
 	}
 	
-	template<class T>
-	T& TCVectorContainer<T>::GetItem(const T _Item)
-	{
-		for(int i = 0; i < iCapacity_; ++i)
-			if(_Item == aVector_Container_[i])
-				return aVector_Container_[i];
-	}
-
 	template<class T>
 	T& TCVectorContainer<T>::GetFirstItem()
 	{

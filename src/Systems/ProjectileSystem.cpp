@@ -62,15 +62,15 @@ namespace GLVM::ecs
         GLVM::ecs::CTextureManager*    TextureSystem    = GLVM::ecs::CTextureManager::GetInstance();
 		
         for(int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
-			std::cout << "Size: " << pComponent_Manager->GetEntityContainer<cm::projectile>()->GetSize() << std::endl;
-			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
+
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bGround_Collision_) {
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
                 cm::material& textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
             }
-
+			std::cout << "Size: " << pComponent_Manager->GetEntityContainer<cm::projectile>()->GetSize() << std::endl;
+			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
 			// std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
 			// std::cout << "Projectiles container size 1: " << pEntity_Container_refProjectile->GetSize() << std::endl;
 			// std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
