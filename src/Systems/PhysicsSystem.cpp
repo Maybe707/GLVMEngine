@@ -153,16 +153,14 @@ namespace GLVM::ecs
         {
                 unsigned int uiEntity_refCollider = (*pEntity_Container_refCollider)[i];
 				cm::transform& transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refCollider);                
-                if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_
-                    && pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bPush_Collission)
+                if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_)
                 {
 //                    Gravity();
 					transformComponent.tPosition += transformComponent.frameVerticalMovement; 
 					transformComponent.frameVerticalMovement = 0;
                     pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bGround_Collision_ = false;
                 }
-                if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bWall_Collision_
-                    && pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bPush_Collission)
+                if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refCollider).bWall_Collision_)
                 {
 					transformComponent.tPosition += transformComponent.frameHorizontalMovement; 
 					transformComponent.frameHorizontalMovement = 0;
