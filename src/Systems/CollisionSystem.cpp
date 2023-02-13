@@ -71,7 +71,6 @@ namespace GLVM::ecs
                 {
                     _Component_Manager->GetComponent<cm::collider>(uiBacktracking_Entity_refCollider).bGround_Collision_ = true;
                     _Component_Manager->GetComponent<cm::collider>(uiCompared_Entity_refCollider).bGround_Collision_ = true;
-                    _Component_Manager->GetComponent<cm::collider>(uiBacktracking_Entity_refCollider).uiGround_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
                     
@@ -79,7 +78,6 @@ namespace GLVM::ecs
                 {
                     _Component_Manager->GetComponent<cm::collider>(uiBacktracking_Entity_refCollider).bWall_Collision_ = true;
                     _Component_Manager->GetComponent<cm::collider>(uiCompared_Entity_refCollider).bWall_Collision_ = true;
-                    _Component_Manager->GetComponent<cm::collider>(uiBacktracking_Entity_refCollider).uiWall_Collider_ = uiCompared_Entity_refCollider;
                     continue;
                 }
 			}
