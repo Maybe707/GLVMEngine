@@ -12,12 +12,12 @@ namespace GLVM::core::Sound
 {
     class CSoundEngineAlsa : public ISoundEngine
     {
-        TCVectorContainer<CSoundSample*> tSound_Contaier;
+        vector<CSoundSample*> tSound_Contaier;
     public:
         void SoundStream() override;
         void PlaybackSoundSample(CSoundSample& _sound_sample) override;
         void SetMasterVolume(long _lVolume) override;
-        TCVectorContainer<CSoundSample*>& GetSoundContainer() override;
+        vector<CSoundSample*>& GetSoundContainer() override;
     };
 }
 

@@ -14,8 +14,8 @@ namespace GLVM::ecs
         static std::mutex  Mutex_;
 
 		inline static Entity_ID u_iID = 0;		
- 		core::TCVectorContainer<Entity_ID> tRemoved_Entity_Registry_;
-		core::TCVectorContainer<Entity_ID> tActive_Entity_Registry_;
+ 		core::vector<Entity_ID> tRemoved_Entity_Registry_;
+		core::vector<Entity_ID> tActive_Entity_Registry_;
 		
         CEntityManager();
         ~CEntityManager();

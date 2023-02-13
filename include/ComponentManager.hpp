@@ -33,12 +33,12 @@ namespace GLVM::ecs
 				s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
 				s_bExist_Component_Container_Flag = true;
             
-				core::TCVectorContainer<Component_Type>* pComponent_Container =
-					new core::TCVectorContainer<Component_Type>;    ///< Create component container of current type.
+				core::vector<Component_Type>* pComponent_Container =
+					new core::vector<Component_Type>;    ///< Create component container of current type.
 				tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
             
-				core::TCVectorContainer<Entity_ID>* pRow_Ordered_IDs_Container =
-					new core::TCVectorContainer<Entity_ID>;    ///< Create ID's component container.
+				core::vector<Entity_ID>* pRow_Ordered_IDs_Container =
+					new core::vector<Entity_ID>;    ///< Create ID's component container.
 				tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
 //				std::cout << typeid(Component_Type).name() << std::endl;			
 				++s_iComponents_Container_ID;
@@ -47,8 +47,8 @@ namespace GLVM::ecs
         
 	public:
 		inline static unsigned int s_iComponents_Container_ID = 0;
-		core::TCVectorContainer<core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
-		core::TCVectorContainer<core::TCVectorContainer<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
+		core::vector<core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
+		core::vector<core::vector<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
 
         CComponentManager(CComponentManager& _component_Manager) = delete;         ///< Dont need to make cope because of singleton property.
         void operator=(const CComponentManager& _component_Manager) = delete;      ///< Dont need assignment operator because of singleton property.
@@ -61,9 +61,9 @@ namespace GLVM::ecs
 			Component_Type Component;
 			u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
 
-			static_cast<core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
-			static_cast<core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
-//			return (*static_cast<core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
+			static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
+			static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
+//			return (*static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
         /// Allow to give a various components to chosen entity.
@@ -81,7 +81,7 @@ namespace GLVM::ecs
             unsigned int u_iLocal_Container_ID;
             u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
 
-            return (*static_cast<core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
+            return (*static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
         }
         
         /**************************************************************************************
@@ -93,21 +93,21 @@ namespace GLVM::ecs
 		void RemoveComponent(Entity_ID& _u_iEntity)
 		{
 //			static_cast<core::TCConstVectorContainer<S>*>(tWorld_Components_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
-			static_cast<core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
+			static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
 		}
 		
 		unsigned int GetContainerID();
 
 		template <typename Component_Type>
-		core::TCVectorContainer<Component_Type>* GetComponentContainer()
+		core::vector<Component_Type>* GetComponentContainer()
 			{
-				return static_cast<core::TCVectorContainer<Component_Type>*>(tWorld_Components_Container_[CreateComponentContainer<Component_Type>()]);
+				return static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[CreateComponentContainer<Component_Type>()]);
 			}
 
 		template <typename Component_Type>
-		core::TCVectorContainer<Entity_ID>* GetEntityContainer()
+		core::vector<Entity_ID>* GetEntityContainer()
 			{
-				return static_cast<core::TCVectorContainer<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()]);
+				return static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()]);
 			}
 	};
 

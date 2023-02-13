@@ -1327,7 +1327,7 @@ namespace GLVM::core
         }
 
         ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        core::TCVectorContainer<cm::transform>* pEntity_Container_refTransform =
+        core::vector<cm::transform>* pEntity_Container_refTransform =
 			pComponent_Manager->GetComponentContainer<cm::transform>();
 
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {

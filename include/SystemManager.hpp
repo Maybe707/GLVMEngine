@@ -21,7 +21,7 @@ namespace GLVM::ecs
         static CSystemManager* GetInstance();                     ///< It possibly to get only one instance of this class whith this method.
         
 		inline static unsigned int s_iSystem_ID = 0;
-		core::TCVectorContainer<ISystem*> tSystemContainer;
+		core::vector<ISystem*> tSystemContainer;
 
 		void ActivateSystem(ISystem* _System);
 

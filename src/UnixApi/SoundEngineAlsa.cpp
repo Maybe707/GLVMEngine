@@ -83,5 +83,5 @@ namespace GLVM::core::Sound
         snd_mixer_close(pHandle);
     }
         
-    TCVectorContainer<CSoundSample*>& CSoundEngineAlsa::GetSoundContainer() { return tSound_Contaier; }
+    vector<CSoundSample*>& CSoundEngineAlsa::GetSoundContainer() { return tSound_Contaier; }
 }

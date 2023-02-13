@@ -17,7 +17,7 @@ namespace GLVM::core::Sound
     public:
         virtual ~ISoundEngine() {}
 
-        virtual TCVectorContainer<CSoundSample*>& GetSoundContainer() = 0;
+        virtual vector<CSoundSample*>& GetSoundContainer() = 0;
         virtual void PlaybackSoundSample(CSoundSample& _sound_sample) = 0;
         virtual void SetMasterVolume(long _lVolume) = 0;
         virtual void SoundStream() = 0;

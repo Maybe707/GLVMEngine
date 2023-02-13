@@ -45,7 +45,7 @@ namespace GLVM::ecs
 		void Update() override
 		{
             CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
-            core::TCVectorContainer<unsigned int>* pEntity_Container_refAnimationMove =
+            core::vector<unsigned int>* pEntity_Container_refAnimationMove =
                 ecs::GetEntityContainer<ecs::animation>(*pComponent_Manager);
             unsigned int uiVector_AnimationMove_Size = pEntity_Container_refAnimationMove->GetSize();
 

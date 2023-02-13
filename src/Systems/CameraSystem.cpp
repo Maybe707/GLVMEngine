@@ -10,7 +10,7 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+        core::vector<unsigned int>* pEntity_Container_refView =
 			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         

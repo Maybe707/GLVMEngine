@@ -20,10 +20,10 @@ namespace GLVM::core
     //     return pInstance_;
     // }
     
-    GLVM::core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
-    GLVM::core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
-	GLVM::core::TCVectorContainer<SVertex>& CWaveFrontObjParser::getNormals() { return normals_; }
-    GLVM::core::TCVectorContainer<SFace>& CWaveFrontObjParser::getFaces() { return faces_; }
+    GLVM::core::vector<SVertex>& CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
+    GLVM::core::vector<SVertex>& CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
+	GLVM::core::vector<SVertex>& CWaveFrontObjParser::getNormals() { return normals_; }
+    GLVM::core::vector<SFace>& CWaveFrontObjParser::getFaces() { return faces_; }
     
     void CWaveFrontObjParser::ReadFile(const char* _filePath) {
         const char* _pWavefrontObjFile = _filePath;
@@ -62,7 +62,7 @@ namespace GLVM::core
         // auto currentTime = std::chrono::high_resolution_clock::now();
         // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-            GLVM::core::TCVectorContainer<TCVectorContainer<char>> line = Split(pWavefrontObjFileData, ' ', '\n', uiCounter);
+            GLVM::core::vector<vector<char>> line = Split(pWavefrontObjFileData, ' ', '\n', uiCounter);
 		   
             if (line[0] == "v") {
                 SVertex vertex = ParseVertices(line);
@@ -88,8 +88,8 @@ namespace GLVM::core
         }
     }
 
-    GLVM::core::TCVectorContainer<TCVectorContainer<char>> CWaveFrontObjParser::Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter) {
-        GLVM::core::TCVectorContainer<TCVectorContainer<char>> wordsContainer;
+    GLVM::core::vector<vector<char>> CWaveFrontObjParser::Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter) {
+        GLVM::core::vector<vector<char>> wordsContainer;
         unsigned int outerIndex = 0;
         wordsContainer.Push({});
         
@@ -115,7 +115,7 @@ namespace GLVM::core
         }
     }
 
-    SVertex CWaveFrontObjParser::ParseVertices(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer) {
+    SVertex CWaveFrontObjParser::ParseVertices(GLVM::core::vector<vector<char>> _wordsContainer) {
         SVertex vertex;
         unsigned int uiVertexIndex = 0;
 
@@ -128,10 +128,10 @@ namespace GLVM::core
         return vertex;
     }
 
-    SFace CWaveFrontObjParser::ParseFaces(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer) {
+    SFace CWaveFrontObjParser::ParseFaces(GLVM::core::vector<vector<char>> _wordsContainer) {
         SFace face;
-        GLVM::core::TCVectorContainer<TCVectorContainer<char>> wordsInnerContainer;
-        GLVM::core::TCVectorContainer<char> word;
+        GLVM::core::vector<vector<char>> wordsInnerContainer;
+        GLVM::core::vector<char> word;
         
         unsigned int uiWordsContainerSize = _wordsContainer.GetSize();
 
@@ -150,8 +150,8 @@ namespace GLVM::core
         return face;
     }
 
-    int CWaveFrontObjParser::ParseInteger(GLVM::core::TCVectorContainer<char> _word) {
-        GLVM::core::TCVectorContainer<int> baseContainer;
+    int CWaveFrontObjParser::ParseInteger(GLVM::core::vector<char> _word) {
+        GLVM::core::vector<int> baseContainer;
 
         for (int i = 0; i < _word.GetSize() - 1; ++i)
             baseContainer.Push(_word[i] - 48);
@@ -172,16 +172,16 @@ namespace GLVM::core
         return iResult;
     }
     
-    float CWaveFrontObjParser::ParseFloating(GLVM::core::TCVectorContainer<char> _word) {
-        GLVM::core::TCVectorContainer<int> baseContainer;
+    float CWaveFrontObjParser::ParseFloating(GLVM::core::vector<char> _word) {
+        GLVM::core::vector<int> baseContainer;
 
         for (int i = 0; i < _word.GetSize() - 1; ++i)
             baseContainer.Push(_word[i] - 48);
 
         int integerPart = 0;
         float floatingPart = 0;
-        GLVM::core::TCVectorContainer<int> integerPartContainer;
-        GLVM::core::TCVectorContainer<int> floatingPartContainer;
+        GLVM::core::vector<int> integerPartContainer;
+        GLVM::core::vector<int> floatingPartContainer;
         bool dotFlag = false;
         bool negateFlag = false;
         unsigned int baseContainerSize = baseContainer.GetSize();

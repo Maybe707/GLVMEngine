@@ -24,11 +24,11 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        core::TCVectorContainer<unsigned int>* pEntity_Container_refMove =
+        core::vector<unsigned int>* pEntity_Container_refMove =
 			pComponent_Manager->GetEntityContainer<cm::move>();
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
-        core::TCVectorContainer<unsigned int>* pEntity_Container_refView =
+        core::vector<unsigned int>* pEntity_Container_refView =
 			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
 		cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
@@ -97,7 +97,7 @@ namespace GLVM::ecs
                 default:
                     break;
                 }
-				// core::TCVectorContainer<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
+				// core::vector<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
 				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
 				// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];

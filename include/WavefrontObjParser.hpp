@@ -40,11 +40,11 @@ namespace GLVM::core
 
     struct SFace
     {
-        GLVM::core::TCVectorContainer<int> vertexIndex;
-        GLVM::core::TCVectorContainer<int> textureIndex;
-        GLVM::core::TCVectorContainer<int> normalIndex;
+        GLVM::core::vector<int> vertexIndex;
+        GLVM::core::vector<int> textureIndex;
+        GLVM::core::vector<int> normalIndex;
 
-        GLVM::core::TCVectorContainer<int>& operator[](const unsigned int _iIndex) {
+        GLVM::core::vector<int>& operator[](const unsigned int _iIndex) {
             assert(_iIndex < 3 && _iIndex >= 0 && "Wrong index");
             switch(_iIndex) {
             default:
@@ -63,10 +63,10 @@ namespace GLVM::core
         // static CWaveFrontObjParser* pInstance_;
         // static std::mutex  Mutex_;
         
-        GLVM::core::TCVectorContainer<SVertex> coordinateVertices_;
-        GLVM::core::TCVectorContainer<SVertex> textureVertices_;
-		GLVM::core::TCVectorContainer<SVertex> normals_;
-        GLVM::core::TCVectorContainer<SFace> faces_;
+        GLVM::core::vector<SVertex> coordinateVertices_;
+        GLVM::core::vector<SVertex> textureVertices_;
+		GLVM::core::vector<SVertex> normals_;
+        GLVM::core::vector<SFace> faces_;
 
         std::string sWavefrontObjFileData;
         const char* pWavefrontObjFileData;
@@ -76,18 +76,18 @@ namespace GLVM::core
 
 //        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         
-        GLVM::core::TCVectorContainer<SVertex>& getCoordinateVertices();
-        GLVM::core::TCVectorContainer<SVertex>& getTextureVertices();
-		GLVM::core::TCVectorContainer<SVertex>& getNormals();
-        GLVM::core::TCVectorContainer<SFace>& getFaces();
+        GLVM::core::vector<SVertex>& getCoordinateVertices();
+        GLVM::core::vector<SVertex>& getTextureVertices();
+		GLVM::core::vector<SVertex>& getNormals();
+        GLVM::core::vector<SFace>& getFaces();
         
         void ReadFile(const char* _filePath);
         void ParseFile();
-        GLVM::core::TCVectorContainer<TCVectorContainer<char>> Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter);
-        SVertex ParseVertices(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
-        SFace ParseFaces(GLVM::core::TCVectorContainer<TCVectorContainer<char>> _wordsContainer);
-        int ParseInteger(GLVM::core::TCVectorContainer<char> _word);
-        float ParseFloating(GLVM::core::TCVectorContainer<char> _word);
+        GLVM::core::vector<vector<char>> Split(const char* _pWaveFrontObjFileData, const char _separator, const char _exitSymbol, unsigned int& _uiCounter);
+        SVertex ParseVertices(GLVM::core::vector<vector<char>> _wordsContainer);
+        SFace ParseFaces(GLVM::core::vector<vector<char>> _wordsContainer);
+        int ParseInteger(GLVM::core::vector<char> _word);
+        float ParseFloating(GLVM::core::vector<char> _word);
     };
 }
 

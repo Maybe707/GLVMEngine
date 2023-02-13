@@ -72,7 +72,7 @@ namespace GLVM::core::Sound
     }
 
     void CSoundEngineWaveform::SetMasterVolume(long _lVolume) {}
-    TCVectorContainer<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Contaier; }
+    vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Contaier; }
 }
 
 // #define FRAMES 32
