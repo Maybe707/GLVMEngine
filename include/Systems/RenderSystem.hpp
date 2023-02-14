@@ -5,7 +5,7 @@
 #include <GL/gl.h>
 #include "IRenderer.hpp"
 #include "ISystem.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "Components/VertexComponent.hpp"
 #include "ComponentManager.hpp"
 #include "Components/MaterialComponent.hpp"

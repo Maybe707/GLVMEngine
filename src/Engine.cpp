@@ -86,9 +86,8 @@ namespace GLVM::core
 
     void CEngine::GameLoop()
     {
-		ecs::CSystemManager*   pSystem_Manager     = ecs::CSystemManager::GetInstance();
-
-		bool bGame_Loop_Active            = true;
+		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
+		bool bGame_Loop_Active = true;
 
 		///< Call of ActivateSystem function must be in this order.
 
@@ -110,7 +109,7 @@ namespace GLVM::core
 			fDelta_Time_ = Chrono_->GetElapsed();
 			Chrono_->Reset();
 
-			FPScounter();
+//			FPScounter();
 			
 			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
             
@@ -131,7 +130,6 @@ namespace GLVM::core
 																										&g_eEvent.mouse_Pointer_Position_.iOffset_Y);
 
 			Movement_System->_dOffset                     = fDelta_Time_;
-			Movement_System->_Anim_Event                  = g_eEvent.GetEvent();
 			Collision_System->fDelta_Time_                = fDelta_Time_;
 			pProjectile_System_->_dOffset                 = fDelta_Time_;
 			Physics_System_->fDelta_Time_                 = fDelta_Time_;

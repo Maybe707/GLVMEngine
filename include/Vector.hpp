@@ -190,9 +190,6 @@ namespace GLVM::core
 		if ( iSize_ < 1)
 			return;
 
-		std::cout << "first element: " << firstElement << std::endl;
-		std::cout << "second element: " << secondElement << std::endl;
-		
 		if ( &firstElement == &secondElement ) {
 		    return;
 		}

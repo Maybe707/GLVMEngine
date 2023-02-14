@@ -1,6 +1,6 @@
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 
 namespace GLVM::ecs
 {

@@ -17,7 +17,7 @@
 #include "ISystem.hpp"
 #include "Texture.hpp"
 #include "TextureManager.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
 #include <GL/gl.h>

@@ -1,7 +1,7 @@
 #ifndef ENTITY_MANAGER
 #define ENTITY_MANAGER
 
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "ComponentManager.hpp"
 
 typedef unsigned int Entity_ID;  

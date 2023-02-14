@@ -1,7 +1,7 @@
 #ifndef HEALTH
 #define HEALTH
 
-namespace GLVM::ecs::components
+namespace GAME_MECHANICS::ecs::components
 {
 	struct health
 	{

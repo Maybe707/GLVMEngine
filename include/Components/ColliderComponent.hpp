@@ -1,7 +1,7 @@
 #ifndef COLLIDER_COMPONENT
 #define COLLIDER_COMPONENT
 
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 
 namespace GLVM::ecs::components
 {

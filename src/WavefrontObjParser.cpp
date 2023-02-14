@@ -1,5 +1,5 @@
 #include "WavefrontObjParser.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include <chrono>
 #include <iterator>
 

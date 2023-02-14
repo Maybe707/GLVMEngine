@@ -19,7 +19,7 @@
 #include "WindowCreator.hpp"
 #include "TimerCreator.hpp"
 #include "Components/MaterialComponent.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "EntityManager.hpp"
 #include "ComponentManager.hpp"
@@ -48,7 +48,7 @@
 #include "Components/MoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "Components/VertexComponent.hpp"
 #include "IContainer.hpp"
 #include <GL/gl.h>

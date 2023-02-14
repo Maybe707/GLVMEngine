@@ -3,7 +3,7 @@
 
 #include "ComponentManager.hpp"
 #include "Event.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "VertexData.hpp"
 #include "Stack.hpp"
 #include "ISystem.hpp"

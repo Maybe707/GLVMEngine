@@ -2,7 +2,7 @@
 #define WAVEFRONT_OBJ_PARSER
 
 #include <string>
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>

@@ -4,7 +4,7 @@
 #include "Event.hpp"
 #include "Components/TransformComponent.hpp"
 #include "ISoundEngine.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "Components/MoveComponent.hpp"
 #include "ComponentManager.hpp"
 #include "ISystem.hpp"
@@ -24,7 +24,6 @@ namespace GLVM::ecs
 	public:
         float                      fProjectile_Accumulator_ = 2.0f; 
 		float                      _dOffset;
-		core::EEvents              _Anim_Event;
         core::CStack&              Input_Stack_;
         core::Sound::ISoundEngine* Sound_Engine_;
 

@@ -1,7 +1,7 @@
 #ifndef COLLISION_SYSTEM
 #define COLLISION_SYSTEM
 
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "Components/EventComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -10,7 +10,7 @@
 #include "Event.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <mutex>

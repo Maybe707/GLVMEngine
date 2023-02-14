@@ -1,7 +1,7 @@
 #ifndef DAMAGE
 #define DAMAGE
 
-namespace GLVM::ecs::components
+namespace GAME_MECHANICS::ecs::components
 {
 	struct damage
 	{

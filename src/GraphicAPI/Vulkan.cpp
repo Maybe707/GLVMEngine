@@ -4,7 +4,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Texture.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
 #include <cstdlib>

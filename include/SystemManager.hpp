@@ -2,7 +2,7 @@
 #define SYSTEM_MANAGER
 
 #include "ISystem.hpp"
-#include "VectorContainer.hpp"
+#include "Vector.hpp"
 #include <mutex>
 
 namespace GLVM::ecs
