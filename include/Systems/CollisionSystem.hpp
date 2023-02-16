@@ -31,10 +31,11 @@ namespace GLVM::ecs
 				   components::beholder& _view_Component,
 				   core::CEvent& _event);
         bool Gravity(components::transform& _transform_Component, components::event& _event_Component);
-		bool BoxCollider(components::transform& _transform_Component1, components::transform& _transform_Component2);
+		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
+		                 float backtrackingScale, float comparedScale);
 		void Update() override;
-        bool UpperActorCheck(components::transform& _transform_Component1,
-                             components::transform& _transform_Component2);
+        bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
+							 float backtrackingScale, float comparedScale);
     };
 }
 	

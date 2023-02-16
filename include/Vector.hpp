@@ -61,9 +61,9 @@ namespace GLVM::core
 		void Push(T _Item);
 		void Pop();
 		void Swap(T& firstElement, T& secondElement);
-		VectorIterator<T> Find(T& element);
+		VectorIterator<T> Find(const T& element);
 		void Insert(const T _Item, const unsigned int _Index);
-		void RemoveItem(const T _Item);
+		void Remove(unsigned int entity);
 		void RemoveFirstItem();
 		T& GetItem(const T _Item);
 		T& GetFirstItem();
@@ -200,7 +200,7 @@ namespace GLVM::core
 	}
 
 	template <class T>
-	VectorIterator<T> vector<T>::Find(T& element) {
+	VectorIterator<T> vector<T>::Find(const T& element) {
 		VectorIterator<T> iterator(*this);
 		if ( !iterator.ValidStatus() ) {
 			std::cout << "Vector is empty. Retern iterator with pointer on end" << std::endl;
@@ -244,41 +244,14 @@ namespace GLVM::core
 		++iSize_;
 	}
 	
-	template<class T>
-	void vector<T>::RemoveItem(const T _Item)
+ 	template<class T>
+	void vector<T>::Remove(unsigned int entity)
 	{
 		if(iSize_ < 1)
 			return;
 
-		// unsigned int i = 0;
-		// for ( i = 0; i < iSize_; ++i) {
-		// 	if ( _Item == aVector_Container_[i] )
-		// 		break;
-		// }
-
-		// for ( ; i < iSize_ - 1; ++i )
-		// 	aVector_Container_[i] = aVector_Container_[i + 1];
-
-		// if ( i == iSize_ ) {
-		// 	std::cout << "Vector dont contain this element" << std::endl;
-		// 	return;
-		// }
-
-		// --iSize_;
-		// aVector_Container_[iSize_] = k_iNull;
-
-		for ( unsigned int i = 0; i < iSize_; ++i ) {
-			if ( _Item == aVector_Container_[i] ) {
-				aVector_Container_[i] = aVector_Container_[iSize_ - 1];
-				aVector_Container_[iSize_ - 1] = k_iNull;
-				--iSize_;
-				return;
-			}
-		}
-
-		std::cout << "Vector dont contain this element" << std::endl;
+		(*(T*)&aVector_Container_[entity]).~T();
 	}
-
     
 	template<class T>
 	void vector<T>::RemoveFirstItem()

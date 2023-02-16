@@ -17,7 +17,8 @@
 int main()
 {
 	using namespace GLVM;
-	namespace cm = GLVM::ecs::components;
+	namespace cm  = GLVM::ecs::components;
+	namespace ct = GAME_MECHANICS::ECS::components;
 	
 	ecs::CEntityManager   * EntityManager     = ecs::CEntityManager::GetInstance();
 	ecs::CComponentManager* ComponentManager  = ecs::CComponentManager::GetInstance();
@@ -63,12 +64,12 @@ int main()
     hudTextureManager->SetTextureVector(hudTextureVector);
 	
     Entity uiPlayer = EntityManager->CreateEntity();
-    ComponentManager->CreateComponent<cm::vertex, cm::move, cm::collider, cm::animation, cm::beholder,
+    ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
 	ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 1.0f };
     ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .Front_Camera = { 0.0f, 0.0f, -1.0f },
 		.Up_Camera = { 0.0f, 1.0f, 0.0f } };
-    ComponentManager->GetComponent<cm::vertex>(uiPlayer).vkVertexId_        = 0;
+    ComponentManager->GetComponent<cm::vertex>(uiPlayer).vkVertexId_ = 0;
 
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform>(plain0);

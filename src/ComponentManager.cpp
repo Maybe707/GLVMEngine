@@ -9,21 +9,21 @@ namespace GLVM::ecs
     
     CComponentManager::~CComponentManager()
     {
-        for(int i = 0, iSize_Main = tWorld_Components_Container_.GetSize(); i < iSize_Main; ++i)
+        for(int i = 0, iSize_Main = worldComponentsContainer.GetSize(); i < iSize_Main; ++i)
         {
-            delete tWorld_Components_Container_[i];
-            tWorld_Components_Container_[i] = nullptr;
+            delete worldComponentsContainer[i];
+            worldComponentsContainer[i] = nullptr;
         }
-        for(int j = 0, iSize_Ordered = tWorld_IDs_Container.GetSize(); j < iSize_Ordered; ++j)
+        for(int j = 0, iSize_Ordered = worldSparseEntitiesMapToComponents.GetSize(); j < iSize_Ordered; ++j)
         {
-            delete tWorld_IDs_Container[j];
-            tWorld_IDs_Container[j] = nullptr;
+            delete worldSparseEntitiesMapToComponents[j];
+            worldSparseEntitiesMapToComponents[j] = nullptr;
         }
     }
 
     unsigned int CComponentManager::GetContainerID()
     {
-        return s_iComponents_Container_ID;
+        return componentsContainerID;
     }
 
     CComponentManager* CComponentManager::GetInstance()

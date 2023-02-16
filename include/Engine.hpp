@@ -57,6 +57,7 @@
 #include <mutex>
 #include "Systems/RenderSystem.hpp"
 #include "TextureManager.hpp"
+#include "Components/ControllerComponent.hpp"
 
 using Entity = unsigned int;
 
@@ -91,7 +92,7 @@ namespace GLVM::core
         
         ~CEngine();
         
-        CEngine(CEngine& _engine) = delete;                   ///< Dont need to make cope because of singleton property.
+        CEngine(CEngine& _engine) = delete;                   ///< Dont need to make copy because of singleton property.
         void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
         static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         

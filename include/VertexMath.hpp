@@ -149,7 +149,17 @@ public:
     void operator-=(Vector<T2, var2> _vector);
     void operator+=(Vector<T2, var2> _vector);
     Vector<T2, var2> operator*(T2 _scalar);
+	Vector<T2, var2> operator-();
 };
+
+template <class T2, int var2>
+Vector<T2, var2> Vector<T2, var2>::operator-() {
+	Vector<T2, var2> tempVector;
+	for (int i = 0; i < var2; ++i)
+		tempVector[i] = -m_vector[i];
+
+	return tempVector;
+}
 
 template<class T2, int var2>
 T2& Vector<T2, var2>::operator[](const int index)

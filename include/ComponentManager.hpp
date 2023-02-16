@@ -5,12 +5,13 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Vector.hpp"
+#include <cassert>
 #include <iostream>
 #include "IContainer.hpp"
 //#include "Components/VertexComponent.hpp"
 #include <mutex>
 
-typedef unsigned int Entity_ID;
+typedef unsigned int Entity;
 
 namespace GLVM::ecs
 {
@@ -22,66 +23,99 @@ namespace GLVM::ecs
         CComponentManager();
         ~CComponentManager();
 
-		template <typename Component_Type>
+		template <typename componentType>
 		unsigned int CreateComponentContainer()
 			{
-				static unsigned int s_iLocal_Container_ID = 0;
-				static bool s_bExist_Component_Container_Flag = false;
-				if(s_bExist_Component_Container_Flag)  
-					return s_iLocal_Container_ID;
+				static unsigned int localContainerID = 0;
+				static bool existComponentContainerFlag = false;
+				if(existComponentContainerFlag)  
+					return localContainerID;
                                                                                                                 
-				s_iLocal_Container_ID = s_iComponents_Container_ID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
-				s_bExist_Component_Container_Flag = true;
+				localContainerID = componentsContainerID;    ///< Give a value of global component container ID's counter to local container ID of current component type.
+				existComponentContainerFlag = true;
             
-				core::vector<Component_Type>* pComponent_Container =
-					new core::vector<Component_Type>;    ///< Create component container of current type.
-				tWorld_Components_Container_.Insert(pComponent_Container, s_iComponents_Container_ID);
+				core::vector<componentType>* componentContainer =
+					new core::vector<componentType>;    ///< Create component container of current type.
+				worldComponentsContainer.Insert(componentContainer, componentsContainerID);
             
-				core::vector<Entity_ID>* pRow_Ordered_IDs_Container =
-					new core::vector<Entity_ID>;    ///< Create ID's component container.
-				tWorld_IDs_Container.Insert(pRow_Ordered_IDs_Container, s_iComponents_Container_ID);
+				core::vector<Entity>* sparseEntitiesMapToComponents =
+					new core::vector<Entity>;    ///< Create ID's component container.
+				worldSparseEntitiesMapToComponents.Insert(sparseEntitiesMapToComponents, componentsContainerID);
+
+				core::vector<Entity>* denseEntitiesMapToComponents =
+					new core::vector<Entity>;    ///< Create ID's component container.
+				worldDenseComponentsMapToEntities.Insert(denseEntitiesMapToComponents, componentsContainerID);
+				
 //				std::cout << typeid(Component_Type).name() << std::endl;			
-				++s_iComponents_Container_ID;
-				return s_iLocal_Container_ID;
+				++componentsContainerID;
+				return localContainerID;
 			}
         
 	public:
-		inline static unsigned int s_iComponents_Container_ID = 0;
-		core::vector<core::IContainer*> tWorld_Components_Container_;    ///< Contains all local containers for diferent types of components.
-		core::vector<core::vector<Entity_ID>*> tWorld_IDs_Container;    ///< Contains all local container with IDs for diferent types of components.
+		inline static unsigned int componentsContainerID = 0;
+		core::vector<core::IContainer*> worldComponentsContainer;    ///< Contains all local containers for diferent types of components.
+		core::vector<core::vector<Entity>*> worldSparseEntitiesMapToComponents;    ///< Contains all local container with IDs for diferent types of components.
+		core::vector<core::vector<Entity>*> worldDenseComponentsMapToEntities;
 
-        CComponentManager(CComponentManager& _component_Manager) = delete;         ///< Dont need to make cope because of singleton property.
-        void operator=(const CComponentManager& _component_Manager) = delete;      ///< Dont need assignment operator because of singleton property.
+        CComponentManager(CComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
+        void operator=(const CComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
        static CComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
                 
-		template <typename Component_Type>
-		void CreateComponent(const Entity_ID& _u_iEntity)
+		template <typename componentType>
+		void CreateComponent(const Entity& entity)
 		{
-			unsigned int u_iLocal_Container_ID = 0; ///< Index for world components and world ID's containers.
-			Component_Type Component;
-			u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
+			unsigned int localContainerID = 0; ///< Index for world components and world ID's containers.
+			componentType Component;
+			localContainerID = CreateComponentContainer<componentType>();
 
-			static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID])->Insert(Component, _u_iEntity);
-			static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[u_iLocal_Container_ID])->Push(_u_iEntity);
+			core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+				(worldSparseEntitiesMapToComponents[localContainerID]);
+			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+				(worldDenseComponentsMapToEntities[localContainerID]);
+			core::vector<componentType>& components = *static_cast<core::vector<componentType>*>
+				(worldComponentsContainer[localContainerID]);
+			
+			for (int i = 0; i < sparse.GetSize(); ++i) {
+				if (sparse[i] == entity)
+					return;
+			}
+
+			// unsigned int maxValue = 0;
+			// maxValue = ~maxValue;
+			
+			unsigned int topComponentIndex = dense.GetSize();
+			sparse.Insert(topComponentIndex, entity);
+			dense.Push(entity);
+			components.Push(Component);
+				
+			// static_cast<core::vector<componentType>*>(worldComponentsContainer[localContainerID])->Insert(Component, entity);
+			// entitiesContainer->Push(entity);
 //			return (*static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
 		}
 
         /// Allow to give a various components to chosen entity.
         
-        template <typename Component_Type, typename Component_Type2, typename... Args>
-		void CreateComponent(Entity_ID& _u_iEntity)
+        template <typename componentType, typename componentType2, typename... Args>
+		void CreateComponent(Entity& entity)
 		{
-            CreateComponent<Component_Type2, Args...>(_u_iEntity);
-            CreateComponent<Component_Type>(_u_iEntity);
+            CreateComponent<componentType2, Args...>(entity);
+            CreateComponent<componentType>(entity);
         }
 
-        template <typename Component_Type>
-        Component_Type& GetComponent(const Entity_ID& _u_iEntity)
+        template <typename componentType>
+        componentType& GetComponent(const Entity& entity)
         {
-            unsigned int u_iLocal_Container_ID;
-            u_iLocal_Container_ID = CreateComponentContainer<Component_Type>();
-
-            return (*static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[u_iLocal_Container_ID]))[_u_iEntity];
+            unsigned int localContainerID;
+            localContainerID = CreateComponentContainer<componentType>();
+			
+			core::vector<Entity>& components =
+				*static_cast<core::vector<Entity>*>(worldSparseEntitiesMapToComponents[localContainerID]);
+			core::VectorIterator<Entity> iterator = components.Find(entity);
+			
+			if ( localContainerID || !iterator.ValidStatus() )
+				return iterator.Current();
+			
+            return components[entity];
         }
         
         /**************************************************************************************
@@ -89,25 +123,54 @@ namespace GLVM::ecs
          * component without indices for that component in ordered container.
          **************************************************************************************/
         
-		template <typename Component_Type>
-		void RemoveComponent(Entity_ID& _u_iEntity)
-		{
-//			static_cast<core::TCConstVectorContainer<S>*>(tWorld_Components_Container_[CreateComponentContainer<S>()])->Remove(_u_iEntity);
-			static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()])->RemoveItem(_u_iEntity);
-		}
+		template <typename componentType>
+		void RemoveComponent(Entity& entity)
+			{
+				// core::vector<Entity>* entityVector = static_cast<core::vector<Entity>*>
+				// 	(worldSparseEntitiesMapToComponents[CreateComponentContainer<componentType>()]);
+				// core::vector<componentType>* componentVector = static_cast<core::vector<componentType>*>
+				// 	(worldComponentsContainer[CreateComponentContainer<componentType>()]);
+
+				unsigned int localContainerID;
+				localContainerID = CreateComponentContainer<componentType>();
+
+				if (localContainerID)
+					return;
+				
+				core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+					(worldSparseEntitiesMapToComponents[localContainerID]);
+				core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+					(worldDenseComponentsMapToEntities[localContainerID]);
+				core::vector<componentType>& components = *static_cast<core::vector<componentType>*>
+					(worldComponentsContainer[localContainerID]);
+
+				unsigned int entityIndexInDenseArray = sparse[entity];
+				dense.Swap(entityIndexInDenseArray, dense.GetHead());
+				unsigned int entityIndexInSparseArray = dense.GetHead();
+				dense.Pop();
+				dense[entityIndexInSparseArray] = entityIndexInDenseArray;
+				components.Remove(dense.GetHead());
+//				componentVector->Remove(entity);
+				
+//				core::VectorIterator<unsigned int> iterator = entityVector->Find(entity);
+ 				// if ( !iterator.ValidStatus() ) {
+				// 	entityVector->Swap(iterator.Current(), entityVector->GetHead());
+				// 	entityVector->Pop();
+				// }
+			}
 		
 		unsigned int GetContainerID();
 
-		template <typename Component_Type>
-		core::vector<Component_Type>* GetComponentContainer()
+		template <typename componentType>
+		core::vector<componentType>* GetComponentContainer()
 			{
-				return static_cast<core::vector<Component_Type>*>(tWorld_Components_Container_[CreateComponentContainer<Component_Type>()]);
+				return static_cast<core::vector<componentType>*>(worldComponentsContainer[CreateComponentContainer<componentType>()]);
 			}
 
-		template <typename Component_Type>
-		core::vector<Entity_ID>* GetEntityContainer()
+		template <typename componentType>
+		core::vector<Entity>* GetEntityContainer()
 			{
-				return static_cast<core::vector<Entity_ID>*>(tWorld_IDs_Container[CreateComponentContainer<Component_Type>()]);
+				return static_cast<core::vector<Entity>*>(worldSparseEntitiesMapToComponents[CreateComponentContainer<componentType>()]);
 			}
 	};
 

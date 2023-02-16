@@ -97,7 +97,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(Physics_System_);
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 //		pSystem_Manager->ActivateSystem(pCamera_System);
-		pSystem_Manager->ActivateSystem(Render_System_Interface_);
+//		pSystem_Manager->ActivateSystem(Render_System_Interface_);
 		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(Sound_Engine_));
@@ -112,7 +112,7 @@ namespace GLVM::core
 //			FPScounter();
 			
 			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.ClearDisplay();
-            
+             
 			while(((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
 			{
 				//                std::cout << g_eEvent.GetEvent() << std::endl;
@@ -124,10 +124,11 @@ namespace GLVM::core
 
 			//            Input_Stack_.PrintStack();
             
-			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
-																										g_eEvent.mouse_Pointer_Position_.iPosition_Y,
-																										&g_eEvent.mouse_Pointer_Position_.iOffset_X,
-																										&g_eEvent.mouse_Pointer_Position_.iOffset_Y);
+			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->
+				Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
+								  g_eEvent.mouse_Pointer_Position_.iPosition_Y,
+								  &g_eEvent.mouse_Pointer_Position_.iOffset_X,
+								  &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
 
 			Movement_System->_dOffset                     = fDelta_Time_;
 			Collision_System->fDelta_Time_                = fDelta_Time_;

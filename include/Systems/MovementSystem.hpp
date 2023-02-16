@@ -46,14 +46,14 @@ namespace GLVM::ecs
         Vector<float, 3> CalculateVectorRL(components::beholder& _view_Component);
         Vector<float, 3> CalculateVectorFB(components::beholder& _view_Component,
                                            core::CEvent& _event);
-        void CalculatePerdendicularVectors(float _camera_Speed,
-                                           components::beholder& _view_Component,
-                                           core::CEvent& _event,
-                                           Vector<float, 3>& _temp_Vector);
+        vec3 CalculatePerdendicularVectors(float speed,
+                                           components::beholder& beholder,
+                                           core::CEvent& _event);
         bool FixDiagonalMove(core::CStack& _input_Stack,
 							 components::transform& _transform_Component,
 							 float _camera_Speed,
 							 components::beholder& _view_Component,
+							 components::move& moveComponent,
 							 core::CEvent& _event);
 	};
 }

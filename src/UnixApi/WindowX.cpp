@@ -123,7 +123,6 @@ namespace GLVM::core
         XFreeCursor(pDisp_, invisibleCursor);
         XFreePixmap(pDisp_, bitmapNoData);
         
-        
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
 		Drawable = glXGetCurrentDrawable();
 		Initializer();
@@ -142,8 +141,8 @@ namespace GLVM::core
     void CWindowX::CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset)
     {
         ///< Solve a problem with endlessly growing numbers in the start game run.
-        if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
-            return;
+        // if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
+        //     return;
         
         int iOffset_X = 0, iOffset_Y = 0;
         iOffset_X = _x_position - 960;
