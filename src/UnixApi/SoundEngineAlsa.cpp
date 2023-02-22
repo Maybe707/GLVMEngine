@@ -4,7 +4,7 @@ namespace GLVM::core::Sound
 {    
     void CSoundEngineAlsa::SoundStream()
     {
-        for(int i = 0; i < tSound_Contaier.GetSize(); ++i)
+        for(unsigned int i = 0; i < tSound_Contaier.GetSize(); ++i)
         {
             // std::cout << (*tSound_Contaier[i]).kPath_to_File_ << std::endl;
             // std::cout << (*tSound_Contaier[i]).uiDuration_ << std::endl;

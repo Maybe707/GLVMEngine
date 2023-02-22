@@ -1,12 +1,4 @@
- #include "ComponentManager.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/ProjectileComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/ViewComponent.hpp"
-#include "EntityManager.hpp"
 #include <Systems/ProjectileSystem.hpp>
-#include "Stack.hpp"
 
 namespace GLVM::ecs
 {
@@ -61,7 +53,7 @@ namespace GLVM::ecs
 
         GLVM::ecs::CTextureManager*    TextureSystem    = GLVM::ecs::CTextureManager::GetInstance();
 		
-        for(int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
+        for(unsigned int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
 
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bWall_Collision_ ||

@@ -139,7 +139,7 @@ namespace GLVM::core
             unsigned int counter = 0;
             wordsInnerContainer = Split(_wordsContainer[i].GetVectorContainer(), '/', '\0', counter);
 
-            for (int j = 0; j < wordsInnerContainer.GetSize(); ++j) {
+            for ( unsigned int j = 0; j < wordsInnerContainer.GetSize(); ++j ) {
 
                 word = wordsInnerContainer[j];
                 int iValue = ParseInteger(word);
@@ -153,7 +153,7 @@ namespace GLVM::core
     int CWaveFrontObjParser::ParseInteger(GLVM::core::vector<char> _word) {
         GLVM::core::vector<int> baseContainer;
 
-        for (int i = 0; i < _word.GetSize() - 1; ++i)
+        for ( unsigned int i = 0; i < _word.GetSize() - 1; ++i )
             baseContainer.Push(_word[i] - 48);
 
         int iResult = 0;
@@ -175,7 +175,7 @@ namespace GLVM::core
     float CWaveFrontObjParser::ParseFloating(GLVM::core::vector<char> _word) {
         GLVM::core::vector<int> baseContainer;
 
-        for (int i = 0; i < _word.GetSize() - 1; ++i)
+        for (unsigned int i = 0; i < _word.GetSize() - 1; ++i )
             baseContainer.Push(_word[i] - 48);
 
         int integerPart = 0;

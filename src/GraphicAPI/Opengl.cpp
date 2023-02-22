@@ -101,7 +101,7 @@ namespace GLVM::core
 		sampledDirectionalLightEntityIDcontainer.clear();
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-		for ( int i = 0; i < pEntityContainerRefDirectionalLight->GetSize(); ++i ) {
+		for ( unsigned int i = 0; i < pEntityContainerRefDirectionalLight->GetSize(); ++i ) {
 			unsigned int uiDirectionalLightsEntity = (*pEntityContainerRefDirectionalLight)[i];
 			cm::directionalLight& directionalLightComponent = pComponent_Manager->
 				GetComponent<cm::directionalLight>(uiDirectionalLightsEntity);
@@ -129,7 +129,7 @@ namespace GLVM::core
 													 (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT,
 													 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
-		for ( int i = 0; i < pEntityContainerRefSpotLight->GetSize(); ++i ) {
+		for ( unsigned int i = 0; i < pEntityContainerRefSpotLight->GetSize(); ++i ) {
 			unsigned int uiSpotLightsEntity = (*pEntityContainerRefSpotLight)[i];
 			cm::spotLight& spotLightComponent = pComponent_Manager->GetComponent<cm::spotLight>(uiSpotLightsEntity);
 

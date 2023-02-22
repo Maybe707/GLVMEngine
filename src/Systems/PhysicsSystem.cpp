@@ -25,7 +25,7 @@ namespace GLVM::ecs
 			pComponent_Manager->GetEntityContainer<cm::move>();
 //        unsigned int uiVector_Collider_Size = entityContainerRefMove->GetSize();
 
-        for(int i = 0; i < entityContainerRefMove->GetSize(); ++i)
+        for(unsigned int i = 0; i < entityContainerRefMove->GetSize(); ++i)
         {
                 unsigned int entityRefMove = (*entityContainerRefMove)[i];
 				cm::transform& transformComponent = pComponent_Manager->GetComponent<cm::transform>(entityRefMove);

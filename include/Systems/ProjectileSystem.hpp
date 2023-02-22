@@ -2,14 +2,20 @@
 #define PROJECTILE_SYSTEM
 
 #include "ISystem.hpp"
-#include "Components/ProjectileComponent.hpp"
 #include "Vector.hpp"
 #include "ComponentManager.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/ViewComponent.hpp"
 #include "chelik.hpp"
 #include "Globals.hpp"
 #include "TextureManager.hpp"
+#include "ComponentManager.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/ProjectileComponent.hpp"
+#include "Components/MaterialComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/ViewComponent.hpp"
+#include "Components/MoveComponent.hpp"
+#include "EntityManager.hpp"
+#include "Stack.hpp"
 
 namespace GLVM::ecs
 {
