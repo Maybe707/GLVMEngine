@@ -30,14 +30,15 @@ namespace GLVM::ecs
                 unsigned int entityRefMove = (*entityContainerRefMove)[i];
 				cm::transform& transformComponent = pComponent_Manager->GetComponent<cm::transform>(entityRefMove);
 				cm::move& move = pComponent_Manager->GetComponent<cm::move>(entityRefMove);
-                if(pComponent_Manager->GetComponent<cm::collider>(entityRefMove).bGround_Collision_) {
+				cm::collider& collider = pComponent_Manager->GetComponent<cm::collider>(entityRefMove);
+                if((&collider) != nullptr && collider.bGround_Collision_) {
 					move.frameMovement[1] = 0.0f;
-                    pComponent_Manager->GetComponent<cm::collider>(entityRefMove).bGround_Collision_ = false;
+                    collider.bGround_Collision_ = false;
                 }
-                if(pComponent_Manager->GetComponent<cm::collider>(entityRefMove).bWall_Collision_) {
+                if((&collider) != nullptr && collider.bWall_Collision_) {
 					move.frameMovement[0] = 0.0f;
 					move.frameMovement[2] = 0.0f;					
-                    pComponent_Manager->GetComponent<cm::collider>(entityRefMove).bWall_Collision_ = false;
+                    collider.bWall_Collision_ = false;
                 }
 //				std::cout << entityContainerRefMove->GetSize() << std::endl;
 				std::cout << "vec: " << move.frameMovement[0] << " " << move.frameMovement[1] <<
