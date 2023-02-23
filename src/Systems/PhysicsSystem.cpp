@@ -42,7 +42,6 @@ namespace GLVM::ecs
                     collider->bWall_Collision_ = false;
                 }
 				
-				std::cout << "i: " << entityContainerRefMove->GetSize() << std::endl;
 				if ( move != nullptr && transformComponent != nullptr ) {
 					// std::cout << "vec: " << move->frameMovement[0] << " " << move->frameMovement[1] <<
 					// 	" " << move->frameMovement[2] << " For entity: " << entityRefMove << std::endl;

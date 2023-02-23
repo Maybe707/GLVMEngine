@@ -2,10 +2,13 @@
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
 #include "Components/EventComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
+#include "Components/SpotLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
@@ -15,6 +18,7 @@
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
 #include "Stack.hpp"
+#include "Vector.hpp"
 #include <cstdio>
 
 namespace GLVM::ecs
@@ -28,85 +32,93 @@ namespace GLVM::ecs
 		namespace ct = GAME_MECHANICS::ECS::components;
 
         CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        core::vector<unsigned int>* controllerComponents =
-			pComponent_Manager->GetEntityContainer<ct::controller>();
-        unsigned int vectorControllerSize = controllerComponents->GetSize();
+        // core::vector<unsigned int>* controllerComponents =
+		// 	pComponent_Manager->GetEntityContainer<ct::controller>();
+        // unsigned int entitiesVectorSize = controllerComponents->GetSize();
 
-        core::vector<unsigned int>* pEntity_Container_refView =
-			pComponent_Manager->GetEntityContainer<cm::beholder>();
-        unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-		cm::beholder* view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
+		core::vector<Entity> entitiesVector = pComponent_Manager->collectEntities<cm::collider, cm::beholder>();
+		unsigned int entitiesVectorSize = entitiesVector.GetSize();
+		// for ( unsigned int i = 0; i < vectorWithEntities.GetSize(); ++i)
+		// 	std::cout << vectorWithEntities[i] << std::endl;
+		
+        // core::vector<unsigned int>* pEntity_Container_refView =
+		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
 
         float cameraSpeed = 5.5f * _dOffset;            
 
-        for(unsigned int i = 0; i < vectorControllerSize; ++i) {
+        for(unsigned int i = 0; i < entitiesVectorSize; ++i) {
             for(int n = 0; n < 6; ++n) {
-                bool bDiagonal_Movement_Availability = false;
+                bool diagonalMovementAvailability = false;
 
-                unsigned int entityRefController = (*controllerComponents)[i];
+//                unsigned int currentEntity = (*controllerComponents)[i];
+				// unsigned int entityRefView = (*pEntity_Container_refView)[i];
+				Entity currentEntity                = entitiesVector[i];
+				cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
+//				cm::beholder* colliderComponent = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
+		
 				vec3 right;
 				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
-					right = CalculatePerdendicularVectors(cameraSpeed, *view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement =
-						-Normalize(view_Component->Front_Camera - right) * cameraSpeed;
-					bDiagonal_Movement_Availability = true;
+					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-Normalize(beholderComponent->Front_Camera - right) * cameraSpeed;
+					diagonalMovementAvailability = true;
 				}
 				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
-					right = CalculatePerdendicularVectors(cameraSpeed, *view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement =
-						Normalize(view_Component->Front_Camera + right) * cameraSpeed;
-					bDiagonal_Movement_Availability = true;
+					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						Normalize(beholderComponent->Front_Camera + right) * cameraSpeed;
+					diagonalMovementAvailability = true;
 				}
 				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
-					right = CalculatePerdendicularVectors(cameraSpeed, *view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement =
-						Normalize(view_Component->Front_Camera - right) * cameraSpeed;
-					bDiagonal_Movement_Availability = true;
+					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						Normalize(beholderComponent->Front_Camera - right) * cameraSpeed;
+					diagonalMovementAvailability = true;
 				}
 				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
-					right = CalculatePerdendicularVectors(cameraSpeed, *view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement =
-						-Normalize(view_Component->Front_Camera + right) * cameraSpeed;
-					bDiagonal_Movement_Availability = true;
+					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-Normalize(beholderComponent->Front_Camera + right) * cameraSpeed;
+					diagonalMovementAvailability = true;
 				}
 				
-                if(bDiagonal_Movement_Availability)
+                if(diagonalMovementAvailability)
                     break;
 
 				vec3 forward;
                 switch(Input_Stack_[n])
                 {
                 case core::EEvents::eMOVE_LEFT:
-					right = CalculateVectorRL(*view_Component);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement +=
+					right = CalculateVectorRL(*beholderComponent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-right * cameraSpeed;					
                     break;
                 case core::EEvents::eMOVE_RIGHT:
-					right = CalculateVectorRL(*view_Component);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement +=
+					right = CalculateVectorRL(*beholderComponent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
-                    forward = CalculateVectorFB(*view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement +=
+                    forward = CalculateVectorFB(*beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
-					forward = CalculateVectorFB(*view_Component, g_eEvent);
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement +=
+					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
-					pComponent_Manager->CreateComponent<cm::move>(entityRefController);
-					pComponent_Manager->GetComponent<cm::move>(entityRefController)->frameMovement[1] +=
+					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement[1] +=
 						1.0f;
                     break;
                 default:

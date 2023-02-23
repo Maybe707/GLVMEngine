@@ -94,13 +94,41 @@ namespace GLVM::ecs
 		
         /// Allow to give a various components to chosen entity.
         
-        template <typename componentType, typename componentType2, typename... Args>
-		void CreateComponent(Entity& entity)
-		{
+        template <typename componentType1, typename componentType2, typename... Args>
+		void CreateComponent(Entity& entity) {
             CreateComponent<componentType2, Args...>(entity);
-            CreateComponent<componentType>(entity);
+            CreateComponent<componentType1>(entity);
         }
 
+        template <typename componentType, typename... Args>
+		core::vector<Entity> collectEntities() {
+			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+				( worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()] );
+
+			core::vector<Entity> returnVector;
+			for ( unsigned int i = 0; i < dense.GetSize(); ++i ) {
+				if ( multiCheckAvailability<Args...>(dense[i]) )
+					returnVector.Push(dense[i]);
+			}
+
+			return returnVector;
+		}
+
+		template <typename... Args>
+		bool multiCheckAvailability(Entity entity) {
+			return (multiCheckAvailabilityBase<Args>(entity) && ...);
+		}
+
+		template <typename componentType>
+		bool multiCheckAvailabilityBase(Entity entity) {
+			core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+				(worldSparseEntitiesMapToComponents[CreateComponentContainer<componentType>()]);
+			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+				(worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()]);
+
+			return checkAvailability(sparse, dense, entity);
+		}
+		
         template <typename componentType>
         componentType* GetComponent(const Entity& entity)
         {
@@ -157,12 +185,12 @@ namespace GLVM::ecs
 		
 		unsigned int GetContainerID();
 
-		// template <typename componentType>
-		// core::VectorIterator<componentType> GetComponentContainer() {
-		// 	core::vector<componentType>* componentVector = static_cast<core::vector<componentType>*>(worldComponentsContainer[CreateComponentContainer<componentType>()]);
-		// 	core::VectorIterator<componentType> iterator(*componentVector);
-		// 	return iterator;
-		// }
+		template <typename componentType>
+		core::VectorIterator<componentType> GetComponentContainerTest() {
+			core::vector<componentType>* componentVector = static_cast<core::vector<componentType>*>(worldComponentsContainer[CreateComponentContainer<componentType>()]);
+			core::VectorIterator<componentType> iterator(*componentVector);
+			return iterator;
+		}
 
 		// template <typename componentType>
 		// core::VectorIterator<Entity> GetEntityContainer() {
