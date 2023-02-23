@@ -25,30 +25,34 @@ namespace GLVM::ecs
 			pComponent_Manager->GetEntityContainer<cm::move>();
 //        unsigned int uiVector_Collider_Size = entityContainerRefMove->GetSize();
 
-        for(unsigned int i = 0; i < entityContainerRefMove->GetSize(); ++i)
+		unsigned int moveContainerSize = entityContainerRefMove->GetSize();
+        for(unsigned int i = 0; i < moveContainerSize; ++i)
         {
                 unsigned int entityRefMove = (*entityContainerRefMove)[i];
-				cm::transform& transformComponent = pComponent_Manager->GetComponent<cm::transform>(entityRefMove);
-				cm::move& move = pComponent_Manager->GetComponent<cm::move>(entityRefMove);
-				cm::collider& collider = pComponent_Manager->GetComponent<cm::collider>(entityRefMove);
-                if((&collider) != nullptr && collider.bGround_Collision_) {
-					move.frameMovement[1] = 0.0f;
-                    collider.bGround_Collision_ = false;
+				cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(entityRefMove);
+				cm::move* move = pComponent_Manager->GetComponent<cm::move>(entityRefMove);
+				cm::collider* collider = pComponent_Manager->GetComponent<cm::collider>(entityRefMove);
+                if(collider != nullptr && collider->bGround_Collision_) {
+					move->frameMovement[1] = 0.0f;
+                    collider->bGround_Collision_ = false;
                 }
-                if((&collider) != nullptr && collider.bWall_Collision_) {
-					move.frameMovement[0] = 0.0f;
-					move.frameMovement[2] = 0.0f;					
-                    collider.bWall_Collision_ = false;
+                if(collider != nullptr && collider->bWall_Collision_) {
+					move->frameMovement[0] = 0.0f;
+					move->frameMovement[2] = 0.0f;					
+                    collider->bWall_Collision_ = false;
                 }
 				
-//				std::cout << entityContainerRefMove->GetSize() << std::endl;
-				std::cout << "vec: " << move.frameMovement[0] << " " << move.frameMovement[1] <<
-					" " << move.frameMovement[2] << " For entity: " << entityRefMove << std::endl;
-				// unsigned int Size = entityContainerRefMove->GetSize();
-				// std::cout << "size 1: " << Size << std::endl;
-				transformComponent.tPosition += move.frameMovement;
-				move.frameMovement = 0.0f;
-				pComponent_Manager->RemoveComponent<cm::move>(entityRefMove);
+				std::cout << "i: " << entityContainerRefMove->GetSize() << std::endl;
+				if ( move != nullptr && transformComponent != nullptr ) {
+					// std::cout << "vec: " << move->frameMovement[0] << " " << move->frameMovement[1] <<
+					// 	" " << move->frameMovement[2] << " For entity: " << entityRefMove << std::endl;
+					// unsigned int Size = entityContainerRefMove->GetSize();
+					// std::cout << "size 1: " << Size << std::endl;
+					transformComponent->tPosition += move->frameMovement;
+					move->frameMovement = 0.0f;
+//					std::cout << "i: " << i << std::endl;
+					pComponent_Manager->RemoveComponent<cm::move>(entityRefMove);
+				}
 				// Size = entityContainerRefMove->GetSize();
 				// std::cout << "size 2: " << Size << std::endl;
         }

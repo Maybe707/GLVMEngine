@@ -72,7 +72,7 @@ namespace GLVM::ecs
 				(worldDenseComponentsMapToEntities[localContainerID]);
 			core::vector<componentType>& components = *static_cast<core::vector<componentType>*>
 				(worldComponentsContainer[localContainerID]);
-
+//			std::cout << typeid(componentType).name() << std::endl;
 			if ( checkAvailability( sparse, dense, entity ) ) {
 				return;
 			}
@@ -102,7 +102,7 @@ namespace GLVM::ecs
         }
 
         template <typename componentType>
-        componentType& GetComponent(const Entity& entity)
+        componentType* GetComponent(const Entity& entity)
         {
             unsigned int localContainerID;
             localContainerID = CreateComponentContainer<componentType>();
@@ -115,10 +115,11 @@ namespace GLVM::ecs
 				*static_cast<core::vector<componentType>*>(worldComponentsContainer[localContainerID]);
 
 			if ( checkAvailability( sparse, dense, entity ) ) {
-				return components[entity];
+				Entity componentIndex = sparse[entity];
+				return &components[componentIndex];
 			} else {
 				componentType* nullPtrComponent = nullptr;
-				return *nullPtrComponent;
+				return nullPtrComponent;
 			}
         }
         
@@ -156,6 +157,20 @@ namespace GLVM::ecs
 		
 		unsigned int GetContainerID();
 
+		// template <typename componentType>
+		// core::VectorIterator<componentType> GetComponentContainer() {
+		// 	core::vector<componentType>* componentVector = static_cast<core::vector<componentType>*>(worldComponentsContainer[CreateComponentContainer<componentType>()]);
+		// 	core::VectorIterator<componentType> iterator(*componentVector);
+		// 	return iterator;
+		// }
+
+		// template <typename componentType>
+		// core::VectorIterator<Entity> GetEntityContainer() {
+		// 	core::vector<Entity>* entityVector = static_cast<core::vector<Entity>*>(worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()]);
+		// 	core::VectorIterator<Entity> iterator(*entityVector);
+		// 	return iterator;
+		// }
+
 		template <typename componentType>
 		core::vector<componentType>* GetComponentContainer()
 			{
@@ -165,7 +180,7 @@ namespace GLVM::ecs
 		template <typename componentType>
 		core::vector<Entity>* GetEntityContainer()
 			{
-				return static_cast<core::vector<Entity>*>(worldSparseEntitiesMapToComponents[CreateComponentContainer<componentType>()]);
+				return static_cast<core::vector<Entity>*>(worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()]);
 			}
 	};
 

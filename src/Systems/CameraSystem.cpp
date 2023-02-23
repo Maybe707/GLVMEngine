@@ -21,8 +21,8 @@ namespace GLVM::ecs
         for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
         {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
-            Player_Transform_Component = &(pComponent_Manager->GetComponent<cm::transform>(uiEntity_refView));
-            SetViewMatrix(*Player_Transform_Component, pComponent_Manager->GetComponent<cm::beholder>(uiEntity_refView));
+            Player_Transform_Component = (pComponent_Manager->GetComponent<cm::transform>(uiEntity_refView));
+            SetViewMatrix(*Player_Transform_Component, *pComponent_Manager->GetComponent<cm::beholder>(uiEntity_refView));
         }
     }
     

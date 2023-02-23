@@ -1,3 +1,5 @@
+#include "Components/MaterialComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include <Systems/ProjectileSystem.hpp>
 
 namespace GLVM::ecs
@@ -19,7 +21,7 @@ namespace GLVM::ecs
         core::vector<unsigned int>* pEntity_Container_refView =
 			pComponent_Manager->GetEntityContainer<cm::beholder>();
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
-        cm::beholder& view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
+        cm::beholder* view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
         float cameraSpeed = 5.5f * _dOffset;            
 
@@ -34,7 +36,7 @@ namespace GLVM::ecs
                     if(fProjectile_Accumulator_ <= 0) {
                         CalculateProjectile(pComponent_Manager,
                                             iEntity_refMove,
-                                            view_Component);
+                                            *view_Component);
                         fProjectile_Accumulator_ = 2.0;
                     }
                 }
@@ -47,19 +49,22 @@ namespace GLVM::ecs
 
         for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
-            cm::transform& rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-            rTransformProjectile.tPosition += rTransformProjectile.tForward * 0.2f;
+            cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
+			if ( rTransformProjectile != nullptr )
+				rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
         }
 
-        GLVM::ecs::CTextureManager*    TextureSystem    = GLVM::ecs::CTextureManager::GetInstance();
+        GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
 		
         for(unsigned int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
 
             unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
-            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bWall_Collision_ ||
-               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile).bGround_Collision_) {
+            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
+               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-                cm::material& textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);                      TextureSystem->UnbindTexture(textureProjectile, uiEntity_refProjectile);     
+                cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
+				if ( textureProjectile != nullptr )
+					TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);     
             }
 			std::cout << "Size: " << pComponent_Manager->GetEntityContainer<cm::projectile>()->GetSize() << std::endl;
 			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
@@ -86,22 +91,26 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
-		pComponent_Manager->GetComponent<cm::vertex>(uiEntity_Projectile).vkVertexId_ = 1;
-		cm::material& rTextureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_Projectile);
-		rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+		pComponent_Manager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
+		cm::material* rTextureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_Projectile);
+		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile.diffuseTextureID_);
+        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
         // rTextureProjectile.iWidth_  = 96;
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
-        cm::transform& rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile.fScale = 0.1f;
+        cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_Projectile);
+        rTransformProjectile->fScale = 0.1f;
 //        Vector<float, 3> vec(0.0f);
-        rTransformProjectile.tPosition = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove).tPosition;
-        rTransformProjectile.tForward = GetDirectionVector(view_Component);
+		
+		cm::transform* transform = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove);
+		if ( transform != nullptr )
+			rTransformProjectile->tPosition = transform->tPosition;
+		
+        rTransformProjectile->tForward = GetDirectionVector(view_Component);
 
-        rTransformProjectile.tPosition += rTransformProjectile.tForward;
+        rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
     
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& _view_Component)
