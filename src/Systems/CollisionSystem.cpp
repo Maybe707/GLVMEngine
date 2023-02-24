@@ -70,20 +70,26 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* componentManager = ComponentManager::GetInstance();
-        core::vector<unsigned int>* entityContainerRefCollider =
-			componentManager->GetEntityContainer<cm::collider>();
-        unsigned int vectorColliderSize = entityContainerRefCollider->GetSize();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider, cm::move>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+        // core::vector<unsigned int>* entityContainerRefCollider =
+		// 	componentManager->GetEntityContainer<cm::collider>();
+        // unsigned int vectorColliderSize = entityContainerRefCollider->GetSize();
 
-		for(unsigned int i = 0; i < vectorColliderSize; ++i) {
-			for(unsigned int j = i + 1; j < vectorColliderSize; ++j) {
-                unsigned int backtrackingEntityRefCollider = (*entityContainerRefCollider)[i];  
-                unsigned int comparedEntityRefCollider     = (*entityContainerRefCollider)[j];
-				cm::transform* backtrackingTransform = componentManager->GetComponent<cm::transform>(backtrackingEntityRefCollider);
-			    cm::transform* comparedTransform     = componentManager->GetComponent<cm::transform>(comparedEntityRefCollider);
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			for(unsigned int j = i + 1; j < linkedEntitiesVectorSize; ++j) {
+                unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
+                unsigned int comparedEntityRefCollider     = linkedEntities[j];
+				cm::transform* backtrackingTransform = componentManager->
+					GetComponent<cm::transform>(backtrackingEntityRefCollider);
+			    cm::transform* comparedTransform     = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider);
 				componentManager->CreateComponent<cm::move>(backtrackingEntityRefCollider);
 				componentManager->CreateComponent<cm::move>(comparedEntityRefCollider);
-				cm::move* backtrackingMove           = componentManager->GetComponent<cm::move>(backtrackingEntityRefCollider);
-			    cm::move* comparedMove               = componentManager->GetComponent<cm::move>(comparedEntityRefCollider);
+				cm::move* backtrackingMove           = componentManager->
+					GetComponent<cm::move>(backtrackingEntityRefCollider);
+			    cm::move* comparedMove               = componentManager->
+					GetComponent<cm::move>(comparedEntityRefCollider);
 
 				bool boxColliderFlag;
 				bool upperActorCheckFlag = false;;

@@ -21,16 +21,16 @@ namespace GLVM::ecs
         static TextureManager* pHUDInstance_;
         static std::mutex  HUDMutex_;
         
-        std::vector<CTexture> textureVector_;
+        std::vector<Texture> textureVector_;
     public:
         TextureManager();
 		
-        void SetTextureVector(std::vector<CTexture> _textureVector);
+        void SetTextureVector(std::vector<Texture> _textureVector);
         static TextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         static TextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
-		void LoadTextureData(GLVM::ecs::CTexture& _Texture);
-        std::vector<CTexture>& GetTextureVector();
+		void LoadTextureData(GLVM::ecs::Texture& _Texture);
+        std::vector<Texture>& GetTextureVector();
         void UnbindTexture(components::material _textureComponent, Entity _entity);
     };
 }

@@ -35,14 +35,14 @@ namespace GLVM::ecs
         return pHUDInstance_;
     }
     
-    void TextureManager::SetTextureVector(std::vector<CTexture> _textureVector) {
+    void TextureManager::SetTextureVector(std::vector<Texture> _textureVector) {
         textureVector_ = _textureVector;
 		for ( unsigned int i = 0; i < textureVector_.size(); ++i ) {
 			LoadTextureData(textureVector_[i]);
 		}
     }
 
- 	void TextureManager::LoadTextureData(GLVM::ecs::CTexture& _Texture)
+ 	void TextureManager::LoadTextureData(GLVM::ecs::Texture& _Texture)
 	{
 		///< Loading and creating texture.
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
@@ -60,7 +60,7 @@ namespace GLVM::ecs
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
-    std::vector<CTexture>& TextureManager::GetTextureVector() { return textureVector_; }
+    std::vector<Texture>& TextureManager::GetTextureVector() { return textureVector_; }
     void TextureManager::UnbindTexture(components::material _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
         for (unsigned int i = 0; i < textureVector.size(); ++i) {

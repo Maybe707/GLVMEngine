@@ -683,7 +683,7 @@ namespace GLVM::core
 		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) {
+    void COpenglRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) {
 		texture_load_data_ = _texture_data;
 		hudTexture_load_data_ = _hud_texture_data;
 	}

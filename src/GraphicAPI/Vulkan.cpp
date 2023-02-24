@@ -28,7 +28,7 @@ namespace GLVM::core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<ecs::CTexture> _initializeTextureData, std::vector<ecs::CTexture> _initializeHUDTextureData) {
+    CVulkanRenderer::CVulkanRenderer(std::vector<ecs::Texture> _initializeTextureData, std::vector<ecs::Texture> _initializeHUDTextureData) {
         texturePool_ = 10;
         unsigned int mainTexturesQuantity = _initializeTextureData.size() * texturePool_;
         unsigned int hudTexturesQuantity = _initializeHUDTextureData.size();
@@ -157,7 +157,7 @@ namespace GLVM::core
         createFramebuffers();
     }
     
-    void CVulkanRenderer::SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) {
+    void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) {
         texture_load_data_ = _texture_data;
         hudTexture_load_data_ = _hud_texture_data;
 

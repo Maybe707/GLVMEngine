@@ -243,9 +243,9 @@ namespace GLVM::core
     
     class CVulkanRenderer : public IRenderer {
     public:
-        std::vector<ecs::CTexture> initializeTextureData_;
-        std::vector<ecs::CTexture> texture_load_data_;
-        std::vector<ecs::CTexture> hudTexture_load_data_;
+        std::vector<ecs::Texture> initializeTextureData_;
+        std::vector<ecs::Texture> texture_load_data_;
+        std::vector<ecs::Texture> hudTexture_load_data_;
         std::vector<ecs::components::transform> transform_data_;
         std::vector<const char*> pathsArray_;
         std::vector<std::vector<core::Vertex>> aVertices_;
@@ -267,14 +267,14 @@ namespace GLVM::core
         GLVM::core::CWindowWin Window;
 #endif
         
-        CVulkanRenderer(std::vector<ecs::CTexture> _texture_data, std::vector<ecs::CTexture> _initializeHUDTextureData);
+        CVulkanRenderer(std::vector<ecs::Texture> _texture_data, std::vector<ecs::Texture> _initializeHUDTextureData);
         ~CVulkanRenderer();
 
         void createTextureImage();
         void recreateSwapChain();
         void draw() override;
         void loadWavefrontObj() override;
-        void SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) override;
+        void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
         void SetMeshData(std::vector<const char*> _pathsArray) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;

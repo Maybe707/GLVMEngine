@@ -86,8 +86,8 @@ namespace GLVM::core {
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
 		bool shadows = true;
-		std::vector<ecs::CTexture> texture_load_data_;
-        std::vector<ecs::CTexture> hudTexture_load_data_;
+		std::vector<ecs::Texture> texture_load_data_;
+        std::vector<ecs::Texture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
@@ -126,7 +126,7 @@ namespace GLVM::core {
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
-		void SetTextureData(std::vector<ecs::CTexture>& _texture_data, std::vector<ecs::CTexture>& _hud_texture_data) override;
+		void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;
 		mat4 SetModelMatrix(ecs::components::transform& transformComponent_);
