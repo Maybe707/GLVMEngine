@@ -186,7 +186,7 @@ namespace GLVM::ecs
 
 			if ( checkAvailability( sparse, dense, entity ) ) {
 				assert( dense.GetSize() == components.GetSize() );
-				std::cout << "DELETE!" << std::endl;
+				std::cout << "DELETE: " << typeid(componentType).name() << std::endl;
 				Entity indexInDenseOfRemovableEntity = sparse[entity];
 				Entity indexInSparseOfSwapableEntity = dense.GetHead();
 				const componentType& componentFromLastIndex = components.GetHead();
@@ -197,8 +197,30 @@ namespace GLVM::ecs
 				sparse[indexInSparseOfSwapableEntity] = indexInDenseOfRemovableEntity;
 			}
 		}
-
+		
 		void RemoveAllComponents(Entity& entity) {
+			// for ( unsigned int i = 0; i < worldComponentsContainer.GetSize(); ++i ) {
+			// 	core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+			// 		(worldSparseEntitiesMapToComponents[i]);
+			// 	core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+			// 		(worldDenseComponentsMapToEntities[i]);
+			// 	core::vector<core::IContainer>& components = *static_cast<core::vector<core::IContainer>*>
+			// 		(worldComponentsContainer[i]);
+
+			// 	if ( checkAvailability( sparse, dense, entity ) ) {
+			// 		assert( dense.GetSize() == components.GetSize() );
+			// 		std::cout << "DELETE!" << std::endl;
+			// 		Entity indexInDenseOfRemovableEntity = sparse[entity];
+			// 		Entity indexInSparseOfSwapableEntity = dense.GetHead();
+			// 		const core::IContainer& componentFromLastIndex = components.GetHead();
+			// 		dense[indexInDenseOfRemovableEntity] = indexInSparseOfSwapableEntity;
+			// 		dense.Pop();
+			// 		components[indexInDenseOfRemovableEntity] = componentFromLastIndex;
+			// 		components.Pop();
+			// 		sparse[indexInSparseOfSwapableEntity] = indexInDenseOfRemovableEntity;
+			// 	}
+			// }
+			
 			for ( unsigned int i = 0; i < worldComponentsContainer.GetSize(); ++i ) {
 				std::cout << "iteration: " << i << std::endl;
 				if ( componentsTypes[i] == typeid(components::transform).name() ) {

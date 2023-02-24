@@ -32,17 +32,16 @@ namespace GLVM::ecs
 				cm::move* move = componentManager->GetComponent<cm::move>(entityRefMove);
 				cm::collider* collider = componentManager->GetComponent<cm::collider>(entityRefMove);
                 if(collider->bGround_Collision_) {
-					transformComponent->tPosition += move->frameMovement;
-					move->frameMovement = 0.0f;
-					componentManager->RemoveComponent<cm::move>(entityRefMove);
+					transformComponent->tPosition += move->gravity;
+					move->gravity = 0.0f;
                     collider->bGround_Collision_ = false;
                 }
                 if(collider->bWall_Collision_) {
 					transformComponent->tPosition += move->frameMovement;
 					move->frameMovement = 0.0f;
-					componentManager->RemoveComponent<cm::move>(entityRefMove);
                     collider->bWall_Collision_ = false;
                 }
+				componentManager->RemoveComponent<cm::move>(entityRefMove);
         }
     }
 }

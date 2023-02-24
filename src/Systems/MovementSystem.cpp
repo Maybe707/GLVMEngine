@@ -141,19 +141,19 @@ namespace GLVM::ecs
             }
         }
 		
-//         for(int n = 0; n < pComponent_Manager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
-// //            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
-// 			int iEntity_refRigidBody = (*pComponent_Manager->GetEntityContainer<cm::rigidBody>())[n];
-// //            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
-// //			cm::transform& rTransform_Component = pComponent_Manager->GetComponent<cm::transform>(iEntity_refRigidBody);
-// 			pComponent_Manager->CreateComponent<cm::move>(iEntity_refRigidBody);
-// 			cm::move& move = pComponent_Manager->GetComponent<cm::move>(iEntity_refRigidBody);
-//             Vector<float, 3> vec(0.0f);
-//             vec[1] = -1.0f;
-// //            rTransform_Component.tPosition += vec * cameraSpeed;
-// 			move.frameMovement += vec * cameraSpeed;
-// //			rTransform_Component.frameVerticalMovement -= vec * cameraSpeed;
-//         }
+        for(unsigned int n = 0; n < pComponent_Manager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
+//            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
+			int iEntity_refRigidBody = (*pComponent_Manager->GetEntityContainer<cm::rigidBody>())[n];
+//            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
+			cm::transform* rTransform_Component = pComponent_Manager->GetComponent<cm::transform>(iEntity_refRigidBody);
+			pComponent_Manager->CreateComponent<cm::move>(iEntity_refRigidBody);
+            Vector<float, 3> vec(0.0f);
+            vec[1] = -1.0f;
+//            rTransform_Component.tPosition += vec * cameraSpeed;
+			pComponent_Manager->GetComponent<cm::move>(iEntity_refRigidBody)->gravity = -vec * cameraSpeed;
+			rTransform_Component->tPosition += vec * cameraSpeed;
+//			rTransform_Component.frameVerticalMovement -= vec * cameraSpeed;
+        }
     }
 
     bool CMovementSystem::TestDiagonalMovement(core::CStack& inputStack,

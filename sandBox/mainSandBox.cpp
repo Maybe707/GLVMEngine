@@ -27,8 +27,45 @@ void func(GLVM::core::vector<std::string>& vector) {
 	vector.Push(typeid(T).name());
 }
 
+class Interface
+{
+public:
+	~Interface() {}
+
+	virtual void func() = 0;
+};
+
+class Spawn : public Interface
+{
+public:
+	void func() override;
+};
+
+void Spawn::func() {
+	std::cout << "Privet" << std::endl;
+}
+
+class Spawn2 : public Interface
+{
+public:
+	void func() override;
+};
+
+void Spawn2::func() {
+	std::cout << "Medved" << std::endl;
+}
+
+
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
+	Spawn obj;
+	Interface* interface = &obj;
+	
+	((Spawn2*)interface)->func();
+
+
+
+	
 //  	namespace ecs = GLVM::ecs;
 
 // 	ecs::CEntityManager* entityManager       = ecs::CEntityManager::GetInstance();
