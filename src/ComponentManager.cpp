@@ -2,12 +2,12 @@
 
 namespace GLVM::ecs
 {
-    CComponentManager* CComponentManager::pInstance_ = nullptr;
-    std::mutex CComponentManager::Mutex_;
+    ComponentManager* ComponentManager::pInstance_ = nullptr;
+    std::mutex ComponentManager::Mutex_;
 
-    CComponentManager::CComponentManager() = default;
+    ComponentManager::ComponentManager() = default;
     
-    CComponentManager::~CComponentManager() {
+    ComponentManager::~ComponentManager() {
         for(int i = 0, iSize_Main = worldComponentsContainer.GetSize(); i < iSize_Main; ++i) {
             delete worldComponentsContainer[i];
             worldComponentsContainer[i] = nullptr;
@@ -18,20 +18,20 @@ namespace GLVM::ecs
         }
     }
 
-	bool CComponentManager::checkAvailability( core::vector<Entity>& sparse,
+	bool ComponentManager::checkAvailability( core::vector<Entity>& sparse,
 											   core::vector<Entity>& dense,
 											   Entity entity ) {
 		return entity < sparse.GetSize() && sparse[entity] < dense.GetSize() && dense[sparse[entity]] == entity;
 	}
 	
-    unsigned int CComponentManager::GetContainerID() {
+    unsigned int ComponentManager::GetContainerID() {
         return componentsContainerID;
     }
 
-    CComponentManager* CComponentManager::GetInstance() {
+    ComponentManager* ComponentManager::GetInstance() {
         std::lock_guard<std::mutex> lock(Mutex_);
         if(pInstance_ == nullptr) {
-            pInstance_ = new CComponentManager();
+            pInstance_ = new ComponentManager();
         }
         return pInstance_;
     }

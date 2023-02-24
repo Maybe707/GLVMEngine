@@ -4,23 +4,23 @@
 
 namespace GLVM::ecs
 {
-    CEntityManager* CEntityManager::pInstance_ = nullptr;
-    std::mutex CEntityManager::Mutex_;
+    EntityManager* EntityManager::pInstance_ = nullptr;
+    std::mutex EntityManager::Mutex_;
     
-    CEntityManager::CEntityManager() {}
-    CEntityManager::~CEntityManager() {}
+    EntityManager::EntityManager() {}
+    EntityManager::~EntityManager() {}
     
-    CEntityManager* CEntityManager::GetInstance()
+    EntityManager* EntityManager::GetInstance()
     {
         std::lock_guard<std::mutex> lock(Mutex_);
         if(pInstance_ == nullptr)
         {
-            pInstance_ = new CEntityManager();
+            pInstance_ = new EntityManager();
         }
         return pInstance_;
     }
     
-    [[nodiscard]] Entity_ID CEntityManager::CreateEntity()
+    [[nodiscard]] Entity_ID EntityManager::CreateEntity()
     {
 		Entity_ID _Entity_ID;
 		
@@ -45,7 +45,7 @@ namespace GLVM::ecs
      * component without indices for that component in ordered container.
      **************************************************************************************/
         
-    void CEntityManager::RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager)
+    void EntityManager::RemoveEntity(Entity_ID& _Entity_ID, ComponentManager* _ComponentManager)
     {
         for(int i = 0, iSize = _ComponentManager->worldSparseEntitiesMapToComponents.GetSize(); i < iSize; ++i) {
             // static_cast<core::vector<unsigned int>*>(_ComponentManager->tWorld_IDs_Container[i])->RemoveItem(_Entity_ID);

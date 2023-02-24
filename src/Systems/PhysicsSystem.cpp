@@ -20,7 +20,7 @@ namespace GLVM::ecs
     {
 		namespace cm = GLVM::ecs::components;
 		
-        CComponentManager* pComponent_Manager = CComponentManager::GetInstance();
+        ComponentManager* pComponent_Manager = ComponentManager::GetInstance();
         core::vector<unsigned int>* entityContainerRefMove =
 			pComponent_Manager->GetEntityContainer<cm::move>();
 //        unsigned int uiVector_Collider_Size = entityContainerRefMove->GetSize();

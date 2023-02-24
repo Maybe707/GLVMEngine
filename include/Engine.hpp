@@ -63,38 +63,38 @@ using Entity = unsigned int;
 
 namespace GLVM::core
 {
-	class CEngine
+	class Engine
 	{
-        static CEngine*    pInstance_;
+        static Engine*    pInstance_;
         static std::mutex  Mutex_;
         
-		Time::IChrono       * Chrono_;
-        Sound::ISoundEngine * Sound_Engine_;
+		Time::IChrono       * chrono;
+        Sound::ISoundEngine * soundEngine;
 
 		float              deltaFrameTime;
 		CStack             Input_Stack_;
-        ecs::CRenderSystem * Render_System_Interface_;
+        ecs::CRenderSystem * renderSystemInterface;
         
-        ecs::CCollisionSystem  * Collision_System;
-		ecs::CMovementSystem   * Movement_System;
-        ecs::CPhysicsSystem    * Physics_System_;
-        ecs::CProjectileSystem * pProjectile_System_;
+        ecs::CCollisionSystem  * collisionSystem;
+		ecs::CMovementSystem   * movementSystem;
+        ecs::CPhysicsSystem    * physicsSystem;
+        ecs::CProjectileSystem * projectileSystem;
         ecs::CGUISystem        * GUI_System;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
 		double fpsAccumulator   = 0;
 		
-        CEngine();
+        Engine();
         
 	public:
 
         
-        ~CEngine();
+        ~Engine();
         
-        CEngine(CEngine& _engine) = delete;                   ///< Dont need to make copy because of singleton property.
-        void operator=(const CEngine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
-        static CEngine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
+        Engine(Engine& _engine) = delete;                   ///< Dont need to make copy because of singleton property.
+        void operator=(const Engine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
+        static Engine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
 		void GameLoop();
 		void FPScounter();

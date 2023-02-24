@@ -1204,7 +1204,7 @@ namespace GLVM::core
         /* MAX_FRAMES_IN_FLIGHT doubles texture pool and then j + currentFrame * texturePool
          * choose specific texture. */
 
-        ecs::CComponentManager* componentManager = ecs::CComponentManager::GetInstance();
+        ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
         for (unsigned int i = 0; i < texture_load_data_.size(); ++i) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
                 unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -1326,7 +1326,7 @@ namespace GLVM::core
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+        ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
         core::vector<cm::transform>* pEntity_Container_refTransform =
 			pComponent_Manager->GetComponentContainer<cm::transform>();
 

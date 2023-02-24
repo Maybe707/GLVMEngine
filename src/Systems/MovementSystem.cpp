@@ -31,7 +31,7 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		namespace ct = GAME_MECHANICS::ECS::components;
 		
-        CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+        ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities = pComponent_Manager->collectLinkedEntities<ct::controller, cm::beholder>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         float cameraSpeed = 5.5f * deltaFrameTime;            

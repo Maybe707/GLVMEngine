@@ -13,13 +13,13 @@ typedef unsigned int Entity;
 
 namespace GLVM::ecs
 {
-	class CComponentManager
+	class ComponentManager
 	{
-        static CComponentManager* pInstance_;
+        static ComponentManager* pInstance_;
         static std::mutex  Mutex_;
 		
-        CComponentManager();
-        ~CComponentManager();
+        ComponentManager();
+        ~ComponentManager();
 
 		template <typename componentType>
 		unsigned int CreateComponentContainer()
@@ -55,9 +55,9 @@ namespace GLVM::ecs
 		core::vector<core::vector<Entity>*> worldSparseEntitiesMapToComponents;    ///< Contains all local container with IDs for diferent types of components.
 		core::vector<core::vector<Entity>*> worldDenseComponentsMapToEntities;
 
-        CComponentManager(CComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
-        void operator=(const CComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
-       static CComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
+        ComponentManager(ComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
+        void operator=(const ComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
+       static ComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
                 
 		template <typename componentType>
 		void CreateComponent(const Entity& entity)

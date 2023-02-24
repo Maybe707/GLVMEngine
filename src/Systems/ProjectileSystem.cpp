@@ -11,8 +11,8 @@ namespace GLVM::ecs
     {
 		namespace cm = GLVM::ecs::components;
 		
-        CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        CEntityManager* pEntity_Manager       = GLVM::ecs::CEntityManager::GetInstance();
+        ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
+        EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
     
         core::vector<unsigned int>* pEntity_Container_refMove =
 			pComponent_Manager->GetEntityContainer<cm::move>();
@@ -75,14 +75,14 @@ namespace GLVM::ecs
         }
     }
 
-    void CProjectileSystem::CalculateProjectile(ecs::CComponentManager* componentManager,
+    void CProjectileSystem::CalculateProjectile(ecs::ComponentManager* componentManager,
                                               unsigned int entityRefMove,
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
         GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
         
-        unsigned int uiEntity_Projectile = ecs::CEntityManager::GetInstance()->CreateEntity();
-        ecs::CComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
+        unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
+        ecs::ComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
                                                                cm::transform, cm::material,
                                                                cm::projectile>(uiEntity_Projectile);
 

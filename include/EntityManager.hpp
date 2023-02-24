@@ -8,26 +8,26 @@ typedef unsigned int Entity_ID;
 
 namespace GLVM::ecs
 {
-	class CEntityManager
+	class EntityManager
 	{
-        static CEntityManager* pInstance_;
+        static EntityManager* pInstance_;
         static std::mutex  Mutex_;
 
 		inline static Entity_ID u_iID = 0;		
  		core::vector<Entity_ID> tRemoved_Entity_Registry_;
 		core::vector<Entity_ID> tActive_Entity_Registry_;
 		
-        CEntityManager();
-        ~CEntityManager();
+        EntityManager();
+        ~EntityManager();
         
     public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
-        CEntityManager(CEntityManager& _entity_Manager) = delete;           ///< Dont need to make cope because of singleton property.
-        void operator=(const CEntityManager& _entity_Manager) = delete;     ///< Dont need assignment operator because of singleton property.
-        static CEntityManager* GetInstance();                      ///< It possibly to get only one instance of this class whith this method.
+        EntityManager(EntityManager& _entity_Manager) = delete;           ///< Dont need to make cope because of singleton property.
+        void operator=(const EntityManager& _entity_Manager) = delete;     ///< Dont need assignment operator because of singleton property.
+        static EntityManager* GetInstance();                      ///< It possibly to get only one instance of this class whith this method.
         
 		[[nodiscard]] Entity_ID CreateEntity();
 
-        void RemoveEntity(Entity_ID& _Entity_ID, CComponentManager* _ComponentManager);
+        void RemoveEntity(Entity_ID& _Entity_ID, ComponentManager* _ComponentManager);
 	};
 }
 

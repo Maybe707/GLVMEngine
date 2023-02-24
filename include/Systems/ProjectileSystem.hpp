@@ -33,7 +33,7 @@ namespace GLVM::ecs
 
         CProjectileSystem(core::CStack& inputStack);
         void Update() override;
-        void CalculateProjectile(ecs::CComponentManager* componentManager,
+        void CalculateProjectile(ecs::ComponentManager* componentManager,
                                  unsigned int entityRefMove,
                                  components::beholder& beholder);
         Vector<float, 3> GetDirectionVector(components::beholder& beholder);

@@ -20,8 +20,8 @@ int main()
 	namespace cm  = GLVM::ecs::components;
 	namespace ct = GAME_MECHANICS::ECS::components;
 	
-	ecs::CEntityManager   * EntityManager     = ecs::CEntityManager::GetInstance();
-	ecs::CComponentManager* ComponentManager  = ecs::CComponentManager::GetInstance();
+	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
+	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 	core::CMeshManager    * MeshManager       = core::CMeshManager::GetInstance();
 	ecs::CTextureManager  * TextureManager    = ecs::CTextureManager::GetInstance();
 	ecs::CTextureManager  * hudTextureManager = ecs::CTextureManager::GetHUDInstance();
@@ -31,9 +31,9 @@ int main()
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
-	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
+//	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 //	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-	core::CEngine* GLVM = core::CEngine::GetInstance();	
+	core::Engine* GLVM = core::Engine::GetInstance();	
 	ecs::CTexture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::CTexture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,

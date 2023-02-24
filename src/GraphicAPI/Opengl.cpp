@@ -88,7 +88,7 @@ namespace GLVM::core
 		using namespace GLVM;
 		namespace cm = GLVM::ecs::components;
 		
-		ecs::CComponentManager* pComponent_Manager = ecs::CComponentManager::GetInstance();
+		ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
 				
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -349,7 +349,7 @@ namespace GLVM::core
 
 	void COpenglRenderer::EvaluateCoreShader() {
 		namespace cm = GLVM::ecs::components;
-        ecs::CComponentManager* pComponent_Manager = ecs::CComponentManager::GetInstance();
+        ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefView =
 			pComponent_Manager->GetEntityContainer<cm::beholder>();
 		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
@@ -410,7 +410,7 @@ namespace GLVM::core
 	
 	void COpenglRenderer::ComputeDirectionalLight() {
 		namespace cm = GLVM::ecs::components;
-		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefDirectionalLight =
 			pComponent_Manager->GetEntityContainer<cm::directionalLight>();
 		unsigned int directionalLightComponentContainerSize = pEntityContainerRefDirectionalLight->GetSize();
@@ -436,7 +436,7 @@ namespace GLVM::core
 
 	void COpenglRenderer::ComputePointLight() {
 		namespace cm = GLVM::ecs::components;
-		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefPointLight =
 			pComponent_Manager->GetEntityContainer<cm::pointLight>();
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
@@ -471,7 +471,7 @@ namespace GLVM::core
 
 	void COpenglRenderer::ComputeSpotLight() {
 		namespace cm = GLVM::ecs::components;
-		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefSpotLight =
 			pComponent_Manager->GetEntityContainer<cm::spotLight>();
 		unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
@@ -505,7 +505,7 @@ namespace GLVM::core
 	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
 		namespace cm = GLVM::ecs::components;
-		ecs::CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
 
 		
