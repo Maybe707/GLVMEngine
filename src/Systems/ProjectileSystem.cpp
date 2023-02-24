@@ -1,6 +1,8 @@
+#include "Components/ColliderComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include <Systems/ProjectileSystem.hpp>
 
 namespace GLVM::ecs
@@ -51,10 +53,12 @@ namespace GLVM::ecs
         ComponentManager* componentManager = ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::projectile,
 																					  cm::transform,
-																					  cm::material>();
-//		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+																					  cm::material,
+																					  cm::vertex,
+																					  cm::collider>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		
-        for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
+        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
 			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
@@ -62,14 +66,15 @@ namespace GLVM::ecs
 
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
-        for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
+        for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
+				cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
+				TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-                cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
-				TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);     
+				--linkedEntitiesVectorSize;
             }
 			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
 			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();

@@ -1,6 +1,20 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
+#include "Components/AnimationMoveComponent.hpp"
+#include "Components/Attack.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/CrosshairComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
+#include "Components/EventComponent.hpp"
+#include "Components/MaterialComponent.hpp"
+#include "Components/MoveComponent.hpp"
+#include "Components/PointLightComponent.hpp"
+#include "Components/ProjectileComponent.hpp"
+#include "Components/SpotLightComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Vector.hpp"
 #include <cassert>
 #include <iostream>
@@ -8,6 +22,7 @@
 //#include "Components/VertexComponent.hpp"
 #include <mutex>
 #include <assert.h>
+#include "Components/ControllerComponent.hpp"
 
 typedef unsigned int Entity;
 
@@ -22,8 +37,7 @@ namespace GLVM::ecs
         ~ComponentManager();
 
 		template <typename componentType>
-		unsigned int CreateComponentContainer()
-			{
+		unsigned int CreateComponentContainer() {
 				static unsigned int localContainerID = 0;
 				static bool existComponentContainerFlag = false;
 				if(existComponentContainerFlag)  
@@ -43,7 +57,7 @@ namespace GLVM::ecs
 				core::vector<Entity>* denseEntitiesMapToComponents =
 					new core::vector<Entity>;    ///< Create ID's component container.
 				worldDenseComponentsMapToEntities.Push(denseEntitiesMapToComponents);
-				
+				componentsTypes.Push(typeid(componentType).name());
 //				std::cout << typeid(Component_Type).name() << std::endl;			
 				++componentsContainerID;
 				return localContainerID;
@@ -55,6 +69,8 @@ namespace GLVM::ecs
 		core::vector<core::vector<Entity>*> worldSparseEntitiesMapToComponents;    ///< Contains all local container with IDs for diferent types of components.
 		core::vector<core::vector<Entity>*> worldDenseComponentsMapToEntities;
 
+		core::vector<const char*> componentsTypes;
+		
         ComponentManager(ComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
         void operator=(const ComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
        static ComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
@@ -157,31 +173,86 @@ namespace GLVM::ecs
          **************************************************************************************/
         
 		template <typename componentType>
-		void RemoveComponent(Entity& entity)
-			{
-				unsigned int localContainerID;
-				localContainerID = CreateComponentContainer<componentType>();
+		void RemoveComponent(Entity& entity) {
+			unsigned int localContainerID;
+			localContainerID = CreateComponentContainer<componentType>();
 
-				core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
-					(worldSparseEntitiesMapToComponents[localContainerID]);
-				core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
-					(worldDenseComponentsMapToEntities[localContainerID]);
-				core::vector<componentType>& components = *static_cast<core::vector<componentType>*>
-					(worldComponentsContainer[localContainerID]);
+			core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+				(worldSparseEntitiesMapToComponents[localContainerID]);
+			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+				(worldDenseComponentsMapToEntities[localContainerID]);
+			core::vector<componentType>& components = *static_cast<core::vector<componentType>*>
+				(worldComponentsContainer[localContainerID]);
 
-				if ( checkAvailability( sparse, dense, entity ) ) {
-					assert( dense.GetSize() == components.GetSize() );
-					
-					Entity indexInDenseOfRemovableEntity = sparse[entity];
-					Entity indexInSparseOfSwapableEntity = dense.GetHead();
-					const componentType& componentFromLastIndex = components.GetHead();
-					dense[indexInDenseOfRemovableEntity] = indexInSparseOfSwapableEntity;
-					dense.Pop();
-					components[indexInDenseOfRemovableEntity] = componentFromLastIndex;
-					components.Pop();
-					sparse[indexInSparseOfSwapableEntity] = indexInDenseOfRemovableEntity;
+			if ( checkAvailability( sparse, dense, entity ) ) {
+				assert( dense.GetSize() == components.GetSize() );
+				std::cout << "DELETE!" << std::endl;
+				Entity indexInDenseOfRemovableEntity = sparse[entity];
+				Entity indexInSparseOfSwapableEntity = dense.GetHead();
+				const componentType& componentFromLastIndex = components.GetHead();
+				dense[indexInDenseOfRemovableEntity] = indexInSparseOfSwapableEntity;
+				dense.Pop();
+				components[indexInDenseOfRemovableEntity] = componentFromLastIndex;
+				components.Pop();
+				sparse[indexInSparseOfSwapableEntity] = indexInDenseOfRemovableEntity;
+			}
+		}
+
+		void RemoveAllComponents(Entity& entity) {
+			for ( unsigned int i = 0; i < worldComponentsContainer.GetSize(); ++i ) {
+				std::cout << "iteration: " << i << std::endl;
+				if ( componentsTypes[i] == typeid(components::transform).name() ) {
+					std::cout << "transform from container: " << componentsTypes[i] << std::endl;
+					std::cout << "transform from typeid: " << typeid(components::transform).name() << std::endl;
+					RemoveComponent<components::transform>(entity);
+					std::cout << "Delete transform" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::beholder).name() ) {
+					RemoveComponent<components::beholder>(entity);
+					std::cout << "Delete beholder" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::animation).name() ) {
+					RemoveComponent<components::animation>(entity);
+					std::cout << "Delete animation" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::collider).name() ) {
+					RemoveComponent<components::collider>(entity);
+					std::cout << "Delete collider" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::crosshair).name() ) {
+					RemoveComponent<components::crosshair>(entity);
+					std::cout << "Delete crosshair" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::directionalLight).name() ) {
+					RemoveComponent<components::directionalLight>(entity);
+					std::cout << "Delete directional light" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::pointLight).name() ) {
+					RemoveComponent<components::pointLight>(entity);
+					std::cout << "Delete point light" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::spotLight).name() ) {
+					RemoveComponent<components::spotLight>(entity);
+					std::cout << "Delete spot light" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::event).name() ) {
+					RemoveComponent<components::event>(entity);
+					std::cout << "Delete event" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::material).name() ) {
+					RemoveComponent<components::material>(entity);
+					std::cout << "Delete material" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::move).name() ) {
+					RemoveComponent<components::move>(entity);
+					std::cout << "Delete move" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::vertex).name() ) {
+					RemoveComponent<components::vertex>(entity);
+					std::cout << "Delete vertex" << std::endl;
+				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::controller).name() ) {
+					RemoveComponent<GAME_MECHANICS::ECS::components::controller>(entity);
+					std::cout << "Delete controller" << std::endl;
+				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::Attack).name() ) {
+					RemoveComponent<GAME_MECHANICS::ECS::components::Attack>(entity);
+				 	std::cout << "Delete attack" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::projectile).name() ) {
+					RemoveComponent<components::projectile>(entity);
+				 	std::cout << "Delete projectile" << std::endl;
+				} else {
+					continue;
 				}
 			}
+		}
 		
 		unsigned int GetContainerID();
 
