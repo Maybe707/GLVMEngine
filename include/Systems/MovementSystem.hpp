@@ -24,7 +24,7 @@ namespace GLVM::ecs
 	public:
         float                      fProjectile_Accumulator_ = 2.0f; 
 		float                      deltaFrameTime;
-        core::CStack&              Input_Stack_;
+        core::CStack&              inputStack;
         core::Sound::ISoundEngine* Sound_Engine_;
 
         float fYaw        = -90.0f;

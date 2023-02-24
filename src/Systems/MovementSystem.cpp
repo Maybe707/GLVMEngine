@@ -24,7 +24,7 @@
 namespace GLVM::ecs
 {
     CMovementSystem::CMovementSystem(core::CStack& inputStack, core::Sound::ISoundEngine* soundEngine) :
-        Input_Stack_(inputStack), Sound_Engine_(soundEngine) {}
+        inputStack(inputStack), Sound_Engine_(soundEngine) {}
         
     void CMovementSystem::Update()
     {
@@ -44,28 +44,28 @@ namespace GLVM::ecs
 				cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
 		
 				vec3 right;
-				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
+				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
 						-Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
-				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
+				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
 						Normalize(beholderComponent->forward + right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
-				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
+				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
 						Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
-				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
+				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
@@ -77,7 +77,7 @@ namespace GLVM::ecs
                     break;
 
 				vec3 forward;
-                switch(Input_Stack_[n])
+                switch(inputStack[n])
                 {
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*beholderComponent);
