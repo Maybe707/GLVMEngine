@@ -202,8 +202,8 @@ namespace GLVM::core
             iMouse_Position_X = GET_X_LPARAM(_pLParam);
             iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
             pEvent->SetEvent(EEvents::eMOUSE_POINTER_POSITION);
-            pEvent->mouse_Pointer_Position_.iPosition_X = iMouse_Position_X;
-            pEvent->mouse_Pointer_Position_.iPosition_Y = iMouse_Position_Y;
+            pEvent->mousePointerPosition.position_X = iMouse_Position_X;
+            pEvent->mousePointerPosition.position_Y = iMouse_Position_Y;
             return 0;
             
         case WM_KEYDOWN: 

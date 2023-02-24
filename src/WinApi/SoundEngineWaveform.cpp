@@ -9,7 +9,7 @@ namespace GLVM::core::Sound
         for(int i = 0; i < tSound_Contaier.GetSize(); ++i)
         {
             PlaybackSoundSample(*tSound_Contaier[i]);
-            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
+//            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
         }
     }
 
