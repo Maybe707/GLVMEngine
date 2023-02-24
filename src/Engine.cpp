@@ -63,7 +63,7 @@ namespace GLVM::core
 
 		Collision_System         = new ecs::CCollisionSystem(Input_Stack_);
 		GUI_System               = new ecs::CGUISystem();
-		Movement_System          = new ecs::CMovementSystem(Input_Stack_, Sound_Engine_);
+		Movement_System          = new ecs::CMovementSystem(Input_Stack_);
 		Physics_System_          = new ecs::CPhysicsSystem(Input_Stack_);
 		pProjectile_System_      = new ecs::CProjectileSystem(Input_Stack_);
 //		pCamera_System           = new ecs::CCameraSystem();

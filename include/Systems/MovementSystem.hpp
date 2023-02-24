@@ -22,18 +22,10 @@ namespace GLVM::ecs
 	class CMovementSystem : public ISystem
 	{
 	public:
-        float                      fProjectile_Accumulator_ = 2.0f; 
 		float                      deltaFrameTime;
         core::CStack&              inputStack;
-        core::Sound::ISoundEngine* Sound_Engine_;
-
-        float fYaw        = -90.0f;
-        float fPitch      = 0.0f;
-        float fLast_X     = 1920.0f / 2.0f;
-        float fLast_Y     = 1080.0f / 2.0f;
-        bool bFirst_Mouse = true;
         
-        CMovementSystem( core::CStack& inputStack, core::Sound::ISoundEngine* soundEngine );
+        CMovementSystem( core::CStack& inputStack );
 
 		void Update();
         bool TestDiagonalMovement(core::CStack& inputStack,

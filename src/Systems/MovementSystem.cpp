@@ -23,8 +23,8 @@
 
 namespace GLVM::ecs
 {
-    CMovementSystem::CMovementSystem(core::CStack& inputStack, core::Sound::ISoundEngine* soundEngine) :
-        inputStack(inputStack), Sound_Engine_(soundEngine) {}
+    CMovementSystem::CMovementSystem(core::CStack& inputStack) :
+        inputStack(inputStack) {}
         
     void CMovementSystem::Update()
     {
