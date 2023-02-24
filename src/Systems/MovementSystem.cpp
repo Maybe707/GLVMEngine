@@ -32,7 +32,9 @@ namespace GLVM::ecs
 		namespace ct = GAME_MECHANICS::ECS::components;
 		
         ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = pComponent_Manager->collectLinkedEntities<ct::controller, cm::beholder>();
+		core::vector<Entity> linkedEntities = pComponent_Manager->collectLinkedEntities<ct::controller,
+																						cm::beholder,
+																						cm::transform>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         float cameraSpeed = 5.5f * deltaFrameTime;            
 
@@ -42,33 +44,42 @@ namespace GLVM::ecs
 
 				Entity currentEntity                = linkedEntities[i];
 				cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
+				cm::transform* transformComponent   = pComponent_Manager->GetComponent<cm::transform>(currentEntity);
 		
 				vec3 right;
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
+						-Normalize(beholderComponent->forward - right) * cameraSpeed;
+					transformComponent->tPosition =
 						-Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
+						Normalize(beholderComponent->forward + right) * cameraSpeed;
+					transformComponent->tPosition =
 						Normalize(beholderComponent->forward + right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
+						Normalize(beholderComponent->forward - right) * cameraSpeed;
+					transformComponent->tPosition =
 						Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
+						-Normalize(beholderComponent->forward + right) * cameraSpeed;
+					transformComponent->tPosition =
 						-Normalize(beholderComponent->forward + right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
@@ -82,31 +93,36 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*beholderComponent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						-right * cameraSpeed;					
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						right * cameraSpeed;
+					transformComponent->tPosition -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*beholderComponent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						right * cameraSpeed;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-right * cameraSpeed;
+					transformComponent->tPosition += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						-forward * cameraSpeed;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						forward * cameraSpeed;
+					transformComponent->tPosition -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						forward * cameraSpeed;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-forward * cameraSpeed;
+					transformComponent->tPosition += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement[1] +=
-						1.0f;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement[1] =
+						-1.0f;
+					transformComponent->tPosition[1] += 1.0f;
                     break;
                 default:
                     break;

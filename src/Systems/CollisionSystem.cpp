@@ -70,7 +70,9 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* componentManager = ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider, cm::move>();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
+																					  cm::transform>();
+
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         // core::vector<unsigned int>* entityContainerRefCollider =
 		// 	componentManager->GetEntityContainer<cm::collider>();
@@ -84,34 +86,30 @@ namespace GLVM::ecs
 					GetComponent<cm::transform>(backtrackingEntityRefCollider);
 			    cm::transform* comparedTransform     = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider);
-				componentManager->CreateComponent<cm::move>(backtrackingEntityRefCollider);
-				componentManager->CreateComponent<cm::move>(comparedEntityRefCollider);
-				cm::move* backtrackingMove           = componentManager->
-					GetComponent<cm::move>(backtrackingEntityRefCollider);
-			    cm::move* comparedMove               = componentManager->
-					GetComponent<cm::move>(comparedEntityRefCollider);
 
 				bool boxColliderFlag;
 				bool upperActorCheckFlag = false;;
-				if ( comparedTransform != nullptr && backtrackingTransform != nullptr
-					&& comparedMove != nullptr && backtrackingMove != nullptr) {
-                boxColliderFlag = BoxCollider(backtrackingTransform->tPosition + backtrackingMove->frameMovement,
-					                                  comparedTransform->tPosition + comparedMove->frameMovement,
-					                                  backtrackingTransform->fScale, comparedTransform->fScale);
-                upperActorCheckFlag = UpperActorCheck(backtrackingTransform->tPosition + backtrackingMove->frameMovement,
-					                                  comparedTransform->tPosition + comparedMove->frameMovement,
-					                                  backtrackingTransform->fScale, comparedTransform->fScale);
-				}
+				// if ( comparedTransform != nullptr && backtrackingTransform != nullptr
+				// 	&& comparedMove != nullptr && backtrackingMove != nullptr) {
+                boxColliderFlag = BoxCollider(backtrackingTransform->tPosition,
+											  comparedTransform->tPosition,
+											  backtrackingTransform->fScale,
+											  comparedTransform->fScale);
+                upperActorCheckFlag = UpperActorCheck(backtrackingTransform->tPosition,
+					                                  comparedTransform->tPosition,
+					                                  backtrackingTransform->fScale,
+													  comparedTransform->fScale);
+//				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
-//					std::cout << "TEST 1" << std::endl;
+					std::cout << "TEST 1" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
                     componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bGround_Collision_ = true;
                     continue;
                 }
                     
                 if(boxColliderFlag) {
-//					std::cout << "TEST 2" << std::endl;
+					std::cout << "TEST 2" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
                     componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bWall_Collision_ = true;
                     continue;

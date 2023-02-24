@@ -66,7 +66,7 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 1.0f, 0.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 3.5f, 0.0f }, .fScale = 1.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
     ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 0;

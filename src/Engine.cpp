@@ -92,9 +92,9 @@ namespace GLVM::core
 		///< Call of ActivateSystem function must be in this order.
 
 		pSystem_Manager->ActivateSystem(movementSystem);
-		pSystem_Manager->ActivateSystem(collisionSystem);
+//		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
-		pSystem_Manager->ActivateSystem(physicsSystem);
+//		pSystem_Manager->ActivateSystem(physicsSystem);
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 //		pSystem_Manager->ActivateSystem(pCamera_System);
 		pSystem_Manager->ActivateSystem(renderSystemInterface);
