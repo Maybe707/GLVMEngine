@@ -54,7 +54,7 @@ namespace GLVM::ecs
 				rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
         }
 
-        GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
+        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
         for(unsigned int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
 
@@ -79,7 +79,7 @@ namespace GLVM::ecs
                                               unsigned int entityRefMove,
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
-        GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
+        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,

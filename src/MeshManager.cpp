@@ -3,23 +3,23 @@
 
 namespace GLVM::core
 {    
-    CMeshManager* CMeshManager::pInstance_ = nullptr;
-    std::mutex CMeshManager::Mutex_;
+    MeshManager* MeshManager::pInstance_ = nullptr;
+    std::mutex MeshManager::Mutex_;
 
-    CMeshManager::CMeshManager() {}
-    CMeshManager::~CMeshManager() {}
+    MeshManager::MeshManager() {}
+    MeshManager::~MeshManager() {}
 
-    void CMeshManager::SetMesh(const char* _pathToMesh) {
+    void MeshManager::SetMesh(const char* _pathToMesh) {
         pathsArray_.push_back(_pathToMesh);
     }
     
-    CMeshManager* CMeshManager::GetInstance()
+    MeshManager* MeshManager::GetInstance()
     {
         
         std::lock_guard<std::mutex> lock(Mutex_);
         if(pInstance_ == nullptr)
         {
-            pInstance_ = new CMeshManager();
+            pInstance_ = new MeshManager();
         }
         return pInstance_;
     }

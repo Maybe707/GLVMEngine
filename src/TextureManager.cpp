@@ -5,44 +5,44 @@
 
 namespace GLVM::ecs
 {
-    CTextureManager* CTextureManager::pInstance_ = nullptr;
-    std::mutex CTextureManager::Mutex_;
+    TextureManager* TextureManager::pInstance_ = nullptr;
+    std::mutex TextureManager::Mutex_;
 
-    CTextureManager* CTextureManager::pHUDInstance_ = nullptr;
-    std::mutex CTextureManager::HUDMutex_;
+    TextureManager* TextureManager::pHUDInstance_ = nullptr;
+    std::mutex TextureManager::HUDMutex_;
     
-    CTextureManager::CTextureManager() {}
+    TextureManager::TextureManager() {}
 
-    void CTextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
+    void TextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
         textureVector_[_textureID].entitiesOwnsThisTypeOfTexture_.push_back(_entityID);
     }
 
-    CTextureManager* CTextureManager::GetInstance()
+    TextureManager* TextureManager::GetInstance()
     {
         std::lock_guard<std::mutex> lock(Mutex_);
         if(pInstance_ == nullptr) {
-            pInstance_ = new CTextureManager();
+            pInstance_ = new TextureManager();
         }
         return pInstance_;
     }
 
-    CTextureManager* CTextureManager::GetHUDInstance()
+    TextureManager* TextureManager::GetHUDInstance()
     {
         std::lock_guard<std::mutex> lock(HUDMutex_);
         if(pHUDInstance_ == nullptr) {
-            pHUDInstance_ = new CTextureManager();
+            pHUDInstance_ = new TextureManager();
         }
         return pHUDInstance_;
     }
     
-    void CTextureManager::SetTextureVector(std::vector<CTexture> _textureVector) {
+    void TextureManager::SetTextureVector(std::vector<CTexture> _textureVector) {
         textureVector_ = _textureVector;
 		for ( unsigned int i = 0; i < textureVector_.size(); ++i ) {
 			LoadTextureData(textureVector_[i]);
 		}
     }
 
- 	void CTextureManager::LoadTextureData(GLVM::ecs::CTexture& _Texture)
+ 	void TextureManager::LoadTextureData(GLVM::ecs::CTexture& _Texture)
 	{
 		///< Loading and creating texture.
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &_Texture.iTexture_);
@@ -60,8 +60,8 @@ namespace GLVM::ecs
 		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
-    std::vector<CTexture>& CTextureManager::GetTextureVector() { return textureVector_; }
-    void CTextureManager::UnbindTexture(components::material _textureComponent, Entity _entity) {
+    std::vector<CTexture>& TextureManager::GetTextureVector() { return textureVector_; }
+    void TextureManager::UnbindTexture(components::material _textureComponent, Entity _entity) {
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
         for (unsigned int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)

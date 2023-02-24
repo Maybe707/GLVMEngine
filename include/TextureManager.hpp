@@ -13,21 +13,21 @@ typedef unsigned int Texture_ID;
 
 namespace GLVM::ecs
 {
-    class CTextureManager
+    class TextureManager
     {
-        static CTextureManager* pInstance_;
+        static TextureManager* pInstance_;
         static std::mutex  Mutex_;
 
-        static CTextureManager* pHUDInstance_;
+        static TextureManager* pHUDInstance_;
         static std::mutex  HUDMutex_;
         
         std::vector<CTexture> textureVector_;
     public:
-        CTextureManager();
+        TextureManager();
 		
         void SetTextureVector(std::vector<CTexture> _textureVector);
-        static CTextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
-        static CTextureManager* GetHUDInstance();
+        static TextureManager* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
+        static TextureManager* GetHUDInstance();
         void BindTexture(Entity_ID _entityID, Texture_ID _textureID);
 		void LoadTextureData(GLVM::ecs::CTexture& _Texture);
         std::vector<CTexture>& GetTextureVector();

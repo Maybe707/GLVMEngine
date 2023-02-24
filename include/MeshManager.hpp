@@ -9,18 +9,18 @@ typedef unsigned int Mesh_ID;
 
 namespace GLVM::core
 {
-    class CMeshManager
+    class MeshManager
     {
-        static CMeshManager* pInstance_;
+        static MeshManager* pInstance_;
         static std::mutex  Mutex_;
 
-        CMeshManager();
-        ~CMeshManager();
+        MeshManager();
+        ~MeshManager();
         
     public:
         std::vector<const char*> pathsArray_;
 
-        static CMeshManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
+        static MeshManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
         void SetMesh(const char* _pathToMesh);
     };
 }

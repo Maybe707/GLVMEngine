@@ -22,9 +22,9 @@ int main()
 	
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
-	core::CMeshManager    * MeshManager       = core::CMeshManager::GetInstance();
-	ecs::CTextureManager  * TextureManager    = ecs::CTextureManager::GetInstance();
-	ecs::CTextureManager  * hudTextureManager = ecs::CTextureManager::GetHUDInstance();
+	core::MeshManager    * MeshManager       = core::MeshManager::GetInstance();
+	ecs::TextureManager  * TextureManager    = ecs::TextureManager::GetInstance();
+	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
 	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
     MeshManager->SetMesh("../waveFrontObj/sphere.obj");
