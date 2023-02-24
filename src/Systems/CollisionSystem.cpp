@@ -15,31 +15,6 @@
 
 namespace GLVM::ecs
 {
-	// bool CCollisionSystem::BoxCollider(components::transform& _transform_Component1,
-    //                                    components::transform& _transform_Component2)
-	// {
-    //     if(_transform_Component1.tPosition[0] + _transform_Component1.fScale / 2 > _transform_Component2.tPosition[0] - _transform_Component2.fScale / 2 &&
-    //        _transform_Component1.tPosition[0] - _transform_Component1.fScale / 2 < _transform_Component2.tPosition[0] + _transform_Component2.fScale / 2 &&
-    //        _transform_Component1.tPosition[1] + _transform_Component1.fScale / 2 > _transform_Component2.tPosition[1] - _transform_Component2.fScale / 2 &&
-    //        _transform_Component1.tPosition[1] - _transform_Component1.fScale / 2 < _transform_Component2.tPosition[1] + _transform_Component2.fScale / 2 &&
-    //        _transform_Component1.tPosition[2] + _transform_Component1.fScale / 2 > _transform_Component2.tPosition[2] - _transform_Component2.fScale / 2 &&
-    //        _transform_Component1.tPosition[2] - _transform_Component1.fScale / 2 < _transform_Component2.tPosition[2] + _transform_Component2.fScale / 2)
-    //     {
-    //         return true;
-    //     }
-        
-	// 	return false;
-	// }
-
-    // bool CCollisionSystem::UpperActorCheck(components::transform& _transform_Component1,
-    //                                        components::transform& _transform_Component2) {
-    //     if((_transform_Component1.tPosition[1] - _transform_Component1.fScale / 2) > (_transform_Component2.tPosition[1] + (_transform_Component2.fScale / 2  - (_transform_Component2.fScale / 10)))) {
-    //         return true;
-    //     }
-
-    //     return false;
-    // }
-
 	bool CCollisionSystem::BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                               float backtrackingScale, float comparedScale)
 	{
@@ -57,7 +32,8 @@ namespace GLVM::ecs
 
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 										   float backtrackingScale, float comparedScale) {
-        if((backtrackingPosition[1] - backtrackingScale / 2) > (comparedPosition[1] + (comparedScale / 2  - (comparedScale / 10)))) {
+        if((backtrackingPosition[1] - backtrackingScale / 2) >
+		   (comparedPosition[1] + (comparedScale / 2  - (comparedScale / 10)))) {
             return true;
         }
 
@@ -74,10 +50,6 @@ namespace GLVM::ecs
 																					  cm::transform>();
 
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-        // core::vector<unsigned int>* entityContainerRefCollider =
-		// 	componentManager->GetEntityContainer<cm::collider>();
-        // unsigned int vectorColliderSize = entityContainerRefCollider->GetSize();
-
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			for(unsigned int j = i + 1; j < linkedEntitiesVectorSize; ++j) {
                 unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
@@ -89,8 +61,6 @@ namespace GLVM::ecs
 
 				bool boxColliderFlag;
 				bool upperActorCheckFlag = false;;
-				// if ( comparedTransform != nullptr && backtrackingTransform != nullptr
-				// 	&& comparedMove != nullptr && backtrackingMove != nullptr) {
                 boxColliderFlag = BoxCollider(backtrackingTransform->tPosition,
 											  comparedTransform->tPosition,
 											  backtrackingTransform->fScale,
@@ -99,7 +69,6 @@ namespace GLVM::ecs
 					                                  comparedTransform->tPosition,
 					                                  backtrackingTransform->fScale,
 													  comparedTransform->fScale);
-//				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
 					std::cout << "TEST 1" << std::endl;
@@ -116,7 +85,6 @@ namespace GLVM::ecs
                 }
 			}
 		}
-//		std::cout << "Size: " << componentManager->GetComponentContainer<cm::move>()->GetSize() << std::endl;
 	}
 
 }

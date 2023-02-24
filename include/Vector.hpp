@@ -180,7 +180,9 @@ namespace GLVM::core
 			return;
 
 		T& element = *(T*)&rowInnerData[(size - 1) * sizeof(T)];
-//		element = 0;                                                     ///< For debug purpouses only!!!
+		// if ( typeid(T).name() == typeid(unsigned int).name() ) {
+		// 	element = 0;                                                     ///< For debug purpouses only!!!
+		// }
 		element.~T();
 		--size;
 	}

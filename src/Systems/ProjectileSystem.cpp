@@ -1,4 +1,5 @@
 #include "Components/MaterialComponent.hpp"
+#include "Components/ProjectileComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include <Systems/ProjectileSystem.hpp>
 
@@ -43,48 +44,52 @@ namespace GLVM::ecs
             }
         }
 
-        core::vector<unsigned int>* pEntity_Container_refProjectile =
-			pComponent_Manager->GetEntityContainer<cm::projectile>();
-        unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
+        // core::vector<unsigned int>* pEntity_Container_refProjectile =
+		// 	pComponent_Manager->GetEntityContainer<cm::projectile>();
+        // unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
-        for(unsigned int x = 0; x < uiVector_Projectile_Size; ++x) {
-            unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[x];
+        ComponentManager* componentManager = ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::projectile,
+																					  cm::transform,
+																					  cm::material>();
+//		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		
+        for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
+            unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			if ( rTransformProjectile != nullptr )
-				rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
+			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
         }
 
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
-        for(unsigned int i = 0; i < pEntity_Container_refProjectile->GetSize(); ++i) {
+        for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
 
-            unsigned int uiEntity_refProjectile = (*pEntity_Container_refProjectile)[i];
+            unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
                 cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
-				if ( textureProjectile != nullptr )
-					TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);     
+				TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);     
             }
-			std::cout << "Size: " << pComponent_Manager->GetEntityContainer<cm::projectile>()->GetSize() << std::endl;
+			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
 			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
 			// std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
-			// std::cout << "Projectiles container size 1: " << pEntity_Container_refProjectile->GetSize() << std::endl;
-			// std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
-			// std::cout << "entity: " << uiEntity_refProjectile << std::endl;
+			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
+//			std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
+			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
         }
     }
 
     void CProjectileSystem::CalculateProjectile(ecs::ComponentManager* componentManager,
-                                              unsigned int entityRefMove,
+												unsigned int entityRefMove,
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
         
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
-                                                               cm::transform, cm::material,
-                                                               cm::projectile>(uiEntity_Projectile);
+															  cm::transform, cm::material,
+															  cm::projectile>(uiEntity_Projectile);
 
         // core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         // pSound_Sample->kPath_to_File_ = "../laser2.wav";
