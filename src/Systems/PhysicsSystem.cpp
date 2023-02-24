@@ -21,15 +21,10 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* componentManager = ComponentManager::GetInstance();
-        // core::vector<unsigned int>* entityContainerRefMove =
-		// 	componentManager->GetEntityContainer<cm::move>();
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::move,
 																					  cm::transform>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-
-//        unsigned int uiVector_Collider_Size = entityContainerRefMove->GetSize();
-
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i)
         {
                 unsigned int entityRefMove = linkedEntities[i];
@@ -37,24 +32,17 @@ namespace GLVM::ecs
 				cm::move* move = componentManager->GetComponent<cm::move>(entityRefMove);
 				cm::collider* collider = componentManager->GetComponent<cm::collider>(entityRefMove);
                 if(collider->bGround_Collision_) {
-					move->frameMovement[1] = 0.0f;
+					transformComponent->tPosition += move->frameMovement;
+					move->frameMovement = 0.0f;
+					componentManager->RemoveComponent<cm::move>(entityRefMove);
                     collider->bGround_Collision_ = false;
                 }
                 if(collider->bWall_Collision_) {
-					move->frameMovement[0] = 0.0f;
-					move->frameMovement[2] = 0.0f;					
-                    collider->bWall_Collision_ = false;
-                }
-					// std::cout << "vec: " << move->frameMovement[0] << " " << move->frameMovement[1] <<
-					// 	" " << move->frameMovement[2] << " For entity: " << entityRefMove << std::endl;
-					// unsigned int Size = entityContainerRefMove->GetSize();
-					// std::cout << "size 1: " << Size << std::endl;
 					transformComponent->tPosition += move->frameMovement;
 					move->frameMovement = 0.0f;
-//					std::cout << "i: " << i << std::endl;
 					componentManager->RemoveComponent<cm::move>(entityRefMove);
-				// Size = entityContainerRefMove->GetSize();
-				// std::cout << "size 2: " << Size << std::endl;
+                    collider->bWall_Collision_ = false;
+                }
         }
     }
 }

@@ -50,37 +50,37 @@ namespace GLVM::ecs
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						-Normalize(beholderComponent->forward - right) * cameraSpeed;
-					transformComponent->tPosition =
-						-Normalize(beholderComponent->forward - right) * cameraSpeed;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						Normalize(beholderComponent->forward - right) * cameraSpeed;
+					transformComponent->tPosition -=
+						Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						Normalize(beholderComponent->forward + right) * cameraSpeed;
-					transformComponent->tPosition =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-Normalize(beholderComponent->forward + right) * cameraSpeed;
+					transformComponent->tPosition +=
 						Normalize(beholderComponent->forward + right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						Normalize(beholderComponent->forward - right) * cameraSpeed;
-					transformComponent->tPosition =
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						-Normalize(beholderComponent->forward - right) * cameraSpeed;
+					transformComponent->tPosition +=
 						Normalize(beholderComponent->forward - right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				if(TestDiagonalMovement(inputStack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
-					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						-Normalize(beholderComponent->forward + right) * cameraSpeed;
-					transformComponent->tPosition =
-						-Normalize(beholderComponent->forward + right) * cameraSpeed;
+					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
+						Normalize(beholderComponent->forward + right) * cameraSpeed;
+					transformComponent->tPosition -=
+						Normalize(beholderComponent->forward + right) * cameraSpeed;
 					diagonalMovementFlag = true;
 				}
 				
