@@ -23,70 +23,57 @@
 
 namespace GLVM::ecs
 {
-    CMovementSystem::CMovementSystem(core::CStack& _input_Stack, core::Sound::ISoundEngine* _sound_Engine) :
-        Input_Stack_(_input_Stack), Sound_Engine_(_sound_Engine) {}
+    CMovementSystem::CMovementSystem(core::CStack& inputStack, core::Sound::ISoundEngine* soundEngine) :
+        Input_Stack_(inputStack), Sound_Engine_(soundEngine) {}
         
     void CMovementSystem::Update()
     {
 		namespace cm = GLVM::ecs::components;
 		namespace ct = GAME_MECHANICS::ECS::components;
-
-        CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
-        // core::vector<unsigned int>* controllerComponents =
-		// 	pComponent_Manager->GetEntityContainer<ct::controller>();
-        // unsigned int entitiesVectorSize = controllerComponents->GetSize();
-
-		core::vector<Entity> entitiesVector = pComponent_Manager->collectEntities<cm::collider, cm::beholder>();
-		unsigned int entitiesVectorSize = entitiesVector.GetSize();
-		// for ( unsigned int i = 0; i < vectorWithEntities.GetSize(); ++i)
-		// 	std::cout << vectorWithEntities[i] << std::endl;
 		
-        // core::vector<unsigned int>* pEntity_Container_refView =
-		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
+        CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities = pComponent_Manager->collectLinkedEntities<ct::controller, cm::beholder>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+        float cameraSpeed = 5.5f * deltaFrameTime;            
 
-        float cameraSpeed = 5.5f * _dOffset;            
-
-        for(unsigned int i = 0; i < entitiesVectorSize; ++i) {
+        for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
             for(int n = 0; n < 6; ++n) {
-                bool diagonalMovementAvailability = false;
+                bool diagonalMovementFlag = false;
 
-//                unsigned int currentEntity = (*controllerComponents)[i];
-				// unsigned int entityRefView = (*pEntity_Container_refView)[i];
-				Entity currentEntity                = entitiesVector[i];
+				Entity currentEntity                = linkedEntities[i];
 				cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
-//				cm::beholder* colliderComponent = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
 		
 				vec3 right;
-				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
+				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
-						-Normalize(beholderComponent->Front_Camera - right) * cameraSpeed;
-					diagonalMovementAvailability = true;
+						-Normalize(beholderComponent->forward - right) * cameraSpeed;
+					diagonalMovementFlag = true;
 				}
-				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
+				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
-						Normalize(beholderComponent->Front_Camera + right) * cameraSpeed;
-					diagonalMovementAvailability = true;
+						Normalize(beholderComponent->forward + right) * cameraSpeed;
+					diagonalMovementFlag = true;
 				}
-				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
+				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
-						Normalize(beholderComponent->Front_Camera - right) * cameraSpeed;
-					diagonalMovementAvailability = true;
+						Normalize(beholderComponent->forward - right) * cameraSpeed;
+					diagonalMovementFlag = true;
 				}
-				if(CompareDirection(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
+				if(TestDiagonalMovement(Input_Stack_, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT)) {
 					right = CalculatePerdendicularVectors(cameraSpeed, *beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement =
-						-Normalize(beholderComponent->Front_Camera + right) * cameraSpeed;
-					diagonalMovementAvailability = true;
+						-Normalize(beholderComponent->forward + right) * cameraSpeed;
+					diagonalMovementFlag = true;
 				}
 				
-                if(diagonalMovementAvailability)
+                if(diagonalMovementFlag)
                     break;
 
 				vec3 forward;
@@ -124,6 +111,9 @@ namespace GLVM::ecs
                 default:
                     break;
                 }
+				
+			  	// FIXME: FLASH LIGHT CRUTCH
+				
 				// core::vector<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
 				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
 				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
@@ -150,86 +140,44 @@ namespace GLVM::ecs
 //         }
     }
 
-    bool CMovementSystem::CompareDirection(core::CStack& _input_Stack,
-                                           core::EEvents _event0,
-                                           core::EEvents _event1) {
-		core::EEvents eTemp_Event0 = _input_Stack.SearchElement(_event0);
-        core::EEvents eTemp_Event1 = _input_Stack.SearchElement(_event1);
+    bool CMovementSystem::TestDiagonalMovement(core::CStack& inputStack,
+                                           core::EEvents event1,
+                                           core::EEvents event2) {
+		core::EEvents availableEvent1 = inputStack.SearchElement(event1);
+        core::EEvents availableEvent2 = inputStack.SearchElement(event2);
             
-        if((eTemp_Event0 == _event0) && (eTemp_Event1 == _event1))
+        if((availableEvent1 == event1) && (availableEvent2 == event2))
             return true;
         else
             return false;
     }
         
-    Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& _view_Component) {
-        Vector<float, 3> tNormalized_Vector = Normalize(Cross(_view_Component.Front_Camera, _view_Component.Up_Camera));
-        return tNormalized_Vector;
+    Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
+        Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, beholder.up));
+        return normalizedVector;
     }
 
-    Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& _view_Component,
-                                                        core::CEvent& _event) {
-        Vector<float, 3> front(0.0f);
-        front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-        front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-        _view_Component.Front_Camera = Normalize(front);
-        return _view_Component.Front_Camera;
+    Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& beholder,
+                                                        core::CEvent& event) {
+        Vector<float, 3> forward(0.0f);
+        forward[0] = std::cos(Radians(event.mousePointerPosition.yaw));
+        forward[2] = std::sin(Radians(event.mousePointerPosition.yaw));
+        beholder.forward = Normalize(forward);
+        return beholder.forward;
     }
 
     vec3 CMovementSystem::CalculatePerdendicularVectors(float speed,
                                                         components::beholder& beholder,
-                                                        core::CEvent& _event) {
+                                                        core::CEvent& event) {
 		vec3 right(0.0f);
-        vec3 front(0.0f);
-        beholder.Front_Camera[1] = 0.0f;
-        front[0] = std::cos(Radians(_event.mouse_Pointer_Position_.fYaw_));
-        front[2] = std::sin(Radians(_event.mouse_Pointer_Position_.fYaw_));
-        beholder.Front_Camera = Normalize(front) * speed;
-        right = Normalize(Cross(beholder.Front_Camera, beholder.Up_Camera)) * speed;
+        vec3 forward(0.0f);
+        beholder.forward[1] = 0.0f;                                ///< Movement must be only in horizontal vector.
+        forward[0] = std::cos(Radians(event.mousePointerPosition.yaw));
+        forward[2] = std::sin(Radians(event.mousePointerPosition.yaw));
+        beholder.forward = Normalize(forward) * speed;
+        right = Normalize(Cross(beholder.forward, beholder.up)) * speed;
 		return right;
     }
-        
-    // bool CMovementSystem::FixDiagonalMove(core::CStack& _input_Stack,
-    //                                       components::transform& _transform_Component,
-    //                                       float _camera_Speed,
-    //                                       components::beholder& _view_Component,
-	// 									  components::move& moveComponent,
-    //                                       core::CEvent& _event) {
-	// 	namespace cm = GLVM::ecs::components;
-    //     CComponentManager* pComponent_Manager = GLVM::ecs::CComponentManager::GetInstance();		
-    //     Vector<float, 3> temp_Vector(0.0f);
-    //     if(CompareDirection(_input_Stack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_RIGHT))
-    //     {
-    //         CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-    //         _transform_Component.tPosition -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
-	// 		pComponent_Manager->CreateComponent<cm::move>(iEntity_refMove);
-	// 		pComponent_Manager->GetComponent<cm::move>(iEntity_refMove).frameHorizontalMovement
-	// 			_transform_Component.frameHorizontalMovement += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
-    //         return true;
-    //     }
-    //     if(CompareDirection(_input_Stack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_RIGHT))
-    //     {
-    //         CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-    //         _transform_Component.tPosition += Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
-	// 		_transform_Component.frameHorizontalMovement -= Normalize(temp_Vector + _view_Component.Front_Camera) * _camera_Speed;
-    //         return true;
-    //     }
-    //     if(CompareDirection(_input_Stack, core::EEvents::eMOVE_FORWARD, core::EEvents::eMOVE_LEFT))
-    //     {
-    //         CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-    //         _transform_Component.tPosition += Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
-	// 		_transform_Component.frameHorizontalMovement -= Normalize(_view_Component.Front_Camera - temp_Vector) * _camera_Speed;
-    //         return true;
-    //     }
-    //     if(CompareDirection(_input_Stack, core::EEvents::eMOVE_BACKWARD, core::EEvents::eMOVE_LEFT))
-    //     {
-    //         CalculatePerdendicularVectors(_camera_Speed, _view_Component, _event, temp_Vector);
-    //         _transform_Component.tPosition -= Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
-	// 		_transform_Component.frameHorizontalMovement += Normalize(_view_Component.Front_Camera + temp_Vector) * _camera_Speed;
-    //         return true;
-    //     }
-    //     return false;
-    // }
 }
 
 

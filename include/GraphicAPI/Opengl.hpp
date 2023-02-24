@@ -78,7 +78,7 @@ namespace GLVM::core {
 		std::vector<unsigned int> sampledSpotLightEntityIDcontainer;
 		float borderColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f }; ///< Border color for fix shadow issue in flat shadow map in long range.
 		float fYaw   = -90.0f;
-        float fPitch = 0.0f;
+        float pitch = 0.0f;
 		mat4 spotLightSpaceMatrixContainer[8];
 		mat4 directionalLightSpaceMatrixContainer[4];
 		float nearPlaneFlatShadowMap = 1.0f;
@@ -132,7 +132,7 @@ namespace GLVM::core {
 		mat4 SetModelMatrix(ecs::components::transform& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;
 		void SetProjectionMatrix(mat4 _projectionMatrix) override;
-		void ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& _Player, ecs::components::beholder& _view_Component);
+		void ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder);
 		void ComputeProjectionMatrix(Shader* shaderProgram);
 		void renderScene(const Shader& shader);
 		void renderCube();

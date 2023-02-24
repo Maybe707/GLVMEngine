@@ -101,7 +101,7 @@ namespace GLVM::ecs
         }
 
         template <typename componentType, typename... Args>
-		core::vector<Entity> collectEntities() {
+		core::vector<Entity> collectLinkedEntities() {
 			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
 				( worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()] );
 

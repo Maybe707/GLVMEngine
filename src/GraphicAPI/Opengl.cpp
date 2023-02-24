@@ -697,39 +697,39 @@ namespace GLVM::core
 		loadWavefrontObj();
 	}
 
-	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& _Player, ecs::components::beholder& _view_Component)
+	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
     {
-        Matrix<float, 4> tView_Matrix(1.0f);
+        Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
-        fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
-        fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
+        fYaw = g_eEvent.mousePointerPosition.offset_X;
+        pitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
-        fPitch *= kSensitivity;
+        pitch *= kSensitivity;
 
-        g_eEvent.mouse_Pointer_Position_.fPitch_ = fPitch;
-        g_eEvent.mouse_Pointer_Position_.fYaw_ = fYaw;
+        g_eEvent.mousePointerPosition.pitch = pitch;
+        g_eEvent.mousePointerPosition.yaw = fYaw;
         
-        if(fPitch > 89.0f)
-            fPitch = 89.0f;
-        if(fPitch < -89.0f)
-            fPitch = -89.0f;
+        if(pitch > 89.0f)
+            pitch = 89.0f;
+        if(pitch < -89.0f)
+            pitch = -89.0f;
 		vec3 front;
-        front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
-        front[1] = std::sin(Radians(fPitch));
-        front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-        _view_Component.Front_Camera = Normalize(front);
+        front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));
+        front[1] = std::sin(Radians(pitch));
+        front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));
+        beholder.forward = Normalize(front);
 
-        tView_Matrix = LookAtMain(_Player.tPosition,
-								  _Player.tPosition + _view_Component.Front_Camera,
-								  _view_Component.Up_Camera);
+        viewMatrix = LookAtMain(player.tPosition,
+								  player.tPosition + beholder.forward,
+								  beholder.up);
 
 
  		// _view_Component.Position[0] = _Player.tPosition[0];
 		// _view_Component.Position[1] = _Player.tPosition[1];
 		// _view_Component.Position[2] = _Player.tPosition[2];
 
-		shaderProgram->SetMat4("viewMatrix", tView_Matrix);
+		shaderProgram->SetMat4("viewMatrix", viewMatrix);
     }
 
 	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {

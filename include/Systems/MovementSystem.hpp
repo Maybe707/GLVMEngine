@@ -23,7 +23,7 @@ namespace GLVM::ecs
 	{
 	public:
         float                      fProjectile_Accumulator_ = 2.0f; 
-		float                      _dOffset;
+		float                      deltaFrameTime;
         core::CStack&              Input_Stack_;
         core::Sound::ISoundEngine* Sound_Engine_;
 
@@ -33,28 +33,18 @@ namespace GLVM::ecs
         float fLast_Y     = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         
-        CMovementSystem( core::CStack& _input_Stack, core::Sound::ISoundEngine* _sound_Engine );
+        CMovementSystem( core::CStack& inputStack, core::Sound::ISoundEngine* soundEngine );
 
 		void Update();
-        void CalculateProjectile( ecs::CComponentManager* pComponent_Manager,
-                                  unsigned int iEntity_refMove,
-                                  components::beholder& view_Component );
-        
-        bool CompareDirection(core::CStack& _input_Stack,
-                              core::EEvents _event0,
-                              core::EEvents _event1);
-        Vector<float, 3> CalculateVectorRL(components::beholder& _view_Component);
-        Vector<float, 3> CalculateVectorFB(components::beholder& _view_Component,
-                                           core::CEvent& _event);
+        bool TestDiagonalMovement(core::CStack& inputStack,
+                              core::EEvents event1,
+                              core::EEvents event2);
+        Vector<float, 3> CalculateVectorRL(components::beholder& beholder);
+        Vector<float, 3> CalculateVectorFB(components::beholder& beholder,
+                                           core::CEvent& event);
         vec3 CalculatePerdendicularVectors(float speed,
                                            components::beholder& beholder,
-                                           core::CEvent& _event);
-        bool FixDiagonalMove(core::CStack& _input_Stack,
-							 components::transform& _transform_Component,
-							 float _camera_Speed,
-							 components::beholder& _view_Component,
-							 components::move& moveComponent,
-							 core::CEvent& _event);
+                                           core::CEvent& event);
 	};
 }
 

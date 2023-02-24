@@ -4,7 +4,7 @@
 
 namespace GLVM::ecs
 {
-    CProjectileSystem::CProjectileSystem(core::CStack& _input_Stack) : Input_Stack_ (_input_Stack)
+    CProjectileSystem::CProjectileSystem(core::CStack& inputStack) : inputStack (inputStack)
     {}
     
     void CProjectileSystem::Update()
@@ -23,21 +23,21 @@ namespace GLVM::ecs
         unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
         cm::beholder* view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
-        float cameraSpeed = 5.5f * _dOffset;            
+        float cameraSpeed = 5.5f * deltaFrameTime;            
 
-        if(fProjectile_Accumulator_ > 0)
-            fProjectile_Accumulator_ -= cameraSpeed;
+        if(projectileCooldown > 0)
+            projectileCooldown -= cameraSpeed;
 
         for(unsigned int i = 0; i < u_iVector_Move_Size; ++i) {
             for(int n = 0; n < 6; ++n) {
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
                 
-                if(Input_Stack_.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
-                    if(fProjectile_Accumulator_ <= 0) {
+                if(inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
+                    if(projectileCooldown <= 0) {
                         CalculateProjectile(pComponent_Manager,
                                             iEntity_refMove,
                                             *view_Component);
-                        fProjectile_Accumulator_ = 2.0;
+                        projectileCooldown = 2.0;
                     }
                 }
             }
@@ -75,9 +75,9 @@ namespace GLVM::ecs
         }
     }
 
-    void CProjectileSystem::CalculateProjectile(ecs::CComponentManager* pComponent_Manager,
-                                              unsigned int iEntity_refMove,
-												components::beholder& view_Component) {
+    void CProjectileSystem::CalculateProjectile(ecs::CComponentManager* componentManager,
+                                              unsigned int entityRefMove,
+												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
         GLVM::ecs::CTextureManager* TextureSystem = GLVM::ecs::CTextureManager::GetInstance();
         
@@ -91,8 +91,8 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
-		pComponent_Manager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
-		cm::material* rTextureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_Projectile);
+		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
+		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
@@ -100,31 +100,30 @@ namespace GLVM::ecs
         // rTextureProjectile.iHeight_ = 128;
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
-        cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_Projectile);
+        cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
         rTransformProjectile->fScale = 0.1f;
 //        Vector<float, 3> vec(0.0f);
 		
-		cm::transform* transform = pComponent_Manager->GetComponent<cm::transform>(iEntity_refMove);
+		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
 		if ( transform != nullptr )
 			rTransformProjectile->tPosition = transform->tPosition;
 		
-        rTransformProjectile->tForward = GetDirectionVector(view_Component);
+        rTransformProjectile->tForward = GetDirectionVector(beholder);
 
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
     
-    Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& _view_Component)
+    Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
     {
-        Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.1f;
 
-        fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
-        fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
+        fYaw = g_eEvent.mousePointerPosition.offset_X;
+        fPitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
         fPitch *= kSensitivity;
 
-        g_eEvent.mouse_Pointer_Position_.fPitch_ = fPitch;
-        g_eEvent.mouse_Pointer_Position_.fYaw_ = fYaw;
+        g_eEvent.mousePointerPosition.pitch = fPitch;
+        g_eEvent.mousePointerPosition.yaw = fYaw;
         
         if(fPitch > 89.0f)
             fPitch = 89.0f;
@@ -135,8 +134,8 @@ namespace GLVM::ecs
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-        _view_Component.Front_Camera = Normalize(front);
+        beholder.forward = Normalize(front);
 
-        return _view_Component.Front_Camera;
+        return beholder.forward;
     }
 }

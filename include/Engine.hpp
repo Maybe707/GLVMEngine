@@ -71,7 +71,7 @@ namespace GLVM::core
 		Time::IChrono       * Chrono_;
         Sound::ISoundEngine * Sound_Engine_;
 
-		float              fDelta_Time_;
+		float              deltaFrameTime;
 		CStack             Input_Stack_;
         ecs::CRenderSystem * Render_System_Interface_;
         

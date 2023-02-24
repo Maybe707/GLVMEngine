@@ -26,18 +26,18 @@ namespace GLVM::ecs
         }
     }
     
-    void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& _view_Component)
+    void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& cameraComponent)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
         const float kSensitivity = 0.05f;
 
-        fYaw = g_eEvent.mouse_Pointer_Position_.iOffset_X;
-        fPitch = g_eEvent.mouse_Pointer_Position_.iOffset_Y;
+        fYaw = g_eEvent.mousePointerPosition.offset_X;
+        fPitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
         fPitch *= kSensitivity;
 
-        g_eEvent.mouse_Pointer_Position_.fPitch_ = fPitch;
-        g_eEvent.mouse_Pointer_Position_.fYaw_ = fYaw;
+        g_eEvent.mousePointerPosition.pitch = fPitch;
+        g_eEvent.mousePointerPosition.yaw = fYaw;
         
         if(fPitch > 89.0f)
             fPitch = 89.0f;
@@ -48,7 +48,7 @@ namespace GLVM::ecs
         front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
         front[1] = std::sin(Radians(fPitch));
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-        _view_Component.Front_Camera = Normalize(front);
+        cameraComponent.forward = Normalize(front);
 
         // tView_Matrix = LookAtMain(_Player.tPosition,
 		// 						  _Player.tPosition + _view_Component.Front_Camera,
@@ -56,12 +56,12 @@ namespace GLVM::ecs
 
 		tView_Matrix = LookAtMain(_Player.tPosition,
 								  vec3(0.0f, 0.0f, 0.0f),
-								  _view_Component.Up_Camera);
+								  cameraComponent.up);
 
 		
- 		_view_Component.Position[0] = _Player.tPosition[0];
-		_view_Component.Position[1] = _Player.tPosition[1];
-		_view_Component.Position[2] = _Player.tPosition[2];
+ 		cameraComponent.Position[0] = _Player.tPosition[0];
+		cameraComponent.Position[1] = _Player.tPosition[1];
+		cameraComponent.Position[2] = _Player.tPosition[2];
 
 		Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();

@@ -43,12 +43,12 @@ namespace GLVM::core
 
     struct SMousePointerPosition
     {
-        int iPosition_X;
-        int iPosition_Y;
-        int iOffset_X = 0;
-        int iOffset_Y = 0;
-        float fPitch_;
-        float fYaw_;
+        int position_X;
+        int position_Y;
+        int offset_X = 0;
+        int offset_Y = 0;
+        float pitch;
+        float yaw;
     };
     
     /*! \class Event
@@ -60,7 +60,7 @@ namespace GLVM::core
         EEvents eEvent_;
     
     public:
-        SMousePointerPosition mouse_Pointer_Position_;
+        SMousePointerPosition mousePointerPosition;
         
         CEvent();
         EEvents& GetEvent();

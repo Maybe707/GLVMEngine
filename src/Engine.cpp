@@ -68,7 +68,7 @@ namespace GLVM::core
 		pProjectile_System_      = new ecs::CProjectileSystem(Input_Stack_);
 //		pCamera_System           = new ecs::CCameraSystem();
         
-		fDelta_Time_             = 0.0;
+		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
     }
 
@@ -106,7 +106,7 @@ namespace GLVM::core
 		
 		while(bGame_Loop_Active)
 		{
-			fDelta_Time_ = Chrono_->GetElapsed();
+			deltaFrameTime = Chrono_->GetElapsed();
 			Chrono_->Reset();
 
 //			FPScounter();
@@ -125,16 +125,16 @@ namespace GLVM::core
 			//            Input_Stack_.PrintStack();
             
 			((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->
-				Window.CursorLock(g_eEvent.mouse_Pointer_Position_.iPosition_X,
-								  g_eEvent.mouse_Pointer_Position_.iPosition_Y,
-								  &g_eEvent.mouse_Pointer_Position_.iOffset_X,
-								  &g_eEvent.mouse_Pointer_Position_.iOffset_Y);
+				Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
+								  g_eEvent.mousePointerPosition.position_Y,
+								  &g_eEvent.mousePointerPosition.offset_X,
+								  &g_eEvent.mousePointerPosition.offset_Y);
 
-			Movement_System->_dOffset                     = fDelta_Time_;
-			Collision_System->fDelta_Time_                = fDelta_Time_;
-			pProjectile_System_->_dOffset                 = fDelta_Time_;
-			Physics_System_->fDelta_Time_                 = fDelta_Time_;
-			Physics_System_->fAcceleration_of_Gravity_   += (fDelta_Time_ / 20);
+			Movement_System->deltaFrameTime               = deltaFrameTime;
+			Collision_System->fDelta_Time_                = deltaFrameTime;
+			pProjectile_System_->deltaFrameTime           = deltaFrameTime;
+			Physics_System_->fDelta_Time_                 = deltaFrameTime;
+			Physics_System_->fAcceleration_of_Gravity_   += (deltaFrameTime / 20);
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
 //			pCamera_System->Render_System_                = Render_System_Interface_;
@@ -148,7 +148,7 @@ namespace GLVM::core
 
 	void CEngine::FPScounter() {
 		++fpsCounter;
-		fpsAccumulator += fDelta_Time_;
+		fpsAccumulator += deltaFrameTime;
 		if (fpsAccumulator > 1.0f) {
 			std::cout << "FPS: " << fpsCounter << std::endl;
 			fpsCounter = 0;
