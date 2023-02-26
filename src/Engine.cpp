@@ -138,10 +138,9 @@ namespace GLVM::core
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
 //			pCamera_System->Render_System_                = Render_System_Interface_;
-            
+			std::cout << "Frame" << std::endl;
 			pSystem_Manager->Update();
 			((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.SwapBuffers();
-            
 			//            g_Sound_Engine.SoundStream();
 		}
     }

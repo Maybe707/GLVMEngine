@@ -136,7 +136,11 @@ namespace GLVM::core
             }
             return false;
         }
+
+		void Clear() {
+			for ( int i = 0; i < iHead_; ++i)
+				aStack_[i] = EEvents::eDEFAULT;
+		}
 	};
-	
 }
 #endif

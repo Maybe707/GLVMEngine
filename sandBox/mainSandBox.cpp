@@ -59,9 +59,11 @@ void Spawn2::func() {
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
 	Spawn obj;
+	Spawn2 obj2;
 	Interface* interface = &obj;
 	
-	((Spawn2*)interface)->func();
+	if ( dynamic_cast<Spawn*>(interface) == nullptr )
+		std::cout << "Null pointer" << std::endl;
 
 
 
@@ -115,15 +117,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 	// new(ptr0) Component0(obj1);
 		
 	// std::cout << ptr0->value << std::endl;
-	GLVM::core::vector<std::string> vector;
-	func<int>(vector);
+	// GLVM::core::vector<std::string> vector;
+	// func<int>(vector);
 
-	char symbol = 'a';
+	// char symbol = 'a';
 
-	if ( vector[0] == typeid(int).name() )
-		std::cout << (int)symbol << std::endl;
+	// if ( vector[0] == typeid(int).name() )
+	// 	std::cout << (int)symbol << std::endl;
 	
-
+	
 	
 	return 0;
 }

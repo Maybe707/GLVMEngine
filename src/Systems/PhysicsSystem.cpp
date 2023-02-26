@@ -39,8 +39,10 @@ namespace GLVM::ecs
 					transformComponent->tPosition += move->frameMovement;
                     collider->bWall_Collision_ = false;
                 }
+				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;
 				componentManager->RemoveComponent<cm::move>(entityRefMove);
         }
     }
 }
+

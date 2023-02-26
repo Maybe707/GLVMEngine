@@ -28,14 +28,8 @@ namespace GLVM::ecs
         CMovementSystem( core::CStack& inputStack );
 
 		void Update();
-        bool TestDiagonalMovement(core::CStack& inputStack,
-                              core::EEvents event1,
-                              core::EEvents event2);
         Vector<float, 3> CalculateVectorRL(components::beholder& beholder);
         Vector<float, 3> CalculateVectorFB(components::beholder& beholder,
-                                           core::CEvent& event);
-        vec3 CalculatePerdendicularVectors(float speed,
-                                           components::beholder& beholder,
                                            core::CEvent& event);
 	};
 }

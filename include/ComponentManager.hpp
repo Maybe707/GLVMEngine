@@ -186,7 +186,7 @@ namespace GLVM::ecs
 
 			if ( checkAvailability( sparse, dense, entity ) ) {
 				assert( dense.GetSize() == components.GetSize() );
-				std::cout << "DELETE: " << typeid(componentType).name() << std::endl;
+//				std::cout << "DELETE: " << typeid(componentType).name() << std::endl;
 				Entity indexInDenseOfRemovableEntity = sparse[entity];
 				Entity indexInSparseOfSwapableEntity = dense.GetHead();
 				const componentType& componentFromLastIndex = components.GetHead();
@@ -199,6 +199,8 @@ namespace GLVM::ecs
 		}
 		
 		void RemoveAllComponents(Entity& entity) {
+			// TODO: DYNAMIC CAST THAT CAN RETURN 0 IF CANT CAST
+			
 			// for ( unsigned int i = 0; i < worldComponentsContainer.GetSize(); ++i ) {
 			// 	core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
 			// 		(worldSparseEntitiesMapToComponents[i]);
@@ -222,54 +224,54 @@ namespace GLVM::ecs
 			// }
 			
 			for ( unsigned int i = 0; i < worldComponentsContainer.GetSize(); ++i ) {
-				std::cout << "iteration: " << i << std::endl;
+//				std::cout << "iteration: " << i << std::endl;
 				if ( componentsTypes[i] == typeid(components::transform).name() ) {
-					std::cout << "transform from container: " << componentsTypes[i] << std::endl;
-					std::cout << "transform from typeid: " << typeid(components::transform).name() << std::endl;
+					// std::cout << "transform from container: " << componentsTypes[i] << std::endl;
+					// std::cout << "transform from typeid: " << typeid(components::transform).name() << std::endl;
 					RemoveComponent<components::transform>(entity);
-					std::cout << "Delete transform" << std::endl;
+//					std::cout << "Delete transform" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::beholder).name() ) {
 					RemoveComponent<components::beholder>(entity);
-					std::cout << "Delete beholder" << std::endl;
+//					std::cout << "Delete beholder" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::animation).name() ) {
 					RemoveComponent<components::animation>(entity);
-					std::cout << "Delete animation" << std::endl;
+//					std::cout << "Delete animation" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::collider).name() ) {
 					RemoveComponent<components::collider>(entity);
-					std::cout << "Delete collider" << std::endl;
+//					std::cout << "Delete collider" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::crosshair).name() ) {
 					RemoveComponent<components::crosshair>(entity);
-					std::cout << "Delete crosshair" << std::endl;
+//					std::cout << "Delete crosshair" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::directionalLight).name() ) {
 					RemoveComponent<components::directionalLight>(entity);
-					std::cout << "Delete directional light" << std::endl;
+//					std::cout << "Delete directional light" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::pointLight).name() ) {
 					RemoveComponent<components::pointLight>(entity);
-					std::cout << "Delete point light" << std::endl;
+//					std::cout << "Delete point light" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::spotLight).name() ) {
 					RemoveComponent<components::spotLight>(entity);
-					std::cout << "Delete spot light" << std::endl;
+//					std::cout << "Delete spot light" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::event).name() ) {
 					RemoveComponent<components::event>(entity);
-					std::cout << "Delete event" << std::endl;
+//					std::cout << "Delete event" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::material).name() ) {
 					RemoveComponent<components::material>(entity);
-					std::cout << "Delete material" << std::endl;
+//					std::cout << "Delete material" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::move).name() ) {
 					RemoveComponent<components::move>(entity);
-					std::cout << "Delete move" << std::endl;
+//					std::cout << "Delete move" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::vertex).name() ) {
 					RemoveComponent<components::vertex>(entity);
-					std::cout << "Delete vertex" << std::endl;
+//					std::cout << "Delete vertex" << std::endl;
 				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::controller).name() ) {
 					RemoveComponent<GAME_MECHANICS::ECS::components::controller>(entity);
-					std::cout << "Delete controller" << std::endl;
+//					std::cout << "Delete controller" << std::endl;
 				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::Attack).name() ) {
 					RemoveComponent<GAME_MECHANICS::ECS::components::Attack>(entity);
-				 	std::cout << "Delete attack" << std::endl;
+//				 	std::cout << "Delete attack" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::projectile).name() ) {
 					RemoveComponent<components::projectile>(entity);
-				 	std::cout << "Delete projectile" << std::endl;
+//				 	std::cout << "Delete projectile" << std::endl;
 				} else {
 					continue;
 				}

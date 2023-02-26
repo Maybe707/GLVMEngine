@@ -60,7 +60,7 @@ namespace GLVM::ecs
 					GetComponent<cm::transform>(comparedEntityRefCollider);
 
 				bool boxColliderFlag;
-				bool upperActorCheckFlag = false;;
+				bool upperActorCheckFlag = false;
                 boxColliderFlag = BoxCollider(backtrackingTransform->tPosition,
 											  comparedTransform->tPosition,
 											  backtrackingTransform->fScale,
@@ -71,18 +71,19 @@ namespace GLVM::ecs
 													  comparedTransform->fScale);
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
-					std::cout << "TEST 1" << std::endl;
+//					std::cout << "TEST 1" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
                     componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bGround_Collision_ = true;
                     continue;
                 }
                     
                 if(boxColliderFlag) {
-					std::cout << "TEST 2" << std::endl;
+//					std::cout << "TEST 2" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
                     componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bWall_Collision_ = true;
                     continue;
                 }
+//				std::cout << "No collissions" << std::endl;
 			}
 		}
 	}

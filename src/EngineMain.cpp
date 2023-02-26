@@ -108,6 +108,15 @@ int main()
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch3, materialWitch3->diffuseTextureID_);
 
+	Entity uiWitch4 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch4);
+	ComponentManager->GetComponent<cm::vertex>(uiWitch4)->vkVertexId_ = 0;
+	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { 7.7f, 3.5f, 5.0f }, .fScale = 3.0f };
+	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
+	*materialWitch4 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
+    TextureManager->BindTexture(uiWitch4, materialWitch4->diffuseTextureID_);
+	
     // Entity u_iHud1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
     // ComponentManager->GetComponent<cm::vertex>(u_iHud1).vkVertexId_ = 0;
