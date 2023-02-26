@@ -162,11 +162,10 @@ namespace GLVM::ecs
 				Entity componentIndex = sparse[entity];
 				return &components[componentIndex];
 			} else {
-				componentType* nullPtrComponent = nullptr;
-				return nullPtrComponent;
+				return nullptr;
 			}
         }
-        
+
         /**************************************************************************************
          * Dont need to delete real component in this method. Because systems dont work with
          * component without indices for that component in ordered container.

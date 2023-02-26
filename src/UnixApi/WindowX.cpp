@@ -245,6 +245,7 @@ namespace GLVM::core
 					_Event.SetEvent(EEvents::eMOVE_FORWARD);
 					break;
                 case XK_space:
+					std::cout << "Jump" << std::endl;
                     _Event.SetEvent(EEvents::eJUMP);
                     break;
 				}
