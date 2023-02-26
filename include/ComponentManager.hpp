@@ -2,7 +2,7 @@
 #define COMPONENT_MANAGER
 
 #include "Components/AnimationMoveComponent.hpp"
-#include "Components/Attack.hpp"
+#include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
@@ -266,8 +266,8 @@ namespace GLVM::ecs
 				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::controller).name() ) {
 					RemoveComponent<GAME_MECHANICS::ECS::components::controller>(entity);
 //					std::cout << "Delete controller" << std::endl;
-				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::Attack).name() ) {
-					RemoveComponent<GAME_MECHANICS::ECS::components::Attack>(entity);
+				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::attack).name() ) {
+					RemoveComponent<GAME_MECHANICS::ECS::components::attack>(entity);
 //				 	std::cout << "Delete attack" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::projectile).name() ) {
 					RemoveComponent<components::projectile>(entity);
