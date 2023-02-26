@@ -9,6 +9,7 @@ namespace GLVM::ecs::components
 	{
     public:
         bool bGround_Collision_ = false;
+		bool roofCollision = false;
         bool bWall_Collision_ = false;
 	};
 }

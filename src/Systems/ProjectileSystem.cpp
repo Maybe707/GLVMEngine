@@ -76,12 +76,12 @@ namespace GLVM::ecs
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
 				--linkedEntitiesVectorSize;
             }
-			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
-			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
+			// std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
+			// pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
 			// std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
-			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
+//			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
 //			std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
-			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
+//			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
         }
     }
 

@@ -73,7 +73,7 @@ namespace GLVM::ecs
 				if(upperActorCheckFlag && boxColliderFlag) {
 //					std::cout << "TEST 1" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
-                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bGround_Collision_ = true;
+                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->roofCollision = true;
                     continue;
                 }
                     

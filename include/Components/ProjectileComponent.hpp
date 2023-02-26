@@ -9,6 +9,7 @@ namespace GLVM::ecs::components
     class projectile
     {
     public:
+		unsigned int owner;
         bool bCollision_Status_ = false;
         float fDamage_;
         float fSpeed_;
