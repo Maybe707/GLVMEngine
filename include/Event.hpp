@@ -12,8 +12,7 @@ namespace GLVM::core
         \brief Realise event event types.
     */
 
-    enum
-    EEvents
+    enum EEvents
     {
 		eDEFAULT,
 		eKEYRELEASE_A,

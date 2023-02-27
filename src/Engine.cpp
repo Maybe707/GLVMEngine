@@ -44,19 +44,18 @@ namespace GLVM::core
     Engine* Engine::pInstance_ = nullptr;
     std::mutex Engine::Mutex_;
 
-    void PlaybackSound(Sound::ISoundEngine* _sound_Engine)
-    {
+    void PlaybackSound(Sound::ISoundEngine* _sound_Engine) {
 		//        _sound_Engine->SetMasterVolume(10);
-        while(1)
-		{
+        while(1) {
 			_sound_Engine->SoundStream();
 		}
     }
     
-    Engine::Engine()
-    {
+    Engine::Engine() {
 		//		Window_             = CWindowCreator().Create();
 		//   Render_System_Interface_ = new ecs::CRenderSystem();
+		// TODO: Remove render system interface and make both renderers to be a systems that user can
+		// handle and using those methods for setting up texture and mesh data.
 		renderSystemInterface    = new ecs::CRenderSystem();
 		chrono                   = Time::CTimerCreator().Create();
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
@@ -74,18 +73,15 @@ namespace GLVM::core
 
     Engine::~Engine() {}
             
-    Engine* Engine::GetInstance()
-    {
+    Engine* Engine::GetInstance() {
 		std::lock_guard<std::mutex> lock(Mutex_);
-		if(pInstance_ == nullptr)
-		{
+		if(pInstance_ == nullptr) {
 			pInstance_ = new Engine();
 		}
 		return pInstance_;
     }
 
-    void Engine::GameLoop()
-    {
+    void Engine::GameLoop() {
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 		bool bGame_Loop_Active = true;
 
