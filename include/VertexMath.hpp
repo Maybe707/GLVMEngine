@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <ostream>
 
 #define PI 3.14159265
 
@@ -150,7 +151,19 @@ public:
     void operator+=(Vector<T2, var2> _vector);
     Vector<T2, var2> operator*(T2 _scalar);
 	Vector<T2, var2> operator-();
+	T2 Length() const;
 };
+
+template <class T2, int var2>
+T2 Vector<T2, var2>::Length() const { 
+	return std::sqrt(m_vector[0] * m_vector[0] + m_vector[1] * m_vector[1] + m_vector[2] * m_vector[2]);		
+}
+
+template <class T2, int var2>
+std::ostream& operator<<(std::ostream& ostream, const Vector<T2, var2>& vector) {
+	ostream << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << " length: " << vector.Length();
+	return ostream;
+}
 
 template <class T2, int var2>
 Vector<T2, var2> Vector<T2, var2>::operator-() {
@@ -388,6 +401,9 @@ T VectorLength(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 template <typename T>
 Vector<T, 3> Normalize(Vector<T, 3> _vector)
 {
+	if (_vector[0] == 0 && _vector[1] == 0 && _vector[2] == 0)
+		return vec3 { 0.0f, 0.0f, 0.0f }; 
+	
     float range = std::sqrt(_vector[0]*_vector[0] + _vector[1]*_vector[1] + _vector[2]*_vector[2]);
 	for(int l = 0; l < 3; ++l)
 		_vector[l] = _vector[l]/range;

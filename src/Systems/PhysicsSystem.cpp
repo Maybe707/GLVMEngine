@@ -8,6 +8,7 @@
 #include "EntityManager.hpp"
 #include "Event.hpp"
 #include "Globals.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ecs
 {
@@ -24,6 +25,7 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::move,
 																					  cm::transform>();
+		float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i)
         {
@@ -36,7 +38,8 @@ namespace GLVM::ecs
                     collider->bGround_Collision_ = false;
                 }
                 if(collider->bWall_Collision_) {
-					transformComponent->tPosition += move->frameMovement;
+					std::cout << "move: " << Normalize(move->frameMovement) << std::endl;
+					transformComponent->tPosition += Normalize(move->frameMovement) * cameraSpeed;
                     collider->bWall_Collision_ = false;
                 }
 				move->gravity       = 0.0f;

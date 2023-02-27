@@ -19,6 +19,7 @@
 #include "ISoundEngine.hpp"
 #include "Stack.hpp"
 #include "Vector.hpp"
+#include "VertexMath.hpp"
 #include <cstdio>
 
 namespace GLVM::ecs
@@ -39,12 +40,14 @@ namespace GLVM::ecs
         float cameraSpeed = 5.5f * deltaFrameTime;            
 
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			// std::cout << "i: " << i << std::endl;
+			// std::cout << "size: " << linkedEntitiesVectorSize << std::endl;
+			Entity currentEntity                = linkedEntities[i];
+			cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
+			cm::transform* transformComponent   = pComponent_Manager->GetComponent<cm::transform>(currentEntity);
+			vec3 result = { 0.0f, 0.0f, 0.0f };
+			
             for(int n = 0; n < 6; ++n) {
-
-				Entity currentEntity                = linkedEntities[i];
-				cm::beholder* beholderComponent     = pComponent_Manager->GetComponent<cm::beholder>(currentEntity);
-				cm::transform* transformComponent   = pComponent_Manager->GetComponent<cm::transform>(currentEntity);
-
 				vec3 right;
 				vec3 forward;
                 switch(inputStack[n])
@@ -54,28 +57,28 @@ namespace GLVM::ecs
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						right * cameraSpeed;
-					transformComponent->tPosition -= right * cameraSpeed;
+					result -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*beholderComponent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-right * cameraSpeed;
-					transformComponent->tPosition += right * cameraSpeed;
+					result += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						forward * cameraSpeed;
-					transformComponent->tPosition -= forward * cameraSpeed;
+					result -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-forward * cameraSpeed;
-					transformComponent->tPosition += forward * cameraSpeed;
+					result += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
@@ -84,7 +87,6 @@ namespace GLVM::ecs
                 default:
                     break;
                 }
-				
 			  	// FIXME: FLASH LIGHT CRUTCH
 				
 				// core::vector<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
@@ -96,6 +98,17 @@ namespace GLVM::ecs
 				// 	spotLightComponent.position  = rTransformComponent.tPosition;
 				// }
             }
+			// std::cout << "x: " << transformComponent->tPosition[0] << std::endl;
+			// std::cout << "y: " << transformComponent->tPosition[1] << std::endl;
+			// std::cout << "z: " << transformComponent->tPosition[2] << std::endl;
+
+			std::cout << "position: " << Normalize(result) * cameraSpeed << std::endl;
+			transformComponent->tPosition += Normalize(result) * cameraSpeed;
+
+			// std::cout << "x: " << transformComponent->tPosition[0] << std::endl;
+			// std::cout << "y: " << transformComponent->tPosition[1] << std::endl;
+			// std::cout << "z: " << transformComponent->tPosition[2] << std::endl;
+
         }
 		// FIXME: NO NEED TO HAVE SPECIAL FIELD FOR GRAVITY FRAME MOVEMENT
         for(unsigned int n = 0; n < pComponent_Manager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
