@@ -63,7 +63,7 @@ namespace GLVM::core
 		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
 		GUI_System               = new ecs::CGUISystem();
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
-		physicsSystem            = new ecs::CPhysicsSystem(Input_Stack_);
+		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
 //		pCamera_System           = new ecs::CCameraSystem();
         
@@ -104,7 +104,8 @@ namespace GLVM::core
 		{
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
-
+		    gravity += deltaFrameTime;
+//			std::cout << "gravity: " << gravity << std::endl;
 //			FPScounter();
 			
 			((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.ClearDisplay();
@@ -126,11 +127,14 @@ namespace GLVM::core
 								  &g_eEvent.mousePointerPosition.offset_X,
 								  &g_eEvent.mousePointerPosition.offset_Y);
 
-			movementSystem->deltaFrameTime               = deltaFrameTime;
-			collisionSystem->fDelta_Time_                = deltaFrameTime;
-			projectileSystem->deltaFrameTime           = deltaFrameTime;
-			physicsSystem->fDelta_Time_                 = deltaFrameTime;
-			physicsSystem->fAcceleration_of_Gravity_   += (deltaFrameTime / 20);
+			movementSystem->deltaFrameTime            = deltaFrameTime;
+			movementSystem->gravity                   = gravity;
+			collisionSystem->fDelta_Time_             = deltaFrameTime;
+			collisionSystem->gravity                  = gravity;
+			projectileSystem->deltaFrameTime          = deltaFrameTime;
+			physicsSystem->fDelta_Time_               = deltaFrameTime;
+			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
+			physicsSystem->gravity                    = gravity;
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			//            pCamera_System->Shader_Program_               = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->_Shader_Program;
 //			pCamera_System->Render_System_                = Render_System_Interface_;

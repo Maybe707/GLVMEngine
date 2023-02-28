@@ -22,6 +22,7 @@ namespace GLVM::ecs
 	public:
         
 		float fDelta_Time_;
+		float gravity;
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}

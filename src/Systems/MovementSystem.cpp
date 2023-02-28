@@ -57,28 +57,28 @@ namespace GLVM::ecs
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						right * cameraSpeed;
-					result -= right * cameraSpeed;
+//					result -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*beholderComponent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-right * cameraSpeed;
-					result += right * cameraSpeed;
+//					result += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						forward * cameraSpeed;
-					result -= forward * cameraSpeed;
+//					result -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
 					pComponent_Manager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						-forward * cameraSpeed;
-					result += forward * cameraSpeed;
+//					result += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
 					pComponent_Manager->CreateComponent<cm::move>(currentEntity);
@@ -102,8 +102,8 @@ namespace GLVM::ecs
 			// std::cout << "y: " << transformComponent->tPosition[1] << std::endl;
 			// std::cout << "z: " << transformComponent->tPosition[2] << std::endl;
 
-			std::cout << "position: " << Normalize(result) * cameraSpeed << std::endl;
-			transformComponent->tPosition += Normalize(result) * cameraSpeed;
+			// std::cout << "position: " << Normalize(result) * cameraSpeed << std::endl;
+			// transformComponent->tPosition += Normalize(result) * cameraSpeed;
 
 			// std::cout << "x: " << transformComponent->tPosition[0] << std::endl;
 			// std::cout << "y: " << transformComponent->tPosition[1] << std::endl;
@@ -116,12 +116,20 @@ namespace GLVM::ecs
 			int iEntity_refRigidBody = (*pComponent_Manager->GetEntityContainer<cm::rigidBody>())[n];
 //            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
 			cm::transform* rTransform_Component = pComponent_Manager->GetComponent<cm::transform>(iEntity_refRigidBody);
+			cm::rigidBody* rigidBodyComponennt = pComponent_Manager->GetComponent<cm::rigidBody>(iEntity_refRigidBody);
 			pComponent_Manager->CreateComponent<cm::move>(iEntity_refRigidBody);
+			cm::move* moveComponent = pComponent_Manager->GetComponent<cm::move>(iEntity_refRigidBody);
             // Vector<float, 3> vec(0.0f);
             // vec[1] = -1.0f;
 //            rTransform_Component.tPosition += vec * cameraSpeed;
-			pComponent_Manager->GetComponent<cm::move>(iEntity_refRigidBody)->gravity[1] = 1.0f * cameraSpeed;
-			rTransform_Component->tPosition[1] -= 1.0f * cameraSpeed;
+			rTransform_Component->GravityAccumulator += deltaFrameTime;
+			std::cout << "gravity: " << rTransform_Component->GravityAccumulator << std::endl;
+			moveComponent->gravity[1] += 1.3f * rTransform_Component->GravityAccumulator
+				* rigidBodyComponennt->fMass_ /
+				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
+			rTransform_Component->tPosition[1] -= 1.3f * rTransform_Component->GravityAccumulator
+				* rigidBodyComponennt->fMass_ /
+				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
 //			rTransform_Component.frameVerticalMovement -= vec * cameraSpeed;
         }
     }

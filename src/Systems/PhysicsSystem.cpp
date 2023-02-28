@@ -34,15 +34,19 @@ namespace GLVM::ecs
 				cm::move* move = componentManager->GetComponent<cm::move>(entityRefMove);
 				cm::collider* collider = componentManager->GetComponent<cm::collider>(entityRefMove);
                 if(collider->bGround_Collision_) {
+//					std::cout << "ground for entity: " << linkedEntities[i] << std::endl;
 					transformComponent->tPosition += move->gravity;
+					transformComponent->GravityAccumulator = 0.0f;
                     collider->bGround_Collision_ = false;
                 }
                 if(collider->bWall_Collision_) {
-					std::cout << "move: " << Normalize(move->frameMovement) << std::endl;
-					transformComponent->tPosition += Normalize(move->frameMovement) * cameraSpeed;
+					std::cout << "move" << std::endl;
+//					std::cout << "move: " << Normalize(move->frameMovement) << std::endl;
+					move->frameMovement = 0;
                     collider->bWall_Collision_ = false;
                 }
-				move->gravity       = 0.0f;
+				transformComponent->tPosition -= Normalize(move->frameMovement) * cameraSpeed;
+//				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;
 				componentManager->RemoveComponent<cm::move>(entityRefMove);
         }

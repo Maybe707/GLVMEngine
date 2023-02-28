@@ -72,6 +72,7 @@ namespace GLVM::core
         Sound::ISoundEngine * soundEngine;
 
 		float              deltaFrameTime;
+		float              gravity;
 		CStack             Input_Stack_;
         ecs::CRenderSystem * renderSystemInterface;
         

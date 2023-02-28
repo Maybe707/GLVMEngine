@@ -18,9 +18,11 @@ namespace GLVM::ecs
     public:
         float fAcceleration_of_Gravity_;
         float fDelta_Time_;
+		float& gravity;
         core::CStack& Input_Stack_;
 
-        CPhysicsSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
+        CPhysicsSystem(float& gravity_, core::CStack& _input_Stack) : gravity(gravity_),
+																	  Input_Stack_(_input_Stack) {}
         
         ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.
         

@@ -3,6 +3,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/SpotLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -66,7 +67,8 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 3.5f, 0.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 0.0f, 15.5f, 0.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
     ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 0;
@@ -109,9 +111,10 @@ int main()
     TextureManager->BindTexture(uiWitch3, materialWitch3->diffuseTextureID_);
 
 	Entity uiWitch4 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch4);
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform, cm::rigidBody>(uiWitch4);
 	ComponentManager->GetComponent<cm::vertex>(uiWitch4)->vkVertexId_ = 0;
-	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { 7.7f, 3.5f, 5.0f }, .fScale = 3.0f };
+	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { 2.7f, 15.5f, 2.0f }, .fScale = 2.0f };
 	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
 	*materialWitch4 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };

@@ -6,6 +6,7 @@ namespace GLVM::ecs::components
 	class rigidBody
 	{
     public:
+		float gravityTime;
         float fMass_;
         bool bGravity_;
 	};

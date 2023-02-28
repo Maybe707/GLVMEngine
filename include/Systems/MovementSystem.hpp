@@ -23,6 +23,7 @@ namespace GLVM::ecs
 	{
 	public:
 		float                      deltaFrameTime;
+		float                      gravity;
         core::CStack&              inputStack;
         
         CMovementSystem( core::CStack& inputStack );

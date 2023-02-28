@@ -12,6 +12,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Stack.hpp"
 #include "Vector.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ecs
 {
@@ -48,39 +49,68 @@ namespace GLVM::ecs
         ComponentManager* componentManager = ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::transform>();
-
+		
+		core::vector<Entity> linkedEntitiesWithMove = componentManager->collectLinkedEntities<cm::collider,
+																					  cm::transform,
+																					  cm::move>();
+		
+        float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		unsigned int linkedEntitiesVectorSizeWithMove = linkedEntitiesWithMove.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			for(unsigned int j = i + 1; j < linkedEntitiesVectorSize; ++j) {
+			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
+				if ( i == j )
+					continue;
+				
                 unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
                 unsigned int comparedEntityRefCollider     = linkedEntities[j];
-				cm::transform* backtrackingTransform = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider);
-			    cm::transform* comparedTransform     = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider);
-
+				vec3 backtrackingTransform = componentManager->
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
+				float backtrackingScale = componentManager->
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->fScale;
+			    vec3  comparedTransform     = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
+				float comparedScale     = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
+				for ( unsigned int m = 0; m < linkedEntitiesVectorSizeWithMove; ++m) {
+					if ( backtrackingEntityRefCollider == linkedEntitiesWithMove[m] ) {
+//						std::cout << "backtrack" << std::endl;
+						cm::move* backtrackingMove = componentManager->
+							GetComponent<cm::move>(backtrackingEntityRefCollider);
+						backtrackingTransform -= Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+					}
+				}
+				for ( unsigned int n = 0; n < linkedEntitiesVectorSizeWithMove; ++n) {
+					if ( comparedEntityRefCollider == linkedEntitiesWithMove[n] ) {
+//						std::cout << "compared" << std::endl;
+						cm::move* comparedMove     = componentManager->
+							GetComponent<cm::move>(comparedEntityRefCollider);
+						comparedTransform -= Normalize(comparedMove->frameMovement) * cameraSpeed;
+					}
+				}
+				
 				bool boxColliderFlag;
 				bool upperActorCheckFlag = false;
-                boxColliderFlag = BoxCollider(backtrackingTransform->tPosition,
-											  comparedTransform->tPosition,
-											  backtrackingTransform->fScale,
-											  comparedTransform->fScale);
-                upperActorCheckFlag = UpperActorCheck(backtrackingTransform->tPosition,
-					                                  comparedTransform->tPosition,
-					                                  backtrackingTransform->fScale,
-													  comparedTransform->fScale);
+                boxColliderFlag = BoxCollider(backtrackingTransform,
+											  comparedTransform,
+											  backtrackingScale,
+											  comparedScale);
+                upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
+					                                  comparedTransform,
+					                                  backtrackingScale,
+													  comparedScale);
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
 //					std::cout << "TEST 1" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
-                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->roofCollision = true;
+//                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->roofCollision = true;
                     continue;
                 }
                     
                 if(boxColliderFlag) {
 //					std::cout << "TEST 2" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
-                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bWall_Collision_ = true;
+//                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bWall_Collision_ = true;
                     continue;
                 }
 //				std::cout << "No collissions" << std::endl;
