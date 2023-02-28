@@ -77,7 +77,8 @@ namespace GLVM::ecs
 //						std::cout << "backtrack" << std::endl;
 						cm::move* backtrackingMove = componentManager->
 							GetComponent<cm::move>(backtrackingEntityRefCollider);
-						backtrackingTransform -= Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+						backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+						backtrackingTransform += backtrackingMove->gravity;
 					}
 				}
 				for ( unsigned int n = 0; n < linkedEntitiesVectorSizeWithMove; ++n) {
@@ -85,7 +86,8 @@ namespace GLVM::ecs
 //						std::cout << "compared" << std::endl;
 						cm::move* comparedMove     = componentManager->
 							GetComponent<cm::move>(comparedEntityRefCollider);
-						comparedTransform -= Normalize(comparedMove->frameMovement) * cameraSpeed;
+						comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
+						comparedTransform += comparedMove->gravity;
 					}
 				}
 				
