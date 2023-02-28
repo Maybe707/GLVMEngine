@@ -123,11 +123,12 @@ namespace GLVM::ecs
             // vec[1] = -1.0f;
 //            rTransform_Component.tPosition += vec * cameraSpeed;
 			rTransform_Component->GravityAccumulator += deltaFrameTime;
-			std::cout << "gravity: " << rTransform_Component->GravityAccumulator << std::endl;
-			moveComponent->gravity[1] += 1.3f * rTransform_Component->GravityAccumulator
+//			std::cout << "gravity: " << rTransform_Component->GravityAccumulator << std::endl;
+			std::cout << "y position: " << rTransform_Component->tPosition[1] << std::endl;
+			moveComponent->gravity[1] += 1.2f * rTransform_Component->GravityAccumulator
 				* rigidBodyComponennt->fMass_ /
 				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
-			rTransform_Component->tPosition[1] -= 1.3f * rTransform_Component->GravityAccumulator
+			rTransform_Component->tPosition[1] -= 1.2f * rTransform_Component->GravityAccumulator
 				* rigidBodyComponennt->fMass_ /
 				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
 //			rTransform_Component.frameVerticalMovement -= vec * cameraSpeed;
