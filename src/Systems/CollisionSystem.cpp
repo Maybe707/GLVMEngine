@@ -40,7 +40,6 @@ namespace GLVM::ecs
 
         return false;
     }
-
 	
 	void CCollisionSystem::Update()
 	{

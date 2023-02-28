@@ -109,11 +109,16 @@ namespace GLVM::ecs
 			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
 			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
 			rTransform_Component->GravityAccumulator += deltaFrameTime;
-//			std::cout << "gravity: " << rTransform_Component->GravityAccumulator << std::endl;
-			std::cout << "y position: " << rTransform_Component->tPosition[1] << std::endl;
-			moveComponent->gravity[1] -= 1.2f * rTransform_Component->GravityAccumulator
+			// std::cout << "gravity accumulator: " << rTransform_Component->GravityAccumulator << std::endl;
+			// std::cout << "y position: " << rTransform_Component->tPosition[1] << std::endl;
+			float gravity = 9.8f * rTransform_Component->GravityAccumulator
 				* rigidBodyComponennt->fMass_ /
 				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
+			if ( gravity > 0.15f )
+				gravity = 0.15;
+				
+			moveComponent->gravity[1] -= gravity;
+//			std::cout << "gravity: " << gravity << std::endl;
         }
     }
 

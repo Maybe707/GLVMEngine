@@ -32,8 +32,8 @@ int main()
     MeshManager->SetMesh("../waveFrontObj/cone.obj");
     MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
-//	MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
-//	MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
+	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
+	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
 	core::Engine* GLVM = core::Engine::GetInstance();	
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
