@@ -548,6 +548,7 @@ namespace GLVM::core
 
 			}
 
+		/// TODO: This code for debug purpouses only
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -559,34 +560,35 @@ namespace GLVM::core
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
 		float plane[] = {
-			-10.0f, -10.0f, -10.0f,
-			10.0f, -10.0f, -10.0f,
-			10.0f, 10.0f, -10.0f,
-			10.0f, 10.0f, -10.0f,
-			-10.0f, 10.0f, -10.0f,
-			-10.0f, -10.0f, -10.0f
+		   -0.3f, -0.3f, -0.5f,
+			0.3f, -0.3f, -0.5f,
+			0.3f,  0.3f, -0.5f,
+			0.3f,  0.3f, -0.5f,
+		   -0.3f,  0.3f, -0.5f,
+		   -0.3f, -0.3f, -0.5f
 		};
 
 
 		debugLines->Use();
 		
 		mat4 planeModelMatrix(1.0);
-		planeModelMatrix[0][0] = 3.02;
-		planeModelMatrix[1][1] = 3.02;
-		planeModelMatrix[2][2] = 3.02;
+		planeModelMatrix[0][0] = 1.0;
+		planeModelMatrix[1][1] = 1.0;
+		planeModelMatrix[2][2] = 1.0;
 		planeModelMatrix[3][3] = 1.0;
 		// planeModelMatrix[3][0] = 0.0;
 		// planeModelMatrix[3][1] = 0.0;
 		// planeModelMatrix[3][2] = -1.1;
 
-		for ( int i = 0; i < 4; ++i )
-			for ( int j = 0; j < 4; ++j)
-				std::cout << planeModelMatrix[i][j] << std::endl;
+		// for ( int i = 0; i < 4; ++i )
+		// 	for ( int j = 0; j < 4; ++j)
+		// 		std::cout << planeModelMatrix[i][j] << std::endl;
 		
         // Matrix<float, 4> planeModelMatrix(1.0);
         // planeModelMatrix[0][0] = 0.05;
         // planeModelMatrix[1][1] = 0.05;
         // planeModelMatrix[2][2] = 0.05;
+
 		namespace cm = GLVM::ecs::components;
         ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefView =
