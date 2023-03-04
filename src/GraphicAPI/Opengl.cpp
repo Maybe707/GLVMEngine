@@ -636,20 +636,30 @@ namespace GLVM::core
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
         pGLBind_Vertex_Array(0);         
+
+		mat4 linesModelMatrix(1.0);
+		linesModelMatrix[0][0] = 1.0;
+		linesModelMatrix[1][1] = 1.0;
+		linesModelMatrix[2][2] = 1.0;
+		linesModelMatrix[3][3] = 1.0;
+		linesModelMatrix[3][0] = 3.0;
+		linesModelMatrix[3][1] = 5.0;
+		linesModelMatrix[3][2] = 3.0;
+
+		unsigned int locationLines = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
+		pGLUniform_Matrix4fv(locationLines, NUMBER_OF_MATRICES, GL_FALSE, &linesModelMatrix[0][0]);
 		
-		// pGLGen_Vertex_Arrays(1, &vaoLines);
-		// pGLGen_Buffers(1, &vboLines);
-		// pGLBind_Vertex_Array(vaoLines);
-		// pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
-		// pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(lines), &lines[0], GL_DYNAMIC_DRAW);
+		pGLGen_Vertex_Arrays(1, &vaoLines);
+		pGLGen_Buffers(1, &vboLines);
+		pGLBind_Vertex_Array(vaoLines);
+		pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
+		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(lines), &lines[0], GL_DYNAMIC_DRAW);
 
-		// pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)VERTEX_OFFSET);
-		// pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
+		pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 
-		// pGLBind_Vertex_Array(vaoLines);
-		// glDrawArrays(GL_LINES, 0, 6);		
+		pGLBind_Vertex_Array(vaoLines);
+		glDrawArrays(GL_LINES, 0, 6);		
 	}
 	
 	void COpenglRenderer::RenderQuad()
