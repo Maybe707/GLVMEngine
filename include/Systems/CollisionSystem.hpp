@@ -14,6 +14,7 @@
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <mutex>
+#include "Globals.hpp"
 
 namespace GLVM::ecs
 {
@@ -37,6 +38,8 @@ namespace GLVM::ecs
 		void Update() override;
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 							 float backtrackingScale, float comparedScale);
+		bool RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
+					 float rayCasterScale, float receiverScale);
     };
 }
 	

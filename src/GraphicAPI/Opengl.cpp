@@ -20,6 +20,7 @@
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
+#include <GL/glext.h>
 #include <cmath>
 #include "Globals.hpp"
 #include "WavefrontObjParser.hpp"
@@ -42,7 +43,8 @@ namespace GLVM::core
  		cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
 			                                     "../GLshaders/CubeShadowMap.geom");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
-
+		debugLines                  = new Shader("../GLshaders/debugLines.vert", "../GLshaders/debugLines.frag");
+		
         glEnable(GL_DEPTH_TEST);
 		glEnable(GL_CULL_FACE);
 
@@ -87,11 +89,13 @@ namespace GLVM::core
 	void COpenglRenderer::draw() {
 		using namespace GLVM;
 		namespace cm = GLVM::ecs::components;
+
+		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 		
 		ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
 				
-		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		coreShaderProgram->Use();
 		
@@ -507,7 +511,6 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
-
 		
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
@@ -525,7 +528,7 @@ namespace GLVM::core
 					diffuseTextureID  = material->diffuseTextureID_;
 					specularTextureID = material->specularTextureID_;
 				}
-				
+				//			std::cout << "Entity: " << uiEntity_refTexture << std::endl;
 				cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 				if ( transformComponent != nullptr )
 					modelMatrix = SetModelMatrix(*transformComponent);
@@ -542,6 +545,7 @@ namespace GLVM::core
 				// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
 //				coreShaderProgram->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+
 			}
 
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
@@ -554,6 +558,90 @@ namespace GLVM::core
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
+		float plane[] = {
+			-10.0f, -10.0f, -10.0f,
+			10.0f, -10.0f, -10.0f,
+			10.0f, 10.0f, -10.0f,
+			10.0f, 10.0f, -10.0f,
+			-10.0f, 10.0f, -10.0f,
+			-10.0f, -10.0f, -10.0f
+		};
+
+
+		debugLines->Use();
+		
+		mat4 planeModelMatrix(1.0);
+		planeModelMatrix[0][0] = 3.02;
+		planeModelMatrix[1][1] = 3.02;
+		planeModelMatrix[2][2] = 3.02;
+		planeModelMatrix[3][3] = 1.0;
+		// planeModelMatrix[3][0] = 0.0;
+		// planeModelMatrix[3][1] = 0.0;
+		// planeModelMatrix[3][2] = -1.1;
+
+		for ( int i = 0; i < 4; ++i )
+			for ( int j = 0; j < 4; ++j)
+				std::cout << planeModelMatrix[i][j] << std::endl;
+		
+        // Matrix<float, 4> planeModelMatrix(1.0);
+        // planeModelMatrix[0][0] = 0.05;
+        // planeModelMatrix[1][1] = 0.05;
+        // planeModelMatrix[2][2] = 0.05;
+		namespace cm = GLVM::ecs::components;
+        ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
+		core::vector<unsigned int>* pEntityContainerRefView =
+			componentManager->GetEntityContainer<cm::beholder>();
+		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		cm::beholder* playerViewComponent = componentManager->GetComponent<cm::beholder>(uiPlayerEntity);
+		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(uiPlayerEntity);
+		
+//		viewPosition = playerViewComponent.Position;
+		
+//		debugLines->SetMat4("modelMatrix", planeModelMatrix);
+		unsigned int location = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
+		pGLUniform_Matrix4fv(location, NUMBER_OF_MATRICES, GL_FALSE, &planeModelMatrix[0][0]);
+		ComputeProjectionMatrix(debugLines);
+		ComputeViewMatrix(debugLines, *playerTransformComponent, *playerViewComponent);
+		pGLGen_Vertex_Arrays(1, &vaoPlane);
+		pGLGen_Buffers(1, &vboPlane);
+		pGLBind_Vertex_Array(vaoPlane);
+		pGLBind_Buffer(GL_ARRAY_BUFFER, vboPlane);
+		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(plane), plane, GL_STATIC_DRAW);
+
+		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
+		pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		
+		// pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
+		// pGLBind_Vertex_Array(0);
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+		
+//		pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
+//		pGLBind_Vertex_Array(vaoPlane);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
+
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        pGLBind_Vertex_Array(0);         
+		
+		// pGLGen_Vertex_Arrays(1, &vaoLines);
+		// pGLGen_Buffers(1, &vboLines);
+		// pGLBind_Vertex_Array(vaoLines);
+		// pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
+		// pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(lines), &lines[0], GL_DYNAMIC_DRAW);
+
+		// pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)VERTEX_OFFSET);
+		// pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+
+		// pGLBind_Vertex_Array(vaoLines);
+		// glDrawArrays(GL_LINES, 0, 6);		
+
 	}
 
 	void COpenglRenderer::RenderQuad()
@@ -667,6 +755,10 @@ namespace GLVM::core
 		translationMatrix[3][1] = transformComponent_.tPosition[1];
 		translationMatrix[3][2] = transformComponent_.tPosition[2];
         translationMatrix[3][3] = 1.0f;
+
+		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
+		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
+		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
 		
         modelMatrix = scalingMatrix * translationMatrix;
 
@@ -714,16 +806,16 @@ namespace GLVM::core
             pitch = 89.0f;
         if(pitch < -89.0f)
             pitch = -89.0f;
-		vec3 front;
-        front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));
-        front[1] = std::sin(Radians(pitch));
-        front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));
-        beholder.forward = Normalize(front);
+		vec3 forward;
+		/// We have dot product here to compute projection to axes
+        forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
+        forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
+        forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
+        beholder.forward = Normalize(forward);
 
         viewMatrix = LookAtMain(player.tPosition,
-								  player.tPosition + beholder.forward,
-								  beholder.up);
-
+								player.tPosition + beholder.forward,
+								beholder.up);
 
  		// _view_Component.Position[0] = _Player.tPosition[0];
 		// _view_Component.Position[1] = _Player.tPosition[1];

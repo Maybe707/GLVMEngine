@@ -56,5 +56,6 @@ void main()
 //	vs_out.normal = normalize(vs_out.normal);
 	// spotLightSpaceMatrixArraySize        = spotLightSpaceMatrixContainerSize;
 	// directionalLightSpaceMatrixArraySize = directionalLightSpaceMatrixContainerSize;
+
 	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
 }

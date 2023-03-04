@@ -164,7 +164,7 @@ void main()
 	// Compute shadow
 	// float shadow = ComputeShadow(fs_in.fragmentPositionPointLightSpace);
 	// result = result * (1.0 - shadow);
-	
+
 	fragColor = vec4(result, 1.0);
 //	fragColor = vec4(spotLightArraySize, spotLightArraySize ,spotLightArraySize, 1.0);
 }

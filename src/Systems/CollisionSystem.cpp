@@ -40,6 +40,39 @@ namespace GLVM::ecs
 
         return false;
     }
+
+	// bool CCollisionSystem::RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
+	// 							   float rayCasterScale, float receiverScale) {
+	// 	float yaw, pitch;
+	// 	const float kSensitivity = 0.1;
+    //     yaw = g_eEvent.mousePointerPosition.offset_X;
+    //     pitch = g_eEvent.mousePointerPosition.offset_Y;
+    //     yaw *= kSensitivity;
+    //     pitch *= kSensitivity;
+
+    //     g_eEvent.mousePointerPosition.pitch = pitch;
+    //     g_eEvent.mousePointerPosition.yaw = yaw;
+        
+    //     if(pitch > 89.0f)
+    //         pitch = 89.0f;
+    //     if(pitch < -89.0f)
+    //         pitch = -89.0f;
+	// 	vec3 forward;
+    //     forward[0] = std::cos(Radians(yaw)) * std::cos(Radians(pitch));
+    //     forward[1] = std::sin(Radians(pitch));
+    //     forward[2] = std::sin(Radians(yaw)) * std::cos(Radians(pitch));
+    //     forward = Normalize(forward);
+
+	// 	// vec3 vectorXZ = vec3{ rayCasterPosition[0], 0.0f, rayCasterPosition[2] } -
+	// 	// 				vec3{ receiverPosition[0], 0.0f, receiverPosition[2] };
+
+	// 	// vectorXZ -= receiverScale / 2;
+	// 	// float distance = std::sqrt(vectorXZ[0] * vectorXZ[0] + vectorXZ[1] * vectorXZ[1] + vectorXZ[2] *\ vectorXZ[2]);
+	// 	// forward *= distance;
+	// 	forward *= 5.0f;
+		
+	// 	if ( forward[0] 
+	// }
 	
 	void CCollisionSystem::Update()
 	{

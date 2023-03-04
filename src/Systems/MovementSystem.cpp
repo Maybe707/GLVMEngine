@@ -114,8 +114,8 @@ namespace GLVM::ecs
 			float gravity = 9.8f * rTransform_Component->GravityAccumulator
 				* rigidBodyComponennt->fMass_ /
 				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]);
-			if ( gravity > 0.15f )
-				gravity = 0.15;
+			if ( gravity > 0.2f )
+				gravity = 0.2;
 				
 			moveComponent->gravity[1] -= gravity;
 //			std::cout << "gravity: " << gravity << std::endl;

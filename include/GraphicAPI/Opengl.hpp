@@ -59,9 +59,31 @@ namespace GLVM::core {
 		Shader* flatShadowMapShaderProgram;
 		Shader* cubeShadowMapShaderProgram;
 		Shader* debugQuadDepth_;
+		Shader* debugLines;                            ///< For debug only
 		GLuint quadVAO_;
 		GLuint quadVBO_;
 
+		GLuint vboPlane, vaoPlane;
+		float plane[18] = {
+			-10.0f, -10.0f, -10.0f,
+			10.0f, -10.0f, -10.0f,
+			10.0f, 10.0f, -10.0f,
+			10.0f, 10.0f, -10.0f,
+			-10.0f, 10.0f, -10.0f,
+			-10.0f, -10.0f, -10.0f
+		};
+
+		GLuint vboLines, vaoLines;
+		float lines[36] = {
+			-10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
+			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f, 
+			-10.0f, -10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
+			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
+			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f, 
+			10.0f, -10.0f, 8.0f, 0.0f, 0.0f, 0.0f
+		};
+
+		
 		/// Directional light
 		std::vector<unsigned int> directionalLightFlatShadowMapFBOcontainer;
 		std::vector<unsigned int> directionalLightFlatShadowMapTextureContainer;
