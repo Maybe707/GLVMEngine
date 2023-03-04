@@ -74,13 +74,13 @@ namespace GLVM::core {
 		};
 
 		GLuint vboLines, vaoLines;
-		float lines[36] = {
-			-10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
-			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f, 
-			-10.0f, -10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
-			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f,
-			10.0f, 10.0f, 8.0f, 0.0f, 0.0f, 0.0f, 
-			10.0f, -10.0f, 8.0f, 0.0f, 0.0f, 0.0f
+		float lines[18] = {
+			-10.0f, 10.0f, 8.0f,
+			10.0f, 10.0f, 8.0f,
+			-10.0f, -10.0f, 8.0f,
+			10.0f, 10.0f, 8.0f,
+			10.0f, 10.0f, 8.0f,
+			10.0f, -10.0f, 8.0f
 		};
 
 		
@@ -144,6 +144,7 @@ namespace GLVM::core {
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
+		void RaycastringDebug();                                                         ///< TODO: For debug only
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);

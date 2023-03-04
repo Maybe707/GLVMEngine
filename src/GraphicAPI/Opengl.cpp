@@ -93,7 +93,6 @@ namespace GLVM::core
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		
 		ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
 				
 
@@ -508,6 +507,10 @@ namespace GLVM::core
 	}
 	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
+		RaycastringDebug();
+
+		coreShaderProgram->Use();
+		
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
@@ -548,7 +551,7 @@ namespace GLVM::core
 
 			}
 
-		/// TODO: This code for debug purpouses only
+
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -559,26 +562,30 @@ namespace GLVM::core
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 			}
+	}
+
+	void COpenglRenderer::RaycastringDebug() {
+		/// TODO: This code for debug purpouses only
 		float plane[] = {
-		   -0.3f, -0.3f, -0.5f,
+			-0.3f, -0.3f, -0.5f,
 			0.3f, -0.3f, -0.5f,
 			0.3f,  0.3f, -0.5f,
 			0.3f,  0.3f, -0.5f,
-		   -0.3f,  0.3f, -0.5f,
-		   -0.3f, -0.3f, -0.5f
+			-0.3f,  0.3f, -0.5f,
+			-0.3f, -0.3f, -0.5f
 		};
 
 
 		debugLines->Use();
 		
 		mat4 planeModelMatrix(1.0);
-		planeModelMatrix[0][0] = 50.0;
-		planeModelMatrix[1][1] = 50.0;
-		planeModelMatrix[2][2] = 50.0;
+		planeModelMatrix[0][0] = 10.0;
+		planeModelMatrix[1][1] = 10.0;
+		planeModelMatrix[2][2] = 10.0;
 		planeModelMatrix[3][3] = 1.0;
-		planeModelMatrix[3][0] = 0.0;
-		planeModelMatrix[3][1] = 10.0;
-		planeModelMatrix[3][2] = -5.1;
+		planeModelMatrix[3][0] = 3.0;
+		planeModelMatrix[3][1] = 5.0;
+		planeModelMatrix[3][2] = 3.0;
 
 		// for ( int i = 0; i < 4; ++i )
 		// 	for ( int j = 0; j < 4; ++j)
@@ -643,9 +650,8 @@ namespace GLVM::core
 
 		// pGLBind_Vertex_Array(vaoLines);
 		// glDrawArrays(GL_LINES, 0, 6);		
-
 	}
-
+	
 	void COpenglRenderer::RenderQuad()
 	{
 		if (quadVAO_ == 0)
