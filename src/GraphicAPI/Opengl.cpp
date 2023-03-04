@@ -566,14 +566,14 @@ namespace GLVM::core
 
 	void COpenglRenderer::RaycastringDebug() {
 		/// TODO: This code for debug purpouses only
-		float plane[] = {
-			-0.3f, -0.3f, -0.5f,
-			0.3f, -0.3f, -0.5f,
-			0.3f,  0.3f, -0.5f,
-			0.3f,  0.3f, -0.5f,
-			-0.3f,  0.3f, -0.5f,
-			-0.3f, -0.3f, -0.5f
-		};
+		// float plane[] = {
+		// 	-0.3f, -0.3f, -0.5f, 0.3f, 0.5f, 0.7f,
+		// 	0.3f, -0.3f, -0.5f, 0.3f, 0.5f, 0.7f,
+		// 	0.3f,  0.3f, -0.5f, 0.3f, 0.5f, 0.7f,
+		// 	0.3f,  0.3f, -0.5f, 0.3f, 0.5f, 0.7f,
+		// 	-0.3f,  0.3f, -0.5f, 0.3f, 0.5f, 0.7f,
+		// 	-0.3f, -0.3f, -0.5f, 0.3f, 0.5f, 0.7f
+		// };
 
 
 		debugLines->Use();
@@ -617,10 +617,10 @@ namespace GLVM::core
 		pGLBind_Buffer(GL_ARRAY_BUFFER, vboPlane);
 		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(plane), plane, GL_STATIC_DRAW);
 
-		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
+		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)VERTEX_OFFSET);
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 		
 		// pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
 		// pGLBind_Vertex_Array(0);
@@ -638,9 +638,9 @@ namespace GLVM::core
         pGLBind_Vertex_Array(0);         
 
 		mat4 linesModelMatrix(1.0);
-		linesModelMatrix[0][0] = 1.0;
-		linesModelMatrix[1][1] = 1.0;
-		linesModelMatrix[2][2] = 1.0;
+		linesModelMatrix[0][0] = 10.0;
+		linesModelMatrix[1][1] = 10.0;
+		linesModelMatrix[2][2] = 10.0;
 		linesModelMatrix[3][3] = 1.0;
 		linesModelMatrix[3][0] = 3.0;
 		linesModelMatrix[3][1] = 5.0;
@@ -653,10 +653,12 @@ namespace GLVM::core
 		pGLGen_Buffers(1, &vboLines);
 		pGLBind_Vertex_Array(vaoLines);
 		pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
-		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(lines), &lines[0], GL_DYNAMIC_DRAW);
+		pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(lines), lines, GL_DYNAMIC_DRAW);
 
-		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
+		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)VERTEX_OFFSET);
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+		pGLVertex_Attrib_Pointer(LAYOUT_1, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 
 		pGLBind_Vertex_Array(vaoLines);
 		glDrawArrays(GL_LINES, 0, 6);		
