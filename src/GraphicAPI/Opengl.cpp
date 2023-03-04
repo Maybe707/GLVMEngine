@@ -572,13 +572,13 @@ namespace GLVM::core
 		debugLines->Use();
 		
 		mat4 planeModelMatrix(1.0);
-		planeModelMatrix[0][0] = 1.0;
-		planeModelMatrix[1][1] = 1.0;
-		planeModelMatrix[2][2] = 1.0;
+		planeModelMatrix[0][0] = 50.0;
+		planeModelMatrix[1][1] = 50.0;
+		planeModelMatrix[2][2] = 50.0;
 		planeModelMatrix[3][3] = 1.0;
-		// planeModelMatrix[3][0] = 0.0;
-		// planeModelMatrix[3][1] = 0.0;
-		// planeModelMatrix[3][2] = -1.1;
+		planeModelMatrix[3][0] = 0.0;
+		planeModelMatrix[3][1] = 10.0;
+		planeModelMatrix[3][2] = -5.1;
 
 		// for ( int i = 0; i < 4; ++i )
 		// 	for ( int j = 0; j < 4; ++j)
