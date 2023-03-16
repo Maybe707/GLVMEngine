@@ -61,9 +61,9 @@ int main()
     std::vector<ecs::Texture> hudTextureVector;
     hudTextureVector.push_back(hudTexture_0);
     //    hudTextureVector.push_back(hudTexture_1);
-	core::Engine* GLVM = core::Engine::GetInstance();		
-    hudTextureManager->SetTextureVector(hudTextureVector);
 
+    hudTextureManager->SetTextureVector(hudTextureVector);
+	core::Engine* GLVM = core::Engine::GetInstance();		
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
