@@ -308,16 +308,16 @@ namespace GLVM::core
 #ifdef VULKAN_API
     CWindowX::CWindowX()
     {
-        const int aAttrib[] =
-        {
-            GLX_RENDER_TYPE, GLX_RGBA_BIT,
-            GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-            GLX_DOUBLEBUFFER, true,
-            GLX_RED_SIZE, 1,
-            GLX_GREEN_SIZE, 1,
-            GLX_BLUE_SIZE, 1,
-            None
-        };
+        // const int aAttrib[] =
+        // {
+        //     GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        //     GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        //     GLX_DOUBLEBUFFER, true,
+        //     GLX_RED_SIZE, 1,
+        //     GLX_GREEN_SIZE, 1,
+        //     GLX_BLUE_SIZE, 1,
+        //     None
+        // };
         
         pDisp_ = XOpenDisplay(NULL);
         Root_Window_ = DefaultRootWindow(pDisp_);
@@ -345,7 +345,7 @@ namespace GLVM::core
         XFreePixmap(pDisp_, bitmapNoData);
         
         XGetWindowAttributes(pDisp_, Win_, &GWindow_Attributes_);
-		const int kInterval = 1;
+//		const int kInterval = 1;
     }
     
     CWindowX::~CWindowX()
@@ -402,8 +402,8 @@ namespace GLVM::core
                 motion = uXEvent.xmotion;
                 
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
-                _Event.mouse_Pointer_Position_.iPosition_X = motion.x;
-                _Event.mouse_Pointer_Position_.iPosition_Y = motion.y;
+                _Event.mousePointerPosition.offset_X = motion.x;
+                _Event.mousePointerPosition.offset_Y = motion.y;
                                 
                 ///< Search MapNotify events depend on XMapWindow(pDisp_, Win_) function.
             case MapNotify:

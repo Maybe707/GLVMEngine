@@ -56,12 +56,6 @@ namespace GLVM::core
         // unsigned int uiTextureVerticesIndex = 0;
         // unsigned int uiFacesIndex = 0;
         while(pWavefrontObjFileData[uiCounter] != '\0') {
-
-        // static auto startTime = std::chrono::high_resolution_clock::now();
-
-        // auto currentTime = std::chrono::high_resolution_clock::now();
-        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
             GLVM::core::vector<vector<char>> line = Split(pWavefrontObjFileData, ' ', '\n', uiCounter);
 		   
             if (line[0] == "v") {

@@ -20,7 +20,7 @@ int main()
 	using namespace GLVM;
 	namespace cm  = GLVM::ecs::components;
 	namespace ct = GAME_MECHANICS::ECS::components;
-	
+
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 	core::MeshManager    * MeshManager       = core::MeshManager::GetInstance();
@@ -34,7 +34,7 @@ int main()
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-	core::Engine* GLVM = core::Engine::GetInstance();	
+
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
@@ -45,9 +45,9 @@ int main()
 		.dat_length_ = container2_dat_len, .u_iData_ = container2_dat };
 	ecs::Texture Texture_4{ .iWidth_ = 500, .iHeight_ = 500,
 		.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
-    
+
     std::vector<ecs::Texture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
-	
+
     TextureManager->SetTextureVector(TextureVector);
 	
 	ecs::Texture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
@@ -57,13 +57,13 @@ int main()
     // hudTexture_1.iHeight_ = 32;
     // hudTexture_1.u_iData_ = witch_dat;
     // hudTexture_1.dat_length_ = witch_dat_len;
-    
+	
     std::vector<ecs::Texture> hudTextureVector;
     hudTextureVector.push_back(hudTexture_0);
     //    hudTextureVector.push_back(hudTexture_1);
-
+	core::Engine* GLVM = core::Engine::GetInstance();		
     hudTextureManager->SetTextureVector(hudTextureVector);
-	
+
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
@@ -72,7 +72,7 @@ int main()
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
     ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 0;
-
+	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
@@ -120,13 +120,13 @@ int main()
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch4, materialWitch4->diffuseTextureID_);
 	
-    // Entity u_iHud1 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
-    // ComponentManager->GetComponent<cm::vertex>(u_iHud1).vkVertexId_ = 0;
-	// ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0, 0.0f, 0.0f }, .fScale = 0.1f , .hud = true };
-	// cm::material & materialHud0   = ComponentManager->GetComponent<cm::material>(u_iHud1);
-	// materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
-    // hudTextureManager->BindTexture(u_iHud1, materialHud0.diffuseTextureID_);
+    Entity u_iHud1 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
+    ComponentManager->GetComponent<cm::vertex>(u_iHud1)->vkVertexId_ = 0;
+	*ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0, 0.0f, 0.0f }, .fScale = 0.1f , .hud = true };
+	cm::material* materialHud0   = ComponentManager->GetComponent<cm::material>(u_iHud1);
+	*materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+    hudTextureManager->BindTexture(u_iHud1, materialHud0->diffuseTextureID_);
 
 	Entity directionalLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
@@ -214,6 +214,8 @@ int main()
 //	spotLightComponent0.position     =  TransformPlayer.tPosition;
 //	spotLightComponent0.direction    =  TransformPlayer.tForward;
 //	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
+
+
 	
     ///< Game rendering loop
 	GLVM->GameLoop();

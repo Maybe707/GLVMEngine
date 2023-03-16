@@ -50,7 +50,7 @@ namespace GLVM::core
 			_sound_Engine->SoundStream();
 		}
     }
-    
+
     Engine::Engine() {
 		//		Window_             = CWindowCreator().Create();
 		//   Render_System_Interface_ = new ecs::CRenderSystem();
@@ -61,7 +61,7 @@ namespace GLVM::core
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
 
 		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
-		GUI_System               = new ecs::CGUISystem();
+//		GUI_System               = new ecs::CGUISystem();
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
@@ -70,7 +70,7 @@ namespace GLVM::core
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
     }
-
+	
     Engine::~Engine() {}
             
     Engine* Engine::GetInstance() {
@@ -94,7 +94,7 @@ namespace GLVM::core
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 //		pSystem_Manager->ActivateSystem(pCamera_System);
 		pSystem_Manager->ActivateSystem(renderSystemInterface);
-		pSystem_Manager->ActivateSystem(GUI_System);
+//		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();
@@ -108,9 +108,9 @@ namespace GLVM::core
 //			std::cout << "gravity: " << gravity << std::endl;
 //			FPScounter();
 			
-			((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.ClearDisplay();
+			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.ClearDisplay();
              
-			while(((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.HandleEvent(g_eEvent))
+			while((dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.HandleEvent(g_eEvent))
 			{
 				//                std::cout << g_eEvent.GetEvent() << std::endl;
 				Input_Stack_.ControlInput(g_eEvent);
@@ -121,7 +121,7 @@ namespace GLVM::core
 
 			//            Input_Stack_.PrintStack();
             
-			((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->
+			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->
 				Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,
@@ -140,7 +140,7 @@ namespace GLVM::core
 //			pCamera_System->Render_System_                = Render_System_Interface_;
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();
-			((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.SwapBuffers();
+			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.SwapBuffers();
 			//            g_Sound_Engine.SoundStream();
 		}
     }
@@ -157,8 +157,8 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
-		((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->Window.Close();
+		(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.Close();
 		delete chrono;
 		chrono = nullptr;
     }
-}
+} // namespace GLVM::core

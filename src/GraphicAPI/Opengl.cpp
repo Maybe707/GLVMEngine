@@ -66,7 +66,7 @@ namespace GLVM::core
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	}
-
+	
 	COpenglRenderer::~COpenglRenderer()
 	{
         delete coreShaderProgram;
@@ -579,9 +579,9 @@ namespace GLVM::core
 		debugLines->Use();
 		
 		mat4 planeModelMatrix(1.0);
-		planeModelMatrix[0][0] = 10.0;
-		planeModelMatrix[1][1] = 10.0;
-		planeModelMatrix[2][2] = 10.0;
+		planeModelMatrix[0][0] = 5.0;
+		planeModelMatrix[1][1] = 5.0;
+		planeModelMatrix[2][2] = 5.0;
 		planeModelMatrix[3][3] = 1.0;
 		planeModelMatrix[3][0] = 3.0;
 		planeModelMatrix[3][1] = 5.0;
@@ -648,6 +648,15 @@ namespace GLVM::core
 
 		unsigned int locationLines = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(locationLines, NUMBER_OF_MATRICES, GL_FALSE, &linesModelMatrix[0][0]);
+
+		float lines[12] = { playerTransformComponent->tPosition[0],
+			playerTransformComponent->tPosition[1],
+			playerTransformComponent->tPosition[2],
+			0.0f, 0.0f, 0.0f,
+			playerTransformComponent->tPosition[0] + playerViewComponent->forward[0],
+			playerTransformComponent->tPosition[1] + playerViewComponent->forward[1],
+			playerTransformComponent->tPosition[2] + playerViewComponent->forward[2],
+		    0.0f, 0.0f, 0.0f };
 		
 		pGLGen_Vertex_Arrays(1, &vaoLines);
 		pGLGen_Buffers(1, &vboLines);
@@ -661,7 +670,7 @@ namespace GLVM::core
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 
 		pGLBind_Vertex_Array(vaoLines);
-		glDrawArrays(GL_LINES, 0, 6);		
+		glDrawArrays(GL_LINES, 0, 2);	
 	}
 	
 	void COpenglRenderer::RenderQuad()

@@ -80,7 +80,7 @@ namespace GLVM::core
 		ecs::CMovementSystem   * movementSystem;
         ecs::CPhysicsSystem    * physicsSystem;
         ecs::CProjectileSystem * projectileSystem;
-        ecs::CGUISystem        * GUI_System;
+//        ecs::CGUISystem        * GUI_System;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;

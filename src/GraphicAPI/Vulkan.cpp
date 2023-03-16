@@ -227,11 +227,10 @@ namespace GLVM::core
         createTextureSampler();
         // createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
         // createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
-        loadWavefrontObj();
-        createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
-        createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
+        loadWavefrontObj();                                                           ///< Both second functions inside this function
+		createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
+		createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
         createUniformBuffers();
-
         createDescriptorPool();
         createDescriptorSets();
         createCommandBuffers();
@@ -1222,33 +1221,33 @@ namespace GLVM::core
             }
         }
 
-        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
+        // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
 
-        VkViewport viewportHUD{};
-        viewportHUD.x = 0.0f;
-        viewportHUD.y = 0.0f;
-        viewportHUD.width = (float) swapChainExtent.width;
-        viewportHUD.height = (float) swapChainExtent.height;
-        viewportHUD.minDepth = 0.0f;
-        viewportHUD.maxDepth = 1.0f;
-        vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
+        // VkViewport viewportHUD{};
+        // viewportHUD.x = 0.0f;
+        // viewportHUD.y = 0.0f;
+        // viewportHUD.width = (float) swapChainExtent.width;
+        // viewportHUD.height = (float) swapChainExtent.height;
+        // viewportHUD.minDepth = 0.0f;
+        // viewportHUD.maxDepth = 1.0f;
+        // vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
 
-        VkRect2D scissorHUD{};
-        scissorHUD.offset = {0, 0};
-        scissorHUD.extent = swapChainExtent;
-        vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
+        // VkRect2D scissorHUD{};
+        // scissorHUD.offset = {0, 0};
+        // scissorHUD.extent = swapChainExtent;
+        // vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
 
-        VkBuffer vertexBuffersHUD[] = {hudVertexBuffer};
-        VkDeviceSize offsetsHUD[] = {0};
-        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
+        // VkBuffer vertexBuffersHUD[] = {hudVertexBuffer};
+        // VkDeviceSize offsetsHUD[] = {0};
+        // vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
 
-        vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        // vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-        unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
-            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
-            vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
-        }
+        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
+        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
+        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
+        //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
+        // }
         
         vkCmdEndRenderPass(commandBuffer);
 
@@ -1298,7 +1297,7 @@ namespace GLVM::core
         //     ubo.proj.SelfIdentity();
         // }
 
-        
+		std::cout << currentImage << std::endl;
         if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_) {
             ubo.view.SelfIdentity();
             ubo.proj.SelfIdentity();
