@@ -18,8 +18,7 @@ namespace GLVM::ecs
         // Shader_Program_->SetUniformID();
         
         cm::transform* Player_Transform_Component;
-        for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j)
-        {
+        for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j) {
             unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
             Player_Transform_Component = (pComponent_Manager->GetComponent<cm::transform>(uiEntity_refView));
             SetViewMatrix(*Player_Transform_Component, *pComponent_Manager->GetComponent<cm::beholder>(uiEntity_refView));
@@ -29,7 +28,7 @@ namespace GLVM::ecs
     void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& cameraComponent)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-        const float kSensitivity = 0.05f;
+        const float kSensitivity = 0.1f;
 
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         fPitch = g_eEvent.mousePointerPosition.offset_Y;
@@ -50,18 +49,18 @@ namespace GLVM::ecs
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         cameraComponent.forward = Normalize(front);
 
-        // tView_Matrix = LookAtMain(_Player.tPosition,
-		// 						  _Player.tPosition + _view_Component.Front_Camera,
-		// 						  _view_Component.Up_Camera);
-
-		tView_Matrix = LookAtMain(_Player.tPosition,
-								  vec3(0.0f, 0.0f, 0.0f),
+        tView_Matrix = LookAtMain(_Player.tPosition,
+								  _Player.tPosition + cameraComponent.forward,
 								  cameraComponent.up);
 
+		// tView_Matrix = LookAtMain(_Player.tPosition,
+		// 						  vec3(0.0f, 0.0f, 0.0f),
+		// 						  cameraComponent.up);
+
 		
- 		cameraComponent.Position[0] = _Player.tPosition[0];
-		cameraComponent.Position[1] = _Player.tPosition[1];
-		cameraComponent.Position[2] = _Player.tPosition[2];
+ 		// cameraComponent.Position[0] = _Player.tPosition[0];
+		// cameraComponent.Position[1] = _Player.tPosition[1];
+		// cameraComponent.Position[2] = _Player.tPosition[2];
 
 		Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
@@ -69,7 +68,7 @@ namespace GLVM::ecs
 
     void CCameraSystem::SetProjectionMatrix()
 	{
-		tProjection_Matrix = Perspective(Radians(90.0f), (float)1024 / (float)1024, 1.0f, 25.0f);
+		tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
         Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}
 }

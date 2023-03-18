@@ -55,48 +55,6 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/WindowCreator.o",
-      "src/WindowCreator.cpp"
-    ],
-    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/WindowCreator.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/WindowCreator.o"
-  },
-  {
-    "arguments": [
-      "/usr/lib/llvm/15/bin/clang++",
-      "-I./include",
-      "-c",
-      "-std=c++20",
-      "-g",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-Wpedantic",
-      "-O2",
-      "-fsanitize=null",
-      "-o",
-      "build/EngineMain.o",
-      "src/EngineMain.cpp"
-    ],
-    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/EngineMain.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/EngineMain.o"
-  },
-  {
-    "arguments": [
-      "/usr/lib/llvm/15/bin/clang++",
-      "-I./include",
-      "-c",
-      "-std=c++20",
-      "-g",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-Wpedantic",
-      "-O2",
-      "-fsanitize=null",
-      "-o",
       "build/Systems/RenderSystem.o",
       "src/Systems/RenderSystem.cpp"
     ],
@@ -118,12 +76,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/UnixApi/ChronoX.o",
-      "src/UnixApi/ChronoX.cpp"
+      "build/WindowCreator.o",
+      "src/WindowCreator.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/UnixApi/ChronoX.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/UnixApi/ChronoX.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/WindowCreator.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/WindowCreator.o"
   },
   {
     "arguments": [
@@ -160,12 +118,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/Systems/GUISystem.o",
-      "src/Systems/GUISystem.cpp"
+      "build/EntityManager.o",
+      "src/EntityManager.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/GUISystem.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/GUISystem.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/EntityManager.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/EntityManager.o"
   },
   {
     "arguments": [
@@ -181,12 +139,54 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/SystemManager.o",
-      "src/SystemManager.cpp"
+      "build/EngineMain.o",
+      "src/EngineMain.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/SystemManager.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/SystemManager.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/EngineMain.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/EngineMain.o"
+  },
+  {
+    "arguments": [
+      "/usr/lib/llvm/15/bin/clang++",
+      "-I./include",
+      "-c",
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-O2",
+      "-fsanitize=null",
+      "-o",
+      "build/UnixApi/ChronoX.o",
+      "src/UnixApi/ChronoX.cpp"
+    ],
+    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/UnixApi/ChronoX.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/UnixApi/ChronoX.o"
+  },
+  {
+    "arguments": [
+      "/usr/lib/llvm/15/bin/clang++",
+      "-I./include",
+      "-c",
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-O2",
+      "-fsanitize=null",
+      "-o",
+      "build/VertexData.o",
+      "src/VertexData.cpp"
+    ],
+    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/VertexData.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/VertexData.o"
   },
   {
     "arguments": [
@@ -244,75 +244,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/ComponentManager.o",
-      "src/ComponentManager.cpp"
-    ],
-    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/ComponentManager.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/ComponentManager.o"
-  },
-  {
-    "arguments": [
-      "/usr/lib/llvm/15/bin/clang++",
-      "-I./include",
-      "-c",
-      "-std=c++20",
-      "-g",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-Wpedantic",
-      "-O2",
-      "-fsanitize=null",
-      "-o",
-      "build/VertexData.o",
-      "src/VertexData.cpp"
-    ],
-    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/VertexData.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/VertexData.o"
-  },
-  {
-    "arguments": [
-      "/usr/lib/llvm/15/bin/clang++",
-      "-I./include",
-      "-c",
-      "-std=c++20",
-      "-g",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-Wpedantic",
-      "-O2",
-      "-fsanitize=null",
-      "-o",
       "build/TimerCreator.o",
       "src/TimerCreator.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
     "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/TimerCreator.cpp",
     "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/TimerCreator.o"
-  },
-  {
-    "arguments": [
-      "/usr/lib/llvm/15/bin/clang++",
-      "-I./include",
-      "-c",
-      "-std=c++20",
-      "-g",
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-Wpedantic",
-      "-O2",
-      "-fsanitize=null",
-      "-o",
-      "build/chelik.o",
-      "src/chelik.cpp"
-    ],
-    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/chelik.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/chelik.o"
   },
   {
     "arguments": [
@@ -349,12 +286,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/EntityManager.o",
-      "src/EntityManager.cpp"
+      "build/Systems/GUISystem.o",
+      "src/Systems/GUISystem.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/EntityManager.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/EntityManager.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/GUISystem.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/GUISystem.o"
   },
   {
     "arguments": [
@@ -370,12 +307,33 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/Systems/PhysicsSystem.o",
-      "src/Systems/PhysicsSystem.cpp"
+      "build/ComponentManager.o",
+      "src/ComponentManager.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/PhysicsSystem.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/PhysicsSystem.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/ComponentManager.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/ComponentManager.o"
+  },
+  {
+    "arguments": [
+      "/usr/lib/llvm/15/bin/clang++",
+      "-I./include",
+      "-c",
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-O2",
+      "-fsanitize=null",
+      "-o",
+      "build/chelik.o",
+      "src/chelik.cpp"
+    ],
+    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/chelik.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/chelik.o"
   },
   {
     "arguments": [
@@ -433,12 +391,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/UnixApi/SoundEngineAlsa.o",
-      "src/UnixApi/SoundEngineAlsa.cpp"
+      "build/SystemManager.o",
+      "src/SystemManager.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/UnixApi/SoundEngineAlsa.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/UnixApi/SoundEngineAlsa.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/SystemManager.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/SystemManager.o"
   },
   {
     "arguments": [
@@ -454,12 +412,54 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/Systems/CameraSystem.o",
-      "src/Systems/CameraSystem.cpp"
+      "build/Systems/PhysicsSystem.o",
+      "src/Systems/PhysicsSystem.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/CameraSystem.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/CameraSystem.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/PhysicsSystem.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/PhysicsSystem.o"
+  },
+  {
+    "arguments": [
+      "/usr/lib/llvm/15/bin/clang++",
+      "-I./include",
+      "-c",
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-O2",
+      "-fsanitize=null",
+      "-o",
+      "build/SoundEngineFactory.o",
+      "src/SoundEngineFactory.cpp"
+    ],
+    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/SoundEngineFactory.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/SoundEngineFactory.o"
+  },
+  {
+    "arguments": [
+      "/usr/lib/llvm/15/bin/clang++",
+      "-I./include",
+      "-c",
+      "-std=c++20",
+      "-g",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wpedantic",
+      "-O2",
+      "-fsanitize=null",
+      "-o",
+      "build/UnixApi/SoundEngineAlsa.o",
+      "src/UnixApi/SoundEngineAlsa.cpp"
+    ],
+    "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/UnixApi/SoundEngineAlsa.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/UnixApi/SoundEngineAlsa.o"
   },
   {
     "arguments": [
@@ -496,12 +496,12 @@
       "-O2",
       "-fsanitize=null",
       "-o",
-      "build/SoundEngineFactory.o",
-      "src/SoundEngineFactory.cpp"
+      "build/Systems/CameraSystem.o",
+      "src/Systems/CameraSystem.cpp"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
-    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/SoundEngineFactory.cpp",
-    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/SoundEngineFactory.o"
+    "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/src/Systems/CameraSystem.cpp",
+    "output": "/home/cyberdemon/cyberdemon_code/GLVMEngine/build/Systems/CameraSystem.o"
   },
   {
     "arguments": [
@@ -806,11 +806,11 @@
       "-x",
       "c++",
       "-o",
-      "/tmp/GLPointer-207a21.o",
+      "/tmp/GLPointer-c76962.o",
       "GLPointer.c"
     ],
     "directory": "/home/cyberdemon/cyberdemon_code/GLVMEngine",
     "file": "/home/cyberdemon/cyberdemon_code/GLVMEngine/GLPointer.c",
-    "output": "/tmp/GLPointer-207a21.o"
+    "output": "/tmp/GLPointer-c76962.o"
   }
 ]

@@ -1288,7 +1288,20 @@ namespace GLVM::core
         ubo.model[1][3] = _transformComponent.tPosition[1];
         ubo.model[2][3] = _transformComponent.tPosition[2];
         ubo.model.SelfTensorTranspose();
-        
+
+		for ( int i = 0; i < 4; ++i )
+			for ( int j = 0; j < 4; ++j ) {
+				if ( i == j ) {
+					std::cout <<  "View: " << viewMatrix[i][j] << std::endl;
+					std::cout <<  "Projection: " << projectionMatrix[i][j] << std::endl;
+				// 	viewMatrix[i][j] = 1.0f;
+				// 	projectionMatrix[i][j] = 1.0f;
+				// } else {
+				// 	viewMatrix[i][j] = 0.0f;
+				// 	projectionMatrix[i][j] = 0.0f;
+				}
+			}
+		
         ubo.view = viewMatrix;
         ubo.proj = projectionMatrix;
 
@@ -1297,7 +1310,6 @@ namespace GLVM::core
         //     ubo.proj.SelfIdentity();
         // }
 
-		std::cout << currentImage << std::endl;
         if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_) {
             ubo.view.SelfIdentity();
             ubo.proj.SelfIdentity();

@@ -28,13 +28,13 @@ int main()
 	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
 	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
-    MeshManager->SetMesh("../waveFrontObj/sphere.obj");
-    MeshManager->SetMesh("../waveFrontObj/cone.obj");
-    MeshManager->SetMesh("../waveFrontObj/monkey.obj");
+//    MeshManager->SetMesh("../waveFrontObj/sph.obj");
+//    MeshManager->SetMesh("../waveFrontObj/cone.obj");
+//    MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-
+	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
@@ -63,7 +63,7 @@ int main()
     //    hudTextureVector.push_back(hudTexture_1);
 
     hudTextureManager->SetTextureVector(hudTextureVector);
-	core::Engine* GLVM = core::Engine::GetInstance();		
+
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
@@ -76,7 +76,7 @@ int main()
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
-    ComponentManager->GetComponent<cm::vertex>(plain0)->vkVertexId_ = 4;
+    ComponentManager->GetComponent<cm::vertex>(plain0)->vkVertexId_ = 1;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -165,10 +165,10 @@ int main()
 
 	Entity pointLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight1);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 3.3f, 3.5f },
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 3.3f, 5.5f },
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 3.3f, 3.5f }, .fScale = 0.3f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 3.3f, 5.5f }, .fScale = 0.3f };
 	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 0;
 	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
 	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };

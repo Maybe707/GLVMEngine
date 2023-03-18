@@ -507,7 +507,7 @@ namespace GLVM::core
 	}
 	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
-		RaycastringDebug();
+//		RaycastringDebug();
 
 		coreShaderProgram->Use();
 		
@@ -552,16 +552,16 @@ namespace GLVM::core
 			}
 
 
-		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
-			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
-				modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
-				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE30);
-				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-			}
+		// for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
+		// 	for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+		// 		unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+        //         unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
+		// 		modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
+		// 		shaderProgram_->SetMat4("modelMatrix", modelMatrix);
+		// 		pGLActive_Texture(GL_TEXTURE30);
+		// 		pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+		// 		glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+		// 	}
 	}
 
 	void COpenglRenderer::RaycastringDebug() {
