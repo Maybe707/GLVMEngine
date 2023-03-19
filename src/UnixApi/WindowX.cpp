@@ -358,9 +358,12 @@ namespace GLVM::core
     void CWindowX::CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset)
     {
         ///< Solve a problem with endlessly growing numbers in the start game run.
-        if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
-            return;
-        
+        // if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
+        //     return;
+
+		std::cout << "x2: " << *_x_offset << std::endl;
+		std::cout << "y2: " << *_y_offset << std::endl;
+		
         int iOffset_X = 0, iOffset_Y = 0;
         iOffset_X = _x_position - 960;
         iOffset_Y = _y_position - 540;
@@ -400,10 +403,10 @@ namespace GLVM::core
 			{
             case MotionNotify:
                 motion = uXEvent.xmotion;
-                
+
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
-                _Event.mousePointerPosition.offset_X = motion.x;
-                _Event.mousePointerPosition.offset_Y = motion.y;
+                _Event.mousePointerPosition.position_X = motion.x;
+                _Event.mousePointerPosition.position_Y = motion.y;
                                 
                 ///< Search MapNotify events depend on XMapWindow(pDisp_, Win_) function.
             case MapNotify:

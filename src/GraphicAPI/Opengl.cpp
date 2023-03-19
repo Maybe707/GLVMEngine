@@ -820,6 +820,10 @@ namespace GLVM::core
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
     {
+		static int viewCount = 0;
+		std::cout << "Count: " << viewCount << std::endl;
+		++viewCount;
+		
         Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
@@ -842,6 +846,9 @@ namespace GLVM::core
         forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
         beholder.forward = Normalize(forward);
 
+		std::cout << "Opengl" << std::endl;
+		std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
+		
         viewMatrix = LookAtMain(player.tPosition,
 								player.tPosition + beholder.forward,
 								beholder.up);
@@ -850,11 +857,24 @@ namespace GLVM::core
 		// _view_Component.Position[1] = _Player.tPosition[1];
 		// _view_Component.Position[2] = _Player.tPosition[2];
 
+		// for ( int i = 0; i < 4; ++i )
+		// 	for ( int j = 0; j < 4; ++j )
+		// 			std::cout <<  "View: " << viewMatrix[i][j] << std::endl;
+		
 		shaderProgram->SetMat4("viewMatrix", viewMatrix);
     }
 
 	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
+		static int projectionCount = 0;
+		std::cout << "Count: " << projectionCount << std::endl;
+		++projectionCount;
+
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+
+ 		// for ( int i = 0; i < 4; ++i )
+		// 	for ( int j = 0; j < 4; ++j )
+		// 			std::cout <<  "Projection: " << tProjection_Matrix[i][j] << std::endl;
+		
 		shaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
 	}
 }

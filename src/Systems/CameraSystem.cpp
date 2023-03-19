@@ -1,4 +1,5 @@
 #include "Systems/CameraSystem.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "VertexMath.hpp"
@@ -9,20 +10,31 @@ namespace GLVM::ecs
     {
 		namespace cm = GLVM::ecs::components;
 		
-        ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        core::vector<unsigned int>* pEntity_Container_refView =
-			pComponent_Manager->GetEntityContainer<cm::beholder>();
-        unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
+        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+        // core::vector<unsigned int>* pEntity_Container_refView =
+		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
+        // unsigned int uiVector_View_Size = pEntity_Container_refView->GetSize();
         
-        // Shader_Program_->Use();
-        // Shader_Program_->SetUniformID();
+        // // Shader_Program_->Use();
+        // // Shader_Program_->SetUniformID();
         
-        cm::transform* Player_Transform_Component;
-        for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j) {
-            unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
-            Player_Transform_Component = (pComponent_Manager->GetComponent<cm::transform>(uiEntity_refView));
-            SetViewMatrix(*Player_Transform_Component, *pComponent_Manager->GetComponent<cm::beholder>(uiEntity_refView));
-        }
+        // cm::transform* Player_Transform_Component;
+        // for(int j = 0, iSize = uiVector_View_Size; j < iSize; ++j) {
+        //     unsigned int uiEntity_refView = (*pEntity_Container_refView)[j];
+        //     Player_Transform_Component = (pComponent_Manager->GetComponent<cm::transform>(uiEntity_refView));
+        //     SetViewMatrix(*Player_Transform_Component, *pComponent_Manager->GetComponent<cm::beholder>(uiEntity_refView));
+        // }
+
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			// std::cout << "i: " << i << std::endl;
+			// std::cout << "size: " << linkedEntitiesVectorSize << std::endl;
+			Entity currentEntity                = linkedEntities[i];
+			cm::beholder* beholderComponent     = componentManager->GetComponent<cm::beholder>(currentEntity);
+			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
+			SetViewMatrix(*transformComponent, *beholderComponent);
+		}
     }
     
     void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& cameraComponent)
@@ -49,6 +61,10 @@ namespace GLVM::ecs
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         cameraComponent.forward = Normalize(front);
 
+//		std::cout << "x: " << _Player.tPosition[0] << " y: " << _Player.tPosition[1] << " z: " << _Player.tPosition[2] << std::endl;
+		std::cout << "Camera system" << std::endl;
+		std::cout << "x: " << cameraComponent.forward[0] << " y: " << cameraComponent.forward[1] << " z: " << cameraComponent.forward[2] << std::endl;
+		
         tView_Matrix = LookAtMain(_Player.tPosition,
 								  _Player.tPosition + cameraComponent.forward,
 								  cameraComponent.up);
@@ -57,11 +73,15 @@ namespace GLVM::ecs
 		// 						  vec3(0.0f, 0.0f, 0.0f),
 		// 						  cameraComponent.up);
 
-		
  		// cameraComponent.Position[0] = _Player.tPosition[0];
 		// cameraComponent.Position[1] = _Player.tPosition[1];
 		// cameraComponent.Position[2] = _Player.tPosition[2];
 
+		// for ( int i = 0; i < 4; ++i )
+		// 	for ( int j = 0; j < 4; ++j )
+		// 			std::cout <<  "View base: " << tView_Matrix[i][j] << std::endl;
+
+		
 		Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
     }
