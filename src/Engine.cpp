@@ -136,7 +136,7 @@ namespace GLVM::core
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-//			cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->;
+			cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
 			cameraSystem->Render_System_                = renderSystemInterface;
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();

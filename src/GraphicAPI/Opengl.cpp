@@ -90,11 +90,10 @@ namespace GLVM::core
 		using namespace GLVM;
 		namespace cm = GLVM::ecs::components;
 
+		ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
+
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		ecs::ComponentManager* pComponent_Manager = ecs::ComponentManager::GetInstance();
-				
 
 		coreShaderProgram->Use();
 		
@@ -509,8 +508,8 @@ namespace GLVM::core
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
 //		RaycastringDebug();
 
-		coreShaderProgram->Use();
-		
+//		coreShaderProgram->Use();
+
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
@@ -552,16 +551,16 @@ namespace GLVM::core
 			}
 
 
-		// for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
-		// 	for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-		// 		unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-        //         unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
-		// 		modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
-		// 		shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-		// 		pGLActive_Texture(GL_TEXTURE30);
-		// 		pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-		// 		glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-		// 	}
+		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
+			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+                unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
+				modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
+				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
+				pGLActive_Texture(GL_TEXTURE30);
+				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+			}
 	}
 
 	void COpenglRenderer::RaycastringDebug() {
@@ -820,9 +819,9 @@ namespace GLVM::core
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
     {
-		static int viewCount = 0;
-		std::cout << "Count: " << viewCount << std::endl;
-		++viewCount;
+		// static int viewCount = 0;
+		// std::cout << "Count: " << viewCount << std::endl;
+		// ++viewCount;
 		
         Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
@@ -846,8 +845,8 @@ namespace GLVM::core
         forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
         beholder.forward = Normalize(forward);
 
-		std::cout << "Opengl" << std::endl;
-		std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
+		// std::cout << "Opengl" << std::endl;
+		// std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
 		
         viewMatrix = LookAtMain(player.tPosition,
 								player.tPosition + beholder.forward,
@@ -865,9 +864,9 @@ namespace GLVM::core
     }
 
 	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
-		static int projectionCount = 0;
-		std::cout << "Count: " << projectionCount << std::endl;
-		++projectionCount;
+		// static int projectionCount = 0;
+		// std::cout << "Count: " << projectionCount << std::endl;
+		// ++projectionCount;
 
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
 

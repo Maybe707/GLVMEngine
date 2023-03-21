@@ -40,7 +40,7 @@ namespace GLVM::ecs
     void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& cameraComponent)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-        const float kSensitivity = 0.1f;
+        const float kSensitivity = 0.05f;
 
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         fPitch = g_eEvent.mousePointerPosition.offset_Y;
