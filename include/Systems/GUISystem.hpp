@@ -19,8 +19,10 @@ namespace GLVM::ecs
     public:
 		CGUISystem();
         void Update() override;
+		void RaycastringDebug();
 
         Shader* _Shader_Program;
+		Shader* debugLines;
     };
 }
 

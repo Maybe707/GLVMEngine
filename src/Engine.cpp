@@ -61,7 +61,7 @@ namespace GLVM::core
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
 
 		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
-//		GUI_System               = new ecs::CGUISystem();
+		GUI_System               = new ecs::CGUISystem();
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
@@ -94,7 +94,7 @@ namespace GLVM::core
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 		pSystem_Manager->ActivateSystem(cameraSystem);
 		pSystem_Manager->ActivateSystem(renderSystemInterface);
-//		pSystem_Manager->ActivateSystem(GUI_System);
+		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();

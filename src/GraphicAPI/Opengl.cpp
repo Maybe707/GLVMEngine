@@ -94,7 +94,7 @@ namespace GLVM::core
 
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+		
 		coreShaderProgram->Use();
 		
 		core::vector<unsigned int>* pEntityContainerRefDirectionalLight =
@@ -185,8 +185,7 @@ namespace GLVM::core
 		ComputeDirectionalLight();
 		ComputePointLight();
 		ComputeSpotLight();
- 
-		
+
 	    EvaluateCoreShader();
 		RenderScene(coreShaderProgram);
 
@@ -506,14 +505,10 @@ namespace GLVM::core
 	}
 	
 	void COpenglRenderer::RenderScene(Shader* shaderProgram_) {
-//		RaycastringDebug();
-
-//		coreShaderProgram->Use();
-
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
-		
+
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
