@@ -783,7 +783,7 @@ namespace GLVM::core
 
 //		transformComponent_.rotate += delta;
 		
-		rotationMatrix = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), transformComponent_.rotate);
+		rotationMatrix = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.rotate);
 		
 		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
