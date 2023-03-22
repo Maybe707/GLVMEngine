@@ -34,7 +34,7 @@ namespace GLVM::ecs
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 										   float backtrackingScale, float comparedScale) {
         if((backtrackingPosition[1] - backtrackingScale / 2) >
-		   (comparedPosition[1] + (comparedScale / 2  - (comparedScale / 10)))) {
+		   (comparedPosition[1] + (comparedScale / 2))) {
             return true;
         }
 
@@ -96,11 +96,16 @@ namespace GLVM::ecs
 				
                 unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
                 unsigned int comparedEntityRefCollider     = linkedEntities[j];
+				
 				vec3 backtrackingTransform = componentManager->
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
+				vec3 backtrackingTransformUpper = componentManager->
 					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
 				float backtrackingScale = componentManager->
 					GetComponent<cm::transform>(backtrackingEntityRefCollider)->fScale;
 			    vec3  comparedTransform     = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
+				vec3 comparedTransformUpper = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
 				float comparedScale     = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
@@ -129,10 +134,12 @@ namespace GLVM::ecs
 											  comparedTransform,
 											  backtrackingScale,
 											  comparedScale);
-                upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
-					                                  comparedTransform,
-					                                  backtrackingScale,
-													  comparedScale);
+				if ( boxColliderFlag ) {
+					upperActorCheckFlag = UpperActorCheck(backtrackingTransformUpper,
+														  comparedTransformUpper,
+														  backtrackingScale,
+														  comparedScale);
+				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
 //					std::cout << "TEST 1" << std::endl;

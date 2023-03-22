@@ -77,16 +77,10 @@ namespace GLVM::ecs
         unsigned int uiTransformt_Loc2 = pGLGet_Uniform_Location(_Shader_Program->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc2, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 
-		GLuint vboPlane, vaoPlane;
-		float plane[24] = {
-			-0.3f,  0.3f, -0.5f,
-			0.3f,  0.3f, -0.5f,
-			-0.3f, -0.3f, -0.5f,
-			0.3f,  0.3f, -0.5f,
-			0.3f,  0.3f, -0.5f,
-			0.3f, -0.3f, -0.5f,
-			-0.3f,  0.3f, -0.5f,
-			-0.3f, -0.3f, -0.5f,
+		GLuint vboRay, vaoRay;
+		float ray[24] = {
+			0.0f,  0.3f, -0.5f,
+			0.0f,  0.0f, -0.5f,
 		};
 
 		// GLuint vboLines, vaoLines;
@@ -101,13 +95,13 @@ namespace GLVM::ecs
 		// 	-0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f
 		// };
 
-        pGLGen_Vertex_Arrays(1, &vaoPlane);
-        pGLGen_Buffers(1, &vboPlane);
+        pGLGen_Vertex_Arrays(1, &vaoRay);
+        pGLGen_Buffers(1, &vboRay);
         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        pGLBind_Vertex_Array(vaoPlane);
+        pGLBind_Vertex_Array(vaoRay);
 
-        pGLBind_Buffer(GL_ARRAY_BUFFER, vboPlane);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(plane), plane, GL_DYNAMIC_DRAW);
+        pGLBind_Buffer(GL_ARRAY_BUFFER, vboRay);
+        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(ray), ray, GL_DYNAMIC_DRAW);
 
         pGLVertex_Attrib_Pointer(0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
