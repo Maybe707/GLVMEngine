@@ -101,7 +101,7 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // Sound_Engine_->GetSoundContainer().Push(pSound_Sample);
-		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
+		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 3;
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };

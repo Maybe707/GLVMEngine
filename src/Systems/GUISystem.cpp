@@ -23,19 +23,23 @@ namespace GLVM::ecs
         unsigned int uiTransformt_Loc = pGLGet_Uniform_Location(_Shader_Program->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(uiTransformt_Loc, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 
+//		tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
+		unsigned int transformLocationProjection = pGLGet_Uniform_Location(_Shader_Program->iID, "projectionMatrix");
+		pGLUniform_Matrix4fv(transformLocationProjection, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
+						
         float aCrosshair_Vertices[] = {
-			-0.1, 0.5, 0.0,
-			0.1, -0.5, 0.0,
-			0.1, 0.5, 0.0,
-			-0.1, 0.5, 0.0,
-			-0.1, -0.5, 0.0,
-			0.1, -0.5, 0.0,
-			-0.5, 0.1, 0.0,
-		    0.5, -0.1, 0.0,
-			0.5, 0.1, 0.0,
-			-0.5, 0.1, 0.0,
-			-0.5, -0.1, 0.0,
-			0.5, -0.1, 0.0
+			-0.1, 0.5, -0.3,
+			0.1, -0.5, -0.3,
+			0.1, 0.5, -0.3,
+			-0.1, 0.5, -0.3,
+			-0.1, -0.5, -0.3,
+			0.1, -0.5, -0.3,
+			-0.5, 0.1, -0.3,
+		    0.5, -0.1, -0.3,
+			0.5, 0.1, -0.3,
+			-0.5, 0.1, -0.3,
+			-0.5, -0.1, -0.3,
+			0.5, -0.1, -0.3
         }; 
 
         pGLGen_Vertex_Arrays(1, &iVao_Crosshair_);
@@ -65,58 +69,61 @@ namespace GLVM::ecs
 
 
 
-		Matrix<float, 4> tModel_Matrix2(1.0);
-        tModel_Matrix[0][0] = 1.05;
-        tModel_Matrix[1][1] = 1.05;
-        tModel_Matrix[2][2] = 1.05;
-        Matrix<float, 4> tProjection_Matrix2(1.0f);
-        Matrix<float, 4> tView_Matrix2(1.0f);
+// 		Matrix<float, 4> tModel_Matrix2(1.0);
+//         tModel_Matrix[0][0] = 1.05;
+//         tModel_Matrix[1][1] = 1.05;
+//         tModel_Matrix[2][2] = 1.05;
+//         Matrix<float, 4> tProjection_Matrix2(1.0f);
+//         Matrix<float, 4> tView_Matrix2(1.0f);
 
-        _Shader_Program->Use();
+//         _Shader_Program->Use();
 		
-        unsigned int uiTransformt_Loc2 = pGLGet_Uniform_Location(_Shader_Program->iID, "modelMatrix");
-		pGLUniform_Matrix4fv(uiTransformt_Loc2, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
+//         unsigned int uiTransformt_Loc2 = pGLGet_Uniform_Location(_Shader_Program->iID, "modelMatrix");
+// 		pGLUniform_Matrix4fv(uiTransformt_Loc2, NUMBER_OF_MATRICES, GL_FALSE, &tModel_Matrix[0][0]);
 
-		GLuint vboRay, vaoRay;
-		float ray[24] = {
-			0.0f,  0.3f, -0.5f,
-			0.0f,  0.0f, -0.5f,
-		};
+// 		tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
+// 		pGLUniform_Matrix4fv(transformLocationProjection, NUMBER_OF_MATRICES, GL_FALSE, &tProjection_Matrix[0][0]);
+		
+// 		GLuint vboRay, vaoRay;
+// 		float ray[24] = {
+// 			0.0f,  -0.5f, -0.3f,
+// 			0.9f,  0.0f, -1.0f,
+// 		};
 
-		// GLuint vboLines, vaoLines;
-		// float lines[48] = {
-		// 	-0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	-0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	-0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
-		// 	-0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f
-		// };
+// 		// GLuint vboLines, vaoLines;
+// 		// float lines[48] = {
+// 		// 	-0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	-0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	-0.3f,  0.3f, -0.5f, 0.0f, 0.0f, 0.0f,
+// 		// 	-0.3f, -0.3f, -0.5f, 0.0f, 0.0f, 0.0f
+// 		// };
 
-        pGLGen_Vertex_Arrays(1, &vaoRay);
-        pGLGen_Buffers(1, &vboRay);
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        pGLBind_Vertex_Array(vaoRay);
+//         pGLGen_Vertex_Arrays(1, &vaoRay);
+//         pGLGen_Buffers(1, &vboRay);
+//         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+//         pGLBind_Vertex_Array(vaoRay);
 
-        pGLBind_Buffer(GL_ARRAY_BUFFER, vboRay);
-        pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(ray), ray, GL_DYNAMIC_DRAW);
+//         pGLBind_Buffer(GL_ARRAY_BUFFER, vboRay);
+//         pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(ray), ray, GL_DYNAMIC_DRAW);
 
-        pGLVertex_Attrib_Pointer(0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
-        pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+//         pGLVertex_Attrib_Pointer(0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)VERTEX_OFFSET);
+//         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
         
-        glClear(GL_DEPTH_BUFFER_BIT);
+//         glClear(GL_DEPTH_BUFFER_BIT);
         
-//        glDrawArrays(GL_TRIANGLES, 0, 6);
-		glDrawArrays(GL_LINES, 0, 8);	
+// //        glDrawArrays(GL_TRIANGLES, 0, 6);
+// 		glDrawArrays(GL_LINES, 0, 8);	
 
-        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-        pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
+//         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+//         pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
 
-        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-        pGLBind_Vertex_Array(0);
+//         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+//         // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+//         pGLBind_Vertex_Array(0);
     }
 
 	void CGUISystem::RaycastringDebug() {
@@ -227,4 +234,6 @@ namespace GLVM::ecs
 // 		pGLBind_Vertex_Array(vaoLines);
 // 		glDrawArrays(GL_LINES, 0, 2);	
 	}
+
+
 }

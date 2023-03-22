@@ -561,7 +561,7 @@ Matrix<T, 4> FPS_View_RH(Vector<T, 3> _eye, float _pitch, float _yaw)
 }
 
 template <class T, int var, int vec_size>
-Matrix<T, var> Rotate(Matrix<T, var> matrix, Vector<T, vec_size> vector, float angle)
+Matrix<T, var> Rotate(Vector<T, vec_size> vector, float angle)
 {
     vector = (Normalize(vector));
 
@@ -623,10 +623,10 @@ Matrix<T, var> Rotate(Matrix<T, var> matrix, Vector<T, vec_size> vector, float a
 	// tempMatrix[3][2] = 0;
 	// tempMatrix[3][3] = 1;
 
-    Matrix<float, 4> model_mat(1.0f);
-    model_mat = matrix * tempMatrix;
+    // Matrix<float, 4> model_mat(1.0f);
+    // model_mat = matrix * tempMatrix;
     
-	return model_mat;
+	return tempMatrix;
 }
 
 template <class T, int var>

@@ -32,6 +32,7 @@ int main()
 	// MeshManager->SetMesh("../waveFrontObj/cone.obj");
 	// MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
+	MeshManager->SetMesh("../waveFrontObj/ray.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
 	core::Engine* GLVM = core::Engine::GetInstance();		
@@ -67,7 +68,7 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 2.5f, 2.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 3.5f, 2.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };

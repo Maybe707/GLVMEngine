@@ -40,7 +40,7 @@ namespace GLVM::ecs
     void CCameraSystem::SetViewMatrix(components::transform& _Player, components::beholder& cameraComponent)
     {
         Matrix<float, 4> tView_Matrix(1.0f);
-        const float kSensitivity = 0.05f;
+        const float kSensitivity = 0.1f;
 
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         fPitch = g_eEvent.mousePointerPosition.offset_Y;
@@ -49,7 +49,7 @@ namespace GLVM::ecs
 
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
-        
+
         if(fPitch > 89.0f)
             fPitch = 89.0f;
         if(fPitch < -89.0f)
@@ -61,9 +61,11 @@ namespace GLVM::ecs
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         cameraComponent.forward = Normalize(front);
 
+		std::cout << "x: " << front[0] << " z: " << front[2] << std::endl;
+		
 //		std::cout << "x: " << _Player.tPosition[0] << " y: " << _Player.tPosition[1] << " z: " << _Player.tPosition[2] << std::endl;
-		std::cout << "Camera system" << std::endl;
-		std::cout << "x: " << cameraComponent.forward[0] << " y: " << cameraComponent.forward[1] << " z: " << cameraComponent.forward[2] << std::endl;
+		// std::cout << "Camera system" << std::endl;
+		// std::cout << "x: " << cameraComponent.forward[0] << " y: " << cameraComponent.forward[1] << " z: " << cameraComponent.forward[2] << std::endl;
 		
         tView_Matrix = LookAtMain(_Player.tPosition,
 								  _Player.tPosition + cameraComponent.forward,
