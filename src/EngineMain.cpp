@@ -85,7 +85,8 @@ int main()
     
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f },
+		.rotate = 0.785f, .fScale = 1.0f };
     ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 0;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },

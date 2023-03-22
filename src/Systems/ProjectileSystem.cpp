@@ -58,11 +58,11 @@ namespace GLVM::ecs
 																					  cm::collider>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		
-        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
-            unsigned int uiEntity_refProjectile = linkedEntities[x];
-            cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
-        }
+        // for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+        //     unsigned int uiEntity_refProjectile = linkedEntities[x];
+        //     cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
+		// 	rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
+        // }
 
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
@@ -112,7 +112,7 @@ namespace GLVM::ecs
         // rTextureProjectile.u_iData_ = chelik_dat;
 //        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile->fScale = 0.1f;
+        rTransformProjectile->fScale = 0.2f;
 //        Vector<float, 3> vec(0.0f);
 		
 		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
@@ -120,7 +120,7 @@ namespace GLVM::ecs
 			rTransformProjectile->tPosition = transform->tPosition;
 		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
-		rTransformProjectile->rotate     = std::cos(Radians(fYaw));
+		rTransformProjectile->rotate     = Radians(fYaw);
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
     
