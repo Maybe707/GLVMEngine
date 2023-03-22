@@ -565,7 +565,7 @@ Matrix<T, var> Rotate(Vector<T, vec_size> vector, float angle)
 {
     vector = (Normalize(vector));
 
-	angle *= PI / 180;
+//	angle *= PI / 180;
 	Matrix<T, var> tempMatrix(1.0f);
 
     /// Transposed rotate matrix.

@@ -90,7 +90,8 @@ namespace GLVM::ecs
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
-        
+
+
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
 															  cm::transform, cm::material,
@@ -118,8 +119,8 @@ namespace GLVM::ecs
 		if ( transform != nullptr )
 			rTransformProjectile->tPosition = transform->tPosition;
 		
-        rTransformProjectile->tForward = GetDirectionVector(beholder);
-
+        rTransformProjectile->tForward   = GetDirectionVector(beholder);
+		rTransformProjectile->rotate     = std::cos(Radians(fYaw));
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
     

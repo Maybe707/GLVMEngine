@@ -21,7 +21,7 @@ out VS_OUT {
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 } vs_out;
 
-//uniform mat4 aRotate_Matrix;
+//uniform mat4 rotateMatrix;
 uniform mat4 modelMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 projectionMatrix;

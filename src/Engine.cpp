@@ -138,6 +138,7 @@ namespace GLVM::core
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
 			cameraSystem->Render_System_                = renderSystemInterface;
+			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();
 			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.SwapBuffers();

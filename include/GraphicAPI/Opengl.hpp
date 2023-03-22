@@ -62,6 +62,7 @@ namespace GLVM::core {
 		Shader* debugLines;                            ///< For debug only
 		GLuint quadVAO_;
 		GLuint quadVBO_;
+		float delta;
 
 		GLuint vboPlane, vaoPlane;
 		float plane[36] = {

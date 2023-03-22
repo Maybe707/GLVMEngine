@@ -779,13 +779,19 @@ namespace GLVM::core
 		translationMatrix[3][2] = transformComponent_.tPosition[2];
         translationMatrix[3][3] = 1.0f;
 
+		std::cout << "rotate: " << transformComponent_.rotate << std::endl;
+
+//		transformComponent_.rotate += delta;
+		
+		rotationMatrix = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), transformComponent_.rotate);
+		
 		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
 		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
 		
         modelMatrix = scalingMatrix * translationMatrix;
 
-		return modelMatrix;
+		return rotationMatrix * modelMatrix;
 	}
 
     void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {
@@ -834,19 +840,18 @@ namespace GLVM::core
         if(pitch < -89.0f)
             pitch = -89.0f;
 
-		std::cout << "Pitch in radians: " << Radians(pitch) << std::endl;
-		std::cout << "Yaw in radians: " << Radians(fYaw) << std::endl;
+		// std::cout << "Pitch in radians: " << Radians(pitch) << std::endl;
+		// std::cout << "Yaw in radians: " << Radians(fYaw) << std::endl;
 		
-		std::cout << "cos yaw: " << std::cos(Radians(fYaw)) << std::endl;
-		std::cout << "sin yaw: " << std::sin(Radians(fYaw)) << std::endl;
-		std::cout << "cos pitch: " << std::cos(Radians(pitch)) << std::endl;
-		std::cout << "sin pitch: " << std::sin(Radians(pitch)) << std::endl;
+		// std::cout << "cos yaw: " << std::cos(Radians(fYaw)) << std::endl;
+		// std::cout << "sin yaw: " << std::sin(Radians(fYaw)) << std::endl;
+		// std::cout << "cos pitch: " << std::cos(Radians(pitch)) << std::endl;
+		// std::cout << "sin pitch: " << std::sin(Radians(pitch)) << std::endl;
 		
 		vec3 forward;
 		/// We have dot product here to compute projection to axes
         forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
-//        forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
-		forward[1] = 0.0f;                              ///< Projection to y axis
+        forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
         forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
         beholder.forward = Normalize(forward);
 

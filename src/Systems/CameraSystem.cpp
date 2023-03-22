@@ -61,7 +61,7 @@ namespace GLVM::ecs
         front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
         cameraComponent.forward = Normalize(front);
 
-		std::cout << "x: " << front[0] << " z: " << front[2] << std::endl;
+//		std::cout << "x: " << front[0] << " z: " << front[2] << std::endl;
 		
 //		std::cout << "x: " << _Player.tPosition[0] << " y: " << _Player.tPosition[1] << " z: " << _Player.tPosition[2] << std::endl;
 		// std::cout << "Camera system" << std::endl;
