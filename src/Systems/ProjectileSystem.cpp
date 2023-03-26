@@ -58,11 +58,11 @@ namespace GLVM::ecs
 																					  cm::collider>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		
-        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
-            unsigned int uiEntity_refProjectile = linkedEntities[x];
-            cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
-        }
+        // for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+        //     unsigned int uiEntity_refProjectile = linkedEntities[x];
+        //     cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
+		// 	rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
+        // }
 
         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
@@ -120,7 +120,9 @@ namespace GLVM::ecs
 			rTransformProjectile->tPosition = transform->tPosition;
 		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
-		rTransformProjectile->rotate     = Radians(fYaw);
+		rTransformProjectile->yaw        = Radians(fYaw);
+		rTransformProjectile->pitch      = Radians(fPitch);
+		std::cout << "In projectile: " << rTransformProjectile->pitch << std::endl;
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
     

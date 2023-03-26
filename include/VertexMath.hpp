@@ -78,6 +78,7 @@ public:
         
 	Matrix<T, var> operator*(Matrix& matrix);
 	T* operator[](const int index);
+	const T* operator[](const int index) const;
 	template<class T2, int var2>
 	Vector<T2, var2> operator*(Vector<T2, var2>& vector);
 };
@@ -109,6 +110,23 @@ template <class T, int var>
 T* Matrix<T, var>::operator[](const int index)
 {
 	return m_matrix[index];
+}
+
+template <class T, int var>
+const T* Matrix<T, var>::operator[](const int index) const
+{
+	return m_matrix[index];
+}
+
+template <int var2>
+std::ostream& operator<<(std::ostream& ostream, const Matrix<float, var2>& matrix) {
+	for ( int i = 0; i < var2; ++i) {
+		ostream << std::endl;
+		for ( int j = 0; j < var2; ++j) {
+			ostream << matrix[i][j] << " ";
+		}
+	}
+	return ostream;
 }
 
 template <class T, int var>

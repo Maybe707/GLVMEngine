@@ -509,6 +509,9 @@ namespace GLVM::core
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
 
+		RaycastringDebug();
+		coreShaderProgram->Use();
+		
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -632,24 +635,20 @@ namespace GLVM::core
         pGLBind_Vertex_Array(0);         
 
 		mat4 linesModelMatrix(1.0);
-		linesModelMatrix[0][0] = 10.0;
-		linesModelMatrix[1][1] = 10.0;
-		linesModelMatrix[2][2] = 10.0;
+		linesModelMatrix[0][0] = 1.0;
+		linesModelMatrix[1][1] = 1.0;
+		linesModelMatrix[2][2] = 1.0;
 		linesModelMatrix[3][3] = 1.0;
-		linesModelMatrix[3][0] = 3.0;
-		linesModelMatrix[3][1] = 5.0;
-		linesModelMatrix[3][2] = 3.0;
+		linesModelMatrix[3][0] = 0.0;
+		linesModelMatrix[3][1] = 0.0;
+		linesModelMatrix[3][2] = 0.0;
 
 		unsigned int locationLines = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(locationLines, NUMBER_OF_MATRICES, GL_FALSE, &linesModelMatrix[0][0]);
 
-		float lines[12] = { playerTransformComponent->tPosition[0],
-			playerTransformComponent->tPosition[1],
-			playerTransformComponent->tPosition[2],
+		float lines[12] = { 0.0f, -10.0f, 0.0f,
 			0.0f, 0.0f, 0.0f,
-			playerTransformComponent->tPosition[0] + playerViewComponent->forward[0],
-			playerTransformComponent->tPosition[1] + playerViewComponent->forward[1],
-			playerTransformComponent->tPosition[2] + playerViewComponent->forward[2],
+			0.0f, 10.0f, -0.5f,
 		    0.0f, 0.0f, 0.0f };
 		
 		pGLGen_Vertex_Arrays(1, &vaoLines);
@@ -779,12 +778,16 @@ namespace GLVM::core
 		translationMatrix[3][2] = transformComponent_.tPosition[2];
         translationMatrix[3][3] = 1.0f;
 
-		std::cout << "rotate: " << transformComponent_.rotate << std::endl;
+		// std::cout << "yaw: " << transformComponent_.yaw << std::endl;
+		std::cout << "In renderer: " << transformComponent_.pitch << std::endl;
 
 //		transformComponent_.rotate += delta;
-		
-		rotationMatrix = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.rotate);
-		
+		mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
+		mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
+		// std::cout << "yaw: " << yaw << std::endl;
+		// std::cout << "pitch: " << pitch << std::endl;
+		rotationMatrix =   pitch * yaw;
+//		std::cout << "rotation: " << rotationMatrix << std::endl;
 		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
 		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
