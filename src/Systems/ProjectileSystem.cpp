@@ -15,7 +15,7 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
+//        EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
     
         core::vector<unsigned int>* pEntity_Container_refMove =
 			pComponent_Manager->GetEntityContainer<cm::move>();
@@ -50,39 +50,53 @@ namespace GLVM::ecs
 		// 	pComponent_Manager->GetEntityContainer<cm::projectile>();
         // unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
 
-        ComponentManager* componentManager = ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::projectile,
-																					  cm::transform,
-																					  cm::material,
-																					  cm::vertex,
-																					  cm::collider>();
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+        ComponentManager* componentManager       = ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::projectile,
+																						   cm::transform,
+																						   cm::material,
+																						   cm::vertex,
+																						   cm::collider>();
+		
+		core::vector<Entity> otherLinkedEntities = componentManager->collectLinkedEntities<cm::collider,
+																						   cm::transform>();
+		
+		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
+		unsigned int otherLinkedEntitiesVectorSize = linkedEntities.GetSize();
 		
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
 			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
-        }
 
-        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
+			// TODO: add loop for other entities in game world.
+			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
+				if ( x == j )
+					continue;
+
+				cm::transform* transformOther = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
+				Raycasting(*rTransformProjectile, *transformOther);
+			}
+		}
+
+//         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
-        for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+//         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 
-            unsigned int uiEntity_refProjectile = linkedEntities[i];
-            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
-               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
-				cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
-				TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
-                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-				--linkedEntitiesVectorSize;
-            }
-			// std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
-			// pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
-			// std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
-//			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
-//			std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
-//			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
-        }
+//             unsigned int uiEntity_refProjectile = linkedEntities[i];
+//             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
+//                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
+// 				cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
+// 				TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
+//                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
+// 				--linkedEntitiesVectorSize;
+//             }
+// 			// std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
+// 			// pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
+// 			// std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
+// //			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
+// //			std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
+// //			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
+//         }
     }
 
     void CProjectileSystem::CalculateProjectile(ecs::ComponentManager* componentManager,
@@ -107,13 +121,8 @@ namespace GLVM::ecs
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
         TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
-        // rTextureProjectile.iWidth_  = 96;
-        // rTextureProjectile.iHeight_ = 128;
-        // rTextureProjectile.u_iData_ = chelik_dat;
-//        core::CEngine::GetInstance()->LoadTextureData(rTextureProjectile);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
         rTransformProjectile->fScale = 0.2f;
-//        Vector<float, 3> vec(0.0f);
 		
 		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
 		if ( transform != nullptr )
@@ -122,10 +131,13 @@ namespace GLVM::ecs
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
 		rTransformProjectile->yaw        = Radians(fYaw);
 		rTransformProjectile->pitch      = Radians(fPitch);
-//		std::cout << "In projectile: " << rTransformProjectile->pitch << std::endl;
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
-    
+
+	void CProjectileSystem::Raycasting([[maybe_unused]] components::transform& projectileTransform, [[maybe_unused]] components::transform& targetTransform) {
+		
+	}
+	
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
     {
         const float kSensitivity = 0.1f;
