@@ -33,6 +33,7 @@ int main()
 	// MeshManager->SetMesh("../waveFrontObj/monkey.obj");
 	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
 	MeshManager->SetMesh("../waveFrontObj/ray.obj");
+//	MeshManager->SetMesh("../waveFrontObj/ray_y.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
 	core::Engine* GLVM = core::Engine::GetInstance();		

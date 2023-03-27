@@ -509,8 +509,8 @@ namespace GLVM::core
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
 		mat4 modelMatrix(1.0f);
 
-		RaycastringDebug();
-		coreShaderProgram->Use();
+		// RaycastringDebug();
+		// coreShaderProgram->Use();
 		
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
@@ -646,10 +646,22 @@ namespace GLVM::core
 		unsigned int locationLines = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(locationLines, NUMBER_OF_MATRICES, GL_FALSE, &linesModelMatrix[0][0]);
 
-		float lines[12] = { 0.0f, -10.0f, 0.0f,
-			0.0f, 0.0f, 0.0f,
-			0.0f, 10.0f, -0.5f,
-		    0.0f, 0.0f, 0.0f };
+		float lines[36] = {
+			0.0f, 5.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 5.0f, -5.5f,
+		    0.0f, 1.0f, 0.0f,
+			
+			0.0f, 5.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			0.0f, 10.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f,
+			
+			0.0f, 5.0f, 0.0f,
+			0.0f, 1.0f, 0.0f,
+			5.0f, 5.0f, 0.0f,
+		    0.0f, 1.0f, 0.0f
+		};
 		
 		pGLGen_Vertex_Arrays(1, &vaoLines);
 		pGLGen_Buffers(1, &vboLines);
@@ -663,7 +675,7 @@ namespace GLVM::core
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 
 		pGLBind_Vertex_Array(vaoLines);
-		glDrawArrays(GL_LINES, 0, 2);	
+		glDrawArrays(GL_LINES, 0, 6);	
 	}
 	
 	void COpenglRenderer::RenderQuad()
@@ -779,7 +791,7 @@ namespace GLVM::core
         translationMatrix[3][3] = 1.0f;
 
 		// std::cout << "yaw: " << transformComponent_.yaw << std::endl;
-		std::cout << "In renderer: " << transformComponent_.pitch << std::endl;
+		// std::cout << "pitch: " << transformComponent_.pitch << std::endl;
 
 //		transformComponent_.rotate += delta;
 		mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
