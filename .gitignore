@@ -3,6 +3,7 @@ a.exe
 a.out
 doxy/
 exec
+build/
 .ccls-cache/
 .cache/
 valgrind-out.txt
