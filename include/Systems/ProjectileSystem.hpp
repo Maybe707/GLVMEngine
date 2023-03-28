@@ -36,7 +36,7 @@ namespace GLVM::ecs
         void CalculateProjectile(ecs::ComponentManager* componentManager,
                                  unsigned int entityRefMove,
                                  components::beholder& beholder);
-		void Raycasting(components::transform& projectileTransform, components::transform& targetTransform);
+
         Vector<float, 3> GetDirectionVector(components::beholder& beholder);
     };
 }

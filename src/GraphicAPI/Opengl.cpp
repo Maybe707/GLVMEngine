@@ -561,7 +561,39 @@ namespace GLVM::core
 			}
 	}
 
-	void COpenglRenderer::RaycastringDebug() {
+	void COpenglRenderer::Raycasting() {
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::projectile,
+																						   cm::transform,
+																						   cm::material,
+																						   cm::vertex,
+																						   cm::collider>();
+		
+		core::vector<Entity> otherLinkedEntities = componentManager->collectLinkedEntities<cm::collider,
+																						   cm::transform>();
+		
+		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
+		unsigned int otherLinkedEntitiesVectorSize = linkedEntities.GetSize();
+		
+        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+           unsigned int uiEntity_refProjectile = linkedEntities[x];
+           cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+
+			// TODO: add loop for other entities in game world.
+			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
+				if ( x == j )
+					continue;
+
+				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+				vec3 ray = rTransformProjectile->tForward * 5.0f;
+				
+			}
+		}
+	}
+
+	
+	void COpenglRenderer::RaycastingDebug() {
 		/// TODO: This code for debug purpouses only
 		// float plane[] = {
 		// 	-0.3f, -0.3f, -0.5f, 0.3f, 0.5f, 0.7f,

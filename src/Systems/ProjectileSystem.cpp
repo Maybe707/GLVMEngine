@@ -57,25 +57,12 @@ namespace GLVM::ecs
 																						   cm::vertex,
 																						   cm::collider>();
 		
-		core::vector<Entity> otherLinkedEntities = componentManager->collectLinkedEntities<cm::collider,
-																						   cm::transform>();
-		
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
-		unsigned int otherLinkedEntitiesVectorSize = linkedEntities.GetSize();
 		
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
 			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
-
-			// TODO: add loop for other entities in game world.
-			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-				if ( x == j )
-					continue;
-
-				cm::transform* transformOther = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-				Raycasting(*rTransformProjectile, *transformOther);
-			}
 		}
 
 //         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
@@ -134,10 +121,6 @@ namespace GLVM::ecs
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
 
-	void CProjectileSystem::Raycasting([[maybe_unused]] components::transform& projectileTransform, [[maybe_unused]] components::transform& targetTransform) {
-		
-	}
-	
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
     {
         const float kSensitivity = 0.1f;

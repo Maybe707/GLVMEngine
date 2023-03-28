@@ -147,7 +147,8 @@ namespace GLVM::core {
 		void EvaluateCoreShader();
 		void EvaluateFlatDebugShader();
 		void RenderScene(Shader* shaderProgram_);
-		void RaycastringDebug();                                                         ///< TODO: For debug only
+		void Raycasting();
+		void RaycastingDebug();                                                         ///< TODO: For debug only
 		void RenderQuad();
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
