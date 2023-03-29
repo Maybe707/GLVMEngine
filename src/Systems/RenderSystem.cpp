@@ -30,7 +30,7 @@ namespace GLVM::ecs
     void CRenderSystem::SetTextureData() {
         GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
         GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
-        
+
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
     }
     

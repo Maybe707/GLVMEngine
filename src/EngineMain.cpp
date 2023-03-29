@@ -36,7 +36,7 @@ int main()
 //	MeshManager->SetMesh("../waveFrontObj/ray_y.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-	core::Engine* GLVM = core::Engine::GetInstance();		
+//	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
@@ -49,9 +49,9 @@ int main()
 		.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
 
     std::vector<ecs::Texture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4 };
-
-    TextureManager->SetTextureVector(TextureVector);
 	
+    TextureManager->SetTextureVector(TextureVector);
+
 	ecs::Texture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
 		.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
     // CTexture hudTexture_1;
@@ -65,7 +65,7 @@ int main()
     //    hudTextureVector.push_back(hudTexture_1);
 
     hudTextureManager->SetTextureVector(hudTextureVector);
-//	core::Engine* GLVM = core::Engine::GetInstance();		
+	core::Engine* GLVM = core::Engine::GetInstance();		
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
@@ -123,13 +123,13 @@ int main()
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch4, materialWitch4->diffuseTextureID_);
 	
-    // Entity u_iHud1 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
-    // ComponentManager->GetComponent<cm::vertex>(u_iHud1)->vkVertexId_ = 0;
-	// *ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0, 0.0f, 0.0f }, .fScale = 0.1f , .hud = true };
-	// cm::material* materialHud0   = ComponentManager->GetComponent<cm::material>(u_iHud1);
-	// *materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
-    // hudTextureManager->BindTexture(u_iHud1, materialHud0->diffuseTextureID_);
+    Entity u_iHud1 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform>(u_iHud1);
+    ComponentManager->GetComponent<cm::vertex>(u_iHud1)->vkVertexId_ = 0;
+	*ComponentManager->GetComponent<cm::transform>(u_iHud1) = { .tPosition = { 0.0, 0.0f, 0.0f }, .fScale = 0.1f , .hud = true };
+	cm::material* materialHud0   = ComponentManager->GetComponent<cm::material>(u_iHud1);
+	*materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+    hudTextureManager->BindTexture(u_iHud1, materialHud0->diffuseTextureID_);
 
 	// Entity directionalLight0 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::directionalLight, cm::transform>(directionalLight0);

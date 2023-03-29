@@ -61,7 +61,7 @@ namespace GLVM::core
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
 
 		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
-		GUI_System               = new ecs::CGUISystem();
+//		GUI_System               = new ecs::CGUISystem();
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
@@ -92,7 +92,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(projectileSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		//		pSystem_Manager->ActivateSystem(Animation_System);
-//		pSystem_Manager->ActivateSystem(cameraSystem);
+		pSystem_Manager->ActivateSystem(cameraSystem);
 		pSystem_Manager->ActivateSystem(renderSystemInterface);
 //		pSystem_Manager->ActivateSystem(GUI_System);
 
@@ -136,9 +136,9 @@ namespace GLVM::core
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-			cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
+			// cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
 			cameraSystem->Render_System_                = renderSystemInterface;
-			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
+//			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();
 			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.SwapBuffers();

@@ -83,7 +83,7 @@ namespace GLVM::ecs
 		// 	for ( int j = 0; j < 4; ++j )
 		// 			std::cout <<  "View base: " << tView_Matrix[i][j] << std::endl;
 
-		
+
 		Render_System_->SetViewMatrix(tView_Matrix);
         SetProjectionMatrix();
     }
@@ -91,6 +91,6 @@ namespace GLVM::ecs
     void CCameraSystem::SetProjectionMatrix()
 	{
 		tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
-        Render_System_->SetProjectionMatrix(tProjection_Matrix);
+		Render_System_->SetProjectionMatrix(tProjection_Matrix);
 	}
 }

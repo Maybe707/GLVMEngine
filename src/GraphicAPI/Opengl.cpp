@@ -573,25 +573,26 @@ namespace GLVM::core
 		core::vector<Entity> otherLinkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																						   cm::transform>();
 		
-		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
-		unsigned int otherLinkedEntitiesVectorSize = linkedEntities.GetSize();
+		// unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
+		// unsigned int otherLinkedEntitiesVectorSize = linkedEntities.GetSize();
 		
-        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
-//           unsigned int uiEntity_refProjectile = linkedEntities[x];
-//           cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+        // for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+        //    unsigned int uiEntity_refProjectile = linkedEntities[x];
+        //    cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
 
-			// TODO: add loop for other entities in game world.
-			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-				if ( x == j )
-					continue;
+		// 	// TODO: add loop for other entities in game world.
+		// 	for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
+		// 		if ( x == j )
+		// 			continue;
 
-				// cm::transform* transformOther = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
-				// vec3 ray = rTransformProjectile->tForward * 5.0f;
+		// 		cm::transform* transformOther = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+		// 		vec3 ray = rTransformProjectile->tForward * 5.0f;
 
-				// float 
-				// float delta_x1 = 
-			}
-		}
+		// 		float box_min_x = transformOther->tPosition[0] - transformOther->fScale / 2;
+		// 		float ray_x     = transformOther->tPosition - ray;
+		// 		float delta_x1  = box_min_x - 
+		// 	}
+		// }
 	}
 
 	
@@ -904,6 +905,8 @@ namespace GLVM::core
         forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
         beholder.forward = Normalize(forward);
 
+		std::cout << beholder.forward << std::endl;
+		
 //		std::cout << "x: " << forward[0] << " z: " << forward[2] << std::endl;
 		
 		// std::cout << "Opengl" << std::endl;

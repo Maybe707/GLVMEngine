@@ -16,7 +16,7 @@ namespace GLVM::core
     {
         ///< Create classic window
         pClassic_Window_ = CreateWindowA( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1, NULL, NULL, GetModuleHandle( NULL ), NULL );
-        pClassic_DC_ = GetDC( pClassic_Window_ );
+        pClassic_DC_ = GetDC( pClassic_Window_ );           ///< DC - device context.
 
         ///< Set classic pixel format
         PIXELFORMATDESCRIPTOR classic_Format_Descriptor =
