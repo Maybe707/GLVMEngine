@@ -119,7 +119,7 @@ int main()
 //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
 	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { 5.7f, 1.0f, 2.0f }, .fScale = 2.0f };
 	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
-	*materialWitch4 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	*materialWitch4 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch4, materialWitch4->diffuseTextureID_);
 	
