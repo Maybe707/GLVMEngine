@@ -2,7 +2,7 @@ C = clang
 CC = clang++
 LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -fsanitize=null
 CXXFLAGS = -c -std=c++20 -g -Wall -Wextra -Werror -Wpedantic -O2 -fsanitize=null
-CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic -fsanitize=null
+CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic -fsanitize=null  -fsanitize=null
 INC = -I./include
 BUILD = build
 SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.cpp ./src/Systems/RenderSystem.cpp \

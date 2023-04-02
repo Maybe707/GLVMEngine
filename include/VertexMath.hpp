@@ -417,6 +417,12 @@ T VectorLength(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 }
 
 template <typename T>
+T VecLength(Vector<T, 3> vector)
+{
+    return std::sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
+}
+
+template <typename T>
 Vector<T, 3> Normalize(Vector<T, 3> _vector)
 {
 	if (_vector[0] == 0 && _vector[1] == 0 && _vector[2] == 0)

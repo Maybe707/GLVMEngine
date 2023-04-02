@@ -36,7 +36,7 @@ int main()
 //	MeshManager->SetMesh("../waveFrontObj/ray_y.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
-//	core::Engine* GLVM = core::Engine::GetInstance();		
+	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
@@ -65,7 +65,7 @@ int main()
     //    hudTextureVector.push_back(hudTexture_1);
 
     hudTextureManager->SetTextureVector(hudTextureVector);
-	core::Engine* GLVM = core::Engine::GetInstance();		
+//	core::Engine* GLVM = core::Engine::GetInstance();		
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);

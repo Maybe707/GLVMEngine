@@ -63,7 +63,7 @@ namespace GLVM::core
 		void Swap(T& firstElement, T& secondElement);
 		VectorIterator<T> Find(T& element);
 		void Resize(const unsigned int _Index);
-		void Remove(unsigned int entity);
+		void Remove(unsigned int index);
 		void RemoveFirstItem();
 		T& GetItem(const T _Item);
 		T& GetFirstItem();
@@ -72,6 +72,7 @@ namespace GLVM::core
 		unsigned int GetSize();
 		int GetCapacity();
 		T& operator[](const unsigned int _iIndex);
+		void clear();
         void Print();
         vector& operator=(const vector<T>& _vector);
         bool operator==(const char* string_);
@@ -253,12 +254,19 @@ namespace GLVM::core
 	}
 	
  	template<class T>
-	void vector<T>::Remove(unsigned int entity)
+	void vector<T>::Remove(unsigned int index)
 	{
 		if(size < 1)
 			return;
 
-		(*(T*)&rowInnerData[entity]).~T();
+		for(unsigned int j = index; j < size - 1; ++j) {
+			T& element = *(T*)&rowInnerData[(j + 1) * sizeof(T)];
+			T& previousElement = *(T*)&rowInnerData[j * sizeof(T)];
+			previousElement.~T();
+			new (&rowInnerData[j * sizeof(T)]) T(element);
+		}
+
+	    --size;
 	}
     
 	template<class T>
@@ -312,11 +320,33 @@ namespace GLVM::core
 		return *(T*)&rowInnerData[_iIndex * sizeof(T)];
 	}
 
+	template<typename T>
+	void vector<T>::clear() {
+		if(size < 1)
+			return;
+		
+		for(unsigned int i = 0; i < size; ++i) {
+			T& element = *(T*)&rowInnerData[i * sizeof(T)];
+			element.~T();
+		}
+
+		unsigned int sizeOfType = sizeof(T);
+		for (unsigned int j = 0; j < capacity * sizeOfType; ++j) {
+			*(unsigned char*)&rowInnerData[j] = 0;
+		}
+		
+		// delete [] this->rowInnerData;
+		// this->rowInnerData = nullptr;
+
+		size     = 0;
+		expander = 0;
+	}
+	
     template<class T>
     void vector<T>::Print()
     {
         for(unsigned int i = 0; i < capacity; ++i)
-            std::cout << (T)rowInnerData[i * sizeof(T)] << std::endl;
+            std::cout << *(T*)&rowInnerData[i * sizeof(T)] << std::endl;
 
         std::cout << "End of container" << std::endl;
     }

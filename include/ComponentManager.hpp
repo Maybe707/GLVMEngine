@@ -17,12 +17,15 @@
 #include "Components/ViewComponent.hpp"
 #include "Vector.hpp"
 #include <cassert>
+#include <compare>
+#include <concepts>
 #include <iostream>
 #include "IContainer.hpp"
 //#include "Components/VertexComponent.hpp"
 #include <mutex>
 #include <assert.h>
 #include "Components/ControllerComponent.hpp"
+#include <cstdlib>
 
 typedef unsigned int Entity;
 
@@ -32,6 +35,7 @@ namespace GLVM::ecs
 	{
         static ComponentManager* pInstance_;
         static std::mutex  Mutex_;
+		core::vector<unsigned int> matchComponentArrayIndices;
 		
         ComponentManager();
         ~ComponentManager();
@@ -74,7 +78,10 @@ namespace GLVM::ecs
         ComponentManager(ComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
         void operator=(const ComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
        static ComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
-                
+
+		template <typename componentType>
+		
+		
 		template <typename componentType>
 		void CreateComponent(const Entity& entity)
 		{
@@ -118,8 +125,10 @@ namespace GLVM::ecs
 
         template <typename componentType, typename... Args>
 		core::vector<Entity> collectLinkedEntities() {
+			unsigned int firstComponentArrayIndex = CreateComponentContainer<componentType>();
+			matchComponentArrayIndices.Push(firstComponentArrayIndex);
 			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
-				( worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()] );
+				( worldDenseComponentsMapToEntities[firstComponentArrayIndex] );
 
 			core::vector<Entity> returnVector;
 			for ( unsigned int i = 0; i < dense.GetSize(); ++i ) {
@@ -130,6 +139,49 @@ namespace GLVM::ecs
 			return returnVector;
 		}
 
+		template <typename componentType, typename... Args>
+		core::vector<Entity> collectUniqueLinkedEntities() {
+			core::vector<Entity> baseSubSetEntities;
+			baseSubSetEntities = collectLinkedEntities<componentType, Args...>();
+
+			// std::qsort(matchComponentArrayIndices.GetVectorContainer(), matchComponentArrayIndices.GetSize(),
+			// 		   sizeof(unsigned int), [](const void* var1, const void* var2) {
+			// 			   const unsigned int val1 = *static_cast<const unsigned int*>(var1);
+			// 			   const unsigned int val2 = *static_cast<const unsigned int*>(var2);
+			// 			   const std::strong_ordering compare = val1 <=> val2;
+			// 			   if (compare < 0)
+			// 				   return -1;
+			// 			   if (compare > 0)
+			// 				   return 1;
+						   
+			// 			   return 0;
+			// 		   });
+						   
+			for ( unsigned int j = 0; j < baseSubSetEntities.GetSize(); ++j ) {
+				for ( unsigned int i = 0; i < worldDenseComponentsMapToEntities.GetSize(); ++i ) {
+					core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+						(worldSparseEntitiesMapToComponents[i]);
+					core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+						(worldDenseComponentsMapToEntities[i]);
+
+				    for ( unsigned int np = 0; np < matchComponentArrayIndices.GetSize(); ++np ) {
+						if ( i != matchComponentArrayIndices[np] &&
+							 checkAvailability(sparse, dense, baseSubSetEntities[j])) {
+							baseSubSetEntities.Remove(j);
+							--j;
+							std::cout << "DEBIL" << std::endl;
+							matchComponentArrayIndices.Print();
+							matchComponentArrayIndices.clear();
+							matchComponentArrayIndices.Print();
+							return baseSubSetEntities;
+						}
+					}
+				}
+			}
+			
+			return baseSubSetEntities;
+		}
+		
 		template <typename... Args>
 		bool multiCheckAvailability(Entity entity) {
 			return (multiCheckAvailabilityBase<Args>(entity) && ...);
@@ -137,12 +189,18 @@ namespace GLVM::ecs
 
 		template <typename componentType>
 		bool multiCheckAvailabilityBase(Entity entity) {
+			unsigned int componentArrayIndex = CreateComponentContainer<componentType>();
 			core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
-				(worldSparseEntitiesMapToComponents[CreateComponentContainer<componentType>()]);
+				(worldSparseEntitiesMapToComponents[componentArrayIndex]);
 			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
-				(worldDenseComponentsMapToEntities[CreateComponentContainer<componentType>()]);
+				(worldDenseComponentsMapToEntities[componentArrayIndex]);
 
-			return checkAvailability(sparse, dense, entity);
+			if ( checkAvailability(sparse, dense, entity) ) {
+				matchComponentArrayIndices.Push(componentArrayIndex);
+				return true;
+			} else {
+				return false;
+			}
 		}
 		
         template <typename componentType>
