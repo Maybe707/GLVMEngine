@@ -80,9 +80,6 @@ namespace GLVM::ecs
        static ComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
 
 		template <typename componentType>
-		
-		
-		template <typename componentType>
 		void CreateComponent(const Entity& entity)
 		{
 			unsigned int localContainerID = 0; ///< Index for world components and world ID's containers.

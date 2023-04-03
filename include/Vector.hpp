@@ -52,20 +52,19 @@ namespace GLVM::core
 	{
 		unsigned int size = 0;
 		unsigned int capacity = 0;
-		unsigned int expander = 10;
+		unsigned int expander = 1000;
 		unsigned char* rowInnerData = nullptr;
 	public:
-        vector() {}
+        vector() = default;
         vector(const vector<T>& _vector);
-        ~vector();
-		void Push(T _Item);
+        ~vector() override;
+		void Push(T item);
 		void Pop();
 		void Swap(T& firstElement, T& secondElement);
 		VectorIterator<T> Find(T& element);
-		void Resize(const unsigned int _Index);
+		void Resize(const unsigned int index);
 		void Remove(unsigned int index);
 		void RemoveFirstItem();
-		T& GetItem(const T _Item);
 		T& GetFirstItem();
 		T& GetHead();
 		T* GetVectorContainer();
@@ -150,12 +149,12 @@ namespace GLVM::core
     /// Push element on top of the container.
     
 	template<class T>
-	void vector<T>::Push(T _Item)
+	void vector<T>::Push(T item)
 	{
 		if(size == capacity)
 			{
 				unsigned char* aTemp_Vector_Container = new unsigned char[(capacity + expander) * sizeof(T)];
-				for(unsigned int i = 0; i < capacity; ++i) {
+				for(unsigned int i = 0; i < size; ++i) {
 					T& element = *(T*)&rowInnerData[i * sizeof(T)];
 					new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
 					element.~T();
@@ -165,13 +164,13 @@ namespace GLVM::core
 				rowInnerData = aTemp_Vector_Container;
 
 				capacity += expander;
-			
-				new (&rowInnerData[size * sizeof(T)]) T(_Item);
+				
+				new (&rowInnerData[size * sizeof(T)]) T(item);
 				++size;
 				return;
 			}
 
-		new (&rowInnerData[size * sizeof(T)]) T(_Item);
+		new (&rowInnerData[size * sizeof(T)]) T(item);
 		++size;
 	}
 
@@ -283,6 +282,7 @@ namespace GLVM::core
 		}
 
 		delete [] this->rowInnerData;
+		this->rowInnerData = nullptr;
 
 		--size;				
 		rowInnerData = new unsigned char[size * sizeof(T)];
@@ -317,6 +317,12 @@ namespace GLVM::core
 	template<typename T>
 	T& vector<T>::operator[](const unsigned int _iIndex)
 	{
+		if ( size <= _iIndex || rowInnerData == nullptr ) {
+			size     = _iIndex + 1;
+			capacity = _iIndex + 1;
+			rowInnerData = new unsigned char[(_iIndex + 1) * sizeof(T)];
+		}
+		
 		return *(T*)&rowInnerData[_iIndex * sizeof(T)];
 	}
 
