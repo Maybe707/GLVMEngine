@@ -52,7 +52,7 @@ namespace GLVM::core
 	{
 		unsigned int size = 0;
 		unsigned int capacity = 0;
-		unsigned int expander = 1000;
+		static constexpr int expander = 10;
 		unsigned char* rowInnerData = nullptr;
 	public:
         vector() = default;
@@ -123,8 +123,7 @@ namespace GLVM::core
     }
 
     template <class T>
-    vector<T>::vector(const vector<T>& _vector)
-    {
+    vector<T>::vector(const vector<T>& _vector) {
 		size     = _vector.size;
 	    capacity = _vector.size;
 		this->rowInnerData = new unsigned char[capacity * sizeof(T)];
@@ -136,8 +135,7 @@ namespace GLVM::core
     }
     
 	template<class T>
-	vector<T>::~vector()
-	{
+	vector<T>::~vector() {
 		for ( unsigned int i = 0; i < size; ++i) {
 			T& element = *(T*)&rowInnerData[i * sizeof(T)];
 			element.~T();
@@ -149,10 +147,8 @@ namespace GLVM::core
     /// Push element on top of the container.
     
 	template<class T>
-	void vector<T>::Push(T item)
-	{
-		if(size == capacity)
-			{
+	void vector<T>::Push(T item) {
+		if(size == capacity) {
 				unsigned char* aTemp_Vector_Container = new unsigned char[(capacity + expander) * sizeof(T)];
 				for(unsigned int i = 0; i < size; ++i) {
 					T& element = *(T*)&rowInnerData[i * sizeof(T)];
@@ -164,10 +160,6 @@ namespace GLVM::core
 				rowInnerData = aTemp_Vector_Container;
 
 				capacity += expander;
-				
-				new (&rowInnerData[size * sizeof(T)]) T(item);
-				++size;
-				return;
 			}
 
 		new (&rowInnerData[size * sizeof(T)]) T(item);
@@ -293,38 +285,21 @@ namespace GLVM::core
 	}
 	
 	template<class T>
-	T& vector<T>::GetFirstItem()
-	{
-		return *(T*)&rowInnerData[0];
-	}
+	T& vector<T>::GetFirstItem() { return *(T*)&rowInnerData[0]; }
 
 	template<class T>
-	T& vector<T>::GetHead()
-	{
-		return *(T*)&rowInnerData[(size - 1) * sizeof(T)];
-	}
+	T& vector<T>::GetHead() { return *(T*)&rowInnerData[(size - 1) * sizeof(T)]; }
 
 	template<class T>
-	T* vector<T>::GetVectorContainer()
-	{
-		return (T*)rowInnerData;
-	}
+	T* vector<T>::GetVectorContainer() { return (T*)rowInnerData; }
 
 	template<typename T>
 	unsigned int vector<T>::GetSize() { return size; }
+	
 	template<typename T>
 	int vector<T>::GetCapacity() { return capacity; }
 	template<typename T>
-	T& vector<T>::operator[](const unsigned int _iIndex)
-	{
-		if ( size <= _iIndex || rowInnerData == nullptr ) {
-			size     = _iIndex + 1;
-			capacity = _iIndex + 1;
-			rowInnerData = new unsigned char[(_iIndex + 1) * sizeof(T)];
-		}
-		
-		return *(T*)&rowInnerData[_iIndex * sizeof(T)];
-	}
+	T& vector<T>::operator[](const unsigned int _iIndex) { return *(T*)&rowInnerData[_iIndex * sizeof(T)]; }
 
 	template<typename T>
 	void vector<T>::clear() {
@@ -341,11 +316,8 @@ namespace GLVM::core
 			*(unsigned char*)&rowInnerData[j] = 0;
 		}
 		
-		// delete [] this->rowInnerData;
-		// this->rowInnerData = nullptr;
-
 		size     = 0;
-		expander = 0;
+		capacity = 0;
 	}
 	
     template<class T>

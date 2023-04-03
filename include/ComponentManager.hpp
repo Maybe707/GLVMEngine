@@ -166,10 +166,10 @@ namespace GLVM::ecs
 							 checkAvailability(sparse, dense, baseSubSetEntities[j])) {
 							baseSubSetEntities.Remove(j);
 							--j;
-							std::cout << "DEBIL" << std::endl;
-							matchComponentArrayIndices.Print();
+							// std::cout << "DEBIL" << std::endl;
+							// matchComponentArrayIndices.Print();
 							matchComponentArrayIndices.clear();
-							matchComponentArrayIndices.Print();
+//							matchComponentArrayIndices.Print();
 							return baseSubSetEntities;
 						}
 					}

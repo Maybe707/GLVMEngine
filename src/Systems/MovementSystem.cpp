@@ -45,7 +45,7 @@ namespace GLVM::ecs
 			Entity currentEntity                = linkedEntities[i];
 			cm::beholder* beholderComponent     = componentManager->GetComponent<cm::beholder>(currentEntity);
 //			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			vec3 result = { 0.0f, 0.0f, 0.0f };
+//			vec3 result = { 0.0f, 0.0f, 0.0f };
 			
             for(int n = 0; n < 6; ++n) {
 				vec3 right;

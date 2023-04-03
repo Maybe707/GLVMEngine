@@ -6,7 +6,7 @@ namespace GLVM::core::Sound
 {
     void CSoundEngineWaveform::SoundStream()
     {
-        for(int i = 0; i < tSound_Contaier.GetSize(); ++i)
+        for(unsigned int i = 0; i < tSound_Contaier.GetSize(); ++i)
         {
             PlaybackSoundSample(*tSound_Contaier[i]);
 //            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
@@ -15,7 +15,7 @@ namespace GLVM::core::Sound
 
     void CSoundEngineWaveform::PlaybackSoundSample(CSoundSample& _sound_sample)
     {
-        MMRESULT     rc;
+//        MMRESULT     rc;
         HWAVEOUT     hWaveOut;
         WAVEHDR      lpWaveHdr {};
         WAVEFORMATEX Format;
@@ -31,11 +31,11 @@ namespace GLVM::core::Sound
         /// Open a waveform device for output using window callback.
         
         if(waveOutOpen (&hWaveOut, WAVE_MAPPER, &Format, 0L, 0L, 0L));
-        if(rc != MMSYSERR_NOERROR) {
-            std::cerr << "waveOutOpen: ";
-//            print_waveout_error(rc);        ///< MAKE DIFINITION!
-            std::exit(-1);
-        }
+//         if(rc != MMSYSERR_NOERROR) {
+//             std::cerr << "waveOutOpen: ";
+// //            print_waveout_error(rc);        ///< MAKE DIFINITION!
+//             std::exit(-1);
+//         }
 
         std::ifstream file(_sound_sample.kPath_to_File_, std::ios_base::binary | std::ios_base::in);
         if(!file) {
@@ -43,8 +43,7 @@ namespace GLVM::core::Sound
             std::exit(-1);
         }
         
-        char* buf;        
-        buf = (char*)malloc(Format.nAvgBytesPerSec);
+        char *buf = (char*)malloc(Format.nAvgBytesPerSec);
 //        frames = fread(buf, uiFrame_Size, FRAMES, iFile_Descritor);
 
         /// After allocation, set up and prepare header.

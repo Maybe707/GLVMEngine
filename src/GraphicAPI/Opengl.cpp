@@ -281,7 +281,6 @@ namespace GLVM::core
 	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::directionalLight& directionalLightComponent, mat4 projectionMatrixLight) {
 		vec3 positionVectorLight  = directionalLightComponent.position;
 		vec3 directionVectorLight = directionalLightComponent.direction;
-		vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
@@ -304,8 +303,6 @@ namespace GLVM::core
 	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::spotLight& directionalLightComponent, mat4 projectionMatrixLight) {
 			vec3 positionVectorLight = directionalLightComponent.position;
 			vec3 directionVectorLight = directionalLightComponent.direction;
-			vec3 upVectorLight        = { 0.0f, 1.0f, 0.0f };
-
 			mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 														 directionVectorLight,
 														 { 0.0f, 1.0f, 0.0f });
