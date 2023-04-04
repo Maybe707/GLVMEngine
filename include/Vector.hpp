@@ -257,6 +257,12 @@ namespace GLVM::core
 			new (&rowInnerData[j * sizeof(T)]) T(element);
 		}
 
+		/// FIXME: FOR DEBUG ONLY!
+		if ( typeid(T).name() == typeid(unsigned int).name() ) {
+			T& element = *(T*)&rowInnerData[(size - 1) * sizeof(T)];
+			element = 0;                                                     ///< For debug purpouses only!!!
+		}
+		
 	    --size;
 	}
     
@@ -305,19 +311,28 @@ namespace GLVM::core
 	void vector<T>::clear() {
 		if(size < 1)
 			return;
-		
+
+		/// FIXME: FOR DEBUG ONLY!
+		if ( typeid(T).name() == typeid(unsigned int).name() ) {
+			for ( unsigned int i = 0; i < capacity; ++i ) {
+				T& element = *(T*)&rowInnerData[i * sizeof(T)];
+				element = 0;                                                     ///< For debug purpouses only!!!
+			}
+		}
+
 		for(unsigned int i = 0; i < size; ++i) {
 			T& element = *(T*)&rowInnerData[i * sizeof(T)];
 			element.~T();
 		}
-
-		unsigned int sizeOfType = sizeof(T);
-		for (unsigned int j = 0; j < capacity * sizeOfType; ++j) {
-			*(unsigned char*)&rowInnerData[j] = 0;
-		}
+		
+		/// FIXME: DEBUG ONLY!
+		// unsigned int sizeOfType = sizeof(T);
+		// for (unsigned int j = 0; j < capacity * sizeOfType; ++j) {
+		// 	*(unsigned char*)&rowInnerData[j] = 0;
+		// }
 		
 		size     = 0;
-		capacity = 0;
+//		capacity = 0;
 	}
 	
     template<class T>

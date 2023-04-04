@@ -563,17 +563,16 @@ namespace GLVM::core
 	void COpenglRenderer::Raycasting() {
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
-																								 cm::transform,
-																								 cm::material,
-																								 cm::vertex,
-																								 cm::collider>();
+		// core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
+		// 																						 cm::transform,
+		// 																						 cm::material,
+		// 																						 cm::vertex,
+		// 																						 cm::collider>();
 		
-		core::vector<Entity> otherLinkedEntities = componentManager->collectUniqueLinkedEntities<
+		core::vector<Entity> otherLinkedEntities = componentManager->collectUniqueLinkedEntities<cm::material,
 																								 cm::vertex,
-																								 cm::transform,
-																								 cm::material>();
-
+																								 cm::transform>();
+		otherLinkedEntities.Print();
 //		otherLinkedEntities.Print();
 		
 		// unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();

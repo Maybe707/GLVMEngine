@@ -35,7 +35,7 @@ namespace GLVM::ecs
 	{
         static ComponentManager* pInstance_;
         static std::mutex  Mutex_;
-		core::vector<unsigned int> matchComponentArrayIndices;
+		unsigned int numberOfBaseComponents;
 		
         ComponentManager();
         ~ComponentManager();
@@ -122,10 +122,15 @@ namespace GLVM::ecs
 
         template <typename componentType, typename... Args>
 		core::vector<Entity> collectLinkedEntities() {
+			numberOfBaseComponents = 0;
 			unsigned int firstComponentArrayIndex = CreateComponentContainer<componentType>();
-			matchComponentArrayIndices.Push(firstComponentArrayIndex);
 			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
 				( worldDenseComponentsMapToEntities[firstComponentArrayIndex] );
+
+			if ( dense.GetSize() > 0 ) {
+				++numberOfBaseComponents;
+				numberOfBaseComponents += sizeof...(Args);
+			}
 
 			core::vector<Entity> returnVector;
 			for ( unsigned int i = 0; i < dense.GetSize(); ++i ) {
@@ -141,38 +146,22 @@ namespace GLVM::ecs
 			core::vector<Entity> baseSubSetEntities;
 			baseSubSetEntities = collectLinkedEntities<componentType, Args...>();
 
-			// std::qsort(matchComponentArrayIndices.GetVectorContainer(), matchComponentArrayIndices.GetSize(),
-			// 		   sizeof(unsigned int), [](const void* var1, const void* var2) {
-			// 			   const unsigned int val1 = *static_cast<const unsigned int*>(var1);
-			// 			   const unsigned int val2 = *static_cast<const unsigned int*>(var2);
-			// 			   const std::strong_ordering compare = val1 <=> val2;
-			// 			   if (compare < 0)
-			// 				   return -1;
-			// 			   if (compare > 0)
-			// 				   return 1;
-						   
-			// 			   return 0;
-			// 		   });
-						   
+			unsigned int numberOfComponentArrays = 0;
 			for ( unsigned int j = 0; j < baseSubSetEntities.GetSize(); ++j ) {
+				numberOfComponentArrays = 0;
 				for ( unsigned int i = 0; i < worldDenseComponentsMapToEntities.GetSize(); ++i ) {
 					core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
 						(worldSparseEntitiesMapToComponents[i]);
 					core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
 						(worldDenseComponentsMapToEntities[i]);
 
-				    for ( unsigned int np = 0; np < matchComponentArrayIndices.GetSize(); ++np ) {
-						if ( i != matchComponentArrayIndices[np] &&
-							 checkAvailability(sparse, dense, baseSubSetEntities[j])) {
-							baseSubSetEntities.Remove(j);
-							--j;
-							// std::cout << "DEBIL" << std::endl;
-							// matchComponentArrayIndices.Print();
-							matchComponentArrayIndices.clear();
-//							matchComponentArrayIndices.Print();
-							return baseSubSetEntities;
-						}
-					}
+						if ( checkAvailability(sparse, dense, baseSubSetEntities[j]) )
+							++numberOfComponentArrays;
+				}
+
+				if ( numberOfComponentArrays > numberOfBaseComponents ) {
+					baseSubSetEntities.Remove(baseSubSetEntities[j]);
+					--j;
 				}
 			}
 			
@@ -192,12 +181,7 @@ namespace GLVM::ecs
 			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
 				(worldDenseComponentsMapToEntities[componentArrayIndex]);
 
-			if ( checkAvailability(sparse, dense, entity) ) {
-				matchComponentArrayIndices.Push(componentArrayIndex);
-				return true;
-			} else {
-				return false;
-			}
+			return checkAvailability(sparse, dense, entity);
 		}
 		
         template <typename componentType>
