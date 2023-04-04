@@ -563,81 +563,84 @@ namespace GLVM::core
 	void COpenglRenderer::Raycasting() {
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		// core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
-		// 																						 cm::transform,
-		// 																						 cm::material,
-		// 																						 cm::vertex,
-		// 																						 cm::collider>();
+		core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
+																								 cm::transform,
+																								 cm::material,
+																								 cm::vertex,
+																								 cm::collider>();
 		
 		core::vector<Entity> otherLinkedEntities = componentManager->collectUniqueLinkedEntities<cm::material,
+																								 cm::collider,
 																								 cm::vertex,
 																								 cm::transform>();
-		otherLinkedEntities.Print();
+
+		linkedEntities.Print();
+//		otherLinkedEntities.Print();
 //		otherLinkedEntities.Print();
 		
-		// unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
-		// unsigned int otherLinkedEntitiesVectorSize = otherLinkedEntities.GetSize();
+		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
+		unsigned int otherLinkedEntitiesVectorSize = otherLinkedEntities.GetSize();
 
-        // for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
-        //   unsigned int uiEntity_refProjectile = linkedEntities[x];
-        //   cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+          unsigned int uiEntity_refProjectile = linkedEntities[x];
+          cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
 
-		// 	// TODO: add loop for other entities in game world.
-		// 	for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-		// 		if ( x == j )
-		// 			continue;
+			// TODO: add loop for other entities in game world.
+			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
+				// if ( x == j )
+				// 	continue;
 				
-		// 		unsigned int entityOther = otherLinkedEntities[j];
-		// 		cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
-		// 		vec3 ray         = rTransformProjectile->tForward * 5.0f;
-		// 		float otherHalfScale = transformOther->fScale * 0.5f;
+				unsigned int entityOther = otherLinkedEntities[j];
+				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
+				vec3 ray         = rTransformProjectile->tForward * 5.0f;
+				float otherHalfScale = transformOther->fScale * 0.5f;
 				
-		// 		std::cout << "entity: " << entityOther << std::endl;
-		// 		std::cout << "ray: " << ray << std::endl;
-		// 		std::cout << "other transform: " << transformOther->tPosition << std::endl;
+				std::cout << "entity: " << entityOther << std::endl;
+				std::cout << "ray: " << ray << std::endl;
+				std::cout << "other transform: " << transformOther->tPosition << std::endl;
 				
-		// 		float box_min_x = transformOther->tPosition[0] - otherHalfScale;
-		// 		float box_max_x = transformOther->tPosition[0] + otherHalfScale;
+				float box_min_x = transformOther->tPosition[0] - otherHalfScale;
+				float box_max_x = transformOther->tPosition[0] + otherHalfScale;
 				
-		// 		float delta_x1  = (box_min_x - rTransformProjectile->tPosition[0]);
-		// 		float delta_x2  = (box_max_x - rTransformProjectile->tPosition[0]);
+				float delta_x1  = (box_min_x - rTransformProjectile->tPosition[0]);
+				float delta_x2  = (box_max_x - rTransformProjectile->tPosition[0]);
 
-		// 		float min_x     = delta_x1 < delta_x2 ? delta_x1 : delta_x2;
-		// 		float max_x     = delta_x1 > delta_x2 ? delta_x1 : delta_x2;
-		// 		min_x           = min_x < max_x ? min_x : max_x;
+				float min_x     = delta_x1 < delta_x2 ? delta_x1 : delta_x2;
+				float max_x     = delta_x1 > delta_x2 ? delta_x1 : delta_x2;
+				min_x           = min_x < max_x ? min_x : max_x;
 
-		// 		float box_min_y = transformOther->tPosition[1] - otherHalfScale;
-		// 		float box_max_y = transformOther->tPosition[1] + otherHalfScale;
+				float box_min_y = transformOther->tPosition[1] - otherHalfScale;
+				float box_max_y = transformOther->tPosition[1] + otherHalfScale;
 				
-		// 		float delta_y1  = (box_min_y - rTransformProjectile->tPosition[1]);
-		// 		float delta_y2  = (box_max_y - rTransformProjectile->tPosition[1]);
+				float delta_y1  = (box_min_y - rTransformProjectile->tPosition[1]);
+				float delta_y2  = (box_max_y - rTransformProjectile->tPosition[1]);
 
-		// 		float min_y     = delta_y1 < delta_y2 ? delta_y1 : delta_y2;
-		// 		float max_y     = delta_y1 > delta_y2 ? delta_y1 : delta_y2;
-		// 		min_y           = min_y < max_y ? min_y : max_y;
+				float min_y     = delta_y1 < delta_y2 ? delta_y1 : delta_y2;
+				float max_y     = delta_y1 > delta_y2 ? delta_y1 : delta_y2;
+				min_y           = min_y < max_y ? min_y : max_y;
 
-		// 		float box_min_z = transformOther->tPosition[2] - otherHalfScale;
-		// 		float box_max_z = transformOther->tPosition[2] + otherHalfScale;
+				float box_min_z = transformOther->tPosition[2] - otherHalfScale;
+				float box_max_z = transformOther->tPosition[2] + otherHalfScale;
 				
-		// 		float delta_z1  = (box_min_z - rTransformProjectile->tPosition[2]);
-		// 		float delta_z2  = (box_max_z - rTransformProjectile->tPosition[2]);
+				float delta_z1  = (box_min_z - rTransformProjectile->tPosition[2]);
+				float delta_z2  = (box_max_z - rTransformProjectile->tPosition[2]);
 
-		// 		float min_z     = delta_z1 < delta_z2 ? delta_z1 : delta_z2;
-		// 		float max_z     = delta_z1 > delta_z2 ? delta_z1 : delta_z2;
-		// 		min_z           = min_z < max_z ? min_z : max_z;
+				float min_z     = delta_z1 < delta_z2 ? delta_z1 : delta_z2;
+				float max_z     = delta_z1 > delta_z2 ? delta_z1 : delta_z2;
+				min_z           = min_z < max_z ? min_z : max_z;
 
-		// 		if ( ray[0] > min_x && ray[1] > min_y && ray[2] > min_z) {
-		// 			std::cout << ray << std::endl;
-		// 			std::cout << "TEST 2" << std::endl;
-		// 			GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
-		// 			ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
-		// 			cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
-		// 			textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
-		// 			entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
-		// 			--linkedEntitiesVectorSize;
- 		// 		}
-		// 	}
-		// }
+				if ( ray[0] > min_x && ray[1] > min_y && ray[2] > min_z) {
+					std::cout << ray << std::endl;
+					std::cout << "TEST 2" << std::endl;
+					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
+					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
+					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
+					textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
+					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
+					--linkedEntitiesVectorSize;
+ 				}
+			}
+		}
 	}
 
 	
