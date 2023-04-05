@@ -111,7 +111,7 @@ namespace GLVM::core {
 		float nearPlaneCubeShadowMap = 1.0f;
 		float farPlaneCubeShadowMap  = 25.0f;
 		bool shadows = true;
-		std::vector<ecs::Texture> texture_load_data_;
+		std::vector<ecs::Texture> texture_load_data;
         std::vector<ecs::Texture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
 		std::vector<std::vector<float>> aVertexes_;

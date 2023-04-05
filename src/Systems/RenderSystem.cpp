@@ -36,7 +36,7 @@ namespace GLVM::ecs
     
 	CRenderSystem::~CRenderSystem() {}
     void CRenderSystem::Update() {
-        SetTextureData();
+//        SetTextureData();
         renderer_instance_->draw();
     }
     core::IRenderer* CRenderSystem::GetRenderSystemInstance() { return renderer_instance_; }    

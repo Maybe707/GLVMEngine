@@ -11,7 +11,7 @@ namespace GLVM::ecs
     TextureManager* TextureManager::pHUDInstance_ = nullptr;
     std::mutex TextureManager::HUDMutex_;
     
-    TextureManager::TextureManager() {}
+    TextureManager::TextureManager() = default;
 
     void TextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
         textureVector_[_textureID].entitiesOwnsThisTypeOfTexture_.push_back(_entityID);
@@ -53,7 +53,7 @@ namespace GLVM::ecs
 		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, _Texture.iWidth_, _Texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, _Texture.u_iData_);
 		pGLGenerate_Mipmap(GL_TEXTURE_2D);
 
-		///< Setting texture applying parameters
+		///< Setting applying parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		
@@ -63,12 +63,11 @@ namespace GLVM::ecs
 	
     std::vector<Texture>& TextureManager::GetTextureVector() { return textureVector_; }
     void TextureManager::UnbindTexture(components::material _textureComponent, Entity _entity) {
+		/// TODO: add deletion of specular texture.
         std::vector<Entity>& textureVector = textureVector_[_textureComponent.diffuseTextureID_].entitiesOwnsThisTypeOfTexture_;
         for (unsigned int i = 0; i < textureVector.size(); ++i) {
             if (textureVector[i] == _entity)
-                textureVector.erase(textureVector.begin() + i);
-            else
-                continue;
+				textureVector.erase(textureVector.begin() + i);
         }
     }
 }

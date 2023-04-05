@@ -1,8 +1,9 @@
 C = clang
 CC = clang++
-LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -fsanitize=null
-CXXFLAGS = -c -std=c++20 -g -Wall -Wextra -Werror -Wpedantic -O0 -fsanitize=null -fno-omit-frame-pointer
-CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic -fsanitize=null  -fsanitize=null -fno-omit-frame-pointer
+SANITIZE = -fsanitize=null -fno-omit-frame-pointer
+LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi
+CXXFLAGS = -c -std=c++20 -g -Wall -Wextra -Werror -Wpedantic -O0
+CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic
 INC = -I./include
 BUILD = build
 SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.cpp ./src/Systems/RenderSystem.cpp \
@@ -19,14 +20,14 @@ EXECUTABLE = linGame
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $(BUILD)/$@
+	$(CC) $(LDFLAGS) $(SANITIZE) $(OBJECTS) -o $(BUILD)/$@
 
 $(BUILD)/%.o : ./src/%.cpp
 	mkdir -p $(@D)
-	$(CC) $(INC) $(CXXFLAGS) $< -o $@
+	$(CC) $(INC) $(SANITIZE) $(CXXFLAGS) $< -o $@
 
 $(BUILD)/%.o : %.c
-	$(C) $(INC) $(CFLAGS) $< -o $@
+	$(C) $(INC) $(SANITIZE) $(CFLAGS) $< -o $@
 
 clean:
 	rm -rf $(BUILD)/*

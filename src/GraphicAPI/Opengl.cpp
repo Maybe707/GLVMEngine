@@ -15,6 +15,7 @@
 #include "MeshManager.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
+#include "TextureManager.hpp"
 #include "ToString.hpp"
 #include "Vector.hpp"
 #include "Components/VertexComponent.hpp"
@@ -512,9 +513,15 @@ namespace GLVM::core
 		// RaycastringDebug();
 		// coreShaderProgram->Use();
 
-		for(unsigned int i = 0; i < texture_load_data_.size(); ++i)
+		ecs::TextureManager* textureManager = ecs::TextureManager::GetInstance();
+		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
+		
+		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
+			std::cout << "cicle start: " << std::endl;
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+
+				std::cout << "texture onws entity: " << uiEntity_refTexture << std::endl;
 				
 				cm::vertex* vertexComponent = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture);
 				unsigned int uiVertexId = 0;
@@ -547,6 +554,7 @@ namespace GLVM::core
 				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 
 			}
+		}
 
 		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
 			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
@@ -574,9 +582,11 @@ namespace GLVM::core
 																								 cm::vertex,
 																								 cm::transform>();
 
-		linkedEntities.Print();
-//		otherLinkedEntities.Print();
-//		otherLinkedEntities.Print();
+		// std::cout << "linged entities size " << linkedEntities.GetSize() << std::endl;
+		// linkedEntities.Print();
+
+		// std::cout << "other linged entities size :" << otherLinkedEntities.GetSize() << std::endl;
+		// otherLinkedEntities.Print();
 		
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
 		unsigned int otherLinkedEntitiesVectorSize = otherLinkedEntities.GetSize();
@@ -584,20 +594,20 @@ namespace GLVM::core
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
           unsigned int uiEntity_refProjectile = linkedEntities[x];
           cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
+		  vec3 ray         = rTransformProjectile->tForward * 5.0f;
 
 			// TODO: add loop for other entities in game world.
 			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-				// if ( x == j )
-				// 	continue;
+				if ( x == j )
+					continue;
 				
 				unsigned int entityOther = otherLinkedEntities[j];
 				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
-				vec3 ray         = rTransformProjectile->tForward * 5.0f;
 				float otherHalfScale = transformOther->fScale * 0.5f;
 				
-				std::cout << "entity: " << entityOther << std::endl;
-				std::cout << "ray: " << ray << std::endl;
-				std::cout << "other transform: " << transformOther->tPosition << std::endl;
+				// std::cout << "entity: " << entityOther << std::endl;
+				// std::cout << "ray: " << ray << std::endl;
+				// std::cout << "other transform: " << transformOther->tPosition << std::endl;
 				
 				float box_min_x = transformOther->tPosition[0] - otherHalfScale;
 				float box_max_x = transformOther->tPosition[0] + otherHalfScale;
@@ -630,14 +640,16 @@ namespace GLVM::core
 				min_z           = min_z < max_z ? min_z : max_z;
 
 				if ( ray[0] > min_x && ray[1] > min_y && ray[2] > min_z) {
-					std::cout << ray << std::endl;
-					std::cout << "TEST 2" << std::endl;
+//					std::cout << ray << std::endl;
+					std::cout << transformOther->tPosition << std::endl;
+					// std::cout << "TEST 2" << std::endl;
+					std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
 					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
 					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
 					textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
 					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
-					--linkedEntitiesVectorSize;
+//					--linkedEntitiesVectorSize;
  				}
 			}
 		}
@@ -903,7 +915,7 @@ namespace GLVM::core
     }
     
     void COpenglRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) {
-		texture_load_data_ = _texture_data;
+		texture_load_data = _texture_data;
 		hudTexture_load_data_ = _hud_texture_data;
 	}
 	
