@@ -16,6 +16,7 @@
 #include "Components/MoveComponent.hpp"
 #include "EntityManager.hpp"
 #include "Stack.hpp"
+#include "ISoundEngine.hpp"
 
 namespace GLVM::ecs
 {
@@ -28,6 +29,7 @@ namespace GLVM::ecs
         float fLast_Y = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         core::CStack&              inputStack;
+		core::Sound::ISoundEngine* soundEngine;
         float                      projectileCooldown = 2.0f; 
 		float                      deltaFrameTime;
 

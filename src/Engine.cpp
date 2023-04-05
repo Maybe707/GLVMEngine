@@ -132,6 +132,7 @@ namespace GLVM::core
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
+			projectileSystem->soundEngine             = soundEngine;
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
