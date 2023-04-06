@@ -686,8 +686,7 @@ Matrix<T, 4> ortho(T left, T right, T bottom, T top, T nearVal, T farVal) {
 }
 
 template <class T, int var>
-Matrix<T, var> Perspective(float fov, float n, float f)
-{
+Matrix<T, var> Perspective(float fov, float n, float f) {
 	float S = std::tan((fov/2)*(PI/360));
 	Matrix<float, var> tempMatrix;
 	tempMatrix[0][0] = 1/((1280.0f/1280.0f)*S);
@@ -699,6 +698,12 @@ Matrix<T, var> Perspective(float fov, float n, float f)
 	return tempMatrix;
 }
 
+constexpr float Max(float var1, float var2) {
+	return var1 > var2 ? var1 : var2;
+}
 
+constexpr float Min(float var1, float var2) {
+	return var1 < var2 ? var1 : var2;
+}
 
 #endif

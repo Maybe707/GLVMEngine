@@ -517,12 +517,9 @@ namespace GLVM::core
 		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
 		
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
-			std::cout << "cicle start: " << std::endl;
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
 
-				std::cout << "texture onws entity: " << uiEntity_refTexture << std::endl;
-				
 				cm::vertex* vertexComponent = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture);
 				unsigned int uiVertexId = 0;
 				if ( vertexComponent != nullptr )
@@ -535,7 +532,7 @@ namespace GLVM::core
 					diffuseTextureID  = material->diffuseTextureID_;
 					specularTextureID = material->specularTextureID_;
 				}
-				//			std::cout << "Entity: " << uiEntity_refTexture << std::endl;
+
 				cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 				if ( transformComponent != nullptr )
 					modelMatrix = SetModelMatrix(*transformComponent);
@@ -594,7 +591,8 @@ namespace GLVM::core
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
           unsigned int uiEntity_refProjectile = linkedEntities[x];
           cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
-		  vec3 ray         = rTransformProjectile->tForward * 5.0f;
+		  float rayLength = 1.0f;
+		  vec3 ray        = rTransformProjectile->tForward * rayLength;
 
 			// TODO: add loop for other entities in game world.
 			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
@@ -604,46 +602,53 @@ namespace GLVM::core
 				unsigned int entityOther = otherLinkedEntities[j];
 				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
 				float otherHalfScale = transformOther->fScale * 0.5f;
+				float min = -INFINITY;
+				float max = INFINITY;
 				
 				// std::cout << "entity: " << entityOther << std::endl;
 				// std::cout << "ray: " << ray << std::endl;
 				// std::cout << "other transform: " << transformOther->tPosition << std::endl;
+
+				if ( ray[0] != 0.0f) {
+					float box_min_x = transformOther->tPosition[0] - otherHalfScale;
+					float box_max_x = transformOther->tPosition[0] + otherHalfScale;
 				
-				float box_min_x = transformOther->tPosition[0] - otherHalfScale;
-				float box_max_x = transformOther->tPosition[0] + otherHalfScale;
+					float delta_x1  = (box_min_x - rTransformProjectile->tPosition[0]) / ray[0];
+					float delta_x2  = (box_max_x - rTransformProjectile->tPosition[0]) / ray[0];
+
+					min = Max(min, Min(delta_x1, delta_x2));
+					max = Min(max, Max(delta_x1, delta_x2));
+				}
+
+				if ( ray[1] != 0.0f ) {
+					float box_min_y = transformOther->tPosition[1] - otherHalfScale;
+					float box_max_y = transformOther->tPosition[1] + otherHalfScale;
 				
-				float delta_x1  = (box_min_x - rTransformProjectile->tPosition[0]);
-				float delta_x2  = (box_max_x - rTransformProjectile->tPosition[0]);
+					float delta_y1  = (box_min_y - rTransformProjectile->tPosition[1]) / ray[1];
+					float delta_y2  = (box_max_y - rTransformProjectile->tPosition[1]) / ray[1];
 
-				float min_x     = delta_x1 < delta_x2 ? delta_x1 : delta_x2;
-				float max_x     = delta_x1 > delta_x2 ? delta_x1 : delta_x2;
-				min_x           = min_x < max_x ? min_x : max_x;
+					min = Max(min, Min(delta_y1, delta_y2));
+					max = Min(max, Max(delta_y1, delta_y2));
+				}
 
-				float box_min_y = transformOther->tPosition[1] - otherHalfScale;
-				float box_max_y = transformOther->tPosition[1] + otherHalfScale;
+				if ( ray[2] != 0.0f ) {
+					float box_min_z = transformOther->tPosition[2] - otherHalfScale;
+					float box_max_z = transformOther->tPosition[2] + otherHalfScale;
 				
-				float delta_y1  = (box_min_y - rTransformProjectile->tPosition[1]);
-				float delta_y2  = (box_max_y - rTransformProjectile->tPosition[1]);
+					float delta_z1  = (box_min_z - rTransformProjectile->tPosition[2]) / ray[2];
+					float delta_z2  = (box_max_z - rTransformProjectile->tPosition[2]) / ray[2];
 
-				float min_y     = delta_y1 < delta_y2 ? delta_y1 : delta_y2;
-				float max_y     = delta_y1 > delta_y2 ? delta_y1 : delta_y2;
-				min_y           = min_y < max_y ? min_y : max_y;
-
-				float box_min_z = transformOther->tPosition[2] - otherHalfScale;
-				float box_max_z = transformOther->tPosition[2] + otherHalfScale;
+					min = Max(min, Min(delta_z1, delta_z2));
+					max = Min(max, Max(delta_z1, delta_z2));
+				}
+				std::cout << "ray" << std::endl;
+				// std::cout << ray << std::endl;
+				// std::cout << transformOther->tPosition << std::endl;
 				
-				float delta_z1  = (box_min_z - rTransformProjectile->tPosition[2]);
-				float delta_z2  = (box_max_z - rTransformProjectile->tPosition[2]);
-
-				float min_z     = delta_z1 < delta_z2 ? delta_z1 : delta_z2;
-				float max_z     = delta_z1 > delta_z2 ? delta_z1 : delta_z2;
-				min_z           = min_z < max_z ? min_z : max_z;
-
-				if ( ray[0] > min_x && ray[1] > min_y && ray[2] > min_z) {
-//					std::cout << ray << std::endl;
-					std::cout << transformOther->tPosition << std::endl;
+				if ( max > min ) {
 					// std::cout << "TEST 2" << std::endl;
 					std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
+					std::cout << "other entity: " << entityOther << std::endl;
 					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
 					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);

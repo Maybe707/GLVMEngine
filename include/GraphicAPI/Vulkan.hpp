@@ -268,7 +268,7 @@ namespace GLVM::core
 #endif
         
         CVulkanRenderer(std::vector<ecs::Texture> _texture_data, std::vector<ecs::Texture> _initializeHUDTextureData);
-        ~CVulkanRenderer();
+        ~CVulkanRenderer() override;
 
         void createTextureImage();
         void recreateSwapChain();
