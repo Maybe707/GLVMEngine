@@ -595,52 +595,12 @@ namespace GLVM::core
 		  float rayLength = 1.0f;
 		  vec3 ray        = rTransformProjectile->tForward * rayLength;
 
-			// TODO: add loop for other entities in game world.
 			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-				// if ( x == j )
-				// 	continue;
-
-// // Given a ray and an aabb:
-// // return t at which the ray intersects the aabb. 
-// // return -1 if there is no intersection
-// public static float Raycast(Ray ray, AABB aabb) {
-//     float t1 = (aabb.minX - ray.Position.X) / ray.Normal.X;
-//     float t2 = (aabb.maxX - ray.Position.X) / ray.Normal.X;
-//     float t3 = (aabb.minY - ray.Position.Y) / ray.Normal.Y;
-//     float t4 = (aabb.maxY - ray.Position.Y) / ray.Normal.Y;
-//     float t5 = (aabb.minZ - ray.Position.Z) / ray.Normal.Z;
-//     float t6 = (aabb.maxZ - ray.Position.Z) / ray.Normal.Z;
-
-//     float tmin = Max(Max(Min(t1, t2), Min(t3, t4)), Min(t5, t6));
-//     float tmax = Min(Min(Max(t1, t2), Max(t3, t4)), Max(t5, t6));
-
-//     // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
-//     if (tmax < 0) {
-//         return -1;
-//     }
-
-//     // if tmin > tmax, ray doesn't intersect AABB
-//     if (tmin > tmax) {
-//         return -1
-//     }
-
-//     if (tmin < 0f) {
-//         return tmax;
-//     }
-//     return tmin;
-// }
-				
 				unsigned int entityOther = otherLinkedEntities[j];
 				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
 				float otherHalfScale = transformOther->fScale * 0.5f;
 				float min = 0.0f;
 				float max = 1.0f;
-
-				// std::cout << "entity: " << entityOther << std::endl;
-				// std::cout << "ray: " << ray << std::endl;
-				// std::cout << "other transform: " << transformOther->tPosition << std::endl;
-
-				bool intersect = true;
 
 				for ( int dimension = 0; dimension < 3; ++dimension ) {
 					float invariant = 1.0f / ray[dimension];
@@ -652,17 +612,11 @@ namespace GLVM::core
 
 					min = Max(min, Min(delta1, delta2));
 					max = Min(max, Max(delta1, delta2));
-					if ( max < min ) {
-						intersect = false;
+					if ( max < min )
 						break;
-					}
 				}
 
-//				std::cout << "ray" << std::endl;
-				// std::cout << ray << std::endl;
-				// std::cout << transformOther->tPosition << std::endl;
-
-				if ( intersect ) {
+				if ( max > min ) {
 					// std::cout << "TEST 2" << std::endl;
 					std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
 					std::cout << "other entity: " << entityOther << std::endl;
@@ -671,7 +625,8 @@ namespace GLVM::core
 					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
 					textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
 					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
-//					--linkedEntitiesVectorSize;
+					/// TODO: There is a big quastion is this decrement have sence.
+//					--linkedEntitiesVectorSize;  
  				}
 			}
 		}
