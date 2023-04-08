@@ -603,15 +603,16 @@ namespace GLVM::core
 				float max = 1.0f;
 
 				for ( int dimension = 0; dimension < 3; ++dimension ) {
-					float invariant = 1.0f / ray[dimension];
+					float axis_invariant = 1.0f / ray[dimension];
 					float box_min = transformOther->tPosition[dimension] - otherHalfScale;
 					float box_max = transformOther->tPosition[dimension] + otherHalfScale;
 					
-					float delta1  = (box_min - rTransformProjectile->tPosition[dimension]) * invariant;
-					float delta2  = (box_max - rTransformProjectile->tPosition[dimension]) * invariant;
+					float delta1  = (box_min - rTransformProjectile->tPosition[dimension]) * axis_invariant;
+					float delta2  = (box_max - rTransformProjectile->tPosition[dimension]) * axis_invariant;
 
 					min = Max(min, Min(delta1, delta2));
 					max = Min(max, Max(delta1, delta2));
+					
 					if ( max < min )
 						break;
 				}
