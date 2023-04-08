@@ -12,6 +12,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "GLPointer.h"
+#include "GraphicAPI/Vulkan.hpp"
 #include "MeshManager.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
@@ -596,56 +597,72 @@ namespace GLVM::core
 
 			// TODO: add loop for other entities in game world.
 			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
-				if ( x == j )
-					continue;
+				// if ( x == j )
+				// 	continue;
+
+// // Given a ray and an aabb:
+// // return t at which the ray intersects the aabb. 
+// // return -1 if there is no intersection
+// public static float Raycast(Ray ray, AABB aabb) {
+//     float t1 = (aabb.minX - ray.Position.X) / ray.Normal.X;
+//     float t2 = (aabb.maxX - ray.Position.X) / ray.Normal.X;
+//     float t3 = (aabb.minY - ray.Position.Y) / ray.Normal.Y;
+//     float t4 = (aabb.maxY - ray.Position.Y) / ray.Normal.Y;
+//     float t5 = (aabb.minZ - ray.Position.Z) / ray.Normal.Z;
+//     float t6 = (aabb.maxZ - ray.Position.Z) / ray.Normal.Z;
+
+//     float tmin = Max(Max(Min(t1, t2), Min(t3, t4)), Min(t5, t6));
+//     float tmax = Min(Min(Max(t1, t2), Max(t3, t4)), Max(t5, t6));
+
+//     // if tmax < 0, ray (line) is intersecting AABB, but whole AABB is behing us
+//     if (tmax < 0) {
+//         return -1;
+//     }
+
+//     // if tmin > tmax, ray doesn't intersect AABB
+//     if (tmin > tmax) {
+//         return -1
+//     }
+
+//     if (tmin < 0f) {
+//         return tmax;
+//     }
+//     return tmin;
+// }
 				
 				unsigned int entityOther = otherLinkedEntities[j];
 				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
 				float otherHalfScale = transformOther->fScale * 0.5f;
-				float min = -INFINITY;
-				float max = INFINITY;
-				
+				float min = 0.0f;
+				float max = 1.0f;
+
 				// std::cout << "entity: " << entityOther << std::endl;
 				// std::cout << "ray: " << ray << std::endl;
 				// std::cout << "other transform: " << transformOther->tPosition << std::endl;
 
-				if ( ray[0] != 0.0f) {
-					float box_min_x = transformOther->tPosition[0] - otherHalfScale;
-					float box_max_x = transformOther->tPosition[0] + otherHalfScale;
-				
-					float delta_x1  = (box_min_x - rTransformProjectile->tPosition[0]) / ray[0];
-					float delta_x2  = (box_max_x - rTransformProjectile->tPosition[0]) / ray[0];
+				bool intersect = true;
 
-					min = Max(min, Min(delta_x1, delta_x2));
-					max = Min(max, Max(delta_x1, delta_x2));
+				for ( int dimension = 0; dimension < 3; ++dimension ) {
+					float invariant = 1.0f / ray[dimension];
+					float box_min = transformOther->tPosition[dimension] - otherHalfScale;
+					float box_max = transformOther->tPosition[dimension] + otherHalfScale;
+					
+					float delta1  = (box_min - rTransformProjectile->tPosition[dimension]) * invariant;
+					float delta2  = (box_max - rTransformProjectile->tPosition[dimension]) * invariant;
+
+					min = Max(min, Min(delta1, delta2));
+					max = Min(max, Max(delta1, delta2));
+					if ( max < min ) {
+						intersect = false;
+						break;
+					}
 				}
 
-				if ( ray[1] != 0.0f ) {
-					float box_min_y = transformOther->tPosition[1] - otherHalfScale;
-					float box_max_y = transformOther->tPosition[1] + otherHalfScale;
-				
-					float delta_y1  = (box_min_y - rTransformProjectile->tPosition[1]) / ray[1];
-					float delta_y2  = (box_max_y - rTransformProjectile->tPosition[1]) / ray[1];
-
-					min = Max(min, Min(delta_y1, delta_y2));
-					max = Min(max, Max(delta_y1, delta_y2));
-				}
-
-				if ( ray[2] != 0.0f ) {
-					float box_min_z = transformOther->tPosition[2] - otherHalfScale;
-					float box_max_z = transformOther->tPosition[2] + otherHalfScale;
-				
-					float delta_z1  = (box_min_z - rTransformProjectile->tPosition[2]) / ray[2];
-					float delta_z2  = (box_max_z - rTransformProjectile->tPosition[2]) / ray[2];
-
-					min = Max(min, Min(delta_z1, delta_z2));
-					max = Min(max, Max(delta_z1, delta_z2));
-				}
-				std::cout << "ray" << std::endl;
+//				std::cout << "ray" << std::endl;
 				// std::cout << ray << std::endl;
 				// std::cout << transformOther->tPosition << std::endl;
-				
-				if ( max > min ) {
+
+				if ( intersect ) {
 					// std::cout << "TEST 2" << std::endl;
 					std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
 					std::cout << "other entity: " << entityOther << std::endl;

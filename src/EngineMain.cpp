@@ -1,4 +1,5 @@
 #include "ComponentManager.hpp"
+#include "Components/ColliderComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/MaterialComponent.hpp"
@@ -87,22 +88,22 @@ int main()
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f },
-		.yaw = 0.785f, .pitch = 0.785, .fScale = 1.0f };
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
     ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 0;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch, materialWitch->diffuseTextureID_);
 
-    // Entity uiWitch2 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
-	// ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 0;
-	// *ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
-	// 	= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };
-	// cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
-	// *materialWitch2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
-    // TextureManager->BindTexture(uiWitch2, materialWitch2->diffuseTextureID_);
+    Entity uiWitch2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
+	ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 0;
+	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
+		= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };
+	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
+	*materialWitch2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
+    TextureManager->BindTexture(uiWitch2, materialWitch2->diffuseTextureID_);
 
 	// Entity uiWitch3 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch3);
