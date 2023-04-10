@@ -68,8 +68,9 @@ namespace GLVM::core
 		T& GetFirstItem();
 		T& GetHead();
 		T* GetVectorContainer();
-		unsigned int GetSize();
+		[[nodiscard]] unsigned int GetSize() const;
 		int GetCapacity();
+		const T& operator[](const unsigned int _iIndex) const;
 		T& operator[](const unsigned int _iIndex);
 		void clear();
         void Print();
@@ -300,12 +301,14 @@ namespace GLVM::core
 	T* vector<T>::GetVectorContainer() { return (T*)rowInnerData; }
 
 	template<typename T>
-	unsigned int vector<T>::GetSize() { return size; }
+	unsigned int vector<T>::GetSize() const { return size; }
 	
 	template<typename T>
 	int vector<T>::GetCapacity() { return capacity; }
 	template<typename T>
-	T& vector<T>::operator[](const unsigned int _iIndex) { return *(T*)&rowInnerData[_iIndex * sizeof(T)]; }
+	const T& vector<T>::operator[](const unsigned int _iIndex) const { return reinterpret_cast<const T*>(rowInnerData)[_iIndex]; }
+	template<typename T>
+	T& vector<T>::operator[](const unsigned int _iIndex) { return reinterpret_cast<T*>(rowInnerData)[_iIndex]; }
 
 	template<typename T>
 	void vector<T>::clear() {

@@ -18,12 +18,13 @@
 
 namespace GLVM::core
 {
-    struct SVertex
+    class SVertex
     {
         float x;
         float y;
         float z;
 
+	public:
         float& operator[](const unsigned int _iIndex) {
             assert(_iIndex < 3 && _iIndex >= 0 && "Wrong index");
             switch(_iIndex) {
@@ -38,13 +39,27 @@ namespace GLVM::core
         }
     };
 
-    struct SFace
+    class SFace
     {
         GLVM::core::vector<int> vertexIndex;
         GLVM::core::vector<int> textureIndex;
         GLVM::core::vector<int> normalIndex;
 
+	public:
         GLVM::core::vector<int>& operator[](const unsigned int _iIndex) {
+            assert(_iIndex < 3 && _iIndex >= 0 && "Wrong index");
+            switch(_iIndex) {
+            default:
+            case 0:
+                return vertexIndex;
+            case 1:
+                return textureIndex;
+            case 2:
+                return normalIndex;
+            }
+        }
+
+		const GLVM::core::vector<int>& operator[](const unsigned int _iIndex) const {
             assert(_iIndex < 3 && _iIndex >= 0 && "Wrong index");
             switch(_iIndex) {
             default:
@@ -71,15 +86,16 @@ namespace GLVM::core
         std::string sWavefrontObjFileData;
         const char* pWavefrontObjFileData;
         unsigned int uiCounter = 0;
+		
     public:
         CWaveFrontObjParser();
 
 //        static CWaveFrontObjParser* GetInstance(); ///< It possibly to get only one instance of this class whith this method.
         
-        GLVM::core::vector<SVertex>& getCoordinateVertices();
-        GLVM::core::vector<SVertex>& getTextureVertices();
-		GLVM::core::vector<SVertex>& getNormals();
-        GLVM::core::vector<SFace>& getFaces();
+        [[nodiscard]] const GLVM::core::vector<SVertex>& getCoordinateVertices() const;
+        [[nodiscard]] const GLVM::core::vector<SVertex>& getTextureVertices() const;
+		[[nodiscard]] const GLVM::core::vector<SVertex>& getNormals() const;
+        [[nodiscard]] const GLVM::core::vector<SFace>&   getFaces() const;
         
         void ReadFile(const char* _filePath);
         void ParseFile();

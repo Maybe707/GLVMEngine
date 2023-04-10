@@ -20,10 +20,10 @@ namespace GLVM::core
     //     return pInstance_;
     // }
     
-    GLVM::core::vector<SVertex>& CWaveFrontObjParser::getCoordinateVertices() { return coordinateVertices_; }
-    GLVM::core::vector<SVertex>& CWaveFrontObjParser::getTextureVertices() { return textureVertices_; }
-	GLVM::core::vector<SVertex>& CWaveFrontObjParser::getNormals() { return normals_; }
-    GLVM::core::vector<SFace>& CWaveFrontObjParser::getFaces() { return faces_; }
+    const GLVM::core::vector<SVertex>& CWaveFrontObjParser::getCoordinateVertices() const { return coordinateVertices_; }
+    const GLVM::core::vector<SVertex>& CWaveFrontObjParser::getTextureVertices()    const { return textureVertices_; }
+	const GLVM::core::vector<SVertex>& CWaveFrontObjParser::getNormals()            const { return normals_; }
+    const GLVM::core::vector<SFace>& CWaveFrontObjParser::getFaces()                const { return faces_; }
     
     void CWaveFrontObjParser::ReadFile(const char* _filePath) {
         const char* _pWavefrontObjFile = _filePath;
