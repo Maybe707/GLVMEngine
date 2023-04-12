@@ -10,7 +10,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c ./src/WindowCreator.
 	./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
 	./src/SystemManager.cpp ./src/chelik.cpp ./src/Systems/ProjectileSystem.cpp ./src/Systems/CameraSystem.cpp \
 	./src/WinApi/SoundEngineWaveform.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Opengl.cpp ./src/GraphicAPI/Vulkan.cpp ./src/TextureManager.cpp ./src/witch.cpp ./src/crosshair.cpp \
-	./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/gray.cpp ./src/container2.cpp ./src/container2_specular.cpp
+	./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/gray.cpp ./src/container2.cpp ./src/container2_specular.cpp ./src/JsonParser.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = winGame
 

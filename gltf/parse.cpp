@@ -32,15 +32,15 @@ void ReadFile(const char* _filePath) {
 }
 
 void readFile(const char* _filePath) {
-	float buffer[840];
+	char buffer[840];
 
 	FILE* ptr;
 
 	ptr = fopen("cube.bin", "rb");
-	fread(buffer, sizeof(buffer), 1, ptr);
+	fread(buffer, 840, 1, ptr);
 
-	for(unsigned int i = 0; i < sizeof(buffer) / 4; ++i)
-		printf("%f ", buffer[i]);
+	for(unsigned int i = 0; i < 840; i += 2)
+		printf("%hu ", buffer[i]);
 }
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
