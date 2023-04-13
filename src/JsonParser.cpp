@@ -343,9 +343,17 @@ namespace GLVM::Core
 	JsonValue* CJsonParser::SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_) const {
 		for ( unsigned int i = 0; i < mapValue->GetCapacity(); ++i ) {
 			if ( mapValue->hashMap_[i] != nullptr ) {
-				if ( mapValue->hashMap_[i]->key_ == key_ )
-					return &mapValue->hashMap_[i]->value_;
-						
+				Node<JsonValue>* current = mapValue->hashMap_[i];
+				while ( current != nullptr ) {
+					std::string searchKey = key_;
+					std::string currentKey = current->key_;
+					if ( currentKey == searchKey ) {
+						return &current->value_;
+					}
+
+					current = current->next_;
+				}
+				
 				if ( mapValue->hashMap_[i]->value_.type == JSON_OBJECT ) {
 					JsonValue* pValue = SearchInJsonObject(mapValue->hashMap_[i]->value_.value.object, key_);
 					if ( pValue != nullptr )
@@ -363,8 +371,8 @@ namespace GLVM::Core
 		return nullptr;
 	}		
 	
-	const JsonValue& CJsonParser::Search(const char* key_) const {
+	const JsonValue* CJsonParser::Search(const char* key_) const {
 		JsonValue* value = SearchInJsonObject(root_->value.object, key_);
-		return *value;
+		return value;
 	}
 }

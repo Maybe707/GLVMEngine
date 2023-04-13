@@ -13,6 +13,7 @@
 #include "Components/TransformComponent.hpp"
 #include "GLPointer.h"
 #include "GraphicAPI/Vulkan.hpp"
+#include "JsonParser.hpp"
 #include "MeshManager.hpp"
 #include "ShaderProgram.hpp"
 #include "Texture.hpp"
@@ -811,6 +812,7 @@ namespace GLVM::core
 	}
 	
     void COpenglRenderer::loadWavefrontObj() {
+		LoadGLTF();
         for (unsigned int m = 0; m < pathsArray_.size(); ++m) {
             CWaveFrontObjParser parser;
             CWaveFrontObjParser* wavefrontObjParser = &parser;
@@ -845,7 +847,28 @@ namespace GLVM::core
 			SetVertices(aIndices_[m], aVertexes_[m]);
         }
     }
-    
+
+	void COpenglRenderer::LoadGLTF() {
+//		for (unsigned int m = 0; m < pathsArrayJson_.size(); ++m) {
+
+			Core::CJsonParser parser;
+			parser.ReadFile("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube.gltf");
+			parser.Parse();
+
+			const Core::JsonValue* uri = parser.Search("uri");
+			if ( uri == nullptr )
+				std::cout << "nullptr" << std::endl;
+			
+			if ( uri != nullptr ) {
+				std::cout << "TEST" << std::endl;
+//				std::string binaryPath          = *(*(*uri->value.array)[0].value.object)["uri"].value.string;
+				std::string binaryPath = *uri->value.string;
+//				int binaryPath = uri->value.iNumber;
+				std::cout << binaryPath << std::endl;
+			}
+//		}
+	}
+	
 	mat4 COpenglRenderer::SetModelMatrix(ecs::components::transform& transformComponent_)
 	{
         mat4 rotationMatrix(1.0f);

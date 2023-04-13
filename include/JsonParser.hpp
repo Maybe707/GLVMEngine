@@ -217,7 +217,7 @@ namespace GLVM::Core
 		core::vector<char> StringToVectorOfChars(std::string _string);
 		int ParseInteger(core::vector<char> _word);
 		float ParseFloating(core::vector<char> _word);
-		const JsonValue& Search(const char* key_) const;
+		const JsonValue* Search(const char* key_) const;
     };
 }
 

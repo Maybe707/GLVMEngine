@@ -20,6 +20,7 @@
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
+#include "JsonParser.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include "ShaderProgram.hpp"
@@ -114,6 +115,7 @@ namespace GLVM::core {
 		std::vector<ecs::Texture> texture_load_data;
         std::vector<ecs::Texture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
+		std::vector<const char*> pathsArrayJson_;
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		std::vector<GLuint> VBOcontainer_;
@@ -153,6 +155,7 @@ namespace GLVM::core {
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
+		void LoadGLTF() override;
 		void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray) override;
 		void run() override;

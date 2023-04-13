@@ -71,7 +71,7 @@ public:
     S& operator[](const char* _key) {
         unsigned int hash = HashFunction(_key);
 
-        if (hash > capacity_)
+        if (hash >= capacity_)
             Rehash(hash);
 
         return Link(hashMap_[hash], _key);
@@ -106,8 +106,10 @@ public:
 
 	bool SearchKey(const char* key_) {
 		for ( int i = 0; i < capacity_; ++i ) {
-			if ( hashMap_[i] != nullptr && hashMap_[i]->key_ == key_ )
+			if ( hashMap_[i] != nullptr && hashMap_[i]->key_ == key_ ) {
+				std::cout << "key: " << key_ << std::endl;
 				return true;
+			}
 		}
 
 		return false;
@@ -156,14 +158,14 @@ private:
     }
 };
 
-union Variant
-{
-    std::string string;
-    float integer;
-    bool boolean;
-    int null;
-	GLVM::core::vector<Variant> array;
-    HashMap<Variant> map;
-    Variant() {}
-    ~Variant() {}
-};
+// union Variant
+// {
+//     std::string string;
+//     float integer;
+//     bool boolean;
+//     int null;
+// 	GLVM::core::vector<Variant> array;
+//     HashMap<Variant> map;
+//     Variant() {}
+//     ~Variant() {}
+// };
