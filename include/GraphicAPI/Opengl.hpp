@@ -25,6 +25,7 @@
 #include <GL/glext.h>
 #include "ShaderProgram.hpp"
 #include "ToString.hpp"
+#include <fstream>
 
 #ifdef __linux__
 #include "UnixApi/WindowX.hpp"

@@ -186,6 +186,29 @@ namespace GLVM::Core
 			}
 			type = _value.type;
 		}
+
+		JsonValue& operator[](std::string key_) {
+			const char* key = key_.c_str();
+			switch (type) {
+			case JSON_OBJECT:
+				return (*value.object)[key];
+				break;
+			default:
+				throw std::out_of_range("Type is not a json object");
+				break;
+			}
+		}
+
+		JsonValue& operator[](const unsigned int index_) {
+			switch (type) {
+			case JSON_ARRAY:
+				return (*value.array)[index_];
+				break;
+			default:
+				throw std::out_of_range("Type is not a json array");
+				break;
+			}
+		}
     };
         
     class CJsonParser
@@ -201,8 +224,10 @@ namespace GLVM::Core
 	    std::string lastKey_ = "";
 		std::string bufferString_ = "";
 
-		JsonValue* SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_) const;
-		JsonValue* SearchInJsonArray(core::vector<JsonValue>* arrayValue, const char* key_) const;
+		void SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_,
+								core::vector<JsonValue>& resultVector) const;
+		void SearchInJsonArray(core::vector<JsonValue>* arrayValue, const char* key_,
+							   core::vector<JsonValue>& resultVector) const;
 
     public:
 		JsonValue* GetRoot() { return root_; }
@@ -217,7 +242,7 @@ namespace GLVM::Core
 		core::vector<char> StringToVectorOfChars(std::string _string);
 		int ParseInteger(core::vector<char> _word);
 		float ParseFloating(core::vector<char> _word);
-		const JsonValue* Search(const char* key_) const;
+		core::vector<JsonValue> Search(const char* key_) const;
     };
 }
 

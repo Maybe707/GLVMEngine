@@ -341,7 +341,7 @@ namespace GLVM::core
     template<class T>
     void vector<T>::Print()
     {
-        for(unsigned int i = 0; i < capacity; ++i)
+        for(unsigned int i = 0; i < size; ++i)
             std::cout << *(T*)&rowInnerData[i * sizeof(T)] << std::endl;
 
         std::cout << "End of container" << std::endl;

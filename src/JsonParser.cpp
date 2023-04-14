@@ -322,25 +322,19 @@ namespace GLVM::Core
         return result;
     }
 
-	JsonValue* CJsonParser::SearchInJsonArray(core::vector<JsonValue>* arrayValue, const char* key_) const {
+	void CJsonParser::SearchInJsonArray(core::vector<JsonValue>* arrayValue, const char* key_,
+										core::vector<JsonValue>& resultVector) const {
 		for ( unsigned int i = 0; i < arrayValue->GetSize(); ++i ) {
-			if ( (*arrayValue)[i].type == JSON_OBJECT ) {
-				JsonValue* pValue = SearchInJsonObject((*arrayValue)[i].value.object, key_);
-				if ( pValue != nullptr )
-					return pValue;
-			}
+			if ( (*arrayValue)[i].type == JSON_OBJECT )
+				SearchInJsonObject((*arrayValue)[i].value.object, key_, resultVector);
 
-			if ( (*arrayValue)[i].type == JSON_ARRAY ) {
-				JsonValue* pValue = SearchInJsonArray((*arrayValue)[i].value.array, key_);
-				if ( pValue != nullptr )
-					return pValue;
-			}
+			if ( (*arrayValue)[i].type == JSON_ARRAY )
+				SearchInJsonArray((*arrayValue)[i].value.array, key_, resultVector);
 		}
-
-		return nullptr;
 	}
 	
-	JsonValue* CJsonParser::SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_) const {
+	void CJsonParser::SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_,
+										 core::vector<JsonValue>& resultVector) const {
 		for ( unsigned int i = 0; i < mapValue->GetCapacity(); ++i ) {
 			if ( mapValue->hashMap_[i] != nullptr ) {
 				Node<JsonValue>* current = mapValue->hashMap_[i];
@@ -348,31 +342,24 @@ namespace GLVM::Core
 					std::string searchKey = key_;
 					std::string currentKey = current->key_;
 					if ( currentKey == searchKey ) {
-						return &current->value_;
+						resultVector.Push(current->value_);
 					}
+
+					if ( current->value_.type == JSON_OBJECT )
+						SearchInJsonObject(current->value_.value.object, key_, resultVector);
+
+					if ( current->value_.type == JSON_ARRAY )
+						SearchInJsonArray(current->value_.value.array, key_, resultVector);
 
 					current = current->next_;
 				}
-				
-				if ( mapValue->hashMap_[i]->value_.type == JSON_OBJECT ) {
-					JsonValue* pValue = SearchInJsonObject(mapValue->hashMap_[i]->value_.value.object, key_);
-					if ( pValue != nullptr )
-						return pValue;
-				}
-
-				if ( mapValue->hashMap_[i]->value_.type == JSON_ARRAY ) {
-					JsonValue* pValue = SearchInJsonArray(mapValue->hashMap_[i]->value_.value.array, key_);
-					if ( pValue != nullptr )
-						return pValue;
-				}
 			}
 		}
-
-		return nullptr;
 	}		
 	
-	const JsonValue* CJsonParser::Search(const char* key_) const {
-		JsonValue* value = SearchInJsonObject(root_->value.object, key_);
-		return value;
+	core::vector<JsonValue> CJsonParser::Search(const char* key_) const {
+		core::vector<JsonValue> resultVector;
+		SearchInJsonObject(root_->value.object, key_, resultVector);
+		return resultVector;
 	}
 }

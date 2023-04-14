@@ -31,9 +31,14 @@
 #include "WavefrontObjParser.hpp"
 
 #include <chrono>
+#include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
+#include <fstream>
 #include <ratio>
+#include <sstream>
 #include <thread>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -812,7 +817,6 @@ namespace GLVM::core
 	}
 	
     void COpenglRenderer::loadWavefrontObj() {
-		LoadGLTF();
         for (unsigned int m = 0; m < pathsArray_.size(); ++m) {
             CWaveFrontObjParser parser;
             CWaveFrontObjParser* wavefrontObjParser = &parser;
@@ -855,18 +859,120 @@ namespace GLVM::core
 			parser.ReadFile("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube.gltf");
 			parser.Parse();
 
-			const Core::JsonValue* uri = parser.Search("uri");
-			if ( uri == nullptr )
-				std::cout << "nullptr" << std::endl;
+			// const Core::JsonValue* binaryPath = parser.Search("uri");
+			// std::string binary_path;
+			// if ( binaryPath != nullptr ) {
+			// 	binary_path = *binaryPath->value.string;
+			// 	std::cout << binary_path << std::endl;
+			// }
+
+			Core::JsonValue* gltf = parser.GetRoot();
+			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
+			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
+
+			std::ifstream in_stream;
+			in_stream.open("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path);
+ 			char* buffer = new char[full_byte_size];
+			in_stream.read(buffer, full_byte_size);
+			in_stream.close();
+
+			// for ( int i = 0; i < full_byte_size; i += 4 )
+			// 	std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
+
+			int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
+			int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
+			int indices_byte_length = (*gltf)["bufferViews"][indices_buffer_view_index]["byteLength"].value.iNumber;
+			int indices_byte_offset = (*gltf)["bufferViews"][indices_buffer_view_index]["byteOffset"].value.iNumber;
+
+//			std::cout << "length: " << byte_length << " offset: " << byte_offset << std::endl;
 			
-			if ( uri != nullptr ) {
-				std::cout << "TEST" << std::endl;
-//				std::string binaryPath          = *(*(*uri->value.array)[0].value.object)["uri"].value.string;
-				std::string binaryPath = *uri->value.string;
-//				int binaryPath = uri->value.iNumber;
-				std::cout << binaryPath << std::endl;
+			core::vector<unsigned int> indices;
+			for ( int i = indices_byte_offset; i < indices_byte_offset + indices_byte_length; i += 2 )
+				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
+
+			int vertices_position_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["POSITION"].value.iNumber;
+			int vertices_buffer_view_index = (*gltf)["accessors"][vertices_position_index]["bufferView"].value.iNumber;
+			int vertices_byte_length = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteLength"].value.iNumber;
+			int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
+
+//			std::cout << "length: " << vertices_byte_length << " offset: " << vertices_byte_offset << std::endl;
+
+			core::vector<float> vertices_position;
+			for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 )
+				vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
+
+			int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
+			int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;
+			int texture_byte_length = (*gltf)["bufferViews"][texture_buffer_view_index]["byteLength"].value.iNumber;
+			int texture_byte_offset = (*gltf)["bufferViews"][texture_buffer_view_index]["byteOffset"].value.iNumber;
+
+//			std::cout << "length: " << texture_byte_length << " offset: " << texture_byte_offset << std::endl;
+
+			core::vector<float> texture_coordinates;
+			for ( int i = texture_byte_offset; i < texture_byte_offset + texture_byte_length; i += 4 )
+				texture_coordinates.Push(reinterpret_cast<float &>(buffer[i]));
+
+			int normals_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["NORMAL"].value.iNumber;
+			int normals_buffer_view_index = (*gltf)["accessors"][normals_index]["bufferView"].value.iNumber;
+			int normals_byte_length = (*gltf)["bufferViews"][normals_buffer_view_index]["byteLength"].value.iNumber;
+			int normals_byte_offset = (*gltf)["bufferViews"][normals_buffer_view_index]["byteOffset"].value.iNumber;
+
+//			std::cout << "length: " << normals_byte_length << " offset: " << normals_byte_offset << std::endl;
+
+			core::vector<float> normals;
+			for ( int i = normals_byte_offset; i < normals_byte_offset + normals_byte_length; i += 4 )
+				normals.Push(reinterpret_cast<float &>(buffer[i]));
+
+			aVertexes_.emplace_back();
+			aIndices_.emplace_back();
+
+			indices.Print();
+			
+			for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
+				aIndices_[0].push_back(i);
+
+//				std::cout << indices[i] - 1 << std::endl;
+				unsigned int index = indices[i] * 3;
+				if ( index + 2 < vertices_position.GetSize() ) {
+					aVertexes_[0].push_back(vertices_position[index]);
+					aVertexes_[0].push_back(vertices_position[index + 1]);
+					aVertexes_[0].push_back(vertices_position[index + 2]);
+				}
+
+				if ( index + 2 < normals.GetSize() ) {
+					aVertexes_[0].push_back(normals[index]);
+					aVertexes_[0].push_back(normals[index + 1]);
+					aVertexes_[0].push_back(normals[index + 2]);
+				}
+
+				index = indices[i] * 2;
+				if ( index + 1 < texture_coordinates.GetSize() ) {
+					aVertexes_[0].push_back(texture_coordinates[index]);
+					aVertexes_[0].push_back(texture_coordinates[index + 1]);
+				}
 			}
+
+			SetVertices(aIndices_[0], aVertexes_[0]);
+			
+			// core::vector<Core::JsonValue> vector = parser.Search("name");
+			// std::cout << "size: " << vector.GetSize() << std::endl;
+			// for ( unsigned int i = 0; i < vector.GetSize(); ++i )
+			// 	std::cout << *vector[i].value.string << std::endl;
+			
+			// int byteLength = 840;
+			// int byteOffset = 768;
+
+
+			// FILE* ptr;
+
+			// ptr = fopen(("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path).c_str(), "rb");
+			// fread(buffer, byteLength, 1, ptr);
+
+			// for(int i = 0; i < 840; i += 4)
+			// 	printf("%d ", buffer[i]);
+			
 //		}
+		
 	}
 	
 	mat4 COpenglRenderer::SetModelMatrix(ecs::components::transform& transformComponent_)
@@ -926,7 +1032,8 @@ namespace GLVM::core
 	}
     
     void COpenglRenderer::run() {
-		loadWavefrontObj();
+//		loadWavefrontObj();
+		LoadGLTF();
 	}
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
