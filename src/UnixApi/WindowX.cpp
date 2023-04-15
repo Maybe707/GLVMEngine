@@ -62,7 +62,8 @@ namespace GLVM::core
         Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1920, 1080, 0, pVisual_->depth, InputOutput,
                             pVisual_->visual, CWColormap | CWEventMask, &Set_Window_Attributes_);    
 
-    
+		XStoreName(pDisp_, Win_, "RPGESHECHKA");
+		
         pGLXCreateContextAttribsARB_ =
             (GLXContext (*)(Display*, GLXFBConfig, GLXContext, Bool, const int*))
         glXGetProcAddress((const GLubyte*)"glXCreateContextAttribsARB");

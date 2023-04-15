@@ -41,9 +41,6 @@
 #include <sstream>
 #include <thread>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 namespace GLVM::core
 {
     COpenglRenderer::COpenglRenderer()
