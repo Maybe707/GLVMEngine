@@ -10,7 +10,6 @@
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
 #include "Event.hpp"
-#include "VertexData.hpp"
 #include "WindowCreator.hpp"
 #include "TimerCreator.hpp"
 #include "Vector.hpp"

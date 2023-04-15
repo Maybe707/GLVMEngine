@@ -873,8 +873,8 @@ namespace GLVM::core
 			in_stream.read(buffer, full_byte_size);
 			in_stream.close();
 
-			for ( int i = 0; i < full_byte_size; i += 4 )
-				std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
+			// for ( int i = 0; i < full_byte_size; i += 4 )
+			// 	std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
 
 			int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
 			int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
@@ -920,6 +920,24 @@ namespace GLVM::core
 			for ( int i = normals_byte_offset; i < normals_byte_offset + normals_byte_length; i += 4 )
 				normals.Push(reinterpret_cast<float &>(buffer[i]));
 
+			bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
+			mat3 scaleTransform(1.0f);
+
+			std::cout << "scale flag: " << scaleFlag << std::endl;
+			
+			if ( scaleFlag ) {
+				core::vector<Core::JsonValue> scale = *(*gltf)["nodes"][0]["scale"].value.array;
+				for ( int i = 0; i < 3; ++i ) {
+					if ( scale[i].type == Core::JSON_FLOAT_NUMBER )
+						scaleTransform[i][i] = scale[i].value.fNumber;
+
+					if ( scale[i].type == Core::JSON_INTEGER_NUMBER )
+						scaleTransform[i][i] = (float)scale[i].value.iNumber;
+				}
+
+				std::cout << "scale: " << scaleTransform << std::endl;
+			}
+			
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 
@@ -929,15 +947,29 @@ namespace GLVM::core
 //				std::cout << indices[i] - 1 << std::endl;
 				unsigned int index = indices[i] * 3;
 				if ( index + 2 < vertices_position.GetSize() ) {
-					aVertexes_[m].push_back(vertices_position[index]);
-					aVertexes_[m].push_back(vertices_position[index + 1]);
-					aVertexes_[m].push_back(vertices_position[index + 2]);
+					vec3 position = { vertices_position[index],
+						vertices_position[index + 1],
+						vertices_position[index + 2] };
+
+					if ( scaleFlag )
+						position = position * scaleTransform;
+					
+					aVertexes_[m].push_back(position[0]);
+					aVertexes_[m].push_back(position[1]);
+					aVertexes_[m].push_back(position[2]);
 				}
 
 				if ( index + 2 < normals.GetSize() ) {
-					aVertexes_[m].push_back(normals[index]);
-					aVertexes_[m].push_back(normals[index + 1]);
-					aVertexes_[m].push_back(normals[index + 2]);
+					vec3 normal = { normals[index],
+						normals[index + 1],
+						normals[index + 2] };
+
+					if ( scaleFlag )
+						normal = normal * scaleTransform;
+					
+					aVertexes_[m].push_back(normal[0]);
+					aVertexes_[m].push_back(normal[1]);
+					aVertexes_[m].push_back(normal[2]);
 				}
 
 				index = indices[i] * 2;
