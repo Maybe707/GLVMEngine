@@ -5,6 +5,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Texture.hpp"
+#include "Vector.hpp"
 
 namespace GLVM::core
 {
@@ -17,7 +18,7 @@ namespace GLVM::core
         virtual void loadWavefrontObj() = 0;
 		virtual void LoadGLTF() = 0;
         virtual void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) = 0;
-        virtual void SetMeshData(std::vector<const char*> _pathsArray) = 0;
+        virtual void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) = 0;
         virtual void SetViewMatrix(mat4 _viewMatrix) = 0;
         virtual void SetProjectionMatrix(mat4 _projectionMatrix) = 0;
         virtual void run() = 0;

@@ -853,10 +853,10 @@ namespace GLVM::core
     }
 
 	void COpenglRenderer::LoadGLTF() {
-//		for (unsigned int m = 0; m < pathsArrayJson_.size(); ++m) {
+		for (unsigned int m = 0; m < pathsGLTF.GetSize(); ++m) {
 
 			Core::CJsonParser parser;
-			parser.ReadFile("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube.gltf");
+			parser.ReadFile(pathsGLTF[m]);
 			parser.Parse();
 
 			// const Core::JsonValue* binaryPath = parser.Search("uri");
@@ -869,15 +869,15 @@ namespace GLVM::core
 			Core::JsonValue* gltf = parser.GetRoot();
 			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
-
+			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
 			in_stream.open("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path);
  			char* buffer = new char[full_byte_size];
 			in_stream.read(buffer, full_byte_size);
 			in_stream.close();
 
-			// for ( int i = 0; i < full_byte_size; i += 4 )
-			// 	std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
+			for ( int i = 0; i < full_byte_size; i += 4 )
+				std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
 
 			int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
 			int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
@@ -926,33 +926,31 @@ namespace GLVM::core
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 
-			indices.Print();
-			
 			for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
-				aIndices_[0].push_back(i);
+				aIndices_[m].push_back(i);
 
 //				std::cout << indices[i] - 1 << std::endl;
 				unsigned int index = indices[i] * 3;
 				if ( index + 2 < vertices_position.GetSize() ) {
-					aVertexes_[0].push_back(vertices_position[index]);
-					aVertexes_[0].push_back(vertices_position[index + 1]);
-					aVertexes_[0].push_back(vertices_position[index + 2]);
+					aVertexes_[m].push_back(vertices_position[index]);
+					aVertexes_[m].push_back(vertices_position[index + 1]);
+					aVertexes_[m].push_back(vertices_position[index + 2]);
 				}
 
 				if ( index + 2 < normals.GetSize() ) {
-					aVertexes_[0].push_back(normals[index]);
-					aVertexes_[0].push_back(normals[index + 1]);
-					aVertexes_[0].push_back(normals[index + 2]);
+					aVertexes_[m].push_back(normals[index]);
+					aVertexes_[m].push_back(normals[index + 1]);
+					aVertexes_[m].push_back(normals[index + 2]);
 				}
 
 				index = indices[i] * 2;
 				if ( index + 1 < texture_coordinates.GetSize() ) {
-					aVertexes_[0].push_back(texture_coordinates[index]);
-					aVertexes_[0].push_back(texture_coordinates[index + 1]);
+					aVertexes_[m].push_back(texture_coordinates[index]);
+					aVertexes_[m].push_back(texture_coordinates[index + 1]);
 				}
 			}
 
-			SetVertices(aIndices_[0], aVertexes_[0]);
+			SetVertices(aIndices_[m], aVertexes_[m]);
 			
 			// core::vector<Core::JsonValue> vector = parser.Search("name");
 			// std::cout << "size: " << vector.GetSize() << std::endl;
@@ -971,7 +969,7 @@ namespace GLVM::core
 			// for(int i = 0; i < 840; i += 4)
 			// 	printf("%d ", buffer[i]);
 			
-//		}
+		}
 		
 	}
 	
@@ -1026,9 +1024,12 @@ namespace GLVM::core
 		hudTexture_load_data_ = _hud_texture_data;
 	}
 	
-    void COpenglRenderer::SetMeshData(std::vector<const char*> _pathsArray) {
+    void COpenglRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) {
 		for (unsigned int i = 0; i < _pathsArray.size(); ++i)
             pathsArray_.push_back(_pathsArray[i]);
+
+		for (unsigned int i = 0; i < pathsGLTF_.GetSize(); ++i)
+			pathsGLTF.Push(pathsGLTF_[i]);
 	}
     
     void COpenglRenderer::run() {

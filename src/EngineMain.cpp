@@ -28,15 +28,19 @@ int main()
 	ecs::TextureManager  * TextureManager    = ecs::TextureManager::GetInstance();
 	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
-	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
-	MeshManager->SetMesh("../waveFrontObj/sphere.obj");
+//	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
+//	MeshManager->SetMesh("../waveFrontObj/sphere.obj");
 	// MeshManager->SetMesh("../waveFrontObj/cone.obj");
 	// MeshManager->SetMesh("../waveFrontObj/monkey.obj");
-	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
-	MeshManager->SetMesh("../waveFrontObj/ray.obj");
+//	MeshManager->SetMesh("../waveFrontObj/plain5.obj");
+//	MeshManager->SetMesh("../waveFrontObj/ray.obj");
 //	MeshManager->SetMesh("../waveFrontObj/ray_y.obj");
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
+
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/ray3.gltf");
+	
 	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };

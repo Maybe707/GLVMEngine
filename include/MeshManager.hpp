@@ -19,9 +19,11 @@ namespace GLVM::core
         
     public:
         std::vector<const char*> pathsArray_;
+		core::vector<const char*> pathsGLTF_;
 
         static MeshManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
         void SetMesh(const char* _pathToMesh);
+		void SetMeshGLTF(const char* pathToMesh);
     };
 }
 

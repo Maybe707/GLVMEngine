@@ -116,7 +116,7 @@ namespace GLVM::core {
 		std::vector<ecs::Texture> texture_load_data;
         std::vector<ecs::Texture> hudTexture_load_data_;
 		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
-		std::vector<const char*> pathsArrayJson_;
+		core::vector<const char*> pathsGLTF;
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		std::vector<GLuint> VBOcontainer_;
@@ -158,7 +158,7 @@ namespace GLVM::core {
 		void loadWavefrontObj() override;
 		void LoadGLTF() override;
 		void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
-		void SetMeshData(std::vector<const char*> _pathsArray) override;
+		void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) override;
 		void run() override;
 		mat4 SetModelMatrix(ecs::components::transform& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;

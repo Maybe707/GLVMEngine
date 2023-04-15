@@ -248,6 +248,7 @@ namespace GLVM::core
         std::vector<ecs::Texture> hudTexture_load_data_;
         std::vector<ecs::components::transform> transform_data_;
         std::vector<const char*> pathsArray_;
+		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
 
@@ -275,7 +276,7 @@ namespace GLVM::core
         void draw() override;
         void loadWavefrontObj() override;
         void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
-        void SetMeshData(std::vector<const char*> _pathsArray) override;
+        void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
         void run() override;

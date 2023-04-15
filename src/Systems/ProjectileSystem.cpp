@@ -62,7 +62,7 @@ namespace GLVM::ecs
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.2f;
+			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.02f;
 		}
 
 //         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
@@ -103,7 +103,7 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // soundEngine->GetSoundContainer().Push(pSound_Sample);
-		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 3;
+		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };

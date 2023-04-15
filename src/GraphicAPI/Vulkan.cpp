@@ -169,9 +169,12 @@ namespace GLVM::core
         // textureSamplers.resize(texture_load_data_.size());
     }
 
-    void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray) {
+    void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) {
         for (unsigned int i = 0; i < _pathsArray.size(); ++i)
             pathsArray_.push_back(_pathsArray[i]);
+
+		for (unsigned int i = 0; i < pathsGLTF.GetSize(); ++i)
+			pathsGLTF_.Push(pathsGLTF[i]);
     }
     
     void CVulkanRenderer::run() {

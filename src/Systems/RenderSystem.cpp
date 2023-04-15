@@ -23,7 +23,7 @@ namespace GLVM::ecs
 #endif
 
         renderer_instance_->SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
-        renderer_instance_->SetMeshData(meshManager->pathsArray_);
+        renderer_instance_->SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
         renderer_instance_->run();
 	}
 

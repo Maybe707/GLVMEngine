@@ -12,7 +12,11 @@ namespace GLVM::core
     void MeshManager::SetMesh(const char* _pathToMesh) {
         pathsArray_.push_back(_pathToMesh);
     }
-    
+
+	void MeshManager::SetMeshGLTF(const char* pathToMesh) {
+		pathsGLTF_.Push(pathToMesh);
+	}
+	
     MeshManager* MeshManager::GetInstance()
     {
         
