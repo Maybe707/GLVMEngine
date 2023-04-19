@@ -26,6 +26,7 @@
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <X11/Xlib.h>
 #include <cmath>
 #include "Globals.hpp"
 #include "WavefrontObjParser.hpp"
@@ -788,7 +789,7 @@ namespace GLVM::core
 		GLuint iEbo_;
 		pGLGen_Vertex_Arrays(NUMBER_OF_CREATING_VAO_OBJECT_1, &iVao_);
         pGLGen_Buffers(NUMBER_OF_CREATING_VBO_OBJECT_1, &iVbo_);
-  
+		
         pGLGen_Buffers(1, &iEbo_);
         
         ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
@@ -893,7 +894,7 @@ namespace GLVM::core
 			int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
 
 //			std::cout << "length: " << vertices_byte_length << " offset: " << vertices_byte_offset << std::endl;
-
+			
 			core::vector<float> vertices_position;
 			for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 )
 				vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
@@ -1075,6 +1076,9 @@ namespace GLVM::core
         Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
+		std::cout << "x offset: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
+		std::cout << "y offset: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
+		
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         pitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
@@ -1097,10 +1101,20 @@ namespace GLVM::core
 		// std::cout << "sin pitch: " << std::sin(Radians(pitch)) << std::endl;
 		
 		vec3 forward;
+		Quaternion quaternion1;
+		Quaternion quaternion2;
 		/// We have dot product here to compute projection to axes
-        forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
-        forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
-        forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
+        // forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
+        // forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
+        // forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
+
+		quaternion1 = MultiplyQuaternion(Quaternion{ .real = std::cos(Radians(pitch)), .imaginary = vec3{ 1.0f, 0.0f, 0.0f } * -std::sin(Radians(pitch)) },
+										Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 0.0f, 1.0f}) });
+		quaternion2 = MultiplyQuaternion(Quaternion{ .real = -std::cos(Radians(fYaw)), .imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(fYaw)) },
+										Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ -1.0f, 0.0f, 0.0f}) });
+		
+
+		forward = quaternion2.imaginary;
         beholder.forward = Normalize(forward);
 
 //		std::cout << "x: " << forward[0] << " z: " << forward[2] << std::endl;

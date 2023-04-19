@@ -1,5 +1,5 @@
-#ifndef VERTEX_MATRIX
-#define VERTEX_MATRIX
+#ifndef VERTEX_MATH
+#define VERTEX_MATH
 
 #include <iostream>
 #include <cmath>
@@ -704,6 +704,52 @@ constexpr float Max(float var1, float var2) {
 
 constexpr float Min(float var1, float var2) {
 	return var1 < var2 ? var1 : var2;
+}
+
+struct Quaternion
+{
+	float real;
+	vec3  imaginary;
+};
+
+inline Quaternion CreateQuaternion(float cosine, float sine, vec3 vector) {
+	float cosine_in_radians = Radians(cosine);
+	float sine_in_radians   = Radians(sine);
+
+	Quaternion quaternion;
+	quaternion.real = cosine_in_radians;
+	quaternion.imaginary = vector * sine_in_radians;
+
+	return quaternion;
+}
+
+inline Quaternion LinkedQuaternionValue(Quaternion quaternion) {
+	quaternion.imaginary = -quaternion.imaginary;
+
+	return quaternion;
+}
+
+inline float NormQuaternion(Quaternion quaternion) {
+	return sqrt(quaternion.real * quaternion.real + quaternion.imaginary[0] * quaternion.imaginary[0] +
+				quaternion.imaginary[1] * quaternion.imaginary[1] + quaternion.imaginary[2] * quaternion.imaginary[2]);
+}
+
+inline Quaternion InverseQuaternion([[maybe_unused]] Quaternion quaternion) {
+//	Quaternion linkedValue = linkedQuaternionValue(quaternion);
+	
+	return {};
+}
+
+inline Quaternion MultiplyQuaternion(Quaternion quaternion1, Quaternion quaternion2) {
+	Quaternion quaternion;
+	quaternion.real = quaternion1.real * quaternion2.real -
+		Dot(quaternion1.imaginary, quaternion2.imaginary);
+	
+	quaternion.imaginary = quaternion2.imaginary * quaternion1.real +
+		quaternion1.imaginary * quaternion2.real +
+		Cross(quaternion1.imaginary, quaternion2.imaginary);
+
+	return quaternion;
 }
 
 #endif
