@@ -790,4 +790,21 @@ inline Quaternion inverseQuaternion(Quaternion quaternion) {
 	return quaternion;
 }
 
+inline Quaternion eulerToQuaternion(float roll, float pitch, float yaw) {
+	float cr = cos(roll * 0.5);
+    float sr = sin(roll * 0.5);
+    float cp = cos(pitch * 0.5);
+    float sp = sin(pitch * 0.5);
+    float cy = cos(yaw * 0.5);
+    float sy = sin(yaw * 0.5);
+
+    Quaternion q;
+    q.w = cr * cp * cy + sr * sp * sy;
+    q.x = sr * cp * cy - cr * sp * sy;
+    q.y = cr * sp * cy + sr * cp * sy;
+    q.z = cr * cp * sy - sr * sp * cy;
+
+	return q;
+}
+
 #endif
