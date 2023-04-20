@@ -708,47 +708,85 @@ constexpr float Min(float var1, float var2) {
 
 struct Quaternion
 {
-	float real;
-	vec3  imaginary;
+	// float real;
+	// vec3  imaginary;
+
+	float w, x, y, z;
 };
 
-inline Quaternion CreateQuaternion(float cosine, float sine, vec3 vector) {
-	float cosine_in_radians = Radians(cosine);
-	float sine_in_radians   = Radians(sine);
+// inline Quaternion CreateQuaternion(float cosine, float sine, vec3 vector) {
+// 	float cosine_in_radians = Radians(cosine);
+// 	float sine_in_radians   = Radians(sine);
 
-	Quaternion quaternion;
-	quaternion.real = cosine_in_radians;
-	quaternion.imaginary = vector * sine_in_radians;
+// 	Quaternion quaternion;
+// 	quaternion.real = cosine_in_radians;
+// 	quaternion.imaginary = vector * sine_in_radians;
+
+// 	return quaternion;
+// }
+
+// inline float NormQuaternion(Quaternion quaternion) {
+// 	return sqrt(quaternion.real * quaternion.real + quaternion.imaginary[0] * quaternion.imaginary[0] +
+// 				quaternion.imaginary[1] * quaternion.imaginary[1] + quaternion.imaginary[2] * quaternion.imaginary[2]);
+// }
+
+// inline Quaternion MultiplyQuaternion(Quaternion quaternion1, Quaternion quaternion2) {
+// 	Quaternion quaternion;
+// 	quaternion.real = quaternion1.real * quaternion2.real -
+// 		Dot(quaternion1.imaginary, quaternion2.imaginary);
+	
+// 	quaternion.imaginary = quaternion2.imaginary * quaternion1.real +
+// 		quaternion1.imaginary * quaternion2.real +
+// 		Cross(quaternion1.imaginary, quaternion2.imaginary);
+
+// 	return quaternion;
+// }
+
+inline Quaternion linkedQuaternionValue(Quaternion quaternion) {
+//	quaternion.imaginary = -quaternion.imaginary;
+
+	quaternion.x = -quaternion.x;
+	quaternion.y = -quaternion.y;
+	quaternion.z = -quaternion.z;
+	
+	return quaternion;
+}
+
+inline Quaternion multiplyQuaternion(Quaternion a, Quaternion b) {
+	Quaternion result;
+	result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
+	result.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
+	result.y = a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x;
+	result.z = a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w;
+
+	return result;
+}
+
+inline float normQuaternion(Quaternion quaternion) {
+	return sqrt(quaternion.w * quaternion.w + quaternion.x * quaternion.x +
+				quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+}
+
+inline Quaternion normalizeQuaternion(Quaternion quaternion) {
+	float norm = normQuaternion(quaternion);
+	
+	quaternion.w /= norm;
+	quaternion.x /= norm;
+	quaternion.y /= norm;
+	quaternion.z /= norm;
 
 	return quaternion;
 }
 
-inline Quaternion LinkedQuaternionValue(Quaternion quaternion) {
-	quaternion.imaginary = -quaternion.imaginary;
+inline Quaternion inverseQuaternion(Quaternion quaternion) {
+	Quaternion linkedValue = linkedQuaternionValue(quaternion);
+	float norm = normQuaternion(quaternion);
 
-	return quaternion;
-}
-
-inline float NormQuaternion(Quaternion quaternion) {
-	return sqrt(quaternion.real * quaternion.real + quaternion.imaginary[0] * quaternion.imaginary[0] +
-				quaternion.imaginary[1] * quaternion.imaginary[1] + quaternion.imaginary[2] * quaternion.imaginary[2]);
-}
-
-inline Quaternion InverseQuaternion([[maybe_unused]] Quaternion quaternion) {
-//	Quaternion linkedValue = linkedQuaternionValue(quaternion);
+	quaternion.w = linkedValue.w / norm;
+	quaternion.x = linkedValue.x / norm;
+	quaternion.y = linkedValue.y / norm;
+	quaternion.z = linkedValue.z / norm;
 	
-	return {};
-}
-
-inline Quaternion MultiplyQuaternion(Quaternion quaternion1, Quaternion quaternion2) {
-	Quaternion quaternion;
-	quaternion.real = quaternion1.real * quaternion2.real -
-		Dot(quaternion1.imaginary, quaternion2.imaginary);
-	
-	quaternion.imaginary = quaternion2.imaginary * quaternion1.real +
-		quaternion1.imaginary * quaternion2.real +
-		Cross(quaternion1.imaginary, quaternion2.imaginary);
-
 	return quaternion;
 }
 

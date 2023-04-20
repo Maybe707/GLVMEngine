@@ -1101,20 +1101,56 @@ namespace GLVM::core
 		// std::cout << "sin pitch: " << std::sin(Radians(pitch)) << std::endl;
 		
 		vec3 forward;
-		Quaternion quaternion1;
-		Quaternion quaternion2;
+		float sinPitch = std::sin(Radians(pitch / 2));
+		float cosPitch = std::cos(Radians(pitch / 2));
+		float sinYaw = std::sin(Radians(-fYaw / 2));
+		float cosYaw = std::cos(Radians(-fYaw / 2));
+		
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = sinPitch;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = 0.0f;
+
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
 		/// We have dot product here to compute projection to axes
         // forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
         // forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
         // forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
 
-		quaternion1 = MultiplyQuaternion(Quaternion{ .real = std::cos(Radians(pitch)), .imaginary = vec3{ 1.0f, 0.0f, 0.0f } * -std::sin(Radians(pitch)) },
-										Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 0.0f, 1.0f}) });
-		quaternion2 = MultiplyQuaternion(Quaternion{ .real = -std::cos(Radians(fYaw)), .imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(fYaw)) },
-										Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ -1.0f, 0.0f, 0.0f}) });
+		// quaternion1 = MultiplyQuaternion(Quaternion{ .real = std::cos(Radians(pitch)), .imaginary = vec3{ 1.0f, 0.0f, 0.0f } * std::sin(Radians(pitch)) },
+		// 								Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 0.0f, -1.0f}) });
+		// quaternion2 = MultiplyQuaternion(Quaternion{ .real = -std::cos(Radians(fYaw)), .imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(fYaw)) },
+		// 								 Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ -1.0f, 0.0f, 0.0f })});
 		
+		Quaternion result;
+		// result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f, .y = 0.0f, .z = 1.0f });
+		// result = multiplyQuaternion(result, pitchQuat);
 
-		forward = quaternion2.imaginary;
+		result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f,
+					.y = 0.0f, .z = 0.0f }), inverseQuaternion(yawQuat));
+		
+		// quaternion1.real = std::cos(Radians(pitch));
+		// quaternion1.imaginary = Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0f }) * std::sin(Radians(pitch));
+		// quaternion2.real = std::cos(Radians(-fYaw));
+		// quaternion2.imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(-fYaw));
+
+		// quaternion1.real = std::cos(Radians(pitch));
+		// quaternion1.imaginary = vec3{ std::sin(pitch), 0.0f, 0.0f };
+		// quaternion2.real = std::cos(Radians(fYaw));
+		// quaternion2.imaginary = vec3{ 0.0f, std::sin(fYaw), 0.0f };
+		
+		// quaternion3 = MultiplyQuaternion(quaternion1, quaternion2);
+		// quaternion3 = MultiplyQuaternion(quaternion3, Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 1.0f, 0.0f })});
+//		quaternion3 = MultiplyQuaternion(quaternion3, quaternion1);
+//		forward = quaternion3.imaginary;
+		forward[0] = result.x;
+		forward[1] = result.y;
+		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
 //		std::cout << "x: " << forward[0] << " z: " << forward[2] << std::endl;
