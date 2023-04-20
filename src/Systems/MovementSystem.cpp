@@ -123,6 +123,7 @@ namespace GLVM::ecs
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
+//		std::cout << beholder.up << std::endl;
         Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, beholder.up));
         return normalizedVector;
     }
@@ -133,6 +134,7 @@ namespace GLVM::ecs
         forward[0] = std::cos(Radians(event.mousePointerPosition.yaw));
         forward[2] = std::sin(Radians(event.mousePointerPosition.yaw));
         beholder.forward = Normalize(forward);
+//		std::cout << beholder.forward << std::endl;
         return beholder.forward;
     }
 }

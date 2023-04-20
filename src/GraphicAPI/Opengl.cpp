@@ -1076,8 +1076,8 @@ namespace GLVM::core
         Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
-		std::cout << "x offset: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
-		std::cout << "y offset: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
+		// std::cout << "x offset: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
+		// std::cout << "y offset: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
 		
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         pitch = g_eEvent.mousePointerPosition.offset_Y;
@@ -1128,12 +1128,12 @@ namespace GLVM::core
 		// 								 Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ -1.0f, 0.0f, 0.0f })});
 		
 		Quaternion result;
-		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
-		// result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
-		// result = multiplyQuaternion(result, pitchQuat);
+//		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
+		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
+		result = multiplyQuaternion(result, pitchQuat);
 
-		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 1.0f,
-					.y = 0.0f, .z = 0.0f }), inverseQuaternion(result));
+		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
+					.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
 		
 		// quaternion1.real = std::cos(Radians(pitch));
 		// quaternion1.imaginary = Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0f }) * std::sin(Radians(pitch));
@@ -1154,7 +1154,7 @@ namespace GLVM::core
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
-//		std::cout << "x: " << forward[0] << " z: " << forward[2] << std::endl;
+//		std::cout << beholder.forward << std::endl;
 		
 		// std::cout << "Opengl" << std::endl;
 		// std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
