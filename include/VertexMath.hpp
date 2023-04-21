@@ -75,7 +75,9 @@ public:
                     this->m_matrix[i][j] = 0.0f;
             }
     }
-        
+
+	Matrix<T, var> operator+(Matrix matrix);
+	Matrix<T, var> operator*(T scalar);
 	Matrix<T, var> operator*(Matrix& matrix);
 	T* operator[](const int index);
 	const T* operator[](const int index) const;
@@ -92,6 +94,26 @@ typedef Matrix<float, 1> mat1;
 typedef Matrix<float, 2> mat2;
 typedef Matrix<float, 3> mat3;
 typedef Matrix<float, 4> mat4;
+
+template <class T, int var>
+Matrix<T, var> Matrix<T, var>::operator+(Matrix matrix) {
+	Matrix<T, var> tempMatrix;
+	for(int i = 0; i < var; ++i)
+		for(int j = 0; j < var; ++j)
+			tempMatrix[i][j] = this->m_matrix[i][j] + matrix.m_matrix[i][j];
+
+	return tempMatrix;
+}
+	
+template <class T, int var>
+Matrix<T, var> Matrix<T, var>::operator*(T scalar) {
+	Matrix<T, var> tempMatrix;
+	for(int i = 0; i < var; ++i)
+		for(int j = 0; j < var; ++j)
+			tempMatrix[i][j] = this->m_matrix[i][j] * scalar;
+
+	return tempMatrix;
+}
 
 template<class T, int var>
 Matrix<T, var> Matrix<T, var>::operator*(Matrix& matrix)
@@ -805,6 +827,40 @@ inline Quaternion eulerToQuaternion(float roll, float pitch, float yaw) {
     q.z = cr * cp * sy - sr * sp * cy;
 
 	return q;
+}
+
+template <class T, int var>
+Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
+	mat4 w_matrix(1.0f);
+	mat4 x_matrix(0.0f);
+	mat4 y_matrix(0.0f);
+	mat4 z_matrix(0.0f);
+	w_matrix.SelfTensorTranspose();
+
+	x_matrix[0][1] = -1.0f;
+	x_matrix[1][0] =  1.0f;
+	x_matrix[2][3] = -1.0f;
+	x_matrix[3][2] =  1.0f;
+	x_matrix.SelfTensorTranspose();
+	
+	y_matrix[0][2] = -1.0f;
+	y_matrix[1][3] =  1.0f;
+	y_matrix[2][0] =  1.0f;
+	y_matrix[3][1] = -1.0f;
+	y_matrix.SelfTensorTranspose();
+
+	z_matrix[0][3] = -1.0f;
+	z_matrix[1][2] = -1.0f;
+	z_matrix[2][1] =  1.0f;
+	z_matrix[3][0] =  1.0f;
+	z_matrix.SelfTensorTranspose();
+
+	w_matrix = w_matrix * quaternion.w;
+	x_matrix = x_matrix * quaternion.x;
+	y_matrix = y_matrix * quaternion.y;
+	z_matrix = z_matrix * quaternion.z;
+
+	return w_matrix + x_matrix + y_matrix + z_matrix;
 }
 
 #endif

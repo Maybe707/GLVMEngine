@@ -1024,11 +1024,38 @@ namespace GLVM::core
 		// std::cout << "pitch: " << transformComponent_.pitch << std::endl;
 
 //		transformComponent_.rotate += delta;
-		mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
-		mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
+
+		float sinPitch = std::sin(Radians(transformComponent_.pitch / 2));
+		float cosPitch = std::cos(Radians(transformComponent_.pitch / 2));
+		float sinYaw = std::sin(Radians(-transformComponent_.yaw / 2));
+		float cosYaw = std::cos(Radians(-transformComponent_.yaw / 2));
+		
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = sinPitch;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = 0.0f;
+
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
+
+		Quaternion result;
+//		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
+//		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
+		result = multiplyQuaternion(yawQuat, pitchQuat);
+
+		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 1.0f,
+		// 			.y = 0.0f, .z = 0.0f }), inverseQuaternion(result));
+
+		// mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
+		// mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
+		
 		// std::cout << "yaw: " << yaw << std::endl;
 		// std::cout << "pitch: " << pitch << std::endl;
-		rotationMatrix =   pitch * yaw;
+		rotationMatrix = rotateQuaternion<float, 4>(result);
 //		std::cout << "rotation: " << rotationMatrix << std::endl;
 		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
