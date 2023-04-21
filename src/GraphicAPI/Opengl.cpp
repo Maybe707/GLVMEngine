@@ -1025,10 +1025,10 @@ namespace GLVM::core
 
 //		transformComponent_.rotate += delta;
 
-		float sinPitch = std::sin(Radians(transformComponent_.pitch / 2));
-		float cosPitch = std::cos(Radians(transformComponent_.pitch / 2));
-		float sinYaw = std::sin(Radians(-transformComponent_.yaw / 2));
-		float cosYaw = std::cos(Radians(-transformComponent_.yaw / 2));
+		float sinPitch = std::sin(Radians(transformComponent_.pitch / 4));
+		float cosPitch = std::cos(Radians(transformComponent_.pitch / 4));
+		float sinYaw = std::sin(Radians(-transformComponent_.yaw / 4));
+		float cosYaw = std::cos(Radians(-transformComponent_.yaw / 4));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;
@@ -1046,12 +1046,14 @@ namespace GLVM::core
 //		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
 //		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
 		result = multiplyQuaternion(yawQuat, pitchQuat);
-
-		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 1.0f,
-		// 			.y = 0.0f, .z = 0.0f }), inverseQuaternion(result));
+//		std::cout << result << std::endl;
+		result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f,
+						.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
 
 		// mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
 		// mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
+
+//		result = eulerToQuaternion(0.0f, transformComponent_.pitch, transformComponent_.yaw);
 		
 		// std::cout << "yaw: " << yaw << std::endl;
 		// std::cout << "pitch: " << pitch << std::endl;
@@ -1060,9 +1062,15 @@ namespace GLVM::core
 		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
 		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
+
+		std::cout << rotationMatrix << std::endl;
 		
         modelMatrix = scalingMatrix * translationMatrix;
 
+		// rotationMatrix[0][0] = 30.0f;
+		// rotationMatrix[1][1] = 30.0f;
+		// rotationMatrix[2][2] = 30.0f;
+		
 		return rotationMatrix * modelMatrix;
 	}
 

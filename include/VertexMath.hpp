@@ -736,6 +736,12 @@ struct Quaternion
 	float w, x, y, z;
 };
 
+inline std::ostream& operator<<(std::ostream& ostream, const Quaternion& quaternion) {
+	ostream << "w: " << quaternion.w << " x: " << quaternion.x << " y: " << quaternion.y << " z: " << quaternion.z;
+	
+	return ostream;
+}
+
 // inline Quaternion CreateQuaternion(float cosine, float sine, vec3 vector) {
 // 	float cosine_in_radians = Radians(cosine);
 // 	float sine_in_radians   = Radians(sine);
@@ -831,36 +837,93 @@ inline Quaternion eulerToQuaternion(float roll, float pitch, float yaw) {
 
 template <class T, int var>
 Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
-	mat4 w_matrix(1.0f);
-	mat4 x_matrix(0.0f);
-	mat4 y_matrix(0.0f);
-	mat4 z_matrix(0.0f);
-	w_matrix.SelfTensorTranspose();
+	// mat4 w_matrix(1.0f);
+	// mat4 x_matrix(0.0f);
+	// mat4 y_matrix(0.0f);
+	// mat4 z_matrix(0.0f);
+	// w_matrix.SelfTensorTranspose();
 
-	x_matrix[0][1] = -1.0f;
-	x_matrix[1][0] =  1.0f;
-	x_matrix[2][3] = -1.0f;
-	x_matrix[3][2] =  1.0f;
-	x_matrix.SelfTensorTranspose();
+	// x_matrix[0][1] = -1.0f;
+	// x_matrix[1][0] =  1.0f;
+	// x_matrix[2][3] = -1.0f;
+	// x_matrix[3][2] =  1.0f;
+	// x_matrix.SelfTensorTranspose();
 	
-	y_matrix[0][2] = -1.0f;
-	y_matrix[1][3] =  1.0f;
-	y_matrix[2][0] =  1.0f;
-	y_matrix[3][1] = -1.0f;
-	y_matrix.SelfTensorTranspose();
+	// y_matrix[0][2] = -1.0f;
+	// y_matrix[1][3] =  1.0f;
+	// y_matrix[2][0] =  1.0f;
+	// y_matrix[3][1] = -1.0f;
+	// y_matrix.SelfTensorTranspose();
 
-	z_matrix[0][3] = -1.0f;
-	z_matrix[1][2] = -1.0f;
-	z_matrix[2][1] =  1.0f;
-	z_matrix[3][0] =  1.0f;
-	z_matrix.SelfTensorTranspose();
+	// z_matrix[0][3] = -1.0f;
+	// z_matrix[1][2] = -1.0f;
+	// z_matrix[2][1] =  1.0f;
+	// z_matrix[3][0] =  1.0f;
+	// z_matrix.SelfTensorTranspose();
 
-	w_matrix = w_matrix * quaternion.w;
-	x_matrix = x_matrix * quaternion.x;
-	y_matrix = y_matrix * quaternion.y;
-	z_matrix = z_matrix * quaternion.z;
+	// w_matrix = w_matrix * quaternion.w;
+	// x_matrix = x_matrix * quaternion.x;
+	// y_matrix = y_matrix * quaternion.y;
+	// z_matrix = z_matrix * quaternion.z;
 
-	return w_matrix + x_matrix + y_matrix + z_matrix;
+	// return w_matrix + x_matrix + y_matrix + z_matrix;
+
+	mat4 result(0.0f);
+	// result[0][0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+	// result[0][1] = 2 * (quaternion.x * quaternion.y + quaternion.z * quaternion.w);
+	// result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.y * quaternion.w);
+
+	// result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.z * quaternion.w);
+	// result[1][1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
+	// result[1][2] = 2 * (quaternion.y * quaternion.z - quaternion.x * quaternion.w);
+
+	// result[2][0] = 2 * (quaternion.x * quaternion.z - quaternion.x * quaternion.w);
+	// result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.x * quaternion.w);
+	// result[2][2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+
+	quaternion = normalizeQuaternion(quaternion);
+	std::cout << quaternion << std::endl;
+	// result[0][0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+	// result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.z * quaternion.w);
+	// result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.y * quaternion.w);
+
+	// result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.z * quaternion.w);
+	// result[1][1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
+	// result[1][2] = 2 * (quaternion.y * quaternion.z - quaternion.x * quaternion.w);
+
+	// result[2][0] = 2 * (quaternion.x * quaternion.z - quaternion.y * quaternion.w);
+	// result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.x * quaternion.w);
+	// result[2][2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+	
+	// result[0][0] = 2 * (quaternion.w * quaternion.w + quaternion.x * quaternion.x) - 1;
+	// result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
+	// result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
+
+	// result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
+	// result[1][1] = 2 * (quaternion.w * quaternion.w + quaternion.y * quaternion.y) - 1;
+	// result[1][2] = 2 * (quaternion.y * quaternion.z - quaternion.w * quaternion.x);
+
+	// result[2][0] = 2 * (quaternion.x * quaternion.z - quaternion.w * quaternion.y);
+	// result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
+	// result[2][2] = 2 * (quaternion.w * quaternion.w + quaternion.y * quaternion.y) - 1;
+
+	result[0][0] = 1 - 2 * quaternion.y * quaternion.y - 2 * quaternion.z * quaternion.z;
+	result[0][1] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
+	result[0][2] = 2 * quaternion.x * quaternion.z - 2 * quaternion.y * quaternion.w;
+
+	result[1][0] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
+	result[1][1] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.z * quaternion.z;
+	result[1][2] = 2 * quaternion.y * quaternion.z + 2 * quaternion.x * quaternion.w;
+
+	result[2][0] = 2 * quaternion.x * quaternion.z + 2 * quaternion.y * quaternion.w;
+	result[2][1] = 2 * quaternion.y * quaternion.z - 2 * quaternion.x * quaternion.w;
+	result[2][2] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.y * quaternion.y;
+	
+	result[3][3] = 1.0f;
+
+	result.SelfTensorTranspose();
+
+	return result;
 }
 
 #endif
