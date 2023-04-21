@@ -138,11 +138,38 @@ namespace GLVM::ecs
         if(fPitch < -89.0f)
             fPitch = -89.0f;
 
-        Vector<float, 3> front;
-        front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
-        front[1] = std::sin(Radians(fPitch));
-        front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-        beholder.forward = Normalize(front);
+		vec3 forward;
+		float sinPitch = std::sin(Radians(fPitch / 2));
+		float cosPitch = std::cos(Radians(fPitch / 2));
+		float sinYaw = std::sin(Radians(-fYaw / 2));
+		float cosYaw = std::cos(Radians(-fYaw / 2));
+		
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = sinPitch;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = 0.0f;
+
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
+
+		Quaternion result;
+		result = multiplyQuaternion(yawQuat, pitchQuat);
+
+		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
+					.y = 0.0f, .z = -1.0f }), inverseQuaternion(result));
+
+		forward[0] = result.x;
+		forward[1] = result.y;
+		forward[2] = result.z;
+		
+        // front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
+        // front[1] = std::sin(Radians(fPitch));
+        // front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
+        beholder.forward = Normalize(forward);
 
         return beholder.forward;
     }

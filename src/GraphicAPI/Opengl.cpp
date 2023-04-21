@@ -1129,11 +1129,20 @@ namespace GLVM::core
 		
 		Quaternion result;
 //		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
-		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
-		result = multiplyQuaternion(result, pitchQuat);
+//		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
+		result = multiplyQuaternion(yawQuat, pitchQuat);
 
 		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
+					.y = 0.0f, .z = -1.0f }), inverseQuaternion(result));
+
+//		std::cout << "x: " << result.x << " y: " << result.y << " z: " << result.z << std::endl;
+		
+		// result = multiplyQuaternion(pitchQuat, Quaternion{ .w = 0.0f, .x = 0.0f, .y = 0.0f, .z = 1.0f });
+		// result = multiplyQuaternion(result, yawQuat);
+
+		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 1.0f,
+		// 			.y = 0.0f, .z = 0.0f }), inverseQuaternion(result));
+
 		
 		// quaternion1.real = std::cos(Radians(pitch));
 		// quaternion1.imaginary = Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0f }) * std::sin(Radians(pitch));
@@ -1154,6 +1163,8 @@ namespace GLVM::core
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
+		std::cout << beholder.forward << std::endl;
+		
 //		std::cout << beholder.forward << std::endl;
 		
 		// std::cout << "Opengl" << std::endl;

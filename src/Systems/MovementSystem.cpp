@@ -131,8 +131,26 @@ namespace GLVM::ecs
     Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& beholder,
                                                         core::CEvent& event) {
         Vector<float, 3> forward(0.0f);
-        forward[0] = std::cos(Radians(event.mousePointerPosition.yaw));
-        forward[2] = std::sin(Radians(event.mousePointerPosition.yaw));
+        // forward[0] = std::cos(Radians(event.mousePointerPosition.yaw * 2));
+        // forward[2] = std::sin(Radians(event.mousePointerPosition.yaw * 2));
+
+		float sinYaw = std::sin(Radians(-event.mousePointerPosition.yaw / 2));
+		float cosYaw = std::cos(Radians(-event.mousePointerPosition.yaw / 2));
+		
+		Quaternion yawQuat;
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
+
+		Quaternion result;
+		result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
+					.y = 0.0f, .z = -1.0f }), inverseQuaternion(yawQuat));
+
+		forward[0] = result.x;
+		forward[1] = result.y;
+		forward[2] = result.z;
+		
         beholder.forward = Normalize(forward);
 //		std::cout << beholder.forward << std::endl;
         return beholder.forward;
