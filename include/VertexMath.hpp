@@ -883,21 +883,21 @@ Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
 
 	quaternion = normalizeQuaternion(quaternion);
 	std::cout << quaternion << std::endl;
-	// result[0][0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
-	// result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.z * quaternion.w);
-	// result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.y * quaternion.w);
+	result[0][0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
+	result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.z * quaternion.w);
+	result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.y * quaternion.w);
 
-	// result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.z * quaternion.w);
-	// result[1][1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
-	// result[1][2] = 2 * (quaternion.y * quaternion.z - quaternion.x * quaternion.w);
+	result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.z * quaternion.w);
+	result[1][1] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.z * quaternion.z);
+	result[1][2] = 2 * (quaternion.y * quaternion.z - quaternion.x * quaternion.w);
 
-	// result[2][0] = 2 * (quaternion.x * quaternion.z - quaternion.y * quaternion.w);
-	// result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.x * quaternion.w);
-	// result[2][2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
+	result[2][0] = 2 * (quaternion.x * quaternion.z - quaternion.y * quaternion.w);
+	result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.x * quaternion.w);
+	result[2][2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
 	
-	// result[0][0] = 2 * (quaternion.w * quaternion.w + quaternion.x * quaternion.x) - 1;
-	// result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
-	// result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
+	result[0][0] = 2 * (quaternion.w * quaternion.w + quaternion.x * quaternion.x) - 1;
+	result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.w * quaternion.z);
+	result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.w * quaternion.y);
 
 	// result[1][0] = 2 * (quaternion.x * quaternion.y + quaternion.w * quaternion.z);
 	// result[1][1] = 2 * (quaternion.w * quaternion.w + quaternion.y * quaternion.y) - 1;
@@ -907,17 +907,17 @@ Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
 	// result[2][1] = 2 * (quaternion.y * quaternion.z + quaternion.w * quaternion.x);
 	// result[2][2] = 2 * (quaternion.w * quaternion.w + quaternion.y * quaternion.y) - 1;
 
-	result[0][0] = 1 - 2 * quaternion.y * quaternion.y - 2 * quaternion.z * quaternion.z;
-	result[0][1] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
-	result[0][2] = 2 * quaternion.x * quaternion.z - 2 * quaternion.y * quaternion.w;
+	// result[0][0] = 1 - 2 * quaternion.y * quaternion.y - 2 * quaternion.z * quaternion.z;
+	// result[0][1] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
+	// result[0][2] = 2 * quaternion.x * quaternion.z - 2 * quaternion.y * quaternion.w;
 
-	result[1][0] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
-	result[1][1] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.z * quaternion.z;
-	result[1][2] = 2 * quaternion.y * quaternion.z + 2 * quaternion.x * quaternion.w;
+	// result[1][0] = 2 * quaternion.x * quaternion.y - 2 * quaternion.z * quaternion.w;
+	// result[1][1] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.z * quaternion.z;
+	// result[1][2] = 2 * quaternion.y * quaternion.z + 2 * quaternion.x * quaternion.w;
 
-	result[2][0] = 2 * quaternion.x * quaternion.z + 2 * quaternion.y * quaternion.w;
-	result[2][1] = 2 * quaternion.y * quaternion.z - 2 * quaternion.x * quaternion.w;
-	result[2][2] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.y * quaternion.y;
+	// result[2][0] = 2 * quaternion.x * quaternion.z + 2 * quaternion.y * quaternion.w;
+	// result[2][1] = 2 * quaternion.y * quaternion.z - 2 * quaternion.x * quaternion.w;
+	// result[2][2] = 1 - 2 * quaternion.x * quaternion.x - 2 * quaternion.y * quaternion.y;
 	
 	result[3][3] = 1.0f;
 

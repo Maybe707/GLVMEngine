@@ -116,7 +116,7 @@ namespace GLVM::ecs
 			rTransformProjectile->tPosition = transform->tPosition;
 		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
-		rTransformProjectile->yaw        = fYaw;
+		rTransformProjectile->yaw        = fYaw + 90.0f;
 		rTransformProjectile->pitch      = fPitch;
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
     }
