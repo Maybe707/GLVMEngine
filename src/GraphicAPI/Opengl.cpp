@@ -1027,8 +1027,8 @@ namespace GLVM::core
 
 		float sinPitch = std::sin(Radians(-transformComponent_.pitch / 2));
 		float cosPitch = std::cos(Radians(-transformComponent_.pitch / 2));
-		float sinYaw = std::sin(Radians(-transformComponent_.yaw / 2));
-		float cosYaw = std::cos(Radians(-transformComponent_.yaw / 2));
+		float sinYaw = std::sin(Radians(-(transformComponent_.yaw + 90.0f)  / 2));
+		float cosYaw = std::cos(Radians(-(transformComponent_.yaw + 90.0f)  / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;
@@ -1067,7 +1067,7 @@ namespace GLVM::core
 		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
 		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
 
-		std::cout << rotationMatrix << std::endl;
+//		std::cout << rotationMatrix << std::endl;
 		
         modelMatrix = scalingMatrix * translationMatrix;
 
