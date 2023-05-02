@@ -119,6 +119,9 @@ namespace GLVM::core {
 		core::vector<const char*> pathsGLTF;
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
+		core::vector<core::vector<mat4>> jointMatrices;
+		core::vector<core::vector<vec4>> jointIndicesPerVertex;
+		core::vector<core::vector<vec4>> weighstPerVertex;
 		std::vector<GLuint> VBOcontainer_;
 		std::vector<GLuint> VAOcontainer_;
 		std::vector<GLuint> EBOcontainer_;

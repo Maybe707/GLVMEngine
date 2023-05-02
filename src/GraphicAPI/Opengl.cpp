@@ -867,7 +867,7 @@ namespace GLVM::core
 			Core::JsonValue* gltf = parser.GetRoot();
 			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
-			std::cout << binary_path << std::endl;
+//			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
 			in_stream.open("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path);
  			char* buffer = new char[full_byte_size];
@@ -882,7 +882,7 @@ namespace GLVM::core
 			int indices_byte_length = (*gltf)["bufferViews"][indices_buffer_view_index]["byteLength"].value.iNumber;
 			int indices_byte_offset = (*gltf)["bufferViews"][indices_buffer_view_index]["byteOffset"].value.iNumber;
 
-//			std::cout << "length: " << byte_length << " offset: " << byte_offset << std::endl;
+//			std::cout << "length: " << indices_byte_length << " offset: " << indices_byte_offset << std::endl;
 			
 			core::vector<unsigned int> indices;
 			for ( int i = indices_byte_offset; i < indices_byte_offset + indices_byte_length; i += 2 )
@@ -921,23 +921,71 @@ namespace GLVM::core
 			for ( int i = normals_byte_offset; i < normals_byte_offset + normals_byte_length; i += 4 )
 				normals.Push(reinterpret_cast<float &>(buffer[i]));
 
-			bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
-			mat3 scaleTransform(1.0f);
-
-			std::cout << "scale flag: " << scaleFlag << std::endl;
+			core::vector<Core::JsonValue> test = parser.Search("skins");
+			Core::JsonValue joints;
 			
-			if ( scaleFlag ) {
-				core::vector<Core::JsonValue> scale = *(*gltf)["nodes"][0]["scale"].value.array;
-				for ( int i = 0; i < 3; ++i ) {
-					if ( scale[i].type == Core::JSON_FLOAT_NUMBER )
-						scaleTransform[i][i] = scale[i].value.fNumber;
+			if ( test.GetSize() > 0 ) {
+				joints = (*gltf)["skins"][0]["joints"];
 
-					if ( scale[i].type == Core::JSON_INTEGER_NUMBER )
-						scaleTransform[i][i] = (float)scale[i].value.iNumber;
+				// for( unsigned int i = 0; i < joints->GetSize(); ++i ) {
+				// 	std::cout << (*joints)[i].value.iNumber << std::endl;
+				// }
+
+				Core::JsonValue nodes = (*gltf)["nodes"];
+				core::vector<mat4> globalTransformJointNode;
+				for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {
+					unsigned int index = (*joints.value.array)[i].value.iNumber;
+					std::cout << "index: " << index << std::endl;
+					Core::JsonValue node = nodes[index];
+					Quaternion rotationQuaternion;
+					mat4 rotation(1.0f);
+					mat4 scale(1.0f);
+					mat4 translation(1.0f);
+					
+					if ( node.value.object->Contain("rotation") ) {
+						rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
+						rotationQuaternion.y = (*node.value.object)["rotation"][1].value.fNumber;
+						rotationQuaternion.z = (*node.value.object)["rotation"][2].value.fNumber;
+						rotationQuaternion.w = (*node.value.object)["rotation"][3].value.fNumber;
+						std::cout << rotationQuaternion << std::endl;
+					}
+
+
+					
+					if ( node.value.object->Contain("scale") ) {
+						scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
+						scale[1][1] = (*node.value.object)["scale"][1].value.iNumber;
+						scale[2][2] = (*node.value.object)["scale"][2].value.iNumber;
+//						std::cout << scale << std::endl;
+					}
+
+
+					
+					// if ( node.value.object->Contain("rotation") )
+					// 	rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
 				}
 
-				std::cout << "scale: " << scaleTransform << std::endl;
+				
 			}
+
+			
+			// bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
+			// mat3 scaleTransform(1.0f);
+
+//			std::cout << "scale flag: " << scaleFlag << std::endl;
+			
+// 			if ( scaleFlag ) {
+// 				core::vector<Core::JsonValue> scale = *(*gltf)["nodes"][0]["scale"].value.array;
+// 				for ( int i = 0; i < 3; ++i ) {
+// 					if ( scale[i].type == Core::JSON_FLOAT_NUMBER )
+// 						scaleTransform[i][i] = scale[i].value.fNumber;
+
+// 					if ( scale[i].type == Core::JSON_INTEGER_NUMBER )
+// 						scaleTransform[i][i] = (float)scale[i].value.iNumber;
+// 				}
+
+// //				std::cout << "scale: " << scaleTransform << std::endl;
+// 			}
 			
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
@@ -952,8 +1000,8 @@ namespace GLVM::core
 						vertices_position[index + 1],
 						vertices_position[index + 2] };
 
-					if ( scaleFlag )
-						position = position * scaleTransform;
+					// if ( scaleFlag )
+					// 	position = position * scaleTransform;
 					
 					aVertexes_[m].push_back(position[0]);
 					aVertexes_[m].push_back(position[1]);
@@ -965,8 +1013,8 @@ namespace GLVM::core
 						normals[index + 1],
 						normals[index + 2] };
 
-					if ( scaleFlag )
-						normal = normal * scaleTransform;
+					// if ( scaleFlag )
+					// 	normal = normal * scaleTransform;
 					
 					aVertexes_[m].push_back(normal[0]);
 					aVertexes_[m].push_back(normal[1]);
@@ -1202,8 +1250,6 @@ namespace GLVM::core
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
-		std::cout << beholder.forward << std::endl;
-		
 //		std::cout << beholder.forward << std::endl;
 		
 		// std::cout << "Opengl" << std::endl;

@@ -882,7 +882,7 @@ Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
 	// result[2][2] = 1 - 2 * (quaternion.x * quaternion.x + quaternion.y * quaternion.y);
 
 	quaternion = normalizeQuaternion(quaternion);
-	std::cout << quaternion << std::endl;
+//	std::cout << quaternion << std::endl;
 	result[0][0] = 1 - 2 * (quaternion.y * quaternion.y + quaternion.z * quaternion.z);
 	result[0][1] = 2 * (quaternion.x * quaternion.y - quaternion.z * quaternion.w);
 	result[0][2] = 2 * (quaternion.x * quaternion.z + quaternion.y * quaternion.w);

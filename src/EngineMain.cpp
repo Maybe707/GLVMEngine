@@ -40,6 +40,7 @@ int main()
 
 	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
 	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/ray3.gltf");
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake.gltf");
 	
 	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
@@ -81,11 +82,11 @@ int main()
     ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 1;
 	
 	Entity plain0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 5.5f, 6.5f, 0.0f }, .fScale = 1.2f };
-    ComponentManager->GetComponent<cm::vertex>(plain0)->vkVertexId_ = 2;
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform, cm::collider>(plain0);
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { -1.5f, 2.5f, 0.0f }, .fScale = 1.2f };
+    ComponentManager->GetComponent<cm::vertex>(plain0)->vkVertexId_ = 1;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
-	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+	*materialPlain0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(plain0, materialPlain0->diffuseTextureID_);
     

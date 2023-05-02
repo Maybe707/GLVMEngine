@@ -33,7 +33,7 @@ namespace GLVM::Core
     union JsonVariant
     {
         std::string* string;
-        float fNumber;
+        double fNumber;
 		int iNumber;
         bool boolean;
         void* null;
@@ -58,7 +58,7 @@ namespace GLVM::Core
 			value.string = new std::string;
 			new (value.string) std::string{_string};
 		}
-		JsonValue(float _float) {
+		JsonValue(double _float) {
 			type = JSON_FLOAT_NUMBER;
 			value.fNumber = _float;
 		}
@@ -209,6 +209,15 @@ namespace GLVM::Core
 				break;
 			}
 		}
+
+		bool isInvalid()  { return type == JSON_INVALID_VALUE; }
+		bool isObject()   { return type == JSON_OBJECT; }
+		bool isFloat()    { return type == JSON_FLOAT_NUMBER; }
+		bool isInterger() { return type == JSON_INTEGER_NUMBER; }
+		bool isString()   { return type == JSON_STRING; }
+		bool isBoolean()  { return type == JSON_BOOLEAN; }
+		bool isNull()     { return type == JSON_NULL; }
+		bool isArray()    { return type == JSON_ARRAY; }
     };
         
     class CJsonParser
@@ -241,7 +250,7 @@ namespace GLVM::Core
 		std::string StringParse();
 		core::vector<char> StringToVectorOfChars(std::string _string);
 		int ParseInteger(core::vector<char> _word);
-		float ParseFloating(core::vector<char> _word);
+		double ParseFloating(core::vector<char> _word);
 		core::vector<JsonValue> Search(const char* key_) const;
     };
 }

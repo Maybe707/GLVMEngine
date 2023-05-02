@@ -55,7 +55,7 @@ namespace GLVM::Core
 					   currentChar_ == '+' || currentChar_ == '-') {
 				bufferString_ = NumberAsStringParse();
 				core::vector<char> vector = StringToVectorOfChars(bufferString_);
-				float fNumber = 0.0f;
+				double fNumber = 0.0f;
 				int iNumber = 0;
 				if (IsContainChar(bufferString_, '.')) {
 					fNumber = ParseFloating(vector);
@@ -205,7 +205,8 @@ namespace GLVM::Core
 		while (1) {
 			currentChar_ = pJsonFileData_[globalFileCounter_];
 			if ((currentChar_ >= '0' && currentChar_ <= '9') ||
-				currentChar_ == '+' || currentChar_ == '-') {
+				currentChar_ == '+' || currentChar_ == '-' ||
+				currentChar_ == 'e') {
 				numberAsString.push_back(currentChar_);
 				++globalFileCounter_;
 			} else if (currentChar_ == '.') {
@@ -267,18 +268,22 @@ namespace GLVM::Core
         return iResult;
     }
     
-    float CJsonParser::ParseFloating(core::vector<char> _word) {
+    double CJsonParser::ParseFloating(core::vector<char> _word) {
 		core::vector<int> baseContainer;
 
         for (unsigned int i = 0; i < _word.GetSize(); ++i)
             baseContainer.Push(_word[i] - 48);
 
         int integerPart = 0;
-        float floatingPart = 0;
+        double floatingPart = 0;
+		int eNumber = 0;
 		core::vector<int> integerPartContainer;
 		core::vector<int> floatingPartContainer;
+		core::vector<int> ePartContainer;
         bool dotFlag = false;
         bool negateFlag = false;
+		bool eFlag = false;
+		bool eSign = false;                    ///< false value equal "+" sign;
         unsigned int baseContainerSize = baseContainer.GetSize();
 
         if (baseContainer[0] == -3)
@@ -292,8 +297,23 @@ namespace GLVM::Core
             else if (baseContainer[i] == -2) {
                 dotFlag = true;
                 continue;
-            }
+            } else if (baseContainer[i] == 53) {
+				eFlag = true;
+				continue;
+			}
 
+			if (eFlag) {
+				if (baseContainer[i] == -5)
+					continue;
+				else if (baseContainer[i] == -3) {
+					eSign = true;
+					continue;
+				}
+
+				ePartContainer.Push(baseContainer[i]);
+				continue;
+			}
+			
             if (baseContainer[i] >= 0 && baseContainer[i] <= 9) {
                 if (dotFlag)
                     floatingPartContainer.Push(baseContainer[i]);
@@ -305,6 +325,10 @@ namespace GLVM::Core
             }
         }
 
+        unsigned int ePartContainerSize = ePartContainer.GetSize();
+        for (unsigned int i = 0; i < ePartContainerSize; ++i)
+            eNumber += ePartContainer[i] * std::pow(10, (ePartContainerSize - 1) - i);
+		
         unsigned int integerPartContainerSize = integerPartContainer.GetSize();
         for (unsigned int i = 0; i < integerPartContainerSize; ++i)
             integerPart += integerPartContainer[i] * std::pow(10, (integerPartContainerSize - 1) - i);
@@ -313,9 +337,18 @@ namespace GLVM::Core
         for (unsigned int i = 0; i < floatingPartContainerSize; ++i)
             floatingPart += floatingPartContainer[i] / std::pow(10, i + 1);
 
-        float result = 0;
-        result = (float)(integerPart + floatingPart);
-        
+        double result = 0;
+        result = (double)(integerPart + floatingPart);
+
+		if (eFlag) {
+			if (eSign)
+				result /= std::pow(10, eNumber);
+			else
+				result *= std::pow(10, eNumber);
+
+			std::cout << "e: " << eNumber << std::endl;
+		}
+		
         if (negateFlag)
             result *= -1.0f;
 
