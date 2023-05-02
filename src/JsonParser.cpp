@@ -345,8 +345,6 @@ namespace GLVM::Core
 				result /= std::pow(10, eNumber);
 			else
 				result *= std::pow(10, eNumber);
-
-			std::cout << "e: " << eNumber << std::endl;
 		}
 		
         if (negateFlag)

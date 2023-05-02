@@ -943,24 +943,69 @@ namespace GLVM::core
 					mat4 translation(1.0f);
 					
 					if ( node.value.object->Contain("rotation") ) {
-						rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
-						rotationQuaternion.y = (*node.value.object)["rotation"][1].value.fNumber;
-						rotationQuaternion.z = (*node.value.object)["rotation"][2].value.fNumber;
-						rotationQuaternion.w = (*node.value.object)["rotation"][3].value.fNumber;
-						std::cout << rotationQuaternion << std::endl;
+						Core::JsonValue array = (*node.value.object)["rotation"];
+						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
+							switch(i) {
+							case 0:
+								if ( array[i].isInterger() )
+									rotationQuaternion.x = array[i].value.iNumber;
+								else if ( array[i].isFloat() )
+									rotationQuaternion.x = array[i].value.fNumber;
+							case 1:
+								if ( array[i].isInterger() )
+									rotationQuaternion.y = array[i].value.iNumber;
+								else if ( array[i].isFloat() )
+									rotationQuaternion.y = array[i].value.fNumber;
+							case 2:
+								if ( array[i].isInterger() )
+									rotationQuaternion.z = array[i].value.iNumber;
+								else if ( array[i].isFloat() )
+									rotationQuaternion.z = array[i].value.fNumber;
+							case 3:
+								if ( array[i].isInterger() )
+									rotationQuaternion.w = array[i].value.iNumber;
+								else if ( array[i].isFloat() )
+									rotationQuaternion.w = array[i].value.fNumber;
+							}
+						}
+						
+						// rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
+						// rotationQuaternion.y = (*node.value.object)["rotation"][1].value.fNumber;
+						// rotationQuaternion.z = (*node.value.object)["rotation"][2].value.fNumber;
+						// rotationQuaternion.w = (*node.value.object)["rotation"][3].value.fNumber;
+//						std::cout << rotationQuaternion << std::endl;
 					}
 
-
-					
 					if ( node.value.object->Contain("scale") ) {
-						scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
-						scale[1][1] = (*node.value.object)["scale"][1].value.iNumber;
-						scale[2][2] = (*node.value.object)["scale"][2].value.iNumber;
-//						std::cout << scale << std::endl;
+						Core::JsonValue array = (*node.value.object)["scale"];
+						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
+							if ( array[i].isInterger() )
+								scale[i][i] = array[i].value.iNumber;
+							else if ( array[i].isFloat() )
+								scale[i][i] = array[i].value.fNumber;
+						}
+						// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
+						// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
+						// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
+						// std::cout << "govno 1: " << (*node.value.object)["scale"][0].value.fNumber << std::endl;;
+						// std::cout << "govno 2: " << (*node.value.object)["scale"][1].value.fNumber << std::endl;;
+						// std::cout << "govno 3: " << (*node.value.object)["scale"][2].value.fNumber << std::endl;;
+//					    std::cout << scale << std::endl;
+					}
+
+					if ( node.value.object->Contain("translation") ) {
+						Core::JsonValue array = (*node.value.object)["translation"];
+						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
+							if ( array[i].isInterger() )
+								translation[i][i] = array[i].value.iNumber;
+							else if ( array[i].isFloat() )
+								translation[i][i] = array[i].value.fNumber;
+						}
+
+//						std::cout << translation << std::endl;
 					}
 
 
-					
 					// if ( node.value.object->Contain("rotation") )
 					// 	rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
 				}
