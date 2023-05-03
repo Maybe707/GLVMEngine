@@ -921,21 +921,26 @@ namespace GLVM::core
 			for ( int i = normals_byte_offset; i < normals_byte_offset + normals_byte_length; i += 4 )
 				normals.Push(reinterpret_cast<float &>(buffer[i]));
 
-			core::vector<Core::JsonValue> test = parser.Search("skins");
+			core::vector<Core::JsonValue> skins = parser.Search("skins");
+//			core::vector<Core::JsonValue> accessors = parser.Search("accessors");
 			Core::JsonValue joints;
+			core::vector<mat4> globalTransformJointNode;
 			
-			if ( test.GetSize() > 0 ) {
+			if ( skins.GetSize() > 0 ) {
 				joints = (*gltf)["skins"][0]["joints"];
-
+//				joints = skins[0]["joints"];
+				// unsigned int inverseBindMatricesAccessorIndex = skins[0]["inverseBindMatrices"].value.iNumber;
+				// Core::JsonValue accessor = accessors[inverseBindMatricesAccessorIndex];
+				// unsigned int bufferView = accessor["bufferView"].value.iNumber;
+				// std::cout << bufferView << std::endl;
 				// for( unsigned int i = 0; i < joints->GetSize(); ++i ) {
 				// 	std::cout << (*joints)[i].value.iNumber << std::endl;
 				// }
 
 				Core::JsonValue nodes = (*gltf)["nodes"];
-				core::vector<mat4> globalTransformJointNode;
 				for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {
 					unsigned int index = (*joints.value.array)[i].value.iNumber;
-					std::cout << "index: " << index << std::endl;
+//					std::cout << "index: " << index << std::endl;
 					Core::JsonValue node = nodes[index];
 					Quaternion rotationQuaternion;
 					mat4 rotation(1.0f);
@@ -968,14 +973,18 @@ namespace GLVM::core
 									rotationQuaternion.w = array[i].value.fNumber;
 							}
 						}
-						
+
 						// rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
 						// rotationQuaternion.y = (*node.value.object)["rotation"][1].value.fNumber;
 						// rotationQuaternion.z = (*node.value.object)["rotation"][2].value.fNumber;
 						// rotationQuaternion.w = (*node.value.object)["rotation"][3].value.fNumber;
-//						std::cout << rotationQuaternion << std::endl;
+
+						rotation = rotateQuaternion<float, 4>(rotationQuaternion);
 					}
 
+//					std::cout << rotationQuaternion << std::endl;
+//					std::cout << rotation << std::endl;
+					
 					if ( node.value.object->Contain("scale") ) {
 						Core::JsonValue array = (*node.value.object)["scale"];
 						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
@@ -990,29 +999,119 @@ namespace GLVM::core
 						// std::cout << "govno 1: " << (*node.value.object)["scale"][0].value.fNumber << std::endl;;
 						// std::cout << "govno 2: " << (*node.value.object)["scale"][1].value.fNumber << std::endl;;
 						// std::cout << "govno 3: " << (*node.value.object)["scale"][2].value.fNumber << std::endl;;
-//					    std::cout << scale << std::endl;
+
 					}
 
+//					std::cout << scale << std::endl;
+					
 					if ( node.value.object->Contain("translation") ) {
 						Core::JsonValue array = (*node.value.object)["translation"];
 						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
 							if ( array[i].isInterger() )
-								translation[i][i] = array[i].value.iNumber;
+								translation[3][i] = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
-								translation[i][i] = array[i].value.fNumber;
+								translation[3][i] = array[i].value.fNumber;
 						}
 
-//						std::cout << translation << std::endl;
+
 					}
 
-
+					mat4 model = translation * scale * rotation;
+					globalTransformJointNode.Push(model);
+//					std::cout << translation << std::endl;
 					// if ( node.value.object->Contain("rotation") )
 					// 	rotationQuaternion.x = (*node.value.object)["rotation"][0].value.fNumber;
 				}
 
+//				std::cout << globalTransformJointNode[1] << std::endl;
+
+				unsigned int inverseBindMatricesIndex = (*gltf)["skins"][0]["inverseBindMatrices"].value.iNumber;
+				unsigned int bufferView = (*gltf)["accessors"][inverseBindMatricesIndex]["bufferView"].value.iNumber;
+				unsigned int byteLengthInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteLength"].value.iNumber;
+				unsigned int byteOffsetInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteOffset"].value.iNumber;
+
+				core::vector<float> inverseBindMatricesData;
+				for ( unsigned int i = byteOffsetInverseBindMatrices; i < byteOffsetInverseBindMatrices + byteLengthInverseBindMatrices; i += 4 )
+					inverseBindMatricesData.Push(reinterpret_cast<float &>(buffer[i]));
+
+				core::vector<mat4> jointMatriciesLocalContainer;
+				for ( unsigned int n = 0; n < joints.value.array->GetSize(); ++n ) {
+					mat4 inverseBindMatrix(0.0f);
+					for ( unsigned int g = 0; g < 4; ++g )
+						for ( unsigned int j = 0; j < 4; ++j )
+							inverseBindMatrix[g][j] = inverseBindMatricesData[g * 4 + j];
+					
+					mat4 jointMatrix = globalTransformJointNode[n] * inverseBindMatrix;
+					jointMatriciesLocalContainer.Push(jointMatrix);
+				}
+
+				jointMatrices.Push(jointMatriciesLocalContainer);
 				
+				unsigned int joints_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["JOINTS_0"].value.iNumber;
+				unsigned int joints_buffer_view_index = (*gltf)["accessors"][joints_index]["bufferView"].value.iNumber;
+				unsigned int joints_byte_length = (*gltf)["bufferViews"][joints_buffer_view_index]["byteLength"].value.iNumber;
+				unsigned int joints_byte_offset = (*gltf)["bufferViews"][joints_buffer_view_index]["byteOffset"].value.iNumber;
+
+				core::vector<short> jointsIndices;
+				for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
+					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
+
+				core::vector<Vector<short,4>> jointIndicesLocalContainer;
+				for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
+					unsigned int offset = 4;
+					unsigned int index = indices[v] * offset;
+					if ( index + 3 < jointsIndices.GetSize() ) {
+						Vector<short, 4> indices = { jointsIndices[index],
+							jointsIndices[index + 1],
+							jointsIndices[index + 2],
+							jointsIndices[index + 3]};
+
+						jointIndicesLocalContainer.Push(indices);
+					}
+				}
+
+				jointIndicesPerVertex.Push(jointIndicesLocalContainer);
+				
+				unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
+				unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
+				unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
+				unsigned int weights_byte_offset = (*gltf)["bufferViews"][weights_buffer_view_index]["byteOffset"].value.iNumber;
+
+				core::vector<float> weightsContainer;
+				for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
+					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
+
+				core::vector<vec4> weightsLocalContainer;
+				for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
+					unsigned int offset = 4;
+					unsigned int index = indices[v] * offset;
+					if ( index + 3 < weightsContainer.GetSize() ) {
+						vec4 weights = { weightsContainer[index],
+							weightsContainer[index + 1],
+							weightsContainer[index + 2],
+							weightsContainer[index + 3]};
+
+						weightsLocalContainer.Push(weights);
+					}
+				}
+
+				weightsPerVertex.Push(weightsLocalContainer);
 			}
 
+			core::vector<Core::JsonValue> animations = parser.Search("animations");
+
+
+			
+			if ( animations.GetSize() > 0 ) {
+				core::vector<Core::JsonValue> samplers = parser.Search("sampler");
+				core::vector<Core::JsonValue> targetNodes = parser.Search("node");
+				core::vector<Core::JsonValue> targetPaths = parser.Search("path");
+				
+				for ( unsigned int i = 0; i < targetPaths.GetSize(); ++i)
+					std::cout << *targetPaths[i].value.string << std::endl;
+//				std::string* target = (*gltf)["animations"][0]["channels"][0]["target"]["path"].value.string;
+
+			}
 			
 			// bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
 			// mat3 scaleTransform(1.0f);
