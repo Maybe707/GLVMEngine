@@ -1116,16 +1116,20 @@ namespace GLVM::core
 
 				core::vector<Core::JsonValue> inputs;
 				core::vector<Core::JsonValue> outputs;
-
+				
 				Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
 					inputs.Push(samplers[i]["input"].value.iNumber);
 
 				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
 					outputs.Push(samplers[i]["output"].value.iNumber);
-				
-				// for ( unsigned int i = 0; i < outputs.GetSize(); ++i)
-				// 	std::cout << outputs[i].value.iNumber << std::endl;
+
+				unsigned int timingsBufferViewIndex = (*gltf)["accessors"][7]["bufferView"].value.iNumber;
+				unsigned int timingsByteLength      = (*gltf)["bufferViews"][timingsBufferViewIndex]["byteLength"].value.iNumber;
+				unsigned int timingsByteOffset      = (*gltf)["bufferViews"][timingsBufferViewIndex]["byteOffset"].value.iNumber;
+
+				// for ( unsigned int i = 0; i < inputs.GetSize(); ++i)
+				// 	std::cout << inputs[i].value.iNumber << std::endl;
 //				std::string* target = (*gltf)["animations"][0]["channels"][0]["target"]["path"].value.string;
 
 				// std::cout << std::endl;
