@@ -1101,12 +1101,12 @@ namespace GLVM::core
 			core::vector<Core::JsonValue> animations = parser.Search("animations");
 
 			if ( animations.GetSize() > 0 ) {
-				core::vector<Core::JsonValue> samplers;
+				core::vector<Core::JsonValue> samplerIndices;
 				core::vector<Core::JsonValue> targetNodes;
 				core::vector<Core::JsonValue> targetPaths;
 				Core::JsonValue channels = (*gltf)["animations"][0]["channels"];
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
-					samplers.Push(channels[i]["sampler"]);
+					samplerIndices.Push(channels[i]["sampler"]);
 
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
 					targetNodes.Push(channels[i]["target"]["node"]);
@@ -1117,10 +1117,15 @@ namespace GLVM::core
 				core::vector<Core::JsonValue> inputs;
 				core::vector<Core::JsonValue> outputs;
 
+				Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
+				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
+					inputs.Push(samplers[i]["input"].value.iNumber);
+
+				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
+					outputs.Push(samplers[i]["output"].value.iNumber);
 				
-				
-				// for ( unsigned int i = 0; i < targetPaths.GetSize(); ++i)
-				// 	std::cout << *targetPaths[i].value.string << std::endl;
+				// for ( unsigned int i = 0; i < outputs.GetSize(); ++i)
+				// 	std::cout << outputs[i].value.iNumber << std::endl;
 //				std::string* target = (*gltf)["animations"][0]["channels"][0]["target"]["path"].value.string;
 
 				// std::cout << std::endl;
