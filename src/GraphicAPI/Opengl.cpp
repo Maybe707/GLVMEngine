@@ -1114,22 +1114,81 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
 					targetPaths.Push(channels[i]["target"]["path"]);
 
-				core::vector<Core::JsonValue> inputs;
-				core::vector<Core::JsonValue> outputs;
-				
+				core::vector<unsigned int> translationSamplerIndices;
+				core::vector<unsigned int> rotationSamplerIndices;
+				core::vector<unsigned int> scaleSamplerIndices;
+				for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
+					if ( *targetPaths[i].value.string == "translation" ) {
+						translationSamplerIndices.Push(i);
+					} else if ( *targetPaths[i].value.string == "rotation" ) {
+						rotationSamplerIndices.Push(i);
+					} else if ( *targetPaths[i].value.string == "scale" ) {
+						scaleSamplerIndices.Push(i);
+					}
+				}
+
 				Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
-				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
-					inputs.Push(samplers[i]["input"].value.iNumber);
+				
+				core::vector<unsigned int> translationInputs;
+				core::vector<unsigned int> translationOutputs;
+				
+				for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i)
+					translationInputs.Push(samplers[translationSamplerIndices[i]]["input"].value.iNumber);
 
-				for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
-					outputs.Push(samplers[i]["output"].value.iNumber);
+				for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i)
+					translationOutputs.Push(samplers[translationSamplerIndices[i]]["output"].value.iNumber);
 
-				unsigned int timingsBufferViewIndex = (*gltf)["accessors"][7]["bufferView"].value.iNumber;
-				unsigned int timingsByteLength      = (*gltf)["bufferViews"][timingsBufferViewIndex]["byteLength"].value.iNumber;
-				unsigned int timingsByteOffset      = (*gltf)["bufferViews"][timingsBufferViewIndex]["byteOffset"].value.iNumber;
+				core::vector<core::vector<float>> frames;
+				for ( unsigned int i = 0; i < translationInputs.GetSize(); ++i) {
+					unsigned int frameBufferViewIndex = (*gltf)["accessors"][translationInputs[i]]["bufferView"].value.iNumber;
+					unsigned int frameByteLength      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int frameByteOffset      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
 
-				// for ( unsigned int i = 0; i < inputs.GetSize(); ++i)
-				// 	std::cout << inputs[i].value.iNumber << std::endl;
+					core::vector<float> temp;
+					for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+					frames.Push(temp);
+				}
+
+				core::vector<core::vector<float>> translations;
+				for ( unsigned int i = 0; i < translationOutputs.GetSize(); ++i) {
+					unsigned int outputBufferViewIndex = (*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
+					unsigned int outputByteLength      = (*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int outputByteOffset      = (*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
+
+					core::vector<float> temp;
+					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+					temp.Print();
+					translations.Push(temp);
+				}
+
+				
+				
+ 				// core::vector<Core::JsonValue> inputs;
+				// core::vector<Core::JsonValue> outputs;
+				
+				// Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
+				// for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
+				// 	inputs.Push(samplers[i]["input"].value.iNumber);
+
+				// for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)
+				// 	outputs.Push(samplers[i]["output"].value.iNumber);
+
+				// unsigned int frameBufferViewIndex = (*gltf)["accessors"][7]["bufferView"].value.iNumber;
+				// unsigned int frameByteLength      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
+				// unsigned int frameByteOffset      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
+
+				// core::vector<float> frames;
+				// for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameByteLength; i += 4 )
+				// 	frames.Push(reinterpret_cast<float &>(buffer[i]));
+				
+				
+				
+				// for ( unsigned int i = 0; i < frames.GetSize(); ++i)
+				// 	std::cout << frames[i] << std::endl;
 //				std::string* target = (*gltf)["animations"][0]["channels"][0]["target"]["path"].value.string;
 
 				// std::cout << std::endl;
