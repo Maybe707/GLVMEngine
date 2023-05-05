@@ -1138,34 +1138,125 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i)
 					translationOutputs.Push(samplers[translationSamplerIndices[i]]["output"].value.iNumber);
 
-				core::vector<core::vector<float>> frames;
+				core::vector<core::vector<float>> frameInputsTranslation;
 				for ( unsigned int i = 0; i < translationInputs.GetSize(); ++i) {
-					unsigned int frameBufferViewIndex = (*gltf)["accessors"][translationInputs[i]]["bufferView"].value.iNumber;
-					unsigned int frameByteLength      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
-					unsigned int frameByteOffset      = (*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
+					unsigned int frameBufferViewIndex =
+						(*gltf)["accessors"][translationInputs[i]]["bufferView"].value.iNumber;
+					unsigned int frameByteLength      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int frameByteOffset      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
 
 					core::vector<float> temp;
 					for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameByteLength; i += 4 )
 						temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-					frames.Push(temp);
+//					temp.Print();
+					frameInputsTranslation.Push(temp);
 				}
 
 				core::vector<core::vector<float>> translations;
 				for ( unsigned int i = 0; i < translationOutputs.GetSize(); ++i) {
-					unsigned int outputBufferViewIndex = (*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
-					unsigned int outputByteLength      = (*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
-					unsigned int outputByteOffset      = (*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
+					unsigned int outputBufferViewIndex =
+						(*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
+					unsigned int outputByteLength      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int outputByteOffset      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
 
 					core::vector<float> temp;
 					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
 						temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-					temp.Print();
+//					temp.Print();
 					translations.Push(temp);
 				}
 
+				core::vector<unsigned int> rotationInputs;
+				core::vector<unsigned int> rotationOutputs;
 				
+				for ( unsigned int i = 0; i < rotationSamplerIndices.GetSize(); ++i)
+					rotationInputs.Push(samplers[rotationSamplerIndices[i]]["input"].value.iNumber);
+
+				for ( unsigned int i = 0; i < rotationSamplerIndices.GetSize(); ++i)
+					rotationOutputs.Push(samplers[rotationSamplerIndices[i]]["output"].value.iNumber);
+
+				core::vector<core::vector<float>> frameInputsRotation;
+				for ( unsigned int i = 0; i < rotationInputs.GetSize(); ++i) {
+					unsigned int frameBufferViewIndex =
+						(*gltf)["accessors"][rotationInputs[i]]["bufferView"].value.iNumber;
+					unsigned int frameByteLength      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int frameByteOffset      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
+
+					core::vector<float> temp;
+					for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+//					temp.Print();
+					frameInputsRotation.Push(temp);
+				}
+
+				core::vector<core::vector<float>> rotations;
+				for ( unsigned int i = 0; i < rotationOutputs.GetSize(); ++i) {
+					unsigned int outputBufferViewIndex =
+						(*gltf)["accessors"][rotationOutputs[i]]["bufferView"].value.iNumber;
+					unsigned int outputByteLength      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int outputByteOffset      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
+
+					core::vector<float> temp;
+					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+//					temp.Print();
+					rotations.Push(temp);
+				}
+
+				core::vector<unsigned int> scaleInputs;
+				core::vector<unsigned int> scaleOutputs;
+				
+				for ( unsigned int i = 0; i < scaleSamplerIndices.GetSize(); ++i)
+					scaleInputs.Push(samplers[scaleSamplerIndices[i]]["input"].value.iNumber);
+
+				for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i)
+					scaleOutputs.Push(samplers[scaleSamplerIndices[i]]["output"].value.iNumber);
+
+				core::vector<core::vector<float>> frameInputsScale;
+				for ( unsigned int i = 0; i < scaleInputs.GetSize(); ++i) {
+					unsigned int frameBufferViewIndex =
+						(*gltf)["accessors"][scaleInputs[i]]["bufferView"].value.iNumber;
+					unsigned int frameByteLength      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int frameByteOffset      =
+						(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
+
+					core::vector<float> temp;
+					for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+//					temp.Print();
+					frameInputsScale.Push(temp);
+				}
+
+				core::vector<core::vector<float>> scales;
+				for ( unsigned int i = 0; i < scaleOutputs.GetSize(); ++i) {
+					unsigned int outputBufferViewIndex =
+						(*gltf)["accessors"][scaleOutputs[i]]["bufferView"].value.iNumber;
+					unsigned int outputByteLength      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
+					unsigned int outputByteOffset      =
+						(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
+
+					core::vector<float> temp;
+					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
+						temp.Push(reinterpret_cast<float &>(buffer[i]));
+
+//					temp.Print();
+					scales.Push(temp);
+				}
 				
  				// core::vector<Core::JsonValue> inputs;
 				// core::vector<Core::JsonValue> outputs;
