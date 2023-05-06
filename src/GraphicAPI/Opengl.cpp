@@ -1045,7 +1045,7 @@ namespace GLVM::core
 					jointMatriciesLocalContainer.Push(jointMatrix);
 				}
 
-				jointMatrices.Push(jointMatriciesLocalContainer);
+//				jointMatrices.Push(jointMatriciesLocalContainer);
 				
 				unsigned int joints_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["JOINTS_0"].value.iNumber;
 				unsigned int joints_buffer_view_index = (*gltf)["accessors"][joints_index]["bufferView"].value.iNumber;
@@ -1108,9 +1108,12 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
 					samplerIndices.Push(channels[i]["sampler"]);
 
+				// for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i )
+				// 	std::cout << samplerIndices[i].value.iNumber << std::endl;;
+				
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
 					targetNodes.Push(channels[i]["target"]["node"]);
-				
+
 				for ( unsigned int i = 0; i < channels.value.array->GetSize(); ++i )
 					targetPaths.Push(channels[i]["target"]["path"]);
 
@@ -1119,14 +1122,14 @@ namespace GLVM::core
 				core::vector<unsigned int> scaleSamplerIndices;
 				for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
 					if ( *targetPaths[i].value.string == "translation" ) {
-						translationSamplerIndices.Push(i);
+						translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
 					} else if ( *targetPaths[i].value.string == "rotation" ) {
-						rotationSamplerIndices.Push(i);
+						rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
 					} else if ( *targetPaths[i].value.string == "scale" ) {
-						scaleSamplerIndices.Push(i);
+						scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
 					}
 				}
-
+				
 				Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				
 				core::vector<unsigned int> translationInputs;
@@ -1157,6 +1160,7 @@ namespace GLVM::core
 
 				core::vector<core::vector<float>> translations;
 				for ( unsigned int i = 0; i < translationOutputs.GetSize(); ++i) {
+//					std::cout << "index: " << translationOutputs[i] << std::endl;
 					unsigned int outputBufferViewIndex =
 						(*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
 					unsigned int outputByteLength      =
@@ -1164,11 +1168,13 @@ namespace GLVM::core
 					unsigned int outputByteOffset      =
 						(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
 
+//					std::cout << "length: " << outputByteLength << " offset: " << outputByteOffset << std::endl;
+					
 					core::vector<float> temp;
 					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
 						temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-//					temp.Print();
+					temp.Print();
 					translations.Push(temp);
 				}
 
@@ -1257,9 +1263,38 @@ namespace GLVM::core
 //					temp.Print();
 					scales.Push(temp);
 				}
+
+				for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); i += 4 ) {
+					// mat4 scale(1.0f);
+					// for ( unsigned int j = 0; j < 4; ++j ) {
+					// 	scale[j][j] = scales[j];
+					// }
+						
+					// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
+					// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
+					// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
+					// std::cout << "govno 1: " << (*node.value.object)["scale"][0].value.fNumber << std::endl;;
+					// std::cout << "govno 2: " << (*node.value.object)["scale"][1].value.fNumber << std::endl;;
+					// std::cout << "govno 3: " << (*node.value.object)["scale"][2].value.fNumber << std::endl;;
+
+				}
+
+				// Quaternion rotationQuaternion;
+				// if ( node.value.object->Contain("translation") ) {
+				// 	Core::JsonValue array = (*node.value.object)["translation"];
+				// 	for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
+				// 		if ( array[i].isInterger() )
+				// 			translation[3][i] = array[i].value.iNumber;
+				// 		else if ( array[i].isFloat() )
+				// 			translation[3][i] = array[i].value.fNumber;
+				// 	}
+
+
+				// }					
+//			}
 				
- 				// core::vector<Core::JsonValue> inputs;
-				// core::vector<Core::JsonValue> outputs;
+			// core::vector<Core::JsonValue> inputs;
+			// core::vector<Core::JsonValue> outputs;
 				
 				// Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				// for ( unsigned int i = 0; i < samplers.value.array->GetSize(); ++i)

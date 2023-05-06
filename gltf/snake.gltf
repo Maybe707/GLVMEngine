@@ -24,7 +24,7 @@
             "scale" : [
                 0.9999999403953552,
                 1,
-                1.234234
+                1
             ],
             "translation" : [
                 5.587923457284205e-09,
@@ -199,6 +199,49 @@
                     "output" : 16
                 }
             ]
+        },
+        {
+            "channels" : [
+                {
+                    "sampler" : 0,
+                    "target" : {
+                        "node" : 3,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 1,
+                    "target" : {
+                        "node" : 3,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 2,
+                    "target" : {
+                        "node" : 3,
+                        "path" : "scale"
+                    }
+                }
+            ],
+            "name" : "CubeAction",
+            "samplers" : [
+                {
+                    "input" : 17,
+                    "interpolation" : "LINEAR",
+                    "output" : 18
+                },
+                {
+                    "input" : 19,
+                    "interpolation" : "STEP",
+                    "output" : 20
+                },
+                {
+                    "input" : 19,
+                    "interpolation" : "STEP",
+                    "output" : 21
+                }
+            ]
         }
     ],
     "materials" : [
@@ -364,6 +407,48 @@
             "componentType" : 5126,
             "count" : 24,
             "type" : "VEC3"
+        },
+        {
+            "bufferView" : 17,
+            "componentType" : 5126,
+            "count" : 5,
+            "max" : [
+                0.16666666666666666
+            ],
+            "min" : [
+                0
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 18,
+            "componentType" : 5126,
+            "count" : 5,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 19,
+            "componentType" : 5126,
+            "count" : 1,
+            "max" : [
+                0.16666666666666666
+            ],
+            "min" : [
+                0.16666666666666666
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 20,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 21,
+            "componentType" : 5126,
+            "count" : 1,
+            "type" : "VEC3"
         }
     ],
     "bufferViews" : [
@@ -457,11 +542,36 @@
             "buffer" : 0,
             "byteLength" : 288,
             "byteOffset" : 5128
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 20,
+            "byteOffset" : 5416
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 60,
+            "byteOffset" : 5436
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 4,
+            "byteOffset" : 5496
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 16,
+            "byteOffset" : 5500
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 12,
+            "byteOffset" : 5516
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 5416,
+            "byteLength" : 5528,
             "uri" : "snake.bin"
         }
     ]
