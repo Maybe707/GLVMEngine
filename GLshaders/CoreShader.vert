@@ -37,7 +37,6 @@ uniform bool reverseNormals;
 uniform vec4 jointIndices;
 uniform vec4 weights;
 
-uniform int jointMatricesSize;
 uniform mat4 jointMatrices[4];
 
 void main()

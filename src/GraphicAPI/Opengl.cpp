@@ -534,9 +534,6 @@ namespace GLVM::core
 				jointMatricesData[2] = jointMatricesPerMesh[2][2][currentFrame];
 				jointMatricesData[3] = jointMatricesPerMesh[2][3][currentFrame];
 				coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
-
-				coreShaderProgram->SetInt("depthMap", 31);
-				
 			}
 		}
 				
@@ -1120,7 +1117,7 @@ namespace GLVM::core
 						weightsLocalContainer.Push(weights);
 					}
 				}
-
+//				std::cout << weightsLocalContainer.GetSize() << std::endl;
 				weightsPerVertex.Push(weightsLocalContainer);
 			}
 

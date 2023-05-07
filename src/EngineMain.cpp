@@ -94,7 +94,7 @@ int main()
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 0;
+    ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 2;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -102,7 +102,7 @@ int main()
 
     Entity uiWitch2 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
-	ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 0;
+	ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
 		= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };
 	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
