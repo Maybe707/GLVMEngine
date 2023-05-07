@@ -925,6 +925,7 @@ namespace GLVM::core
 //			core::vector<Core::JsonValue> accessors = parser.Search("accessors");
 			Core::JsonValue joints;
 			core::vector<mat4> globalTransformJointNode;
+			core::vector<mat4> inverseBindMatrixSet;
 			
 			if ( skins.GetSize() > 0 ) {
 				joints = (*gltf)["skins"][0]["joints"];
@@ -1034,15 +1035,20 @@ namespace GLVM::core
 				for ( unsigned int i = byteOffsetInverseBindMatrices; i < byteOffsetInverseBindMatrices + byteLengthInverseBindMatrices; i += 4 )
 					inverseBindMatricesData.Push(reinterpret_cast<float &>(buffer[i]));
 
-				core::vector<mat4> jointMatriciesLocalContainer;
+//				inverseBindMatricesData.Print();
+//				std::cout << inverseBindMatricesData.GetSize() << std::endl;
+				
+//				core::vector<mat4> jointMatriciesLocalContainer;
+
 				for ( unsigned int n = 0; n < joints.value.array->GetSize(); ++n ) {
 					mat4 inverseBindMatrix(0.0f);
 					for ( unsigned int g = 0; g < 4; ++g )
 						for ( unsigned int j = 0; j < 4; ++j )
 							inverseBindMatrix[g][j] = inverseBindMatricesData[g * 4 + j];
-					
-					mat4 jointMatrix = globalTransformJointNode[n] * inverseBindMatrix;
-					jointMatriciesLocalContainer.Push(jointMatrix);
+
+					inverseBindMatrixSet.Push(inverseBindMatrix);
+					// mat4 jointMatrix = globalTransformJointNode[n] * inverseBindMatrix;
+					// jointMatriciesLocalContainer.Push(jointMatrix);
 				}
 
 //				jointMatrices.Push(jointMatriciesLocalContainer);
@@ -1160,7 +1166,8 @@ namespace GLVM::core
 
 				core::vector<core::vector<float>> translations;
 				for ( unsigned int i = 0; i < translationOutputs.GetSize(); ++i) {
-//					std::cout << "index: " << translationOutputs[i] << std::endl;
+					// std::cout << i << std::endl;
+					// std::cout << "index: " << translationOutputs[i] << std::endl;
 					unsigned int outputBufferViewIndex =
 						(*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
 					unsigned int outputByteLength      =
@@ -1174,7 +1181,7 @@ namespace GLVM::core
 					for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputByteLength; i += 4 )
 						temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-					temp.Print();
+//					temp.Print();
 					translations.Push(temp);
 				}
 
@@ -1264,19 +1271,61 @@ namespace GLVM::core
 					scales.Push(temp);
 				}
 
-				for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); i += 4 ) {
-					// mat4 scale(1.0f);
-					// for ( unsigned int j = 0; j < 4; ++j ) {
-					// 	scale[j][j] = scales[j];
-					// }
-						
-					// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
-					// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
-					// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
-					// std::cout << "govno 1: " << (*node.value.object)["scale"][0].value.fNumber << std::endl;;
-					// std::cout << "govno 2: " << (*node.value.object)["scale"][1].value.fNumber << std::endl;;
-					// std::cout << "govno 3: " << (*node.value.object)["scale"][2].value.fNumber << std::endl;;
+				for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
+					core::vector<float> boneAllFrameTranslations = translations[j];
+					// std::cout << "index: " << j << std::endl;
+					// boneAllFrameTranslations.Print();
+					core::vector<float> boneAllFrameRotations    = rotations[j];
+					core::vector<float> boneAllFrameScales       = scales[j];
+					core::vector<mat4>  globalAllFrameNodeMatrix;
+//					std::cout << "node #: " << j << std::endl;
+					for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); ++i ) {
+						mat4 frameTranslation(1.0f);
+						mat4 frameScale(1.0f);
+						for ( unsigned int q = 0; q < 3; ++q ) {
+							frameTranslation[3][q] = boneAllFrameTranslations[i * 3 + q];
+							frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
+						}
+//						std::cout << frameTranslation << std::endl;
 
+						Quaternion frameRotationQuaternion;
+						mat4 frameRotation(1.0f);
+						frameRotationQuaternion.x = boneAllFrameRotations[i * 4];
+						frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
+						frameRotationQuaternion.z = boneAllFrameRotations[i * 4 + 2];
+						frameRotationQuaternion.w = boneAllFrameRotations[i * 4 + 3];
+						frameRotation = rotateQuaternion<float, 4>(frameRotationQuaternion);
+//						std::cout << frameRotation << std::endl;
+
+						mat4 globalTransformNodeMatrix = frameTranslation * frameScale * frameRotation;
+						globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * inverseBindMatrixSet[j]);
+//						globalTransformJointNode.Push(jointFrameMatrix);
+
+						// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
+						// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
+						// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
+						// std::cout << "govno 1: " << (*node.value.object)["scale"][0].value.fNumber << std::endl;;
+						// std::cout << "govno 2: " << (*node.value.object)["scale"][1].value.fNumber << std::endl;;
+						// std::cout << "govno 3: " << (*node.value.object)["scale"][2].value.fNumber << std::endl;;
+
+					}
+
+					jointMatrices.Push(globalAllFrameNodeMatrix);
+				}
+
+				unsigned int maximumJoints     = 4;
+				unsigned int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
+
+				if ( unitMatricesSize ) {
+					for ( unsigned int i = 0; i < unitMatricesSize; ++i) {
+						core::vector<mat4>  globalAllFrameNodeMatrix;
+						for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
+							mat4 unitMatrix(1.0f);
+							globalAllFrameNodeMatrix.Push(unitMatrix);
+						}
+
+						jointMatrices.Push(globalAllFrameNodeMatrix);
+					}
 				}
 
 				// Quaternion rotationQuaternion;
