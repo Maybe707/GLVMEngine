@@ -59,6 +59,10 @@ EXTERN GLint (*pGLGet_Uniform_Location)(GLuint, const GLchar *);
 
 EXTERN void (*pGLUniform3f)(GLuint, GLfloat, GLfloat, GLfloat);
 
+EXTERN void (*pGLUniform4f)(GLuint, GLfloat, GLfloat, GLfloat, GLfloat);
+
+EXTERN void (*pGLUniform4i)(GLint, GLfloat, GLfloat, GLfloat, GLfloat);
+
 EXTERN void (*pGLUniform1i)(GLint, GLint);
 
 EXTERN void (*pGLDelete_Vertex_Arrays)(GLsizei, const GLuint *);

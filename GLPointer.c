@@ -71,6 +71,10 @@ EXTERN_C void Initializer()
 
 	pGLUniform3f = (void (*)(GLuint, GLfloat, GLfloat, GLfloat))GET_PROC_ADDRESS((const GLubyte*)"glUniform3f");
 
+	pGLUniform4f = (void (*)(GLuint, GLfloat, GLfloat, GLfloat, GLfloat))GET_PROC_ADDRESS((const GLubyte*)"glUniform4f");
+
+	pGLUniform4i = (void (*)(GLint, GLfloat, GLfloat, GLfloat, GLfloat))GET_PROC_ADDRESS((const GLubyte*)"glUniform4i");
+	
     pGLUniform1f = (void (*)(GLint, GLfloat))GET_PROC_ADDRESS((const GLubyte *)"glUniform1f");
 
     pGLGet_Shaderiv = (void (*)(GLuint, GLenum, GLint *))GET_PROC_ADDRESS((const GLubyte *)"glGetShaderiv");

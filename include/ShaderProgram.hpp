@@ -112,7 +112,9 @@ public:
 	void SetInt(const std::string& name, GLsizei count, const GLint* value) const;
     void SetFloat(const std::string& name, float value) const;
 	void SetVec3(const std::string &name, float x, float y, float z) const;
-	void SetVec3(const std::string &name, const vec3& vector) const;
+	void SetVec3(const std::string &name, const vec3& vector) const;	
+	void SetVec4(const std::string &name, float x, float y, float z, float w) const;
+	void SetVec4(const std::string &name, int x, int y, int z, int w) const;
 	void SetUniformID(const char* _uniformIdentificator, int _id);
 	void SetMat4(const std::string &name, mat4 &mat) const;
 	void SetMat4(const std::string &name, unsigned int matrixNumber, mat4 &mat) const;

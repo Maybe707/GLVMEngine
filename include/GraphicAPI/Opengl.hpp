@@ -120,6 +120,9 @@ namespace GLVM::core {
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
+		core::vector<float> frames;
+		float frameAccumulator = 0.0f;
+		unsigned int currentFrame = 0;
 		core::vector<core::vector<Vector<short, 4>>> jointIndicesPerVertex;
 		core::vector<core::vector<vec4>> weightsPerVertex;
 		std::vector<GLuint> VBOcontainer_;

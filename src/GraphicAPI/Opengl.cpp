@@ -520,7 +520,26 @@ namespace GLVM::core
 
 		ecs::TextureManager* textureManager = ecs::TextureManager::GetInstance();
 		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
-		
+
+
+		if ( frameAccumulator >= frames[currentFrame] ) {
+			++currentFrame;
+			if ( currentFrame == frames.GetSize() ) {
+				currentFrame = 0;
+				frameAccumulator = 0.0f;
+			} else {
+				mat4 jointMatricesData[4];
+				jointMatricesData[0] = jointMatricesPerMesh[2][0][currentFrame];
+				jointMatricesData[1] = jointMatricesPerMesh[2][1][currentFrame];
+				jointMatricesData[2] = jointMatricesPerMesh[2][2][currentFrame];
+				jointMatricesData[3] = jointMatricesPerMesh[2][3][currentFrame];
+				coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
+
+				coreShaderProgram->SetInt("depthMap", 31);
+				
+			}
+		}
+				
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -546,7 +565,7 @@ namespace GLVM::core
 				pGLActive_Texture(GL_TEXTURE28);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
 				pGLActive_Texture(GL_TEXTURE29);
-				glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
+		 		glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
 				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
 				cm::material* materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 				shaderProgram_->SetFloat("material.shininess", materialComponent->shininess);
@@ -1272,6 +1291,8 @@ namespace GLVM::core
 					scales.Push(temp);
 				}
 
+				frames = frameInputsTranslation[0];
+				
 				for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 					core::vector<float> boneAllFrameTranslations = translations[j];
 					// std::cout << "index: " << j << std::endl;
