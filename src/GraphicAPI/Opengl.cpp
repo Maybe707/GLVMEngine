@@ -926,6 +926,7 @@ namespace GLVM::core
 			Core::JsonValue joints;
 			core::vector<mat4> globalTransformJointNode;
 			core::vector<mat4> inverseBindMatrixSet;
+			core::vector<core::vector<mat4>> jointMatrices;
 			
 			if ( skins.GetSize() > 0 ) {
 				joints = (*gltf)["skins"][0]["joints"];
@@ -947,7 +948,7 @@ namespace GLVM::core
 					mat4 rotation(1.0f);
 					mat4 scale(1.0f);
 					mat4 translation(1.0f);
-					
+
 					if ( node.value.object->Contain("rotation") ) {
 						Core::JsonValue array = (*node.value.object)["rotation"];
 						for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
@@ -1077,7 +1078,7 @@ namespace GLVM::core
 				}
 
 				jointIndicesPerVertex.Push(jointIndicesLocalContainer);
-				
+
 				unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
 				unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
 				unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
@@ -1135,7 +1136,7 @@ namespace GLVM::core
 						scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
 					}
 				}
-				
+
 				Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				
 				core::vector<unsigned int> translationInputs;
@@ -1312,7 +1313,7 @@ namespace GLVM::core
 
 					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
-
+//				std::cout << jointMatrices.GetSize() << std::endl;
 				unsigned int maximumJoints     = 4;
 				unsigned int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
@@ -1374,7 +1375,20 @@ namespace GLVM::core
 				// 	std::cout << bufferViewsIndices[i] << std::endl;
 				// }
 				
+			} else {
+				unsigned int maximumJoints = 4;
+				for ( unsigned int i = 0; i < maximumJoints; ++i) {
+					core::vector<mat4>  globalAllFrameNodeMatrix;
+					for ( unsigned int j = 0; j < 1; ++j ) {      ///< If we dont have animations then we have 1 frame
+						mat4 unitMatrix(1.0f);
+						globalAllFrameNodeMatrix.Push(unitMatrix);
+					}
+
+					jointMatrices.Push(globalAllFrameNodeMatrix);
+				}
 			}
+
+			jointMatricesPerMesh.Push(jointMatrices);
 			
 			// bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
 			// mat3 scaleTransform(1.0f);
