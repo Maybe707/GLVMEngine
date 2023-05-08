@@ -828,7 +828,14 @@ namespace GLVM::core
         pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
         pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _aIndices.size(), _aIndices.data(), GL_STATIC_DRAW);
         
-        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)VERTEX_OFFSET);
+        // pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)VERTEX_OFFSET);
+        // pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
+		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
+		// pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		// pGLEnable_Vertex_Attrib_Array(2);
+		
+		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(3 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
@@ -1099,6 +1106,8 @@ namespace GLVM::core
 				for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
 					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
+//				jointsIndices.Print();
+				
 				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
 				// 	unsigned int offset = 4;
 				// 	unsigned int index = indices[v] * offset;
@@ -1122,7 +1131,7 @@ namespace GLVM::core
 				for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
 					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
 
-				weightsContainer.Print();
+//				weightsContainer.Print();
 				
 				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
 				// 	unsigned int offset = 4;

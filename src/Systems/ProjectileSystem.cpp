@@ -62,7 +62,7 @@ namespace GLVM::ecs
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.02f;
+			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.1f;
 		}
 
 //         GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
