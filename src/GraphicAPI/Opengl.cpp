@@ -533,15 +533,17 @@ namespace GLVM::core
 			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
 			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			// for ( int i = 0; i < 4; ++i )
+			// 	std::cout << jointMatricesData[i] << std::endl;
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
-//			std::cout << jointMatricesData << std::endl;
 		} else {
 			mat4 jointMatricesData[4];
 			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
 			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
 			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
-//			std::cout << jointMatricesData << std::endl;
+			// for ( int i = 0; i < 4; ++i )
+			// 	std::cout << jointMatricesData[i] << std::endl;
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		}
 				
@@ -880,7 +882,7 @@ namespace GLVM::core
 
 	void COpenglRenderer::LoadGLTF() {
 		for (unsigned int m = 0; m < pathsGLTF.GetSize(); ++m) {
-
+			
 			Core::CJsonParser parser;
 			parser.ReadFile(pathsGLTF[m]);
 			parser.Parse();
@@ -894,6 +896,7 @@ namespace GLVM::core
 
 			Core::JsonValue* gltf = parser.GetRoot();
 			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
+			std::cout << binary_path << std::endl;
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
 //			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
@@ -902,8 +905,8 @@ namespace GLVM::core
 			in_stream.read(buffer, full_byte_size);
 			in_stream.close();
 
-			// for ( int i = 0; i < full_byte_size; i += 2 )
-			// 	std::cout << reinterpret_cast<unsigned short &>(buffer[i]) << std::endl;
+			// for ( int i = 0; i < full_byte_size; i += 4 )
+			// 	std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
 
 			int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
 			int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
@@ -1119,6 +1122,8 @@ namespace GLVM::core
 				for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
 					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
 
+				weightsContainer.Print();
+				
 				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
 				// 	unsigned int offset = 4;
 				// 	unsigned int index = indices[v] * offset;
@@ -1419,7 +1424,7 @@ namespace GLVM::core
 					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
 			}
-
+//			std::cout << jointMatrices[0][0] << std::endl;
 			jointMatricesPerMesh.Push(jointMatrices);
 
 			// bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
