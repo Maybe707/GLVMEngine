@@ -97,7 +97,10 @@ namespace GLVM::core
             createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
         }
     }
-    
+
+	void CVulkanRenderer::EnlargeFrameAccumulator([[maybe_unused]] float value) {
+	}
+	
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
         viewMatrix = _viewMatrix; // 
     }

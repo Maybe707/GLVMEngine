@@ -38,8 +38,8 @@ int main()
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
 
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/ray3.gltf");
+	// MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
+	// MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/ray3.gltf");
 	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake.gltf");
 	
 	core::Engine* GLVM = core::Engine::GetInstance();		

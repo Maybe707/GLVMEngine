@@ -520,21 +520,29 @@ namespace GLVM::core
 
 		ecs::TextureManager* textureManager = ecs::TextureManager::GetInstance();
 		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
-
-
+		
 		if ( frameAccumulator >= frames[currentFrame] ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
 				currentFrame = 0;
 				frameAccumulator = 0.0f;
-			} else {
-				mat4 jointMatricesData[4];
-				jointMatricesData[0] = jointMatricesPerMesh[2][0][currentFrame];
-				jointMatricesData[1] = jointMatricesPerMesh[2][1][currentFrame];
-				jointMatricesData[2] = jointMatricesPerMesh[2][2][currentFrame];
-				jointMatricesData[3] = jointMatricesPerMesh[2][3][currentFrame];
-				coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 			}
+
+			mat4 jointMatricesData[4];
+			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
+//			std::cout << jointMatricesData << std::endl;
+		} else {
+			mat4 jointMatricesData[4];
+			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+//			std::cout << jointMatricesData << std::endl;
+			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		}
 				
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
@@ -818,12 +826,16 @@ namespace GLVM::core
         pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
         pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _aIndices.size(), _aIndices.data(), GL_STATIC_DRAW);
         
-        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)VERTEX_OFFSET);
+        pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(3 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-		pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+		pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(6 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(2);
+		pGLVertex_Attrib_Pointer(3, 4, GL_INT, GL_FALSE, 16 * sizeof(float), (void*)(8 * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(3);
+		pGLVertex_Attrib_Pointer(4, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(12 * sizeof(float)));
+		pGLEnable_Vertex_Attrib_Array(4);
 
 		VBOcontainer_.push_back(iVbo_);
 		VAOcontainer_.push_back(iVao_);
@@ -890,8 +902,8 @@ namespace GLVM::core
 			in_stream.read(buffer, full_byte_size);
 			in_stream.close();
 
-			// for ( int i = 0; i < full_byte_size; i += 4 )
-			// 	std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
+			// for ( int i = 0; i < full_byte_size; i += 2 )
+			// 	std::cout << reinterpret_cast<unsigned short &>(buffer[i]) << std::endl;
 
 			int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
 			int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
@@ -904,6 +916,8 @@ namespace GLVM::core
 			for ( int i = indices_byte_offset; i < indices_byte_offset + indices_byte_length; i += 2 )
 				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
 
+			baseIndices.Push(indices);
+			
 			int vertices_position_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["POSITION"].value.iNumber;
 			int vertices_buffer_view_index = (*gltf)["accessors"][vertices_position_index]["bufferView"].value.iNumber;
 			int vertices_byte_length = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteLength"].value.iNumber;
@@ -943,6 +957,10 @@ namespace GLVM::core
 			core::vector<mat4> globalTransformJointNode;
 			core::vector<mat4> inverseBindMatrixSet;
 			core::vector<core::vector<mat4>> jointMatrices;
+			// core::vector<Vector<int ,4>> jointIndicesLocalContainer;
+			// core::vector<vec4> weightsLocalContainer;
+			core::vector<float> weightsContainer;
+			core::vector<int> jointsIndices;
 			
 			if ( skins.GetSize() > 0 ) {
 				joints = (*gltf)["skins"][0]["joints"];
@@ -1075,50 +1093,46 @@ namespace GLVM::core
 				unsigned int joints_byte_length = (*gltf)["bufferViews"][joints_buffer_view_index]["byteLength"].value.iNumber;
 				unsigned int joints_byte_offset = (*gltf)["bufferViews"][joints_buffer_view_index]["byteOffset"].value.iNumber;
 
-				core::vector<short> jointsIndices;
 				for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
 					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
-				core::vector<Vector<short,4>> jointIndicesLocalContainer;
-				for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
-					unsigned int offset = 4;
-					unsigned int index = indices[v] * offset;
-					if ( index + 3 < jointsIndices.GetSize() ) {
-						Vector<short, 4> indices = { jointsIndices[index],
-							jointsIndices[index + 1],
-							jointsIndices[index + 2],
-							jointsIndices[index + 3]};
-
-						jointIndicesLocalContainer.Push(indices);
-					}
-				}
-
-				jointIndicesPerVertex.Push(jointIndicesLocalContainer);
+				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
+				// 	unsigned int offset = 4;
+				// 	unsigned int index = indices[v] * offset;
+				// 	if ( index + 3 < jointsIndices.GetSize() ) {
+				// 		Vector<int, 4> indices = { jointsIndices[index],
+				// 			jointsIndices[index + 1],
+				// 			jointsIndices[index + 2],
+				// 			jointsIndices[index + 3]};
+						
+				// 		jointIndicesLocalContainer.Push(indices);
+				// 	}
+				// }
+				
+//				jointIndicesPerVertex.Push(jointIndicesLocalContainer);
 
 				unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
 				unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
 				unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
 				unsigned int weights_byte_offset = (*gltf)["bufferViews"][weights_buffer_view_index]["byteOffset"].value.iNumber;
 
-				core::vector<float> weightsContainer;
 				for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
 					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
 
-				core::vector<vec4> weightsLocalContainer;
-				for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
-					unsigned int offset = 4;
-					unsigned int index = indices[v] * offset;
-					if ( index + 3 < weightsContainer.GetSize() ) {
-						vec4 weights = { weightsContainer[index],
-							weightsContainer[index + 1],
-							weightsContainer[index + 2],
-							weightsContainer[index + 3]};
+				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
+				// 	unsigned int offset = 4;
+				// 	unsigned int index = indices[v] * offset;
+				// 	if ( index + 3 < weightsContainer.GetSize() ) {
+				// 		vec4 weights = { weightsContainer[index],
+				// 			weightsContainer[index + 1],
+				// 			weightsContainer[index + 2],
+				// 			weightsContainer[index + 3]};
 
-						weightsLocalContainer.Push(weights);
-					}
-				}
+				// 		weightsLocalContainer.Push(weights);
+				// 	}
+				// }
 //				std::cout << weightsLocalContainer.GetSize() << std::endl;
-				weightsPerVertex.Push(weightsLocalContainer);
+//				weightsPerVertex.Push(weightsLocalContainer);
 			}
 
 			core::vector<Core::JsonValue> animations = parser.Search("animations");
@@ -1407,7 +1421,7 @@ namespace GLVM::core
 			}
 
 			jointMatricesPerMesh.Push(jointMatrices);
-			
+
 			// bool scaleFlag = (*gltf)["nodes"][0].value.object->Contain("scale");
 			// mat3 scaleTransform(1.0f);
 
@@ -1425,10 +1439,13 @@ namespace GLVM::core
 
 // //				std::cout << "scale: " << scaleTransform << std::endl;
 // 			}
-			
+			// indices.Print();
+			// std::cout << "size: " << indices.GetSize() << std::endl;
+
+			// std::cout << "vertex size: " << vertices_position.GetSize() << std::endl;
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
-
+			
 			for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
 				aIndices_[m].push_back(i);
 
@@ -1465,6 +1482,21 @@ namespace GLVM::core
 					aVertexes_[m].push_back(texture_coordinates[index]);
 					aVertexes_[m].push_back(texture_coordinates[index + 1]);
 				}
+
+				index = indices[i] * 4;
+				if ( index + 3 < jointsIndices.GetSize() ) {
+					aVertexes_[m].push_back(jointsIndices[index]);
+					aVertexes_[m].push_back(jointsIndices[index + 1]);
+					aVertexes_[m].push_back(jointsIndices[index + 2]);
+					aVertexes_[m].push_back(jointsIndices[index + 3]);
+				}
+
+				if ( index + 3 < weightsContainer.GetSize() ) {
+					aVertexes_[m].push_back(weightsContainer[index]);
+					aVertexes_[m].push_back(weightsContainer[index + 1]);
+					aVertexes_[m].push_back(weightsContainer[index + 2]);
+					aVertexes_[m].push_back(weightsContainer[index + 3]);
+				}
 			}
 
 			SetVertices(aIndices_[m], aVertexes_[m]);
@@ -1488,6 +1520,10 @@ namespace GLVM::core
 			
 		}
 		
+	}
+
+	void COpenglRenderer::EnlargeFrameAccumulator(float value) {
+		frameAccumulator += value;
 	}
 	
 	mat4 COpenglRenderer::SetModelMatrix(ecs::components::transform& transformComponent_)

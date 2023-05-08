@@ -123,8 +123,9 @@ namespace GLVM::core {
 		core::vector<float> frames;
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrame = 0;
-		core::vector<core::vector<Vector<short, 4>>> jointIndicesPerVertex;
-		core::vector<core::vector<vec4>> weightsPerVertex;
+		core::vector<core::vector<unsigned int>> baseIndices;
+//		core::vector<core::vector<Vector<short, 4>>> jointIndicesPerVertex;
+//		core::vector<core::vector<vec4>> weightsPerVertex;
 		std::vector<GLuint> VBOcontainer_;
 		std::vector<GLuint> VAOcontainer_;
 		std::vector<GLuint> EBOcontainer_;
@@ -163,6 +164,7 @@ namespace GLVM::core {
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
 		void LoadGLTF() override;
+		void EnlargeFrameAccumulator(float value) override;
 		void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) override;
 		void run() override;

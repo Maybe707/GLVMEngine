@@ -5,6 +5,8 @@
 layout (location = 0) in vec3 vertexPosition;
 layout (location = 1) in vec3 normal;
 layout (location = 2) in vec2 textureCoordinates;
+layout (location = 3) in vec4 jointIndices;
+layout (location = 4) in vec4 weights;
 
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
 #define DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 4
@@ -33,9 +35,6 @@ uniform mat4 spotLightSpaceMatrixContainer[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZ
 uniform int directionalLightSpaceMatrixContainerSize;
 
 uniform bool reverseNormals;
-
-uniform vec4 jointIndices;
-uniform vec4 weights;
 
 uniform mat4 jointMatrices[4];
 
@@ -69,5 +68,5 @@ void main()
 		weights.w * jointMatrices[int(jointIndices.w)];
 
 	vec4 worldPosition = skinMatrix * vec4(vertexPosition, 1.0);	
-	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition, 1.0);
+	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * worldPosition;
 }
