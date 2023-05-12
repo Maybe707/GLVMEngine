@@ -38,6 +38,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <math.h>
 #include <ratio>
 #include <sstream>
 #include <thread>
@@ -546,7 +547,7 @@ namespace GLVM::core
 			// 	std::cout << jointMatricesData[i] << std::endl;
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		}
-				
+
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
@@ -821,6 +822,9 @@ namespace GLVM::core
         ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
         
         pGLBind_Vertex_Array(iVao_);
+
+		for ( int i = 0; i < _aVertices.size(); ++i)
+			std::cout << _aVertices[i] << std::endl;
 		
 		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
         pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * _aVertices.size(), _aVertices.data(), GL_DYNAMIC_DRAW);
@@ -841,7 +845,7 @@ namespace GLVM::core
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 		pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(6 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(2);
-		pGLVertex_Attrib_Pointer(3, 4, GL_INT, GL_FALSE, 16 * sizeof(float), (void*)(8 * sizeof(float)));
+		pGLVertex_Attrib_Pointer(3, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(8 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(3);
 		pGLVertex_Attrib_Pointer(4, 4, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(12 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(4);
@@ -907,7 +911,7 @@ namespace GLVM::core
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
 //			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
-			in_stream.open("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path);
+			in_stream.open("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/" + binary_path, std::ios::binary);
  			char* buffer = new char[full_byte_size];
 			in_stream.read(buffer, full_byte_size);
 			in_stream.close();
@@ -926,7 +930,7 @@ namespace GLVM::core
 			for ( int i = indices_byte_offset; i < indices_byte_offset + indices_byte_length; i += 2 )
 				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
 
-			baseIndices.Push(indices);
+//			baseIndices.Push(indices);
 			
 			int vertices_position_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["POSITION"].value.iNumber;
 			int vertices_buffer_view_index = (*gltf)["accessors"][vertices_position_index]["bufferView"].value.iNumber;
@@ -1107,6 +1111,8 @@ namespace GLVM::core
 					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
 //				jointsIndices.Print();
+
+				jointIndicesToShader = jointsIndices;
 				
 				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
 				// 	unsigned int offset = 4;
@@ -1132,6 +1138,8 @@ namespace GLVM::core
 					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
 
 //				weightsContainer.Print();
+
+				weightsToShader = weightsContainer;
 				
 				// for ( unsigned int v = 0; v < indices.GetSize(); ++v ) {
 				// 	unsigned int offset = 4;
@@ -1317,7 +1325,7 @@ namespace GLVM::core
 				}
 
 				frames = frameInputsTranslation[0];
-				
+
 				for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 					core::vector<float> boneAllFrameTranslations = translations[j];
 					// std::cout << "index: " << j << std::endl;
@@ -1459,6 +1467,8 @@ namespace GLVM::core
 			// std::cout << "vertex size: " << vertices_position.GetSize() << std::endl;
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
+
+			baseIndices = indices;
 			
 			for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
 				aIndices_[m].push_back(i);

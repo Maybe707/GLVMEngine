@@ -3,7 +3,6 @@
 #include "GLPointer.h"
 #include "Event.hpp"
 #include <GL/glx.h>
-#include <X11/X.h>
 #include <X11/Xlib.h>
 #include <bits/types/time_t.h>
 #include <bits/types/wint_t.h>
@@ -45,7 +44,7 @@ namespace GLVM::core
             exit(0);
         } 
         else
-        {
+		{
             
             ///< creates hexadecimal output like in glxinfo
             

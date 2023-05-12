@@ -38,9 +38,11 @@ int main()
 	// MeshManager->SetMesh("../waveFrontObj/chrismas_tree.obj");
 	// MeshManager->SetMesh("../waveFrontObj/shama_final.obj");
 
-	// MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cube2.gltf");
 	// MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/sphere.gltf");
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake2.gltf");
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake3.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
 	
 	core::Engine* GLVM = core::Engine::GetInstance();		
@@ -76,7 +78,7 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::vertex, ct::controller, cm::collider, cm::animation, cm::beholder,
 									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 3.5f, 2.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 15.5f, 2.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };

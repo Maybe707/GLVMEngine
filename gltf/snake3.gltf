@@ -1,0 +1,504 @@
+{
+    "asset" : {
+        "generator" : "Khronos glTF Blender I/O v3.4.50",
+        "version" : "2.0"
+    },
+    "scene" : 0,
+    "scenes" : [
+        {
+            "name" : "Scene",
+            "nodes" : [
+                3
+            ]
+        }
+    ],
+    "nodes" : [
+        {
+            "name" : "Bone.001",
+            "rotation" : [
+                -1.4249835383192883e-15,
+                -3.774895418473534e-08,
+                -3.774895418473534e-08,
+                1
+            ],
+            "translation" : [
+                4.551914400963142e-15,
+                1,
+                0
+            ]
+        },
+        {
+            "children" : [
+                0
+            ],
+            "name" : "Bone"
+        },
+        {
+            "mesh" : 0,
+            "name" : "Cube",
+            "skin" : 0
+        },
+        {
+            "children" : [
+                2,
+                1
+            ],
+            "name" : "Armature",
+            "rotation" : [
+                0,
+                0,
+                -0.7071068286895752,
+                0.7071068286895752
+            ],
+            "scale" : [
+                9.099878311157227,
+                9.099878311157227,
+                9.099878311157227
+            ],
+            "translation" : [
+                -8.899611473083496,
+                0,
+                0
+            ]
+        }
+    ],
+    "animations" : [
+        {
+            "channels" : [
+                {
+                    "sampler" : 0,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 1,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 2,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "scale"
+                    }
+                },
+                {
+                    "sampler" : 3,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 4,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 5,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "scale"
+                    }
+                }
+            ],
+            "name" : "ArmatureAction",
+            "samplers" : [
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 8
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 9
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 10
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 11
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 12
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 13
+                }
+            ]
+        },
+        {
+            "channels" : [
+                {
+                    "sampler" : 0,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 1,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 2,
+                    "target" : {
+                        "node" : 1,
+                        "path" : "scale"
+                    }
+                },
+                {
+                    "sampler" : 3,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 4,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "rotation"
+                    }
+                },
+                {
+                    "sampler" : 5,
+                    "target" : {
+                        "node" : 0,
+                        "path" : "scale"
+                    }
+                }
+            ],
+            "name" : "ArmatureAction.001",
+            "samplers" : [
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 14
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 15
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 16
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 17
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 18
+                },
+                {
+                    "input" : 7,
+                    "interpolation" : "LINEAR",
+                    "output" : 19
+                }
+            ]
+        }
+    ],
+    "meshes" : [
+        {
+            "name" : "Cube.001",
+            "primitives" : [
+                {
+                    "attributes" : {
+                        "POSITION" : 0,
+                        "TEXCOORD_0" : 1,
+                        "NORMAL" : 2,
+                        "JOINTS_0" : 3,
+                        "WEIGHTS_0" : 4
+                    },
+                    "indices" : 5
+                }
+            ]
+        }
+    ],
+    "skins" : [
+        {
+            "inverseBindMatrices" : 6,
+            "joints" : [
+                1,
+                0
+            ],
+            "name" : "Armature"
+        }
+    ],
+    "accessors" : [
+        {
+            "bufferView" : 0,
+            "componentType" : 5126,
+            "count" : 32,
+            "max" : [
+                9.201817512512207,
+                1,
+                1
+            ],
+            "min" : [
+                -9.20181941986084,
+                -1,
+                -1
+            ],
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 1,
+            "componentType" : 5126,
+            "count" : 32,
+            "type" : "VEC2"
+        },
+        {
+            "bufferView" : 2,
+            "componentType" : 5126,
+            "count" : 32,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 3,
+            "componentType" : 5121,
+            "count" : 32,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 4,
+            "componentType" : 5126,
+            "count" : 32,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 5,
+            "componentType" : 5123,
+            "count" : 60,
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 6,
+            "componentType" : 5126,
+            "count" : 2,
+            "type" : "MAT4"
+        },
+        {
+            "bufferView" : 7,
+            "componentType" : 5126,
+            "count" : 25,
+            "max" : [
+                1
+            ],
+            "min" : [
+                0
+            ],
+            "type" : "SCALAR"
+        },
+        {
+            "bufferView" : 8,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 9,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 10,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 11,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 12,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 13,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 14,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 15,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 16,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 17,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 18,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC4"
+        },
+        {
+            "bufferView" : 19,
+            "componentType" : 5126,
+            "count" : 25,
+            "type" : "VEC3"
+        }
+    ],
+    "bufferViews" : [
+        {
+            "buffer" : 0,
+            "byteLength" : 384,
+            "byteOffset" : 0,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 256,
+            "byteOffset" : 384,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 384,
+            "byteOffset" : 640,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 128,
+            "byteOffset" : 1024,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 512,
+            "byteOffset" : 1152,
+            "target" : 34962
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 120,
+            "byteOffset" : 1664,
+            "target" : 34963
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 128,
+            "byteOffset" : 1784
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 100,
+            "byteOffset" : 1912
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 2012
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 400,
+            "byteOffset" : 2312
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 2712
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 3012
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 400,
+            "byteOffset" : 3312
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 3712
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 4012
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 400,
+            "byteOffset" : 4312
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 4712
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 5012
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 400,
+            "byteOffset" : 5312
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 300,
+            "byteOffset" : 5712
+        }
+    ],
+    "buffers" : [
+        {
+            "byteLength" : 6012,
+            "uri" : "snake3.bin"
+        }
+    ]
+}
