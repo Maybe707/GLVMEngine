@@ -521,12 +521,16 @@ namespace GLVM::core
 
 		ecs::TextureManager* textureManager = ecs::TextureManager::GetInstance();
 		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
+
+//		unsigned int inverseCounter = 0;
+//		coreShaderProgram->SetMat4("inverseMatrices", 3, inverseMatrices[0]);
 		
-		if ( frameAccumulator >= frames[currentFrame] ) {
+		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
 				currentFrame = 0;
 				frameAccumulator = 0.0f;
+//				inverseCounter = 0;
 			}
 
 			mat4 jointMatricesData[4];
@@ -536,6 +540,8 @@ namespace GLVM::core
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
+//			++inverseCounter;
+//			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		} else {
 			mat4 jointMatricesData[4];
@@ -545,6 +551,7 @@ namespace GLVM::core
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
+//			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		}
 
@@ -568,7 +575,7 @@ namespace GLVM::core
 				cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 				if ( transformComponent != nullptr )
 					modelMatrix = SetModelMatrix(*transformComponent);
-				
+
 				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
 				pGLActive_Texture(GL_TEXTURE28);
 				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
@@ -822,9 +829,6 @@ namespace GLVM::core
         ///< First we link the vertex array object, then we link and set the vertex buffers, and then we configure the vertex attributes.
         
         pGLBind_Vertex_Array(iVao_);
-
-		for ( int i = 0; i < _aVertices.size(); ++i)
-			std::cout << _aVertices[i] << std::endl;
 		
 		pGLBind_Buffer(GL_ARRAY_BUFFER, iVbo_);
         pGLBuffer_Data(GL_ARRAY_BUFFER, sizeof(float) * _aVertices.size(), _aVertices.data(), GL_DYNAMIC_DRAW);
@@ -907,7 +911,7 @@ namespace GLVM::core
 
 			Core::JsonValue* gltf = parser.GetRoot();
 			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
-			std::cout << binary_path << std::endl;
+//			std::cout << binary_path << std::endl;
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
 //			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
@@ -1042,7 +1046,7 @@ namespace GLVM::core
 								scale[i][i] = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
 								scale[i][i] = array[i].value.fNumber;
-						}
+ 						}
 						// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
 						// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
 						// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
@@ -1089,12 +1093,87 @@ namespace GLVM::core
 				
 //				core::vector<mat4> jointMatriciesLocalContainer;
 
+				// for ( unsigned int j = 0; j < inverseBindMatricesData.GetSize(); ++j ) {
+				// 	std::cout << inverseBindMatricesData[j] << std::endl;;
+				// }
+				
+				mat4 inverseBindMatrix(0.0f);
 				for ( unsigned int n = 0; n < joints.value.array->GetSize(); ++n ) {
-					mat4 inverseBindMatrix(0.0f);
 					for ( unsigned int g = 0; g < 4; ++g )
 						for ( unsigned int j = 0; j < 4; ++j )
-							inverseBindMatrix[g][j] = inverseBindMatricesData[g * 4 + j];
+							inverseBindMatrix[g][j] = inverseBindMatricesData[n * 16 + g * 4 + j];
 
+					// mat4 bindShapeMatrix(0.0f);
+					
+					// if ( n == 0 ) {
+					// 	bindShapeMatrix[0][0] = 1.0f;
+					// 	bindShapeMatrix[1][0] = 0.0f;
+					// 	bindShapeMatrix[2][0] = 0.0f;
+					// 	bindShapeMatrix[3][0] = 0.0f;
+					// 	bindShapeMatrix[0][1] = 0.0f;
+					// 	bindShapeMatrix[1][1] = 0.0f;
+					// 	bindShapeMatrix[2][1] = 1.0f;
+					// 	bindShapeMatrix[3][1] = 0.0f;
+					// 	bindShapeMatrix[0][2] = 0.0f;
+					// 	bindShapeMatrix[1][2] = -1.0f;
+					// 	bindShapeMatrix[2][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 1.0f;
+					// }
+
+					// if ( n == 1 ) {
+					// 	bindShapeMatrix[0][0] = 1.0f;
+					// 	bindShapeMatrix[1][0] = 0.0f;
+					// 	bindShapeMatrix[2][0] = 0.0f;
+					// 	bindShapeMatrix[3][0] = 0.0f;
+					// 	bindShapeMatrix[0][1] = 0.0f;
+					// 	bindShapeMatrix[1][1] = 0.0f;
+					// 	bindShapeMatrix[2][1] = 1.0f;
+					// 	bindShapeMatrix[3][1] = -14.25394f;
+					// 	bindShapeMatrix[0][2] = 0.0f;
+					// 	bindShapeMatrix[1][2] = -1.0f;
+					// 	bindShapeMatrix[2][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 1.0f;
+					// }
+
+					// if ( n == 2 ) {
+					// 	bindShapeMatrix[0][0] = 1.0f;
+					// 	bindShapeMatrix[1][0] = 0.0f;
+					// 	bindShapeMatrix[2][0] = 0.0f;
+					// 	bindShapeMatrix[3][0] = 0.0f;
+					// 	bindShapeMatrix[0][1] = 0.0f;
+					// 	bindShapeMatrix[1][1] = 0.0f;
+					// 	bindShapeMatrix[2][1] = 1.0f;
+					// 	bindShapeMatrix[3][1] = -28.48223f;
+					// 	bindShapeMatrix[0][2] = 0.0f;
+					// 	bindShapeMatrix[1][2] = -1.0f;
+					// 	bindShapeMatrix[2][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 0.0f;
+					// 	bindShapeMatrix[3][2] = 1.0f;
+					// }
+
+					// inverseBindMatrix = bindShapeMatrix;
+
+					// if ( n == 1 || n == 2 ) {
+					// 	inverseBindMatrix[3][1] = -inverseBindMatrix[3][1];
+					// }
+
+					// if ( n == 1 || n == 2 ) {
+					// 	inverseBindMatrix[3][1] /= 8;
+					// }
+					
+					// std::cout << "inverse bind matrix: " << std::endl;
+//					std::cout << inverseBindMatrix << std::endl << std::endl;
 					inverseBindMatrixSet.Push(inverseBindMatrix);
 					// mat4 jointMatrix = globalTransformJointNode[n] * inverseBindMatrix;
 					// jointMatriciesLocalContainer.Push(jointMatrix);
@@ -1107,10 +1186,13 @@ namespace GLVM::core
 				unsigned int joints_byte_length = (*gltf)["bufferViews"][joints_buffer_view_index]["byteLength"].value.iNumber;
 				unsigned int joints_byte_offset = (*gltf)["bufferViews"][joints_buffer_view_index]["byteOffset"].value.iNumber;
 
+//				std::cout << "length: " << joints_byte_length << " offset: " << joints_byte_offset << std::endl;
+				
 				for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
 					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
-//				jointsIndices.Print();
+				// jointsIndices.Print();
+				// std::cout << "indices size: " << jointsIndices.GetSize() << std::endl;
 
 				jointIndicesToShader = jointsIndices;
 				
@@ -1325,14 +1407,16 @@ namespace GLVM::core
 				}
 
 				frames = frameInputsTranslation[0];
-
+				core::vector<core::vector<mat4>> jointMatricesAccumulator;        ///< Delete this sheet!
+				
 				for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 					core::vector<float> boneAllFrameTranslations = translations[j];
-					// std::cout << "index: " << j << std::endl;
+//					std::cout << "index: " << j << std::endl;
 					// boneAllFrameTranslations.Print();
 					core::vector<float> boneAllFrameRotations    = rotations[j];
 					core::vector<float> boneAllFrameScales       = scales[j];
 					core::vector<mat4>  globalAllFrameNodeMatrix;
+					core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;    ///< Delete this sheet!
 //					std::cout << "node #: " << j << std::endl;
 					for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); ++i ) {
 						mat4 frameTranslation(1.0f);
@@ -1349,11 +1433,75 @@ namespace GLVM::core
 						frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
 						frameRotationQuaternion.z = boneAllFrameRotations[i * 4 + 2];
 						frameRotationQuaternion.w = boneAllFrameRotations[i * 4 + 3];
-						frameRotation = rotateQuaternion<float, 4>(frameRotationQuaternion);
-//						std::cout << frameRotation << std::endl;
+						// std::cout << "rotation quternion on: " << j << " joint" << std::endl;
+						// std::cout << frameRotationQuaternion << std::endl << std::endl;
 
-						mat4 globalTransformNodeMatrix = frameTranslation * frameScale * frameRotation;
-						globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * inverseBindMatrixSet[j]);
+						frameRotation = rotateQuaternion<float, 4>(frameRotationQuaternion);
+						// std::cout << "frame translation" << j << std::endl;
+						// std::cout << frameTranslation << std::endl;
+
+						mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
+
+						// mat4 inverse = frameTranslation;
+						// inverse[3][1] = -inverse[3][1];
+						// std::cout << "j: " << j << std::endl;
+						// std::cout << inverse << std::endl;
+//						inverseMatrices.Push(inverse);
+						
+						// std::cout << "global transform matrix: " << std::endl;
+						// std::cout << "j: " << j << " i: " << i << std::endl;
+						// std::cout << globalTransformNodeMatrix << std::endl << std::endl;
+
+						// std::cout << "inverse test " << std::endl;
+						// std::cout << inverseBindMatrixSet[j] << std::endl;
+
+						globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
+						globalTransformNodeMatrix = inverseBindMatrixSet[j] * globalTransformNodeMatrix;
+
+						mat4 rootTransform(1.0f);
+						for ( unsigned int b = 0; b < j; ++b ) {
+							// if ( j == 1 ) {
+							// 	inverseBindMatrixSet[0][3][0] = -inverseBindMatrixSet[1][3][1];
+							// 	inverseBindMatrixSet[0][3][1] = 0.0f;
+							// }
+
+//							std::cout << "value: " << inverseBindMatrixSet[j][3][1] << std::endl;
+							
+							// if ( j == 1 ) {
+							// 	std::cout << inverseBindMatrixSet[b] << std::endl;
+							// 	inverseBindMatrixSet[j][3][0] = -inverseBindMatrixSet[j][3][1];
+							// 	inverseBindMatrixSet[j][3][1] = 0.0f;
+							// }
+							
+//							globalTransformNodeMatrix =  inverseBindMatrixSet[b] * globalTransformNodeMatrix;
+							if ( b % 2 == 1 ) {
+								rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+							} else {
+								rootTransform = rootTransform * jointMatricesAccumulator[b][i];
+							}
+							//							globalTransformNodeMatrix =  jointMatricesAccumulator[b][i] * globalTransformNodeMatrix * inverseBindMatrixSet[j];
+						}
+
+//						std::cout << "j: " << j << inverseBindMatrixSet[j] << std::endl;
+						
+						if ( j % 2 == 1 ) {
+							mat4 localInverse(0.0f);
+							localInverse = inverseBindMatrixSet[j];
+//							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
+
+//							std::cout << localInverse << std::endl;
+							
+//							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
+//							coreShaderProgram->SetMat4("inverseMatrix", inverseBindMatrixSet[0]);
+							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
+						} else {
+							mat4 localInverse(0.0f);
+							localInverse = inverseBindMatrixSet[j];
+//							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
+							
+//							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
+							globalAllFrameNodeMatrix.Push(rootTransform * globalTransformNodeMatrix);
+						}
 //						globalTransformJointNode.Push(jointFrameMatrix);
 
 						// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
@@ -1365,6 +1513,7 @@ namespace GLVM::core
 
 					}
 
+					jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
 //				std::cout << jointMatrices.GetSize() << std::endl;
@@ -1464,6 +1613,7 @@ namespace GLVM::core
 			// indices.Print();
 			// std::cout << "size: " << indices.GetSize() << std::endl;
 
+			// vertices_position.Print();
 			// std::cout << "vertex size: " << vertices_position.GetSize() << std::endl;
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();

@@ -38,6 +38,9 @@ uniform bool reverseNormals;
 
 uniform mat4 jointMatrices[4];
 
+//uniform mat4 inverseMatrices[32];
+//uniform mat4 inverseMatrix;
+
 void main()
 {
     // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
@@ -67,6 +70,7 @@ void main()
 		weights.z * jointMatrices[int(jointIndices.z)] +
 		weights.w * jointMatrices[int(jointIndices.w)];
 
+//	vec4 worldPosition = skinMatrix * inverseMatrices[int(jointIndices.x)] * vec4(vertexPosition, 1.0);
 	vec4 worldPosition = skinMatrix * vec4(vertexPosition, 1.0);	
 	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * worldPosition;
 }

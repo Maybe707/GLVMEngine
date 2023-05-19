@@ -126,6 +126,9 @@ namespace GLVM::core {
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrame = 0;
 		core::vector<unsigned int> baseIndices;
+
+//		core::vector<mat4> inverseMatrices;
+		
 //		core::vector<core::vector<Vector<short, 4>>> jointIndicesPerVertex;
 //		core::vector<core::vector<vec4>> weightsPerVertex;
 		std::vector<GLuint> VBOcontainer_;
