@@ -47,6 +47,7 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake6.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake7.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake8.gltf");
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cubeAnimation.gltf");
 	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake9.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cb.gltf");	
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
@@ -99,15 +100,15 @@ int main()
 	// 	.shininess = 128.0f * 0.078125f };
     // TextureManager->BindTexture(plain0, materialPlain0->diffuseTextureID_);
     
-	// Entity uiWitch = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
-	// *ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.5f, 1.0f, 0.5f },
-	// 	.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    // ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 2;
-	// cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
-	// *materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
-    // TextureManager->BindTexture(uiWitch, materialWitch->diffuseTextureID_);
+	Entity uiWitch = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.0f, 0.0f, 0.0f },
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
+    ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 0;
+	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
+	*materialWitch  = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
+    TextureManager->BindTexture(uiWitch, materialWitch->diffuseTextureID_);
 
     // Entity uiWitch2 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
@@ -183,11 +184,11 @@ int main()
 
 	Entity pointLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight1);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 5.3f, 5.5f },
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 0.0f, 5.5f },
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 5.3f, 5.5f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 0;
+	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 0.0f, 5.5f }, .fScale = 0.3f };
+	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 1;
 	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
 	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(pointLight1, materialPointLight1->diffuseTextureID_);

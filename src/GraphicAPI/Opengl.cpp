@@ -524,6 +524,8 @@ namespace GLVM::core
 
 //		unsigned int inverseCounter = 0;
 //		coreShaderProgram->SetMat4("inverseMatrices", 3, inverseMatrices[0]);
+
+		
 		
 		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
 			++currentFrame;
@@ -533,22 +535,41 @@ namespace GLVM::core
 //				inverseCounter = 0;
 			}
 
+			// std::cout << "1 matrix: " << std::endl;
+			// std::cout << jointMatricesAccumulatorShader[0][currentFrame] << std::endl;
+			// std::cout << "2 matrix: " << std::endl;
+			// std::cout << jointMatricesAccumulatorShader[1][currentFrame] << std::endl;
+			coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+			if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+				coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+
+			if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+				coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+
+			
 			mat4 jointMatricesData[4];
-			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			jointMatricesData[0] = jointMatricesPerMesh[1][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[1][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[1][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[1][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			++inverseCounter;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		} else {
+			coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+			if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+				coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+
+			if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+				coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+			
 			mat4 jointMatricesData[4];
-			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			jointMatricesData[0] = jointMatricesPerMesh[1][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[1][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[1][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[1][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
@@ -1440,7 +1461,8 @@ namespace GLVM::core
 						// std::cout << "frame translation" << j << std::endl;
 						// std::cout << frameTranslation << std::endl;
 
-						mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
+//						mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
+						mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
 
 						// mat4 inverse = frameTranslation;
 						// inverse[3][1] = -inverse[3][1];
@@ -1456,7 +1478,7 @@ namespace GLVM::core
 						// std::cout << inverseBindMatrixSet[j] << std::endl;
 
 						globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
-						globalTransformNodeMatrix = inverseBindMatrixSet[j] * globalTransformNodeMatrix;
+//						globalTransformNodeMatrix = inverseBindMatrixSet[j] * globalTransformNodeMatrix;
 
 						mat4 rootTransform(1.0f);
 						for ( unsigned int b = 0; b < j; ++b ) {
@@ -1474,15 +1496,24 @@ namespace GLVM::core
 							// }
 							
 //							globalTransformNodeMatrix =  inverseBindMatrixSet[b] * globalTransformNodeMatrix;
-							if ( b % 2 == 1 ) {
-								rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
-							} else {
-								rootTransform = rootTransform * jointMatricesAccumulator[b][i];
-							}
+							rootTransform = rootTransform * jointMatricesAccumulator[b][i];
+							// if ( b % 2 == 1 ) {
+							// 	rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+							// } else {
+							// 	rootTransform = rootTransform * jointMatricesAccumulator[b][i];
+							// }
 							//							globalTransformNodeMatrix =  jointMatricesAccumulator[b][i] * globalTransformNodeMatrix * inverseBindMatrixSet[j];
 						}
 
 //						std::cout << "j: " << j << inverseBindMatrixSet[j] << std::endl;
+
+						// if ( j == 0 && i == 9 ) {
+						// 	coreShaderProgram->SetMat4("transform0", globalAllFrameNodeMatrixAccumulator[i]);
+						// }
+
+						// if ( j == 1 && i == 9 ) {
+						// 	coreShaderProgram->SetMat4("transform1", globalAllFrameNodeMatrixAccumulator[i]);
+						// }
 						
 						if ( j % 2 == 1 ) {
 							mat4 localInverse(0.0f);
@@ -1492,7 +1523,9 @@ namespace GLVM::core
 //							std::cout << localInverse << std::endl;
 							
 //							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
-//							coreShaderProgram->SetMat4("inverseMatrix", inverseBindMatrixSet[0]);
+							coreShaderProgram->SetMat4("inverseMatrix0", inverseBindMatrixSet[0]);
+							coreShaderProgram->SetMat4("inverseMatrix1", inverseBindMatrixSet[1]);
+							coreShaderProgram->SetMat4("inverseMatrix2", inverseBindMatrixSet[2]);
 							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
 						} else {
 							mat4 localInverse(0.0f);
@@ -1500,7 +1533,7 @@ namespace GLVM::core
 //							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
 							
 //							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
-							globalAllFrameNodeMatrix.Push(rootTransform * globalTransformNodeMatrix);
+							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
 						}
 //						globalTransformJointNode.Push(jointFrameMatrix);
 
@@ -1516,6 +1549,9 @@ namespace GLVM::core
 					jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
+
+				jointMatricesAccumulatorShader = jointMatricesAccumulator;
+				
 //				std::cout << jointMatrices.GetSize() << std::endl;
 				unsigned int maximumJoints     = 4;
 				unsigned int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
