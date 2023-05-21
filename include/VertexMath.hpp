@@ -921,7 +921,7 @@ Matrix<T, var> rotateQuaternion(Quaternion quaternion) {
 	
 	result[3][3] = 1.0f;
 
-	result.SelfTensorTranspose();
+//	result.SelfTensorTranspose();
 
 	return result;
 }

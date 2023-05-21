@@ -527,7 +527,7 @@ namespace GLVM::core
 
 		
 		
-		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
+		if ( frameAccumulator >= frames[currentFrame] ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
 				currentFrame = 0;
@@ -1461,9 +1461,17 @@ namespace GLVM::core
 						// std::cout << "frame translation" << j << std::endl;
 						// std::cout << frameTranslation << std::endl;
 
+//						frameRotation.SelfTensorTranspose();
+						
+						std::cout << "frame rotation" << i << std::endl;
+						std::cout << frameRotation << std::endl;
+
 //						mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
 						mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
 
+						std::cout << "transform" << std::endl;
+						std::cout << globalTransformNodeMatrix << std::endl;
+						
 						// mat4 inverse = frameTranslation;
 						// inverse[3][1] = -inverse[3][1];
 						// std::cout << "j: " << j << std::endl;
