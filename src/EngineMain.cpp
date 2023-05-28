@@ -47,9 +47,12 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake6.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake7.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake8.gltf");
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cubeAnimation.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cubeAnimation.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake9.gltf");
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake_x_inverse_y.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake_x_inverse_y.gltf");
+	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake28.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake9.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/bone_cube.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cb.gltf");	
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
 	
@@ -90,7 +93,7 @@ int main()
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
-    ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 1;
+    ComponentManager->GetComponent<cm::vertex>(uiPlayer)->vkVertexId_ = 0;
 	
 	// Entity plain0 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform, cm::collider>(plain0);
@@ -189,7 +192,7 @@ int main()
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 0.0f, 5.5f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 1;
+	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 0;
 	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
 	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	TextureManager->BindTexture(pointLight1, materialPointLight1->diffuseTextureID_);

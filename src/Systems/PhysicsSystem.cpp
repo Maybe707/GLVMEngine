@@ -25,7 +25,7 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::move,
 																					  cm::transform>();
-		float cameraSpeed = 5.5f * fDelta_Time_;            
+//		float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i)
         {
@@ -44,7 +44,7 @@ namespace GLVM::ecs
 					move->frameMovement = 0;
                     collider->bWall_Collision_ = false;
                 }
-				transformComponent->tPosition += Normalize(move->frameMovement) * cameraSpeed;
+				transformComponent->tPosition += Normalize(move->frameMovement);
 				transformComponent->tPosition += move->gravity;
 //				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;

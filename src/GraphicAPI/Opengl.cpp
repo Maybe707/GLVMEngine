@@ -527,7 +527,7 @@ namespace GLVM::core
 
 		
 		
-		if ( frameAccumulator >= frames[currentFrame] ) {
+		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
 				currentFrame = 0;
@@ -539,37 +539,37 @@ namespace GLVM::core
 			// std::cout << jointMatricesAccumulatorShader[0][currentFrame] << std::endl;
 			// std::cout << "2 matrix: " << std::endl;
 			// std::cout << jointMatricesAccumulatorShader[1][currentFrame] << std::endl;
-			coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-			if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-				coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
 
-			if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-				coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 
 			
 			mat4 jointMatricesData[4];
-			jointMatricesData[0] = jointMatricesPerMesh[1][0][currentFrame];
-			jointMatricesData[1] = jointMatricesPerMesh[1][1][currentFrame];
-			jointMatricesData[2] = jointMatricesPerMesh[1][2][currentFrame];
-			jointMatricesData[3] = jointMatricesPerMesh[1][3][currentFrame];
+			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			++inverseCounter;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
 			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
 		} else {
-			coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-			if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-				coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
 
-			if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-				coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 			
 			mat4 jointMatricesData[4];
-			jointMatricesData[0] = jointMatricesPerMesh[1][0][currentFrame];
-			jointMatricesData[1] = jointMatricesPerMesh[1][1][currentFrame];
-			jointMatricesData[2] = jointMatricesPerMesh[1][2][currentFrame];
-			jointMatricesData[3] = jointMatricesPerMesh[1][3][currentFrame];
+			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
@@ -1461,16 +1461,19 @@ namespace GLVM::core
 						// std::cout << "frame translation" << j << std::endl;
 						// std::cout << frameTranslation << std::endl;
 
-//						frameRotation.SelfTensorTranspose();
+						frameRotation.SelfTensorTranspose();
 						
-						std::cout << "frame rotation" << i << std::endl;
-						std::cout << frameRotation << std::endl;
+						// std::cout << "frame rotation" << i << std::endl;
+						// std::cout << frameRotation << std::endl;
 
+						// if ( i == 9 )
+						// 	std::cout << frameRotation << std::endl;
+						
 //						mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
 						mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
 
-						std::cout << "transform" << std::endl;
-						std::cout << globalTransformNodeMatrix << std::endl;
+						// std::cout << "transform" << std::endl;
+						// std::cout << globalTransformNodeMatrix << std::endl;
 						
 						// mat4 inverse = frameTranslation;
 						// inverse[3][1] = -inverse[3][1];
@@ -1504,7 +1507,9 @@ namespace GLVM::core
 							// }
 							
 //							globalTransformNodeMatrix =  inverseBindMatrixSet[b] * globalTransformNodeMatrix;
-							rootTransform = rootTransform * jointMatricesAccumulator[b][i];
+							
+							rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+							
 							// if ( b % 2 == 1 ) {
 							// 	rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
 							// } else {
@@ -1522,29 +1527,43 @@ namespace GLVM::core
 						// if ( j == 1 && i == 9 ) {
 						// 	coreShaderProgram->SetMat4("transform1", globalAllFrameNodeMatrixAccumulator[i]);
 						// }
-						
-						if ( j % 2 == 1 ) {
-							mat4 localInverse(0.0f);
-							localInverse = inverseBindMatrixSet[j];
-//							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
 
-//							std::cout << localInverse << std::endl;
-							
-//							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
-							coreShaderProgram->SetMat4("inverseMatrix0", inverseBindMatrixSet[0]);
-							coreShaderProgram->SetMat4("inverseMatrix1", inverseBindMatrixSet[1]);
-							coreShaderProgram->SetMat4("inverseMatrix2", inverseBindMatrixSet[2]);
-							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
-						} else {
-							mat4 localInverse(0.0f);
-							localInverse = inverseBindMatrixSet[j];
-//							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
-							
-//							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
-							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
+						mat4 transformTest(0.0f);
+						transformTest[0][0] = 0.0f;
+						transformTest[0][1] = -1.0f;
+						transformTest[1][0] = 1.0f;
+						transformTest[2][2] = 1.0f;
+						transformTest[3][3] = 1.0f;
+
+//						transformTest.SelfTensorTranspose();
+
+						if ( j == 1 && i == 9 ) {
+//							std::cout << frameRotation << std::endl;
+							coreShaderProgram->SetMat4("transform0", frameRotation);
 						}
-//						globalTransformJointNode.Push(jointFrameMatrix);
+						
+// 						if ( j % 2 == 1 ) {
+// 							mat4 localInverse(0.0f);
+// 							localInverse = inverseBindMatrixSet[j];
+// //							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
 
+// //							std::cout << localInverse << std::endl;
+							
+// //							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
+// 							coreShaderProgram->SetMat4("inverseMatrix0", inverseBindMatrixSet[0]);
+// 							coreShaderProgram->SetMat4("inverseMatrix1", inverseBindMatrixSet[1]);
+// 							coreShaderProgram->SetMat4("inverseMatrix2", inverseBindMatrixSet[2]);
+// 							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
+// 						} else {
+// 							mat4 localInverse(0.0f);
+// 							localInverse = inverseBindMatrixSet[j];
+// //							localInverse[3][0] = inverseBindMatrixSet[j][3][1];
+							
+// //							globalTransformNodeMatrix = localInverse * globalTransformNodeMatrix;
+// 							globalAllFrameNodeMatrix.Push(globalTransformNodeMatrix * rootTransform);
+// 						}
+//						globalTransformJointNode.Push(jointFrameMatrix);
+						globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
 						// scale[0][0] = (*node.value.object)["scale"][0].value.fNumber;
 						// scale[1][1] = (*node.value.object)["scale"][1].value.fNumber;
 						// scale[2][2] = (*node.value.object)["scale"][2].value.fNumber;
@@ -1794,7 +1813,7 @@ namespace GLVM::core
 		// pitchQuat = multiplyQuaternion(multiplyQuaternion(pitchQuat, Quaternion{ .w = 0.0f, .x = 1.0f,
 		// 				.y = 0.0f, .z = 0.0f }), inverseQuaternion(pitchQuat));
 
-		result = multiplyQuaternion(yawQuat, pitchQuat);
+		result = multiplyQuaternion(pitchQuat, yawQuat);
 		// mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
 		// mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
 
@@ -1968,7 +1987,7 @@ namespace GLVM::core
 		// std::cout << "Count: " << projectionCount << std::endl;
 		// ++projectionCount;
 
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 1000.0f);
 
  		// for ( int i = 0; i < 4; ++i )
 		// 	for ( int j = 0; j < 4; ++j )
