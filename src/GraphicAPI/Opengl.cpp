@@ -547,16 +547,17 @@ namespace GLVM::core
 			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 
 			
-			mat4 jointMatricesData[4];
+			mat4 jointMatricesData[5];
 			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
 			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
 			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			++inverseCounter;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
-			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
+			coreShaderProgram->SetMat4("jointMatrices", 5, jointMatricesData[0]);
 		} else {
 			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
 			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
@@ -565,15 +566,16 @@ namespace GLVM::core
 			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
 			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 			
-			mat4 jointMatricesData[4];
+			mat4 jointMatricesData[5];
 			jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
 			jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
 			jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
 			jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+			jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
 			// for ( int i = 0; i < 4; ++i )
 			// 	std::cout << jointMatricesData[i] << std::endl;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
-			coreShaderProgram->SetMat4("jointMatrices", 4, jointMatricesData[0]);
+			coreShaderProgram->SetMat4("jointMatrices", 5, jointMatricesData[0]);
 		}
 
 		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
@@ -1579,11 +1581,11 @@ namespace GLVM::core
 
 				jointMatricesAccumulatorShader = jointMatricesAccumulator;
 				
-//				std::cout << jointMatrices.GetSize() << std::endl;
-				unsigned int maximumJoints     = 4;
-				unsigned int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
+// //				std::cout << jointMatrices.GetSize() << std::endl;
+				int maximumJoints     = 4;
+				int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
-				if ( unitMatricesSize ) {
+				if ( unitMatricesSize > 0 ) {
 					for ( unsigned int i = 0; i < unitMatricesSize; ++i) {
 						core::vector<mat4>  globalAllFrameNodeMatrix;
 						for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
