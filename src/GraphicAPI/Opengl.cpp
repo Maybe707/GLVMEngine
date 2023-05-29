@@ -549,7 +549,7 @@ namespace GLVM::core
 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
 			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-			for ( int i = 0; i < joinMatricesDataSize; ++i )
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
 				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
 
 			
@@ -577,7 +577,7 @@ namespace GLVM::core
 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
 			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-			for ( int i = 0; i < joinMatricesDataSize; ++i )
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
 				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
 			
 			// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
@@ -1599,9 +1599,9 @@ namespace GLVM::core
 // //				std::cout << jointMatrices.GetSize() << std::endl;
 				int maximumJoints     = 4;
 				int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
-
+				
 				if ( unitMatricesSize > 0 ) {
-					for ( unsigned int i = 0; i < unitMatricesSize; ++i) {
+					for ( int i = 0; i < unitMatricesSize; ++i) {
 						core::vector<mat4>  globalAllFrameNodeMatrix;
 						for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
 							mat4 unitMatrix(1.0f);
