@@ -80,5 +80,5 @@ void main()
 //	vec4 worldPosition = transform0 * transform1 * transform2 * vec4(vertexPosition, 1.0);
 	vec4 worldPosition = skinMatrix * vec4(vertexPosition, 1.0);
 //	vec4 worldPosition = transform0 * vec4(vertexPosition, 1.0);
-	gl_Position   = projectionMatrix * viewMatrix * worldPosition;
+	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * worldPosition;
 }

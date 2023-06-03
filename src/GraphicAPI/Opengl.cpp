@@ -1979,7 +1979,7 @@ namespace GLVM::core
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
-//		std::cout << beholder.forward << std::endl;
+		std::cout << beholder.forward << std::endl;
 		
 		// std::cout << "Opengl" << std::endl;
 		// std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
