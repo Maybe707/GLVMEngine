@@ -1804,8 +1804,8 @@ namespace GLVM::core
 
 		float sinPitch = std::sin(Radians(-transformComponent_.pitch / 2));
 		float cosPitch = std::cos(Radians(-transformComponent_.pitch / 2));
-		float sinYaw = std::sin(Radians(-(transformComponent_.yaw + 90.0f)  / 2));
-		float cosYaw = std::cos(Radians(-(transformComponent_.yaw + 90.0f)  / 2));
+		float sinYaw = std::sin(Radians(-(transformComponent_.yaw)  / 2));
+		float cosYaw = std::cos(Radians(-(transformComponent_.yaw)  / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;
@@ -1846,13 +1846,13 @@ namespace GLVM::core
 
 //		std::cout << rotationMatrix << std::endl;
 		
-        modelMatrix = scalingMatrix * translationMatrix;
+        modelMatrix = scalingMatrix * rotationMatrix * translationMatrix;
 
 		// rotationMatrix[0][0] = 30.0f;
 		// rotationMatrix[1][1] = 30.0f;
 		// rotationMatrix[2][2] = 30.0f;
 		
-		return rotationMatrix * modelMatrix;
+		return modelMatrix;
 	}
 
     void COpenglRenderer::SetViewMatrix(mat4 _viewMatrix) {
