@@ -98,6 +98,9 @@ namespace GLVM::core
         }
     }
 
+	void CVulkanRenderer::LoadGLTF() {
+	}
+
 	void CVulkanRenderer::EnlargeFrameAccumulator([[maybe_unused]] float value) {
 	}
 	
@@ -1399,7 +1402,7 @@ namespace GLVM::core
         
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
-        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
+        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue; n = n + 2) {
 
 			/// TODO: add for loop for inner entitiesownsthistypeoftexture.
             cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];

@@ -38,9 +38,9 @@ namespace GLVM::ecs
     void TextureManager::SetTextureVector(std::vector<Texture> _textureVector) {
         textureVector_ = _textureVector;
 
-		for ( unsigned int i = 0; i < textureVector_.size(); ++i ) {
-			LoadTextureData(textureVector_[i]);
-		}
+		// for ( unsigned int i = 0; i < textureVector_.size(); ++i ) {
+		// 	LoadTextureData(textureVector_[i]);
+		// }
     }
 
  	void TextureManager::LoadTextureData(GLVM::ecs::Texture& _Texture)

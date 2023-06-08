@@ -28,7 +28,7 @@ int main()
 	ecs::TextureManager  * TextureManager    = ecs::TextureManager::GetInstance();
 	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
-//	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
+	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
 //	MeshManager->SetMesh("../waveFrontObj/sphere.obj");
 	// MeshManager->SetMesh("../waveFrontObj/cone.obj");
 	// MeshManager->SetMesh("../waveFrontObj/monkey.obj");
@@ -56,7 +56,7 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cb.gltf");	
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
 	
-	core::Engine* GLVM = core::Engine::GetInstance();		
+//	core::Engine* GLVM = core::Engine::GetInstance();		
 	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
 		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
 	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
@@ -238,7 +238,7 @@ int main()
 //	spotLightComponent0.direction    =  TransformPlayer.tForward;
 //	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
 
-
+	core::Engine* GLVM = core::Engine::GetInstance();		
 	
     ///< Game rendering loop
 	GLVM->GameLoop();

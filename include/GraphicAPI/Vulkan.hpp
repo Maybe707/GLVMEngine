@@ -275,6 +275,7 @@ namespace GLVM::core
         void recreateSwapChain();
         void draw() override;
         void loadWavefrontObj() override;
+		void LoadGLTF() override;
 		void EnlargeFrameAccumulator(float value) override;
         void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) override;
