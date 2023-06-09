@@ -22,6 +22,7 @@
 #include "TextureManager.hpp"
 #include "ComponentManager.hpp"
 #include "WavefrontObjParser.hpp"
+#include "Globals.hpp"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -251,6 +252,8 @@ namespace GLVM::core
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
+		float fYaw   = -90.0f;
+        float fPitch = 0.0f;
 
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
@@ -281,6 +284,8 @@ namespace GLVM::core
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) override;
         void SetViewMatrix(mat4 _viewMatrix) override;
         void SetProjectionMatrix(mat4 _projectionMatrix) override;
+		void SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent);
+		void SetProjectionMatrix();
         void run() override;
     
     private:
