@@ -173,6 +173,7 @@ namespace GLVM::core {
 		void EnlargeFrameAccumulator(float value) override;
 		void SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) override;
+		void LoadTextureData(GLVM::ecs::Texture& texture);
 		void run() override;
 		mat4 SetModelMatrix(ecs::components::transform& transformComponent_);
 		void SetViewMatrix(mat4 _viewMatrix) override;

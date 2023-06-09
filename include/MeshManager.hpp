@@ -2,7 +2,8 @@
 #define MESH_MANAGER
 
 #include <vector>
-#include "GraphicAPI/Vulkan.hpp"
+#include <mutex>
+#include "Vector.hpp"
 #include "Components/VertexComponent.hpp"
 
 typedef unsigned int Mesh_ID;

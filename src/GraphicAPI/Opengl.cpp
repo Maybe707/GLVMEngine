@@ -26,7 +26,6 @@
 #include "Components/ViewComponent.hpp"
 #include <GL/gl.h>
 #include <GL/glext.h>
-#include <X11/Xlib.h>
 #include <cmath>
 #include "Globals.hpp"
 #include "WavefrontObjParser.hpp"
@@ -1877,24 +1876,45 @@ namespace GLVM::core
 		for (unsigned int i = 0; i < pathsGLTF_.GetSize(); ++i)
 			pathsGLTF.Push(pathsGLTF_[i]);
 	}
-    
+
+ 	void COpenglRenderer::LoadTextureData(GLVM::ecs::Texture& texture)
+	{
+		///< Loading and creating texture.
+		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &texture.iTexture_);
+		glBindTexture(GL_TEXTURE_2D, texture.iTexture_);
+
+		///< Loading image, creating texture and generation mipmap-levels
+		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, texture.iWidth_, texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, texture.u_iData_);
+		pGLGenerate_Mipmap(GL_TEXTURE_2D);
+
+		///< Setting applying parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		
+		// glEnable(GL_BLEND);
+		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	
     void COpenglRenderer::run() {
+		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
+        GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
+
+		for ( unsigned int i = 0; i < textureManager->GetTextureVector().size(); ++i ) {
+			LoadTextureData(textureManager->GetTextureVector()[i]);
+		}
+
+		for ( unsigned int j = 0; j < hudTextureManager->GetTextureVector().size(); ++j ) {
+			LoadTextureData(hudTextureManager->GetTextureVector()[j]);
+		}
 //		loadWavefrontObj();
 		LoadGLTF();
 	}
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
     {
-		// static int viewCount = 0;
-		// std::cout << "Count: " << viewCount << std::endl;
-		// ++viewCount;
-		
         Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
-		// std::cout << "x offset: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
-		// std::cout << "y offset: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
-		
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         pitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
@@ -1908,14 +1928,6 @@ namespace GLVM::core
         if(pitch < -89.0f)
             pitch = -89.0f;
 
-		// std::cout << "Pitch in radians: " << Radians(pitch) << std::endl;
-		// std::cout << "Yaw in radians: " << Radians(fYaw) << std::endl;
-		
-		// std::cout << "cos yaw: " << std::cos(Radians(fYaw)) << std::endl;
-		// std::cout << "sin yaw: " << std::sin(Radians(fYaw)) << std::endl;
-		// std::cout << "cos pitch: " << std::cos(Radians(pitch)) << std::endl;
-		// std::cout << "sin pitch: " << std::sin(Radians(pitch)) << std::endl;
-		
 		vec3 forward;
 		float sinPitch = std::sin(Radians(pitch / 2));
 		float cosPitch = std::cos(Radians(pitch / 2));
@@ -1933,47 +1945,13 @@ namespace GLVM::core
 		yawQuat.x = 0.0f;
 		yawQuat.y = sinYaw;
 		yawQuat.z = 0.0f;
-		/// We have dot product here to compute projection to axes
-        // forward[0] = std::cos(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to x axis
-		// forward[1] = std::sin(Radians(pitch));                              ///< Projection to y axis
-        // forward[2] = std::sin(Radians(fYaw)) * std::cos(Radians(pitch));    ///< Projection to z axis
-
-		// quaternion1 = MultiplyQuaternion(Quaternion{ .real = std::cos(Radians(pitch)), .imaginary = vec3{ 1.0f, 0.0f, 0.0f } * std::sin(Radians(pitch)) },
-		// 								Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 0.0f, -1.0f}) });
-		// quaternion2 = MultiplyQuaternion(Quaternion{ .real = -std::cos(Radians(fYaw)), .imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(fYaw)) },
-		// 								 Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ -1.0f, 0.0f, 0.0f })});
 		
 		Quaternion result;
-//		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
-//		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
 		result = multiplyQuaternion(yawQuat, pitchQuat);
 
 		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
 					.y = 0.0f, .z = -1.0f }), inverseQuaternion(result));
 
-//		std::cout << "x: " << result.x << " y: " << result.y << " z: " << result.z << std::endl;
-		
-		// result = multiplyQuaternion(pitchQuat, Quaternion{ .w = 0.0f, .x = 0.0f, .y = 0.0f, .z = 1.0f });
-		// result = multiplyQuaternion(result, yawQuat);
-
-		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 1.0f,
-		// 			.y = 0.0f, .z = 0.0f }), inverseQuaternion(result));
-
-		
-		// quaternion1.real = std::cos(Radians(pitch));
-		// quaternion1.imaginary = Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0f }) * std::sin(Radians(pitch));
-		// quaternion2.real = std::cos(Radians(-fYaw));
-		// quaternion2.imaginary = vec3{ 0.0f, 1.0f, 0.0f } * std::sin(Radians(-fYaw));
-
-		// quaternion1.real = std::cos(Radians(pitch));
-		// quaternion1.imaginary = vec3{ std::sin(pitch), 0.0f, 0.0f };
-		// quaternion2.real = std::cos(Radians(fYaw));
-		// quaternion2.imaginary = vec3{ 0.0f, std::sin(fYaw), 0.0f };
-		
-		// quaternion3 = MultiplyQuaternion(quaternion1, quaternion2);
-		// quaternion3 = MultiplyQuaternion(quaternion3, Quaternion{ .real = 0.0f, .imaginary = Normalize(vec3{ 0.0f, 1.0f, 0.0f })});
-//		quaternion3 = MultiplyQuaternion(quaternion3, quaternion1);
-//		forward = quaternion3.imaginary;
 		forward[0] = result.x;
 		forward[1] = result.y;
 		forward[2] = result.z;
@@ -1981,35 +1959,15 @@ namespace GLVM::core
 
 		std::cout << beholder.forward << std::endl;
 		
-		// std::cout << "Opengl" << std::endl;
-		// std::cout << "x: " << beholder.forward[0] << " y: " << beholder.forward[1] << " z: " << beholder.forward[2] << std::endl;
-		
         viewMatrix = LookAtMain(player.tPosition,
 								player.tPosition + beholder.forward,
 								beholder.up);
 
- 		// _view_Component.Position[0] = _Player.tPosition[0];
-		// _view_Component.Position[1] = _Player.tPosition[1];
-		// _view_Component.Position[2] = _Player.tPosition[2];
-
-		// for ( int i = 0; i < 4; ++i )
-		// 	for ( int j = 0; j < 4; ++j )
-		// 			std::cout <<  "View: " << viewMatrix[i][j] << std::endl;
-		
 		shaderProgram->SetMat4("viewMatrix", viewMatrix);
     }
 
 	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
-		// static int projectionCount = 0;
-		// std::cout << "Count: " << projectionCount << std::endl;
-		// ++projectionCount;
-
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 1000.0f);
-
- 		// for ( int i = 0; i < 4; ++i )
-		// 	for ( int j = 0; j < 4; ++j )
-		// 			std::cout <<  "Projection: " << tProjection_Matrix[i][j] << std::endl;
-		
 		shaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
 	}
 }
