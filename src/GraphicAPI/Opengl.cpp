@@ -73,6 +73,7 @@ namespace GLVM::core
 //		InitializeFlatShadowMap();
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	}
 	
 	COpenglRenderer::~COpenglRenderer()
@@ -1898,6 +1899,7 @@ namespace GLVM::core
     void COpenglRenderer::run() {
 		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
         GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
+		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
 		for ( unsigned int i = 0; i < textureManager->GetTextureVector().size(); ++i ) {
 			LoadTextureData(textureManager->GetTextureVector()[i]);
@@ -1906,6 +1908,10 @@ namespace GLVM::core
 		for ( unsigned int j = 0; j < hudTextureManager->GetTextureVector().size(); ++j ) {
 			LoadTextureData(hudTextureManager->GetTextureVector()[j]);
 		}
+
+		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+		SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+		
 //		loadWavefrontObj();
 		LoadGLTF();
 	}

@@ -17,6 +17,7 @@
 #include "ISystem.hpp"
 #include "Texture.hpp"
 #include "TextureManager.hpp"
+#include "UnixApi/WindowXOpengl.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
@@ -28,11 +29,11 @@
 #include <fstream>
 
 #ifdef __linux__
-#include "UnixApi/WindowX.hpp"
+#include "UnixApi/WindowXOpengl.hpp"
 #endif
 
 #ifdef _WIN32
-#include "WinApi/WindowWin.hpp"
+#include "WinApi/WindowWinOpengl.hpp"
 #endif
 
 /*! \class Renderer.
@@ -45,11 +46,11 @@ namespace GLVM::core {
 	class COpenglRenderer : public IRenderer {
 	public:
 #ifdef __linux__
-		CWindowX Window;
+		WindowXOpengl Window;
 #endif
 
 #ifdef _WIN32
-		CWindowWin Window;
+		WindowWinOpengl Window;
 #endif
 
 //		unsigned int appropriateLightComponentIndex = 0;

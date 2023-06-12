@@ -1,5 +1,5 @@
-#ifndef VULKAN_RENDERER
-#define VULKAN_RENDERER
+#ifndef VULKAN_RENDERER_HG
+#define VULKAN_RENDERER_HG
 
 #include <iostream>
 #include <fstream>
@@ -22,6 +22,7 @@
 #include "TextureManager.hpp"
 #include "ComponentManager.hpp"
 #include "WavefrontObjParser.hpp"
+#include "MeshManager.hpp"
 #include "Globals.hpp"
 
 #ifdef __linux__
@@ -37,13 +38,13 @@
 #include <X11/Xlib.h>
 #include "vulkan/vulkan_xlib.h"
 #include "vulkan/vulkan_core.h"
-#include "UnixApi/WindowX.hpp"
+#include "UnixApi/WindowXVulkan.hpp"
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 #include "../../../Vulkan-Headers/include/vulkan/vulkan.h"
 #include "../../../Vulkan-Headers/include/vulkan/vulkan_core.h"
-#include "WinApi/WindowWin.hpp"
+#include "WinApi/WindowWinVulkan.hpp"
 //#include "WinApi/winVk.hpp"
 #endif
 
@@ -264,14 +265,14 @@ namespace GLVM::core
         unsigned int texturePool_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        GLVM::core::CWindowX Window;
+        GLVM::core::WindowXVulkan Window;
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        GLVM::core::CWindowWin Window;
+        GLVM::core::WindowWinVulkan Window;
 #endif
         
-        CVulkanRenderer(std::vector<ecs::Texture> _texture_data, std::vector<ecs::Texture> _initializeHUDTextureData);
+        CVulkanRenderer();
         ~CVulkanRenderer() override;
 
         void createTextureImage();

@@ -29,7 +29,13 @@ namespace GLVM::core
         }
     }
 
-    CVulkanRenderer::CVulkanRenderer(std::vector<ecs::Texture> _initializeTextureData, std::vector<ecs::Texture> _initializeHUDTextureData) {
+    CVulkanRenderer::CVulkanRenderer() {
+		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
+        GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
+		
+		std::vector<ecs::Texture> _initializeTextureData = textureManager->GetTextureVector();
+		std::vector<ecs::Texture> _initializeHUDTextureData = hudTextureManager->GetTextureVector();
+		
         texturePool_ = 10;
         unsigned int mainTexturesQuantity = _initializeTextureData.size() * texturePool_;
         unsigned int hudTexturesQuantity = _initializeHUDTextureData.size();
@@ -261,6 +267,13 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::run() {
+		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
+        GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
+        GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
+
+		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+		SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+		
         initWindow();
         initVulkan();
 //        mainLoop();

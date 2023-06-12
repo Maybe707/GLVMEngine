@@ -13,17 +13,10 @@
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
 #include "Systems/RenderSystem.hpp"
+#include <X11/Xlib.h>
 #include <limits>
 #include <mutex>
 #include <thread>
-
-#ifdef OPENGL_API
-#define RENDERER_TYPE_PTR COpenglRenderer*
-#endif
-
-#ifdef VULKAN_API
-#define RENDERER_TYPE_PTR CVulkanRenderer*
-#endif
 
 /*******************************************************************
  * Legends never die...
@@ -56,7 +49,7 @@ namespace GLVM::core
 		//   Render_System_Interface_ = new ecs::CRenderSystem();
 		// TODO: Remove render system interface and make both renderers to be a systems that user can
 		// handle and using those methods for setting up texture and mesh data.
-		renderSystemInterface    = new ecs::CRenderSystem();
+//		renderSystemInterface    = new ecs::CRenderSystem();
 		chrono                   = Time::CTimerCreator().Create();
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
 
@@ -81,9 +74,8 @@ namespace GLVM::core
 		return pInstance_;
     }
 
-    void Engine::GameLoop() {
+    void Engine::GameLoop(RendererType renderer) {
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
-		bool bGame_Loop_Active = true;
 
 		///< Call of ActivateSystem function must be in this order.
 
@@ -93,12 +85,31 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		//		pSystem_Manager->ActivateSystem(Animation_System);
 //		pSystem_Manager->ActivateSystem(cameraSystem);
-		pSystem_Manager->ActivateSystem(renderSystemInterface);
+//		pSystem_Manager->ActivateSystem(renderSystemInterface);
 //		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();
 
+		if ( renderer == OPENGL_RENDERER ) {
+			RenderOpengl();
+			return;
+		} else if ( renderer == VULKAN_RENDERER ) {
+			RenderVulkan();
+			return;
+		}
+    }
+
+	void Engine::RenderOpengl() {
+		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
+		bool bGame_Loop_Active = true;
+
+		openglRenderer = new COpenglRenderer();
+		XEvent uXEvent;
+		while (XPending(openglRenderer->Window.GetDisplay())) {
+			XNextEvent(openglRenderer->Window.GetDisplay(), &uXEvent);
+		}
+		openglRenderer->run();
 		
 		while(bGame_Loop_Active)
 		{
@@ -108,9 +119,9 @@ namespace GLVM::core
 //			std::cout << "gravity: " << gravity << std::endl;
 //			FPScounter();
 			
-			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.ClearDisplay();
+			openglRenderer->Window.ClearDisplay();
              
-			while((dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.HandleEvent(g_eEvent))
+			while(openglRenderer->Window.HandleEvent(g_eEvent))
 			{
 				//                std::cout << g_eEvent.GetEvent() << std::endl;
 				Input_Stack_.ControlInput(g_eEvent);
@@ -121,8 +132,7 @@ namespace GLVM::core
 
 			//            Input_Stack_.PrintStack();
             
-			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->
-				Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
+			openglRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,
 								  &g_eEvent.mousePointerPosition.offset_Y);
@@ -138,16 +148,85 @@ namespace GLVM::core
 			physicsSystem->gravity                    = gravity;
 			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
 			// cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
-			cameraSystem->Render_System_                = renderSystemInterface;
-			renderSystemInterface->GetRenderSystemInstance()->EnlargeFrameAccumulator(deltaFrameTime);
+//			cameraSystem->Render_System_                = renderSystemInterface;
+			openglRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 //			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();
-			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.SwapBuffers();
+			openglRenderer->draw();
+			openglRenderer->Window.SwapBuffers();
 			//            g_Sound_Engine.SoundStream();
 		}
-    }
 
+		openglRenderer->Window.Close();
+		delete openglRenderer;
+		openglRenderer = nullptr;
+	}
+	
+	void Engine::RenderVulkan() {
+		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
+		bool bGame_Loop_Active = true;
+
+		vulkanRenderer = new CVulkanRenderer();
+		XEvent uXEvent;
+		while (XPending(vulkanRenderer->Window.GetDisplay())) {
+			XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
+		}
+
+		vulkanRenderer->run();
+		
+		while(bGame_Loop_Active)
+		{
+			deltaFrameTime = chrono->GetElapsed();
+			chrono->Reset();
+		    gravity += deltaFrameTime;
+//			std::cout << "gravity: " << gravity << std::endl;
+//			FPScounter();
+			
+			vulkanRenderer->Window.ClearDisplay();
+             
+			while(vulkanRenderer->Window.HandleEvent(g_eEvent))
+			{
+				//                std::cout << g_eEvent.GetEvent() << std::endl;
+				Input_Stack_.ControlInput(g_eEvent);
+				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
+					bGame_Loop_Active = false;
+			}
+			g_eEvent.SetLastEvent(Input_Stack_);
+
+			//            Input_Stack_.PrintStack();
+            
+			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
+								  g_eEvent.mousePointerPosition.position_Y,
+								  &g_eEvent.mousePointerPosition.offset_X,
+								  &g_eEvent.mousePointerPosition.offset_Y);
+
+			movementSystem->deltaFrameTime            = deltaFrameTime;
+			movementSystem->gravity                   = gravity;
+			collisionSystem->fDelta_Time_             = deltaFrameTime;
+			collisionSystem->gravity                  = gravity;
+			projectileSystem->deltaFrameTime          = deltaFrameTime;
+			projectileSystem->soundEngine             = soundEngine;
+			physicsSystem->fDelta_Time_               = deltaFrameTime;
+			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
+			physicsSystem->gravity                    = gravity;
+			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
+			// cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
+//			cameraSystem->Render_System_                = renderSystemInterface;
+			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
+//			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
+			pSystem_Manager->Update();
+//			Input_Stack_.Clear();
+			vulkanRenderer->draw();
+			vulkanRenderer->Window.SwapBuffers();
+			//            g_Sound_Engine.SoundStream();
+		}
+
+		vulkanRenderer->Window.Close();
+		delete vulkanRenderer;
+		vulkanRenderer = nullptr;
+	}
+	
 	void Engine::FPScounter() {
 		++fpsCounter;
 		fpsAccumulator += deltaFrameTime;
@@ -160,7 +239,6 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
-		(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->Window.Close();
 		delete chrono;
 		chrono = nullptr;
     }

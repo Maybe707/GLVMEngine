@@ -2,6 +2,8 @@
 #define ENGINE
 
 #include "ComponentsFullSet.hpp"
+#include "GraphicAPI/Opengl.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 #include "SystemsFullSet.hpp"
 #include "GLPointer.h"
 #include "IChrono.hpp"
@@ -27,6 +29,11 @@ using Entity = unsigned int;
 
 namespace GLVM::core
 {
+	enum RendererType {
+		OPENGL_RENDERER,
+		VULKAN_RENDERER
+	};
+	
 	class Engine
 	{
         static Engine*    pInstance_;
@@ -38,7 +45,9 @@ namespace GLVM::core
 		float              deltaFrameTime;
 		float              gravity;
 		CStack             Input_Stack_;
-        ecs::CRenderSystem * renderSystemInterface;
+		CVulkanRenderer*   vulkanRenderer;
+		COpenglRenderer*   openglRenderer;
+//        ecs::CRenderSystem * renderSystemInterface;
         
         ecs::CCollisionSystem  * collisionSystem;
 		ecs::CMovementSystem   * movementSystem;
@@ -62,7 +71,9 @@ namespace GLVM::core
         void operator=(const Engine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
         static Engine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
-		void GameLoop();
+		void GameLoop(RendererType renderer);
+		void RenderOpengl();
+		void RenderVulkan();
 		void FPScounter();
 		void GameKill();
 //        void PlaybackSound(core::CSoundEngine& _sound_Engine);

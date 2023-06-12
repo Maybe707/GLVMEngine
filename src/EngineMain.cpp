@@ -241,7 +241,8 @@ int main()
 	core::Engine* GLVM = core::Engine::GetInstance();		
 	
     ///< Game rendering loop
-	GLVM->GameLoop();
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 	GLVM->GameKill();
 
     return 0;
