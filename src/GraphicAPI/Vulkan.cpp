@@ -271,8 +271,8 @@ namespace GLVM::core
         GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
         GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
-		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		
         initWindow();
         initVulkan();

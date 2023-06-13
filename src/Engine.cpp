@@ -62,19 +62,7 @@ namespace GLVM::core
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
-    }
-	
-    Engine::~Engine() {}
-            
-    Engine* Engine::GetInstance() {
-		std::lock_guard<std::mutex> lock(Mutex_);
-		if(pInstance_ == nullptr) {
-			pInstance_ = new Engine();
-		}
-		return pInstance_;
-    }
 
-    void Engine::GameLoop(RendererType renderer) {
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
@@ -90,7 +78,19 @@ namespace GLVM::core
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();
+    }
+	
+    Engine::~Engine() {}
+            
+    Engine* Engine::GetInstance() {
+		std::lock_guard<std::mutex> lock(Mutex_);
+		if(pInstance_ == nullptr) {
+			pInstance_ = new Engine();
+		}
+		return pInstance_;
+    }
 
+    void Engine::GameLoop(RendererType renderer) {
 		if ( renderer == OPENGL_RENDERER ) {
 			RenderOpengl();
 			return;
@@ -105,11 +105,11 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		openglRenderer = new COpenglRenderer();
+		openglRenderer->run();
 		XEvent uXEvent;
 		while (XPending(openglRenderer->Window.GetDisplay())) {
 			XNextEvent(openglRenderer->Window.GetDisplay(), &uXEvent);
 		}
-		openglRenderer->run();
 		
 		while(bGame_Loop_Active)
 		{
@@ -168,13 +168,12 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		vulkanRenderer = new CVulkanRenderer();
+		vulkanRenderer->run();
 		XEvent uXEvent;
 		while (XPending(vulkanRenderer->Window.GetDisplay())) {
 			XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
 		}
 
-		vulkanRenderer->run();
-		
 		while(bGame_Loop_Active)
 		{
 			deltaFrameTime = chrono->GetElapsed();
@@ -223,8 +222,8 @@ namespace GLVM::core
 		}
 
 		vulkanRenderer->Window.Close();
-		delete vulkanRenderer;
-		vulkanRenderer = nullptr;
+		// delete vulkanRenderer;
+		// vulkanRenderer = nullptr;
 	}
 	
 	void Engine::FPScounter() {
@@ -239,6 +238,8 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
+		// delete soundEngine;
+		// soundEngine = nullptr;
 		delete chrono;
 		chrono = nullptr;
     }
