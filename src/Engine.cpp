@@ -12,8 +12,6 @@
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
-#include "Systems/RenderSystem.hpp"
-#include <X11/Xlib.h>
 #include <limits>
 #include <mutex>
 #include <thread>
@@ -100,16 +98,31 @@ namespace GLVM::core
 		}
     }
 
+	void Engine::EventQueueFlush() {
+	}
+	
 	void Engine::RenderOpengl() {
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 		bool bGame_Loop_Active = true;
 
 		openglRenderer = new COpenglRenderer();
 		openglRenderer->run();
+
+#ifdef __linux__
 		XEvent uXEvent;
 		while (XPending(openglRenderer->Window.GetDisplay())) {
 			XNextEvent(openglRenderer->Window.GetDisplay(), &uXEvent);
 		}
+#endif
+
+#ifdef _WIN32
+		MSG msg;
+
+		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+				TranslateMessage( &msg );
+				DispatchMessage( &msg );
+		}
+#endif
 		
 		while(bGame_Loop_Active)
 		{
@@ -159,8 +172,8 @@ namespace GLVM::core
 		}
 
 		openglRenderer->Window.Close();
-		delete openglRenderer;
-		openglRenderer = nullptr;
+		// delete openglRenderer;
+		// openglRenderer = nullptr;
 	}
 	
 	void Engine::RenderVulkan() {
@@ -169,11 +182,28 @@ namespace GLVM::core
 
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->run();
+
+#ifdef __linux__
 		XEvent uXEvent;
 		while (XPending(vulkanRenderer->Window.GetDisplay())) {
 			XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
 		}
+#endif
 
+#ifdef _WIN32
+		MSG msg;
+
+		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+				TranslateMessage( &msg );
+				DispatchMessage( &msg );
+		}
+
+		// while(GetMessageA(&msg, vulkanRenderer->Window.GetModernWindowHWND(), WM_KEYFIRST, WM_KEYLAST)) {
+		// 		// TranslateMessage( &msg );
+		// 		// DispatchMessage( &msg );
+		// }
+#endif
+		
 		while(bGame_Loop_Active)
 		{
 			deltaFrameTime = chrono->GetElapsed();

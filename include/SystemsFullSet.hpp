@@ -4,7 +4,6 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
-#include "Systems/RenderSystem.hpp"
 #include "Systems/GUISystem.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/MovementSystem.hpp"

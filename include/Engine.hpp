@@ -12,7 +12,6 @@
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
 #include "Event.hpp"
-#include "WindowCreator.hpp"
 #include "TimerCreator.hpp"
 #include "Vector.hpp"
 #include "EntityManager.hpp"
@@ -72,6 +71,7 @@ namespace GLVM::core
         static Engine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
 		void GameLoop(RendererType renderer);
+		void EventQueueFlush();
 		void RenderOpengl();
 		void RenderVulkan();
 		void FPScounter();

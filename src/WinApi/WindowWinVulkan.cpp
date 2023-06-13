@@ -103,7 +103,7 @@ namespace GLVM::core
     }
 //}    
 ///< Callback method for events handling.
-    LRESULT CALLBACK CWindowWin::MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam)
+    LRESULT CALLBACK WindowWinVulkan::MainWndProc(HWND _pHwnd, UINT _pMsg, WPARAM _pWParam, LPARAM _pLParam)
     {
 		CEvent* pEvent = (CEvent*)GetWindowLongPtrW(_pHwnd, GWLP_USERDATA);
 

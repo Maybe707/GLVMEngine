@@ -11,7 +11,7 @@
 
 namespace GLVM::core
 {
-    WindowWinOpengl::CWindowWin()
+    WindowWinOpengl::WindowWinOpengl()
     {
         ///< Create classic window
         pClassic_Window_ = CreateWindowA( "STATIC", "", WS_POPUP | WS_DISABLED, 0, 0, 1, 1, NULL, NULL, GetModuleHandle( NULL ), NULL );

@@ -17,7 +17,6 @@
 #include "ISystem.hpp"
 #include "Texture.hpp"
 #include "TextureManager.hpp"
-#include "UnixApi/WindowXOpengl.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
