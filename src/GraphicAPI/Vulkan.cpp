@@ -95,18 +95,23 @@ namespace GLVM::core
             aIndices_.emplace_back();
             aVertices_.emplace_back();
             
-            unsigned int vertexIndex = 0;
+            unsigned int vertexIndex  = 0;
             unsigned int textureIndex = 0;
+			unsigned int normalIndex  = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
 
             for (unsigned int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
-                    vertexIndex = wavefrontObjParser->getFaces()[i][0][j] - 1;
+                    vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
 					aIndices_[m].push_back(i * 3 + j);
-                    SVertex vertex = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
-                    textureIndex = wavefrontObjParser->getFaces()[i][1][j] - 1;
+                    SVertex vertex  = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                    textureIndex    = wavefrontObjParser->getFaces()[i][1][j] - 1;
                     SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
-                    aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]}, {0.0f, 0.0f, 0.0f}, {texture[0], texture[1]}});
+					normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
+					SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
+                    aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
+											 {normal[0], normal[1], normal[2]},
+											 {texture[0], texture[1]}});
                 }
 			
             vertexBufferContainer.emplace_back();
@@ -307,10 +312,8 @@ namespace GLVM::core
 // }
 
     void CVulkanRenderer::initVulkan() {
-
         createInstance();
         setupDebugMessenger();
-
         createSurface();
         pickPhysicalDevice();
         createLogicalDevice();
