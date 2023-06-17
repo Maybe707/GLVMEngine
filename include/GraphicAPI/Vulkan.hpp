@@ -141,6 +141,18 @@ namespace GLVM::core
         alignas(16) mat4 proj;
     };
 
+    struct UniformBufferObjectLight {
+		int valueLight;
+    };
+
+	struct Unit {
+		int value;
+	};
+	
+    struct UniformBufferObject2 {
+		float value;
+    };
+	
     class CVertexObject
     {
     public:
@@ -356,6 +368,12 @@ namespace GLVM::core
         std::vector<VkBuffer> uniformBuffers;
         std::vector<VkDeviceMemory> uniformBuffersMemory;
 
+        std::vector<VkBuffer> uniformBuffers2;
+        std::vector<VkDeviceMemory> uniformBuffersMemory2;
+		
+        std::vector<VkBuffer> uniformBuffersLight;
+        std::vector<VkDeviceMemory> uniformBuffersMemoryLight;
+		
         VkDescriptorPool descriptorPool;
         std::vector<VkDescriptorSet> descriptorSets;
 
