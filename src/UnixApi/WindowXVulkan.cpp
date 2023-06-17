@@ -65,9 +65,6 @@ namespace GLVM::core
         // if(_x_position > 1920 || _x_position < 0 || _y_position > 1080 || _y_position < 0)
         //     return;
 
-		std::cout << "x2: " << *_x_offset << std::endl;
-		std::cout << "y2: " << *_y_offset << std::endl;
-		
         int iOffset_X = 0, iOffset_Y = 0;
         iOffset_X = _x_position - 960;
         iOffset_Y = _y_position - 540;

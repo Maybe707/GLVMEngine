@@ -52,7 +52,6 @@ namespace GLVM::core
             initializeTextureData_[n] = _initializeHUDTextureData[hud_counter];
             ++hud_counter;
         }
-//        std::cout << "size: " << mainTexturesQuantity + hudTexturesQuantity << std::endl;
         textureImages.resize(mainTexturesQuantity + hudTexturesQuantity);
         textureImageMemories.resize(mainTexturesQuantity + hudTexturesQuantity);
 
@@ -71,8 +70,6 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			// std::cout << "i: " << i << std::endl;
-			// std::cout << "size: " << linkedEntitiesVectorSize << std::endl;
 			Entity currentEntity                = linkedEntities[i];
 			cm::beholder* beholderComponent     = componentManager->GetComponent<cm::beholder>(currentEntity);
 			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
@@ -185,8 +182,6 @@ namespace GLVM::core
 		forward[2] = result.z;
         cameraComponent.forward = Normalize(forward);
 
-		std::cout << cameraComponent.forward << std::endl;
-		
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
@@ -222,7 +217,6 @@ namespace GLVM::core
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
             memcpy(data, pixels, static_cast<size_t>(imageSize));
             vkUnmapMemory(device, stagingBufferMemory);
-//            std::cout << "i: " << i << std::endl;
             createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
 
             transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
@@ -500,7 +494,6 @@ namespace GLVM::core
             if (isDeviceSuitable(device)) {
 				// VkPhysicalDeviceProperties properties;
 				// vkGetPhysicalDeviceProperties(device, &properties);
-				// std::cout << properties.deviceName << std::endl;
                 physicalDevice = device;
                 break;
             }
@@ -1385,33 +1378,33 @@ namespace GLVM::core
             }
         }
 
-        // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
 
-        // VkViewport viewportHUD{};
-        // viewportHUD.x = 0.0f;
-        // viewportHUD.y = 0.0f;
-        // viewportHUD.width = (float) swapChainExtent.width;
-        // viewportHUD.height = (float) swapChainExtent.height;
-        // viewportHUD.minDepth = 0.0f;
-        // viewportHUD.maxDepth = 1.0f;
-        // vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
+        VkViewport viewportHUD{};
+        viewportHUD.x = 0.0f;
+        viewportHUD.y = 0.0f;
+        viewportHUD.width = (float) swapChainExtent.width;
+        viewportHUD.height = (float) swapChainExtent.height;
+        viewportHUD.minDepth = 0.0f;
+        viewportHUD.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
 
-        // VkRect2D scissorHUD{};
-        // scissorHUD.offset = {0, 0};
-        // scissorHUD.extent = swapChainExtent;
-        // vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
+        VkRect2D scissorHUD{};
+        scissorHUD.offset = {0, 0};
+        scissorHUD.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
 
-        // VkBuffer vertexBuffersHUD[] = {hudVertexBuffer};
-        // VkDeviceSize offsetsHUD[] = {0};
-        // vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
+        VkBuffer vertexBuffersHUD[] = {hudVertexBuffer};
+        VkDeviceSize offsetsHUD[] = {0};
+        vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
 
-        // vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
+        vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
-        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
-        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
-        //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
-        // }
+        unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
+        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
+            vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
+            vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
+        }
         
         vkCmdEndRenderPass(commandBuffer);
 
@@ -1569,7 +1562,7 @@ namespace GLVM::core
         
         unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
         unsigned int hudCounter = 0;
-        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue; n = n + 2) {
+        for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); n = n + 2) {
 
 			/// TODO: add for loop for inner entitiesownsthistypeoftexture.
             cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
