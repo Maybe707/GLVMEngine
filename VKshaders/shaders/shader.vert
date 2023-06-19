@@ -11,18 +11,15 @@ layout(binding = 3) uniform UniformBufferObject2 {
 } ubo2;
 
 layout(location = 0) in vec3 inPosition;
-layout(location = 1) in vec3 inColor;
-layout(location = 2) in vec2 inTexCoord;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) in vec2 inTextureCoordinate;
 
-layout(location = 0) out vec3 fragColor;
-layout(location = 1) out vec2 fragTexCoord;
-layout(location = 2) out VS_OUT {
-	float value;
-} vs_out;
+layout(location = 0) out vec3 outFragmentPosition;
+layout(location = 1) out vec3 outFragmentNormal;
+layout(location = 2) out vec2 outFragmentTextureCoordinate;
 
 void main() {
-	vs_out.value = ubo2.value;
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition * ubo2.value, 1.0);
-    fragColor = inColor;
-    fragTexCoord = inTexCoord;
+    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    outFragmentNormal = inNormal;
+    outFragmentTextureCoordinate = inTextureCoordinate;
 }
