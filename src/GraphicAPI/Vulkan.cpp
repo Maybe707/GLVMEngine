@@ -1446,56 +1446,6 @@ namespace GLVM::core
         ubo.model[2][3] = _transformComponent.tPosition[2];
         ubo.model.SelfTensorTranspose();
 
-// 		for ( int i = 0; i < 4; ++i )
-// 			for ( int j = 0; j < 4; ++j ) {
-// //				if ( i == j ) {
-// 					std::cout <<  "View: " << viewMatrix[i][j] << std::endl;
-// 				// 	viewMatrix[i][j] = 1.0f;
-// 				// 	projectionMatrix[i][j] = 1.0f;
-// 				// } else {
-// 				// 	viewMatrix[i][j] = 0.0f;
-// 				// 	projectionMatrix[i][j] = 0.0f;
-// //				}
-// 			}
-// 		std::cout << "View end: " << std::endl;
-// 		for ( int i = 0; i < 4; ++i )
-// 			for ( int j = 0; j < 4; ++j )
-// 				std::cout <<  "Projection: " << projectionMatrix[i][j] << std::endl;
-
-// Projection: 0.5625
-// Projection: 0
-// Projection: 0
-// Projection: 0
-// Projection: 0
-// Projection: 1
-// Projection: 0
-// Projection: 0
-// Projection: 0
-// Projection: 0
-// Projection: -1.001
-// Projection: -1
-// Projection: 0
-// Projection: 0
-// Projection: -0.1001
-// Projection: 0
-
-// View: -0.985408
-// View: 0.129042
-// View: -0.110993
-// View: 0
-// View: 0
-// View: 0.652098
-// View: 0.758134
-// View: 0
-// View: 0.17021
-// View: 0.747072
-// View: -0.642583
-// View: 0
-// View: 2.89061
-// View: -6.0809
-// View: -3.99674
-// View: 1
-		
         ubo.view = viewMatrix;
         ubo.proj = projectionMatrix;
 
