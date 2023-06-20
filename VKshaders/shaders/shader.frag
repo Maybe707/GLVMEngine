@@ -24,12 +24,11 @@ layout(location = 2) in vec2 inFragmentTextureCoordinate;
 
 layout(location = 0) out vec4 outColor;
 
-layout(binding = 1) uniform sampler2D texSampler;
-layout(binding = 2) uniform ViewPositionUBO {
+layout(binding = 1) uniform ViewPositionUBO {
 	vec3 viewPosition;
 };
 
-layout(binding = 3) uniform MaterialUBO {
+layout(binding = 2) uniform MaterialUBO {
     vec3      ambient;
     float     shininess;
 } material; 
@@ -74,21 +73,22 @@ struct SpotLight {
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
 
-layout(binding = 4) uniform DirectionalLightsUBO {
+layout(binding = 3) uniform DirectionalLightsUBO {
 	DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 	int directionalLightsArraySize;
 } directionalLights;
 
-layout(binding = 5) uniform PointLightsUBO {
+layout(binding = 4) uniform PointLightsUBO {
 	PointLight pointLights[POINT_LIGHTS_NUMBER];
 	int pointLightsArraySize;
 } pointLights;
 
-layout(binding = 6) uniform SpotLightsUBO {
+layout(binding = 5) uniform SpotLightsUBO {
 	SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 } spotLights;
 
+layout(binding = 6) uniform sampler2D texSampler;
 layout(binding = 7) uniform	sampler2D diffuse;
 layout(binding = 8) uniform	sampler2D specular;
 

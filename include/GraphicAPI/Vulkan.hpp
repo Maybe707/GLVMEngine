@@ -135,20 +135,85 @@ namespace GLVM::core
         }
     };
 
-    struct UniformBufferObject {
+	enum UBOtypes {
+		MODEL_MATRIX_UBO,
+		VIEW_POSITION_UBO,
+		MATERIAL_UBO,
+		DIRECTIONAL_LIGHTS_UBO,
+		POINT_LIGHTS_UBO,
+		SPOT_LIGHTS_UBO
+	};
+	
+    struct ModelMatrixUBO {
         alignas(16) mat4 model;
         alignas(16) mat4 view;
         alignas(16) mat4 proj;
     };
 
-    struct UniformBufferObjectLight {
-		int valueLight;
+	struct DirectionalLight {
+		vec3 position;
+		vec3 direction;
+  
+		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+	};
+
+	struct PointLight {
+		vec3 position;
+
+		vec3 ambient;
+		vec3 diffuse;
+		vec3 specular;
+
+		float constant;
+		float linear;
+		float quadratic;
+	};
+
+	struct SpotLight {
+		vec3  position;
+		vec3  direction;
+		float cutOff;
+		float outerCutOff;
+
+		vec3  ambient;
+		vec3  diffuse;
+		vec3  specular;
+
+		float constant;
+		float linear;
+		float quadratic;
+	};
+	
+    struct ViewPositionUBO {
+		alignas(16) vec3 viewPosition;
     };
 
-    struct UniformBufferObject2 {
-		float value;
+    struct MaterialUBO {
+		alignas(16) vec3  ambient;
+		alignas(16) float shininess;
     };
+
+#define DIRECTIONAL_LIGHTS_NUMBER                          4
+#define POINT_LIGHTS_NUMBER                                32
+#define SPOT_LIGHTS_NUMBER                                 8
 	
+	struct DirectionalLightsUBO {
+		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
+		int directionalLightsArraySize;
+	};
+
+	struct PointLightsUBO {
+		PointLight pointLights[POINT_LIGHTS_NUMBER];
+		int pointLightsArraySize;
+	};
+
+	struct SpotLightsUBO {
+		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
+		int spotLightArraySize;
+	};
+
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 //         {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
@@ -350,14 +415,18 @@ namespace GLVM::core
         VkBuffer hudIndexBuffer;
         VkDeviceMemory hudIndexBufferMemory;
 
-        std::vector<VkBuffer> uniformBuffers;
-        std::vector<VkDeviceMemory> uniformBuffersMemory;
-
-        std::vector<VkBuffer> uniformBuffers2;
-        std::vector<VkDeviceMemory> uniformBuffersMemory2;
-		
-        std::vector<VkBuffer> uniformBuffersLight;
-        std::vector<VkDeviceMemory> uniformBuffersMemoryLight;
+        std::vector<VkBuffer> modelMatrixUniformBuffers;
+        std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
+        std::vector<VkBuffer> viewPositionUniformBuffers;
+        std::vector<VkDeviceMemory> viewPositionUniformBuffersMemory;
+        std::vector<VkBuffer> materialUniformBuffers;
+        std::vector<VkDeviceMemory> materialUniformBuffersMemory;
+        std::vector<VkBuffer> directionalLightsUniformBuffers;
+        std::vector<VkDeviceMemory> directionalLightsUniformBuffersMemory;
+		std::vector<VkBuffer> pointLightsUniformBuffers;
+        std::vector<VkDeviceMemory> pointLightsUniformBuffersMemory;
+		std::vector<VkBuffer> spotLightsUniformBuffers;
+        std::vector<VkDeviceMemory> spotLightsUniformBuffersMemory;
 		
         VkDescriptorPool descriptorPool;
         std::vector<VkDescriptorSet> descriptorSets;

@@ -360,8 +360,18 @@ namespace GLVM::core
         vkDestroyRenderPass(device, renderPass, nullptr);
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-            vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+            vkDestroyBuffer(device, modelMatrixUniformBuffers[i], nullptr);
+            vkFreeMemory(device, modelMatrixUniformBuffersMemory[i], nullptr);
+			vkDestroyBuffer(device, viewPositionUniformBuffers[i], nullptr);
+            vkFreeMemory(device, viewPositionUniformBuffersMemory[i], nullptr);
+			vkDestroyBuffer(device, materialUniformBuffers[i], nullptr);
+            vkFreeMemory(device, materialUniformBuffersMemory[i], nullptr);
+			vkDestroyBuffer(device, directionalLightsUniformBuffers[i], nullptr);
+            vkFreeMemory(device, directionalLightsUniformBuffersMemory[i], nullptr);
+			vkDestroyBuffer(device, pointLightsUniformBuffers[i], nullptr);
+            vkFreeMemory(device, pointLightsUniformBuffersMemory[i], nullptr);
+			vkDestroyBuffer(device, spotLightsUniformBuffers[i], nullptr);
+            vkFreeMemory(device, spotLightsUniformBuffersMemory[i], nullptr);
         }
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -667,37 +677,73 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout) {
-        VkDescriptorSetLayoutBinding uboLayoutBinding{};
-		VkDescriptorSetLayoutBinding uboLayoutBinding2{};
-		VkDescriptorSetLayoutBinding uboLayoutBindingLight{};
-		
-        uboLayoutBinding.binding = 0;
-        uboLayoutBinding.descriptorCount = 1;
-        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding.pImmutableSamplers = nullptr;
-        uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-		
-        uboLayoutBindingLight.binding = 2;
-        uboLayoutBindingLight.descriptorCount = 1;
-        uboLayoutBindingLight.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBindingLight.pImmutableSamplers = nullptr;
-        uboLayoutBindingLight.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+        VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
+		VkDescriptorSetLayoutBinding viewPositionUboLayout{};
+		VkDescriptorSetLayoutBinding materialUboLayout{};
+		VkDescriptorSetLayoutBinding directionalLightsUboLayout{};
+		VkDescriptorSetLayoutBinding pointLightsUboLayout{};
+		VkDescriptorSetLayoutBinding spotLightsUboLayout{};
 
-        uboLayoutBinding2.binding = 3;
-        uboLayoutBinding2.descriptorCount = 1;
-        uboLayoutBinding2.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        uboLayoutBinding2.pImmutableSamplers = nullptr;
-        uboLayoutBinding2.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+        modelMatrixUboLayout.binding = 0;
+        modelMatrixUboLayout.descriptorCount = 1;
+        modelMatrixUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        modelMatrixUboLayout.pImmutableSamplers = nullptr;
+        modelMatrixUboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		
+        viewPositionUboLayout.binding = 1;
+        viewPositionUboLayout.descriptorCount = 1;
+        viewPositionUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        viewPositionUboLayout.pImmutableSamplers = nullptr;
+        viewPositionUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        materialUboLayout.binding = 2;
+        materialUboLayout.descriptorCount = 1;
+        materialUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        materialUboLayout.pImmutableSamplers = nullptr;
+        materialUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        directionalLightsUboLayout.binding = 3;
+        directionalLightsUboLayout.descriptorCount = 1;
+        directionalLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        directionalLightsUboLayout.pImmutableSamplers = nullptr;
+        directionalLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		pointLightsUboLayout.binding = 4;
+        pointLightsUboLayout.descriptorCount = 1;
+        pointLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        pointLightsUboLayout.pImmutableSamplers = nullptr;
+        pointLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		spotLightsUboLayout.binding = 5;
+        spotLightsUboLayout.descriptorCount = 1;
+        spotLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        spotLightsUboLayout.pImmutableSamplers = nullptr;
+        spotLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 		
         VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-        samplerLayoutBinding.binding = 1;
+        samplerLayoutBinding.binding = 6;
         samplerLayoutBinding.descriptorCount = 1;
         samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         samplerLayoutBinding.pImmutableSamplers = nullptr;
         samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-        std::array<VkDescriptorSetLayoutBinding, 4> bindings = {uboLayoutBinding, samplerLayoutBinding,
-			uboLayoutBindingLight, uboLayoutBinding2};
+        VkDescriptorSetLayoutBinding diffuseSamplerLayoutBinding{};
+        diffuseSamplerLayoutBinding.binding = 7;
+        diffuseSamplerLayoutBinding.descriptorCount = 1;
+        diffuseSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
+        diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+        VkDescriptorSetLayoutBinding specularSamplerLayoutBinding{};
+        specularSamplerLayoutBinding.binding = 8;
+        specularSamplerLayoutBinding.descriptorCount = 1;
+        specularSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        specularSamplerLayoutBinding.pImmutableSamplers = nullptr;
+        specularSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+		
+        std::array<VkDescriptorSetLayoutBinding, 9> bindings = {modelMatrixUboLayout, viewPositionUboLayout,
+			materialUboLayout, directionalLightsUboLayout, pointLightsUboLayout, spotLightsUboLayout,
+			samplerLayoutBinding, diffuseSamplerLayoutBinding, specularSamplerLayoutBinding};
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -1103,36 +1149,61 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createUniformBuffers() {
-        VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-		VkDeviceSize bufferSizeLight = sizeof(UniformBufferObjectLight);
-		VkDeviceSize bufferSize2 = sizeof(UniformBufferObject2);
+        VkDeviceSize modelMatrixBufferSize = sizeof(ModelMatrixUBO);
+		VkDeviceSize viewPositionBufferSize = sizeof(ViewPositionUBO);
+		VkDeviceSize materialBufferSize = sizeof(MaterialUBO);
+        VkDeviceSize directionalLightsBufferSize = sizeof(DirectionalLightsUBO);
+		VkDeviceSize pointLightsBufferSize = sizeof(PointLightsUBO);
+		VkDeviceSize spotLightsBufferSize = sizeof(SpotLightsUBO);
+		
+        modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
-        uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        viewPositionUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        viewPositionUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
-        uniformBuffersLight.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        uniformBuffersMemoryLight.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        materialUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        materialUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
-        uniformBuffers2.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        uniformBuffersMemory2.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+
+        pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        pointLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+
+        spotLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        spotLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); i++) {
-            createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-			createBuffer(bufferSizeLight, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffersLight[i], uniformBuffersMemoryLight[i]);
-			createBuffer(bufferSize2, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers2[i], uniformBuffersMemory2[i]);
+            createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+			createBuffer(viewPositionBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, viewPositionUniformBuffers[i], viewPositionUniformBuffersMemory[i]);
+			createBuffer(materialBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialUniformBuffers[i], materialUniformBuffersMemory[i]);
+			createBuffer(directionalLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, directionalLightsUniformBuffers[i], directionalLightsUniformBuffersMemory[i]);
+			createBuffer(pointLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, pointLightsUniformBuffers[i], pointLightsUniformBuffersMemory[i]);
+			createBuffer(spotLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, spotLightsUniformBuffers[i], spotLightsUniformBuffersMemory[i]);
         }
     }
 
     void CVulkanRenderer::createDescriptorPool() {
-        std::array<VkDescriptorPoolSize, 4> poolSizes{};
+        std::array<VkDescriptorPoolSize, 9> poolSizes{};
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[2].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[3].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[4].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSizes[4].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[5].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        poolSizes[5].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[6].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[6].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[7].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[7].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[8].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[8].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -1160,21 +1231,36 @@ namespace GLVM::core
         
         int textureImageViewsIndex = 0;
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
-            VkDescriptorBufferInfo bufferInfo{};
-            bufferInfo.buffer = uniformBuffers[i];
-            bufferInfo.offset = 0;
-            bufferInfo.range = sizeof(UniformBufferObject);
+            VkDescriptorBufferInfo modelMatrixBufferInfo{};
+            modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
+            modelMatrixBufferInfo.offset = 0;
+            modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
-            VkDescriptorBufferInfo bufferInfo2{};
-            bufferInfo2.buffer = uniformBuffers2[i];
-            bufferInfo2.offset = 0;
-            bufferInfo2.range = sizeof(UniformBufferObject2);
+            VkDescriptorBufferInfo viewPositionBufferInfo{};
+            viewPositionBufferInfo.buffer = viewPositionUniformBuffers[i];
+            viewPositionBufferInfo.offset = 0;
+            viewPositionBufferInfo.range = sizeof(ViewPositionUBO);
 			
-            VkDescriptorBufferInfo bufferInfoLight{};
-            bufferInfoLight.buffer = uniformBuffersLight[i];
-            bufferInfoLight.offset = 0;
-            bufferInfoLight.range = sizeof(UniformBufferObjectLight);
+            VkDescriptorBufferInfo materialBufferInfo{};
+            materialBufferInfo.buffer = materialUniformBuffers[i];
+            materialBufferInfo.offset = 0;
+            materialBufferInfo.range = sizeof(MaterialUBO);
 
+            VkDescriptorBufferInfo directionalLightsBufferInfo{};
+            directionalLightsBufferInfo.buffer = directionalLightsUniformBuffers[i];
+            directionalLightsBufferInfo.offset = 0;
+            directionalLightsBufferInfo.range = sizeof(DirectionalLightsUBO);
+			
+            VkDescriptorBufferInfo pointLightsBufferInfo{};
+            pointLightsBufferInfo.buffer = pointLightsUniformBuffers[i];
+            pointLightsBufferInfo.offset = 0;
+            pointLightsBufferInfo.range = sizeof(PointLightsUBO);
+			
+            VkDescriptorBufferInfo spotLightsBufferInfo{};
+            spotLightsBufferInfo.buffer = spotLightsUniformBuffers[i];
+            spotLightsBufferInfo.offset = 0;
+            spotLightsBufferInfo.range = sizeof(SpotLightsUBO);
+			
 			/*! textureImageViewsindex variable dont change value on every odd
 			    iteration because we have only half of texture intances, but
 				need another half part for second frame.
@@ -1188,8 +1274,18 @@ namespace GLVM::core
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             imageInfo.imageView = textureImageViews[textureImageViewsIndex];
             imageInfo.sampler = textureSamplers[textureImageViewsIndex];
+
+            VkDescriptorImageInfo diffuseImageInfo{};
+            diffuseImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            diffuseImageInfo.imageView = textureImageViews[textureImageViewsIndex];
+            diffuseImageInfo.sampler = textureSamplers[textureImageViewsIndex];
+
+            VkDescriptorImageInfo specularImageInfo{};
+            specularImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            specularImageInfo.imageView = textureImageViews[textureImageViewsIndex];
+            specularImageInfo.sampler = textureSamplers[textureImageViewsIndex];
 			
-            std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 9> descriptorWrites{};
 			
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[0].dstSet = descriptorSets[i];
@@ -1197,15 +1293,15 @@ namespace GLVM::core
             descriptorWrites[0].dstArrayElement = 0;
             descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrites[0].descriptorCount = 1;
-            descriptorWrites[0].pBufferInfo = &bufferInfo;
-			
+            descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
             descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[1].dstSet = descriptorSets[i];
             descriptorWrites[1].dstBinding = 1;
             descriptorWrites[1].dstArrayElement = 0;
-            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrites[1].descriptorCount = 1;
-            descriptorWrites[1].pImageInfo = &imageInfo;
+            descriptorWrites[1].pBufferInfo = &viewPositionBufferInfo;
 
             descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[2].dstSet = descriptorSets[i];
@@ -1213,7 +1309,7 @@ namespace GLVM::core
             descriptorWrites[2].dstArrayElement = 0;
             descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrites[2].descriptorCount = 1;
-            descriptorWrites[2].pBufferInfo = &bufferInfoLight;
+            descriptorWrites[2].pBufferInfo = &materialBufferInfo;
 
             descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[3].dstSet = descriptorSets[i];
@@ -1221,7 +1317,48 @@ namespace GLVM::core
             descriptorWrites[3].dstArrayElement = 0;
             descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrites[3].descriptorCount = 1;
-            descriptorWrites[3].pBufferInfo = &bufferInfo2;
+            descriptorWrites[3].pBufferInfo = &directionalLightsBufferInfo;
+
+            descriptorWrites[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[4].dstSet = descriptorSets[i];
+            descriptorWrites[4].dstBinding = 4;
+            descriptorWrites[4].dstArrayElement = 0;
+            descriptorWrites[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[4].descriptorCount = 1;
+            descriptorWrites[4].pBufferInfo = &pointLightsBufferInfo;
+
+            descriptorWrites[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[5].dstSet = descriptorSets[i];
+            descriptorWrites[5].dstBinding = 5;
+            descriptorWrites[5].dstArrayElement = 0;
+            descriptorWrites[5].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrites[5].descriptorCount = 1;
+            descriptorWrites[5].pBufferInfo = &spotLightsBufferInfo;
+			
+			descriptorWrites[6].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[6].dstSet = descriptorSets[i];
+            descriptorWrites[6].dstBinding = 6;
+            descriptorWrites[6].dstArrayElement = 0;
+            descriptorWrites[6].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[6].descriptorCount = 1;
+            descriptorWrites[6].pImageInfo = &imageInfo;
+
+			descriptorWrites[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[7].dstSet = descriptorSets[i];
+            descriptorWrites[7].dstBinding = 7;
+            descriptorWrites[7].dstArrayElement = 0;
+            descriptorWrites[7].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[7].descriptorCount = 1;
+            descriptorWrites[7].pImageInfo = &imageInfo;
+
+			descriptorWrites[8].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[8].dstSet = descriptorSets[i];
+            descriptorWrites[8].dstBinding = 8;
+            descriptorWrites[8].dstArrayElement = 0;
+            descriptorWrites[8].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[8].descriptorCount = 1;
+            descriptorWrites[8].pImageInfo = &imageInfo;
+
 			
             vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
@@ -1423,14 +1560,14 @@ namespace GLVM::core
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-
+		
         VkSemaphoreCreateInfo semaphoreInfo{};
         semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-
+		
         VkFenceCreateInfo fenceInfo{};
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
+		
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
                 vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
@@ -1441,19 +1578,24 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent) {
-        UniformBufferObject ubo{};
+        ModelMatrixUBO modelMatrixUBO{};
+		ViewPositionUBO viewPositionUBO{};
+		MaterialUBO materialUBO{};
+		DirectionalLightsUBO directionalLightsUBO{};
+		PointLightsUBO pointLightsUBO{};
+		SpotLightsUBO spotLightsUBO{};
 
-        ubo.model[0][0] = _transformComponent.fScale;
-        ubo.model[1][1] = _transformComponent.fScale;
-        ubo.model[2][2] = _transformComponent.fScale;
-        ubo.model[3][3] = 1.0;
-        ubo.model[0][3] = _transformComponent.tPosition[0];
-        ubo.model[1][3] = _transformComponent.tPosition[1];
-        ubo.model[2][3] = _transformComponent.tPosition[2];
-        ubo.model.SelfTensorTranspose();
+        modelMatrixUBO.model[0][0] = _transformComponent.fScale;
+        modelMatrixUBO.model[1][1] = _transformComponent.fScale;
+        modelMatrixUBO.model[2][2] = _transformComponent.fScale;
+        modelMatrixUBO.model[3][3] = 1.0;
+        modelMatrixUBO.model[0][3] = _transformComponent.tPosition[0];
+        modelMatrixUBO.model[1][3] = _transformComponent.tPosition[1];
+        modelMatrixUBO.model[2][3] = _transformComponent.tPosition[2];
+        modelMatrixUBO.model.SelfTensorTranspose();
 
-        ubo.view = viewMatrix;
-        ubo.proj = projectionMatrix;
+        modelMatrixUBO.view = viewMatrix;
+        modelMatrixUBO.proj = projectionMatrix;
 
         // if (_transformComponent.hud) {
         //     ubo.view.SelfIdentity();
@@ -1461,32 +1603,53 @@ namespace GLVM::core
         // }
 
         if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_) {
-            ubo.view.SelfIdentity();
-            ubo.proj.SelfIdentity();
+            modelMatrixUBO.view.SelfIdentity();
+            modelMatrixUBO.proj.SelfIdentity();
         }
         
-        ubo.proj[1][1] *= -1;
+        modelMatrixUBO.proj[1][1] *= -1;
 
-        UniformBufferObjectLight uboLight{};
-		uboLight.valueLight = 30;
+        // UniformBufferObjectLight uboLight{};
+		// uboLight.valueLight = 30;
 
-		UniformBufferObject2 ubo2{};
-		ubo2.value = 0.5f;
+		// UniformBufferObject2 ubo2{};
+		// ubo2.value = 0.5f;
 		
-        void* data;
-        vkMapMemory(device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-        memcpy(data, &ubo, sizeof(ubo));
-        vkUnmapMemory(device, uniformBuffersMemory[currentImage]);
+        void* modelMatrixData;
+        vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], 0,
+					sizeof(modelMatrixUBO), 0, &modelMatrixData);
+        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
+        vkUnmapMemory(device, modelMatrixUniformBuffersMemory[currentImage]);
 
-        void* data2;
-        vkMapMemory(device, uniformBuffersMemory2[currentImage], 0, sizeof(ubo2), 0, &data2);
-        memcpy(data2, &ubo2, sizeof(ubo2));
-        vkUnmapMemory(device, uniformBuffersMemory2[currentImage]);
+        void* viewPositionData;
+        vkMapMemory(device, viewPositionUniformBuffersMemory[currentImage], 0,
+					sizeof(viewPositionUBO), 0, &viewPositionData);
+        memcpy(viewPositionData, &viewPositionUBO, sizeof(viewPositionUBO));
+        vkUnmapMemory(device, viewPositionUniformBuffersMemory[currentImage]);
 		
-		void* dataLight;
-        vkMapMemory(device, uniformBuffersMemoryLight[currentImage], 0, sizeof(uboLight), 0, &dataLight);
-        memcpy(dataLight, &uboLight, sizeof(uboLight));
-        vkUnmapMemory(device, uniformBuffersMemoryLight[currentImage]);
+		void* materialData;
+        vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
+					sizeof(materialUBO), 0, &materialData);
+        memcpy(materialData, &materialUBO, sizeof(materialUBO));
+        vkUnmapMemory(device, materialUniformBuffersMemory[currentImage]);
+
+		void* directionalLightsData;
+        vkMapMemory(device, directionalLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(directionalLightsUBO), 0, &directionalLightsData);
+        memcpy(directionalLightsData, &directionalLightsUBO, sizeof(directionalLightsUBO));
+        vkUnmapMemory(device, directionalLightsUniformBuffersMemory[currentImage]);
+
+		void* pointLightsData;
+        vkMapMemory(device, pointLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(pointLightsUBO), 0, &pointLightsData);
+        memcpy(pointLightsData, &pointLightsUBO, sizeof(pointLightsUBO));
+        vkUnmapMemory(device, pointLightsUniformBuffersMemory[currentImage]);
+
+		void* spotLightsData;
+        vkMapMemory(device, spotLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(spotLightsUBO), 0, &spotLightsData);
+        memcpy(spotLightsData, &spotLightsUBO, sizeof(spotLightsUBO));
+        vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
     }
 
     void CVulkanRenderer::drawFrame() {
