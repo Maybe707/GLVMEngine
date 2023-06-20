@@ -1174,10 +1174,16 @@ namespace GLVM::core
             bufferInfoLight.buffer = uniformBuffersLight[i];
             bufferInfoLight.offset = 0;
             bufferInfoLight.range = sizeof(UniformBufferObjectLight);
-			
+
+			/*! textureImageViewsindex variable dont change value on every odd
+			    iteration because we have only half of texture intances, but
+				need another half part for second frame.
+			 */
             if(i % 2 == 0)
                 textureImageViewsIndex = i / 2;
 
+			std::cout << textureImageViewsIndex << std::endl;
+			
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
             imageInfo.imageView = textureImageViews[textureImageViewsIndex];

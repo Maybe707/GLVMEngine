@@ -145,25 +145,10 @@ namespace GLVM::core
 		int valueLight;
     };
 
-	struct Unit {
-		int value;
-	};
-	
     struct UniformBufferObject2 {
 		float value;
     };
 	
-    class CVertexObject
-    {
-    public:
-        const char* k_cPath_;
-        
-        std::vector<float> aVertex_ {
-        };
-
-
-    };
-    
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
 //         {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
