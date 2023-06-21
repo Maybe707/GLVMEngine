@@ -1865,9 +1865,8 @@ namespace GLVM::core
 		pGLUniform_Matrix4fv(uniformLocationProjectionWorld, NUMBER_OF_MATRICES, GL_FALSE, &_projectionMatrix[0][0]);
     }
     
-    void COpenglRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data, std::vector<ecs::Texture>& _hud_texture_data) {
+    void COpenglRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
 		texture_load_data = _texture_data;
-		hudTexture_load_data_ = _hud_texture_data;
 	}
 	
     void COpenglRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) {
@@ -1898,19 +1897,14 @@ namespace GLVM::core
 	
     void COpenglRenderer::run() {
 		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
-        GLVM::ecs::TextureManager* hudTextureManager = GLVM::ecs::TextureManager::GetHUDInstance();
 		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
 		for ( unsigned int i = 0; i < textureManager->GetTextureVector().size(); ++i ) {
 			LoadTextureData(textureManager->GetTextureVector()[i]);
 		}
 
-		for ( unsigned int j = 0; j < hudTextureManager->GetTextureVector().size(); ++j ) {
-			LoadTextureData(hudTextureManager->GetTextureVector()[j]);
-		}
-
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
-		SetTextureData(textureManager->GetTextureVector(), hudTextureManager->GetTextureVector());
+		SetTextureData(textureManager->GetTextureVector());
 		
 //		loadWavefrontObj();
 		LoadGLTF();

@@ -18,9 +18,6 @@ namespace GLVM::ecs
         static TextureManager* pInstance_;
         static std::mutex  Mutex_;
 
-        static TextureManager* pHUDInstance_;
-        static std::mutex  HUDMutex_;
-        
         std::vector<Texture> textureVector_;
     public:
         TextureManager();

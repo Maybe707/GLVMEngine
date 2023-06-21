@@ -15,5 +15,6 @@
 #include "Components/CrosshairComponent.hpp"
 #include "Components/PointLightComponent.hpp"
 #include "Components/ControllerComponent.hpp"
+#include "Components/TextureComponent.hpp"
 
 #endif

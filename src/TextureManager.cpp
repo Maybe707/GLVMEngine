@@ -8,9 +8,6 @@ namespace GLVM::ecs
     TextureManager* TextureManager::pInstance_ = nullptr;
     std::mutex TextureManager::Mutex_;
 
-    TextureManager* TextureManager::pHUDInstance_ = nullptr;
-    std::mutex TextureManager::HUDMutex_;
-    
     TextureManager::TextureManager() = default;
 
     void TextureManager::BindTexture(Entity_ID _entityID, Texture_ID _textureID) {
@@ -26,15 +23,6 @@ namespace GLVM::ecs
         return pInstance_;
     }
 
-    TextureManager* TextureManager::GetHUDInstance()
-    {
-        std::lock_guard<std::mutex> lock(HUDMutex_);
-        if(pHUDInstance_ == nullptr) {
-            pHUDInstance_ = new TextureManager();
-        }
-        return pHUDInstance_;
-    }
-    
     void TextureManager::SetTextureVector(std::vector<Texture> _textureVector) {
         textureVector_ = _textureVector;
     }
