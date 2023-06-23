@@ -1493,14 +1493,16 @@ namespace GLVM::core
 
         ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
 
-		core::vector<unsigned int>* entitiesContainerTexture =
-			componentManager->GetEntityContainer<ecs::components::texture>();
-		unsigned int textureContainerSize = entitiesContainerTexture->GetSize();
-            for (unsigned int j = 0; j < textureContainerSize; ++j) {
-                unsigned int uiEntity = (*entitiesContainerTexture)[j];
+		// core::vector<unsigned int>* entitiesContainerTexture =
+		// 	componentManager->GetEntityContainer<ecs::components::texture>();
+//		unsigned int textureContainerSize = entitiesContainerTexture->GetSize();
+		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
+            for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+				//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
+				unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
-				unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-				std::cout << "texture: " << textureID << std::endl;                
+				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
+				// std::cout << "texture: " << textureID << std::endl;                
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
                 VkDeviceSize offsets[] = {0};
                 vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -1508,9 +1510,10 @@ namespace GLVM::core
                 vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
                 unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[textureID + currentFrame], 0, nullptr);
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i * MAX_FRAMES_IN_FLIGHT + j + currentFrame], 0, nullptr);
                 vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
             }
+		}
 
         // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
 
@@ -1658,15 +1661,18 @@ namespace GLVM::core
         }
 
         ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        core::vector<unsigned int>* pEntity_Container_refTransform =
-			pComponent_Manager->GetEntityContainer<cm::transform>();
+        core::vector<cm::transform>* pEntity_Container_refTransform =
+			pComponent_Manager->GetComponentContainer<cm::transform>();
 //		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
 
-        for (unsigned int i = 0; i < initializeTextureData_.size(); ++i) {
-				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
-				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
-                updateUniformBuffer(i + currentFrame, *transformComponent);
+		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
+			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+//				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
+//				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
+				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+                updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
             }
+		}
 
         // Needed to skip images that intended to game objects that counts according to *texturePool_*.
         
