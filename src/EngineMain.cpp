@@ -116,7 +116,7 @@ int main()
 
     Entity uiWitch2 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform, cm::texture>(uiWitch2);
-	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 1;
+	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
 	ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 0;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
 		= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };

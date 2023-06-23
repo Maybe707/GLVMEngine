@@ -1220,7 +1220,7 @@ namespace GLVM::core
 //        int textureImageViewsIndex = 0;
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
             VkDescriptorBufferInfo modelMatrixBufferInfo{};
-            modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i / 2];
+            modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
             modelMatrixBufferInfo.offset = 0;
             modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
@@ -1496,11 +1496,29 @@ namespace GLVM::core
 		// core::vector<unsigned int>* entitiesContainerTexture =
 		// 	componentManager->GetEntityContainer<ecs::components::texture>();
 //		unsigned int textureContainerSize = entitiesContainerTexture->GetSize();
+
+//		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
+
+// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
+// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
+// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
+
+
+//             }
+// 		}
+
+
+		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
+        core::vector<ecs::components::transform>* pEntity_Container_refTransform =
+			pComponent_Manager->GetComponentContainer<ecs::components::transform>();
 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 				unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
 				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
 				// std::cout << "texture: " << textureID << std::endl;                
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -1596,10 +1614,10 @@ namespace GLVM::core
         //     ubo.proj.SelfIdentity();
         // }
 
-        if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT) {
-            modelMatrixUBO.view.SelfIdentity();
-            modelMatrixUBO.proj.SelfIdentity();
-        }
+        // if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT) {
+        //     modelMatrixUBO.view.SelfIdentity();
+        //     modelMatrixUBO.proj.SelfIdentity();
+        // }
         
         modelMatrixUBO.proj[1][1] *= -1;
 
@@ -1660,19 +1678,19 @@ namespace GLVM::core
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-        ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        core::vector<cm::transform>* pEntity_Container_refTransform =
-			pComponent_Manager->GetComponentContainer<cm::transform>();
-//		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
+//         ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
+//         core::vector<cm::transform>* pEntity_Container_refTransform =
+// 			pComponent_Manager->GetComponentContainer<cm::transform>();
+// //		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
 
-		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
-			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-//				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
-//				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
-				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
-                updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
-            }
-		}
+// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
+// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
+// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
+// 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
+//             }
+// 		}
 
         // Needed to skip images that intended to game objects that counts according to *texturePool_*.
         
