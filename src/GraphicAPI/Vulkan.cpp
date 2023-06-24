@@ -1260,8 +1260,9 @@ namespace GLVM::core
 			
             VkDescriptorImageInfo imageInfo{};
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = textureImageViews[i / 2];
-            imageInfo.sampler = textureSamplers[i / 2];
+			unsigned int textureIndex = i / 2;
+            imageInfo.imageView = textureImageViews[textureIndex];
+            imageInfo.sampler = textureSamplers[textureIndex];
 
             // VkDescriptorImageInfo diffuseImageInfo{};
             // diffuseImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1507,7 +1508,7 @@ namespace GLVM::core
 
 //             }
 // 		}
-
+		
 
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
         core::vector<ecs::components::transform>* pEntity_Container_refTransform =
@@ -1517,8 +1518,8 @@ namespace GLVM::core
 				//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 				unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
-				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
-				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
+				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[uiEntity];
+				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
 				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
 				// std::cout << "texture: " << textureID << std::endl;                
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -1528,7 +1529,7 @@ namespace GLVM::core
                 vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
                 unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[i * MAX_FRAMES_IN_FLIGHT + j + currentFrame], 0, nullptr);
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
                 vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
             }
 		}
@@ -1685,10 +1686,11 @@ namespace GLVM::core
 
 // 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
 // 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+// 				std::cout << "i: " << i << " j: " << j << std::endl;
 // //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
 // //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
 // 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
-//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
+//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
 //             }
 // 		}
 

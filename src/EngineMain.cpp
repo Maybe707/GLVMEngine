@@ -104,22 +104,22 @@ int main()
     // TextureManager->BindTexture(plain0, materialPlain0->diffuseTextureID_);
     
  	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform, cm::texture>(uiWitch);
-	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 0;
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch);
+//	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.0f, 0.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f };
     ComponentManager->GetComponent<cm::vertex>(uiWitch)->vkVertexId_ = 0;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
-	*materialWitch  = { .diffuseTextureID_ = 0, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+	*materialWitch  = { .diffuseTextureID_ = 3, .specularTextureID_ = 4, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
     TextureManager->BindTexture(uiWitch, materialWitch->diffuseTextureID_);
 
     Entity uiWitch2 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform, cm::texture>(uiWitch2);
-	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
+	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
+//	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
 	ComponentManager->GetComponent<cm::vertex>(uiWitch2)->vkVertexId_ = 0;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
-		= { 5.5f, 5.5f, 1.5f }, .fScale = 1.0f };
+		= { 5.5f, 5.5f, 1.5f }, .fScale = 4.0f };
 	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
 	*materialWitch2 = { .diffuseTextureID_ = 0, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -244,7 +244,7 @@ int main()
 	core::Engine* GLVM = core::Engine::GetInstance();		
 	
     ///< Game rendering loop
-	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
 	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
