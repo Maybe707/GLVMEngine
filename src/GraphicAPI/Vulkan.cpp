@@ -1519,6 +1519,20 @@ namespace GLVM::core
 				unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
                 unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[uiEntity];
+
+				VkBufferMemoryBarrier bufferMemoryBarrier{};
+				bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+				bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+				bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
+				bufferMemoryBarrier.offset = 0;
+				bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
+
+				vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+									 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+				
 				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
 				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
 				// std::cout << "texture: " << textureID << std::endl;                
