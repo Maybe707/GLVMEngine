@@ -301,10 +301,10 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createRenderPass();
-        createDescriptorSetLayout(descriptorSetLayout);
-        createDescriptorSetLayout(descriptorSetLayoutHUD);
-        createGraphicsPipeline(graphicsPipeline, pipelineLayout, descriptorSetLayout, vertShaderMain_, fragShaderMain_);
-        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
+        createDescriptorSetLayout(descriptorSetLayout, descriptorSetLayout2);
+//        createDescriptorSetLayout(descriptorSetLayoutHUD);
+        createGraphicsPipeline(graphicsPipeline, pipelineLayout, descriptorSetLayout, descriptorSetLayout2, vertShaderMain_, fragShaderMain_);
+//        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
         createCommandPool();
         createDepthResources();
         createFramebuffers();
@@ -663,7 +663,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout) {
+    void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& descriptorSetLayout2) {
         VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 		// VkDescriptorSetLayoutBinding viewPositionUboLayout{};
 		// VkDescriptorSetLayoutBinding materialUboLayout{};
@@ -731,7 +731,7 @@ namespace GLVM::core
         // std::array<VkDescriptorSetLayoutBinding, 9> bindings = {modelMatrixUboLayout, viewPositionUboLayout,
 		// 	materialUboLayout, directionalLightsUboLayout, pointLightsUboLayout, spotLightsUboLayout,
 		// 	samplerLayoutBinding, diffuseSamplerLayoutBinding, specularSamplerLayoutBinding};
-		std::array<VkDescriptorSetLayoutBinding, 2> bindings = {modelMatrixUboLayout, specularSamplerLayoutBinding};
+		std::array<VkDescriptorSetLayoutBinding, 1> bindings = {modelMatrixUboLayout};
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
@@ -740,9 +740,19 @@ namespace GLVM::core
         if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor set layout!");
         }
+
+		std::array<VkDescriptorSetLayoutBinding, 1> bindings2 = {specularSamplerLayoutBinding};
+        VkDescriptorSetLayoutCreateInfo layoutInfo2{};
+        layoutInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+        layoutInfo2.bindingCount = static_cast<uint32_t>(bindings2.size());
+        layoutInfo2.pBindings = bindings2.data();
+
+        if (vkCreateDescriptorSetLayout(device, &layoutInfo2, nullptr, &descriptorSetLayout2) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create descriptor set layout!");
+        }
     }
 
-    void CVulkanRenderer::createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, const char* _vertShader, const char* _fragShader) {
+    void CVulkanRenderer::createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& _descriptorSetLayout2, const char* _vertShader, const char* _fragShader) {
         auto vertShaderCode = readFile(_vertShader);
         auto fragShaderCode = readFile(_fragShader);
 
@@ -834,15 +844,25 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
+		VkDescriptorSetLayout descriptorSetLayouts[] = { _descriptorSetLayout, _descriptorSetLayout2 };
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 1;
-        pipelineLayoutInfo.pSetLayouts = &_descriptorSetLayout;
+        pipelineLayoutInfo.setLayoutCount = 2;
+        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts;
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");
         }
 
+        // VkPipelineLayoutCreateInfo pipelineLayoutInfo2{};
+        // pipelineLayoutInfo2.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        // pipelineLayoutInfo2.setLayoutCount = 1;
+        // pipelineLayoutInfo2.pSetLayouts = &_descriptorSetLayout2;
+
+        // if (vkCreatePipelineLayout(device, &pipelineLayoutInfo2, nullptr, &_pipelineLayout) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to create pipeline layout!");
+        // }
+		
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = 2;

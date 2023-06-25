@@ -383,12 +383,13 @@ namespace GLVM::core
 
         VkRenderPass renderPass;
         VkDescriptorSetLayout descriptorSetLayout;
-        VkDescriptorSetLayout descriptorSetLayoutHUD;
+		VkDescriptorSetLayout descriptorSetLayout2;
+//        VkDescriptorSetLayout descriptorSetLayoutHUD;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
 
-        VkPipelineLayout pipelineLayoutHUD;
-        VkPipeline graphicsPipelineHUD;
+        // VkPipelineLayout pipelineLayoutHUD;
+        // VkPipeline graphicsPipelineHUD;
 
         VkCommandPool commandPool;
 
@@ -454,8 +455,8 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createRenderPass();
-        void createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout);
-        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, const char* _vertShader, const char* _fragShader);
+        void createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& descriptorSetLayout2);
+        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& _descriptorSetLayout2, const char* _vertShader, const char* _fragShader);
         void createFramebuffers();
         void createCommandPool();
         void createDepthResources();
