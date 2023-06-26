@@ -412,10 +412,10 @@ namespace GLVM::core
         std::vector<VkBuffer> indexBufferContainer;
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
 
-        VkBuffer hudVertexBuffer;
-        VkDeviceMemory hudVertexBufferMemory;
-        VkBuffer hudIndexBuffer;
-        VkDeviceMemory hudIndexBufferMemory;
+        // VkBuffer hudVertexBuffer;
+        // VkDeviceMemory hudVertexBufferMemory;
+        // VkBuffer hudIndexBuffer;
+        // VkDeviceMemory hudIndexBufferMemory;
 
         std::vector<VkBuffer> modelMatrixUniformBuffers;
         std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
@@ -431,7 +431,9 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> spotLightsUniformBuffersMemory;
 		
         VkDescriptorPool descriptorPool;
+		unsigned int uboDescriptorsNumber = 0;
         std::vector<VkDescriptorSet> descriptorSets;
+		std::vector<VkDescriptorSet> descriptorSets2;
 
         std::vector<VkCommandBuffer> commandBuffers;
 

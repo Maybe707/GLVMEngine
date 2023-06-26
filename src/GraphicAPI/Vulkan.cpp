@@ -314,8 +314,8 @@ namespace GLVM::core
         // createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
         // createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
         loadWavefrontObj();                                                           ///< Both second functions inside this function
-		createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
-		createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
+//		createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
+//		createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
@@ -664,18 +664,14 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& descriptorSetLayout2) {
-        VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
+
 		// VkDescriptorSetLayoutBinding viewPositionUboLayout{};
 		// VkDescriptorSetLayoutBinding materialUboLayout{};
 		// VkDescriptorSetLayoutBinding directionalLightsUboLayout{};
 		// VkDescriptorSetLayoutBinding pointLightsUboLayout{};
 		// VkDescriptorSetLayoutBinding spotLightsUboLayout{};
 
-        modelMatrixUboLayout.binding = 0;
-        modelMatrixUboLayout.descriptorCount = 1;
-        modelMatrixUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        modelMatrixUboLayout.pImmutableSamplers = nullptr;
-        modelMatrixUboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
 		
         // viewPositionUboLayout.binding = 1;
         // viewPositionUboLayout.descriptorCount = 1;
@@ -721,6 +717,13 @@ namespace GLVM::core
         // diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
         // diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
+        VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
+		modelMatrixUboLayout.binding = 0;
+        modelMatrixUboLayout.descriptorCount = 1;
+        modelMatrixUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        modelMatrixUboLayout.pImmutableSamplers = nullptr;
+        modelMatrixUboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+		
         VkDescriptorSetLayoutBinding specularSamplerLayoutBinding{};
         specularSamplerLayoutBinding.binding = 1;
         specularSamplerLayoutBinding.descriptorCount = 1;
@@ -734,6 +737,7 @@ namespace GLVM::core
 		std::array<VkDescriptorSetLayoutBinding, 1> bindings = {modelMatrixUboLayout};
         VkDescriptorSetLayoutCreateInfo layoutInfo{};
         layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.flags = 0;
         layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
         layoutInfo.pBindings = bindings.data();
 
@@ -744,6 +748,7 @@ namespace GLVM::core
 		std::array<VkDescriptorSetLayoutBinding, 1> bindings2 = {specularSamplerLayoutBinding};
         VkDescriptorSetLayoutCreateInfo layoutInfo2{};
         layoutInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo2.flags = 0;
         layoutInfo2.bindingCount = static_cast<uint32_t>(bindings2.size());
         layoutInfo2.pBindings = bindings2.data();
 
@@ -844,11 +849,11 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		VkDescriptorSetLayout descriptorSetLayouts[] = { _descriptorSetLayout, _descriptorSetLayout2 };
+		std::array<VkDescriptorSetLayout, 2> descriptorSetLayouts = { _descriptorSetLayout, _descriptorSetLayout2 };
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 2;
-        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts;
+        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");
@@ -875,7 +880,7 @@ namespace GLVM::core
         pipelineInfo.pDepthStencilState = &depthStencil;
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
-        pipelineInfo.layout = pipelineLayout;
+        pipelineInfo.layout = _pipelineLayout;
         pipelineInfo.renderPass = renderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -1194,8 +1199,13 @@ namespace GLVM::core
 
     void CVulkanRenderer::createDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
+
+		for ( unsigned int i = 0; i < initializeTextureData_.size(); ++i )
+			for ( unsigned int j = 0; j < initializeTextureData_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j )
+				++uboDescriptorsNumber;
+
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
         // poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         // poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		// poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1217,7 +1227,8 @@ namespace GLVM::core
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * (initializeTextureData_.size() +
+																		 uboDescriptorsNumber));
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -1225,20 +1236,20 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorSets() {
-        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptorSetLayout);
+        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber, descriptorSetLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
         allocInfo.pSetLayouts = layouts.data();
 
-        descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
         if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate descriptor sets!");
         }
-        
-//        int textureImageViewsIndex = 0;
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
+
+		//        int textureImageViewsIndex = 0;
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber; ++i) {
             VkDescriptorBufferInfo modelMatrixBufferInfo{};
             modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
             modelMatrixBufferInfo.offset = 0;
@@ -1278,11 +1289,11 @@ namespace GLVM::core
 
 			// std::cout << textureImageViewsIndex << std::endl;
 			
-            VkDescriptorImageInfo imageInfo{};
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-            imageInfo.imageView = textureImageViews[textureIndex];
-            imageInfo.sampler = textureSamplers[textureIndex];
+            // VkDescriptorImageInfo imageInfo{};
+            // imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			// unsigned int textureIndex = i / 2;
+            // imageInfo.imageView = textureImageViews[textureIndex];
+            // imageInfo.sampler = textureSamplers[textureIndex];
 
             // VkDescriptorImageInfo diffuseImageInfo{};
             // diffuseImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -1294,7 +1305,7 @@ namespace GLVM::core
             // specularImageInfo.imageView = textureImageViews[textureImageViewsIndex];
             // specularImageInfo.sampler = textureSamplers[textureImageViewsIndex];
 			
-            std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+            std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrites[0].dstSet = descriptorSets[i];
@@ -1344,13 +1355,13 @@ namespace GLVM::core
             // descriptorWrites[5].descriptorCount = 1;
             // descriptorWrites[5].pBufferInfo = &spotLightsBufferInfo;
 			
-			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[1].dstSet = descriptorSets[i];
-            descriptorWrites[1].dstBinding = 1;
-            descriptorWrites[1].dstArrayElement = 0;
-            descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[1].descriptorCount = 1;
-            descriptorWrites[1].pImageInfo = &imageInfo;
+			// descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            // descriptorWrites[1].dstSet = descriptorSets[i];
+            // descriptorWrites[1].dstBinding = 1;
+            // descriptorWrites[1].dstArrayElement = 0;
+            // descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            // descriptorWrites[1].descriptorCount = 1;
+            // descriptorWrites[1].pImageInfo = &imageInfo;
 
 			// descriptorWrites[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             // descriptorWrites[7].dstSet = descriptorSets[i];
@@ -1371,6 +1382,40 @@ namespace GLVM::core
 			
             vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
+		
+        std::vector<VkDescriptorSetLayout> layouts2(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptorSetLayout2);
+        VkDescriptorSetAllocateInfo allocInfo2{};
+        allocInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+        allocInfo2.descriptorPool = descriptorPool;
+        allocInfo2.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        allocInfo2.pSetLayouts = layouts2.data();
+
+        descriptorSets2.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        if (vkAllocateDescriptorSets(device, &allocInfo2, descriptorSets2.data()) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate descriptor sets!");
+        }
+
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
+			VkDescriptorImageInfo imageInfo{};
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			unsigned int textureIndex = i / 2;
+            imageInfo.imageView = textureImageViews[textureIndex];
+            imageInfo.sampler = textureSamplers[textureIndex];
+			
+            std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrites[0].dstSet = descriptorSets2[i];
+            descriptorWrites[0].dstBinding = 1;
+            descriptorWrites[0].dstArrayElement = 0;
+            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            descriptorWrites[0].descriptorCount = 1;
+            descriptorWrites[0].pImageInfo = &imageInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+
+		
+
     }
 
     void CVulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -1540,20 +1585,21 @@ namespace GLVM::core
                 unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[uiEntity];
 
-				VkBufferMemoryBarrier bufferMemoryBarrier{};
-				bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-				bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-				bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-				bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-				bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-				bufferMemoryBarrier.offset = 0;
-				bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
+				// VkBufferMemoryBarrier bufferMemoryBarrier{};
+				// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+				// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+				// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
+				// bufferMemoryBarrier.offset = 0;
+				// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
 
-				vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-									 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+				// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+				// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 				
-				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
+				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[MAX_FRAMES_IN_FLIGHT * i + j + currentFrame], 0, nullptr);
 				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
 				// std::cout << "texture: " << textureID << std::endl;                
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -1563,7 +1609,7 @@ namespace GLVM::core
                 vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
                 unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
+                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
                 vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
             }
 		}
