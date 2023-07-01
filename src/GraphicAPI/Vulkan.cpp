@@ -46,6 +46,9 @@ namespace GLVM::core
 
         textureImageViews.resize(mainTexturesQuantity);
         textureSamplers.resize(mainTexturesQuantity);
+
+		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorSetLayout()});
+		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
     }
     
     CVulkanRenderer::~CVulkanRenderer() {
@@ -301,9 +304,9 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createRenderPass();
-        createDescriptorSetLayout(descriptorSetLayout, descriptorSetLayout2);
+        createDescriptorSetLayout();
 //        createDescriptorSetLayout(descriptorSetLayoutHUD);
-        createGraphicsPipeline(graphicsPipeline, pipelineLayout, descriptorSetLayout, descriptorSetLayout2, vertShaderMain_, fragShaderMain_);
+        createGraphicsPipeline(graphicsPipeline, pipelineLayout, vertShaderMain_, fragShaderMain_);
 //        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
         createCommandPool();
         createDepthResources();
@@ -375,7 +378,8 @@ namespace GLVM::core
             vkFreeMemory(device, textureImageMemories[i], nullptr);
         }
 
-        vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+		for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, descriptors[i].setLayout, nullptr);
 
         for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
             vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
@@ -663,101 +667,29 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& descriptorSetLayout2) {
-
-		// VkDescriptorSetLayoutBinding viewPositionUboLayout{};
-		// VkDescriptorSetLayoutBinding materialUboLayout{};
-		// VkDescriptorSetLayoutBinding directionalLightsUboLayout{};
-		// VkDescriptorSetLayoutBinding pointLightsUboLayout{};
-		// VkDescriptorSetLayoutBinding spotLightsUboLayout{};
-
-
+    void CVulkanRenderer::createDescriptorSetLayout() {
+		for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
+			VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
+			modelMatrixUboLayout.binding = descriptors[i].binding;
+			modelMatrixUboLayout.descriptorCount = 1;
+			modelMatrixUboLayout.descriptorType = descriptors[i].type;
+			modelMatrixUboLayout.pImmutableSamplers = nullptr;
+			modelMatrixUboLayout.stageFlags = descriptors[i].shaderStageFlag;
 		
-        // viewPositionUboLayout.binding = 1;
-        // viewPositionUboLayout.descriptorCount = 1;
-        // viewPositionUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // viewPositionUboLayout.pImmutableSamplers = nullptr;
-        // viewPositionUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+			std::array<VkDescriptorSetLayoutBinding, 1> bindings = {modelMatrixUboLayout};
+			VkDescriptorSetLayoutCreateInfo layoutInfo{};
+			layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+			layoutInfo.flags = 0;
+			layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+			layoutInfo.pBindings = bindings.data();
 
-        // materialUboLayout.binding = 2;
-        // materialUboLayout.descriptorCount = 1;
-        // materialUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // materialUboLayout.pImmutableSamplers = nullptr;
-        // materialUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        // directionalLightsUboLayout.binding = 3;
-        // directionalLightsUboLayout.descriptorCount = 1;
-        // directionalLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // directionalLightsUboLayout.pImmutableSamplers = nullptr;
-        // directionalLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-		// pointLightsUboLayout.binding = 4;
-        // pointLightsUboLayout.descriptorCount = 1;
-        // pointLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // pointLightsUboLayout.pImmutableSamplers = nullptr;
-        // pointLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-		// spotLightsUboLayout.binding = 5;
-        // spotLightsUboLayout.descriptorCount = 1;
-        // spotLightsUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // spotLightsUboLayout.pImmutableSamplers = nullptr;
-        // spotLightsUboLayout.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		
-        // VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-        // samplerLayoutBinding.binding = 6;
-        // samplerLayoutBinding.descriptorCount = 1;
-        // samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        // samplerLayoutBinding.pImmutableSamplers = nullptr;
-        // samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        // VkDescriptorSetLayoutBinding diffuseSamplerLayoutBinding{};
-        // diffuseSamplerLayoutBinding.binding = 7;
-        // diffuseSamplerLayoutBinding.descriptorCount = 1;
-        // diffuseSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        // diffuseSamplerLayoutBinding.pImmutableSamplers = nullptr;
-        // diffuseSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-        VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
-		modelMatrixUboLayout.binding = 0;
-        modelMatrixUboLayout.descriptorCount = 1;
-        modelMatrixUboLayout.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        modelMatrixUboLayout.pImmutableSamplers = nullptr;
-        modelMatrixUboLayout.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-		
-        VkDescriptorSetLayoutBinding specularSamplerLayoutBinding{};
-        specularSamplerLayoutBinding.binding = 1;
-        specularSamplerLayoutBinding.descriptorCount = 1;
-        specularSamplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        specularSamplerLayoutBinding.pImmutableSamplers = nullptr;
-        specularSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-		
-        // std::array<VkDescriptorSetLayoutBinding, 9> bindings = {modelMatrixUboLayout, viewPositionUboLayout,
-		// 	materialUboLayout, directionalLightsUboLayout, pointLightsUboLayout, spotLightsUboLayout,
-		// 	samplerLayoutBinding, diffuseSamplerLayoutBinding, specularSamplerLayoutBinding};
-		std::array<VkDescriptorSetLayoutBinding, 1> bindings = {modelMatrixUboLayout};
-        VkDescriptorSetLayoutCreateInfo layoutInfo{};
-        layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo.flags = 0;
-        layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-        layoutInfo.pBindings = bindings.data();
-
-        if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayout) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor set layout!");
-        }
-
-		std::array<VkDescriptorSetLayoutBinding, 1> bindings2 = {specularSamplerLayoutBinding};
-        VkDescriptorSetLayoutCreateInfo layoutInfo2{};
-        layoutInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-		layoutInfo2.flags = 0;
-        layoutInfo2.bindingCount = static_cast<uint32_t>(bindings2.size());
-        layoutInfo2.pBindings = bindings2.data();
-
-        if (vkCreateDescriptorSetLayout(device, &layoutInfo2, nullptr, &descriptorSetLayout2) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create descriptor set layout!");
-        }
+			if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptors[i].setLayout) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create descriptor set layout!");
+			}
+		}
     }
 
-    void CVulkanRenderer::createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& _descriptorSetLayout2, const char* _vertShader, const char* _fragShader) {
+    void CVulkanRenderer::createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader) {
         auto vertShaderCode = readFile(_vertShader);
         auto fragShaderCode = readFile(_fragShader);
 
@@ -849,7 +781,7 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		std::array<VkDescriptorSetLayout, 2> descriptorSetLayouts = { _descriptorSetLayout, _descriptorSetLayout2 };
+		std::array<VkDescriptorSetLayout, 2> descriptorSetLayouts = { descriptors[0].setLayout, descriptors[1].setLayout };
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = 2;
@@ -1236,7 +1168,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorSets() {
-        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber, descriptorSetLayout);
+        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber, descriptors[0].setLayout);
         VkDescriptorSetAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo.descriptorPool = descriptorPool;
@@ -1255,56 +1187,6 @@ namespace GLVM::core
             modelMatrixBufferInfo.offset = 0;
             modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
-            // VkDescriptorBufferInfo viewPositionBufferInfo{};
-            // viewPositionBufferInfo.buffer = viewPositionUniformBuffers[i];
-            // viewPositionBufferInfo.offset = 0;
-            // viewPositionBufferInfo.range = sizeof(ViewPositionUBO);
-			
-            // VkDescriptorBufferInfo materialBufferInfo{};
-            // materialBufferInfo.buffer = materialUniformBuffers[i];
-            // materialBufferInfo.offset = 0;
-            // materialBufferInfo.range = sizeof(MaterialUBO);
-
-            // VkDescriptorBufferInfo directionalLightsBufferInfo{};
-            // directionalLightsBufferInfo.buffer = directionalLightsUniformBuffers[i];
-            // directionalLightsBufferInfo.offset = 0;
-            // directionalLightsBufferInfo.range = sizeof(DirectionalLightsUBO);
-			
-            // VkDescriptorBufferInfo pointLightsBufferInfo{};
-            // pointLightsBufferInfo.buffer = pointLightsUniformBuffers[i];
-            // pointLightsBufferInfo.offset = 0;
-            // pointLightsBufferInfo.range = sizeof(PointLightsUBO);
-			
-            // VkDescriptorBufferInfo spotLightsBufferInfo{};
-            // spotLightsBufferInfo.buffer = spotLightsUniformBuffers[i];
-            // spotLightsBufferInfo.offset = 0;
-            // spotLightsBufferInfo.range = sizeof(SpotLightsUBO);
-			
-			/*! textureImageViewsindex variable dont change value on every odd
-			    iteration because we have only half of texture intances, but
-				need another half part for second frame.
-			 */
-            // if(i % 2 == 0)
-            //     textureImageViewsIndex = i / 2;
-
-			// std::cout << textureImageViewsIndex << std::endl;
-			
-            // VkDescriptorImageInfo imageInfo{};
-            // imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			// unsigned int textureIndex = i / 2;
-            // imageInfo.imageView = textureImageViews[textureIndex];
-            // imageInfo.sampler = textureSamplers[textureIndex];
-
-            // VkDescriptorImageInfo diffuseImageInfo{};
-            // diffuseImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            // diffuseImageInfo.imageView = textureImageViews[textureImageViewsIndex];
-            // diffuseImageInfo.sampler = textureSamplers[textureImageViewsIndex];
-
-            // VkDescriptorImageInfo specularImageInfo{};
-            // specularImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            // specularImageInfo.imageView = textureImageViews[textureImageViewsIndex];
-            // specularImageInfo.sampler = textureSamplers[textureImageViewsIndex];
-			
             std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
             descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -1315,75 +1197,10 @@ namespace GLVM::core
             descriptorWrites[0].descriptorCount = 1;
             descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-            // descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[1].dstSet = descriptorSets[i];
-            // descriptorWrites[1].dstBinding = 1;
-            // descriptorWrites[1].dstArrayElement = 0;
-            // descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            // descriptorWrites[1].descriptorCount = 1;
-            // descriptorWrites[1].pBufferInfo = &viewPositionBufferInfo;
-
-            // descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[2].dstSet = descriptorSets[i];
-            // descriptorWrites[2].dstBinding = 2;
-            // descriptorWrites[2].dstArrayElement = 0;
-            // descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            // descriptorWrites[2].descriptorCount = 1;
-            // descriptorWrites[2].pBufferInfo = &materialBufferInfo;
-
-            // descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[3].dstSet = descriptorSets[i];
-            // descriptorWrites[3].dstBinding = 3;
-            // descriptorWrites[3].dstArrayElement = 0;
-            // descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            // descriptorWrites[3].descriptorCount = 1;
-            // descriptorWrites[3].pBufferInfo = &directionalLightsBufferInfo;
-
-            // descriptorWrites[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[4].dstSet = descriptorSets[i];
-            // descriptorWrites[4].dstBinding = 4;
-            // descriptorWrites[4].dstArrayElement = 0;
-            // descriptorWrites[4].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            // descriptorWrites[4].descriptorCount = 1;
-            // descriptorWrites[4].pBufferInfo = &pointLightsBufferInfo;
-
-            // descriptorWrites[5].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[5].dstSet = descriptorSets[i];
-            // descriptorWrites[5].dstBinding = 5;
-            // descriptorWrites[5].dstArrayElement = 0;
-            // descriptorWrites[5].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            // descriptorWrites[5].descriptorCount = 1;
-            // descriptorWrites[5].pBufferInfo = &spotLightsBufferInfo;
-			
-			// descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[1].dstSet = descriptorSets[i];
-            // descriptorWrites[1].dstBinding = 1;
-            // descriptorWrites[1].dstArrayElement = 0;
-            // descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            // descriptorWrites[1].descriptorCount = 1;
-            // descriptorWrites[1].pImageInfo = &imageInfo;
-
-			// descriptorWrites[7].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[7].dstSet = descriptorSets[i];
-            // descriptorWrites[7].dstBinding = 7;
-            // descriptorWrites[7].dstArrayElement = 0;
-            // descriptorWrites[7].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            // descriptorWrites[7].descriptorCount = 1;
-            // descriptorWrites[7].pImageInfo = &imageInfo;
-
-			// descriptorWrites[8].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            // descriptorWrites[8].dstSet = descriptorSets[i];
-            // descriptorWrites[8].dstBinding = 8;
-            // descriptorWrites[8].dstArrayElement = 0;
-            // descriptorWrites[8].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            // descriptorWrites[8].descriptorCount = 1;
-            // descriptorWrites[8].pImageInfo = &imageInfo;
-
-			
             vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
         }
 		
-        std::vector<VkDescriptorSetLayout> layouts2(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptorSetLayout2);
+        std::vector<VkDescriptorSetLayout> layouts2(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptors[1].setLayout);
         VkDescriptorSetAllocateInfo allocInfo2{};
         allocInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
         allocInfo2.descriptorPool = descriptorPool;

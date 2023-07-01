@@ -136,6 +136,13 @@ namespace GLVM::core
         }
     };
 
+	struct Descriptor {
+		VkDescriptorType      type;
+		uint32_t              binding;
+		VkShaderStageFlags    shaderStageFlag;
+		VkDescriptorSetLayout setLayout;
+	};
+	
 	enum UBOtypes {
 		MODEL_MATRIX_UBO,
 		VIEW_POSITION_UBO,
@@ -382,8 +389,11 @@ namespace GLVM::core
         std::vector<VkFramebuffer> swapChainFramebuffers;
 
         VkRenderPass renderPass;
-        VkDescriptorSetLayout descriptorSetLayout;
-		VkDescriptorSetLayout descriptorSetLayout2;
+
+		core::vector<Descriptor> descriptors;
+		
+        // VkDescriptorSetLayout descriptorSetLayout;
+		// VkDescriptorSetLayout descriptorSetLayout2;
 //        VkDescriptorSetLayout descriptorSetLayoutHUD;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
@@ -457,8 +467,8 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createRenderPass();
-        void createDescriptorSetLayout(VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& descriptorSetLayout2);
-        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, VkDescriptorSetLayout& _descriptorSetLayout, VkDescriptorSetLayout& _descriptorSetLayout2, const char* _vertShader, const char* _fragShader);
+        void createDescriptorSetLayout();
+        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
         void createFramebuffers();
         void createCommandPool();
         void createDepthResources();
