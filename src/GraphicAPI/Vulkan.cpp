@@ -1100,9 +1100,13 @@ namespace GLVM::core
         // VkDeviceSize directionalLightsBufferSize = sizeof(DirectionalLightsUBO);
 		// VkDeviceSize pointLightsBufferSize = sizeof(PointLightsUBO);
 //		VkDeviceSize spotLightsBufferSize = sizeof(SpotLightsUBO);
+
+		for ( unsigned int i = 0; i < initializeTextureData_.size(); ++i )
+			for ( unsigned int j = 0; j < initializeTextureData_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j )
+				++uboDescriptorsNumber;
 		
-        modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+        modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
+        modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
 
         // viewPositionUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
         // viewPositionUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
@@ -1119,7 +1123,7 @@ namespace GLVM::core
         // spotLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
         // spotLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 		
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); i++) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber; i++) {
             createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
 			// createBuffer(viewPositionBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, viewPositionUniformBuffers[i], viewPositionUniformBuffersMemory[i]);
 			// createBuffer(materialBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialUniformBuffers[i], materialUniformBuffersMemory[i]);
@@ -1132,9 +1136,6 @@ namespace GLVM::core
     void CVulkanRenderer::createDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		for ( unsigned int i = 0; i < initializeTextureData_.size(); ++i )
-			for ( unsigned int j = 0; j < initializeTextureData_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j )
-				++uboDescriptorsNumber;
 
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
@@ -1395,6 +1396,7 @@ namespace GLVM::core
 		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
         core::vector<ecs::components::transform>* pEntity_Container_refTransform =
 			pComponent_Manager->GetComponentContainer<ecs::components::transform>();
+		unsigned int previousContainerSize = 0;
 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
             for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
 				//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
@@ -1414,9 +1416,10 @@ namespace GLVM::core
 
 				// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 				// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
-				
-				updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + j + currentFrame, transformComponent);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[MAX_FRAMES_IN_FLIGHT * i + j + currentFrame], 0, nullptr);
+				std::cout << "entity id: " << uiEntity << " i: " << i << " j: " << j << std::endl;
+				unsigned int uboIndex = previousContainerSize + MAX_FRAMES_IN_FLIGHT * j + currentFrame;
+				updateUniformBuffer(uboIndex, transformComponent);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[uboIndex], 0, nullptr);
 				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
 				// std::cout << "texture: " << textureID << std::endl;                
                 VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -1429,8 +1432,10 @@ namespace GLVM::core
                 vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
                 vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
             }
-		}
 
+			previousContainerSize += (2 * texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size());
+		}
+		std::cout << "End of loop" << std::endl;
         // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
 
         // VkViewport viewportHUD{};
