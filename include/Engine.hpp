@@ -41,11 +41,12 @@ namespace GLVM::core
 		Time::IChrono       * chrono;
         Sound::ISoundEngine * soundEngine;
 
-		float              deltaFrameTime;
-		float              gravity;
-		CStack             Input_Stack_;
-		CVulkanRenderer*   vulkanRenderer;
-		COpenglRenderer*   openglRenderer;
+		float                deltaFrameTime;
+		float                gravity;
+		CStack               Input_Stack_;
+		std::vector<ecs::Texture> textureVector;
+		CVulkanRenderer*     vulkanRenderer;
+		COpenglRenderer*     openglRenderer;
 //        ecs::CRenderSystem * renderSystemInterface;
         
         ecs::CCollisionSystem  * collisionSystem;
@@ -74,6 +75,7 @@ namespace GLVM::core
 		void EventQueueFlush();
 		void RenderOpengl();
 		void RenderVulkan();
+		void SetTextureVector(std::vector<ecs::Texture> _textureVector);
 		void FPScounter();
 		void GameKill();
 //        void PlaybackSound(core::CSoundEngine& _sound_Engine);

@@ -65,6 +65,7 @@ namespace GLVM::core {
 		GLuint quadVAO_;
 		GLuint quadVBO_;
 		float delta;
+		std::vector<ecs::Texture> textureVector;
 
 		GLuint vboPlane, vaoPlane;
 		float plane[36] = {

@@ -106,6 +106,7 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		openglRenderer = new COpenglRenderer();
+		openglRenderer->textureVector = textureVector;
 		openglRenderer->run();
 
 #ifdef __linux__
@@ -255,6 +256,10 @@ namespace GLVM::core
 		// delete vulkanRenderer;
 		// vulkanRenderer = nullptr;
 	}
+
+    void Engine::SetTextureVector(std::vector<ecs::Texture> _textureVector) {
+        textureVector = _textureVector;
+    }
 	
 	void Engine::FPScounter() {
 		++fpsCounter;

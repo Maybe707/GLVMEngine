@@ -25,7 +25,6 @@ int main()
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 	core::MeshManager    * MeshManager       = core::MeshManager::GetInstance();
-	ecs::TextureManager  * TextureManager    = ecs::TextureManager::GetInstance();
 //	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
 	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
@@ -71,7 +70,7 @@ int main()
 		.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
 
     std::vector<ecs::Texture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4, hudTexture_0 };
-    TextureManager->SetTextureVector(TextureVector);
+//    TextureManager->SetTextureVector(TextureVector);
 
     // CTexture hudTexture_1;
     // hudTexture_1.iWidth_ = 32;
@@ -112,7 +111,6 @@ int main()
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 0, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-    TextureManager->BindTexture(uiWitch, materialWitch->diffuseTextureID_);
 
     Entity uiWitch2 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch2);
@@ -123,7 +121,6 @@ int main()
 	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
 	*materialWitch2 = { .diffuseTextureID_ = 0, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-    TextureManager->BindTexture(uiWitch2, materialWitch2->diffuseTextureID_);
 
 	Entity uiWitch3 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch3);
@@ -132,7 +129,6 @@ int main()
 	cm::material* materialWitch3  = ComponentManager->GetComponent<cm::material>(uiWitch3);
 	*materialWitch3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-    TextureManager->BindTexture(uiWitch3, materialWitch3->diffuseTextureID_);
 
 	Entity uiWitch4 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::vertex, cm::collider, cm::transform>(uiWitch4);
@@ -142,7 +138,6 @@ int main()
 	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
 	*materialWitch4 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-    TextureManager->BindTexture(uiWitch4, materialWitch4->diffuseTextureID_);
 	
     // Entity u_iHud1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::collider, cm::transform, cm::texture>(u_iHud1);
@@ -163,7 +158,6 @@ int main()
 	ComponentManager->GetComponent<cm::vertex>(directionalLight0)->vkVertexId_ = 0;
 	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
 	*materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-	TextureManager->BindTexture(directionalLight0, materialDirectionalLight0->diffuseTextureID_);
 
 	// Entity directionalLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
@@ -241,11 +235,12 @@ int main()
 //	spotLightComponent0.direction    =  TransformPlayer.tForward;
 //	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
 
-	core::Engine* GLVM = core::Engine::GetInstance();		
+	core::Engine* GLVM = core::Engine::GetInstance();
+	GLVM->SetTextureVector(TextureVector);
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

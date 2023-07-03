@@ -519,9 +519,6 @@ namespace GLVM::core
 		// RaycastringDebug();
 		// coreShaderProgram->Use();
 
-		ecs::TextureManager* textureManager = ecs::TextureManager::GetInstance();
-		std::vector<ecs::Texture>& texture_load_data_ = textureManager->GetTextureVector();
-
 //		unsigned int inverseCounter = 0;
 //		coreShaderProgram->SetMat4("inverseMatrices", 3, inverseMatrices[0]);
 
@@ -593,53 +590,59 @@ namespace GLVM::core
 			jointMatricesData = nullptr;
 		}
 
-		for(unsigned int i = 0; i < texture_load_data_.size(); ++i) {
-			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-				unsigned int uiEntity_refTexture = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = pComponent_Manager->collectLinkedEntities<cm::transform,
+																							 cm::material,
+																							 cm::transform>();
 
-				cm::vertex* vertexComponent = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture);
-				unsigned int uiVertexId = 0;
-				if ( vertexComponent != nullptr )
-					uiVertexId = vertexComponent->vkVertexId_;
+		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();			
+		std::cout << linkedEntitiesVectorSize << std::endl;
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			unsigned int uiEntity_refTexture = linkedEntities[i];
+//			cm::texture* texture = componentManager->GetComponent<cm::texture>(uiEntity_refTexture);
 
-				cm::material* material = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
-				unsigned int diffuseTextureID  = 0;
-				unsigned int specularTextureID = 0;
-				if ( material != nullptr ) {
-					diffuseTextureID  = material->diffuseTextureID_;
-					specularTextureID = material->specularTextureID_;
-				}
 
-				cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
-				if ( transformComponent != nullptr )
-					modelMatrix = SetModelMatrix(*transformComponent);
+			cm::vertex* vertexComponent = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture);
+			unsigned int uiVertexId = 0;
+			if ( vertexComponent != nullptr )
+				uiVertexId = vertexComponent->vkVertexId_;
 
-				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE28);
-				glBindTexture(GL_TEXTURE_2D, texture_load_data_[diffuseTextureID].iTexture_);
-				pGLActive_Texture(GL_TEXTURE29);
-		 		glBindTexture(GL_TEXTURE_2D, texture_load_data_[specularTextureID].iTexture_);
-				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				cm::material* materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
-				shaderProgram_->SetFloat("material.shininess", materialComponent->shininess);
-				shaderProgram_->SetVec3("material.ambient",  materialComponent->ambient[0], materialComponent->ambient[1], materialComponent->ambient[2]);
-				// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
-//				coreShaderProgram->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
-				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-
+			cm::material* material = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
+			unsigned int diffuseTextureID  = 0;
+			unsigned int specularTextureID = 0;
+			if ( material != nullptr ) {
+				diffuseTextureID  = material->diffuseTextureID_;
+				specularTextureID = material->specularTextureID_;
 			}
+
+			cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
+			if ( transformComponent != nullptr )
+				modelMatrix = SetModelMatrix(*transformComponent);
+
+			shaderProgram_->SetMat4("modelMatrix", modelMatrix);
+			pGLActive_Texture(GL_TEXTURE28);
+			glBindTexture(GL_TEXTURE_2D, textureVector[diffuseTextureID].iTexture_);
+			pGLActive_Texture(GL_TEXTURE29);
+			glBindTexture(GL_TEXTURE_2D, textureVector[specularTextureID].iTexture_);
+			pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+			cm::material* materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
+			shaderProgram_->SetFloat("material.shininess", materialComponent->shininess);
+			shaderProgram_->SetVec3("material.ambient",  materialComponent->ambient[0], materialComponent->ambient[1], materialComponent->ambient[2]);
+			// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
+//				coreShaderProgram->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
+			glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 		}
 
-		for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
-			for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-				unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
-				modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
-				shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-				pGLActive_Texture(GL_TEXTURE30);
-				pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-				glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-			}
+		// for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
+		// 	for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+		// 		unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
+        //         unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
+		// 		modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
+		// 		shaderProgram_->SetMat4("modelMatrix", modelMatrix);
+		// 		pGLActive_Texture(GL_TEXTURE30);
+		// 		pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+		// 		glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+		// 	}
 	}
 
 	void COpenglRenderer::Raycasting() {
@@ -695,8 +698,8 @@ namespace GLVM::core
 
 				if ( max > min ) {
 					// std::cout << "TEST 2" << std::endl;
-					std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
-					std::cout << "other entity: " << entityOther << std::endl;
+					// std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
+					// std::cout << "other entity: " << entityOther << std::endl;
 					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
 					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
@@ -1896,15 +1899,13 @@ namespace GLVM::core
 	}
 	
     void COpenglRenderer::run() {
-		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
 		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
-		for ( unsigned int i = 0; i < textureManager->GetTextureVector().size(); ++i ) {
-			LoadTextureData(textureManager->GetTextureVector()[i]);
+		for ( unsigned int i = 0; i < textureVector.size(); ++i ) {
+			LoadTextureData(textureVector[i]);
 		}
 
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
-		SetTextureData(textureManager->GetTextureVector());
 		
 //		loadWavefrontObj();
 		LoadGLTF();
@@ -1957,7 +1958,7 @@ namespace GLVM::core
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
 
-		std::cout << beholder.forward << std::endl;
+//		std::cout << beholder.forward << std::endl;
 		
         viewMatrix = LookAtMain(player.tPosition,
 								player.tPosition + beholder.forward,
