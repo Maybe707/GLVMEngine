@@ -30,25 +30,6 @@ namespace GLVM::core
     }
 
     CVulkanRenderer::CVulkanRenderer() {
-		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
-		
-		std::vector<ecs::Texture> _initializeTextureData = textureManager->GetTextureVector();
-		
-        unsigned int mainTexturesQuantity = _initializeTextureData.size();
-
-        initializeTextureData_.resize(mainTexturesQuantity);
-
-        for(unsigned int i = 0; i < _initializeTextureData.size(); ++i)
-			initializeTextureData_[i] = _initializeTextureData[i];
-        
-        textureImages.resize(mainTexturesQuantity);
-        textureImageMemories.resize(mainTexturesQuantity);
-
-        textureImageViews.resize(mainTexturesQuantity);
-        textureSamplers.resize(mainTexturesQuantity);
-
-		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorSetLayout()});
-		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
     }
     
     CVulkanRenderer::~CVulkanRenderer() {
@@ -257,11 +238,22 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::run() {
-		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
+//		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
         GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
-		SetTextureData(textureManager->GetTextureVector());
+//		SetTextureData(textureManager->GetTextureVector());
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+
+		unsigned int mainTexturesQuantity = initializeTextureData_.size();
+
+        textureImages.resize(mainTexturesQuantity);
+        textureImageMemories.resize(mainTexturesQuantity);
+
+        textureImageViews.resize(mainTexturesQuantity);
+        textureSamplers.resize(mainTexturesQuantity);
+
+		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorSetLayout()});
+		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
 		
         initWindow();
         initVulkan();
@@ -1101,9 +1093,13 @@ namespace GLVM::core
 		// VkDeviceSize pointLightsBufferSize = sizeof(PointLightsUBO);
 //		VkDeviceSize spotLightsBufferSize = sizeof(SpotLightsUBO);
 
-		for ( unsigned int i = 0; i < initializeTextureData_.size(); ++i )
-			for ( unsigned int j = 0; j < initializeTextureData_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j )
-				++uboDescriptorsNumber;
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::vertex>();
+		
+		uboDescriptorsNumber = linkedEntities.GetSize();
 		
         modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
         modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
@@ -1375,8 +1371,6 @@ namespace GLVM::core
         /* MAX_FRAMES_IN_FLIGHT doubles texture pool and then j + currentFrame * texturePool
          * choose specific texture. */
 
-        ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
-
 		// core::vector<unsigned int>* entitiesContainerTexture =
 		// 	componentManager->GetEntityContainer<ecs::components::texture>();
 //		unsigned int textureContainerSize = entitiesContainerTexture->GetSize();
@@ -1393,49 +1387,46 @@ namespace GLVM::core
 // 		}
 		
 
-		ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        core::vector<ecs::components::transform>* pEntity_Container_refTransform =
-			pComponent_Manager->GetComponentContainer<ecs::components::transform>();
-		unsigned int previousContainerSize = 0;
-		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
-            for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-				//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
-				unsigned int uiEntity = texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-                unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
-				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[uiEntity];
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::vertex>();
+		
+		for ( unsigned int i = 0; i < uboDescriptorsNumber; ++i ) {
+			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
+			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 
-				// VkBufferMemoryBarrier bufferMemoryBarrier{};
-				// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-				// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-				// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-				// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-				// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-				// bufferMemoryBarrier.offset = 0;
-				// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
+			// VkBufferMemoryBarrier bufferMemoryBarrier{};
+			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
+			// bufferMemoryBarrier.offset = 0;
+			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
 
-				// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-				// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
-				std::cout << "entity id: " << uiEntity << " i: " << i << " j: " << j << std::endl;
-				unsigned int uboIndex = previousContainerSize + MAX_FRAMES_IN_FLIGHT * j + currentFrame;
-				updateUniformBuffer(uboIndex, transformComponent);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[uboIndex], 0, nullptr);
-				// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-				// std::cout << "texture: " << textureID << std::endl;                
-                VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-                VkDeviceSize offsets[] = {0};
-                vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+			unsigned int uboIndex = i + currentFrame;
+			updateUniformBuffer(uboIndex, *transformComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[uboIndex], 0, nullptr);
+			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
+			// std::cout << "texture: " << textureID << std::endl;                
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-                vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
-                unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-                vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
-                vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-            }
-
-			previousContainerSize += (2 * texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size());
+			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
-		std::cout << "End of loop" << std::endl;
+
         // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
 
         // VkViewport viewportHUD{};

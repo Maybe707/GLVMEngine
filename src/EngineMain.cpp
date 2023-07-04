@@ -239,8 +239,8 @@ int main()
 	GLVM->SetTextureVector(TextureVector);
 	
     ///< Game rendering loop
-	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

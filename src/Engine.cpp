@@ -182,6 +182,7 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		vulkanRenderer = new CVulkanRenderer();
+		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->run();
 
 #ifdef __linux__
