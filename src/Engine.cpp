@@ -107,6 +107,8 @@ namespace GLVM::core
 
 		openglRenderer = new COpenglRenderer();
 		openglRenderer->textureVector = textureVector;
+		openglRenderer->pathsArray_            = pathsArray_;
+		openglRenderer->pathsGLTF_             = pathsGLTF_;
 		openglRenderer->run();
 
 #ifdef __linux__
@@ -183,6 +185,8 @@ namespace GLVM::core
 
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
+		vulkanRenderer->pathsArray_            = pathsArray_;
+		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
 		vulkanRenderer->run();
 
 #ifdef __linux__
@@ -261,6 +265,14 @@ namespace GLVM::core
     void Engine::SetTextureVector(std::vector<ecs::Texture> _textureVector) {
         textureVector = _textureVector;
     }
+
+	void Engine::SetMesh(const char* _pathToMesh) {
+        pathsArray_.push_back(_pathToMesh);
+    }
+
+	void Engine::SetMeshGLTF(const char* pathToMesh) {
+		pathsGLTF_.Push(pathToMesh);
+	}
 	
 	void Engine::FPScounter() {
 		++fpsCounter;

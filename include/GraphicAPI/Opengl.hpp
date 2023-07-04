@@ -66,6 +66,8 @@ namespace GLVM::core {
 		GLuint quadVBO_;
 		float delta;
 		std::vector<ecs::Texture> textureVector;
+		std::vector<const char*> pathsArray_;
+		core::vector<const char*> pathsGLTF_;
 
 		GLuint vboPlane, vaoPlane;
 		float plane[36] = {
@@ -116,8 +118,6 @@ namespace GLVM::core {
 		bool shadows = true;
 		std::vector<ecs::Texture> texture_load_data;
         std::vector<ecs::Texture> hudTexture_load_data_;
-		std::vector<const char*> pathsArray_; ///< Paths to files with vertecis data.
-		core::vector<const char*> pathsGLTF;
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;

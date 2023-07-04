@@ -45,6 +45,8 @@ namespace GLVM::core
 		float                gravity;
 		CStack               Input_Stack_;
 		std::vector<ecs::Texture> textureVector;
+		std::vector<const char*> pathsArray_;
+		core::vector<const char*> pathsGLTF_;
 		CVulkanRenderer*     vulkanRenderer;
 		COpenglRenderer*     openglRenderer;
 //        ecs::CRenderSystem * renderSystemInterface;
@@ -76,6 +78,8 @@ namespace GLVM::core
 		void RenderOpengl();
 		void RenderVulkan();
 		void SetTextureVector(std::vector<ecs::Texture> _textureVector);
+		void SetMesh(const char* _pathToMesh);
+		void SetMeshGLTF(const char* pathToMesh);
 		void FPScounter();
 		void GameKill();
 //        void PlaybackSound(core::CSoundEngine& _sound_Engine);

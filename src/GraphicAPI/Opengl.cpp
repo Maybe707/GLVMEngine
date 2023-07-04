@@ -937,10 +937,10 @@ namespace GLVM::core
     }
 
 	void COpenglRenderer::LoadGLTF() {
-		for (unsigned int m = 0; m < pathsGLTF.GetSize(); ++m) {
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			
 			Core::CJsonParser parser;
-			parser.ReadFile(pathsGLTF[m]);
+			parser.ReadFile(pathsGLTF_[m]);
 			parser.Parse();
 
 			// const Core::JsonValue* binaryPath = parser.Search("uri");
@@ -1877,7 +1877,7 @@ namespace GLVM::core
             pathsArray_.push_back(_pathsArray[i]);
 
 		for (unsigned int i = 0; i < pathsGLTF_.GetSize(); ++i)
-			pathsGLTF.Push(pathsGLTF_[i]);
+			pathsGLTF_.Push(pathsGLTF_[i]);
 	}
 
  	void COpenglRenderer::LoadTextureData(GLVM::ecs::Texture& texture)
@@ -1899,13 +1899,13 @@ namespace GLVM::core
 	}
 	
     void COpenglRenderer::run() {
-		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
+//		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
 		for ( unsigned int i = 0; i < textureVector.size(); ++i ) {
 			LoadTextureData(textureVector[i]);
 		}
 
-		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+//		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		
 //		loadWavefrontObj();
 		LoadGLTF();

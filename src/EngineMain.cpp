@@ -24,10 +24,10 @@ int main()
 
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
-	core::MeshManager    * MeshManager       = core::MeshManager::GetInstance();
+//	core::MeshManager    * MeshManager       = core::MeshManager::GetInstance();
 //	ecs::TextureManager  * hudTextureManager = ecs::TextureManager::GetHUDInstance();
 //    MeshManager->SetMesh("../waveFrontObj/cube_uv.obj");
-	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
+//	MeshManager->SetMesh("../waveFrontObj/cube2.obj");
 //	MeshManager->SetMesh("../waveFrontObj/sphere.obj");
 	// MeshManager->SetMesh("../waveFrontObj/cone.obj");
 	// MeshManager->SetMesh("../waveFrontObj/monkey.obj");
@@ -49,7 +49,7 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cubeAnimation.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake9.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake_x_inverse_y.gltf");
-	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake32.gltf");
+//	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake32.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake9.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/bone_cube.gltf");
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cb.gltf");	
@@ -237,10 +237,12 @@ int main()
 
 	core::Engine* GLVM = core::Engine::GetInstance();
 	GLVM->SetTextureVector(TextureVector);
+	GLVM->SetMesh("../waveFrontObj/cube2.obj");
+	GLVM->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake32.gltf");
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

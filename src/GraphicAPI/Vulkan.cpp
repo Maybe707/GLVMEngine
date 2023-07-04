@@ -238,10 +238,8 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::run() {
-//		GLVM::ecs::TextureManager* textureManager = GLVM::ecs::TextureManager::GetInstance();
         GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
-//		SetTextureData(textureManager->GetTextureVector());
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 
 		unsigned int mainTexturesQuantity = initializeTextureData_.size();
