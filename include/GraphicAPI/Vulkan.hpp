@@ -152,13 +152,13 @@ namespace GLVM::core
 		SPOT_LIGHTS_UBO
 	};
 	
-    struct ModelMatrixUBO {
-        alignas(16) mat4 model;
-        alignas(16) mat4 view;
-        alignas(16) mat4 proj;
+    struct alignas(16) ModelMatrixUBO {
+        mat4 model;
+        mat4 view;
+        mat4 proj;
     };
 
-	struct DirectionalLight {
+	struct alignas(16) DirectionalLight {
 		vec3 position;
 		vec3 direction;
   
@@ -167,7 +167,7 @@ namespace GLVM::core
 		vec3 specular;
 	};
 
-	struct PointLight {
+	struct alignas(16) PointLight {
 		vec3 position;
 
 		vec3 ambient;
@@ -179,7 +179,7 @@ namespace GLVM::core
 		float quadratic;
 	};
 
-	struct SpotLight {
+	struct alignas(16) SpotLight {
 		vec3  position;
 		vec3  direction;
 		float cutOff;
@@ -194,13 +194,13 @@ namespace GLVM::core
 		float quadratic;
 	};
 	
-    struct ViewPositionUBO {
-		alignas(16) vec3 viewPosition;
+    struct alignas(16) ViewPositionUBO {
+		vec3 viewPosition;
     };
 
-    struct MaterialUBO {
-		alignas(16) vec3  ambient;
-		alignas(16) float shininess;
+    struct alignas(16) MaterialUBO {
+		vec3  ambient;
+		float shininess;
     };
 
 #define DIRECTIONAL_LIGHTS_NUMBER                          4

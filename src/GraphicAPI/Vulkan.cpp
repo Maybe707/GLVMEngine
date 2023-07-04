@@ -1398,6 +1398,7 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
 
 			// VkBufferMemoryBarrier bufferMemoryBarrier{};
 			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -1411,7 +1412,8 @@ namespace GLVM::core
 
 			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
-			unsigned int uboIndex = i + currentFrame;
+			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
+			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 			updateUniformBuffer(uboIndex, *transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[uboIndex], 0, nullptr);
 			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
@@ -1423,7 +1425,7 @@ namespace GLVM::core
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * i + currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &descriptorSets2[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
