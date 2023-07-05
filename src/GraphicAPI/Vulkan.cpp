@@ -1163,71 +1163,70 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorSets() {
-        std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber, descriptors[0].setLayout);
-        VkDescriptorSetAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo.descriptorPool = descriptorPool;
-        allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
-        allocInfo.pSetLayouts = layouts.data();
-
-        descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber);
-        if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate descriptor sets!");
-        }
-
-		//        int textureImageViewsIndex = 0;
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber; ++i) {
-            VkDescriptorBufferInfo modelMatrixBufferInfo{};
-            modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
-            modelMatrixBufferInfo.offset = 0;
-            modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
+		for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
+			unsigned int descriptorsNumber = 0;
+			if ( descriptors[i].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER )
+				descriptorsNumber = uboDescriptorsNumber;
+			else if ( descriptors[i].type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER )
+				descriptorsNumber = initializeTextureData_.size();
+				
+			std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT * descriptorsNumber, descriptors[i].setLayout);
+			VkDescriptorSetAllocateInfo allocInfo{};
+			allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			allocInfo.descriptorPool = descriptorPool;
+			allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * descriptorsNumber);
+			allocInfo.pSetLayouts = layouts.data();
 			
-            std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			if ( descriptors[i].type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+				descriptorSets.resize(MAX_FRAMES_IN_FLIGHT * descriptorsNumber);
+				if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+					throw std::runtime_error("failed to allocate descriptor sets!");
+				}
+				//        int textureImageViewsIndex = 0;
+				for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uboDescriptorsNumber; ++i) {
+					VkDescriptorBufferInfo modelMatrixBufferInfo{};
+					modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
+					modelMatrixBufferInfo.offset = 0;
+					modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
-            descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[0].dstSet = descriptorSets[i];
-            descriptorWrites[0].dstBinding = 0;
-            descriptorWrites[0].dstArrayElement = 0;
-            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrites[0].descriptorCount = 1;
-            descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-            vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-        }
-		
-        std::vector<VkDescriptorSetLayout> layouts2(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(), descriptors[1].setLayout);
-        VkDescriptorSetAllocateInfo allocInfo2{};
-        allocInfo2.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-        allocInfo2.descriptorPool = descriptorPool;
-        allocInfo2.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        allocInfo2.pSetLayouts = layouts2.data();
-
-        descriptorSets2.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-        if (vkAllocateDescriptorSets(device, &allocInfo2, descriptorSets2.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate descriptor sets!");
-        }
-
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
-			VkDescriptorImageInfo imageInfo{};
-            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-            imageInfo.imageView = textureImageViews[textureIndex];
-            imageInfo.sampler = textureSamplers[textureIndex];
+					std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-            std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrites[0].dstSet = descriptorSets2[i];
-            descriptorWrites[0].dstBinding = 1;
-            descriptorWrites[0].dstArrayElement = 0;
-            descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-            descriptorWrites[0].descriptorCount = 1;
-            descriptorWrites[0].pImageInfo = &imageInfo;
+					descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[0].dstSet = descriptorSets[i];
+					descriptorWrites[0].dstBinding = 0;
+					descriptorWrites[0].dstArrayElement = 0;
+					descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+					descriptorWrites[0].descriptorCount = 1;
+					descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+					vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				}
+			} else if ( descriptors[i].type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+				descriptorSets2.resize(MAX_FRAMES_IN_FLIGHT * descriptorsNumber);
+				if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets2.data()) != VK_SUCCESS) {
+					throw std::runtime_error("failed to allocate descriptor sets!");
+				}
+				
+				for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
+					VkDescriptorImageInfo imageInfo{};
+					imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+					unsigned int textureIndex = i / 2;
+					imageInfo.imageView = textureImageViews[textureIndex];
+					imageInfo.sampler = textureSamplers[textureIndex];
+			
+					std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+					descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[0].dstSet = descriptorSets2[i];
+					descriptorWrites[0].dstBinding = 1;
+					descriptorWrites[0].dstArrayElement = 0;
+					descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+					descriptorWrites[0].descriptorCount = 1;
+					descriptorWrites[0].pImageInfo = &imageInfo;
+
+					vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				}
+			}
 		}
-
-		
-
     }
 
     void CVulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
