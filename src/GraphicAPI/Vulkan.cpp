@@ -1631,12 +1631,16 @@ namespace GLVM::core
 																						   cm::material,
 																						   cm::vertex>();
 		
+		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
+		
 		for ( unsigned int i = 0; i < matrixUboDescriptorsNumber; ++i ) {
 			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
+			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 
 			// VkBufferMemoryBarrier bufferMemoryBarrier{};
 			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
@@ -1652,13 +1656,18 @@ namespace GLVM::core
 			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateUniformBuffer(uboIndex, *transformComponent);
+			updateMatrixUniformBuffer(uboIndex, *transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[0], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 2, 1, &materialUboDescriptorSets[0], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[0], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 4, 1, &pointLightUboDescriptorSets[0], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 5, 1, &spotLightUboDescriptorSets[0], 0, nullptr);
+			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
+			updateMaterialUniformBuffer(currentFrame, *materialComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 2, 1, &materialUboDescriptorSets[currentFrame], 0, nullptr);
+			updateDirectionalLightUniformBuffer(currentFrame);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
+			updatePointLightUniformBuffer(currentFrame);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 4, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
+			updateSpotLightUniformBuffer(currentFrame);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
 
 			
 			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
@@ -1671,7 +1680,7 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 7, 1, &specularSamplerDescriptorSets[0], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 7, 1, &specularSamplerDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -1731,7 +1740,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent) {
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent) {
         ModelMatrixUBO modelMatrixUBO{};
 		// ViewPositionUBO viewPositionUBO{};
 		// MaterialUBO materialUBO{};
@@ -1806,6 +1815,136 @@ namespace GLVM::core
         // vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
     }
 
+	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
+		ViewPositionUBO viewPositionUBO{};
+
+		viewPositionUBO.viewPosition = transformComponent->tPosition;
+		std::cout << transformComponent->tPosition << std::endl;
+		
+        void* data;
+        vkMapMemory(device, viewPositionUniformBuffersMemory[currentImage], 0,
+					sizeof(viewPositionUBO), 0, &data);
+        memcpy(data, &viewPositionUBO, sizeof(viewPositionUBO));
+        vkUnmapMemory(device, viewPositionUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material materialComponent) {
+		MaterialUBO materialUBO{};
+
+		materialUBO.ambient = materialComponent.ambient;
+		materialUBO.shininess = materialComponent.shininess;
+		
+        void* data;
+        vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
+					sizeof(materialUBO), 0, &data);
+        memcpy(data, &materialUBO, sizeof(materialUBO));
+        vkUnmapMemory(device, materialUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updateDirectionalLightUniformBuffer(uint32_t currentImage) {
+		DirectionalLightsUBO directionalLightUbo{};
+		DirectionalLight directionalLight{};
+
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::directionalLight,
+																						   cm::vertex>();
+
+		assert(directionalLightUboDescriptorsNumber < 4 && "Directional lights number greater then 4");
+
+		for ( unsigned int i = 0; i < directionalLightUboDescriptorsNumber; ++i ) {
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(linkedEntities[i]);
+			
+			directionalLight.position  = directionalLightComponent->position;
+			directionalLight.direction = directionalLightComponent->direction;
+			directionalLight.ambient   = directionalLightComponent->ambient;
+			directionalLight.diffuse   = directionalLightComponent->diffuse;
+			directionalLight.specular  = directionalLightComponent->specular;
+
+			directionalLightUbo.directionalLights[i] = directionalLight;			
+		}
+
+		directionalLightUbo.directionalLightsArraySize = directionalLightUboDescriptorsNumber;
+
+        void* data;
+        vkMapMemory(device, directionalLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(DirectionalLightsUBO), 0, &data);
+        memcpy(data, &directionalLightUbo, sizeof(DirectionalLightsUBO));
+        vkUnmapMemory(device, directionalLightsUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updatePointLightUniformBuffer(uint32_t currentImage) {
+		PointLightsUBO pointLightUboArray{};
+		PointLight pointLightUBO{};
+
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::pointLight,
+																						   cm::vertex>();
+
+		assert(pointLightUboDescriptorsNumber < 32 && "Point lights number greater then 32");
+		for ( unsigned int i = 0; i < pointLightUboDescriptorsNumber; ++i ) {
+			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntities[i]);
+			
+			pointLightUBO.position  = pointLightComponent->position;
+			pointLightUBO.ambient   = pointLightComponent->ambient;
+			pointLightUBO.diffuse   = pointLightComponent->diffuse;
+			pointLightUBO.specular  = pointLightComponent->specular;
+			pointLightUBO.constant  = pointLightComponent->constant;
+			pointLightUBO.linear    = pointLightComponent->linear;
+			pointLightUBO.quadratic = pointLightComponent->quadratic; 
+
+			pointLightUboArray.pointLights[i] = pointLightUBO;
+		}
+
+		pointLightUboArray.pointLightsArraySize = pointLightUboDescriptorsNumber;
+
+        void* data;
+        vkMapMemory(device, pointLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(pointLightUBO) * 32 + sizeof(pointLightUboDescriptorsNumber), 0, &data);
+        memcpy(data, &pointLightUboArray, sizeof(pointLightUBO) * 32 + sizeof(pointLightUboDescriptorsNumber));
+        vkUnmapMemory(device, pointLightsUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updateSpotLightUniformBuffer(uint32_t currentImage) {
+		SpotLightsUBO spotLightUBO{};
+		SpotLight spotLight{};
+
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::spotLight,
+																						   cm::vertex>();
+
+		assert(spotLightUboDescriptorsNumber < 8 && "Spot light number greater then 8");
+		for ( unsigned int i = 0; i < spotLightUboDescriptorsNumber; ++i ) {
+			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(linkedEntities[i]);
+			
+			spotLight.position    = spotLightComponent->position;
+			spotLight.direction   = spotLightComponent->direction;
+			spotLight.cutOff      = spotLightComponent->cutOff;
+			spotLight.outerCutOff = spotLightComponent->outerCutOff;
+			spotLight.ambient     = spotLightComponent->ambient;
+			spotLight.diffuse     = spotLightComponent->diffuse;
+			spotLight.specular    = spotLightComponent->specular;
+			spotLight.constant    = spotLightComponent->constant;
+			spotLight.linear      = spotLightComponent->linear;
+			spotLight.quadratic   = spotLightComponent->quadratic; 
+
+			spotLightUBO.spotLights[i] = spotLight;
+		}
+
+		spotLightUBO.spotLightArraySize = spotLightUboDescriptorsNumber;
+
+        void* data;
+        vkMapMemory(device, spotLightsUniformBuffersMemory[currentImage], 0,
+					sizeof(spotLight) * 8 + sizeof(spotLightUboDescriptorsNumber), 0, &data);
+        memcpy(data, &spotLightUBO, sizeof(spotLight) * 8 + sizeof(spotLightUboDescriptorsNumber));
+        vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
+	}
+	
     void CVulkanRenderer::drawFrame() {
 		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);

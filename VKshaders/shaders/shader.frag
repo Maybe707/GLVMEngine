@@ -68,17 +68,17 @@ struct SpotLight {
 #define SPOT_LIGHTS_NUMBER                                 8
 
 layout(set = 3, binding = 3) uniform DirectionalLightsUBO {
-	DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
+	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
 	int directionalLightsArraySize;
 } directionalLights;
 
 layout(set = 4, binding = 4) uniform PointLightsUBO {
-	PointLight pointLights[POINT_LIGHTS_NUMBER];
+	PointLight pointLightsArray[POINT_LIGHTS_NUMBER];
 	int pointLightsArraySize;
 } pointLights;
 
 layout(set = 5, binding = 5) uniform SpotLightsUBO {
-	SpotLight spotLights[SPOT_LIGHTS_NUMBER];
+	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 } spotLights;
 
@@ -96,13 +96,13 @@ void main()
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i )
-		result += ComputeDirectionalLight(directionalLights.directionalLights[i], inFragmentNormal, viewDirection);
+		result += ComputeDirectionalLight(directionalLights.directionalLightsArray[i], inFragmentNormal, viewDirection);
 
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i)
-		result += ComputePointLight(pointLights.pointLights[i], inFragmentNormal, inFragmentPosition, viewDirection);
+		result += ComputePointLight(pointLights.pointLightsArray[i], inFragmentNormal, inFragmentPosition, viewDirection);
 
 	for(int i = 0; i < spotLights.spotLightArraySize; ++i)
-		result += ComputeSpotLight(spotLights.spotLights[i], inFragmentNormal, inFragmentPosition, viewDirection);
+		result += ComputeSpotLight(spotLights.spotLightsArray[i], inFragmentNormal, inFragmentPosition, viewDirection);
 
 	outColor = vec4(result, 1.0);
 }

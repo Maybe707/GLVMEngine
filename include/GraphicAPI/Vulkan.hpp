@@ -158,43 +158,43 @@ namespace GLVM::core
         mat4 proj;
     };
 
-	struct alignas(16) DirectionalLight {
-		vec3 position;
-		vec3 direction;
+	 struct DirectionalLight {
+		alignas(16) vec3 position;
+		alignas(16) vec3 direction;
   
-		vec3 ambient;
-		vec3 diffuse;
-		vec3 specular;
+		alignas(16) vec3 ambient;
+		alignas(16) vec3 diffuse;
+		alignas(16) vec3 specular;
 	};
 
-	struct alignas(16) PointLight {
-		vec3 position;
+	struct PointLight {
+		alignas(16) vec3 position;
 
-		vec3 ambient;
-		vec3 diffuse;
-		vec3 specular;
+		alignas(16) vec3 ambient;
+		alignas(16) vec3 diffuse;
+		alignas(16) vec3 specular;
 
 		float constant;
 		float linear;
 		float quadratic;
 	};
 
-	struct alignas(16) SpotLight {
-		vec3  position;
-		vec3  direction;
+	struct SpotLight {
+		alignas(16) vec3  position;
+		alignas(16) vec3  direction;
 		float cutOff;
 		float outerCutOff;
 
-		vec3  ambient;
-		vec3  diffuse;
-		vec3  specular;
+		alignas(16) vec3  ambient;
+		alignas(16) vec3  diffuse;
+		alignas(16) vec3  specular;
 
 		float constant;
 		float linear;
 		float quadratic;
 	};
 	
-    struct alignas(16) ViewPositionUBO {
+    struct ViewPositionUBO {
 		vec3 viewPosition;
     };
 
@@ -206,21 +206,21 @@ namespace GLVM::core
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
-	
+
 	struct DirectionalLightsUBO {
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 		int directionalLightsArraySize;
-	};
+	} __attribute__((packed));
 
 	struct PointLightsUBO {
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
-	};
+	} __attribute__((packed));
 
 	struct SpotLightsUBO {
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
-	};
+	} __attribute__((packed));
 
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
@@ -505,7 +505,12 @@ namespace GLVM::core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent);
+        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent);
+		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
+		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material materialComponent);
+		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
+		void updatePointLightUniformBuffer(uint32_t currentImage);
+		void updateSpotLightUniformBuffer(uint32_t currentImage);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
