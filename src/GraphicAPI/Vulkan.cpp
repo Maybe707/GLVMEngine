@@ -1634,7 +1634,7 @@ namespace GLVM::core
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 		
-		for ( unsigned int i = 0; i < matrixUboDescriptorsNumber; ++i ) {
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
@@ -1656,11 +1656,11 @@ namespace GLVM::core
 			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, *transformComponent);
+			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
 			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			updateMaterialUniformBuffer(currentFrame, *materialComponent);
+			updateMaterialUniformBuffer(currentFrame, materialComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 2, 1, &materialUboDescriptorSets[currentFrame], 0, nullptr);
 			updateDirectionalLightUniformBuffer(currentFrame);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
@@ -1740,7 +1740,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent) {
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
         ModelMatrixUBO modelMatrixUBO{};
 		// ViewPositionUBO viewPositionUBO{};
 		// MaterialUBO materialUBO{};
@@ -1748,13 +1748,13 @@ namespace GLVM::core
 		// PointLightsUBO pointLightsUBO{};
 		// SpotLightsUBO spotLightsUBO{};
 
-        modelMatrixUBO.model[0][0] = _transformComponent.fScale;
-        modelMatrixUBO.model[1][1] = _transformComponent.fScale;
-        modelMatrixUBO.model[2][2] = _transformComponent.fScale;
+        modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        modelMatrixUBO.model[2][2] = _transformComponent->fScale;
         modelMatrixUBO.model[3][3] = 1.0;
-        modelMatrixUBO.model[0][3] = _transformComponent.tPosition[0];
-        modelMatrixUBO.model[1][3] = _transformComponent.tPosition[1];
-        modelMatrixUBO.model[2][3] = _transformComponent.tPosition[2];
+        modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
         modelMatrixUBO.view = viewMatrix;
@@ -1819,7 +1819,6 @@ namespace GLVM::core
 		ViewPositionUBO viewPositionUBO{};
 
 		viewPositionUBO.viewPosition = transformComponent->tPosition;
-		std::cout << transformComponent->tPosition << std::endl;
 		
         void* data;
         vkMapMemory(device, viewPositionUniformBuffersMemory[currentImage], 0,
@@ -1828,16 +1827,16 @@ namespace GLVM::core
         vkUnmapMemory(device, viewPositionUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material materialComponent) {
+	void CVulkanRenderer::updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent) {
 		MaterialUBO materialUBO{};
 
-		materialUBO.ambient = materialComponent.ambient;
-		materialUBO.shininess = materialComponent.shininess;
+		materialUBO.ambient = materialComponent->ambient;
+		materialUBO.shininess = materialComponent->shininess;
 		
         void* data;
         vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
-					sizeof(materialUBO), 0, &data);
-        memcpy(data, &materialUBO, sizeof(materialUBO));
+					sizeof(MaterialUBO), 0, &data);
+        memcpy(data, &materialUBO, sizeof(MaterialUBO));
         vkUnmapMemory(device, materialUniformBuffersMemory[currentImage]);
 	}
 

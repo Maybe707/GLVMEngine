@@ -505,9 +505,9 @@ namespace GLVM::core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
-        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform _transformComponent);
+        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
-		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material materialComponent);
+		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
 		void updateSpotLightUniformBuffer(uint32_t currentImage);
