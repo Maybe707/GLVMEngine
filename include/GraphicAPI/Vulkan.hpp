@@ -441,9 +441,20 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> spotLightsUniformBuffersMemory;
 		
         VkDescriptorPool descriptorPool;
-		unsigned int uboDescriptorsNumber = 0;
-        std::vector<VkDescriptorSet> descriptorSets;
-		std::vector<VkDescriptorSet> descriptorSets2;
+		unsigned int matrixUboDescriptorsNumber = 0;
+		unsigned int viewPositionUboDescriptorsNumber = 0;
+		unsigned int materialUboDescriptorsNumber = 0;
+		unsigned int directionalLightUboDescriptorsNumber = 0;
+		unsigned int pointLightUboDescriptorsNumber = 0;
+		unsigned int spotLightUboDescriptorsNumber = 0;
+        std::vector<VkDescriptorSet> matrixUboDescriptorSets;
+		std::vector<VkDescriptorSet> viewPositionUboDescriptorSets;
+		std::vector<VkDescriptorSet> materialUboDescriptorSets;
+		std::vector<VkDescriptorSet> directionalLightUboDescriptorSets;
+		std::vector<VkDescriptorSet> pointLightUboDescriptorSets;
+		std::vector<VkDescriptorSet> spotLightUboDescriptorSets;
+		std::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
+		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> commandBuffers;
 
