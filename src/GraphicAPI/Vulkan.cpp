@@ -1148,10 +1148,10 @@ namespace GLVM::core
 		
 		directionalLightUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
 		
-        directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-        directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+        directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             createBuffer(directionalLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 directionalLightsUniformBuffers[i], directionalLightsUniformBuffersMemory[i]);
 		}
@@ -1162,10 +1162,10 @@ namespace GLVM::core
 		
 		pointLightUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 		
-        pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-        pointLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+        pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        pointLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             createBuffer(pointLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 pointLightsUniformBuffers[i], pointLightsUniformBuffersMemory[i]);
 		}
@@ -1176,10 +1176,10 @@ namespace GLVM::core
 		
 		spotLightUboDescriptorsNumber = spotLightLinkedEntities.GetSize();
 		
-        spotLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
-        spotLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
+        spotLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        spotLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             createBuffer(spotLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 spotLightsUniformBuffers[i], spotLightsUniformBuffersMemory[i]);
 		}
@@ -1196,11 +1196,11 @@ namespace GLVM::core
 		poolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[2].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
 		poolSizes[3].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[3].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+        poolSizes[3].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		poolSizes[4].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[4].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+        poolSizes[4].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		poolSizes[5].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[5].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
+        poolSizes[5].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		poolSizes[6].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         poolSizes[6].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		poolSizes[7].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -1210,10 +1210,11 @@ namespace GLVM::core
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
+		unsigned int lightsTypesQuantity = 3;
         poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * (2 * initializeTextureData_.size() +
 																		 matrixUboDescriptorsNumber + viewPositionUboDescriptorsNumber +
-																		 materialUboDescriptorsNumber + directionalLightUboDescriptorsNumber +
-																		 pointLightUboDescriptorsNumber + spotLightUboDescriptorsNumber));
+																		 materialUboDescriptorsNumber) +
+												 lightsTypesQuantity * MAX_FRAMES_IN_FLIGHT);
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -1314,19 +1315,19 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber, descriptors[3].setLayout);
+		std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT, descriptors[3].setLayout);
 		VkDescriptorSetAllocateInfo directionalLightUboAllocInfo{};
 		directionalLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		directionalLightUboAllocInfo.descriptorPool = descriptorPool;
-		directionalLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		directionalLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		directionalLightUboAllocInfo.pSetLayouts = directionalLightUboLayouts.data();
 			
-		directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &directionalLightUboAllocInfo, directionalLightUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = directionalLightsUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
@@ -1345,19 +1346,19 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber, descriptors[4].setLayout);
+		std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT, descriptors[4].setLayout);
 		VkDescriptorSetAllocateInfo pointLightUboAllocInfo{};
 		pointLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		pointLightUboAllocInfo.descriptorPool = descriptorPool;
-		pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		pointLightUboAllocInfo.pSetLayouts = pointLightUboLayouts.data();
 			
-		pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &pointLightUboAllocInfo, pointLightUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = pointLightsUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
@@ -1376,19 +1377,19 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> spotLightUboLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber, descriptors[5].setLayout);
+		std::vector<VkDescriptorSetLayout> spotLightUboLayouts(MAX_FRAMES_IN_FLIGHT, descriptors[5].setLayout);
 		VkDescriptorSetAllocateInfo spotLightUboAllocInfo{};
 		spotLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		spotLightUboAllocInfo.descriptorPool = descriptorPool;
-		spotLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
+		spotLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		spotLightUboAllocInfo.pSetLayouts = spotLightUboLayouts.data();
 			
-		spotLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
+		spotLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &spotLightUboAllocInfo, spotLightUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = spotLightsUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
