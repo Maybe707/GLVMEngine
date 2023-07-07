@@ -1,5 +1,5 @@
-#include "GraphicAPI/Vulkan.hpp"
 #include "ComponentManager.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -1640,6 +1640,7 @@ namespace GLVM::core
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
+			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 
 			// VkBufferMemoryBarrier bufferMemoryBarrier{};
@@ -1660,8 +1661,8 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
 			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			updateMaterialUniformBuffer(currentFrame, materialComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 2, 1, &materialUboDescriptorSets[currentFrame], 0, nullptr);
+			updateMaterialUniformBuffer(uboIndex, materialComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 2, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
 			updateDirectionalLightUniformBuffer(currentFrame);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
 			updatePointLightUniformBuffer(currentFrame);
@@ -1680,7 +1681,7 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 7, 1, &specularSamplerDescriptorSets[currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -1832,7 +1833,7 @@ namespace GLVM::core
 
 		materialUBO.ambient = materialComponent->ambient;
 		materialUBO.shininess = materialComponent->shininess;
-		
+		std::cout << materialUBO.shininess << std::endl;
         void* data;
         vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
 					sizeof(MaterialUBO), 0, &data);
@@ -1923,8 +1924,8 @@ namespace GLVM::core
 			
 			spotLight.position    = spotLightComponent->position;
 			spotLight.direction   = spotLightComponent->direction;
-			spotLight.cutOff      = spotLightComponent->cutOff;
-			spotLight.outerCutOff = spotLightComponent->outerCutOff;
+			spotLight.cutOff      = std::cos(Radians(spotLightComponent->cutOff));
+			spotLight.outerCutOff = std::cos(Radians(spotLightComponent->outerCutOff));
 			spotLight.ambient     = spotLightComponent->ambient;
 			spotLight.diffuse     = spotLightComponent->diffuse;
 			spotLight.specular    = spotLightComponent->specular;

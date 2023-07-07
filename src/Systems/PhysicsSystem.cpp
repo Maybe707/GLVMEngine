@@ -44,7 +44,7 @@ namespace GLVM::ecs
 					move->frameMovement = 0;
                     collider->bWall_Collision_ = false;
                 }
-				transformComponent->tPosition += Normalize(move->frameMovement);
+				transformComponent->tPosition += move->frameMovement;
 				transformComponent->tPosition += move->gravity;
 //				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;

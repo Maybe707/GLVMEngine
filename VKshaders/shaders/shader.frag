@@ -99,12 +99,20 @@ void main()
 		result += ComputeDirectionalLight(directionalLights.directionalLightsArray[i], inFragmentNormal, viewDirection);
 
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i)
-		result += ComputePointLight(pointLights.pointLightsArray[i], inFragmentNormal, inFragmentPosition, viewDirection);
+		result += ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 
 	for(int i = 0; i < spotLights.spotLightArraySize; ++i)
-		result += ComputeSpotLight(spotLights.spotLightsArray[i], inFragmentNormal, inFragmentPosition, viewDirection);
+		result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 
 	outColor = vec4(result, 1.0);
+//	vec3 result = material.ambient * pointLights.pointLightsArray[0].diffuse;
+
+	// vec3 lightDirection = normalize(pointLights.pointLightsArray[0].position - inFragmentPosition);
+	// float differece = max(dot(fragmentNormal, lightDirection), 0.0);
+
+	// vec3 diffuse = differece * pointLights.pointLightsArray[0].ambient;
+	
+	// outColor = vec4(diffuse, 1.0);
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {
@@ -124,7 +132,7 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection) {
 	vec3 lightDirection = normalize(light.position - fragmentPosition);
-	// diffuse shading
+	// Diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
 	vec3 reflectDirection   = reflect(-lightDirection, normal);
@@ -167,5 +175,5 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
     diffuse  *= attenuation * intensity;
     specular *= attenuation * intensity;
 	
-    return (ambient + diffuse + specular);
+    return (diffuse);
 }

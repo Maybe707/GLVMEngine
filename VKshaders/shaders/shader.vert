@@ -16,6 +16,7 @@ layout(location = 2) out vec2 outFragmentTextureCoordinate;
 
 void main() {
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+	outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     outFragmentNormal = inNormal;
     outFragmentTextureCoordinate = inTextureCoordinate;
 }
