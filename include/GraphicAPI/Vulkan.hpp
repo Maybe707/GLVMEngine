@@ -329,8 +329,8 @@ namespace GLVM::core
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
 
-        const char* vertShaderHUD_ = "../VKshaders/hudShaders/vert.spv";
-        const char* fragShaderHUD_ = "../VKshaders/hudShaders/frag.spv";
+        const char* vertShaderShadowMap = "../VKshaders/shadowMaps/vert.spv";
+        const char* fragShaderShadowMap = "../VKshaders/shadowMaps/frag.spv";
         
         unsigned int texturePool_;
         
@@ -391,6 +391,7 @@ namespace GLVM::core
         VkRenderPass renderPass;
 
 		core::vector<Descriptor> descriptors;
+		core::vector<Descriptor> shadowMapDescriptors;
 		
         // VkDescriptorSetLayout descriptorSetLayout;
 		// VkDescriptorSetLayout descriptorSetLayout2;
@@ -403,10 +404,30 @@ namespace GLVM::core
 
         VkCommandPool commandPool;
 
+		/// Main pipeline depth.
         VkImage depthImage;
         VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
 
+		/// Depth varialbes for shadow map.
+		VkPipelineLayout shadowMapPipelineLayout;
+		VkPipeline shadowMapPipeline;
+		
+		VkImage shadowMapDepthImage;
+		VkDeviceMemory shadowMapDepthImageMemory;
+		VkImageView shadowMapDepthImageView;
+		VkRenderPass shadowMapRenderPath;
+		VkFramebuffer shadowMapFrameBuffer;
+
+		std::vector<VkBuffer> shadowMapModelMatrixUniformBuffers;
+		std::vector<VkDeviceMemory> shadowMapModelMatrixUniformBuffersMemory;
+
+		VkDescriptorPool shadowMapDescriptorPool;
+		unsigned int shadowMapMatrixUboDescriptorsNumber = 0;
+		core::vector<mat4> shadowMapBasisMatrices;
+
+		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
+		
         std::vector<VkImage> textureImages;
         std::vector<VkDeviceMemory> textureImageMemories;
         std::vector<VkImageView> textureImageViews;
@@ -478,24 +499,33 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createRenderPass();
+		void createShadowMapRenderPass();
+		void createShadowMapDescriptorSetLayout();
         void createDescriptorSetLayout();
         void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
+		void createShadowMapPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
         void createFramebuffers();
+		void createShadowMapFramebuffers();
         void createCommandPool();
         void createDepthResources();
+		void createShadowMapDepthResources();
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
         void createTextureSampler();
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
         void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
+		void createShadowMapUniformBuffers();
         void createUniformBuffers();
         void createDescriptorPool();
+		void createShadowMapDescriptorPool();
+		void createShadowMapDescriptorSets();
         void createDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands();
@@ -505,6 +535,7 @@ namespace GLVM::core
         void createCommandBuffers();
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void createSyncObjects();
+		void updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
