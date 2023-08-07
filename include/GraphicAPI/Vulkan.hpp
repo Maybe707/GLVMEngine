@@ -403,6 +403,7 @@ namespace GLVM::core
         // VkPipeline graphicsPipelineHUD;
 
         VkCommandPool commandPool;
+		VkCommandPool shadowMapCommandPool;
 
 		/// Main pipeline depth.
         VkImage depthImage;
@@ -417,7 +418,7 @@ namespace GLVM::core
 		VkDeviceMemory shadowMapDepthImageMemory;
 		VkImageView shadowMapDepthImageView;
 		VkRenderPass shadowMapRenderPath;
-		VkFramebuffer shadowMapFrameBuffer;
+		std::vector<VkFramebuffer> shadowMapSwapChainFrameBuffers;
 
 		std::vector<VkBuffer> shadowMapModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapModelMatrixUniformBuffersMemory;
@@ -478,11 +479,18 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> commandBuffers;
+		std::vector<VkCommandBuffer> shadowMapCommandBuffers;
 
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
+
+        std::vector<VkSemaphore> shadowMapImageAvailableSemaphores;
+        std::vector<VkSemaphore> shadowMapRenderFinishedSemaphores;
+        std::vector<VkFence> shadowMapInFlightFences;
+		
         uint32_t currentFrame = 0;
+		uint32_t shadowMapCurrentFrame = 0;
 
         bool framebufferResized = false;
 
@@ -506,6 +514,7 @@ namespace GLVM::core
 		void createShadowMapPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
         void createFramebuffers();
 		void createShadowMapFramebuffers();
+		void createShadowMapCommandPool();
         void createCommandPool();
         void createDepthResources();
 		void createShadowMapDepthResources();
@@ -532,8 +541,11 @@ namespace GLVM::core
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+		void createShadowMapCommandBuffers();
         void createCommandBuffers();
+		void recordShadowMapCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+		void createShadowMapSyncObjects();
         void createSyncObjects();
 		void updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
@@ -542,6 +554,7 @@ namespace GLVM::core
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
 		void updateSpotLightUniformBuffer(uint32_t currentImage);
+		void drawShadowMapFrame();
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);

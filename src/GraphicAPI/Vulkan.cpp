@@ -50,6 +50,7 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
+//		drawShadowMapFrame();
         drawFrame();
         vkDeviceWaitIdle(device);
     }
@@ -309,6 +310,7 @@ namespace GLVM::core
         createGraphicsPipeline(graphicsPipeline, pipelineLayout, vertShaderMain_, fragShaderMain_);
 		createShadowMapPipeline(shadowMapPipeline, shadowMapPipelineLayout, vertShaderShadowMap, fragShaderShadowMap);
 //        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
+		createShadowMapCommandPool();
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
@@ -325,7 +327,9 @@ namespace GLVM::core
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
+		createShadowMapCommandBuffers();
         createCommandBuffers();
+		createShadowMapSyncObjects();
         createSyncObjects();
     }
 
@@ -673,14 +677,17 @@ namespace GLVM::core
     void CVulkanRenderer::createShadowMapRenderPass() {
         VkAttachmentDescription attachments[2];
         
-        attachments[0].format = VK_FORMAT_D32_SFLOAT;
+		attachments[0].format = VK_FORMAT_D32_SFLOAT;
+//		attachments[0].format = swapChainImageFormat;
         attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
         attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        attachments[0].finalLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//		attachments[0].initialLayout = VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR;
+        attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+//		attachments[0].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		/// Attachment references form subpasses
         VkAttachmentReference depthAttachmentRef{};
@@ -1005,11 +1012,10 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		std::array<VkDescriptorSetLayout, 8> descriptorSetLayouts = { descriptors[0].setLayout, descriptors[1].setLayout, descriptors[2].setLayout,
-			descriptors[3].setLayout, descriptors[4].setLayout, descriptors[5].setLayout, descriptors[6].setLayout, descriptors[7].setLayout};
+		std::array<VkDescriptorSetLayout, 1> descriptorSetLayouts = { shadowMapDescriptors[0].setLayout };
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 8;
+        pipelineLayoutInfo.setLayoutCount = 1;
         pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
@@ -1053,7 +1059,7 @@ namespace GLVM::core
     void CVulkanRenderer::createFramebuffers() {
         swapChainFramebuffers.resize(swapChainImageViews.size());
 
-        for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
             std::array<VkImageView, 2> attachments = {
                 swapChainImageViews[i],
                 depthImageView
@@ -1075,19 +1081,36 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createShadowMapFramebuffers() {
-		VkFramebufferCreateInfo framebufferInfo{};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.pNext = NULL;
-		framebufferInfo.renderPass = shadowMapRenderPath;
-		framebufferInfo.attachmentCount = 1;
-		framebufferInfo.pAttachments = &shadowMapDepthImageView;
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
-		framebufferInfo.layers = 1;
-		framebufferInfo.flags = 0;
+		shadowMapSwapChainFrameBuffers.resize(swapChainImageViews.size());
 
-		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &shadowMapFrameBuffer) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create framebuffer!");
+		for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+			VkFramebufferCreateInfo framebufferInfo{};
+			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+			framebufferInfo.pNext = NULL;
+			framebufferInfo.renderPass = shadowMapRenderPath;
+			framebufferInfo.attachmentCount = 1;
+			framebufferInfo.pAttachments = &shadowMapDepthImageView;
+			framebufferInfo.width = swapChainExtent.width;
+			framebufferInfo.height = swapChainExtent.height;
+			framebufferInfo.layers = 1;
+			framebufferInfo.flags = 0;
+
+			if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &shadowMapSwapChainFrameBuffers[i]) != VK_SUCCESS) {
+				throw std::runtime_error("failed to create framebuffer!");
+			}
+		}
+    }
+
+	void CVulkanRenderer::createShadowMapCommandPool() {
+        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
+
+        VkCommandPoolCreateInfo poolInfo{};
+        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+
+        if (vkCreateCommandPool(device, &poolInfo, nullptr, &shadowMapCommandPool) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create graphics command pool!");
         }
     }
 	
@@ -1183,6 +1206,10 @@ namespace GLVM::core
         viewInfo.image = image;
         viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
         viewInfo.format = format;
+		viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+		viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
         viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
@@ -1919,6 +1946,20 @@ namespace GLVM::core
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
+    void CVulkanRenderer::createShadowMapCommandBuffers() {
+        shadowMapCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+
+        VkCommandBufferAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocInfo.commandPool = shadowMapCommandPool;
+        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.commandBufferCount = (uint32_t) shadowMapCommandBuffers.size();
+
+        if (vkAllocateCommandBuffers(device, &allocInfo, shadowMapCommandBuffers.data()) != VK_SUCCESS) {
+            throw std::runtime_error("failed to allocate command buffers!");
+        }
+    }
+	
     void CVulkanRenderer::createCommandBuffers() {
         commandBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
@@ -1933,7 +1974,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+    void CVulkanRenderer::recordShadowMapCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1950,7 +1991,7 @@ namespace GLVM::core
 		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		shadowMapRenderPassInfo.pNext = NULL;
 		shadowMapRenderPassInfo.renderPass = shadowMapRenderPath;
-		shadowMapRenderPassInfo.framebuffer = shadowMapFrameBuffer;
+		shadowMapRenderPassInfo.framebuffer = shadowMapSwapChainFrameBuffers[imageIndex];
 		shadowMapRenderPassInfo.renderArea.offset.x = 0;
 		shadowMapRenderPassInfo.renderArea.offset.y = 0;
 		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
@@ -1973,7 +2014,72 @@ namespace GLVM::core
 		shadowMapScissor.extent.width = swapChainExtent.width;
 		shadowMapScissor.extent.height = swapChainExtent.height;
 		shadowMapScissor.offset.x = 0;
-		shadowMapScissor.offset.x = 1;
+		shadowMapScissor.offset.y = 0;
+		vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
+
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipeline);
+
+		const VkDeviceSize shadowMapOffsets[1] = { 0 };
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> shadowMapLinkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::vertex>();
+
+		for ( unsigned int i = 0; i < shadowMapLinkedEntities.GetSize(); ++i ) {
+			unsigned int entity = shadowMapLinkedEntities[i];
+		unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
+		VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
+		}
+
+		vkCmdEndRenderPass(commandBuffer);
+		
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+	
+    void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+		VkClearValue shadowMapClearValues[1];
+		shadowMapClearValues[0].depthStencil.depth = 1.0f;
+		shadowMapClearValues[0].depthStencil.stencil = 0;
+
+		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		shadowMapRenderPassInfo.pNext = NULL;
+		shadowMapRenderPassInfo.renderPass = shadowMapRenderPath;
+		shadowMapRenderPassInfo.framebuffer = shadowMapSwapChainFrameBuffers[imageIndex];
+		shadowMapRenderPassInfo.renderArea.offset.x = 0;
+		shadowMapRenderPassInfo.renderArea.offset.y = 0;
+		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		shadowMapRenderPassInfo.clearValueCount = 1;
+		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+		vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		VkViewport shadowMapViewPort;
+		shadowMapViewPort.height = swapChainExtent.height;
+		shadowMapViewPort.width = swapChainExtent.width;
+		shadowMapViewPort.minDepth = 0.0f;
+		shadowMapViewPort.maxDepth = 1.0f;
+		shadowMapViewPort.x = 0;
+		shadowMapViewPort.y = 0;
+		vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
+
+		VkRect2D shadowMapScissor;
+		shadowMapScissor.extent.width = swapChainExtent.width;
+		shadowMapScissor.extent.height = swapChainExtent.height;
+		shadowMapScissor.offset.x = 0;
+		shadowMapScissor.offset.y = 0;
 		vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipeline);
@@ -2139,6 +2245,27 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::createShadowMapSyncObjects() {
+        shadowMapImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        shadowMapRenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+        shadowMapInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+		
+        VkSemaphoreCreateInfo semaphoreInfo{};
+        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+		
+        VkFenceCreateInfo fenceInfo{};
+        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+		
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &shadowMapImageAvailableSemaphores[i]) != VK_SUCCESS ||
+                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &shadowMapRenderFinishedSemaphores[i]) != VK_SUCCESS ||
+                vkCreateFence(device, &fenceInfo, nullptr, &shadowMapInFlightFences[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create synchronization objects for a frame!");
+            }
+        }
+    }
+	
     void CVulkanRenderer::createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -2412,6 +2539,94 @@ namespace GLVM::core
         memcpy(data, &spotLightUBO, sizeof(spotLight) * 8 + sizeof(spotLightUboDescriptorsNumber));
         vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
 	}
+
+    void CVulkanRenderer::drawShadowMapFrame() {
+		namespace cm = GLVM::ecs::components;
+        vkWaitForFences(device, 1, &shadowMapInFlightFences[shadowMapCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, shadowMapImageAvailableSemaphores[shadowMapCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+//         ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
+//         core::vector<cm::transform>* pEntity_Container_refTransform =
+// 			pComponent_Manager->GetComponentContainer<cm::transform>();
+// //		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
+
+// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
+// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
+// 				std::cout << "i: " << i << " j: " << j << std::endl;
+// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
+// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
+// 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
+//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
+//             }
+// 		}
+
+        // Needed to skip images that intended to game objects that counts according to *texturePool_*.
+        
+        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
+        // unsigned int hudCounter = 0;
+        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); n = n + 2) {
+
+		// 	/// TODO: add for loop for inner entitiesownsthistypeoftexture.
+        //     cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
+        //     updateUniformBuffer(n + currentFrame, transformComponent);
+        //     ++hudCounter;
+        // }
+        vkResetFences(device, 1, &shadowMapInFlightFences[shadowMapCurrentFrame]);
+        vkResetCommandBuffer(shadowMapCommandBuffers[shadowMapCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        recordShadowMapCommandBuffer(shadowMapCommandBuffers[shadowMapCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {shadowMapImageAvailableSemaphores[shadowMapCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &shadowMapCommandBuffers[shadowMapCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {shadowMapRenderFinishedSemaphores[shadowMapCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, shadowMapInFlightFences[shadowMapCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        shadowMapCurrentFrame = (shadowMapCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
 	
     void CVulkanRenderer::drawFrame() {
 		namespace cm = GLVM::ecs::components;
