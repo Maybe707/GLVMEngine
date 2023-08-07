@@ -217,7 +217,9 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createDepthResources();
+		createShadowMapDepthResources();
         createFramebuffers();
+		createShadowMapFramebuffers();
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
