@@ -253,6 +253,17 @@ namespace GLVM::core
         textureImageViews.resize(mainTexturesQuantity);
         textureSamplers.resize(mainTexturesQuantity);
 
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																									  cm::directionalLight,
+																									  cm::vertex>();
+		
+		shadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
+
+		
+		shadowMapTextureSamplers.resize(shadowMapMatrixUboDescriptorsNumber);
+
 		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorSetLayout()});
 		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
 		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
@@ -261,6 +272,7 @@ namespace GLVM::core
 		descriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 5, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
 		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 6, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
 		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 7, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
+		descriptors.Push({VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 8, VK_SHADER_STAGE_FRAGMENT_BIT, VkDescriptorSetLayout()});
 
 		shadowMapDescriptors.Push({VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 0, VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorSetLayout()});
 		
@@ -312,7 +324,7 @@ namespace GLVM::core
         createGraphicsPipeline(graphicsPipeline, pipelineLayout, vertShaderMain_, fragShaderMain_);
 		createShadowMapPipeline(shadowMapPipeline, shadowMapPipelineLayout, vertShaderShadowMap, fragShaderShadowMap);
 //        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
-		createShadowMapCommandPool();
+//		createShadowMapCommandPool();             ///< DELETE!!!!!!!!!
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
@@ -321,15 +333,19 @@ namespace GLVM::core
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
+		createShadowMapTextureSampler();
         // createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
         // createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
         loadWavefrontObj();                                                           ///< Both second functions inside this function
 //		createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
 //		createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
+		createShadowMapUniformBuffers();
+		createShadowMapDescriptorPool();
+		createShadowMapDescriptorSets();
         createUniformBuffers();
         createDescriptorPool();
         createDescriptorSets();
-		createShadowMapCommandBuffers();
+//		createShadowMapCommandBuffers();           ///< DELETE!!!!!!!!!!!!
         createCommandBuffers();
 		createShadowMapSyncObjects();
         createSyncObjects();
@@ -654,12 +670,12 @@ namespace GLVM::core
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
         VkSubpassDependency dependency{};
-        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-        dependency.dstSubpass = 0;
-        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependency.srcAccessMask = 0;
-        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+        dependency.srcSubpass = 0;
+        dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+//        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT ;
         
         std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
         VkRenderPassCreateInfo renderPassInfo{};
@@ -677,19 +693,16 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createShadowMapRenderPass() {
-        VkAttachmentDescription attachments[2];
+        VkAttachmentDescription attachmentDescription{};
         
-		attachments[0].format = VK_FORMAT_D32_SFLOAT;
-//		attachments[0].format = swapChainImageFormat;
-        attachments[0].samples = VK_SAMPLE_COUNT_1_BIT;
-        attachments[0].loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        attachments[0].storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        attachments[0].stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        attachments[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        attachments[0].initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-//		attachments[0].initialLayout = VK_IMAGE_LAYOUT_SHARED_PRESENT_KHR;
-        attachments[0].finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-//		attachments[0].finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		attachmentDescription.format = findDepthFormat();
+        attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+        attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 
 		/// Attachment references form subpasses
         VkAttachmentReference depthAttachmentRef{};
@@ -697,29 +710,38 @@ namespace GLVM::core
         depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 		/// Subpass 0: shadow map rendering
-        VkSubpassDescription subpass[1];
-        subpass[0].pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass[0].flags = 0;
-		subpass[0].inputAttachmentCount = 0;
-		subpass[0].pInputAttachments = NULL;
-		subpass[0].colorAttachmentCount = 0;
-        subpass[0].pColorAttachments = NULL;
-        subpass[0].pDepthStencilAttachment = &depthAttachmentRef;
-		subpass[0].preserveAttachmentCount = 0;
-		subpass[0].pPreserveAttachments = NULL;
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount = 0;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
 
+		VkSubpassDependency dependencies[2];
+		dependencies[0].srcSubpass		= VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass		= 0;
+		dependencies[0].srcStageMask	= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[0].dstStageMask	= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependencies[0].srcAccessMask	= VK_ACCESS_SHADER_READ_BIT;
+		dependencies[0].dstAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		dependencies[1].srcSubpass		= 0;
+		dependencies[1].dstSubpass		= VK_SUBPASS_EXTERNAL;
+		dependencies[1].srcStageMask	= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		dependencies[1].dstStageMask	= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[1].srcAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask	= VK_ACCESS_SHADER_READ_BIT;
+		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+		
         VkRenderPassCreateInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-		renderPassInfo.pNext = 0;
         renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = attachments;
+        renderPassInfo.pAttachments = &attachmentDescription;
         renderPassInfo.subpassCount = 1;
-        renderPassInfo.pSubpasses = subpass;
-        renderPassInfo.dependencyCount = 0;
-        renderPassInfo.pDependencies = NULL;
-		renderPassInfo.flags = 0;
+        renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 2;
+        renderPassInfo.pDependencies = dependencies;
 
-        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &shadowMapRenderPath) != VK_SUCCESS) {
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &shadowMapRenderPass) != VK_SUCCESS) {
             throw std::runtime_error("failed to create render pass!");
         }
     }
@@ -838,11 +860,11 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		std::array<VkDescriptorSetLayout, 8> descriptorSetLayouts = { descriptors[0].setLayout, descriptors[1].setLayout, descriptors[2].setLayout,
-			descriptors[3].setLayout, descriptors[4].setLayout, descriptors[5].setLayout, descriptors[6].setLayout, descriptors[7].setLayout};
+		std::array<VkDescriptorSetLayout, 9> descriptorSetLayouts = { descriptors[0].setLayout, descriptors[1].setLayout, descriptors[2].setLayout,
+			descriptors[3].setLayout, descriptors[4].setLayout, descriptors[5].setLayout, descriptors[6].setLayout, descriptors[7].setLayout, descriptors[8].setLayout };
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        pipelineLayoutInfo.setLayoutCount = 8;
+        pipelineLayoutInfo.setLayoutCount = 9;
         pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
@@ -940,12 +962,12 @@ namespace GLVM::core
 
 		bindingDescription[0].binding = 0;
 		bindingDescription[0].inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-		bindingDescription[0].stride = sizeof(vec3);
+		bindingDescription[0].stride = sizeof(Vertex);
 
 		attributeDescriptions[0].binding = 0;
 		attributeDescriptions[0].location = 0;
 		attributeDescriptions[0].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-		attributeDescriptions[0].offset = 0;
+		attributeDescriptions[0].offset = offsetof(Vertex, pos);
 
 		vertexInputInfo.pNext = NULL;
 		vertexInputInfo.flags = 0;
@@ -1046,7 +1068,7 @@ namespace GLVM::core
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = _pipelineLayout;
-        pipelineInfo.renderPass = renderPass;
+        pipelineInfo.renderPass = shadowMapRenderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -1088,14 +1110,12 @@ namespace GLVM::core
 		for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
 			VkFramebufferCreateInfo framebufferInfo{};
 			framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-			framebufferInfo.pNext = NULL;
-			framebufferInfo.renderPass = shadowMapRenderPath;
+			framebufferInfo.renderPass = shadowMapRenderPass;
 			framebufferInfo.attachmentCount = 1;
 			framebufferInfo.pAttachments = &shadowMapDepthImageView;
 			framebufferInfo.width = swapChainExtent.width;
 			framebufferInfo.height = swapChainExtent.height;
 			framebufferInfo.layers = 1;
-			framebufferInfo.flags = 0;
 
 			if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &shadowMapSwapChainFrameBuffers[i]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create framebuffer!");
@@ -1132,15 +1152,15 @@ namespace GLVM::core
     void CVulkanRenderer::createDepthResources() {
         VkFormat depthFormat = findDepthFormat();
 
-        createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+        createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
         depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
     void CVulkanRenderer::createShadowMapDepthResources() {
 //        VkFormat depthFormat = findDepthFormat();
 
-        createImage(swapChainExtent.width, swapChainExtent.height, VK_FORMAT_D32_SFLOAT, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImage, shadowMapDepthImageMemory);
-        shadowMapDepthImageView = createShadowMapImageView(shadowMapDepthImage, VK_FORMAT_D32_SFLOAT, VK_IMAGE_ASPECT_DEPTH_BIT);
+        createImage(swapChainExtent.width, swapChainExtent.height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImage, shadowMapDepthImageMemory);
+        shadowMapDepthImageView = createShadowMapImageView(shadowMapDepthImage, findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 	
     VkFormat CVulkanRenderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
@@ -1202,6 +1222,42 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::createShadowMapTextureSampler() {
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																									  cm::directionalLight,
+																									  cm::vertex>();
+		
+		shadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
+        for(unsigned int i = 0; i < shadowMapMatrixUboDescriptorsNumber; ++i)
+        {
+            VkPhysicalDeviceProperties properties{};
+            vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+			VkFilter shadowMapFilter = VK_FILTER_LINEAR;
+			
+            VkSamplerCreateInfo samplerInfo{};
+            samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+            samplerInfo.magFilter = shadowMapFilter;
+            samplerInfo.minFilter = shadowMapFilter;
+			samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+            samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
+            samplerInfo.addressModeV = samplerInfo.addressModeU;
+            samplerInfo.addressModeW = samplerInfo.addressModeU;
+			samplerInfo.mipLodBias = 0.0f;
+            samplerInfo.anisotropyEnable = VK_TRUE;
+            samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+			samplerInfo.minLod = 0.0f;
+			samplerInfo.maxLod = 1.0f;
+			samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
+
+            if (vkCreateSampler(device, &samplerInfo, nullptr, &shadowMapTextureSamplers[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create texture sampler!");
+            }
+        }
+    }
+	
     VkImageView CVulkanRenderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1229,15 +1285,10 @@ namespace GLVM::core
     VkImageView CVulkanRenderer::createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-		viewInfo.pNext = NULL;
         viewInfo.image = image;
-		viewInfo.flags = 0;
         viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
         viewInfo.format = format;
-		viewInfo.components.r = VK_COMPONENT_SWIZZLE_R;
-		viewInfo.components.g = VK_COMPONENT_SWIZZLE_G;
-		viewInfo.components.b = VK_COMPONENT_SWIZZLE_B;
-		viewInfo.components.a = VK_COMPONENT_SWIZZLE_A;
+		viewInfo.subresourceRange = {};
         viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
@@ -1258,19 +1309,15 @@ namespace GLVM::core
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
         imageInfo.extent.width = width;
         imageInfo.extent.height = height;
-		imageInfo.pNext = NULL;
         imageInfo.extent.depth = 1;
         imageInfo.mipLevels = 1;
         imageInfo.arrayLayers = 1;
         imageInfo.format = format;
         imageInfo.tiling = tiling;
-        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+//        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageInfo.usage = usage;
-		imageInfo.queueFamilyIndexCount = 0;
-		imageInfo.pQueueFamilyIndices = NULL;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		imageInfo.flags = 0;
+//        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
@@ -1412,11 +1459,10 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							cm::directionalLight,
-																							cm::vertex>();
+																									  cm::directionalLight,
+																									  cm::vertex>();
 		
 		shadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
-
 		// for ( int i = 0; i < matrixUboDescriptorsNumber; ++i ) {
 		// 	cm::directionalLight* directionalLightComponent = componentManager->
 		// 		GetComponent<cm::directionalLight>(directionalLightLinkedEntities[i]);
@@ -1529,7 +1575,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDescriptorPool() {
-        std::array<VkDescriptorPoolSize, 8> poolSizes{};
+        std::array<VkDescriptorPoolSize, 9> poolSizes{};
 
 
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1548,13 +1594,15 @@ namespace GLVM::core
         poolSizes[6].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 		poolSizes[7].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
         poolSizes[7].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+		poolSizes[8].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        poolSizes[8].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
 		unsigned int lightsTypesQuantity = 3;
-        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * (2 * initializeTextureData_.size() +
+        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * (3 * initializeTextureData_.size() +
 																		 matrixUboDescriptorsNumber + viewPositionUboDescriptorsNumber +
 																		 materialUboDescriptorsNumber) +
 												 lightsTypesQuantity * MAX_FRAMES_IN_FLIGHT);
@@ -1864,6 +1912,37 @@ namespace GLVM::core
 
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
+
+		std::vector<VkDescriptorSetLayout> shadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * shadowMapMatrixUboDescriptorsNumber, descriptors[8].setLayout);
+		VkDescriptorSetAllocateInfo shadowMapSamplerAllocInfo{};
+		shadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		shadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
+		shadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * shadowMapMatrixUboDescriptorsNumber);
+		shadowMapSamplerAllocInfo.pSetLayouts = shadowMapSamplerLayouts.data();
+		
+		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * shadowMapMatrixUboDescriptorsNumber);
+		if (vkAllocateDescriptorSets(device, &shadowMapSamplerAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+				
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * shadowMapMatrixUboDescriptorsNumber; ++i) {
+			VkDescriptorImageInfo imageInfo{};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			unsigned int textureIndex = i / 2;
+			imageInfo.imageView = shadowMapDepthImageView;
+			imageInfo.sampler = shadowMapTextureSamplers[textureIndex];
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = 8;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pImageInfo = &imageInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
 	}
 
 	void CVulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -1992,7 +2071,7 @@ namespace GLVM::core
 		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
 		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		shadowMapRenderPassInfo.pNext = NULL;
-		shadowMapRenderPassInfo.renderPass = shadowMapRenderPath;
+		shadowMapRenderPassInfo.renderPass = shadowMapRenderPass;
 		shadowMapRenderPassInfo.framebuffer = shadowMapSwapChainFrameBuffers[imageIndex];
 		shadowMapRenderPassInfo.renderArea.offset.x = 0;
 		shadowMapRenderPassInfo.renderArea.offset.y = 0;
@@ -2057,7 +2136,7 @@ namespace GLVM::core
 		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
 		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		shadowMapRenderPassInfo.pNext = NULL;
-		shadowMapRenderPassInfo.renderPass = shadowMapRenderPath;
+		shadowMapRenderPassInfo.renderPass = shadowMapRenderPass;
 		shadowMapRenderPassInfo.framebuffer = shadowMapSwapChainFrameBuffers[imageIndex];
 		shadowMapRenderPassInfo.renderArea.offset.x = 0;
 		shadowMapRenderPassInfo.renderArea.offset.y = 0;
@@ -2088,15 +2167,25 @@ namespace GLVM::core
 
 		const VkDeviceSize shadowMapOffsets[1] = { 0 };
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> shadowMapLinkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::vertex>();
+		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									 cm::directionalLight,
+																									 cm::vertex>();
 
-		for ( unsigned int i = 0; i < shadowMapLinkedEntities.GetSize(); ++i ) {
-			unsigned int entity = shadowMapLinkedEntities[i];
-		unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
-		VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
+		for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
+			unsigned int entity = directionalLightEntities[i];
+			unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
+			VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[vertexID], 0, VK_INDEX_TYPE_UINT16);
+
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(entity);
+
+			unsigned int indicesContainerSize = aVertices_[vertexID].size();
+			updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayout, 0, 1, &shadowMapMatrixUboDescriptorSets[currentFrame], 0, nullptr);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
 		vkCmdEndRenderPass(commandBuffer);
@@ -2209,6 +2298,7 @@ namespace GLVM::core
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 8, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -2289,7 +2379,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
+    void CVulkanRenderer::updateShadowMapMatrixUniformBuffer([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
         ModelMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 1.0f;
@@ -2297,25 +2387,11 @@ namespace GLVM::core
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							cm::directionalLight,
-																							cm::vertex>();
-		
-		shadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
-		mat4 viewMatrixLight;
-		
-		for ( unsigned int i = 0; i < matrixUboDescriptorsNumber; ++i ) {
-			cm::directionalLight* directionalLightComponent = componentManager->
-				GetComponent<cm::directionalLight>(directionalLightLinkedEntities[i]);
-
-			vec3 positionVectorLight  = directionalLightComponent->position;
-			vec3 directionVectorLight = directionalLightComponent->direction;
-			viewMatrixLight = LookAtMain(positionVectorLight,
+		vec3 positionVectorLight  = directionalLightComponent->position;
+		vec3 directionVectorLight = directionalLightComponent->direction;
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 											  directionVectorLight,
 											  { 0.0f, 1.0f, 0.0f });
-		}
 		
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
@@ -2541,94 +2617,6 @@ namespace GLVM::core
         memcpy(data, &spotLightUBO, sizeof(spotLight) * 8 + sizeof(spotLightUboDescriptorsNumber));
         vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
 	}
-
-    void CVulkanRenderer::drawShadowMapFrame() {
-		namespace cm = GLVM::ecs::components;
-        vkWaitForFences(device, 1, &shadowMapInFlightFences[shadowMapCurrentFrame], VK_TRUE, UINT64_MAX);
-
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, shadowMapImageAvailableSemaphores[shadowMapCurrentFrame], VK_NULL_HANDLE, &imageIndex);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
-
-//         ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-//         core::vector<cm::transform>* pEntity_Container_refTransform =
-// 			pComponent_Manager->GetComponentContainer<cm::transform>();
-// //		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
-
-// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
-// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-// 				std::cout << "i: " << i << " j: " << j << std::endl;
-// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
-// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
-// 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
-//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
-//             }
-// 		}
-
-        // Needed to skip images that intended to game objects that counts according to *texturePool_*.
-        
-        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        // unsigned int hudCounter = 0;
-        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); n = n + 2) {
-
-		// 	/// TODO: add for loop for inner entitiesownsthistypeoftexture.
-        //     cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
-        //     updateUniformBuffer(n + currentFrame, transformComponent);
-        //     ++hudCounter;
-        // }
-        vkResetFences(device, 1, &shadowMapInFlightFences[shadowMapCurrentFrame]);
-        vkResetCommandBuffer(shadowMapCommandBuffers[shadowMapCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        recordShadowMapCommandBuffer(shadowMapCommandBuffers[shadowMapCurrentFrame], imageIndex);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        VkSemaphore waitSemaphores[] = {shadowMapImageAvailableSemaphores[shadowMapCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &shadowMapCommandBuffers[shadowMapCurrentFrame];
-
-        VkSemaphore signalSemaphores[] = {shadowMapRenderFinishedSemaphores[shadowMapCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, shadowMapInFlightFences[shadowMapCurrentFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit draw command buffer!");
-        }
-
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-
-        presentInfo.pImageIndices = &imageIndex;
-
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
-
-        shadowMapCurrentFrame = (shadowMapCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-    }
 	
     void CVulkanRenderer::drawFrame() {
 		namespace cm = GLVM::ecs::components;

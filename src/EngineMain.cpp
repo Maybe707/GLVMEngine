@@ -150,10 +150,10 @@ int main()
 
 	Entity directionalLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
-	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 2.0f, 5.0f, -8.0f },
-		.direction = { 0.0f, 1.5f, -1.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
+	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 2.0f, 5.0f, -16.0f },
+		.direction = { 0.0f, 3.5f, -1.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
 		.specular = {0.3f, 0.3f, 0.3f}};
-	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 2.0f, 5.0f, -8.0f },
+	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 2.0f, 5.0f, -16.0f },
 		.fScale = 0.3f };
 	ComponentManager->GetComponent<cm::vertex>(directionalLight0)->vkVertexId_ = 0;
 	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
@@ -171,26 +171,26 @@ int main()
 	// materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	// TextureManager->BindTexture(directionalLight1, materialDirectionalLight1.diffuseTextureID_);
 	
-	Entity pointLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 6.3f, 2.7f },
-		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
-		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.1f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 6.3f, 2.7f }, .fScale = 0.1f };
-	ComponentManager->GetComponent<cm::vertex>(pointLight0)->vkVertexId_ = 0;
-	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	*materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	// Entity pointLight0 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight0);
+	// *ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 6.3f, 2.7f },
+	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
+	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.1f };
+	// *ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 6.3f, 2.7f }, .fScale = 0.1f };
+	// ComponentManager->GetComponent<cm::vertex>(pointLight0)->vkVertexId_ = 0;
+	// cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
+	// *materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
-	Entity pointLight1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform, cm::texture>(pointLight1);
-	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 0.0f, 5.5f },
-		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f },
-		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 0.0f, 5.5f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 0;
-	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
-	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	// Entity pointLight1 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform, cm::texture>(pointLight1);
+	// ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
+	// *ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 5.2f, 0.0f, 5.5f },
+	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f },
+	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+	// *ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 5.2f, 0.0f, 5.5f }, .fScale = 0.3f };
+	// ComponentManager->GetComponent<cm::vertex>(pointLight1)->vkVertexId_ = 0;
+	// cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
+	// *materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
 // 	Entity pointLight2 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight2);
@@ -203,16 +203,16 @@ int main()
 // 	*materialPointLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 // 	TextureManager->BindTexture(pointLight2, materialPointLight2->diffuseTextureID_);
 	
-	Entity spotLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::spotLight, cm::transform>(spotLight0);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight0) = { .position = { -3.0f, 6.0f, 1.0f },
-		.direction = { 3.0f, 0.0f, 1.0f }, .cutOff = 25.0f, .outerCutOff = 27.0f, .ambient = { 0.2f, 0.2f, 0.2f },
-		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f }, .constant = 1.0f, .linear = 0.09f,
-		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight0) = { .tPosition = { -3.0f, 6.0f, 1.0f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::vertex>(spotLight0)->vkVertexId_ = 0;
-	cm::material* materialSpotLight0   = ComponentManager->GetComponent<cm::material>(spotLight0);
-	*materialSpotLight0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
+	// Entity spotLight0 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::spotLight, cm::transform>(spotLight0);
+	// *ComponentManager->GetComponent<cm::spotLight>(spotLight0) = { .position = { -3.0f, 6.0f, 1.0f },
+	// 	.direction = { 3.0f, 0.0f, 1.0f }, .cutOff = 25.0f, .outerCutOff = 27.0f, .ambient = { 0.2f, 0.2f, 0.2f },
+	// 	.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f }, .constant = 1.0f, .linear = 0.09f,
+	// 	.quadratic = 0.032f };
+	// *ComponentManager->GetComponent<cm::transform>(spotLight0) = { .tPosition = { -3.0f, 6.0f, 1.0f }, .fScale = 0.3f };
+	// ComponentManager->GetComponent<cm::vertex>(spotLight0)->vkVertexId_ = 0;
+	// cm::material* materialSpotLight0   = ComponentManager->GetComponent<cm::material>(spotLight0);
+	// *materialSpotLight0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
 //	spotLightComponent0.position     =  TransformPlayer.tPosition;
 //	spotLightComponent0.direction    =  TransformPlayer.tForward;
 //	transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };

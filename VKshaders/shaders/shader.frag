@@ -82,8 +82,9 @@ layout(set = 5, binding = 5) uniform SpotLightsUBO {
 	int spotLightArraySize;
 } spotLights;
 
-layout(set = 6, binding = 6) uniform	sampler2D diffuse;
-layout(set = 7, binding = 7) uniform	sampler2D specular;
+layout(set = 6, binding = 6) uniform sampler2D diffuse;
+layout(set = 7, binding = 7) uniform sampler2D specular;
+layout(set = 8, binding = 8) uniform sampler2D shadowMap; 
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
@@ -104,7 +105,11 @@ void main()
 	for(int i = 0; i < spotLights.spotLightArraySize; ++i)
 		result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 
-	outColor = vec4(result, 1.0);
+    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
+	
+//	outColor = vec4(result, 1.0);
+	outColor = vec4(vec3(depthValue), 1.0);
+	
 //	vec3 result = material.ambient * pointLights.pointLightsArray[0].diffuse;
 
 	// vec3 lightDirection = normalize(pointLights.pointLightsArray[0].position - inFragmentPosition);

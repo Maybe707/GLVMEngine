@@ -1,2 +1,2 @@
-glslangValidator -V shader.vert -o vert.spv
-glslangValidator -V shader.frag -o frag.spv
+glslangValidator -V -g shader.vert -o vert.spv
+glslangValidator -V -g shader.frag -o frag.spv

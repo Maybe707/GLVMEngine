@@ -329,8 +329,8 @@ namespace GLVM::core
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
 
-        const char* vertShaderShadowMap = "../VKshaders/shadowMaps/vert.spv";
-        const char* fragShaderShadowMap = "../VKshaders/shadowMaps/frag.spv";
+        const char* vertShaderShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
+        const char* fragShaderShadowMap = "../VKshaders/shadowMapShaders/frag.spv";
         
         unsigned int texturePool_;
         
@@ -417,7 +417,8 @@ namespace GLVM::core
 		VkImage shadowMapDepthImage;
 		VkDeviceMemory shadowMapDepthImageMemory;
 		VkImageView shadowMapDepthImageView;
-		VkRenderPass shadowMapRenderPath;
+		std::vector<VkSampler> shadowMapTextureSamplers;
+		VkRenderPass shadowMapRenderPass;
 		std::vector<VkFramebuffer> shadowMapSwapChainFrameBuffers;
 
 		std::vector<VkBuffer> shadowMapModelMatrixUniformBuffers;
@@ -428,6 +429,7 @@ namespace GLVM::core
 		core::vector<mat4> shadowMapBasisMatrices;
 
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
+		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		
         std::vector<VkImage> textureImages;
         std::vector<VkDeviceMemory> textureImageMemories;
@@ -490,7 +492,6 @@ namespace GLVM::core
         std::vector<VkFence> shadowMapInFlightFences;
 		
         uint32_t currentFrame = 0;
-		uint32_t shadowMapCurrentFrame = 0;
 
         bool framebufferResized = false;
 
@@ -523,6 +524,7 @@ namespace GLVM::core
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
         void createTextureSampler();
+		void createShadowMapTextureSampler();
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
         void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
@@ -547,14 +549,13 @@ namespace GLVM::core
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void createShadowMapSyncObjects();
         void createSyncObjects();
-		void updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
+		void updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
 		void updateSpotLightUniformBuffer(uint32_t currentImage);
-		void drawShadowMapFrame();
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
