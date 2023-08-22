@@ -21,7 +21,16 @@ namespace GLVM::core
             return VK_ERROR_EXTENSION_NOT_PRESENT;
         }
     }
-    
+
+	VkResult SetDebugObjectName(VkDevice device, const VkDebugUtilsObjectNameInfoEXT* objectNameInfo) {
+		auto func = (PFN_vkSetDebugUtilsObjectNameEXT) vkGetDeviceProcAddr(device, "vkSetDebugUtilsObjectNameEXT");
+		if (func != nullptr) {
+			return func(device, objectNameInfo);
+		} else {
+			return VK_ERROR_EXTENSION_NOT_PRESENT;
+		}
+	}
+	
     void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) {
         auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
         if (func != nullptr) {
@@ -1177,6 +1186,15 @@ namespace GLVM::core
 		
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {		
 			createImage(swapChainExtent.width, swapChainExtent.height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImage[i], shadowMapDepthImageMemory[i]);
+			VkDebugUtilsObjectNameInfoEXT imageInfo;
+			imageInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			imageInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			imageInfo.objectHandle = (uint64_t)shadowMapDepthImage[i];
+			imageInfo.pObjectName = "depth image";
+			imageInfo.pNext = NULL;
+
+			SetDebugObjectName(device, &imageInfo);
+			
 			std::cout << "i: " << i << std::endl;
 			shadowMapDepthImageView[i] = createShadowMapImageView(shadowMapDepthImage[i], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT);
 		}
