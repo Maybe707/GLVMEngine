@@ -414,9 +414,9 @@ namespace GLVM::core
 		VkPipelineLayout shadowMapPipelineLayout;
 		VkPipeline shadowMapPipeline;
 		
-		VkImage shadowMapDepthImage;
-		VkDeviceMemory shadowMapDepthImageMemory;
-		VkImageView shadowMapDepthImageView;
+		core::vector<VkImage> shadowMapDepthImage;
+		core::vector<VkDeviceMemory> shadowMapDepthImageMemory;
+		core::vector<VkImageView> shadowMapDepthImageView;
 		std::vector<VkSampler> shadowMapTextureSamplers;
 		VkRenderPass shadowMapRenderPass;
 		std::vector<VkFramebuffer> shadowMapSwapChainFrameBuffers;
@@ -538,6 +538,7 @@ namespace GLVM::core
 		void createShadowMapDescriptorPool();
 		void createShadowMapDescriptorSets();
         void createDescriptorSets();
+		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands();
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
