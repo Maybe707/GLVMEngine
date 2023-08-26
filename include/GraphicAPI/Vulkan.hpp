@@ -136,13 +136,6 @@ namespace GLVM::core
         }
     };
 
-	struct Descriptor {
-		VkDescriptorType      type;
-		uint32_t              binding;
-		VkShaderStageFlags    shaderStageFlag;
-		VkDescriptorSetLayout setLayout;
-	};
-	
 	enum UBOtypes {
 		MODEL_MATRIX_UBO,
 		VIEW_POSITION_UBO,
@@ -151,6 +144,40 @@ namespace GLVM::core
 		POINT_LIGHTS_UBO,
 		SPOT_LIGHTS_UBO
 	};
+
+	struct Descriptor {
+		VkDescriptorType      type;
+		uint32_t              binding;
+		VkShaderStageFlags    shaderStageFlag;
+		VkDescriptorSetLayout setLayout;
+	};
+
+	struct Pipeline {
+		core::vector<Descriptor> descriptors;
+		unsigned int globalDescriptorsNumber = 0;
+		unsigned int uboDescriptorsNumber = 0;
+		unsigned int combinedImageSamplersNumber = 0;
+		VkPipeline  pipeline;
+		VkPipelineLayout pipelineLayout;
+		const char* vertShader = nullptr;
+		const char* fragShader = nullptr;
+		VkVertexInputBindingDescription bindingDescription;
+		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+
+		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag) {
+			if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout()});
+				++globalDescriptorsNumber;
+				++uboDescriptorsNumber;
+			} else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout()});
+				++globalDescriptorsNumber;
+				++combinedImageSamplersNumber;
+			} else {
+				assert(!"unreachable");
+			}
+		}
+	};
 	
     struct alignas(16) ModelMatrixUBO {
         mat4 model;
@@ -158,7 +185,12 @@ namespace GLVM::core
         mat4 proj;
     };
 
-	 struct DirectionalLight {
+	struct alignas(16) DirectionalLightShadowMapMatrixUBO {
+		mat4 model;
+		mat4 lightSpaceMatrix;
+	};
+	
+	struct DirectionalLight {
 		alignas(16) vec3 position;
 		alignas(16) vec3 direction;
   
@@ -329,8 +361,8 @@ namespace GLVM::core
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
 
-        const char* vertShaderShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
-        const char* fragShaderShadowMap = "../VKshaders/shadowMapShaders/frag.spv";
+        const char* vertShaderDirectionalLightShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
+        const char* fragShaderDirectionalLightShadowMap = "../VKshaders/shadowMapShaders/frag.spv";
         
         unsigned int texturePool_;
         
@@ -390,8 +422,13 @@ namespace GLVM::core
 
         VkRenderPass renderPass;
 
-		core::vector<Descriptor> descriptors;
-		core::vector<Descriptor> shadowMapDescriptors;
+		// core::vector<Descriptor> descriptors;
+		// core::vector<Descriptor> shadowMapDescriptors;
+
+		Pipeline mainRenderScenePipeline;
+		Pipeline directionalLightPipeline;
+		Pipeline spotLightPipeline;
+		Pipeline pointLightPipeline;
 		
         // VkDescriptorSetLayout descriptorSetLayout;
 		// VkDescriptorSetLayout descriptorSetLayout2;
@@ -411,25 +448,41 @@ namespace GLVM::core
         VkImageView depthImageView;
 
 		/// Depth varialbes for shadow map.
-		VkPipelineLayout shadowMapPipelineLayout;
+//		VkPipelineLayout shadowMapPipelineLayout;
 		VkPipeline shadowMapPipeline;
+
+		unsigned int	directionalLightNumber = 0;
+		core::vector<VkImage> directionalLightShadowMapDepthImages;
+		core::vector<VkDeviceMemory> directionalLightShadowMapDepthImageMemories;
+		core::vector<VkImageView> directionalLightShadowMapDepthImageViews;
+		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
+		VkRenderPass directionalLightShadowMapRenderPass;
+		std::vector<VkSampler> directionalLightShadowMapTextureSamplers;
+		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		
-		core::vector<VkImage> shadowMapDepthImage;
-		core::vector<VkDeviceMemory> shadowMapDepthImageMemory;
-		core::vector<VkImageView> shadowMapDepthImageView;
-		std::vector<VkSampler> shadowMapTextureSamplers;
-		VkRenderPass shadowMapRenderPass;
-		std::vector<VkFramebuffer> shadowMapSwapChainFrameBuffers;
+		unsigned int	pointLightNumber	   = 0;
+		core::vector<VkImage> pointLightShadowMapDepthImages;
+		core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
+		core::vector<VkImageView> pointLightShadowMapDepthImageViews;
+		std::vector<VkFramebuffer> pointLightShadowMapFrameBuffers;
+		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
+
+		unsigned int	spotLightNumber		   = 0;
+		core::vector<VkImage> spotLightShadowMapDepthImages;
+		core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
+		core::vector<VkImageView> spotLightShadowMapDepthImageViews;
+		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
+		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
 
 		std::vector<VkBuffer> shadowMapModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapModelMatrixUniformBuffersMemory;
 
 		VkDescriptorPool shadowMapDescriptorPool;
-		unsigned int shadowMapMatrixUboDescriptorsNumber = 0;
+		unsigned int directionalLightShadowMapMatrixUboDescriptorsNumber = 0;
 		core::vector<mat4> shadowMapBasisMatrices;
 
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
-		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
+
 		
         std::vector<VkImage> textureImages;
         std::vector<VkDeviceMemory> textureImageMemories;
@@ -509,22 +562,25 @@ namespace GLVM::core
         void createImageViews();
         void createRenderPass();
 		void createShadowMapRenderPass();
-		void createShadowMapDescriptorSetLayout();
-        void createDescriptorSetLayout();
-        void createGraphicsPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
-		void createShadowMapPipeline(VkPipeline& _graphicsPipeline, VkPipelineLayout& _pipelineLayout, const char* _vertShader, const char* _fragShader);
-        void createFramebuffers();
-		void createShadowMapFramebuffers();
+        void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
+        void createGraphicsPipeline(Pipeline& pipeline);
+        void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
+										  VkFramebuffer& swapChainFramebuffer);
+		void createFramebuffers();
 		void createShadowMapCommandPool();
         void createCommandPool();
         void createDepthResources();
 		void createShadowMapDepthResources();
+		void createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
+								 core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
+								 core::vector<VkImageView>& shadowMapDepthImageViews);
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
         void createTextureSampler();
-		void createShadowMapTextureSampler();
+		void createShadowMapTextureSamplers();
+		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
         void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
@@ -532,11 +588,11 @@ namespace GLVM::core
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
-		void createShadowMapUniformBuffers();
-        void createUniformBuffers();
+		void createDirectionalLightShadowMapUniformBuffers();
+        void createMainRenderUniformBuffers();
         void createDescriptorPool();
 		void createShadowMapDescriptorPool();
-		void createShadowMapDescriptorSets();
+		void createDirectionalLightShadowMapDescriptorSets();
         void createDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
