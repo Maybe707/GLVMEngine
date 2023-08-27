@@ -274,8 +274,11 @@ namespace GLVM::core
 		directionalLightShadowMapTextureSamplers.resize(directionalLightShadowMapMatrixUboDescriptorsNumber);
 
 		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		directionalLightPipeline.vertShader = vertShaderMain_;
-		directionalLightPipeline.fragShader = fragShaderMain_;
+		directionalLightPipeline.vertShader = vertShaderDirectionalLightShadowMap;
+		directionalLightPipeline.fragShader = fragShaderDirectionalLightShadowMap;
+		
+		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
+		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -286,8 +289,11 @@ namespace GLVM::core
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.vertShader = vertShaderDirectionalLightShadowMap;
-		mainRenderScenePipeline.fragShader = fragShaderDirectionalLightShadowMap;
+		mainRenderScenePipeline.vertShader = vertShaderMain_;
+		mainRenderScenePipeline.fragShader = fragShaderMain_;
+
+		mainRenderScenePipeline.bindingDescription = Vertex::getBindingDescription();
+		mainRenderScenePipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		
         initWindow();
         initVulkan();
@@ -799,7 +805,9 @@ namespace GLVM::core
 			vertShaderStageInfo.pName = "main";
 
 			shaderStages.push_back(vertShaderStageInfo);
-		} else if (pipeline.fragShader != nullptr) {
+		}
+
+		if (pipeline.fragShader != nullptr) {
 			std::vector<char> fragShaderCode = readFile(pipeline.fragShader);
 			fragShaderModule = createShaderModule(fragShaderCode);
 
@@ -919,7 +927,7 @@ namespace GLVM::core
         pipelineInfo.pColorBlendState = &colorBlending;
         pipelineInfo.pDynamicState = &dynamicState;
         pipelineInfo.layout = pipeline.pipelineLayout;
-        pipelineInfo.renderPass = renderPass;
+        pipelineInfo.renderPass = directionalLightShadowMapRenderPass;
         pipelineInfo.subpass = 0;
         pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
@@ -1328,7 +1336,7 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::createDirectionalLightShadowMapUniformBuffers() {
-		VkDeviceSize modelMatrixBufferSize = sizeof(ModelMatrixUBO);
+		VkDeviceSize modelMatrixBufferSize = sizeof(DirectionalLightShadowMapMatrixUBO);
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -1338,12 +1346,12 @@ namespace GLVM::core
 		
 		directionalLightShadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
 		
-        shadowMapModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber);
-        shadowMapModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber);
+        shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber);
+        shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber);
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber; i++) {
             createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapModelMatrixUniformBuffers[i], shadowMapModelMatrixUniformBuffersMemory[i]);
+						 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
 		}
 	}
 	
@@ -1514,9 +1522,9 @@ namespace GLVM::core
 		//        int textureImageViewsIndex = 0;
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapModelMatrixUniformBuffers[i];
+			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(DirectionalLightShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -2226,11 +2234,12 @@ namespace GLVM::core
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+		for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
 			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
-			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiEntity = directionalLightEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiEntity);
 			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
 			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
 			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
@@ -2249,8 +2258,8 @@ namespace GLVM::core
 			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
+			updateShadowMapMatrixUniformBuffer(uboIndex, transformComponent, directionalLightComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);
 			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
 			// updateMaterialUniformBuffer(uboIndex, materialComponent);
@@ -2479,7 +2488,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateShadowMapMatrixUniformBuffer([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
-        ModelMatrixUBO modelMatrixUBO{};
+		DirectionalLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
@@ -2501,16 +2510,14 @@ namespace GLVM::core
         modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
-        modelMatrixUBO.view = viewMatrixLight;
-        modelMatrixUBO.proj = directionalProjectionMatrixLight;
-
-        modelMatrixUBO.proj[1][1] *= -1;
+		directionalProjectionMatrixLight[1][1] *= -1;
+		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * directionalProjectionMatrixLight;
 
         void* modelMatrixData;
-        vkMapMemory(device, shadowMapModelMatrixUniformBuffersMemory[currentImage], 0,
+        vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, shadowMapModelMatrixUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage]);
     }
 	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {

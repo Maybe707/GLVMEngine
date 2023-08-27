@@ -108,8 +108,8 @@ namespace GLVM::core
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
             bindingDescription.binding = 0;
-            bindingDescription.stride = sizeof(Vertex);
             bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            bindingDescription.stride = sizeof(Vertex);
 
             return bindingDescription;
         }
@@ -162,7 +162,7 @@ namespace GLVM::core
 		const char* vertShader = nullptr;
 		const char* fragShader = nullptr;
 		VkVertexInputBindingDescription bindingDescription;
-		std::vector<VkVertexInputAttributeDescription> attributeDescriptions;
+		std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions;
 
 		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag) {
 			if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
@@ -459,6 +459,8 @@ namespace GLVM::core
 		VkRenderPass directionalLightShadowMapRenderPass;
 		std::vector<VkSampler> directionalLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
+		std::vector<VkBuffer> shadowMapDirectionalLightModelMatrixUniformBuffers;
+		std::vector<VkDeviceMemory> shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
 		
 		unsigned int	pointLightNumber	   = 0;
 		core::vector<VkImage> pointLightShadowMapDepthImages;
@@ -473,9 +475,6 @@ namespace GLVM::core
 		core::vector<VkImageView> spotLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
-
-		std::vector<VkBuffer> shadowMapModelMatrixUniformBuffers;
-		std::vector<VkDeviceMemory> shadowMapModelMatrixUniformBuffersMemory;
 
 		VkDescriptorPool shadowMapDescriptorPool;
 		unsigned int directionalLightShadowMapMatrixUboDescriptorsNumber = 0;
