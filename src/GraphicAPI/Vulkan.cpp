@@ -2258,12 +2258,13 @@ namespace GLVM::core
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
-			unsigned int uiEntity = directionalLightEntities[i];
+			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiDirectionalLightEntity = directionalLightEntities[0];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiEntity);
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
 			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
 			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
 			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
@@ -2281,9 +2282,9 @@ namespace GLVM::core
 			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
 			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
-			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateShadowMapMatrixUniformBuffer(uboIndex, transformComponent, directionalLightComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);
+//			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
+			updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
 			// updateMaterialUniformBuffer(uboIndex, materialComponent);
@@ -2522,8 +2523,8 @@ namespace GLVM::core
 		vec3 positionVectorLight  = directionalLightComponent->position;
 		vec3 directionVectorLight = directionalLightComponent->direction;
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
-											  directionVectorLight,
-											  { 0.0f, 1.0f, 0.0f });
+										  directionVectorLight,
+										  { 0.0f, 1.0f, 0.0f });
 		
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
