@@ -25,6 +25,7 @@
 #include "WavefrontObjParser.hpp"
 #include "MeshManager.hpp"
 #include "Globals.hpp"
+#include "ToString.hpp"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -48,6 +49,9 @@
 #include "WinApi/WindowWinVulkan.hpp"
 //#include "WinApi/winVk.hpp"
 #endif
+
+#define VK_DEBUG_DESCRIPTOR_SET_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET\x1b[0m"
+#define VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET LAYOUT\x1b[0m"
 
 // #ifdef NDEBUG
 // #define WNDCLASS 0xc018
@@ -531,6 +535,7 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> spotLightUboDescriptorSets;
 		std::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
+		std::vector<VkDescriptorSet> directionalLightSamperDescriptorSets;
 
         std::vector<VkCommandBuffer> commandBuffers;
 		std::vector<VkCommandBuffer> shadowMapCommandBuffers;
@@ -562,7 +567,7 @@ namespace GLVM::core
         void createRenderPass();
 		void createShadowMapRenderPass();
         void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
-        void createGraphicsPipeline(Pipeline& pipeline);
+        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer);
 		void createFramebuffers();
@@ -625,6 +630,7 @@ namespace GLVM::core
         bool checkValidationLayerSupport();
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+		void setDebugObjectNames();
     };
 
 };

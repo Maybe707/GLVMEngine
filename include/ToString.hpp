@@ -30,6 +30,11 @@ inline std::string ToString( int value ) {
 	unsigned int stringIndex = 0;
 	int var = 0;
 	char buffer[12];
+
+	if (value == 0) {
+		buffer[stringIndex] = 48;
+		++stringIndex;
+	}
 	
 	while( value > 0 ) {
 		var = value % 10;
@@ -39,7 +44,7 @@ inline std::string ToString( int value ) {
 		buffer[stringIndex] = var;
 		++stringIndex;
 	}
-
+	
 	ReverseString( buffer, stringIndex );
 	buffer[stringIndex] = '\0';
 	return std::string (buffer);
@@ -47,6 +52,12 @@ inline std::string ToString( int value ) {
 
 inline std::string ConcatIntBetweenTwoStrings(	std::string leftString, unsigned int value, std::string rightString ) {
 	std::string resultString = leftString + ToString(value) + rightString;
+	
+	return resultString;
+}
+
+inline std::string ConcatIntBetweenTwoStrings(	std::string leftString, std::string rightString, unsigned int value  ) {
+	std::string resultString = leftString + rightString + ToString(value);
 	
 	return resultString;
 }
