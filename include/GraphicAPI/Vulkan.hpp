@@ -598,6 +598,7 @@ namespace GLVM::core
 		void createShadowMapDescriptorPool();
 		void createDirectionalLightShadowMapDescriptorSets();
         void createDescriptorSets();
+		void updateDirectionalLightShadowMapDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands();

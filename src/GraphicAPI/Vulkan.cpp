@@ -228,6 +228,7 @@ namespace GLVM::core
         createDepthResources();
 		createShadowMapDepthResources();
         createFramebuffers();
+		updateDirectionalLightShadowMapDescriptorSets();
 		updateDescriptorSets();
     }
     
@@ -1828,6 +1829,27 @@ namespace GLVM::core
 		}
 	}
 
+	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightShadowMapMatrixUboDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
+			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.range = sizeof(DirectionalLightShadowMapMatrixUBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = 0;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
+	
     void CVulkanRenderer::updateDescriptorSets() {
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
@@ -1987,10 +2009,10 @@ namespace GLVM::core
 //			unsigned int textureIndex = i / 2;
 			imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-			std::cout << "хуй: " << directionalLightShadowMapDepthImageViews[0] << std::endl;
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+			descriptorWrites[0].dstSet = directionalLightSamperDescriptorSets[i];
 			descriptorWrites[0].dstBinding = 8;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
