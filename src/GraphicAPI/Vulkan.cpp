@@ -284,7 +284,7 @@ namespace GLVM::core
 		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		directionalLightPipeline.vertShader = vertShaderMain_;
-		directionalLightPipeline.fragShader = fragShaderMain_;
+//		directionalLightPipeline.fragShader = fragShaderMain_;
 		
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -808,7 +808,7 @@ namespace GLVM::core
 		if (pipeline.vertShader != nullptr) {
 			std::vector<char> vertShaderCode = readFile(pipeline.vertShader);
 			vertShaderModule = createShaderModule(vertShaderCode);
-		
+
 			VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
 			vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
 			vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
@@ -946,8 +946,11 @@ namespace GLVM::core
             throw std::runtime_error("failed to create graphics pipeline!");
         }
 
-        vkDestroyShaderModule(device, fragShaderModule, nullptr);
-        vkDestroyShaderModule(device, vertShaderModule, nullptr);
+		if (pipeline.vertShader != nullptr)
+			vkDestroyShaderModule(device, vertShaderModule, nullptr);
+
+		if (pipeline.fragShader != nullptr)
+			vkDestroyShaderModule(device, fragShaderModule, nullptr);
     }
 
     void CVulkanRenderer::createFramebuffers() {
