@@ -9,7 +9,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <vulkan/vulkan_core.h>
-//#include <vulkan/vulkan_core.h>
 
 namespace GLVM::core
 {    
@@ -59,7 +58,6 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
-//		drawShadowMapFrame();
         drawFrame();
         vkDeviceWaitIdle(device);
     }
@@ -234,12 +232,6 @@ namespace GLVM::core
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
         texture_load_data_ = _texture_data;
-
-        // textureImages.resize(texture_load_data_.size());
-        // textureImageMemories.resize(texture_load_data_.size());
-
-        // textureImageViews.resize(texture_load_data_.size());
-        // textureSamplers.resize(texture_load_data_.size());
     }
 
     void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) {
@@ -275,17 +267,7 @@ namespace GLVM::core
 		directionalLightShadowMapTextureSamplers.resize(directionalLightShadowMapMatrixUboDescriptorsNumber);
 
 		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		directionalLightPipeline.vertShader = vertShaderMain_;
-//		directionalLightPipeline.fragShader = fragShaderMain_;
-		
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
@@ -299,16 +281,7 @@ namespace GLVM::core
 		spotLightShadowMapTextureSamplers.resize(spotLightShadowMapMatrixUboDescriptorsNumber);
 
 		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		spotLightPipeline.vertShader = vertShaderMain_;
-//		directionalLightPipeline.fragShader = fragShaderMain_;
 		
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -323,16 +296,7 @@ namespace GLVM::core
 		pointLightShadowMapTextureSamplers.resize(pointLightShadowMapMatrixUboDescriptorsNumber);
 
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		pointLightPipeline.vertShader = vertShaderMain_;
-//		directionalLightPipeline.fragShader = fragShaderMain_;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -401,13 +365,10 @@ namespace GLVM::core
 		createDescriptorSetLayout(spotLightPipeline.descriptors);
 		createDescriptorSetLayout(pointLightPipeline.descriptors);
         createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
-//        createDescriptorSetLayout(descriptorSetLayoutHUD);
         createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass);
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
 		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
-//        createGraphicsPipeline(graphicsPipelineHUD, pipelineLayoutHUD, descriptorSetLayoutHUD, vertShaderHUD_, fragShaderHUD_);
-//		createShadowMapCommandPool();             ///< DELETE!!!!!!!!!
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
@@ -418,11 +379,7 @@ namespace GLVM::core
 		createDirectionalLightShadowMapTextureSamplers();
 		createSpotLightShadowMapTextureSamplers();
 		createPointLightShadowMapTextureSamplers();
-        // createVertexBuffer(vertexBuffer, vertexBufferMemory, verticesContainer_);
-        // createIndexBuffer(indexBuffer, indexBufferMemory, indicesContainer_);
-        loadWavefrontObj();                                                           ///< Both second functions inside this function
-//		createVertexBuffer(hudVertexBuffer, hudVertexBufferMemory, hudVertices);
-//		createIndexBuffer(hudIndexBuffer, hudIndexBufferMemory, hudIndices);
+        loadWavefrontObj();
 		createDirectionalLightShadowMapUniformBuffers();
 		createDirectionalLightShadowMapDescriptorPool();
 		createDirectionalLightShadowMapDescriptorSets();
@@ -436,7 +393,6 @@ namespace GLVM::core
         createMainRenderDescriptorPool();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
-//		createShadowMapCommandBuffers();           ///< DELETE!!!!!!!!!!!!
         createCommandBuffers();
 		createShadowMapSyncObjects();
         createSyncObjects();
@@ -1086,15 +1042,6 @@ namespace GLVM::core
             throw std::runtime_error("failed to create pipeline layout!");
         }
 
-        // VkPipelineLayoutCreateInfo pipelineLayoutInfo2{};
-        // pipelineLayoutInfo2.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-        // pipelineLayoutInfo2.setLayoutCount = 1;
-        // pipelineLayoutInfo2.pSetLayouts = &_descriptorSetLayout2;
-
-        // if (vkCreatePipelineLayout(device, &pipelineLayoutInfo2, nullptr, &_pipelineLayout) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to create pipeline layout!");
-        // }
-		
         VkGraphicsPipelineCreateInfo pipelineInfo{};
         pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
         pipelineInfo.stageCount = shaderStages.size();
@@ -1339,7 +1286,7 @@ namespace GLVM::core
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::vertex>();
-		std::cout << "TEST: " << pointLightLinkedEntities.GetSize() << std::endl;
+
         for(unsigned int i = 0; i < pointLightLinkedEntities.GetSize(); ++i)
 			createRenderPassShadowMapTextureSamplers(pointLightShadowMapTextureSamplers[i]);
     }
@@ -2181,7 +2128,7 @@ namespace GLVM::core
 //			unsigned int textureIndex = i / 2;
 			imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-//			std::cout << "хуй: " << directionalLightShadowMapDepthImageViews[0] << std::endl;
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = directionalLightSamperDescriptorSets[i];
@@ -2609,7 +2556,6 @@ namespace GLVM::core
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipeline);
 
-//		const VkDeviceSize shadowMapOffsets[1] = { 0 };
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																									 cm::directionalLight,
@@ -2625,47 +2571,13 @@ namespace GLVM::core
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
-//			unsigned int uiDirectionalLightEntity = directionalLightEntities[0];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
-			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-
-			// VkBufferMemoryBarrier bufferMemoryBarrier{};
-			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-			// bufferMemoryBarrier.offset = 0;
-			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
-
-			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			// updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateMaterialUniformBuffer(uboIndex, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 2, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
-			// updateDirectionalLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updatePointLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 4, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateSpotLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
-			
-			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-			// std::cout << "texture: " << textureID << std::endl;                
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -2673,29 +2585,9 @@ namespace GLVM::core
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 8, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 		
-		// for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
-		// 	unsigned int entity = directionalLightEntities[i];
-		// 	unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
-		// 	VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
-		// 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
-
-		// 	vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[vertexID], 0, VK_INDEX_TYPE_UINT16);
-
-		// 	cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
-		// 	cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(entity);
-
-		// 	unsigned int indicesContainerSize = aVertices_[vertexID].size();
-		// 	updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayout, 0, 1, &shadowMapMatrixUboDescriptorSets[currentFrame], 0, nullptr);
-		// 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-		// }
-
 		vkCmdEndRenderPass(commandBuffer);
 
 		VkClearValue spotLightShadowMapClearValues[1];
@@ -2734,53 +2626,18 @@ namespace GLVM::core
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipeline);
 
-//		const VkDeviceSize shadowMapOffsets[1] = { 0 };
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::spotLight,
 																							  cm::vertex>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
-//			unsigned int uiDirectionalLightEntity = directionalLightEntities[0];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
-			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-
-			// VkBufferMemoryBarrier bufferMemoryBarrier{};
-			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-			// bufferMemoryBarrier.offset = 0;
-			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
-
-			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			// updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateMaterialUniformBuffer(uboIndex, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 2, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
-			// updateDirectionalLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updatePointLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 4, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateSpotLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
-			
-			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-			// std::cout << "texture: " << textureID << std::endl;                
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -2788,29 +2645,9 @@ namespace GLVM::core
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 8, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 		
-		// for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
-		// 	unsigned int entity = directionalLightEntities[i];
-		// 	unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
-		// 	VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
-		// 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
-
-		// 	vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[vertexID], 0, VK_INDEX_TYPE_UINT16);
-
-		// 	cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
-		// 	cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(entity);
-
-		// 	unsigned int indicesContainerSize = aVertices_[vertexID].size();
-		// 	updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayout, 0, 1, &shadowMapMatrixUboDescriptorSets[currentFrame], 0, nullptr);
-		// 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-		// }
-
 		vkCmdEndRenderPass(commandBuffer);
 
 		VkClearValue pointLightShadowMapClearValues[1];
@@ -2849,53 +2686,18 @@ namespace GLVM::core
 
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-//		const VkDeviceSize shadowMapOffsets[1] = { 0 };
 		core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::pointLight,
 																							  cm::vertex>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
-//			unsigned int uiDirectionalLightEntity = directionalLightEntities[0];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
-			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-
-			// VkBufferMemoryBarrier bufferMemoryBarrier{};
-			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-			// bufferMemoryBarrier.offset = 0;
-			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
-
-			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			// updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateMaterialUniformBuffer(uboIndex, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 2, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
-			// updateDirectionalLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updatePointLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 4, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
-			// updateSpotLightUniformBuffer(currentFrame);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
-			
-			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-			// std::cout << "texture: " << textureID << std::endl;                
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -2903,29 +2705,9 @@ namespace GLVM::core
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 8, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 		
-		// for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
-		// 	unsigned int entity = directionalLightEntities[i];
-		// 	unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
-		// 	VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
-		// 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
-
-		// 	vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[vertexID], 0, VK_INDEX_TYPE_UINT16);
-
-		// 	cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
-		// 	cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(entity);
-
-		// 	unsigned int indicesContainerSize = aVertices_[vertexID].size();
-		// 	updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
-		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayout, 0, 1, &shadowMapMatrixUboDescriptorSets[currentFrame], 0, nullptr);
-		// 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-		// }
-
 		vkCmdEndRenderPass(commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -2960,29 +2742,7 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-        /* MAX_FRAMES_IN_FLIGHT doubles texture pool and then j + currentFrame * texturePool
-         * choose specific texture. */
-
-		// core::vector<unsigned int>* entitiesContainerTexture =
-		// 	componentManager->GetEntityContainer<ecs::components::texture>();
-//		unsigned int textureContainerSize = entitiesContainerTexture->GetSize();
-
-//		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
-
-// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
-// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
-// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
-
-
-//             }
-// 		}
-		
-
-
-		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -2990,18 +2750,6 @@ namespace GLVM::core
 			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 
-			// VkBufferMemoryBarrier bufferMemoryBarrier{};
-			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
-			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
-			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
-			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
-			// bufferMemoryBarrier.offset = 0;
-			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
-
-			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
@@ -3018,8 +2766,6 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
 
 			
-			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
-			// std::cout << "texture: " << textureID << std::endl;                
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3033,34 +2779,6 @@ namespace GLVM::core
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
-        // vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineHUD);
-
-        // VkViewport viewportHUD{};
-        // viewportHUD.x = 0.0f;
-        // viewportHUD.y = 0.0f;
-        // viewportHUD.width = (float) swapChainExtent.width;
-        // viewportHUD.height = (float) swapChainExtent.height;
-        // viewportHUD.minDepth = 0.0f;
-        // viewportHUD.maxDepth = 1.0f;
-        // vkCmdSetViewport(commandBuffer, 0, 1, &viewportHUD);
-
-        // VkRect2D scissorHUD{};
-        // scissorHUD.offset = {0, 0};
-        // scissorHUD.extent = swapChainExtent;
-        // vkCmdSetScissor(commandBuffer, 0, 1, &scissorHUD);
-
-        // VkBuffer vertexBuffersHUD[] = {hudVertexBuffer};
-        // VkDeviceSize offsetsHUD[] = {0};
-        // vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffersHUD, offsetsHUD);
-
-        // vkCmdBindIndexBuffer(commandBuffer, hudIndexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size() * MAX_FRAMES_IN_FLIGHT; n = n + 2) {
-        //     vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayoutHUD, 0, 1, &descriptorSets[n + currentFrame], 0, nullptr);
-        //     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(hudIndices.size()), 1, 0, 0, 0);
-        // }
-        
         vkCmdEndRenderPass(commandBuffer);
 
         if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
@@ -3145,11 +2863,6 @@ namespace GLVM::core
 	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
         ModelMatrixUBO modelMatrixUBO{};
-		// ViewPositionUBO viewPositionUBO{};
-		// MaterialUBO materialUBO{};
-		// DirectionalLightsUBO directionalLightsUBO{};
-		// PointLightsUBO pointLightsUBO{};
-		// SpotLightsUBO spotLightsUBO{};
 
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
@@ -3163,59 +2876,13 @@ namespace GLVM::core
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
 
-        // if (_transformComponent.hud) {
-        //     ubo.view.SelfIdentity();
-        //     ubo.proj.SelfIdentity();
-        // }
-
-        // if (currentImage >= texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT) {
-        //     modelMatrixUBO.view.SelfIdentity();
-        //     modelMatrixUBO.proj.SelfIdentity();
-        // }
-        
         modelMatrixUBO.proj[1][1] *= -1;
-
-        // UniformBufferObjectLight uboLight{};
-		// uboLight.valueLight = 30;
-
-		// UniformBufferObject2 ubo2{};
-		// ubo2.value = 0.5f;
 		
         void* modelMatrixData;
         vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
         vkUnmapMemory(device, modelMatrixUniformBuffersMemory[currentImage]);
-
-        // void* viewPositionData;
-        // vkMapMemory(device, viewPositionUniformBuffersMemory[currentImage], 0,
-		// 			sizeof(viewPositionUBO), 0, &viewPositionData);
-        // memcpy(viewPositionData, &viewPositionUBO, sizeof(viewPositionUBO));
-        // vkUnmapMemory(device, viewPositionUniformBuffersMemory[currentImage]);
-		
-		// void* materialData;
-        // vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
-		// 			sizeof(materialUBO), 0, &materialData);
-        // memcpy(materialData, &materialUBO, sizeof(materialUBO));
-        // vkUnmapMemory(device, materialUniformBuffersMemory[currentImage]);
-
-		// void* directionalLightsData;
-        // vkMapMemory(device, directionalLightsUniformBuffersMemory[currentImage], 0,
-		// 			sizeof(directionalLightsUBO), 0, &directionalLightsData);
-        // memcpy(directionalLightsData, &directionalLightsUBO, sizeof(directionalLightsUBO));
-        // vkUnmapMemory(device, directionalLightsUniformBuffersMemory[currentImage]);
-
-		// void* pointLightsData;
-        // vkMapMemory(device, pointLightsUniformBuffersMemory[currentImage], 0,
-		// 			sizeof(pointLightsUBO), 0, &pointLightsData);
-        // memcpy(pointLightsData, &pointLightsUBO, sizeof(pointLightsUBO));
-        // vkUnmapMemory(device, pointLightsUniformBuffersMemory[currentImage]);
-
-		// void* spotLightsData;
-        // vkMapMemory(device, spotLightsUniformBuffersMemory[currentImage], 0,
-		// 			sizeof(spotLightsUBO), 0, &spotLightsData);
-        // memcpy(spotLightsData, &spotLightsUBO, sizeof(spotLightsUBO));
-        // vkUnmapMemory(device, spotLightsUniformBuffersMemory[currentImage]);
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
@@ -3235,7 +2902,7 @@ namespace GLVM::core
 
 		materialUBO.ambient = materialComponent->ambient;
 		materialUBO.shininess = materialComponent->shininess;
-//		std::cout << materialUBO.shininess << std::endl;
+
         void* data;
         vkMapMemory(device, materialUniformBuffersMemory[currentImage], 0,
 					sizeof(MaterialUBO), 0, &data);
@@ -3361,32 +3028,6 @@ namespace GLVM::core
             throw std::runtime_error("failed to acquire swap chain image!");
         }
 
-//         ecs::ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-//         core::vector<cm::transform>* pEntity_Container_refTransform =
-// 			pComponent_Manager->GetComponentContainer<cm::transform>();
-// //		unsigned int transformContainerSize = pEntity_Container_refTransform->GetSize();
-
-// 		for ( unsigned int i = 0; i < texture_load_data_.size(); ++i ) {
-// 			for (unsigned int j = 0; j < texture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-// 				std::cout << "i: " << i << " j: " << j << std::endl;
-// //				unsigned int uiEntity = (*pEntity_Container_refTransform)[i];
-// //				ecs::components::transform* transformComponent = pComponent_Manager->GetComponent<ecs::components::transform>(uiEntity);
-// 				ecs::components::transform transformComponent = (*pEntity_Container_refTransform)[texture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j]];
-//                 updateUniformBuffer(MAX_FRAMES_IN_FLIGHT * i + currentFrame, transformComponent);
-//             }
-// 		}
-
-        // Needed to skip images that intended to game objects that counts according to *texturePool_*.
-        
-        // unsigned int hudBaseCounterValue = texture_load_data_.size() * MAX_FRAMES_IN_FLIGHT * texturePool_;
-        // unsigned int hudCounter = 0;
-        // for (unsigned int n = hudBaseCounterValue; n < hudBaseCounterValue + hudTexture_load_data_.size(); n = n + 2) {
-
-		// 	/// TODO: add for loop for inner entitiesownsthistypeoftexture.
-        //     cm::transform transformComponent = (*pEntity_Container_refTransform)[hudTexture_load_data_[hudCounter].entitiesOwnsThisTypeOfTexture_[0]];
-        //     updateUniformBuffer(n + currentFrame, transformComponent);
-        //     ++hudCounter;
-        // }
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
@@ -3811,56 +3452,4 @@ namespace GLVM::core
 		}
 	}
 }
-
-// class RenderManager
-// {
-//     HelloTriangleApplication* vk_;
-    
-// public:
-//     RenderManager(std::vector<Texture> _initializeTextureData) {
-//         vk_ = new HelloTriangleApplication(_initializeTextureData);
-//         vk_->setTextureData(_initializeTextureData);
-//         vk_->run();
-//     }
-
-//     void SetTexture(std::vector<Texture> _initializeTextureData) {
-//         delete vk_;
-//         vk_ = nullptr;
-//         vk_ = new HelloTriangleApplication(_initializeTextureData);
-//         vk_->setTextureData(_initializeTextureData);
-//         vk_->run();
-//     }
-
-//     void Draw() {
-//         vk_->draw();
-//     }
-// };
-
-// int main() {
-//     // HelloTriangleApplication app;
-
-//     // app.setTextureData(witch_dat_len, witch_dat);
-//     // app.run();
-
-//     std::vector<Texture> initializeTextureData;
-//     Texture tex0{chelik_dat_len, chelik_dat};
-//     Texture tex1{witch_dat_len, witch_dat};
-//     initializeTextureData.push_back(tex0);
-//     initializeTextureData.push_back(tex1);
-    
-//     RenderManager app(initializeTextureData);
-
-// //    app.SetTexture(chelik_dat_len, chelik_dat);
-    
-//     try {
-//         while(1) {
-//             app.Draw();
-//         }
-//     } catch (const std::exception& e) {
-//         std::cerr << e.what() << std::endl;
-//         return EXIT_FAILURE;
-//     }
-
-//     return EXIT_SUCCESS;
-// }
 
