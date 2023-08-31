@@ -289,6 +289,15 @@ namespace GLVM::core
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
+		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																							   cm::spotLight,
+																							   cm::vertex>();
+		
+		spotLightShadowMapMatrixUboDescriptorsNumber = spotLightLinkedEntities.GetSize();
+
+		
+		spotLightShadowMapTextureSamplers.resize(spotLightShadowMapMatrixUboDescriptorsNumber);
+
 		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
 		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -303,6 +312,15 @@ namespace GLVM::core
 		
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+
+		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																							   cm::pointLight,
+																							   cm::vertex>();
+		
+		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
+
+		
+		pointLightShadowMapTextureSamplers.resize(pointLightShadowMapMatrixUboDescriptorsNumber);
 
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
 		// directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
@@ -1132,6 +1150,15 @@ namespace GLVM::core
 			spotLightsRenderAttachments.push_back(spotLightShadowMapDepthImageViews[0]);
 
 			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i]);
+		};
+
+		/// Point lights shadow map renderer frame buffers initialization
+		pointLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
+        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+			std::vector<VkImageView> pointLightsRenderAttachments;
+			pointLightsRenderAttachments.push_back(pointLightShadowMapDepthImageViews[0]);
+
+			createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[i]);
 		};
     }
 
@@ -2741,6 +2768,121 @@ namespace GLVM::core
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
+			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
+			// updateMaterialUniformBuffer(uboIndex, materialComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 2, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
+			// updateDirectionalLightUniformBuffer(currentFrame);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 3, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
+			// updatePointLightUniformBuffer(currentFrame);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 4, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
+			// updateSpotLightUniformBuffer(currentFrame);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 5, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
+			
+			// unsigned int textureID = componentManager->GetComponent<ecs::components::texture>(uiEntity)->id;
+			// std::cout << "texture: " << textureID << std::endl;                
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
+
+			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 6, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 7, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 8, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		}
+		
+		// for ( unsigned int i = 0; i < directionalLightEntities.GetSize(); ++i ) {
+		// 	unsigned int entity = directionalLightEntities[i];
+		// 	unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
+		// 	VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
+		// 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
+
+		// 	vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[vertexID], 0, VK_INDEX_TYPE_UINT16);
+
+		// 	cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
+		// 	cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(entity);
+
+		// 	unsigned int indicesContainerSize = aVertices_[vertexID].size();
+		// 	updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
+		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipelineLayout, 0, 1, &shadowMapMatrixUboDescriptorSets[currentFrame], 0, nullptr);
+		// 	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		// }
+
+		vkCmdEndRenderPass(commandBuffer);
+
+		VkClearValue pointLightShadowMapClearValues[1];
+		pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+		pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+
+		VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
+		pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		pointLightShadowMapRenderPassInfo.pNext = NULL;
+		pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
+		pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[currentFrame];
+		pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+		pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+		pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+		pointLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		pointLightShadowMapRenderPassInfo.clearValueCount = 1;
+		pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+
+		vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+		VkViewport pointLightShadowMapViewPort;
+		pointLightShadowMapViewPort.height = swapChainExtent.height;
+		pointLightShadowMapViewPort.width = swapChainExtent.width;
+		pointLightShadowMapViewPort.minDepth = 0.0f;
+		pointLightShadowMapViewPort.maxDepth = 1.0f;
+		pointLightShadowMapViewPort.x = 0;
+		pointLightShadowMapViewPort.y = 0;
+		vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
+
+		VkRect2D pointLightShadowMapScissor;
+		pointLightShadowMapScissor.extent.width = swapChainExtent.width;
+		pointLightShadowMapScissor.extent.height = swapChainExtent.height;
+		pointLightShadowMapScissor.offset.x = 0;
+		pointLightShadowMapScissor.offset.y = 0;
+		vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
+
+		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
+
+//		const VkDeviceSize shadowMapOffsets[1] = { 0 };
+		core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::pointLight,
+																							  cm::vertex>();
+
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			//              unsigned int uiEntity = (*entitiesContainerTexture)[j];
+			unsigned int uiEntity = linkedEntities[i];
+//			unsigned int uiDirectionalLightEntity = directionalLightEntities[0];
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			// cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(uiDirectionalLightEntity);
+			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
+			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
+			// cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+
+			// VkBufferMemoryBarrier bufferMemoryBarrier{};
+			// bufferMemoryBarrier.sType = VK_STRUCTURE_TYPE_BUFFER_MEMORY_BARRIER;
+			// bufferMemoryBarrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+			// bufferMemoryBarrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT | VK_ACCESS_TRANSFER_WRITE_BIT;
+			// bufferMemoryBarrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// bufferMemoryBarrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			// bufferMemoryBarrier.buffer = modelMatrixUniformBuffers[MAX_FRAMES_IN_FLIGHT * i + currentFrame];
+			// bufferMemoryBarrier.offset = 0;
+			// bufferMemoryBarrier.size   = VK_WHOLE_SIZE;
+
+			// vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+			// 					 0, 0, nullptr, 1, &bufferMemoryBarrier, 0, nullptr);
+			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
+			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
+			// updateShadowMapMatrixUniformBuffer(currentFrame, transformComponent, directionalLightComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[currentFrame], 0, nullptr);
+			updateMatrixUniformBuffer(uboIndex, transformComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
 			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 1, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
 			// updateMaterialUniformBuffer(uboIndex, materialComponent);
