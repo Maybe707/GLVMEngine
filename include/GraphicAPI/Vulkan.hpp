@@ -193,6 +193,16 @@ namespace GLVM::core
 		mat4 model;
 		mat4 lightSpaceMatrix;
 	};
+
+	struct alignas(16) SpotLightShadowMapMatrixUBO {
+		mat4 model;
+		mat4 lightSpaceMatrix;
+	};
+
+	struct alignas(16) PointLightShadowMapMatrixUBO {
+		mat4 model;
+		mat4 lightSpaceMatrix;
+	};
 	
 	struct DirectionalLight {
 		alignas(16) vec3 position;
@@ -465,27 +475,37 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		std::vector<VkBuffer> shadowMapDirectionalLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
+		VkDescriptorPool directionalLightShadowMapDescriptorPool;
+		unsigned int directionalLightShadowMapMatrixUboDescriptorsNumber = 0;
 		
 		unsigned int	pointLightNumber	   = 0;
 		core::vector<VkImage> pointLightShadowMapDepthImages;
 		core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
 		core::vector<VkImageView> pointLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> pointLightShadowMapFrameBuffers;
+		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
+		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
+		std::vector<VkBuffer> shadowMapPointLightModelMatrixUniformBuffers;
+		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
+		VkDescriptorPool pointLightShadowMapDescriptorPool;
+		unsigned int pointLightShadowMapMatrixUboDescriptorsNumber = 0;
 
 		unsigned int	spotLightNumber		   = 0;
 		core::vector<VkImage> spotLightShadowMapDepthImages;
 		core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
 		core::vector<VkImageView> spotLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
+		VkRenderPass spotLightShadowMapRenderPass;
 		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
+		std::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
+		std::vector<VkBuffer> shadowMapSpotLightModelMatrixUniformBuffers;
+		std::vector<VkDeviceMemory> shadowMapSpotLightModelMatrixUniformBuffersMemory;
+		VkDescriptorPool spotLightShadowMapDescriptorPool;
+		unsigned int spotLightShadowMapMatrixUboDescriptorsNumber = 0;
 
-		VkDescriptorPool shadowMapDescriptorPool;
-		unsigned int directionalLightShadowMapMatrixUboDescriptorsNumber = 0;
 		core::vector<mat4> shadowMapBasisMatrices;
-
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
-
 		
         std::vector<VkImage> textureImages;
         std::vector<VkDeviceMemory> textureImageMemories;
@@ -564,8 +584,10 @@ namespace GLVM::core
         void createLogicalDevice();
         void createSwapChain();
         void createImageViews();
-        void createRenderPass();
-		void createShadowMapRenderPass();
+        void createMainRenderPass();
+		void createDirectionalLightShadowMapRenderPass();
+		void createSpotLightShadowMapRenderPass();
+		void createPointLightShadowMapRenderPass();
         void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
@@ -583,7 +605,11 @@ namespace GLVM::core
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
         void createTextureSampler();
-		void createShadowMapTextureSamplers();
+		void createDirectionalLightShadowMapTextureSamplers();
+		void createSpotLightShadowMapTextureSamplers();
+		void createPointLightShadowMapTextureSamplers();
+		void createSpotLightShadowMapDescriptorPool();
+		void createPointLightShadowMapDescriptorPool();
 		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
@@ -593,11 +619,15 @@ namespace GLVM::core
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
 		void createDirectionalLightShadowMapUniformBuffers();
+		void createSpotLightShadowMapUniformBuffers();
+		void createPointLightShadowMapUniformBuffers();
         void createMainRenderUniformBuffers();
-        void createDescriptorPool();
-		void createShadowMapDescriptorPool();
+        void createMainRenderDescriptorPool();
+		void createDirectionalLightShadowMapDescriptorPool();
 		void createDirectionalLightShadowMapDescriptorSets();
-        void createDescriptorSets();
+		void createSpotLightShadowMapDescriptorSets();
+		void createPointLightShadowMapDescriptorSets();
+        void createMainRenderDescriptorSets();
 		void updateDirectionalLightShadowMapDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
