@@ -3319,6 +3319,34 @@ namespace GLVM::core
 		directionalLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &directionalLightPipelineLayoutObjectInfo);
 
+		VkDebugUtilsObjectNameInfoEXT spotLightPipelineObjectInfo{};
+		spotLightPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		spotLightPipelineObjectInfo.pObjectName = "Spot light pipeline";
+		spotLightPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
+		spotLightPipelineObjectInfo.objectHandle = (uint64_t)spotLightPipeline.pipeline;
+		SetDebugObjectName(device, &spotLightPipelineObjectInfo);
+
+		VkDebugUtilsObjectNameInfoEXT spotLightPipelineLayoutObjectInfo{};
+		spotLightPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		spotLightPipelineLayoutObjectInfo.pObjectName = "Spot light pipeline layout";
+		spotLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
+		spotLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)spotLightPipeline.pipelineLayout;
+		SetDebugObjectName(device, &spotLightPipelineLayoutObjectInfo);
+
+		VkDebugUtilsObjectNameInfoEXT pointLightPipelineObjectInfo{};
+		pointLightPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		pointLightPipelineObjectInfo.pObjectName = "Point light pipeline";
+		pointLightPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
+		pointLightPipelineObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipeline;
+		SetDebugObjectName(device, &pointLightPipelineObjectInfo);
+
+		VkDebugUtilsObjectNameInfoEXT pointLightPipelineLayoutObjectInfo{};
+		pointLightPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		pointLightPipelineLayoutObjectInfo.pObjectName = "Point light pipeline layout";
+		pointLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
+		pointLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipelineLayout;
+		SetDebugObjectName(device, &pointLightPipelineLayoutObjectInfo);
+		
 		for ( unsigned long i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
 			descriptorSetLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
