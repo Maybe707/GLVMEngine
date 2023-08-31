@@ -1125,19 +1125,6 @@ namespace GLVM::core
             }
     }
 	
-	void CVulkanRenderer::createShadowMapCommandPool() {
-        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
-
-        VkCommandPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
-
-        if (vkCreateCommandPool(device, &poolInfo, nullptr, &shadowMapCommandPool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create graphics command pool!");
-        }
-    }
-	
     void CVulkanRenderer::createCommandPool() {
         QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
@@ -2418,20 +2405,6 @@ namespace GLVM::core
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void CVulkanRenderer::createShadowMapCommandBuffers() {
-        shadowMapCommandBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
-
-        VkCommandBufferAllocateInfo allocInfo{};
-        allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        allocInfo.commandPool = shadowMapCommandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-        allocInfo.commandBufferCount = (uint32_t) shadowMapCommandBuffers.size();
-
-        if (vkAllocateCommandBuffers(device, &allocInfo, shadowMapCommandBuffers.data()) != VK_SUCCESS) {
-            throw std::runtime_error("failed to allocate command buffers!");
-        }
-    }
-	
     void CVulkanRenderer::createCommandBuffers() {
         commandBuffers.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
 
@@ -2687,8 +2660,8 @@ namespace GLVM::core
 		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
 		core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::pointLight,
-																							  cm::vertex>();
+																							   cm::pointLight,
+																							   cm::vertex>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];

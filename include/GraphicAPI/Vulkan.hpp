@@ -454,7 +454,6 @@ namespace GLVM::core
         // VkPipeline graphicsPipelineHUD;
 
         VkCommandPool commandPool;
-		VkCommandPool shadowMapCommandPool;
 
 		/// Main pipeline depth.
         VkImage depthImage;
@@ -593,7 +592,6 @@ namespace GLVM::core
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer);
 		void createFramebuffers();
-		void createShadowMapCommandPool();
         void createCommandPool();
         void createDepthResources();
 		void createShadowMapDepthResources();
@@ -635,7 +633,6 @@ namespace GLVM::core
         void endSingleTimeCommands(VkCommandBuffer commandBuffer);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-		void createShadowMapCommandBuffers();
         void createCommandBuffers();
 		void recordShadowMapCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
