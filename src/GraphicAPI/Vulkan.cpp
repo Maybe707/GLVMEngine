@@ -162,7 +162,7 @@ namespace GLVM::core
 		forward[1] = result.y;
 		forward[2] = result.z;
         cameraComponent.forward = Normalize(forward);
-
+//		std::cout << cameraComponent.forward << std::endl;
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
@@ -267,7 +267,7 @@ namespace GLVM::core
 		directionalLightShadowMapTextureSamplers.resize(directionalLightShadowMapMatrixUboDescriptorsNumber);
 
 		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		directionalLightPipeline.vertShader = vertShaderMain_;
+		directionalLightPipeline.vertShader = vertShaderDirectionalLightShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
@@ -1500,7 +1500,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																									  cm::directionalLight,
+																									  cm::material,
 																									  cm::vertex>();
 		
 		directionalLightShadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
@@ -2545,12 +2545,17 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
+			unsigned int directionalLightEntity = directionalLightEntities[0];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+
+			std::cout << "TEST " << i << std::endl;
+			
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
+			updateShadowMapMatrixUniformBuffer(uboIndex, transformComponent, directionalLightComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);			
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
