@@ -219,11 +219,11 @@ int main()
 
 	Entity spotLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::spotLight, cm::transform>(spotLight1);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 1.0f, 0.0f, -14.0f },
-		.direction = { 100.0f, 1.0f, 100.0f }, .cutOff = 12.5f, .outerCutOff = 17.5f, .ambient = { 0.2f, 0.2f, 0.2f },
-		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f }, .constant = 1.0f, .linear = 0.09f,
+	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 5.0f, 10.0f, -14.0f },
+		.direction = { 0.0f, 1.0f, 0.0f }, .cutOff = 12.5f, .outerCutOff = 17.5f, .ambient = { 0.2f, 0.2f, 0.2f },
+		.diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 0.3f, 0.3f, 0.3f }, .constant = 5.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 1.0f, 0.0f, -14.0f }, .fScale = 0.3f };
+	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 1.0f, 10.0f, -14.0f }, .fScale = 0.3f };
 	ComponentManager->GetComponent<cm::vertex>(spotLight1)->vkVertexId_ = 0;
 	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
 	*materialSpotLight1 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
