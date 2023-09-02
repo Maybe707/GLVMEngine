@@ -161,7 +161,6 @@ namespace GLVM::core
 					_Event.SetEvent(EEvents::eMOVE_FORWARD);
 					break;
                 case XK_space:
-                    std::cout << "SPACE!" << std::endl;
                     _Event.SetEvent(EEvents::eJUMP);
                     break;
 				}

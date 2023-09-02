@@ -189,7 +189,7 @@ namespace GLVM::core
         mat4 proj;
     };
 
-	struct alignas(16) DirectionalLightShadowMapMatrixUBO {
+	struct alignas(16) FlatShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
 	};
@@ -375,7 +375,7 @@ namespace GLVM::core
         const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
 
-        const char* vertShaderDirectionalLightShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
+        const char* vertShaderFlatShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
         const char* fragShaderDirectionalLightShadowMap = "../VKshaders/shadowMapShaders/frag.spv";
         
         unsigned int texturePool_;
@@ -638,7 +638,8 @@ namespace GLVM::core
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void createShadowMapSyncObjects();
         void createSyncObjects();
-		void updateShadowMapMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
+		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
+		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
