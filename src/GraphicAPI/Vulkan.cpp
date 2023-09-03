@@ -198,7 +198,7 @@ namespace GLVM::core
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
             memcpy(data, pixels, static_cast<size_t>(imageSize));
             vkUnmapMemory(device, stagingBufferMemory);
-            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i]);
+            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i], 1, 0);
 
             transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
             copyBufferToImage(stagingBuffer, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
@@ -296,7 +296,7 @@ namespace GLVM::core
 		pointLightShadowMapTextureSamplers.resize(pointLightShadowMapMatrixUboDescriptorsNumber);
 
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		pointLightPipeline.vertShader = vertShaderMain_;
+		pointLightPipeline.vertShader = vertShaderFlatShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -1141,7 +1141,7 @@ namespace GLVM::core
     void CVulkanRenderer::createDepthResources() {
         VkFormat depthFormat = findDepthFormat();
 
-        createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+        createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory, 1, 0);
         depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
     }
 
@@ -1154,35 +1154,48 @@ namespace GLVM::core
 																									  cm::directionalLight,
 																									  cm::vertex>();
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
+		uint32_t			dirImageLayersCount = 1;
+		VkImageCreateFlags	dirImageFlags		= 0;
 		createShadowMapData(directionalLightNumber, directionalLightShadowMapDepthImages,
-						    directionalLightShadowMapDepthImageMemories, directionalLightShadowMapDepthImageViews);
+						    directionalLightShadowMapDepthImageMemories, directionalLightShadowMapDepthImageViews, dirImageLayersCount,
+							dirImageFlags, VK_IMAGE_VIEW_TYPE_2D,
+							swapChainExtent.width, swapChainExtent.height);
 		
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::vertex>();
 		spotLightNumber = spotLightLinkedEntities.GetSize();
+		uint32_t			spotImageLayersCount = 1;
+		VkImageCreateFlags	spotImageFlags		 = 0;
 		createShadowMapData(spotLightNumber, spotLightShadowMapDepthImages,
-							spotLightShadowMapDepthImageMemories, spotLightShadowMapDepthImageViews);
+							spotLightShadowMapDepthImageMemories, spotLightShadowMapDepthImageViews, spotImageLayersCount,
+							spotImageFlags, VK_IMAGE_VIEW_TYPE_2D,
+							swapChainExtent.width, swapChainExtent.height);
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::vertex>();
 		pointLightNumber = pointLightLinkedEntities.GetSize();
+		uint32_t			pointImageLayersCount = 6;
 		createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
-							pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews);
+							pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews, pointImageLayersCount,
+							VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, VK_IMAGE_VIEW_TYPE_CUBE, swapChainExtent.width, swapChainExtent.width);
     }
 
 	void CVulkanRenderer::createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
 											  core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-											  core::vector<VkImageView>& shadowMapDepthImageViews) {
+											  core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t layersCount,
+											  VkImageCreateFlags flags, VkImageViewType viewType, uint32_t width, uint32_t height) {
  		shadowMapDepthImages.Resize(lightsNumber);
 		shadowMapDepthImageMemories.Resize(lightsNumber);
 		shadowMapDepthImageViews.Resize(lightsNumber);
 
 		for ( unsigned int i = 0; i < lightsNumber; ++i ) {		
-			createImage(swapChainExtent.width, swapChainExtent.height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImages[i], shadowMapDepthImageMemories[i]);
-			shadowMapDepthImageViews[i] = createShadowMapImageView(shadowMapDepthImages[i], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT);
+			createImage(width, height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImages[i], shadowMapDepthImageMemories[i], layersCount,
+				flags);
+			shadowMapDepthImageViews[i] = createShadowMapImageView(shadowMapDepthImages[i], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT,
+																   layersCount, viewType);
 		}
 	}
 	
@@ -1328,18 +1341,19 @@ namespace GLVM::core
         return imageView;
     }
 
-    VkImageView CVulkanRenderer::createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+    VkImageView CVulkanRenderer::createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
+														  uint32_t layerCount, VkImageViewType viewType) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         viewInfo.image = image;
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
         viewInfo.format = format;
 		viewInfo.subresourceRange = {};
         viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
         viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
+        viewInfo.subresourceRange.layerCount = layerCount;
+		viewInfo.viewType = viewType;
 
         VkImageView imageView;
         if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
@@ -1349,7 +1363,7 @@ namespace GLVM::core
         return imageView;
     }
 	
-    void CVulkanRenderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+    void CVulkanRenderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory, unsigned int arrayLayers, VkImageCreateFlags flags) {
         VkImageCreateInfo imageInfo{};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -1357,12 +1371,13 @@ namespace GLVM::core
         imageInfo.extent.height = height;
         imageInfo.extent.depth = 1;
         imageInfo.mipLevels = 1;
-        imageInfo.arrayLayers = 1;
+        imageInfo.arrayLayers = arrayLayers;
         imageInfo.format = format;
         imageInfo.tiling = tiling;
 //        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         imageInfo.usage = usage;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.flags = flags;
 //        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {

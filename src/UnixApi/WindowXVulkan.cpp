@@ -52,9 +52,7 @@ namespace GLVM::core
 //		const int kInterval = 1;
     }
     
-    WindowXVulkan::~WindowXVulkan()
-    {
-    }
+    WindowXVulkan::~WindowXVulkan() = default;
 
     Window WindowXVulkan::GetWindow() { return Win_; }
     Display* WindowXVulkan::GetDisplay() { return pDisp_; }

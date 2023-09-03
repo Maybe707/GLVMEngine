@@ -597,7 +597,8 @@ namespace GLVM::core
 		void createShadowMapDepthResources();
 		void createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
 								 core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-								 core::vector<VkImageView>& shadowMapDepthImageViews);
+								 core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t layersCount,
+								 VkImageCreateFlags flags, VkImageViewType viewType, uint32_t width, uint32_t height);
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
@@ -610,8 +611,9 @@ namespace GLVM::core
 		void createPointLightShadowMapDescriptorPool();
 		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-        void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
+											 uint32_t layerCount, VkImageViewType viewType);
+        void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory, unsigned int arrayLayers, VkImageCreateFlags flags);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
