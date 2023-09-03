@@ -372,12 +372,15 @@ namespace GLVM::core
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
 
-        const char* vertShaderMain_ = "../VKshaders/shaders/vert.spv";
-        const char* fragShaderMain_ = "../VKshaders/shaders/frag.spv";
+        const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
+        const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
 
-        const char* vertShaderFlatShadowMap = "../VKshaders/shadowMapShaders/vert.spv";
-        const char* fragShaderDirectionalLightShadowMap = "../VKshaders/shadowMapShaders/frag.spv";
-        
+        const char* vertShaderFlatShadowMap = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
+        const char* fragShaderDirectionalLightShadowMap = "../VKshaders/flatShadowMapShaders/fragFlatShadowMap.spv";
+
+        const char* vertShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/vertCubeShadowMap.spv";
+        const char* fragShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
+		
         unsigned int texturePool_;
         
 #ifdef VK_USE_PLATFORM_XLIB_KHR

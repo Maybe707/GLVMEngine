@@ -1555,7 +1555,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::pointLight,
+																								cm::material,
 																								cm::vertex>();
 		
 		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
