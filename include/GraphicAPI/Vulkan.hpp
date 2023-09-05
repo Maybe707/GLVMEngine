@@ -189,7 +189,7 @@ namespace GLVM::core
         mat4 proj;
     };
 
-	struct alignas(16) FlatShadowMapMatrixUBO {
+	struct alignas(16) ShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
 	};
@@ -484,7 +484,8 @@ namespace GLVM::core
 		core::vector<VkImage> pointLightShadowMapDepthImages;
 		core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
 		core::vector<VkImageView> pointLightShadowMapDepthImageViews;
-		std::vector<VkFramebuffer> pointLightShadowMapFrameBuffers;
+		std::vector<std::vector<std::vector<VkImageView>>> pointLightShadowMapDepthImageViewLayers;
+		std::vector<std::vector<std::vector<VkFramebuffer>>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
@@ -593,15 +594,17 @@ namespace GLVM::core
         void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
-										  VkFramebuffer& swapChainFramebuffer);
+										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
+										  uint32_t height);
 		void createFramebuffers();
         void createCommandPool();
         void createDepthResources();
 		void createShadowMapDepthResources();
 		void createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
 								 core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-								 core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t layersCount,
-								 VkImageCreateFlags flags, VkImageViewType viewType, uint32_t width, uint32_t height);
+								 core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t baseArrayLayer,
+								 uint32_t layersCount, VkImageCreateFlags flags, VkImageViewType viewType,
+								 uint32_t width, uint32_t height);
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
@@ -615,7 +618,7 @@ namespace GLVM::core
 		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-											 uint32_t layerCount, VkImageViewType viewType);
+											 uint32_t baseArrayLayer,uint32_t layerCount, VkImageViewType viewType);
         void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory, unsigned int arrayLayers, VkImageCreateFlags flags);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
@@ -632,6 +635,8 @@ namespace GLVM::core
 		void createPointLightShadowMapDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateDirectionalLightShadowMapDescriptorSets();
+		void updateSpotLightShadowMapDescriptorSets();
+		void updatePointLightShadowMapDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands();
@@ -645,6 +650,7 @@ namespace GLVM::core
         void createSyncObjects();
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent);
+		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* spotLightComponent, uint32_t layer);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);

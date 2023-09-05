@@ -227,6 +227,8 @@ namespace GLVM::core
 		createShadowMapDepthResources();
         createFramebuffers();
 		updateDirectionalLightShadowMapDescriptorSets();
+		updateSpotLightShadowMapDescriptorSets();
+		updatePointLightShadowMapDescriptorSets();
 		updateDescriptorSets();
     }
     
@@ -1078,8 +1080,9 @@ namespace GLVM::core
 			mainRenderAttachments.push_back(swapChainImageViews[i]);
 			mainRenderAttachments.push_back(depthImageView);
 
-			createRenderPassFramebuffers(mainRenderAttachments, renderPass, swapChainFramebuffers[i]);
-		};
+			createRenderPassFramebuffers(mainRenderAttachments, renderPass, swapChainFramebuffers[i],
+										 swapChainExtent.width, swapChainExtent.height);
+		}
 
 		/// Directional lights shadow map renderer frame buffers initialization
 		directionalLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
@@ -1087,8 +1090,8 @@ namespace GLVM::core
 			std::vector<VkImageView> directionalLightsRenderAttachments;
 			directionalLightsRenderAttachments.push_back(directionalLightShadowMapDepthImageViews[0]);
 
-			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i]);
-		};
+			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
 		spotLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
@@ -1096,28 +1099,37 @@ namespace GLVM::core
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightShadowMapDepthImageViews[0]);
 
-			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i]);
-		};
+			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+		}
 
 		/// Point lights shadow map renderer frame buffers initialization
-		pointLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
-        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
-			std::vector<VkImageView> pointLightsRenderAttachments;
-			pointLightsRenderAttachments.push_back(pointLightShadowMapDepthImageViews[0]);
+//		pointLightShadowMapFrameBuffers.resize(pointLightNumber);
+		for ( size_t j = 0; j < pointLightNumber; ++j ) {
+			pointLightShadowMapDepthImageViewLayers.push_back({});
+			pointLightShadowMapFrameBuffers.push_back({});
+			for ( size_t m = 0; m < 6; ++m ) {
+				pointLightShadowMapDepthImageViewLayers[j].push_back({});
+				pointLightShadowMapFrameBuffers[j].push_back({});
+				for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+					pointLightShadowMapDepthImageViewLayers[j][m].push_back(createShadowMapImageView(pointLightShadowMapDepthImages[j], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT, m, 1, VK_IMAGE_VIEW_TYPE_2D));
 
-			createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[i]);
-		};
+					std::vector<VkImageView> pointLightsRenderAttachments;
+					pointLightsRenderAttachments.push_back(pointLightShadowMapDepthImageViewLayers[j][m][i]);
+					pointLightShadowMapFrameBuffers[j][m].push_back({});
+					createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m][i], swapChainExtent.width, swapChainExtent.width);
+				}
+			}
+		}
     }
 
-    void CVulkanRenderer::createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
-													   VkFramebuffer& swapChainFramebuffer) {
+    void CVulkanRenderer::createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_, VkFramebuffer& swapChainFramebuffer, uint32_t width, uint32_t height) {
             VkFramebufferCreateInfo framebufferInfo{};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = renderPass_;
             framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
             framebufferInfo.pAttachments = attachments.data();
-            framebufferInfo.width = swapChainExtent.width;
-            framebufferInfo.height = swapChainExtent.height;
+            framebufferInfo.width = width;
+            framebufferInfo.height = height;
             framebufferInfo.layers = 1;
 			
             if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffer) != VK_SUCCESS) {
@@ -1154,22 +1166,25 @@ namespace GLVM::core
 																									  cm::directionalLight,
 																									  cm::vertex>();
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
+		uint32_t            dirImageBaseArrayLayer = 0;
 		uint32_t			dirImageLayersCount = 1;
 		VkImageCreateFlags	dirImageFlags		= 0;
 		createShadowMapData(directionalLightNumber, directionalLightShadowMapDepthImages,
-						    directionalLightShadowMapDepthImageMemories, directionalLightShadowMapDepthImageViews, dirImageLayersCount,
+						    directionalLightShadowMapDepthImageMemories, directionalLightShadowMapDepthImageViews,
+							dirImageBaseArrayLayer, dirImageLayersCount,
 							dirImageFlags, VK_IMAGE_VIEW_TYPE_2D,
 							swapChainExtent.width, swapChainExtent.height);
-		
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::vertex>();
 		spotLightNumber = spotLightLinkedEntities.GetSize();
+		uint32_t            spotImageBaseArrayLayer = 0;
 		uint32_t			spotImageLayersCount = 1;
 		VkImageCreateFlags	spotImageFlags		 = 0;
 		createShadowMapData(spotLightNumber, spotLightShadowMapDepthImages,
-							spotLightShadowMapDepthImageMemories, spotLightShadowMapDepthImageViews, spotImageLayersCount,
+							spotLightShadowMapDepthImageMemories, spotLightShadowMapDepthImageViews,
+							spotImageBaseArrayLayer, spotImageLayersCount,
 							spotImageFlags, VK_IMAGE_VIEW_TYPE_2D,
 							swapChainExtent.width, swapChainExtent.height);
 
@@ -1177,16 +1192,20 @@ namespace GLVM::core
 																								cm::pointLight,
 																								cm::vertex>();
 		pointLightNumber = pointLightLinkedEntities.GetSize();
+		uint32_t            pointImageBaseArrayLayer = 0;
 		uint32_t			pointImageLayersCount = 6;
+		pointLightShadowMapDepthImageViewLayers.resize(pointLightNumber);
 		createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
-							pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews, pointImageLayersCount,
+							pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews,
+							pointImageBaseArrayLayer, pointImageLayersCount,
 							VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, VK_IMAGE_VIEW_TYPE_CUBE, swapChainExtent.width, swapChainExtent.width);
     }
 
 	void CVulkanRenderer::createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
 											  core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-											  core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t layersCount,
-											  VkImageCreateFlags flags, VkImageViewType viewType, uint32_t width, uint32_t height) {
+											  core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t baseArrayLayer,
+											  uint32_t layersCount, VkImageCreateFlags flags, VkImageViewType viewType,
+											  uint32_t width, uint32_t height) {
  		shadowMapDepthImages.Resize(lightsNumber);
 		shadowMapDepthImageMemories.Resize(lightsNumber);
 		shadowMapDepthImageViews.Resize(lightsNumber);
@@ -1195,7 +1214,7 @@ namespace GLVM::core
 			createImage(width, height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImages[i], shadowMapDepthImageMemories[i], layersCount,
 				flags);
 			shadowMapDepthImageViews[i] = createShadowMapImageView(shadowMapDepthImages[i], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT,
-																   layersCount, viewType);
+																   baseArrayLayer, layersCount, viewType);
 		}
 	}
 	
@@ -1342,7 +1361,8 @@ namespace GLVM::core
     }
 
     VkImageView CVulkanRenderer::createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-														  uint32_t layerCount, VkImageViewType viewType) {
+														  uint32_t baseArrayLayer, uint32_t layerCount,
+														  VkImageViewType viewType) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
         viewInfo.image = image;
@@ -1351,7 +1371,7 @@ namespace GLVM::core
         viewInfo.subresourceRange.aspectMask = aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
+        viewInfo.subresourceRange.baseArrayLayer = baseArrayLayer;
         viewInfo.subresourceRange.layerCount = layerCount;
 		viewInfo.viewType = viewType;
 
@@ -1510,7 +1530,7 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::createDirectionalLightShadowMapUniformBuffers() {
-		VkDeviceSize modelMatrixBufferSize = sizeof(FlatShadowMapMatrixUBO);
+		VkDeviceSize modelMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -1772,7 +1792,7 @@ namespace GLVM::core
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(FlatShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -1807,7 +1827,7 @@ namespace GLVM::core
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(FlatShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -1842,7 +1862,7 @@ namespace GLVM::core
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -2149,12 +2169,54 @@ namespace GLVM::core
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(FlatShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = 0;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
+
+	void CVulkanRenderer::updateSpotLightShadowMapDescriptorSets() {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightShadowMapMatrixUboDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
+			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapSpotLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = 0;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
+
+	void CVulkanRenderer::updatePointLightShadowMapDescriptorSets() {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
+			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
 			descriptorWrites[0].dstBinding = 0;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -2516,7 +2578,7 @@ namespace GLVM::core
 		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		shadowMapRenderPassInfo.pNext = NULL;
 		shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
-		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[currentFrame];
+		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[imageIndex];
 		shadowMapRenderPassInfo.renderArea.offset.x = 0;
 		shadowMapRenderPassInfo.renderArea.offset.y = 0;
 		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
@@ -2584,7 +2646,7 @@ namespace GLVM::core
 		spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		spotLightShadowMapRenderPassInfo.pNext = NULL;
 		spotLightShadowMapRenderPassInfo.renderPass = spotLightShadowMapRenderPass;
-		spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[currentFrame];
+		spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[imageIndex];
 		spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 		spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
 		spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
@@ -2642,65 +2704,71 @@ namespace GLVM::core
 		
 		vkCmdEndRenderPass(commandBuffer);
 
-		VkClearValue pointLightShadowMapClearValues[1];
-		pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-		pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+		for ( uint32_t i = 0; i < pointLightNumber; ++i ) {
+			for ( uint32_t j = 0; j < 6; ++j ) {                      ///< 6 is a number of cube map layers.
+				VkClearValue pointLightShadowMapClearValues[1];
+				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
 
-		VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
-		pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		pointLightShadowMapRenderPassInfo.pNext = NULL;
-		pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
-		pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[currentFrame];
-		pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-		pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-		pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-		pointLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-		pointLightShadowMapRenderPassInfo.clearValueCount = 1;
-		pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
+				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				pointLightShadowMapRenderPassInfo.pNext = NULL;
+				pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
+				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j][imageIndex];
+				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.width;
+				pointLightShadowMapRenderPassInfo.clearValueCount = 1;
+				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
 
-		vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		VkViewport pointLightShadowMapViewPort;
-		pointLightShadowMapViewPort.height = swapChainExtent.height;
-		pointLightShadowMapViewPort.width = swapChainExtent.width;
-		pointLightShadowMapViewPort.minDepth = 0.0f;
-		pointLightShadowMapViewPort.maxDepth = 1.0f;
-		pointLightShadowMapViewPort.x = 0;
-		pointLightShadowMapViewPort.y = 0;
-		vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
+				VkViewport pointLightShadowMapViewPort;
+				pointLightShadowMapViewPort.height = swapChainExtent.height;
+				pointLightShadowMapViewPort.width = swapChainExtent.width;
+				pointLightShadowMapViewPort.minDepth = 0.0f;
+				pointLightShadowMapViewPort.maxDepth = 1.0f;
+				pointLightShadowMapViewPort.x = 0;
+				pointLightShadowMapViewPort.y = 0;
+				vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
 
-		VkRect2D pointLightShadowMapScissor;
-		pointLightShadowMapScissor.extent.width = swapChainExtent.width;
-		pointLightShadowMapScissor.extent.height = swapChainExtent.height;
-		pointLightShadowMapScissor.offset.x = 0;
-		pointLightShadowMapScissor.offset.y = 0;
-		vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
+				VkRect2D pointLightShadowMapScissor;
+				pointLightShadowMapScissor.extent.width = swapChainExtent.width;
+				pointLightShadowMapScissor.extent.height = swapChainExtent.height;
+				pointLightShadowMapScissor.offset.x = 0;
+				pointLightShadowMapScissor.offset.y = 0;
+				vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
 
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
+				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-		core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::pointLight,
-																							   cm::vertex>();
+				core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									   cm::pointLight,
+																									   cm::vertex>();
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
-			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
-			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-			VkDeviceSize offsets[] = {0};
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+				for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+					unsigned int uiEntity = linkedEntities[i];
+					unsigned int pointLightEntity = pointLightEntities[0];
+					unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+					cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+					cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
+					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
+					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
+					updatePointLightShadowMapMatrixUBO(uboIndex, transformComponent, pointLightComponent, j);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);			
+					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+					VkDeviceSize offsets[] = {0};
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
+					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
-			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-		}
+					unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				}
 		
-		vkCmdEndRenderPass(commandBuffer);
+				vkCmdEndRenderPass(commandBuffer);
+			}
+		}
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -2824,7 +2892,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
-		FlatShadowMapMatrixUBO modelMatrixUBO{};
+		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
@@ -2857,7 +2925,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent) {
-		FlatShadowMapMatrixUBO modelMatrixUBO{};
+		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 25.0f;
@@ -2887,6 +2955,62 @@ namespace GLVM::core
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
         vkUnmapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage]);
+    }
+
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* spotLightComponent, uint32_t layer) {
+		ShadowMapMatrixUBO modelMatrixUBO{};
+
+		float nearPlaneFlatShadowMap = 1.0f;
+		float farPlaneFlatShadowMap = 25.0f;
+		mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		
+		vec3 positionVectorLight  = spotLightComponent->position;
+		vec3 directionalVectorLight;
+		vec3 upVector;
+		
+		switch(layer) {
+		case 0:
+			positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+		case 1:
+			positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+		case 2:
+			positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  1.0f);
+		case 3:
+			positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  -1.0f);
+		case 4:
+			positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+		case 5:
+			positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+		}
+		
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
+										  directionalVectorLight,
+										  upVector);
+		
+        modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        modelMatrixUBO.model[2][2] = _transformComponent->fScale;
+        modelMatrixUBO.model[3][3] = 1.0;
+        modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
+        modelMatrixUBO.model.SelfTensorTranspose();
+
+		spotProjectionMatrixLight[1][1] *= -1;
+		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * spotProjectionMatrixLight;
+
+        void* modelMatrixData;
+        vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
+					sizeof(modelMatrixUBO), 0, &modelMatrixData);
+        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
+        vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage]);
     }
 	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
