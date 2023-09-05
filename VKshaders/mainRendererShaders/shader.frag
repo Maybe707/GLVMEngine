@@ -84,7 +84,8 @@ layout(set = 5, binding = 5) uniform SpotLightsUBO {
 
 layout(set = 6, binding = 6) uniform sampler2D diffuse;
 layout(set = 7, binding = 7) uniform sampler2D specular;
-layout(set = 8, binding = 8) uniform sampler2D shadowMap; 
+layout(set = 8, binding = 8) uniform sampler2D shadowMap;
+layout(set = 9, binding = 9) uniform samplerCube cubeShadowMap;
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
