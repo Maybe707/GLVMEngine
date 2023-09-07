@@ -201,7 +201,7 @@ T2 Vector<T2, var2>::Length() const {
 
 template <class T2, int var2>
 std::ostream& operator<<(std::ostream& ostream, const Vector<T2, var2>& vector) {
-	ostream << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << " length: " << vector.Length();
+	ostream << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << " w: " << vector[3] << " length: " << vector.Length();
 	return ostream;
 }
 
