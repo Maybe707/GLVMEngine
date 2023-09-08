@@ -174,6 +174,7 @@ namespace GLVM::core
 	{
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
+		projectionMatrix[1][1] *= -1.0f;
 	}
 	
     void CVulkanRenderer::createTextureImage() {
@@ -3150,7 +3151,7 @@ namespace GLVM::core
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
 
-        modelMatrixUBO.proj[1][1] *= -1;
+//        modelMatrixUBO.proj[1][1] *= -1;
 		
         void* modelMatrixData;
         vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], 0,

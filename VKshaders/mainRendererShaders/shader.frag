@@ -111,7 +111,7 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 void main()
 {
 	vec3 fragmentNormal = normalize(fs_in.normal);
-	vec3 viewDirection  = normalize(viewPos.viewPosition - fs_in.fragmentPosition);
+	vec3 viewDirection  = normalize(fs_in.fragmentPosition - viewPos.viewPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
@@ -156,7 +156,7 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(-lightDirection, normal);
+	vec3 reflectDirection   = reflect(lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// combine results
 	vec3 ambient  = light.ambient * material.ambient;
