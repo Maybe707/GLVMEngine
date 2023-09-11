@@ -174,6 +174,7 @@ namespace GLVM::core
 	{
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
+//		projectionMatrix.SelfTensorTranspose();
 		projectionMatrix[1][1] *= -1.0f;
 	}
 	
@@ -778,8 +779,8 @@ namespace GLVM::core
 		dependencies[0].dstStageMask	= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		dependencies[0].srcAccessMask	= VK_ACCESS_SHADER_READ_BIT;
 		dependencies[0].dstAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 		dependencies[1].srcSubpass		= 0;
 		dependencies[1].dstSubpass		= VK_SUBPASS_EXTERNAL;
 		dependencies[1].srcStageMask	= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
@@ -2922,6 +2923,11 @@ namespace GLVM::core
 
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
+
+		cm::directionalLight* playerDirLightComponent = componentManager->GetComponent<cm::directionalLight>(viewPositionLinkedEntities[0]);
+		cm::beholder* beholderPlayerComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
+		playerDirLightComponent->position = playerTransformComponent->tPosition;
+		playerDirLightComponent->direction = -beholderPlayerComponent->forward;
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
@@ -3015,13 +3021,22 @@ namespace GLVM::core
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		float nearPlaneFlatShadowMap = 1.0f;
+		float nearPlaneFlatShadowMap = 0.01f;
 		float farPlaneFlatShadowMap = 25.0f;
 		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+
+		cm::beholder* beholderComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
+		
 		
 		vec3 positionVectorLight  = directionalLightComponent->position;
-		vec3 directionVectorLight = directionalLightComponent->direction;
+//		vec3 directionVectorLight = directionalLightComponent->direction;
+		vec3 directionVectorLight = -beholderComponent->forward;
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
@@ -3050,7 +3065,7 @@ namespace GLVM::core
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		float nearPlaneFlatShadowMap = 1.0f;
+		float nearPlaneFlatShadowMap = 0.01f;
 		float farPlaneFlatShadowMap = 25.0f;
 		mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);

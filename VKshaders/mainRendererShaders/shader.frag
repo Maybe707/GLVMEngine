@@ -115,11 +115,11 @@ void main()
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
-		result += ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-		// float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], shadowMap);
-		// result += (1.0 - shadow) * light;
-		// if(shadow > 0.0)
-		// 	shadow = 0.0;
+		vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
+		float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], shadowMap);
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
 	}
 
 	// for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
@@ -238,7 +238,7 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 		for (int y = -1; y <= 1; ++y)
 		{
 			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
-			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
+			shadow += currentDepth - bias <= pcfDepth ? 0.5 : 0.0;
 		}
 	}
 	shadow /= 9.0;
