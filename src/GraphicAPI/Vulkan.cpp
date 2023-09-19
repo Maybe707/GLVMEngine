@@ -3020,10 +3020,10 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
-        // static auto startTime = std::chrono::high_resolution_clock::now();
+        static auto startTime = std::chrono::high_resolution_clock::now();
 
-        // auto currentTime = std::chrono::high_resolution_clock::now();
-        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 		
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
@@ -3041,7 +3041,7 @@ namespace GLVM::core
 		
 //		vec3 positionDirectionalLight = directionalLightComponent->position + vec3(std::sin(time), std::cos(time), 0.0);
  
-//		_transformComponent->tPosition[0] = std::cos(time) * 5;
+		directionalLightComponent->position[0] = std::cos(time) * 5;
 //		directionalLightComponent->position = vec3(std::sin(time) * 5, 0.0, std::cos(time));
 		vec3 positionVectorLight = directionalLightComponent->position;
 //		vec3 directionVectorLight = directionalLightComponent->direction;
