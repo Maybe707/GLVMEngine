@@ -3041,7 +3041,7 @@ namespace GLVM::core
 		
 //		vec3 positionDirectionalLight = directionalLightComponent->position + vec3(std::sin(time), std::cos(time), 0.0);
  
-		directionalLightComponent->position[0] = std::cos(time) * 5;
+		directionalLightComponent->position[2] = std::cos(time) * 5;
 //		directionalLightComponent->position = vec3(std::sin(time) * 5, 0.0, std::cos(time));
 		vec3 positionVectorLight = directionalLightComponent->position;
 //		vec3 directionVectorLight = directionalLightComponent->direction;
@@ -3075,8 +3075,8 @@ namespace GLVM::core
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 0.01f;
-		float farPlaneFlatShadowMap = 25.0f;
-		mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+		float farPlaneFlatShadowMap = 50.0f;
+		mat4 spotProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
 		vec3 positionVectorLight  = spotLightComponent->position;

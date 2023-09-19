@@ -131,9 +131,9 @@ void main()
 	// 		shadow = 0.0;
 	// }
 
-	// for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
-	// 	result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-	// }
+	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
+		result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+	}
 
 //    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
 //x	float depthValue = texture(cubeShadowMap, vec3(inFragmentTextureCoordinate, 0)).r;
@@ -152,7 +152,7 @@ void main()
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {
-	vec3 lightDirection = normalize(light.direction);
+	vec3 lightDirection = normalize(-light.direction);
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
