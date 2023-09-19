@@ -135,7 +135,7 @@ void main()
 	// 	result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 	// }
 
-//    float depthValue = texture(cubeShadowMap, inFragmentTextureCoordinate).r;
+//    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
 //x	float depthValue = texture(cubeShadowMap, vec3(inFragmentTextureCoordinate, 0)).r;
 	
 	outColor = vec4(result, 1.0);
@@ -216,17 +216,18 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace, sampler2D flatShadowMap) {
 	// Perform perspective devide
-	vec3 projectiveCoordinates = fragmentPositionDirectionalLightSpace.xyz / fragmentPositionDirectionalLightSpace.w;
+	vec2 projectiveCoordinates = fragmentPositionDirectionalLightSpace.xy / fragmentPositionDirectionalLightSpace.w;
 	// Transform to [0.1] range
 	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
 	float closestDepth         = texture(flatShadowMap, projectiveCoordinates.xy).r;
 	// Get depth of current fragment from light's perspective
-	float currentDepth         = projectiveCoordinates.z;
+	float currentDepth         = fragmentPositionDirectionalLightSpace.z;
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.normal);
 //	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionPointLightSpace.xyz);
 	vec3 lightDir = normalize(light.position - vec3(fs_in.fragmentPosition));
+//	vec3 lightDir = normalize(vec3(fs_in.fragmentPosition) - light.position);
 	float bias                 = max(0.01 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
@@ -238,12 +239,12 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 		for (int y = -1; y <= 1; ++y)
 		{
 			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
-			shadow += currentDepth - bias <= pcfDepth ? 0.5 : 0.0;
+			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
 		}
 	}
 	shadow /= 9.0;
 	
-	if (projectiveCoordinates.z > 1.0)
+	if (fragmentPositionDirectionalLightSpace.z > 1.0)
 		shadow = 0.0;
 
 	// if (projectiveCoordinates.x > 1.0 || projectiveCoordinates.x < -1.0)

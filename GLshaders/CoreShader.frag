@@ -165,6 +165,9 @@ void main()
 	// float shadow = ComputeShadow(fs_in.fragmentPositionPointLightSpace);
 	// result = result * (1.0 - shadow);
 
+
+	// float depthValue = texture(spotLightFlatShadowMapArray[0], fs_in.textureCoords).r;
+	// fragColor = vec4(vec3(depthValue), 1.0);
 	fragColor = vec4(result, 1.0);
 //	fragColor = vec4(spotLightArraySize, spotLightArraySize ,spotLightArraySize, 1.0);
 }

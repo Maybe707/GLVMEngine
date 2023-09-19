@@ -2924,10 +2924,10 @@ namespace GLVM::core
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		cm::directionalLight* playerDirLightComponent = componentManager->GetComponent<cm::directionalLight>(viewPositionLinkedEntities[0]);
-		cm::beholder* beholderPlayerComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
-		playerDirLightComponent->position = playerTransformComponent->tPosition;
-		playerDirLightComponent->direction = -beholderPlayerComponent->forward;
+		// cm::directionalLight* playerDirLightComponent = componentManager->GetComponent<cm::directionalLight>(viewPositionLinkedEntities[0]);
+		// cm::beholder* beholderPlayerComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
+		// playerDirLightComponent->position = playerTransformComponent->tPosition;
+		// playerDirLightComponent->direction = -beholderPlayerComponent->forward;
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
@@ -2938,6 +2938,7 @@ namespace GLVM::core
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
+				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 			updateMatrixUniformBuffer(uboIndex, transformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);

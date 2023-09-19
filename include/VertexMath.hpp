@@ -501,34 +501,19 @@ Matrix<T, 4> Perspective(T _fov, T _aspect, T _near, T _far) {
 template <typename T>
 Matrix<T, 4> LookAtMain(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
 {
-    Vector<T, 3> f = (Normalize(_center - _eye));
-	Vector<T, 3> s = (Normalize(Cross(f, _up)));
-	Vector<T, 3> u = (Cross(s, f));
-	
-    Matrix<T, 4> Result(1.0f);
-    Result[0][0] = s[0];
-    Result[1][0] = s[1];
-    Result[2][0] = s[2];
-    Result[0][1] = u[0];
-    Result[1][1] = u[1];
-    Result[2][1] = u[2];
-    Result[0][2] = -f[0];
-    Result[1][2] = -f[1];
-    Result[2][2] = -f[2];
-    Result[3][0] = -Dot(s, _eye);
-    Result[3][1] = -Dot(u, _eye);
-    Result[3][2] = Dot(f, _eye);
-//    Result.SelfTensorTranspose();
-
-    return Result;
+#ifdef GLVM_OPENGL_RENDER_BIT
+	return LookAtLH<T>(_eye, _center, _up);
+#else
+	return LookAtRH<T>(_eye, _center, _up);
+#endif
 }
 
 template <typename T>
 Matrix<T, 4> LookAtRH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
 {
-    Vector<T, 3> f(Normalize(_center - _eye));
-    Vector<T, 3> s(Normalize(Cross(f, _up)));
-    Vector<T, 3> u(Cross(s, f));
+    Vector<T, 3> f = (Normalize(_center - _eye));
+    Vector<T, 3> s = (Normalize(Cross(f, _up)));
+    Vector<T, 3> u = (Cross(s, f));
 
     Matrix<T, 4> Result(1.0f);
     Result[0][0] = s[0];
@@ -710,37 +695,82 @@ Matrix<T, var> Ortho(float w, float h, float zn, float zf)
 }
 
 template <class T>
-Matrix<T, 4> ortho(T left, T right, T bottom, T top, T nearVal, T farVal) {
-//	Matrix<T, 4> tempMatrix(static_cast<T>(1));
-	
-	// tempMatrix[0][0] = static_cast<T>(2) / (right - left);
-	// tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
-	// tempMatrix[2][2] = - static_cast<T>(1);
-	// tempMatrix[3][0] = - (right + left) / (right - left);
-	// tempMatrix[3][1] = - (top + bottom) / (top - bottom);
-
+Matrix<T, 4> orthoRH_ZO(T left, T right, T bottom, T top, T near, T far) {
 	Matrix<float, 4> tempMatrix(1);
 	tempMatrix[0][0] = static_cast<T>(2) / (right - left);
 	tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
-	tempMatrix[2][2] = - static_cast<T>(2) / (farVal - nearVal);
+	tempMatrix[2][2] = - static_cast<T>(1) / (far - near);
 	tempMatrix[3][0] = - (right + left) / (right - left);
 	tempMatrix[3][1] = - (top + bottom) / (top - bottom);
-	tempMatrix[3][2] = - (farVal + nearVal) / (farVal - nearVal);
+	tempMatrix[3][2] = - near / (far - near);
+
+	return tempMatrix;
+}
+
+template <class T>
+Matrix<T, 4> orthoLH_NO(T left, T right, T bottom, T top, T near, T far) {
+	Matrix<float, 4> tempMatrix(1);
+	tempMatrix[0][0] = static_cast<T>(2) / (right - left);
+	tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
+	tempMatrix[2][2] = - static_cast<T>(2) / (far - near);
+	tempMatrix[3][0] = - (right + left) / (right - left);
+	tempMatrix[3][1] = - (top + bottom) / (top - bottom);
+	tempMatrix[3][2] = - (far + near) / (far - near);
+
+	return tempMatrix;
+}
+
+template <class T>
+Matrix<T, 4> ortho(T left, T right, T bottom, T top, T near, T far) {
+#ifdef GLVM_OPENGL_RENDER_BIT
+	return orthoLH_NO<T>(left, right, bottom, top, near, far);
+#else
+	return orthoRH_ZO<T>(left, right, bottom, top, near, far);
+#endif
+}
+
+template <class T, int var>
+Matrix<T, var> perspectiveRH_ZO(T fov, T aspect, T near, T far) {
+	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
 	
+	Matrix<float, var> tempMatrix(static_cast<T>(0));
+	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
+	tempMatrix[1][1] = static_cast<T>(1) / tanHalfFov;
+	tempMatrix[2][2] = far / (near - far);
+	tempMatrix[2][3] = static_cast<T>(1);
+	tempMatrix[3][2] = -(far * near) / (far - near);
+
 	return tempMatrix;
 }
 
 template <class T, int var>
-Matrix<T, var> Perspective(float fov, float n, float f) {
-	float S = std::tan((fov/2)*(PI/360));
-	Matrix<float, var> tempMatrix;
-	tempMatrix[0][0] = 1/((1280.0f/1280.0f)*S);
-	tempMatrix[1][1] = 1/S;
-	tempMatrix[2][2] = -((f+n)/(f-n));
-	tempMatrix[2][3] = -((2*f*n)/(f-n));
-	tempMatrix[3][2] = -1;
+Matrix<T, var> perspectiveLH_NO(T fov, T aspect, T near, T far) {
+	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
+	
+	Matrix<float, var> tempMatrix(static_cast<T>(0));
+	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
+	tempMatrix[1][1] = static_cast<T>(1) / tanHalfFov;
+	tempMatrix[2][2] = - (far + near) / (far - near);
+	tempMatrix[2][3] = - static_cast<T>(1);
+	tempMatrix[3][2] = - (static_cast<T>(2) * far * near) / (far - near);
 
 	return tempMatrix;
+}
+
+template <class T, int var>
+Matrix<T, var> Perspective(T fov, T aspect, T near, T far) {
+#ifdef GLVM_OPENGL_RENDER_BIT
+	return perspectiveLH_NO(fov, aspect, near, far);
+#else
+	return perspectiveRH_ZO(fov, aspect, near, far);
+#endif
+	// float S = std::tan((fov/2)*(PI/360));
+	// Matrix<float, var> tempMatrix;
+	// tempMatrix[0][0] = 1/((1280.0f/1280.0f)*S);
+	// tempMatrix[1][1] = 1/S;
+	// tempMatrix[2][2] = -((f+n)/(f-n));
+	// tempMatrix[2][3] = -((2*f*n)/(f-n));
+	// tempMatrix[3][2] = -1;
 }
 
 constexpr float Max(float var1, float var2) {

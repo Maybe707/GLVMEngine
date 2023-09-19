@@ -69,7 +69,7 @@ namespace GLVM::core
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
-		cameraSystem             = new ecs::CCameraSystem();
+//		cameraSystem             = new ecs::CCameraSystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
