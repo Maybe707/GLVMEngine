@@ -502,14 +502,14 @@ template <typename T>
 Matrix<T, 4> LookAtMain(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
 {
 #ifdef GLVM_OPENGL_RENDER_BIT
-	return LookAtLH<T>(_eye, _center, _up);
+	return lookAtLH<T>(_eye, _center, _up);
 #else
-	return LookAtRH<T>(_eye, _center, _up);
+	return lookAtRH<T>(_eye, _center, _up);
 #endif
 }
 
 template <typename T>
-Matrix<T, 4> LookAtRH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
+Matrix<T, 4> lookAtRH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
 {
     Vector<T, 3> f = (Normalize(_center - _eye));
     Vector<T, 3> s = (Normalize(Cross(f, _up)));
