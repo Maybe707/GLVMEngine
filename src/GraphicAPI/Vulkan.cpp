@@ -3020,11 +3020,16 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
+        // static auto startTime = std::chrono::high_resolution_clock::now();
+
+        // auto currentTime = std::chrono::high_resolution_clock::now();
+        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+		
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		float nearPlaneFlatShadowMap = 0.01f;
-		float farPlaneFlatShadowMap = 25.0f;
-		mat4 directionalProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
+		float farPlaneFlatShadowMap = 50.0f;
+		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -3034,15 +3039,18 @@ namespace GLVM::core
 
 		cm::beholder* beholderComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
 		
-		
-		vec3 positionVectorLight  = directionalLightComponent->position;
+//		vec3 positionDirectionalLight = directionalLightComponent->position + vec3(std::sin(time), std::cos(time), 0.0);
+ 
+//		_transformComponent->tPosition[0] = std::cos(time) * 5;
+//		directionalLightComponent->position = vec3(std::sin(time) * 5, 0.0, std::cos(time));
+		vec3 positionVectorLight = directionalLightComponent->position;
 //		vec3 directionVectorLight = directionalLightComponent->direction;
 		vec3 directionVectorLight = -beholderComponent->forward;
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
-		
-        modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+
+		modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
         modelMatrixUBO.model[2][2] = _transformComponent->fScale;
         modelMatrixUBO.model[3][3] = 1.0;
