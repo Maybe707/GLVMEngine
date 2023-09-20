@@ -335,9 +335,9 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	// Get depth of current fragment from light's perspective
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
-	vec3 normal = normalize(inFragmentNormal);
+	vec3 normal = normalize(fs_in.normal);
 //	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionPointLightSpace.xyz);
-	vec3 lightDir = normalize(light.position - inFragmentPosition);
+	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
 	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 
