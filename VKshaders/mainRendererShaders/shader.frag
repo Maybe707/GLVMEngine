@@ -114,13 +114,13 @@ void main()
 	vec3 viewDirection  = normalize(fs_in.fragmentPosition - viewPos.viewPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
-	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
-		vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-		float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], shadowMap);
-		result += (1.0 - shadow) * light;
-		if(shadow > 0.0)
-			shadow = 0.0;
-	}
+	// for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
+	// 	vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
+	// 	float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], shadowMap);
+	// 	result += (1.0 - shadow) * light;
+	// 	if(shadow > 0.0)
+	// 		shadow = 0.0;
+	// }
 
 	// for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
 	// 	vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
@@ -171,7 +171,7 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	// Diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(-lightDirection, normal);
+	vec3 reflectDirection   = reflect(lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// attenuation
 	float distance    = length(light.position - fragmentPosition);
@@ -194,7 +194,7 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(-lightDirection, normal);
+	vec3 reflectDirection   = reflect(lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// attenuation
 	float distance    = length(light.position - fragmentPosition);
@@ -207,11 +207,11 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	vec3 ambient  = light.ambient * material.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, inFragmentTextureCoordinate));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
-//	ambient  *= attenuation * intensity;
+	ambient  *= attenuation * intensity;
     diffuse  *= attenuation * intensity;
     specular *= attenuation * intensity;
 	
-    return (diffuse);
+    return vec3(ambient + diffuse + specular);
 }
 
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace, sampler2D flatShadowMap) {
