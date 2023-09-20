@@ -29,15 +29,19 @@ layout(set = 1, binding = 1) uniform TestDirLightSpaceMatrixUBO {
 	mat4 dirSpaceMatrix;
 } dirSpaceMat;
 
+layout(set = 2, binding = 2) uniform SpotLightSpaceMatrixUBO {
+	mat4 spotSpaceMatrix;
+} spotSpaceMat;
+
 void main() {
 	vs_out.fragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
 	vs_out.normal = transpose(inverse(mat3(ubo.model))) * inNormal;
 	vs_out.textureCoords = inTextureCoordinate;
 	for (int i = 0; i < 1; ++i) 
 		vs_out.fragmentPositionDirectionalLightSpace[i] = dirSpaceMat.dirSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
-
+	
 	for (int i = 0; i < 1; ++i) 
-		vs_out.fragmentPositionDirectionalLightSpace[i] = dirSpaceMat.dirSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
+		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix * vec4(vs_out.fragmentPosition, 1.0);
 	
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
 	outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));

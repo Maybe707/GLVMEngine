@@ -186,6 +186,10 @@ namespace GLVM::core
 	struct alignas(16) DirLightSpaceMatrixUBO {
 		mat4 dirSpaceMatrix;
 	};
+
+	struct alignas(16) SpotLightSpaceMatrixUBO {
+		mat4 spotSpaceMatrix;
+	};
 	
     struct alignas(16) ModelMatrixUBO {
         mat4 model;
@@ -494,8 +498,11 @@ namespace GLVM::core
 		std::vector<VkBuffer> dirLightSpaceMatrixBuffer;
 		std::vector<VkDeviceMemory> dirLightSpaceMatrixMemory;
 		std::vector<VkDescriptorSet> dirLightSpaceMatrixDescriptorSet;
-		
-		
+
+		mat4 spotLightSpaceMatrix;
+		std::vector<VkBuffer> spotLightSpaceMatrixBuffer;
+		std::vector<VkDeviceMemory> spotLightSpaceMatrixMemory;
+		std::vector<VkDescriptorSet> spotLightSpaceMatrixDescriptorSet;
 		
 		unsigned int	pointLightNumber	   = 0;
 		core::vector<VkImage> pointLightShadowMapDepthImages;
@@ -673,6 +680,7 @@ namespace GLVM::core
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
+		void updateSpotSpaceMatrix(uint32_t currentImage);
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
 		void updateSpotLightUniformBuffer(uint32_t currentImage);
