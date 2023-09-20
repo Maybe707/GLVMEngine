@@ -2198,8 +2198,10 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 //			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
-			imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
+			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
+			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
+			imageInfo.imageView = spotLightShadowMapDepthImageViews[0];
+			imageInfo.sampler = spotLightShadowMapTextureSamplers[0];
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3104,7 +3106,7 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage]);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* spotLightComponent, uint32_t layer) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		// float nearPlaneFlatShadowMap = 1.0f;
@@ -3112,7 +3114,7 @@ namespace GLVM::core
 		// mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
 		// 											  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
-		vec3 positionVectorLight  = spotLightComponent->position;
+		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight;
 		vec3 upVector;
 		

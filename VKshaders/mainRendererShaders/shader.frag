@@ -111,7 +111,7 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 void main()
 {
 	vec3 fragmentNormal = normalize(fs_in.normal);
-	vec3 viewDirection  = normalize(fs_in.fragmentPosition - viewPos.viewPosition);
+	vec3 viewDirection  = normalize(viewPos.viewPosition - fs_in.fragmentPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	// for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
@@ -132,7 +132,14 @@ void main()
 	// }
 
 	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
-		result += ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+		vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
+									  inFragmentPosition, viewDirection);
+		float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
+										 fs_in.fragmentPositionSpotLightSpace[0], shadowMap);
+
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
 	}
 
 //    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
@@ -156,7 +163,7 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(lightDirection, normal);
+	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// combine results
 	vec3 ambient  = light.ambient * material.ambient;
@@ -194,7 +201,7 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	// diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(lightDirection, normal);
+	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// attenuation
 	float distance    = length(light.position - fragmentPosition);
@@ -220,7 +227,7 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 	// Transform to [0.1] range
 	vec3 projectiveCoordinatesZO      = projectiveCoordinates * 0.5 + 0.5;
 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
-	float closestDepth         = texture(flatShadowMap, projectiveCoordinatesZO.xy).r;
+//	float closestDepth         = texture(flatShadowMap, projectiveCoordinatesZO.xy).r;
 	// Get depth of current fragment from light's perspective
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
@@ -322,9 +329,9 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	// Perform perspective devide
 	vec3 projectiveCoordinates = fragmentPositionSpotLightSpace.xyz / fragmentPositionSpotLightSpace.w;
 	// Transform to [0.1] range
-	projectiveCoordinates      = projectiveCoordinates * 0.5 + 0.5;
+	vec3 projectiveCoordinatesZO      = projectiveCoordinates * 0.5 + 0.5;
 	// Get closest depth value from light's perspective (using [0,1] range fragmentPositionLight as coordinates)
-	float closestDepth         = texture(flatShadowMap, projectiveCoordinates.xy).r;
+//	float closestDepth         = texture(flatShadowMap, projectiveCoordinatesZO.xy).r;
 	// Get depth of current fragment from light's perspective
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
@@ -341,13 +348,13 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	{
 		for (int y = -1; y <= 1; ++y)
 		{
-			float pcfDepth = texture(flatShadowMap, projectiveCoordinates.xy + vec2(x, y) * texelSize).r;
-			shadow += currentDepth - bias > pcfDepth ? 0.5 : 0.0;
+			float pcfDepth = texture(flatShadowMap, projectiveCoordinatesZO.xy + vec2(x, y) * texelSize).r;
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
 		}
 	}
 	shadow /= 9.0;
 	
-	if (projectiveCoordinates.z > 1.0)
+	if (projectiveCoordinatesZO.z > 1.0)
 		shadow = 0.0;
 
 	// if (projectiveCoordinates.x > 1.0 || projectiveCoordinates.x < -1.0)

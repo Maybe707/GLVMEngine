@@ -668,7 +668,7 @@ namespace GLVM::core
         void createSyncObjects();
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent);
-		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* spotLightComponent, uint32_t layer);
+		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
