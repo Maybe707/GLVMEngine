@@ -7,6 +7,7 @@
 
 layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
+	mat4 spaceMatrix;
 } ubo;
 
 layout(location = 0) in vec3 inPosition;
@@ -19,7 +20,7 @@ void main() {
 	// 	} else {
 	// 	gl_Position = vec4(0.7, 0.7, 0.7, 1.0);
 	// 	}
-    gl_Position = ubo.model * vec4(inPosition, 1.0);
+    gl_Position = spaceMatrix * ubo.model * vec4(inPosition, 1.0);
 //	gl_Position = vec4(inPosition, 1.0);
 	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     // outFragmentNormal = inNormal;

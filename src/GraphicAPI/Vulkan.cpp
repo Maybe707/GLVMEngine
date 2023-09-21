@@ -1577,7 +1577,7 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapUniformBuffers() {
-		VkDeviceSize modelMatrixBufferSize = sizeof(PointLightsUBO);
+		VkDeviceSize modelMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -1894,7 +1894,7 @@ namespace GLVM::core
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -2947,7 +2947,7 @@ namespace GLVM::core
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 					VkDeviceSize offsets[] = {0};
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
+					
 					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 					unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
@@ -3178,7 +3178,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer) {
-		ShadowMapMatrixUBO modelMatrixUBO{};
+		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		// float nearPlaneFlatShadowMap = 1.0f;
 		// float farPlaneFlatShadowMap = 25.0f;
@@ -3186,27 +3186,27 @@ namespace GLVM::core
 		// 											  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
 		vec3 positionVectorLight  = pointLightComponent->position;
-		vec3 directionalVectorLight;
-		vec3 upVector;
+		vec3 directionalVectorLight = pointLightComponent->position;
+		vec3 upVector = { 0.0, 0.0, 0.0 };
 		
 		switch(layer) {
 		case 0:
-			positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
+			directionalVectorLight = directionalVectorLight + vec3( 1.0f,  0.0f,  0.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 		case 1:
-			positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+			directionalVectorLight = directionalVectorLight + vec3( -1.0f,  0.0f,  0.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 		case 2:
-			positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+			directionalVectorLight = directionalVectorLight + vec3( 0.0f,  1.0f,  0.0f);
 			upVector = vec3(0.0f, 0.0f,  1.0f);
 		case 3:
-			positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+			directionalVectorLight = directionalVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
 			upVector = vec3(0.0f, 0.0f,  -1.0f);
 		case 4:
-			positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+			directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  1.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 		case 5:
-			positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+			directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 		}
 		
