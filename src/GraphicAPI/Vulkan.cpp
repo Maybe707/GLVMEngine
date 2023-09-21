@@ -223,15 +223,16 @@ namespace GLVM::core
 
         cleanupSwapChain();
 
+		updateDirectionalLightShadowMapDescriptorSets();
+		updateSpotLightShadowMapDescriptorSets();
+		updatePointLightShadowMapDescriptorSets();
+		updateDescriptorSets();
+		
         createSwapChain();
         createImageViews();
         createDepthResources();
 		createShadowMapDepthResources();
         createFramebuffers();
-		updateDirectionalLightShadowMapDescriptorSets();
-		updateSpotLightShadowMapDescriptorSets();
-		updatePointLightShadowMapDescriptorSets();
-		updateDescriptorSets();
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {

@@ -122,25 +122,25 @@ void main()
 	// 		shadow = 0.0;
 	// }
 
-	// for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
-	// 	vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-	// 	float shadow = ComputePointShadow(pointLights.pointLightsArray[0],
-	// 									  inFragmentPosition, cubeShadowMap);
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
-
-	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
-		vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
-									  inFragmentPosition, viewDirection);
-		float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
-										 fs_in.fragmentPositionSpotLightSpace[0], shadowMap);
-
+	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
+		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+		float shadow = ComputePointShadow(pointLights.pointLightsArray[0],
+										  inFragmentPosition, cubeShadowMap);
 		result += (1.0 - shadow) * light;
 		if(shadow > 0.0)
 			shadow = 0.0;
 	}
+
+	// for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
+	// 	vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
+	// 								  inFragmentPosition, viewDirection);
+	// 	float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
+	// 									 fs_in.fragmentPositionSpotLightSpace[0], shadowMap);
+
+	// 	result += (1.0 - shadow) * light;
+	// 	if(shadow > 0.0)
+	// 		shadow = 0.0;
+	// }
 
 //    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
 //x	float depthValue = texture(cubeShadowMap, vec3(inFragmentTextureCoordinate, 0)).r;
@@ -189,9 +189,9 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, inFragmentTextureCoordinate));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 
-	// ambient  *= attenuation;
-	// diffuse  *= attenuation;
-	// specular *= attenuation;
+	ambient  *= attenuation;
+	diffuse  *= attenuation;
+	specular *= attenuation;
 
 	return (ambient + diffuse + specular);
 }
