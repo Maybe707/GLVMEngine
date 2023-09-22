@@ -20,7 +20,7 @@ void main() {
 	// 	} else {
 	// 	gl_Position = vec4(0.7, 0.7, 0.7, 1.0);
 	// 	}
-    gl_Position = spaceMatrix * ubo.model * vec4(inPosition, 1.0);
+    gl_Position = ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0);
 //	gl_Position = vec4(inPosition, 1.0);
 	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     // outFragmentNormal = inNormal;

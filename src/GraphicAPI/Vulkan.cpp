@@ -297,11 +297,12 @@ namespace GLVM::core
 		
 		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 
-		
+
 		pointLightShadowMapTextureSamplers.resize(pointLightShadowMapMatrixUboDescriptorsNumber);
 
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		pointLightPipeline.vertShader = vertShaderFlatShadowMap;
+		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
+		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -3209,6 +3210,27 @@ namespace GLVM::core
 			directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 		}
+
+		// switch(layer) {
+		// case 0:
+		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
+		// case 1:
+		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
+		// case 2:
+		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+		// 	upVector = vec3(0.0f, 0.0f,  1.0f);
+		// case 3:
+		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
+		// case 4:
+		// 	directionalVectorLight = directionalVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
+		// case 5:
+		// 	directionalVectorLight = directionalVectorLight + vec3( 1.0f,  0.0f,  0.0f);
+		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
+		// }
 		
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionalVectorLight,

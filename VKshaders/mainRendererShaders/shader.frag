@@ -178,7 +178,7 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	// Diffuse shading
 	float difference    = max(dot(normal, lightDirection), 0.0f);
 	// specular shading
-	vec3 reflectDirection   = reflect(lightDirection, normal);
+	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), material.shininess);
 	// attenuation
 	float distance    = length(light.position - fragmentPosition);
