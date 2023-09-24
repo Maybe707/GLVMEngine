@@ -179,7 +179,7 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::createTextureImage() {
-        int texWidth, texHeight;
+        unsigned int texWidth, texHeight;
 
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
@@ -200,12 +200,29 @@ namespace GLVM::core
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
             memcpy(data, pixels, static_cast<size_t>(imageSize));
             vkUnmapMemory(device, stagingBufferMemory);
-            createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImages[i], textureImageMemories[i], 1, 0);
+			VK_Image textureImage = {
+				.image = VkImage{},
+				.deviceMemory = VkDeviceMemory{},
+				.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				.createFlags  = 0,
+				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.usageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
+				.format = VK_FORMAT_R8G8B8A8_SRGB,
+				.tiling = VK_IMAGE_TILING_OPTIMAL,
+				.arrayLayers = 1,
+				.width = texWidth,
+				.height = texHeight
+			};
 
-            transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-            copyBufferToImage(stagingBuffer, textureImages[i], static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-            transitionImageLayout(textureImages[i], VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            createImage(textureImage);
 
+            transitionImageLayout(textureImage.image, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+            copyBufferToImage(stagingBuffer, textureImage.image, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
+            transitionImageLayout(textureImage.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+			textureImages.push_back(textureImage);
+			
             vkDestroyBuffer(device, stagingBuffer, nullptr);
             vkFreeMemory(device, stagingBufferMemory, nullptr);
         }
@@ -252,13 +269,9 @@ namespace GLVM::core
 
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 
-		unsigned int mainTexturesQuantity = initializeTextureData_.size();
+//		unsigned int mainTexturesQuantity = initializeTextureData_.size();
 
-        textureImages.resize(mainTexturesQuantity);
-        textureImageMemories.resize(mainTexturesQuantity);
-
-        textureImageViews.resize(mainTexturesQuantity);
-        textureSamplers.resize(mainTexturesQuantity);
+//        textureImages.resize(mainTexturesQuantity);
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -450,14 +463,14 @@ namespace GLVM::core
 
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
-            vkDestroySampler(device, textureSamplers[i], nullptr);
-            vkDestroyImageView(device, textureImageViews[i], nullptr);
+            // vkDestroySampler(device, textureSamplers[i], nullptr);
+            // vkDestroyImageView(device, textureImageViews[i], nullptr);
         }
 
         for (unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
-            vkDestroyImage(device, textureImages[i], nullptr);
-            vkFreeMemory(device, textureImageMemories[i], nullptr);
+            // vkDestroyImage(device, textureImages[i], nullptr);
+            // vkFreeMemory(device, textureImageMemories[i], nullptr);
         }
 
 		for ( unsigned int i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) 
@@ -690,7 +703,19 @@ namespace GLVM::core
         swapChainImageViews.resize(swapChainImages.size());
 
         for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-            swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+			VK_Image swapChainImage		 = {
+				.image				 = swapChainImages[i],
+				.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
+				.aspectFlags         = VK_IMAGE_ASPECT_COLOR_BIT,
+				.format				 = swapChainImageFormat,
+				.red                 = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.green               = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.blue                = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.alpha               = VK_COMPONENT_SWIZZLE_IDENTITY,
+				.arrayLayers         = 1
+			};
+
+            swapChainImageViews[i] = createImageView(swapChainImage, 0, 1);
         }
     }
 
@@ -1089,43 +1114,35 @@ namespace GLVM::core
 			mainRenderAttachments.push_back(depthImageView);
 
 			createRenderPassFramebuffers(mainRenderAttachments, renderPass, swapChainFramebuffers[i],
-										 swapChainExtent.width, swapChainExtent.height);
+										 swapChainExtent.height, swapChainExtent.height);
 		}
 
 		/// Directional lights shadow map renderer frame buffers initialization
-		directionalLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
-        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+		directionalLightShadowMapFrameBuffers.resize(directionalLightNumber);
+        for (size_t i = 0; i < directionalLightNumber; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
-			directionalLightsRenderAttachments.push_back(directionalLightShadowMapDepthImageViews[0]);
+			directionalLightsRenderAttachments.push_back(directionalLightShadowMapImages[i].views[0]);
 
-			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.height, swapChainExtent.height);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
-		spotLightShadowMapFrameBuffers.resize(swapChainImageViews.size());
-        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+		spotLightShadowMapFrameBuffers.resize(spotLightNumber);
+        for (size_t i = 0; i < spotLightNumber; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
-			spotLightsRenderAttachments.push_back(spotLightShadowMapDepthImageViews[0]);
+			spotLightsRenderAttachments.push_back(spotLightShadowMapImages[i].views[0]);
 
-			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.height, swapChainExtent.height);
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
-//		pointLightShadowMapFrameBuffers.resize(pointLightNumber);
+		pointLightShadowMapFrameBuffers.resize(pointLightNumber);
 		for ( size_t j = 0; j < pointLightNumber; ++j ) {
-			pointLightShadowMapDepthImageViewLayers.push_back({});
-			pointLightShadowMapFrameBuffers.push_back({});
 			for ( size_t m = 0; m < 6; ++m ) {
-				pointLightShadowMapDepthImageViewLayers[j].push_back({});
+				std::vector<VkImageView> pointLightsRenderAttachments;
+				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
-				for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
-					pointLightShadowMapDepthImageViewLayers[j][m].push_back(createShadowMapImageView(pointLightShadowMapDepthImages[j], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT, m, 1, VK_IMAGE_VIEW_TYPE_2D));
-
-					std::vector<VkImageView> pointLightsRenderAttachments;
-					pointLightsRenderAttachments.push_back(pointLightShadowMapDepthImageViewLayers[j][m][i]);
-					pointLightShadowMapFrameBuffers[j][m].push_back({});
-					createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m][i], swapChainExtent.width, swapChainExtent.width);
-				}
+				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], swapChainExtent.height, swapChainExtent.height);
 			}
 		}
     }
@@ -1161,8 +1178,23 @@ namespace GLVM::core
     void CVulkanRenderer::createDepthResources() {
         VkFormat depthFormat = findDepthFormat();
 
-        createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory, 1, 0);
-        depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+		VK_Image depthImage		 = {
+			.image				 = VkImage{},
+			.deviceMemory		 = VkDeviceMemory{},
+			.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
+			.createFlags		 = 0,
+			.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+			.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+			.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
+			.format				 = depthFormat,
+			.tiling				 = VK_IMAGE_TILING_OPTIMAL,
+			.arrayLayers		 = 1,
+			.width				 = swapChainExtent.height,
+			.height				 = swapChainExtent.height,
+		};
+
+		createImage(depthImage);
+        depthImageView = createImageView(depthImage, 0, 1);
     }
 
     void CVulkanRenderer::createShadowMapDepthResources() {
@@ -1174,58 +1206,107 @@ namespace GLVM::core
 																									  cm::directionalLight,
 																									  cm::vertex>();
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		uint32_t            dirImageBaseArrayLayer = 0;
-		uint32_t			dirImageLayersCount = 1;
-		VkImageCreateFlags	dirImageFlags		= 0;
-		createShadowMapData(directionalLightNumber, directionalLightShadowMapDepthImages,
-						    directionalLightShadowMapDepthImageMemories, directionalLightShadowMapDepthImageViews,
-							dirImageBaseArrayLayer, dirImageLayersCount,
-							dirImageFlags, VK_IMAGE_VIEW_TYPE_2D,
-							swapChainExtent.width, swapChainExtent.height);
+		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
+			VK_Image depthImage		 = {
+				.image				 = VkImage{},
+				.deviceMemory		 = VkDeviceMemory{},
+				.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
+				.createFlags		 = 0,
+				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.format				 = findDepthFormat(),
+				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
+				.arrayLayers		 = 1,
+				.width				 = swapChainExtent.height,
+				.height				 = swapChainExtent.height,
+			};
 
+			createImage(depthImage);
+			depthImage.views.push_back(createImageView(depthImage, 0, 1));
+			directionalLightShadowMapImages.push_back(depthImage);
+		}
+		
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::vertex>();
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-		uint32_t            spotImageBaseArrayLayer = 0;
-		uint32_t			spotImageLayersCount = 1;
-		VkImageCreateFlags	spotImageFlags		 = 0;
-		createShadowMapData(spotLightNumber, spotLightShadowMapDepthImages,
-							spotLightShadowMapDepthImageMemories, spotLightShadowMapDepthImageViews,
-							spotImageBaseArrayLayer, spotImageLayersCount,
-							spotImageFlags, VK_IMAGE_VIEW_TYPE_2D,
-							swapChainExtent.width, swapChainExtent.height);
+		for ( unsigned int i = 0; i < spotLightNumber; ++i ) {
+			VK_Image depthImage		 = {
+				.image				 = VkImage{},
+				.deviceMemory		 = VkDeviceMemory{},
+				.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
+				.createFlags		 = 0,
+				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.format				 = findDepthFormat(),
+				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
+				.arrayLayers		 = 1,
+				.width				 = swapChainExtent.height,
+				.height				 = swapChainExtent.height,
+			};
+
+			createImage(depthImage);
+			depthImage.views.push_back(createImageView(depthImage, 0, 1));
+			spotLightShadowMapImages.push_back(depthImage);
+		}
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::vertex>();
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-		uint32_t            pointImageBaseArrayLayer = 0;
-		uint32_t			pointImageLayersCount = 6;
-		pointLightShadowMapDepthImageViewLayers.resize(pointLightNumber);
-		createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
-							pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews,
-							pointImageBaseArrayLayer, pointImageLayersCount,
-							VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, VK_IMAGE_VIEW_TYPE_CUBE, swapChainExtent.width, swapChainExtent.width);
+
+		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
+			VK_Image depthImage		 = {
+//				.image				 = VkImage{},
+				.deviceMemory		 = VkDeviceMemory{},
+				.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
+				.createFlags		 = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
+				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.format				 = findDepthFormat(),
+				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
+				.arrayLayers		 = 6,
+				.width				 = swapChainExtent.height,
+				.height				 = swapChainExtent.height,
+			};
+			
+			createImage(depthImage);
+
+			for ( unsigned int j = 0; j < 6; ++j )
+				depthImage.views.push_back(createImageView(depthImage, j, 1));
+			
+			pointLightShadowMapImages.push_back(depthImage);
+		}
+
+		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
+			VK_Image depthImage		 = {
+				.image				 = VkImage{},
+				.deviceMemory		 = VkDeviceMemory{},
+				.viewType			 = VK_IMAGE_VIEW_TYPE_CUBE,
+				.createFlags		 = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
+				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+				.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
+				.format				 = findDepthFormat(),
+				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
+				.arrayLayers		 = 6,
+				.width				 = swapChainExtent.height,
+				.height				 = swapChainExtent.height,
+			};
+
+			createImage(depthImage);
+			pointLightShadowMapImages[i].views.push_back(createImageView(depthImage, 0, 6));
+		}
+		
+		// createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
+		// 					pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews,
+		// 					pointImageBaseArrayLayer, pointImageLayersCount,
+		// 					VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, VK_IMAGE_VIEW_TYPE_CUBE, swapChainExtent.width, swapChainExtent.width);
     }
 
-	void CVulkanRenderer::createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
-											  core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-											  core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t baseArrayLayer,
-											  uint32_t layersCount, VkImageCreateFlags flags, VkImageViewType viewType,
-											  uint32_t width, uint32_t height) {
- 		shadowMapDepthImages.Resize(lightsNumber);
-		shadowMapDepthImageMemories.Resize(lightsNumber);
-		shadowMapDepthImageViews.Resize(lightsNumber);
-
-		for ( unsigned int i = 0; i < lightsNumber; ++i ) {		
-			createImage(width, height, findDepthFormat(), VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, shadowMapDepthImages[i], shadowMapDepthImageMemories[i], layersCount,
-				flags);
-			shadowMapDepthImageViews[i] = createShadowMapImageView(shadowMapDepthImages[i], findDepthFormat(), VK_IMAGE_ASPECT_DEPTH_BIT,
-																   baseArrayLayer, layersCount, viewType);
-		}
-	}
-	
     VkFormat CVulkanRenderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
         for (VkFormat format : candidates) {
             VkFormatProperties props;
@@ -1255,7 +1336,7 @@ namespace GLVM::core
 
     void CVulkanRenderer::createTextureImageView() {
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
-            textureImageViews[i] = createImageView(textureImages[i], VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
+            textureImages[i].views.push_back(createImageView(textureImages[i], 0, 1));
     }
 
     void CVulkanRenderer::createTextureSampler() {
@@ -1279,42 +1360,26 @@ namespace GLVM::core
             samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
             samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-            if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSamplers[i]) != VK_SUCCESS) {
+			textureImages[i].sampler = {};              /// TODO: Is it realy need here?
+            if (vkCreateSampler(device, &samplerInfo, nullptr, &textureImages[i].sampler) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create texture sampler!");
             }
         }
     }
 
     void CVulkanRenderer::createDirectionalLightShadowMapTextureSamplers() {
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																									  cm::directionalLight,
-																									  cm::vertex>();
-		
-        for(unsigned int i = 0; i < directionalLightLinkedEntities.GetSize(); ++i)
-			createRenderPassShadowMapTextureSamplers(directionalLightShadowMapTextureSamplers[i]);
+        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
+			for ( unsigned int j = 0; j < directionalLightShadowMapImages[i].views.size(); ++j )
+				createRenderPassShadowMapTextureSamplers(directionalLightShadowMapImages[i].views[j]);
     }
 
     void CVulkanRenderer::createSpotLightShadowMapTextureSamplers() {
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::spotLight,
-																							   cm::vertex>();
-
-        for(unsigned int i = 0; i < spotLightLinkedEntities.GetSize(); ++i)
+        for(unsigned int i = 0; i < spotLightNumber; ++i)
 			createRenderPassShadowMapTextureSamplers(spotLightShadowMapTextureSamplers[i]);
     }
 
     void CVulkanRenderer::createPointLightShadowMapTextureSamplers() {
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::pointLight,
-																								cm::vertex>();
-
-        for(unsigned int i = 0; i < pointLightLinkedEntities.GetSize(); ++i)
+        for(unsigned int i = 0; i < pointLightNumber; ++i)
 			createRenderPassShadowMapTextureSamplers(pointLightShadowMapTextureSamplers[i]);
     }
 	
@@ -1344,44 +1409,21 @@ namespace GLVM::core
 		}
 	}
 	
-    VkImageView CVulkanRenderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+    VkImageView CVulkanRenderer::createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.image = image;
-        viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-        viewInfo.format = format;
-		viewInfo.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-		viewInfo.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-		viewInfo.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-		viewInfo.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-        viewInfo.subresourceRange.aspectMask = aspectFlags;
+        viewInfo.image = image.image;
+        viewInfo.viewType = image.viewType;
+        viewInfo.format = image.format;
+		viewInfo.components.r = image.red;
+		viewInfo.components.g = image.green;
+		viewInfo.components.b = image.blue;
+		viewInfo.components.a = image.alpha;
+        viewInfo.subresourceRange.aspectMask = image.aspectFlags;
         viewInfo.subresourceRange.baseMipLevel = 0;
         viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = 0;
-        viewInfo.subresourceRange.layerCount = 1;
-
-        VkImageView imageView;
-        if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create texture image view!");
-        }
-
-        return imageView;
-    }
-
-    VkImageView CVulkanRenderer::createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-														  uint32_t baseArrayLayer, uint32_t layerCount,
-														  VkImageViewType viewType) {
-        VkImageViewCreateInfo viewInfo{};
-        viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-        viewInfo.image = image;
-        viewInfo.format = format;
-		viewInfo.subresourceRange = {};
-        viewInfo.subresourceRange.aspectMask = aspectFlags;
-        viewInfo.subresourceRange.baseMipLevel = 0;
-        viewInfo.subresourceRange.levelCount = 1;
-        viewInfo.subresourceRange.baseArrayLayer = baseArrayLayer;
+        viewInfo.subresourceRange.baseArrayLayer = baseArrayLayers;
         viewInfo.subresourceRange.layerCount = layerCount;
-		viewInfo.viewType = viewType;
 
         VkImageView imageView;
         if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
@@ -1390,41 +1432,41 @@ namespace GLVM::core
 
         return imageView;
     }
-	
-    void CVulkanRenderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory, unsigned int arrayLayers, VkImageCreateFlags flags) {
+
+    void CVulkanRenderer::createImage(VK_Image& image) {
         VkImageCreateInfo imageInfo{};
         imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         imageInfo.imageType = VK_IMAGE_TYPE_2D;
-        imageInfo.extent.width = width;
-        imageInfo.extent.height = height;
+        imageInfo.extent.width = image.width;
+        imageInfo.extent.height = image.height;
         imageInfo.extent.depth = 1;
         imageInfo.mipLevels = 1;
-        imageInfo.arrayLayers = arrayLayers;
-        imageInfo.format = format;
-        imageInfo.tiling = tiling;
+        imageInfo.arrayLayers = image.arrayLayers;
+        imageInfo.format = image.format;
+        imageInfo.tiling = image.tiling;
 //        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        imageInfo.usage = usage;
+        imageInfo.usage = image.usageFlags;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-		imageInfo.flags = flags;
+		imageInfo.flags = image.createFlags;
 //        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-        if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
+        if (vkCreateImage(device, &imageInfo, nullptr, &image.image) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
         }
 
         VkMemoryRequirements memRequirements;
-        vkGetImageMemoryRequirements(device, image, &memRequirements);
+        vkGetImageMemoryRequirements(device, image.image, &memRequirements);
 
         VkMemoryAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         allocInfo.allocationSize = memRequirements.size;
-        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+        allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, image.memoryPropertyFlags);
 
-        if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
+        if (vkAllocateMemory(device, &allocInfo, nullptr, &image.deviceMemory) != VK_SUCCESS) {
             throw std::runtime_error("failed to allocate image memory!");
         }
 
-        vkBindImageMemory(device, image, imageMemory, 0);
+        vkBindImageMemory(device, image.image, image.deviceMemory, 0);
     }
 
     void CVulkanRenderer::transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
@@ -1474,6 +1516,53 @@ namespace GLVM::core
         endSingleTimeCommands(commandBuffer);
     }
 
+    void CVulkanRenderer::transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
+        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+        VkImageMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = oldLayout;
+        barrier.newLayout = newLayout;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = image;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+
+        VkPipelineStageFlags sourceStage;
+        VkPipelineStageFlags destinationStage;
+
+        if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+            sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+            destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        } else {
+            throw std::invalid_argument("unsupported layout transition!");
+        }
+
+        vkCmdPipelineBarrier(
+            commandBuffer,
+            sourceStage, destinationStage,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &barrier
+            );
+
+        endSingleTimeCommands(commandBuffer);
+    }
+	
     void CVulkanRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
@@ -2182,8 +2271,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = textureImageViews[textureIndex];
-			imageInfo.sampler = textureSamplers[textureIndex];
+			imageInfo.imageView = textureImages[textureIndex].views[0];
+			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2214,8 +2303,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = textureImageViews[textureIndex];
-			imageInfo.sampler = textureSamplers[textureIndex];
+			imageInfo.imageView = textureImages[textureIndex].views[0];
+			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2247,8 +2336,8 @@ namespace GLVM::core
 //			unsigned int textureIndex = i / 2;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-			imageInfo.imageView = spotLightShadowMapDepthImageViews[0];
-			imageInfo.sampler = spotLightShadowMapTextureSamplers[0];
+			imageInfo.imageView = spotLightShadowMapImages[0].views[0];
+			imageInfo.sampler = spotLightShadowMapImages[0].sampler;
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2278,8 +2367,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 //			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = pointLightShadowMapDepthImageViews[0];
-			imageInfo.sampler = pointLightShadowMapTextureSamplers[0];
+			imageInfo.imageView = pointLightShadowMapImages[0].views[0];
+			imageInfo.sampler = pointLightShadowMapImages[0].sampler;
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2514,8 +2603,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = textureImageViews[textureIndex];
-			imageInfo.sampler = textureSamplers[textureIndex];
+			imageInfo.imageView = textureImages[textureIndex].views[0];
+			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2533,8 +2622,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = textureImageViews[textureIndex];
-			imageInfo.sampler = textureSamplers[textureIndex];
+			imageInfo.imageView = textureImages[textureIndex].views[0];
+			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2552,8 +2641,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 //			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = spotLightShadowMapDepthImageViews[0];
-			imageInfo.sampler = spotLightShadowMapTextureSamplers[0];
+			imageInfo.imageView = spotLightShadowMapImages[0].views[0];
+			imageInfo.sampler = spotLightShadowMapImages[0].sampler;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
 
@@ -2573,8 +2662,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 //			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = pointLightShadowMapDepthImageViews[0];
-			imageInfo.sampler = pointLightShadowMapTextureSamplers[0];
+			imageInfo.imageView = spotLightShadowMapImages[0].views[0];
+			imageInfo.sampler = spotLightShadowMapImages[0].sampler;
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2903,7 +2992,7 @@ namespace GLVM::core
 				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 				pointLightShadowMapRenderPassInfo.pNext = NULL;
 				pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
-				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j][imageIndex];
+				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j];
 				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;

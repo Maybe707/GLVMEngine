@@ -139,7 +139,7 @@ namespace GLVM::core
             return attributeDescriptions;
         }
     };
-
+	
 	enum UBOtypes {
 		MODEL_MATRIX_UBO,
 		VIEW_POSITION_UBO,
@@ -149,6 +149,27 @@ namespace GLVM::core
 		SPOT_LIGHTS_UBO
 	};
 
+	struct VK_Image {
+		VkImage image;
+		VkDeviceMemory deviceMemory;
+		std::vector<VkImageView> views;
+		VkImageViewType viewType;
+		VkImageCreateFlags createFlags;
+		VkMemoryPropertyFlags memoryPropertyFlags;
+		VkImageUsageFlags usageFlags;
+		VkImageAspectFlags aspectFlags;
+		VkFormat format;
+		VkImageTiling tiling;
+		std::vector<VkSampler> sampler;
+		VkComponentSwizzle red;
+		VkComponentSwizzle green;
+		VkComponentSwizzle blue;
+		VkComponentSwizzle alpha;
+		uint32_t arrayLayers;
+		uint32_t width;
+		uint32_t height;
+	};
+	
 	struct Descriptor {
 		VkDescriptorType      type;
 		uint32_t              binding;
@@ -477,9 +498,10 @@ namespace GLVM::core
 		VkPipeline shadowMapPipeline;
 
 		unsigned int	directionalLightNumber = 0;
-		core::vector<VkImage> directionalLightShadowMapDepthImages;
-		core::vector<VkDeviceMemory> directionalLightShadowMapDepthImageMemories;
-		core::vector<VkImageView> directionalLightShadowMapDepthImageViews;
+		std::vector<VK_Image> directionalLightShadowMapImages;
+		// core::vector<VkImage> directionalLightShadowMapDepthImages;
+		// core::vector<VkDeviceMemory> directionalLightShadowMapDepthImageMemories;
+		// core::vector<VkImageView> directionalLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
 		std::vector<VkSampler> directionalLightShadowMapTextureSamplers;
@@ -505,11 +527,12 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> spotLightSpaceMatrixDescriptorSet;
 		
 		unsigned int	pointLightNumber	   = 0;
-		core::vector<VkImage> pointLightShadowMapDepthImages;
-		core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
-		core::vector<VkImageView> pointLightShadowMapDepthImageViews;
-		std::vector<std::vector<std::vector<VkImageView>>> pointLightShadowMapDepthImageViewLayers;
-		std::vector<std::vector<std::vector<VkFramebuffer>>> pointLightShadowMapFrameBuffers;
+		std::vector<VK_Image> spotLightShadowMapImages;
+		// core::vector<VkImage> pointLightShadowMapDepthImages;
+		// core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
+		// core::vector<VkImageView> pointLightShadowMapDepthImageViews;
+//		std::vector<std::vector<std::vector<VkImageView>>> pointLightShadowMapDepthImageViewLayers;
+		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
@@ -519,9 +542,10 @@ namespace GLVM::core
 		unsigned int pointLightShadowMapMatrixUboDescriptorsNumber = 0;
 
 		unsigned int	spotLightNumber		   = 0;
-		core::vector<VkImage> spotLightShadowMapDepthImages;
-		core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
-		core::vector<VkImageView> spotLightShadowMapDepthImageViews;
+		std::vector<VK_Image> pointLightShadowMapImages;
+		// core::vector<VkImage> spotLightShadowMapDepthImages;
+		// core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
+		// core::vector<VkImageView> spotLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;
 		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
@@ -533,11 +557,12 @@ namespace GLVM::core
 
 		core::vector<mat4> shadowMapBasisMatrices;
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
-		
-        std::vector<VkImage> textureImages;
-        std::vector<VkDeviceMemory> textureImageMemories;
-        std::vector<VkImageView> textureImageViews;
-        std::vector<VkSampler> textureSamplers;
+
+		std::vector<VK_Image> textureImages;
+        // std::vector<VkImage> textureImages;
+        // std::vector<VkDeviceMemory> textureImageMemories;
+        // std::vector<VkImageView> textureImageViews;
+        // std::vector<VkSampler> textureSamplers;
 
         // VkBuffer vertexBuffer;
         // VkDeviceMemory vertexBufferMemory;
@@ -625,11 +650,6 @@ namespace GLVM::core
         void createCommandPool();
         void createDepthResources();
 		void createShadowMapDepthResources();
-		void createShadowMapData(unsigned int lightsNumber, core::vector<VkImage>& shadowMapDepthImages,
-								 core::vector<VkDeviceMemory>& shadowMapDepthImageMemories,
-								 core::vector<VkImageView>& shadowMapDepthImageViews, uint32_t baseArrayLayer,
-								 uint32_t layersCount, VkImageCreateFlags flags, VkImageViewType viewType,
-								 uint32_t width, uint32_t height);
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
@@ -641,11 +661,10 @@ namespace GLVM::core
 		void createSpotLightShadowMapDescriptorPool();
 		void createPointLightShadowMapDescriptorPool();
 		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
-        VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-		VkImageView createShadowMapImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags,
-											 uint32_t baseArrayLayer,uint32_t layerCount, VkImageViewType viewType);
-        void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory, unsigned int arrayLayers, VkImageCreateFlags flags);
+        VkImageView createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount);
+        void createImage(VK_Image& image);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
+		void transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
