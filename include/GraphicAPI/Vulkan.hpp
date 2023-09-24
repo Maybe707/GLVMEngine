@@ -160,7 +160,7 @@ namespace GLVM::core
 		VkImageAspectFlags aspectFlags;
 		VkFormat format;
 		VkImageTiling tiling;
-		std::vector<VkSampler> sampler;
+		VkSampler sampler;
 		VkComponentSwizzle red;
 		VkComponentSwizzle green;
 		VkComponentSwizzle blue;
