@@ -415,7 +415,7 @@ namespace GLVM::core
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
         createMainRenderDescriptorSets();
-		setDebugObjectNames();
+//		setDebugObjectNames();
         createCommandBuffers();
 		createShadowMapSyncObjects();
         createSyncObjects();
@@ -1224,6 +1224,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
+			setImageDebugObjectName(depthImage);
 			directionalLightShadowMapImages.push_back(depthImage);
 		}
 		
@@ -1249,6 +1250,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
+			setImageDebugObjectName(depthImage);
 			spotLightShadowMapImages.push_back(depthImage);
 		}
 
@@ -1277,7 +1279,8 @@ namespace GLVM::core
 
 			for ( unsigned int j = 0; j < 6; ++j )
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
-			
+
+			setImageDebugObjectName(depthImage);
 			pointLightShadowMapImages.push_back(depthImage);
 		}
 
@@ -1298,6 +1301,7 @@ namespace GLVM::core
 			};
 
 			createImage(depthImage);
+			setImageDebugObjectName(depthImage);
 			pointLightShadowMapImages[i].views.push_back(createImageView(depthImage, 0, 6));
 		}
 		
@@ -3790,8 +3794,19 @@ namespace GLVM::core
         return VK_FALSE;
     }
 
+	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {
+		VkDebugUtilsObjectNameInfoEXT imageObjectInfo{};
+		imageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Image # ", (uint64_t)image.image);
+		const char* strImageName = imageName.c_str();
+		imageObjectInfo.pObjectName = strImageName;
+		imageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		imageObjectInfo.objectHandle = (uint64_t)image.image;
+		SetDebugObjectName(device, &imageObjectInfo);
+	}
+	
 	void CVulkanRenderer::setDebugObjectNames() {
-		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
+ 		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
 		mainPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		mainPipelineObjectInfo.pObjectName = "Main pipeline";
 		mainPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;

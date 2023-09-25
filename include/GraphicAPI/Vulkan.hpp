@@ -717,6 +717,7 @@ namespace GLVM::core
         bool checkValidationLayerSupport();
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+		void setImageDebugObjectName(VK_Image image);
 		void setDebugObjectNames();
     };
 
