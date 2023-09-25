@@ -1302,6 +1302,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 			setImageDebugObjectName(depthImage);
+			std::cout << "Point light image handler: " << depthImage.image << std::endl;
 			pointLightShadowMapImages[i].views.push_back(createImageView(depthImage, 0, 6));
 		}
 		
@@ -3797,7 +3798,7 @@ namespace GLVM::core
 	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {
 		VkDebugUtilsObjectNameInfoEXT imageObjectInfo{};
 		imageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Image # ", (uint64_t)image.image);
+		std::string imageName = VK_DEBUG_IMAGE_SET_RED;
 		const char* strImageName = imageName.c_str();
 		imageObjectInfo.pObjectName = strImageName;
 		imageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
