@@ -531,7 +531,7 @@ namespace GLVM::core
         if (enableValidationLayers) {
             createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
             createInfo.ppEnabledLayerNames = validationLayers.data();
-
+			
             populateDebugMessengerCreateInfo(debugCreateInfo);
             createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
         } else {
@@ -2661,8 +2661,8 @@ namespace GLVM::core
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 //			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = spotLightShadowMapImages[0].views[6];
-			imageInfo.sampler = spotLightShadowMapImages[0].sampler;
+			imageInfo.imageView = pointLightShadowMapImages[0].views[6];
+			imageInfo.sampler = pointLightShadowMapImages[0].sampler;
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3019,9 +3019,9 @@ namespace GLVM::core
 
 				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-				core::vector<Entity> pointLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									   cm::pointLight,
-																									   cm::vertex>();
+				core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																								  cm::pointLight,
+																								  cm::vertex>();
 
 				for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 					unsigned int uiEntity = linkedEntities[i];
@@ -3846,6 +3846,61 @@ namespace GLVM::core
 		pointLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 		pointLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &pointLightPipelineLayoutObjectInfo);
+
+		for ( unsigned long i = 0; i < pointLightShadowMapImages.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT pointLightImageObjectInfo{};
+			pointLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point light shadow map image # ", i);
+			const char* strImageName = imageName.c_str();
+			pointLightImageObjectInfo.pObjectName = strImageName;
+			pointLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			pointLightImageObjectInfo.objectHandle = (uint64_t)pointLightShadowMapImages[i].image;
+			SetDebugObjectName(device, &pointLightImageObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < spotLightShadowMapImages.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT spotLightImageObjectInfo{};
+			spotLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot light shadow map image # ", i);
+			const char* strImageName = imageName.c_str();
+			spotLightImageObjectInfo.pObjectName = strImageName;
+			spotLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			spotLightImageObjectInfo.objectHandle = (uint64_t)spotLightShadowMapImages[i].image;
+			SetDebugObjectName(device, &spotLightImageObjectInfo);			
+		}
+
+		for ( unsigned long i = 0; i < directionalLightShadowMapImages.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
+			directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional light shadow map image # ", i);
+			const char* strImageName = imageName.c_str();
+			directionalLightImageObjectInfo.pObjectName = strImageName;
+			directionalLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			directionalLightImageObjectInfo.objectHandle = (uint64_t)directionalLightShadowMapImages[i].image;
+			SetDebugObjectName(device, &directionalLightImageObjectInfo);			
+		}
+
+		for ( unsigned long i = 0; i < textureImages.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT textureImageObjectInfo{};
+			textureImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Texture image # ", i);
+			const char* strImageName = imageName.c_str();
+			textureImageObjectInfo.pObjectName = strImageName;
+			textureImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			textureImageObjectInfo.objectHandle = (uint64_t)textureImages[i].image;
+			SetDebugObjectName(device, &textureImageObjectInfo);			
+		}
+
+		for ( unsigned long i = 0; i < swapChainImages.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT swapChainImageObjectInfo{};
+			swapChainImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " SwapChain image # ", i);
+			const char* strImageName = imageName.c_str();
+			swapChainImageObjectInfo.pObjectName = strImageName;
+			swapChainImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+			swapChainImageObjectInfo.objectHandle = (uint64_t)swapChainImages[i];
+			SetDebugObjectName(device, &swapChainImageObjectInfo);			
+		}
 		
 		for ( unsigned long i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
