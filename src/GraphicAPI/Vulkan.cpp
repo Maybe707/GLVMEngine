@@ -3094,7 +3094,9 @@ namespace GLVM::core
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * i + currentFrame * 6 + j;
 					updatePointLightShadowMapMatrixUBO(uboIndex, transformComponent, pointLightComponent, j);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);			
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+					updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 					VkDeviceSize offsets[] = {0};
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3416,6 +3418,19 @@ namespace GLVM::core
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
         vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage]);
     }
+
+    void CVulkanRenderer::updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane) {
+		UniformBufferObjectLightUBO dataMatrixUBO{};
+
+		dataMatrixUBO.lightPosition = pointLightComponent->position;
+		dataMatrixUBO.farPlane = farPlane;
+		
+        void* dataMatrixData;
+        vkMapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage], 0,
+					sizeof(dataMatrixUBO), 0, &dataMatrixData);
+        memcpy(dataMatrixData, &dataMatrixUBO, sizeof(dataMatrixUBO));
+        vkUnmapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage]);
+	}
 	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
         ModelMatrixUBO modelMatrixUBO{};
