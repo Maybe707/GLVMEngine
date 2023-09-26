@@ -1277,8 +1277,8 @@ namespace GLVM::core
 				.format				 = findDepthFormat(),
 				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers		 = 6,
-				.width				 = swapChainExtent.width,
-				.height				 = swapChainExtent.width
+				.width				 = SHADOW_MAP_SIZE,
+				.height				 = SHADOW_MAP_SIZE
 			};
 			
 			createImage(depthImage);

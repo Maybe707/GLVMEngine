@@ -50,7 +50,7 @@
 //#include "WinApi/winVk.hpp"
 #endif
 
-#define SHADOW_MAP_SIZE 1024
+#define SHADOW_MAP_SIZE 4096
 
 #define VK_DEBUG_IMAGE_SET_RED "\x1b[31mVULKAN DEBUG IMAGE\x1b[0m"
 #define VK_DEBUG_DESCRIPTOR_SET_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET\x1b[0m"
