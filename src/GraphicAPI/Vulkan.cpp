@@ -419,7 +419,7 @@ namespace GLVM::core
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
         createMainRenderDescriptorSets();
-//		setDebugObjectNames();
+		setDebugObjectNames();
         createCommandBuffers();
 		createShadowMapSyncObjects();
         createSyncObjects();
@@ -1673,10 +1673,10 @@ namespace GLVM::core
 		
 		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 		
-        shadowMapPointLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
-        shadowMapPointLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
+        shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
+        shadowMapPointLightModelMatrixUniformBuffersMemory.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber; i++) {
             createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 shadowMapPointLightModelMatrixUniformBuffers[i], shadowMapPointLightModelMatrixUniformBuffersMemory[i]);
 		}
@@ -1878,13 +1878,13 @@ namespace GLVM::core
         std::array<VkDescriptorPoolSize, 1> poolSizes{};
 
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
+        poolInfo.maxSets = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &pointLightShadowMapDescriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -1962,21 +1962,21 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDescriptorSets() {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber,
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber,
 															pointLightPipeline.descriptors[0].setLayout);
 		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
 		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		matrixUboAllocInfo.descriptorPool = pointLightShadowMapDescriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
 																	  pointLightShadowMapMatrixUboDescriptorsNumber);
 		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapPointLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
+		shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber);
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightShadowMapMatrixUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
@@ -3029,7 +3029,7 @@ namespace GLVM::core
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 					updatePointLightShadowMapMatrixUBO(uboIndex, transformComponent, pointLightComponent, j);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);			
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex + j], 0, nullptr);			
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 					VkDeviceSize offsets[] = {0};
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3275,7 +3275,7 @@ namespace GLVM::core
 		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight = pointLightComponent->position;
 		vec3 upVector = { 0.0, 0.0, 0.0 };
-		
+		std::cout << "Layer: " << layer << std::endl;
 		switch(layer) {
 		case 0:
 			directionalVectorLight = directionalVectorLight + vec3( 1.0f,  0.0f,  0.0f);
