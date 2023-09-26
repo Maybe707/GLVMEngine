@@ -1148,7 +1148,7 @@ namespace GLVM::core
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
-				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], swapChainExtent.width, swapChainExtent.height);
+				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
 		}
     }
@@ -2991,16 +2991,16 @@ namespace GLVM::core
 				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j];
 				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
 				pointLightShadowMapRenderPassInfo.clearValueCount = 1;
 				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
 
 				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 				VkViewport pointLightShadowMapViewPort;
-				pointLightShadowMapViewPort.height = swapChainExtent.height;
-				pointLightShadowMapViewPort.width = swapChainExtent.width;
+				pointLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
+				pointLightShadowMapViewPort.width = SHADOW_MAP_SIZE;
 				pointLightShadowMapViewPort.minDepth = 0.0f;
 				pointLightShadowMapViewPort.maxDepth = 1.0f;
 				pointLightShadowMapViewPort.x = 0;
@@ -3008,8 +3008,8 @@ namespace GLVM::core
 				vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
 
 				VkRect2D pointLightShadowMapScissor;
-				pointLightShadowMapScissor.extent.width = swapChainExtent.width;
-				pointLightShadowMapScissor.extent.height = swapChainExtent.height;
+				pointLightShadowMapScissor.extent.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapScissor.extent.height = SHADOW_MAP_SIZE;
 				pointLightShadowMapScissor.offset.x = 0;
 				pointLightShadowMapScissor.offset.y = 0;
 				vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
