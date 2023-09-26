@@ -50,7 +50,7 @@
 //#include "WinApi/winVk.hpp"
 #endif
 
-#define SHADOW_MAP_SIZE 4096
+#define SHADOW_MAP_SIZE 2048
 
 #define VK_DEBUG_IMAGE_SET_RED "\x1b[31mVULKAN DEBUG IMAGE\x1b[0m"
 #define VK_DEBUG_DESCRIPTOR_SET_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET\x1b[0m"
@@ -234,6 +234,11 @@ namespace GLVM::core
 	struct alignas(16) PointLightShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
+	};
+
+	struct alignas(16) UniformBufferObjectLightUBO {
+		vec3 lightPosition;
+		float farPlane;
 	};
 	
 	struct DirectionalLight {
@@ -539,8 +544,11 @@ namespace GLVM::core
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
+		std::vector<VkDescriptorSet> shadowMapPointLightDataDescriptorSets;
 		std::vector<VkBuffer> shadowMapPointLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
+		std::vector<VkBuffer> shadowMapPointLightDataUniformBuffers;
+		std::vector<VkDeviceMemory> shadowMapPointLightDataUniformBuffersMemory;
 		VkDescriptorPool pointLightShadowMapDescriptorPool;
 		unsigned int pointLightShadowMapMatrixUboDescriptorsNumber = 0;
 

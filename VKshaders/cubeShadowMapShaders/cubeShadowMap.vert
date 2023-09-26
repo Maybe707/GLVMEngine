@@ -14,13 +14,15 @@ layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTextureCoordinate;
 
+layout(location = 0) out vec3 outFragmentPosition;
+
 void main() {
 	// if (gl_VertexIndex % 2 == 0) {
 	// 	gl_Position = vec4(0.5, 0.5, 0.5, 1.0);
 	// 	} else {
 	// 	gl_Position = vec4(0.7, 0.7, 0.7, 1.0);
 	// 	}
-    gl_Position = ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0);
+    outFragmentPosition = vec3(ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0));
 //	gl_Position = vec4(inPosition, 1.0);
 	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     // outFragmentNormal = inNormal;

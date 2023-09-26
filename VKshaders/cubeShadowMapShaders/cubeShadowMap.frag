@@ -1,8 +1,20 @@
 #version 450
 
+layout(location = 0) in vec3 inFragmentPosition;
+
+layout(set = 1, binding = 1) uniform UniformBufferObjectLight {
+	vec3 lightPosition;
+	float farPlane;
+} uboLight;
+
+
 void main()
 {             
-	gl_FragDepth = gl_FragCoord.z;
+	float lightDistance = length(inFragmentPosition - uboLight.lightPosition);
+
+	lightDistance = lightDistance / uboLight.farPlane;
+
+	gl_FragDepth = lightDistance;
 }
 
 // layout(set = 1, binding = 1) uniform sampler2D texSampler;
