@@ -712,7 +712,9 @@ namespace GLVM::core
 				.green               = VK_COMPONENT_SWIZZLE_IDENTITY,
 				.blue                = VK_COMPONENT_SWIZZLE_IDENTITY,
 				.alpha               = VK_COMPONENT_SWIZZLE_IDENTITY,
-				.arrayLayers         = 1
+				.arrayLayers         = 1,
+				.width               = swapChainExtent.width,
+				.height              = swapChainExtent.height
 			};
 
             swapChainImageViews[i] = createImageView(swapChainImage, 0, 1);
@@ -1114,7 +1116,7 @@ namespace GLVM::core
 			mainRenderAttachments.push_back(depthImageView);
 
 			createRenderPassFramebuffers(mainRenderAttachments, renderPass, swapChainFramebuffers[i],
-										 swapChainExtent.height, swapChainExtent.height);
+										 swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Directional lights shadow map renderer frame buffers initialization
@@ -1123,7 +1125,7 @@ namespace GLVM::core
 			std::vector<VkImageView> directionalLightsRenderAttachments;
 			directionalLightsRenderAttachments.push_back(directionalLightShadowMapImages[i].views[0]);
 
-			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.height, swapChainExtent.height);
+			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
@@ -1132,7 +1134,7 @@ namespace GLVM::core
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightShadowMapImages[i].views[0]);
 
-			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.height, swapChainExtent.height);
+			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
@@ -1142,7 +1144,7 @@ namespace GLVM::core
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
-				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], swapChainExtent.height, swapChainExtent.height);
+				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], swapChainExtent.width, swapChainExtent.height);
 			}
 		}
     }
@@ -1189,7 +1191,7 @@ namespace GLVM::core
 			.format				 = depthFormat,
 			.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 			.arrayLayers		 = 1,
-			.width				 = swapChainExtent.height,
+			.width				 = swapChainExtent.width,
 			.height				 = swapChainExtent.height,
 		};
 
@@ -1218,7 +1220,7 @@ namespace GLVM::core
 				.format				 = findDepthFormat(),
 				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers		 = 1,
-				.width				 = swapChainExtent.height,
+				.width				 = swapChainExtent.width,
 				.height				 = swapChainExtent.height,
 			};
 
@@ -1244,7 +1246,7 @@ namespace GLVM::core
 				.format				 = findDepthFormat(),
 				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers		 = 1,
-				.width				 = swapChainExtent.height,
+				.width				 = swapChainExtent.width,
 				.height				 = swapChainExtent.height,
 			};
 
@@ -1261,7 +1263,7 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
 			VK_Image depthImage		 = {
-//				.image				 = VkImage{},
+				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
 				.viewType			 = VK_IMAGE_VIEW_TYPE_2D,
 				.createFlags		 = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
@@ -1271,7 +1273,7 @@ namespace GLVM::core
 				.format				 = findDepthFormat(),
 				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers		 = 6,
-				.width				 = swapChainExtent.height,
+				.width				 = swapChainExtent.width,
 				.height				 = swapChainExtent.height,
 			};
 			
@@ -1285,25 +1287,11 @@ namespace GLVM::core
 		}
 
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
-			VK_Image depthImage		 = {
-				.image				 = VkImage{},
-				.deviceMemory		 = VkDeviceMemory{},
-				.viewType			 = VK_IMAGE_VIEW_TYPE_CUBE,
-				.createFlags		 = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
-				.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				.usageFlags			 = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
-				.aspectFlags         = VK_IMAGE_ASPECT_DEPTH_BIT,
-				.format				 = findDepthFormat(),
-				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
-				.arrayLayers		 = 6,
-				.width				 = swapChainExtent.height,
-				.height				 = swapChainExtent.height,
-			};
+			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			createImage(depthImage);
-			setImageDebugObjectName(depthImage);
-			std::cout << "Point light image handler: " << depthImage.image << std::endl;
-			pointLightShadowMapImages[i].views.push_back(createImageView(depthImage, 0, 6));
+			setImageDebugObjectName(pointLightShadowMapImages[i]);
+			std::cout << "Point light image handler: " << pointLightShadowMapImages[i].image << std::endl;
+			pointLightShadowMapImages[i].views.push_back(createImageView(pointLightShadowMapImages[i], 0, 6));
 		}
 		
 		// createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
@@ -2863,7 +2851,7 @@ namespace GLVM::core
 		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[0];
 		shadowMapRenderPassInfo.renderArea.offset.x = 0;
 		shadowMapRenderPassInfo.renderArea.offset.y = 0;
-		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.height;
+		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
 		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
 		shadowMapRenderPassInfo.clearValueCount = 1;
 		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
@@ -2872,7 +2860,7 @@ namespace GLVM::core
 
 		VkViewport shadowMapViewPort;
 		shadowMapViewPort.height = swapChainExtent.height;
-		shadowMapViewPort.width = swapChainExtent.height;
+		shadowMapViewPort.width = swapChainExtent.width;
 		shadowMapViewPort.minDepth = 0.0f;
 		shadowMapViewPort.maxDepth = 1.0f;
 		shadowMapViewPort.x = 0;
@@ -2880,7 +2868,7 @@ namespace GLVM::core
 		vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
 
 		VkRect2D shadowMapScissor;
-		shadowMapScissor.extent.width = swapChainExtent.height;
+		shadowMapScissor.extent.width = swapChainExtent.width;
 		shadowMapScissor.extent.height = swapChainExtent.height;
 		shadowMapScissor.offset.x = 0;
 		shadowMapScissor.offset.y = 0;
@@ -2931,7 +2919,7 @@ namespace GLVM::core
 		spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[0];
 		spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 		spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-		spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.height;
+		spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
 		spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
 		spotLightShadowMapRenderPassInfo.clearValueCount = 1;
 		spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
@@ -2940,7 +2928,7 @@ namespace GLVM::core
 
 		VkViewport spotLightShadowMapViewPort;
 		spotLightShadowMapViewPort.height = swapChainExtent.height;
-		spotLightShadowMapViewPort.width = swapChainExtent.height;
+		spotLightShadowMapViewPort.width = swapChainExtent.width;
 		spotLightShadowMapViewPort.minDepth = 0.0f;
 		spotLightShadowMapViewPort.maxDepth = 1.0f;
 		spotLightShadowMapViewPort.x = 0;
@@ -2948,7 +2936,7 @@ namespace GLVM::core
 		vkCmdSetViewport(commandBuffer, 0, 1, &spotLightShadowMapViewPort);
 
 		VkRect2D spotLightShadowMapScissor;
-		spotLightShadowMapScissor.extent.width = swapChainExtent.height;
+		spotLightShadowMapScissor.extent.width = swapChainExtent.width;
 		spotLightShadowMapScissor.extent.height = swapChainExtent.height;
 		spotLightShadowMapScissor.offset.x = 0;
 		spotLightShadowMapScissor.offset.y = 0;
@@ -2999,7 +2987,7 @@ namespace GLVM::core
 				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j];
 				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.height;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
 				pointLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
 				pointLightShadowMapRenderPassInfo.clearValueCount = 1;
 				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
@@ -3008,7 +2996,7 @@ namespace GLVM::core
 
 				VkViewport pointLightShadowMapViewPort;
 				pointLightShadowMapViewPort.height = swapChainExtent.height;
-				pointLightShadowMapViewPort.width = swapChainExtent.height;
+				pointLightShadowMapViewPort.width = swapChainExtent.width;
 				pointLightShadowMapViewPort.minDepth = 0.0f;
 				pointLightShadowMapViewPort.maxDepth = 1.0f;
 				pointLightShadowMapViewPort.x = 0;
@@ -3016,7 +3004,7 @@ namespace GLVM::core
 				vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
 
 				VkRect2D pointLightShadowMapScissor;
-				pointLightShadowMapScissor.extent.width = swapChainExtent.height;
+				pointLightShadowMapScissor.extent.width = swapChainExtent.width;
 				pointLightShadowMapScissor.extent.height = swapChainExtent.height;
 				pointLightShadowMapScissor.offset.x = 0;
 				pointLightShadowMapScissor.offset.y = 0;
@@ -3058,7 +3046,7 @@ namespace GLVM::core
         renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent.height = swapChainExtent.height;
-		renderPassInfo.renderArea.extent.width = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
 
         std::array<VkClearValue, 2> clearValues{};
         clearValues[0].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
@@ -3074,7 +3062,7 @@ namespace GLVM::core
         VkViewport viewport{};
         viewport.x = 0.0f;
         viewport.y = 0.0f;
-        viewport.width = (float) swapChainExtent.height;
+        viewport.width = (float) swapChainExtent.width;
         viewport.height = (float) swapChainExtent.height;
         viewport.minDepth = 0.0f;
         viewport.maxDepth = 1.0f;
@@ -3132,7 +3120,7 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 8, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 9, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 10, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[0], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
