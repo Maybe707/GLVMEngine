@@ -1274,7 +1274,7 @@ namespace GLVM::core
 				.tiling				 = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers		 = 6,
 				.width				 = swapChainExtent.width,
-				.height				 = swapChainExtent.height,
+				.height				 = swapChainExtent.width
 			};
 			
 			createImage(depthImage);
