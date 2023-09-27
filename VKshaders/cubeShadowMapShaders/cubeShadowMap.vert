@@ -17,6 +17,8 @@ layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTextureCoordinate;
 
 layout(location = 0) out vec3 outFragmentPosition;
+layout(location = 1) out vec3 outLightPosition;
+layout(location = 2) out float outFarPlane;
 
 void main() {
 	// if (gl_VertexIndex % 2 == 0) {
@@ -24,12 +26,14 @@ void main() {
 	// 	} else {
 	// 	gl_Position = vec4(0.7, 0.7, 0.7, 1.0);
 	// 	}
-    vec3 fragmentPosition = vec3(ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0));
+    outFragmentPosition = vec3(ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0));
+	outLightPosition = ubo.lightPosition;
+	outFarPlane = ubo.farPlane;
 	// float lightDistance = length(fragmentPosition - ubo.lightPosition);
 	// lightDistance = lightDistance / ubo.farPlane;
 
 //	gl_Position.z = fragmentPosition.z;
-	gl_Position = vec4(fragmentPosition, 1.0);
+	gl_Position = vec4(outFragmentPosition, 1.0);
 	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     // outFragmentNormal = inNormal;
     // outFragmentTextureCoordinate = inTextureCoordinate;

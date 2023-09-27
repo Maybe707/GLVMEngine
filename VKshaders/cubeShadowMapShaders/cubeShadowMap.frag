@@ -1,18 +1,19 @@
 #version 450
 
 layout(location = 0) in vec3 inFragmentPosition;
+layout(location = 1) in	vec3 inLightPosition;
+layout(location = 2) in float inFarPlane;
 
-layout(set = 1, binding = 1) uniform UniformBufferObjectLight {
-	vec3 lightPosition;
-	float farPlane;
-} uboLight;
-
+// layout(set = 1, binding = 1) uniform UniformBufferObjectLight {
+// 	vec3 lightPosition;
+// 	float farPlane;
+// } uboLight;
 
 void main()
 {             
-	float lightDistance = length(inFragmentPosition - uboLight.lightPosition);
+	float lightDistance = length(inFragmentPosition - inLightPosition);
 
-	lightDistance = lightDistance / uboLight.farPlane;
+	lightDistance = lightDistance / inFarPlane;
 
 	gl_FragDepth = lightDistance;
 //	gl_FragDepth = 1.0;;

@@ -556,6 +556,7 @@ namespace GLVM::core
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VK_Image> pointLightShadowMapImages;
+		std::vector<VK_Image> pointLightImages;
 		// core::vector<VkImage> spotLightShadowMapDepthImages;
 		// core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
 		// core::vector<VkImageView> spotLightShadowMapDepthImageViews;
@@ -667,7 +668,9 @@ namespace GLVM::core
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
+		void createShadowMapTextureImageView();
         void createTextureSampler();
+		void createShadowMapTextureSampler();
 		void createDirectionalLightShadowMapTextureSamplers();
 		void createSpotLightShadowMapTextureSamplers();
 		void createPointLightShadowMapTextureSamplers();

@@ -245,7 +245,7 @@ namespace GLVM::core
 		
         vkDeviceWaitIdle(device);
 
-        cleanupSwapChain();
+//        cleanupSwapChain();
 
 		initWindow();
 		
@@ -406,6 +406,8 @@ namespace GLVM::core
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
+		createShadowMapTextureImageView();
+		createShadowMapTextureSampler();
         createFramebuffers();
         createTextureImage();
         createTextureImageView();
@@ -899,6 +901,16 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createPointLightShadowMapRenderPass() {
+        VkAttachmentDescription colorAttachment{};
+        colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB;
+        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		
         VkAttachmentDescription attachmentDescription{};
         
 		attachmentDescription.format = findDepthFormat();
@@ -915,11 +927,16 @@ namespace GLVM::core
         depthAttachmentRef.attachment = 0;
         depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
+        VkAttachmentReference colorAttachmentRef{};
+        colorAttachmentRef.attachment = 1;
+        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
 		/// Subpass 0: shadow map rendering
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = 0;
+		subpass.colorAttachmentCount = 1;
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
+		subpass.pColorAttachments = &colorAttachmentRef;
 
 		VkSubpassDependency dependencies[2];
 		dependencies[0].srcSubpass		= VK_SUBPASS_EXTERNAL;
@@ -937,11 +954,12 @@ namespace GLVM::core
 		dependencies[1].srcAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		dependencies[1].dstAccessMask	= VK_ACCESS_SHADER_READ_BIT;
 		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-		
+
+		std::array<VkAttachmentDescription, 2> attachments = {attachmentDescription, colorAttachment};
         VkRenderPassCreateInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        renderPassInfo.attachmentCount = 1;
-        renderPassInfo.pAttachments = &attachmentDescription;
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments = attachments.data();
         renderPassInfo.subpassCount = 1;
         renderPassInfo.pSubpasses = &subpass;
         renderPassInfo.dependencyCount = 2;
@@ -1154,6 +1172,7 @@ namespace GLVM::core
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
+				pointLightsRenderAttachments.push_back(pointLightImages[j * m + m].views[0]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
@@ -1290,8 +1309,28 @@ namespace GLVM::core
 			
 			createImage(depthImage);
 
-			for ( unsigned int j = 0; j < 6; ++j )
+			for ( unsigned int j = 0; j < 6; ++j ) {
+				VK_Image textureImage = {
+					.image = VkImage{},
+					.deviceMemory = VkDeviceMemory{},
+					.viewType = VK_IMAGE_VIEW_TYPE_2D,
+					.createFlags  = 0,
+					.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+					.usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+					VK_IMAGE_USAGE_SAMPLED_BIT,
+					.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
+					.format = VK_FORMAT_R8G8B8A8_SRGB,
+					.tiling = VK_IMAGE_TILING_OPTIMAL,
+					.arrayLayers = 1,
+					.width = SHADOW_MAP_SIZE,
+					.height = SHADOW_MAP_SIZE
+				};
+
+				createImage(textureImage);
+				pointLightImages.push_back(textureImage);
+				
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
+			}
 
 			setImageDebugObjectName(depthImage);
 			pointLightShadowMapImages.push_back(depthImage);
@@ -1343,6 +1382,11 @@ namespace GLVM::core
             textureImages[i].views.push_back(createImageView(textureImages[i], 0, 1));
     }
 
+    void CVulkanRenderer::createShadowMapTextureImageView() {
+        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
+            pointLightImages[i].views.push_back(createImageView(pointLightImages[i], 0, 1));
+    }
+	
     void CVulkanRenderer::createTextureSampler() {
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
@@ -1371,6 +1415,34 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::createShadowMapTextureSampler() {
+        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
+        {
+            VkPhysicalDeviceProperties properties{};
+            vkGetPhysicalDeviceProperties(physicalDevice, &properties);
+
+            VkSamplerCreateInfo samplerInfo{};
+            samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+            samplerInfo.magFilter = VK_FILTER_NEAREST;
+            samplerInfo.minFilter = VK_FILTER_NEAREST;
+            samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+            samplerInfo.anisotropyEnable = VK_TRUE;
+            samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+            samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+            samplerInfo.unnormalizedCoordinates = VK_FALSE;
+            samplerInfo.compareEnable = VK_FALSE;
+            samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+            samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+
+			pointLightImages[i].sampler = {};              /// TODO: Is it realy need here?
+            if (vkCreateSampler(device, &samplerInfo, nullptr, &pointLightImages[i].sampler) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create texture sampler!");
+            }
+        }
+    }
+	
     void CVulkanRenderer::createDirectionalLightShadowMapTextureSamplers() {
         for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
 			createRenderPassShadowMapTextureSamplers(directionalLightShadowMapImages[i].sampler);
@@ -3051,9 +3123,10 @@ namespace GLVM::core
 
 		for ( uint32_t i = 0; i < pointLightNumber; ++i ) {
 			for ( uint32_t j = 0; j < 6; ++j ) {                      ///< 6 is a number of cube map layers.
-				VkClearValue pointLightShadowMapClearValues[1];
+				VkClearValue pointLightShadowMapClearValues[2];
 				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
 				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
 
 				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
 				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -3064,7 +3137,7 @@ namespace GLVM::core
 				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
 				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.clearValueCount = 1;
+				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
 				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
 
 				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
