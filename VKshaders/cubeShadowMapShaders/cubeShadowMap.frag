@@ -15,6 +15,7 @@ void main()
 	lightDistance = lightDistance / uboLight.farPlane;
 
 	gl_FragDepth = lightDistance;
+//	gl_FragDepth = 1.0;;
 }
 
 // layout(set = 1, binding = 1) uniform sampler2D texSampler;

@@ -234,6 +234,8 @@ namespace GLVM::core
 	struct alignas(16) PointLightShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
+		vec3 lightPosition;
+		float farPlane;
 	};
 
 	struct alignas(16) UniformBufferObjectLightUBO {
