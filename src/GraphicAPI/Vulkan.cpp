@@ -3463,32 +3463,32 @@ namespace GLVM::core
 		mat4 cubeShadowMapTransforms(0.0);
 		projectionMatrixCubeShadowMap[1][1] *= -1.0f;
 		std::cout << layer << std::endl;
-		switch(layer) {
-		case 0:
-			/// Positive X
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		case 1:
-			/// Negative X
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		case 2:
-			/// Positive Y
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		case 3:
-			/// Negative Y
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		case 4:
-			/// Positive Z
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		case 5:
-			/// Negative Z
-			cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-			break;
-		}
+		// switch(layer) {
+		// case 0:
+		// 	/// Positive X
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// case 1:
+		// 	/// Negative X
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// case 2:
+		// 	/// Positive Y
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// case 3:
+		// 	/// Negative Y
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// case 4:
+		// 	/// Positive Z
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// case 5:
+		// 	/// Negative Z
+		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
+		// 	break;
+		// }
 
 		
 		// switch(layer) {
@@ -3521,36 +3521,36 @@ namespace GLVM::core
 		// 										 { 0.0f, 1.0f, 0.0f});
 
 
-//		glm::mat4 viewMatrix = glm::mat4(1.0f);
+		glm::mat4 viewMatrix = glm::mat4(1.0f);
 		// glm::vec3 traslate(0.0f);
 		// std::cout << pointLightComponent->position << std::endl;
 		// traslate[0] = pointLightComponent->position[0];
 		// traslate[1] = pointLightComponent->position[1];
 		// traslate[2] = pointLightComponent->position[2];
 		// viewMatrix = glm::translate(viewMatrix, traslate);
-		// switch (layer)
-		// {
-		// case 0: // POSITIVE_X
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 1:	// NEGATIVE_X
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 2:	// POSITIVE_Y
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 3:	// NEGATIVE_Y
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 4:	// POSITIVE_Z
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 5:	// NEGATIVE_Z
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		// 	break;
-		// }
+		switch (layer)
+		{
+		case 0: // POSITIVE_X
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+		case 1:	// NEGATIVE_X
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+		case 2:	// POSITIVE_Y
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+		case 3:	// NEGATIVE_Y
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+		case 4:	// POSITIVE_Z
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+		case 5:	// NEGATIVE_Z
+			viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+			break;
+		}
 
 
 		// traslate[0] = _transformComponent->tPosition[0];
@@ -3571,12 +3571,12 @@ namespace GLVM::core
 //		projectionMatrixCubeShadowMap[1][1] *= -1;
 //		projectionMatrix[1][1] *= -1;
 
-		// mat4 viewMatrixLight(1.0);
-		// for ( unsigned int i = 0; i < 4; ++i )
-		// 	for ( unsigned int j = 0; j < 4; ++j )
-		// 		viewMatrixLight[i][j] = viewMatrix[i][j];
+		mat4 viewMatrixLight(1.0);
+		for ( unsigned int i = 0; i < 4; ++i )
+			for ( unsigned int j = 0; j < 4; ++j )
+				viewMatrixLight[i][j] = viewMatrix[i][j];
 		
-		modelMatrixUBO.lightSpaceMatrix = cubeShadowMapTransforms;
+		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 		modelMatrixUBO.lightPosition = positionVectorPointLight;
 		modelMatrixUBO.farPlane = 100.0f;
 //		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
