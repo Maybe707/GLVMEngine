@@ -3520,8 +3520,8 @@ namespace GLVM::core
 		// 										 { 1.0f, 0.0f, -1.0f},
 		// 										 { 0.0f, 1.0f, 0.0f});
 
-
 		glm::mat4 viewMatrix = glm::mat4(1.0f);
+
 		switch (layer)
 		{
 		case 0: // POSITIVE_X
@@ -3545,13 +3545,15 @@ namespace GLVM::core
 			viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 			break;
 		}
+
+		glm::vec3 traslate(0.0f);
+		std::cout << pointLightComponent->position << std::endl;
+		traslate[0] = pointLightComponent->position[0];
+		traslate[1] = pointLightComponent->position[1];
+		traslate[2] = pointLightComponent->position[2];
+		viewMatrix = glm::translate(viewMatrix, -traslate);
 		
-		// glm::vec3 traslate(0.0f);
-		// std::cout << pointLightComponent->position << std::endl;
-		// traslate[0] = pointLightComponent->position[0];
-		// traslate[1] = pointLightComponent->position[1];
-		// traslate[2] = pointLightComponent->position[2];
-		// viewMatrix = glm::translate(viewMatrix, -traslate);
+//		viewMatrix[1][1] *= -1.0f;
 		
 //		glm::mat4 translate = glm::translate(viewMatrix, traslate);
 //		viewMatrix = translate * viewMatrix;
@@ -3571,7 +3573,7 @@ namespace GLVM::core
         modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
-//		projectionMatrixCubeShadowMap[1][1] *= -1;
+		projectionMatrixCubeShadowMap[1][1] *= -1;
 //		projectionMatrix[1][1] *= -1;
 
 		mat4 viewMatrixLight(1.0);

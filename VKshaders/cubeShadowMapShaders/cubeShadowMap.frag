@@ -1,6 +1,6 @@
 #version 450
 
-layout(location = 0) in vec3 inFragmentPosition;
+layout(location = 0) in vec4 inFragmentPosition;
 layout(location = 1) in	vec3 inLightPosition;
 layout(location = 2) in float inFarPlane;
 
@@ -11,11 +11,11 @@ layout(location = 2) in float inFarPlane;
 
 void main()
 {             
-	float lightDistance = length(inFragmentPosition - inLightPosition);
+	float lightDistance = length(inFragmentPosition - vec4(inLightPosition, 1.0));
 
 	lightDistance = lightDistance / inFarPlane;
 
-	gl_FragDepth = lightDistance;
+//	gl_FragDepth = lightDistance;
 //	gl_FragDepth = 1.0;;
 }
 
