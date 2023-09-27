@@ -3381,10 +3381,10 @@ namespace GLVM::core
 
 		vec3 positionVectorPointLight  = pointLightComponent->position;
 		
-		// mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 0.01f, 100.0f);
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 0.01f, 100.0f);
 
-		mat4 projectionMatrixCubeShadowMap = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
-													  0.01f, 100.0f);
+		// mat4 projectionMatrixCubeShadowMap = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
+		// 											  0.01f, 100.0f);
 
 		
 		mat4 cubeShadowMapTransforms(0.0);
