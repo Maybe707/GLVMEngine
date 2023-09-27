@@ -3577,7 +3577,9 @@ namespace GLVM::core
 		// 		viewMatrixLight[i][j] = viewMatrix[i][j];
 		
 		modelMatrixUBO.lightSpaceMatrix = cubeShadowMapTransforms;
-		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
+		modelMatrixUBO.lightPosition = positionVectorPointLight;
+		modelMatrixUBO.farPlane = 100.0f;
+//		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
         void* modelMatrixData;
         vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
