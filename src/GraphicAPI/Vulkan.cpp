@@ -3460,29 +3460,34 @@ namespace GLVM::core
 
 		switch(layer) {
 		case 0:
+			/// Positive X
 			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
-		// case 1:
-		// 	directionalVectorLight = directionalVectorLight + vec3( -1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// case 2:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  1.0f);
-		// 	break;
-		// case 3:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// 	break;
-		// case 4:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  1.0f);
-		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
-		// 	break;
-		// case 5:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
-		// 	upVector = vec3(0.0f, -1.0f,  0.0f);
-		// 	break;
+		case 1:
+			/// Negative X
+			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+			upVector = vec3(0.0f, 1.0f,  0.0f);
+			break;
+		case 2:
+			/// Positive Y
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  -1.0f);
+			break;
+		case 3:
+			/// Negative Y
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  1.0f);
+			break;
+		case 4:
+			/// Positive Z
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+			upVector = vec3(0.0f, 1.0f,  0.0f);
+			break;
+		case 5:
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+			upVector = vec3(0.0f, 1.0f,  0.0f);
+			break;
 		}
 		
 //		vec3 positionVectorPointLight  = pointLightComponent->position;
