@@ -108,6 +108,74 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap);
 float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sampler2D flatShadowMap);
 
+vec3 debugCubemapEquirectangular()
+{
+    float pi = 3.14159f;
+    vec2 uv = gl_FragCoord.xy/vec2(800, 400); // width and hight
+ 
+    float alpha = 2.0f*pi * uv.x;
+    float beta = pi*uv.y - pi*0.5f;
+    float x = sin(beta) * cos(alpha);
+    float y = sin(beta) * sin(alpha);
+    float z = cos(beta);
+ 
+    vec3 direction = vec3(x,y,z);
+    // Output to screen
+    return texture(cubeShadowMap, direction).xyz; //iChannel0 your cube map texture
+}
+ 
+vec3 debugCubemapUnflatted(vec2 quadSize)
+{
+ 
+    //   Y+
+    //Z- X+ Z+ X-
+    //   Y-
+ 
+    float pi = 3.14159f;
+ 
+    vec2 uv = mod(gl_FragCoord.xy,quadSize)/quadSize;
+    ivec2 grid = ivec2(gl_FragCoord.xy/quadSize);
+ 
+    uv.y *= -1.0;
+    uv.y += 1.0;
+ 
+ 
+    vec2 uv2 = (uv - vec2(0.5))*2.0f;
+    float a = length(uv2);
+    float rc = (1.0 - a)* sqrt(2.0f) + a;
+ 
+    vec2 st = uv2* abs(rc);
+    vec3 direction = vec3(0.0f); 
+ 
+    if(grid.x == 1 && grid.y == 1)
+    {
+        direction = vec3(rc, -st.t, -st.s);
+    }
+ 
+    if(grid.x == 0 && grid.y == 1)
+    {
+        direction = vec3(-st.s, -st.t, -rc);
+    }
+    if(grid.x == 2 && grid.y == 1)
+    {
+        direction = vec3(st.s, -st.t, rc);
+    }
+    if(grid.x == 3 && grid.y == 1)
+    {
+        direction = vec3(-rc, -st.t, st.s);
+    }
+    if(grid.x == 1 && grid.y == 2)
+    {
+        direction = vec3(st.s, rc, st.t);
+    }
+    if(grid.x == 1 && grid.y == 0)
+    {
+        direction = vec3(st.s, -rc, -st.t);
+    }
+ 
+    return texture(cubeShadowMap, direction).xyz;
+}
+
 void main()
 {
 	vec3 fragmentNormal = normalize(fs_in.normal);
@@ -145,6 +213,7 @@ void main()
 //    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
 //x	float depthValue = texture(cubeShadowMap, vec3(inFragmentTextureCoordinate, 0)).r;
 	
+//	outColor = vec4(debugCubemapUnflatted(vec2(100, 100)), 1.0);
 	outColor = vec4(result, 1.0);
 //	outColor = vec4(vec3(depthValue), 1.0);
 	
