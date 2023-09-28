@@ -169,7 +169,7 @@ namespace GLVM::core
 		forward[1] = result.y;
 		forward[2] = result.z;
         cameraComponent.forward = Normalize(forward);
-//		std::cout << cameraComponent.forward << std::endl;
+		std::cout << cameraComponent.forward << std::endl;
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
