@@ -341,6 +341,7 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cu
 	// closestDepth              *= farPlane;
 	// Now get current linear depth as the length between the fragment and light position
 	float currentDepth         = length(fragmentToLight);
+	currentDepth               = currentDepth / 100.0;
 	// Test for shadows simple
 	// float bias                 = 0.05;
 	// float shadow               = currentDepth - bias > closestDepth ? 0.5 : 0.0;
