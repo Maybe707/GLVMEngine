@@ -179,7 +179,7 @@ namespace GLVM::core
 
     void CVulkanRenderer::SetProjectionMatrix()
 	{
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 1000.0f);
+		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
 //		projectionMatrix.SelfTensorTranspose();
 		projectionMatrix[1][1] *= -1.0f;
@@ -3164,15 +3164,48 @@ namespace GLVM::core
 																								  cm::pointLight,
 																								  cm::vertex>();
 
+				// core::vector<Entity> viewPositionLinkedEntities2 = componentManager->collectLinkedEntities<cm::beholder>();
+				// cm::transform* playerTransformComponent2 = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities2[0]);
+
+				static auto startTime = std::chrono::high_resolution_clock::now();
+
+				auto currentTime = std::chrono::high_resolution_clock::now();
+				float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+
+				
 				for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 					unsigned int uiEntity = linkedEntities[i];
 					unsigned int pointLightEntity = pointLightEntities[0];
 					unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
 					cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+					cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 					cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * i + currentFrame * 6 + j;
 
+//					pointLightComponent->position = playerTransformComponent2->tPosition;
+
+					float deltaTime = time - previousTime;
+					previousTime = time;
+					
+					if ( accumulator > 2.0 && animationFlag == false ) {
+						accumulator = 0;
+						animationFlag = true;
+					} else if ( accumulator > 2.0 && animationFlag == true ) {
+						accumulator = 0;
+						animationFlag = false;
+					} else
+						accumulator += deltaTime;
+
+					if (animationFlag) {
+						transformPointLightComponent->tPosition += deltaTime;
+						pointLightComponent->position += deltaTime;
+					}
+					else {
+						transformPointLightComponent->tPosition -= deltaTime;
+						pointLightComponent->position -= deltaTime;
+					}
+					
 					updatePointLightShadowMapMatrixUBO(uboIndex, transformComponent, pointLightComponent, j);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
@@ -3332,8 +3365,8 @@ namespace GLVM::core
 		
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		float nearPlaneFlatShadowMap = 0.01f;
-		float farPlaneFlatShadowMap = 50.0f;
+		float nearPlaneFlatShadowMap = 1.0f;
+		float farPlaneFlatShadowMap = 100.0f;
 		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
@@ -3379,8 +3412,8 @@ namespace GLVM::core
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		float nearPlaneFlatShadowMap = 0.01f;
-		float farPlaneFlatShadowMap = 50.0f;
+		float nearPlaneFlatShadowMap = 1.0f;
+		float farPlaneFlatShadowMap = 100.0f;
 		mat4 spotProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
@@ -3461,12 +3494,12 @@ namespace GLVM::core
 		switch(layer) {
 		case 0:
 			/// Positive X
-			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f, 0.0f);
+			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 1:
 			/// Negative X
-			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
+			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 2:
@@ -3484,6 +3517,7 @@ namespace GLVM::core
 			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
+			/// Negative Z
 		case 5:
 			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
@@ -3492,7 +3526,7 @@ namespace GLVM::core
 		
 //		vec3 positionVectorPointLight  = pointLightComponent->position;
 		
-		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 1000.0f);
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 100.0f);
 
 		// mat4 projectionMatrixCubeShadowMap = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 		// 											  0.01f, 100.0f);
@@ -3621,7 +3655,7 @@ namespace GLVM::core
 		
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 //		modelMatrixUBO.lightPosition = positionVectorPointLight;
-		modelMatrixUBO.farPlane = 1000.0f;
+		modelMatrixUBO.farPlane = 100.0f;
 //		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
         void* modelMatrixData;
         vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,

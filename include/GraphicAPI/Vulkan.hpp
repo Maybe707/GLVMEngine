@@ -401,6 +401,10 @@ namespace GLVM::core
     
     class CVulkanRenderer : public IRenderer {
     public:
+	    float previousTime = 0;
+		float accumulator = 0;
+		bool animationFlag = false;
+		
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<ecs::Texture> texture_load_data_;
         std::vector<ecs::Texture> hudTexture_load_data_;
