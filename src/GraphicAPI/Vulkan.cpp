@@ -3494,12 +3494,12 @@ namespace GLVM::core
 		switch(layer) {
 		case 0:
 			/// Positive X
-			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
+			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f, 0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 1:
 			/// Negative X
-			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 2:
