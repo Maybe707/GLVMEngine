@@ -901,15 +901,15 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createPointLightShadowMapRenderPass() {
-        VkAttachmentDescription colorAttachment{};
-        colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB;
-        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        // VkAttachmentDescription colorAttachment{};
+        // colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB;
+        // colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        // colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        // colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        // colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        // colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        // colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        // colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
         VkAttachmentDescription attachmentDescription{};
         
@@ -927,16 +927,15 @@ namespace GLVM::core
         depthAttachmentRef.attachment = 0;
         depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-        VkAttachmentReference colorAttachmentRef{};
-        colorAttachmentRef.attachment = 1;
-        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+        // VkAttachmentReference colorAttachmentRef{};
+        // colorAttachmentRef.attachment = 1;
+        // colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 		
 		/// Subpass 0: shadow map rendering
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-		subpass.colorAttachmentCount = 1;
+		subpass.colorAttachmentCount = 0;
         subpass.pDepthStencilAttachment = &depthAttachmentRef;
-		subpass.pColorAttachments = &colorAttachmentRef;
 
 		VkSubpassDependency dependencies[2];
 		dependencies[0].srcSubpass		= VK_SUBPASS_EXTERNAL;
@@ -955,7 +954,7 @@ namespace GLVM::core
 		dependencies[1].dstAccessMask	= VK_ACCESS_SHADER_READ_BIT;
 		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
 
-		std::array<VkAttachmentDescription, 2> attachments = {attachmentDescription, colorAttachment};
+		std::array<VkAttachmentDescription, 1> attachments = {attachmentDescription};
         VkRenderPassCreateInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
         renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
@@ -1172,7 +1171,7 @@ namespace GLVM::core
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
-				pointLightsRenderAttachments.push_back(pointLightImages[j * m + m].views[0]);
+//				pointLightsRenderAttachments.push_back(pointLightImages[j * m + m].views[0]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
@@ -1310,24 +1309,24 @@ namespace GLVM::core
 			createImage(depthImage);
 
 			for ( unsigned int j = 0; j < 6; ++j ) {
-				VK_Image textureImage = {
-					.image = VkImage{},
-					.deviceMemory = VkDeviceMemory{},
-					.viewType = VK_IMAGE_VIEW_TYPE_2D,
-					.createFlags  = 0,
-					.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-					.usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-					VK_IMAGE_USAGE_SAMPLED_BIT,
-					.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
-					.format = VK_FORMAT_R8G8B8A8_SRGB,
-					.tiling = VK_IMAGE_TILING_OPTIMAL,
-					.arrayLayers = 1,
-					.width = SHADOW_MAP_SIZE,
-					.height = SHADOW_MAP_SIZE
-				};
+				// VK_Image textureImage = {
+				// 	.image = VkImage{},
+				// 	.deviceMemory = VkDeviceMemory{},
+				// 	.viewType = VK_IMAGE_VIEW_TYPE_2D,
+				// 	.createFlags  = 0,
+				// 	.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+				// 	.usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
+				// 	VK_IMAGE_USAGE_SAMPLED_BIT,
+				// 	.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
+				// 	.format = VK_FORMAT_R8G8B8A8_SRGB,
+				// 	.tiling = VK_IMAGE_TILING_OPTIMAL,
+				// 	.arrayLayers = 1,
+				// 	.width = SHADOW_MAP_SIZE,
+				// 	.height = SHADOW_MAP_SIZE
+				// };
 
-				createImage(textureImage);
-				pointLightImages.push_back(textureImage);
+				// createImage(textureImage);
+				// pointLightImages.push_back(textureImage);
 				
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
 			}
