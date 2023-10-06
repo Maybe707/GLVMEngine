@@ -179,7 +179,7 @@ namespace GLVM::core
 
     void CVulkanRenderer::SetProjectionMatrix()
 	{
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
+		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 1000.0f);
 		projectionMatrix = tProjection_Matrix;
 //		projectionMatrix.SelfTensorTranspose();
 		projectionMatrix[1][1] *= -1.0f;
@@ -3492,7 +3492,7 @@ namespace GLVM::core
 		
 //		vec3 positionVectorPointLight  = pointLightComponent->position;
 		
-		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 100.0f);
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 1000.0f);
 
 		// mat4 projectionMatrixCubeShadowMap = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 		// 											  0.01f, 100.0f);
@@ -3621,7 +3621,7 @@ namespace GLVM::core
 		
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 //		modelMatrixUBO.lightPosition = positionVectorPointLight;
-		modelMatrixUBO.farPlane = 100.0f;
+		modelMatrixUBO.farPlane = 1000.0f;
 //		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
         void* modelMatrixData;
         vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
