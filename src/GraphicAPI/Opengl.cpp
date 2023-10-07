@@ -602,10 +602,10 @@ namespace GLVM::core
 //			cm::texture* texture = componentManager->GetComponent<cm::texture>(uiEntity_refTexture);
 
 
-			cm::vertex* vertexComponent = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture);
+			cm::mesh* vertexComponent = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
 			unsigned int uiVertexId = 0;
 			if ( vertexComponent != nullptr )
-				uiVertexId = vertexComponent->vkVertexId_;
+				uiVertexId = vertexComponent->id;
 
 			cm::material* material = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 			unsigned int diffuseTextureID  = 0;
@@ -651,12 +651,12 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
 																								 cm::transform,
 																								 cm::material,
-																								 cm::vertex,
+																								 cm::mesh,
 																								 cm::collider>();
 		
 		core::vector<Entity> otherLinkedEntities = componentManager->collectUniqueLinkedEntities<cm::material,
 																								 cm::collider,
-																								 cm::vertex,
+																								 cm::mesh,
 																								 cm::transform>();
 
 		// std::cout << "linged entities size " << linkedEntities.GetSize() << std::endl;

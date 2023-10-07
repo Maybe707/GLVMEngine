@@ -286,7 +286,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::directionalLight,
-																									  cm::vertex>();
+																									  cm::mesh>();
 		
 		directionalLightShadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
 
@@ -300,7 +300,7 @@ namespace GLVM::core
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
-																							   cm::vertex>();
+																							   cm::mesh>();
 		
 		spotLightShadowMapMatrixUboDescriptorsNumber = spotLightLinkedEntities.GetSize();
 
@@ -315,7 +315,7 @@ namespace GLVM::core
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::pointLight,
-																							   cm::vertex>();
+																							   cm::mesh>();
 		
 		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 
@@ -406,8 +406,8 @@ namespace GLVM::core
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
-		createShadowMapTextureImageView();
-		createShadowMapTextureSampler();
+		// createShadowMapTextureImageView();
+		// createShadowMapTextureSampler();
         createFramebuffers();
         createTextureImage();
         createTextureImageView();
@@ -1235,7 +1235,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::directionalLight,
-																									  cm::vertex>();
+																									  cm::mesh>();
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
 			VK_Image depthImage		 = {
@@ -1261,7 +1261,7 @@ namespace GLVM::core
 		
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
-																							   cm::vertex>();
+																							   cm::mesh>();
 		spotLightNumber = spotLightLinkedEntities.GetSize();
 		for ( unsigned int i = 0; i < spotLightNumber; ++i ) {
 			VK_Image depthImage		 = {
@@ -1287,7 +1287,7 @@ namespace GLVM::core
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
-																								cm::vertex>();
+																								cm::mesh>();
 		pointLightNumber = pointLightLinkedEntities.GetSize();
 
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
@@ -1707,7 +1707,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::material,
-																									  cm::vertex>();
+																									  cm::mesh>();
 		
 		directionalLightShadowMapMatrixUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
 		
@@ -1727,7 +1727,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::material,
-																							   cm::vertex>();
+																							   cm::mesh>();
 		
 		spotLightShadowMapMatrixUboDescriptorsNumber = spotLightLinkedEntities.GetSize();
 		
@@ -1748,7 +1748,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
-																								cm::vertex>();
+																								cm::mesh>();
 		
 		pointLightShadowMapMatrixUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 		
@@ -1783,7 +1783,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> matrixLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							cm::material,
-																							cm::vertex>();
+																							cm::mesh>();
 		
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize();
 		
@@ -1813,7 +1813,7 @@ namespace GLVM::core
 		
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								  cm::beholder,
-																								  cm::vertex>();
+																								  cm::mesh>();
 		
 		viewPositionUboDescriptorsNumber = viewPositionLinkedEntities.GetSize();
 		
@@ -1827,7 +1827,7 @@ namespace GLVM::core
 
 		core::vector<Entity> materialLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::material,
-																							  cm::vertex>();
+																							  cm::mesh>();
 		
 		materialUboDescriptorsNumber = materialLinkedEntities.GetSize();
 		
@@ -1841,7 +1841,7 @@ namespace GLVM::core
 
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::directionalLight,
-																									  cm::vertex>();
+																									  cm::mesh>();
 		
 		directionalLightUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
 		
@@ -1855,7 +1855,7 @@ namespace GLVM::core
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
-																								cm::vertex>();
+																								cm::mesh>();
 		
 		pointLightUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 		
@@ -1869,7 +1869,7 @@ namespace GLVM::core
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
-																							   cm::vertex>();
+																							   cm::mesh>();
 		
 		spotLightUboDescriptorsNumber = spotLightLinkedEntities.GetSize();
 		
@@ -2961,11 +2961,11 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> shadowMapLinkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::vertex>();
+																						   cm::mesh>();
 
 		for ( unsigned int i = 0; i < shadowMapLinkedEntities.GetSize(); ++i ) {
 			unsigned int entity = shadowMapLinkedEntities[i];
-		unsigned int vertexID = componentManager->GetComponent<ecs::components::vertex>(entity)->vkVertexId_;
+		unsigned int vertexID = componentManager->GetComponent<ecs::components::mesh>(entity)->id;
 		VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
 		}
@@ -3025,16 +3025,16 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																									 cm::directionalLight,
-																									 cm::vertex>();
+																									 cm::mesh>();
 
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::vertex>();
+																						   cm::mesh>();
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int directionalLightEntity = directionalLightEntities[0];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
 
@@ -3092,13 +3092,13 @@ namespace GLVM::core
 
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::spotLight,
-																							  cm::vertex>();
+																							  cm::mesh>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int spotLightEntity = spotLightEntities[0];
 //			unsigned int directionalLightEntity = directionalLightEntities[0];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
 //			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
@@ -3161,7 +3161,7 @@ namespace GLVM::core
 
 				core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																								  cm::pointLight,
-																								  cm::vertex>();
+																								  cm::mesh>();
 
 				// core::vector<Entity> viewPositionLinkedEntities2 = componentManager->collectLinkedEntities<cm::beholder>();
 				// cm::transform* playerTransformComponent2 = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities2[0]);
@@ -3175,7 +3175,7 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 					unsigned int uiEntity = linkedEntities[i];
 					unsigned int pointLightEntity = pointLightEntities[0];
-					unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+					unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 					cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 					cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 					cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
@@ -3266,7 +3266,7 @@ namespace GLVM::core
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::vertex>(uiEntity)->vkVertexId_;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
 			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
@@ -3749,7 +3749,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::directionalLight,
-																						   cm::vertex>();
+																						   cm::mesh>();
 
 		assert(directionalLightUboDescriptorsNumber < 4 && "Directional lights number greater then 4");
 
@@ -3782,7 +3782,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::pointLight,
-																						   cm::vertex>();
+																						   cm::mesh>();
 
 		assert(pointLightUboDescriptorsNumber < 32 && "Point lights number greater then 32");
 		for ( unsigned int i = 0; i < pointLightUboDescriptorsNumber; ++i ) {
@@ -3817,7 +3817,7 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::spotLight,
-																						   cm::vertex>();
+																						   cm::mesh>();
 
 		assert(spotLightUboDescriptorsNumber < 8 && "Spot light number greater then 8");
 		for ( unsigned int i = 0; i < spotLightUboDescriptorsNumber; ++i ) {

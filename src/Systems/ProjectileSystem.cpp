@@ -54,7 +54,7 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::projectile,
 																						   cm::transform,
 																						   cm::material,
-																						   cm::vertex,
+																						   cm::mesh,
 																						   cm::collider>();
 		
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
@@ -94,7 +94,7 @@ namespace GLVM::ecs
 
 
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
-        ecs::ComponentManager::GetInstance()->CreateComponent<cm::vertex, cm::collider,
+        ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
 															  cm::transform, cm::material,
 															  cm::projectile>(uiEntity_Projectile);
 
@@ -103,7 +103,7 @@ namespace GLVM::ecs
         // pSound_Sample->uiDuration_ = 5;
         // pSound_Sample->uiRate_ = 22050;
         // soundEngine->GetSoundContainer().Push(pSound_Sample);
-		componentManager->GetComponent<cm::vertex>(uiEntity_Projectile)->vkVertexId_ = 1;
+		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->id = 1;
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
