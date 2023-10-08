@@ -28,6 +28,16 @@ namespace GLVM::core
         }
     }
 
+    void CreateBeginDebugUtilsLabelEXT(VkInstance instance, VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT* labelInfo) {
+        auto func = (PFN_vkCmdBeginDebugUtilsLabelEXT) vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT");
+            func(commandBuffer, labelInfo);
+    }
+
+    void CreateEndDebugUtilsLabelEXT(VkInstance instance, VkCommandBuffer commandBuffer) {
+        auto func = (PFN_vkCmdEndDebugUtilsLabelEXT) vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT");
+            func(commandBuffer);
+    }
+	
 	VkResult SetDebugObjectName(VkDevice device, const VkDebugUtilsObjectNameInfoEXT* objectNameInfo) {
 		auto func = (PFN_vkSetDebugUtilsObjectNameEXT) vkGetDeviceProcAddr(device, "vkSetDebugUtilsObjectNameEXT");
 		if (func != nullptr) {
@@ -3007,7 +3017,21 @@ namespace GLVM::core
 		
 		vkCmdEndRenderPass(commandBuffer);
 
-		for ( uint32_t i = 0; i < pointLightNumber; ++i ) {
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh>();
+
+		VkDebugUtilsLabelEXT label;
+		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		label.color[0] = 0.1;
+		label.color[0] = 0.7;
+		label.color[0] = 0.2;
+		label.color[0] = 1.0;
+		label.pLabelName = "pointLightShadowMap";
+		label.pNext = NULL;
+		
+		CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
+		for ( uint32_t i = 0; i < pointLightEntities.GetSize(); ++i ) {
 			for ( uint32_t j = 0; j < 6; ++j ) {                      ///< 6 is a number of cube map layers.
 				VkClearValue pointLightShadowMapClearValues[2];
 				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
@@ -3046,9 +3070,6 @@ namespace GLVM::core
 
 				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-				core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																								  cm::pointLight,
-																								  cm::mesh>();
 
 				// core::vector<Entity> viewPositionLinkedEntities2 = componentManager->collectLinkedEntities<cm::beholder>();
 				// cm::transform* playerTransformComponent2 = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities2[0]);
@@ -3057,60 +3078,61 @@ namespace GLVM::core
 
 				auto currentTime = std::chrono::high_resolution_clock::now();
 				float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-				
-				for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-					unsigned int meshOwnerEntity = linkedEntities[i];
+
+				unsigned int pointLightEntity = pointLightEntities[i];
+				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
+				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
+
+				for ( unsigned int m = 0; m < linkedEntities.GetSize(); ++m ) {
+					unsigned int meshOwnerEntity = linkedEntities[m];
 					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
-					for ( unsigned int j = 0; j < pointLightEntities.GetSize(); ++j ) {
-						unsigned int pointLightEntity = pointLightEntities[j];
-						cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
-						cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 						
-						unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * j + currentFrame * 6 + j;
+					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * i + currentFrame * 6 + j;
 
 //					pointLightComponent->position = playerTransformComponent2->tPosition;
 
-						float deltaTime = time - previousTime;
-						previousTime = time;
+					float deltaTime = time - previousTime;
+					previousTime = time;
 					
-						if ( accumulator > 2.0 && animationFlag == false ) {
-							accumulator = 0;
-							animationFlag = true;
-						} else if ( accumulator > 2.0 && animationFlag == true ) {
-							accumulator = 0;
-							animationFlag = false;
-						} else
-							accumulator += deltaTime;
+					if ( accumulator > 2.0 && animationFlag == false ) {
+						accumulator = 0;
+						animationFlag = true;
+					} else if ( accumulator > 2.0 && animationFlag == true ) {
+						accumulator = 0;
+						animationFlag = false;
+					} else
+						accumulator += deltaTime;
 
-						if (animationFlag) {
-							transformPointLightComponent->tPosition += deltaTime;
-							pointLightComponent->position += deltaTime;
-						}
-						else {
-							transformPointLightComponent->tPosition -= deltaTime;
-							pointLightComponent->position -= deltaTime;
-						}
-					
-						updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, j);
-						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
-						// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
-						// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
-						VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
-						VkDeviceSize offsets[] = {0};
-						vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-					
-						vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
-
-						unsigned int indicesContainerSize = aVertices_[meshID].size();
-						vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+					if (animationFlag) {
+						transformPointLightComponent->tPosition += deltaTime;
+						pointLightComponent->position += deltaTime;
 					}
+					else {
+						transformPointLightComponent->tPosition -= deltaTime;
+						pointLightComponent->position -= deltaTime;
+					}
+					
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, j);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
+					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
+					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
+					VkDeviceSize offsets[] = {0};
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					
+					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
+
+					unsigned int indicesContainerSize = aVertices_[meshID].size();
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 				}
 		
 				vkCmdEndRenderPass(commandBuffer);
 			}
 		}
+
+		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -3334,49 +3356,9 @@ namespace GLVM::core
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
-		// float nearPlaneFlatShadowMap = 1.0f;
-		// float farPlaneFlatShadowMap = 25.0f;
-		// mat4 spotProjectionMatrixLight = ortho(-10.0f, 10.0f, -10.0f, 10.0f,
-		// 											  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-
-		// mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, (float)0.01, (float)100.0);
-		
 		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight = vec3(0.0f, 0.0f, 0.0f);
 		vec3 upVector = { 0.0, 0.0, 0.0 };
-
-		// modelMatrixUBO.farPlane = 100.0f;
-		// modelMatrixUBO.lightPosition = positionVectorLight;
-		
-//		std::cout << positionVectorLight << std::endl;
-		
-//		std::cout << "Layer: " << layer << std::endl;
-		// switch(layer) {
-		// case 0:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// case 1:
-		// 	directionalVectorLight = directionalVectorLight + vec3( -1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// case 2:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// 	break;
-		// case 3:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  1.0f);
-		// 	break;
-		// case 4:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  1.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// case 5:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// }
 
 		switch(layer) {
 		case 0:
@@ -3411,118 +3393,12 @@ namespace GLVM::core
 			break;
 		}
 		
-//		vec3 positionVectorPointLight  = pointLightComponent->position;
-		
 		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 100.0f);
 
-		// mat4 projectionMatrixCubeShadowMap = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
-		// 											  0.01f, 100.0f);
-
-		
-//		mat4 cubeShadowMapTransforms(0.0);
-//		projectionMatrixCubeShadowMap[1][1] *= -1.0f;
-//		std::cout << layer << std::endl;
-		// switch(layer) {
-		// case 0:
-		// 	/// Positive X
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// case 1:
-		// 	/// Negative X
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( -1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// case 2:
-		// 	/// Positive Y
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// case 3:
-		// 	/// Negative Y
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  -1.0f,  0.0f), vec3(0.0f, 0.0f,  1.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// case 4:
-		// 	/// Positive Z
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// case 5:
-		// 	/// Negative Z
-		// 	cubeShadowMapTransforms = (LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 0.0f,  0.0f,  -1.0f), vec3(0.0f, 1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
-		// 	break;
-		// }
-
-		
-		// switch(layer) {
-		// case 0:
-		// 	directionalVectorLight = directionalVectorLight + vec3( -1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// case 1:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// case 2:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// case 3:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  1.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// case 4:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// case 5:
-		// 	directionalVectorLight = directionalVectorLight + vec3( 0.0f,  0.0f,  1.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// }
-		
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionalVectorLight,
 										  upVector);
 
-		// mat4 viewMatrixLight = LookAtMain<float>(positionVectorLight,
-		// 										 { 1.0f, 0.0f, -1.0f},
-		// 										 { 0.0f, 1.0f, 0.0f});
-
-		// glm::mat4 viewMatrix = glm::mat4(1.0f);
-
-		// switch (layer)
-		// {
-		// case 0: // POSITIVE_X
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 1:	// NEGATIVE_X
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 2:	// POSITIVE_Y
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 3:	// NEGATIVE_Y
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 4:	// POSITIVE_Z
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		// 	break;
-		// case 5:	// NEGATIVE_Z
-		// 	viewMatrix = glm::rotate(viewMatrix, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-		// 	break;
-		// }
-
-		// glm::vec3 traslate(0.0f);
-		// std::cout << pointLightComponent->position << std::endl;
-		// traslate[0] = pointLightComponent->position[0];
-		// traslate[1] = pointLightComponent->position[1];
-		// traslate[2] = pointLightComponent->position[2];
-		// viewMatrix = glm::translate(viewMatrix, -traslate);
-		
-//		viewMatrix[1][1] *= -1.0f;
-		
-//		glm::mat4 translate = glm::translate(viewMatrix, traslate);
-//		viewMatrix = translate * viewMatrix;
-		
-		// traslate[0] = _transformComponent->tPosition[0];
-		// traslate[1] = _transformComponent->tPosition[1];
-		// traslate[2] = _transformComponent->tPosition[2];
-		
-
-		
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
         modelMatrixUBO.model[2][2] = _transformComponent->fScale;
@@ -3533,17 +3409,10 @@ namespace GLVM::core
         modelMatrixUBO.model.SelfTensorTranspose();
 
 		projectionMatrixCubeShadowMap[1][1] *= -1;
-//		projectionMatrix[1][1] *= -1;
-
-		// mat4 viewMatrixLight(1.0);
-		// for ( unsigned int i = 0; i < 4; ++i )
-		// 	for ( unsigned int j = 0; j < 4; ++j )
-		// 		viewMatrixLight[i][j] = viewMatrix[i][j];
 		
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
-//		modelMatrixUBO.lightPosition = positionVectorPointLight;
 		modelMatrixUBO.farPlane = 100.0f;
-//		std::cout << modelMatrixUBO.lightSpaceMatrix << std::endl;
+
         void* modelMatrixData;
         vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
