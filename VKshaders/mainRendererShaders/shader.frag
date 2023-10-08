@@ -97,15 +97,16 @@ layout(set = 7, binding = 7) uniform SpotLightsUBO {
 
 layout(set = 8, binding = 8) uniform sampler2D diffuse;
 layout(set = 9, binding = 9) uniform sampler2D specular;
-layout(set = 10, binding = 10) uniform sampler2D shadowMap;
-layout(set = 11, binding = 11) uniform samplerCube cubeShadowMap;
+layout(set = 10, binding = 10) uniform sampler2D directionalLightsShadowMaps;
+layout(set = 11, binding = 11) uniform samplerCube pointLightsCubeShadowMaps;
+layout(set = 12, binding = 12) uniform sampler2D spotLightsShadowMaps;
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
 
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace, sampler2D flatShadowMap);
-float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap);
+float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube pointLightsCubeShadowMaps);
 float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sampler2D flatShadowMap);
 
 vec3 debugCubemapEquirectangular()
@@ -121,7 +122,7 @@ vec3 debugCubemapEquirectangular()
  
     vec3 direction = vec3(x,y,z);
     // Output to screen
-    return texture(cubeShadowMap, direction).xyz; //iChannel0 your cube map texture
+    return texture(pointLightsCubeShadowMaps, direction).xyz; //iChannel0 your cube map texture
 }
  
 vec3 debugCubemapUnflatted(vec2 quadSize)
@@ -173,7 +174,7 @@ vec3 debugCubemapUnflatted(vec2 quadSize)
         direction = vec3(st.s, -rc, -st.t);
     }
  
-    return texture(cubeShadowMap, direction).xyz;
+    return texture(pointLightsCubeShadowMaps, direction).xyz;
 }
 
 float linearize_depth(float depth,float zNear,float zFar) {
@@ -192,7 +193,7 @@ void main()
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	// for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
 	// 	vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-	// 	float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], shadowMap);
+	// 	float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[0], directionalLightsShadowMaps);
 	// 	result += (1.0 - shadow) * light;
 	// 	if(shadow > 0.0)
 	// 		shadow = 0.0;
@@ -201,7 +202,7 @@ void main()
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
 		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 		float shadow = ComputePointShadow(pointLights.pointLightsArray[0],
-										  inFragmentPosition, cubeShadowMap);
+										  inFragmentPosition, pointLightsCubeShadowMaps);
 		result += (1.0 - shadow) * light;
 
 		// if (shadow == 1.0)
@@ -218,15 +219,15 @@ void main()
 	// 	vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
 	// 								  inFragmentPosition, viewDirection);
 	// 	float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
-	// 									 fs_in.fragmentPositionSpotLightSpace[0], shadowMap);
+	// 									 fs_in.fragmentPositionSpotLightSpace[0], directionalLightsShadowMaps);
 
 	// 	result += (1.0 - shadow) * light;
 	// 	if(shadow > 0.0)
 	// 		shadow = 0.0;
 	// }
 
-//    float depthValue = texture(shadowMap, inFragmentTextureCoordinate).r;
-//x	float depthValue = texture(cubeShadowMap, vec3(inFragmentTextureCoordinate, 0)).r;
+//    float depthValue = texture(directionalLightsShadowMaps, inFragmentTextureCoordinate).r;
+//x	float depthValue = texture(pointLightsCubeShadowMaps, vec3(inFragmentTextureCoordinate, 0)).r;
 	
 //	outColor = vec4(debugCubemapUnflatted(vec2(100, 100)), 1.0);
 	outColor = vec4(result, 1.0);
@@ -347,11 +348,11 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 	return shadow;
 }
 
-float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cubeShadowMap) {
+float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube pointLightsCubeShadowMaps) {
 	// Get vector between fragment position and light position
 	vec3 fragmentToLight       = fragmentPosition - light.position;
 	// // Get the fragment to light vector to sample from the shadow map
-//	float closestDepth         = texture(cubeShadowMap, fragmentToLight).r;
+//	float closestDepth         = texture(pointLightsCubeShadowMaps, fragmentToLight).r;
 //	closestDepth = linearize_depth(closestDepth, 1.0, 1000.0);
 //	closestDepth               /= 100.0;
 	// // It is currently in linear range between [0,1], let's re-transform it back to original depth value
@@ -376,7 +377,7 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cu
 	// 			{
 	// 				for(float z = -offset; z < offset; z += offset / (samples * 0.5))
 	// 					{
-	// 						float closestDepth = texture(cubeShadowMap, fragmentToLight + vec3(x, y, z)).r;
+	// 						float closestDepth = texture(pointLightsCubeShadowMaps, fragmentToLight + vec3(x, y, z)).r;
 	// 						closestDepth *= farPlane; ///< undo mapping [0;1]
 	// 						if(currentDepth - bias > closestDepth)
 	// 							shadow += 1.0;
@@ -403,7 +404,7 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube cu
 	float diskRadius   = (1.0 + (viewDistance / pointLights.farPlane)) / 25.0;
 	for(int i = 0; i < samples; ++i)
 		{
-			float closestDepth = texture(cubeShadowMap, fragmentToLight + sampleOffsetDirections[i] *
+			float closestDepth = texture(pointLightsCubeShadowMaps, fragmentToLight + sampleOffsetDirections[i] *
 										 diskRadius).r;
 			closestDepth = linearize_depth(closestDepth, 1.0, 100.0);
 			bias = linearize_depth(bias, 1.0, 100.0);

@@ -522,8 +522,6 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		std::vector<VkBuffer> shadowMapDirectionalLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
-		VkDescriptorPool directionalLightShadowMapDescriptorPool;
-		unsigned int directionalLightShadowMapMatrixUboDescriptorsNumber = 0;
 
 		/*
 		===================================
@@ -555,8 +553,6 @@ namespace GLVM::core
 		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
 		std::vector<VkBuffer> shadowMapPointLightDataUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapPointLightDataUniformBuffersMemory;
-		VkDescriptorPool pointLightShadowMapDescriptorPool;
-		unsigned int pointLightShadowMapMatrixUboDescriptorsNumber = 0;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VK_Image> pointLightShadowMapImages;
@@ -570,8 +566,6 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
 		std::vector<VkBuffer> shadowMapSpotLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapSpotLightModelMatrixUniformBuffersMemory;
-		VkDescriptorPool spotLightShadowMapDescriptorPool;
-		unsigned int spotLightShadowMapMatrixUboDescriptorsNumber = 0;
 
 		core::vector<mat4> shadowMapBasisMatrices;
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
@@ -627,6 +621,7 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> directionalLightSamperDescriptorSets;
 		std::vector<VkDescriptorSet> pointLightSamplerDescriptorSets;
+		std::vector<VkDescriptorSet> spotLightSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> commandBuffers;
 		std::vector<VkCommandBuffer> shadowMapCommandBuffers;
@@ -678,8 +673,6 @@ namespace GLVM::core
 		void createDirectionalLightShadowMapTextureSamplers();
 		void createSpotLightShadowMapTextureSamplers();
 		void createPointLightShadowMapTextureSamplers();
-		void createSpotLightShadowMapDescriptorPool();
-		void createPointLightShadowMapDescriptorPool();
 		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount);
         void createImage(VK_Image& image);
@@ -688,12 +681,8 @@ namespace GLVM::core
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
-		void createDirectionalLightShadowMapUniformBuffers();
-		void createSpotLightShadowMapUniformBuffers();
-		void createPointLightShadowMapUniformBuffers();
         void createMainRenderUniformBuffers();
         void createMainRenderDescriptorPool();
-		void createDirectionalLightShadowMapDescriptorPool();
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();
