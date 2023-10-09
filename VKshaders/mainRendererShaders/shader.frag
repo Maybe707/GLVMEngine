@@ -75,9 +75,9 @@ struct SpotLight {
 	float quadratic;
 };
 
-#define DIRECTIONAL_LIGHTS_NUMBER                          4
-#define POINT_LIGHTS_NUMBER                                32
-#define SPOT_LIGHTS_NUMBER                                 8
+// #define DIRECTIONAL_LIGHTS_NUMBER                          4
+// #define POINT_LIGHTS_NUMBER                                32
+// #define SPOT_LIGHTS_NUMBER                                 8
 
 layout(set = 5, binding = 5) uniform DirectionalLightsUBO {
 	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
