@@ -1729,7 +1729,10 @@ namespace GLVM::core
 						 shadowMapSpotLightModelMatrixUniformBuffers[i], shadowMapSpotLightModelMatrixUniformBuffersMemory[i]);
 		}
 
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::pointLight>();
+		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																								cm::material,
+																								cm::mesh>();
+		
 		pointLightUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
 		
         shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
@@ -2308,20 +2311,20 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
+		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * pointLightNumber,
 																	   mainRenderScenePipeline.descriptors[11].setLayout);
 		VkDescriptorSetAllocateInfo pointLightCubeShadowMapSamplerAllocInfo{};
 		pointLightCubeShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		pointLightCubeShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightNumber);
 		pointLightCubeShadowMapSamplerAllocInfo.pSetLayouts = pointLightCubeShadowMapSamplerLayouts.data();
 		
-		pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightNumber);
 		if (vkAllocateDescriptorSets(device, &pointLightCubeShadowMapSamplerAllocInfo, pointLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-				
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightNumber; ++i) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
@@ -3089,7 +3092,7 @@ namespace GLVM::core
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 						
-					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * i + currentFrame * 6 + j;
+					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * m + currentFrame * 6 + j;
 
 //					pointLightComponent->position = playerTransformComponent2->tPosition;
 
@@ -3541,8 +3544,8 @@ namespace GLVM::core
 																						   cm::pointLight,
 																						   cm::mesh>();
 
-		assert(pointLightUboDescriptorsNumber < 32 && "Point lights number greater then 32");
-		for ( unsigned int i = 0; i < pointLightUboDescriptorsNumber; ++i ) {
+		assert(pointLightNumber < 32 && "Point lights number greater then 32");
+		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
 			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntities[i]);
 			
 			pointLightUBO.position  = pointLightComponent->position;
@@ -3556,13 +3559,13 @@ namespace GLVM::core
 			pointLightUboArray.pointLights[i] = pointLightUBO;
 		}
 
-		pointLightUboArray.pointLightsArraySize = pointLightUboDescriptorsNumber;
+		pointLightUboArray.pointLightsArraySize = pointLightNumber;
 		pointLightUboArray.farPlane = 25.0f;
 
         void* data;
         vkMapMemory(device, pointLightsUniformBuffersMemory[currentImage], 0,
-					sizeof(pointLightUBO) * 32 + sizeof(pointLightUboDescriptorsNumber) + sizeof(float), 0, &data);
-        memcpy(data, &pointLightUboArray, sizeof(pointLightUBO) * 32 + sizeof(pointLightUboDescriptorsNumber) + sizeof(float));
+					sizeof(pointLightUBO) * 32 + sizeof(pointLightNumber) + sizeof(float), 0, &data);
+        memcpy(data, &pointLightUboArray, sizeof(pointLightUBO) * 32 + sizeof(pointLightNumber) + sizeof(float));
         vkUnmapMemory(device, pointLightsUniformBuffersMemory[currentImage]);
 	}
 
