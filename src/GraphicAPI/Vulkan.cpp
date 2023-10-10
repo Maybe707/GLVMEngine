@@ -299,7 +299,7 @@ namespace GLVM::core
 																									  cm::mesh>();
 		
 		directionalLightShadowMapTextureSamplers.resize(directionalLightLinkedEntities.GetSize());
-		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -309,7 +309,7 @@ namespace GLVM::core
 																							   cm::mesh>();
 		
 		spotLightShadowMapTextureSamplers.resize(spotLightLinkedEntities.GetSize());
-		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -320,26 +320,26 @@ namespace GLVM::core
 		
 		pointLightShadowMapTextureSamplers.resize(pointLightLinkedEntities.GetSize());
 
-		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
+		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 //		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 32);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
@@ -966,7 +966,7 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
 			VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 			modelMatrixUboLayout.binding = descriptors[i].binding;
-			modelMatrixUboLayout.descriptorCount = 1;
+			modelMatrixUboLayout.descriptorCount = descriptors[i].descriptorsNumber;
 			modelMatrixUboLayout.descriptorType = descriptors[i].type;
 			modelMatrixUboLayout.pImmutableSamplers = nullptr;
 			modelMatrixUboLayout.stageFlags = descriptors[i].shaderStageFlag;
@@ -2325,11 +2325,14 @@ namespace GLVM::core
 		}
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightNumber; ++i) {
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = pointLightShadowMapImages[textureIndex].views[6];
-			imageInfo.sampler = pointLightShadowMapImages[textureIndex].sampler;
+			VkDescriptorImageInfo imageInfo[32];
+			for ( unsigned int j = 0; j < 32; ++j ) {
+				imageInfo[j] = {};
+				imageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				unsigned int textureIndex = i / 2;
+				imageInfo[j].imageView = pointLightShadowMapImages[textureIndex].views[6];
+				imageInfo[j].sampler = pointLightShadowMapImages[textureIndex].sampler;
+			}
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2337,15 +2340,15 @@ namespace GLVM::core
 			descriptorWrites[0].dstBinding = 11;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pImageInfo = &imageInfo;
+			descriptorWrites[0].descriptorCount = 32;
+			descriptorWrites[0].pImageInfo = imageInfo;
 
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
 		std::vector<VkDescriptorSetLayout> spotLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
-																	   mainRenderScenePipeline.descriptors[12].setLayout);
-		VkDescriptorSetAllocateInfo spotLightShadowMapSamplerAllocInfo{};
+																				mainRenderScenePipeline.descriptors[12].setLayout);
+			VkDescriptorSetAllocateInfo spotLightShadowMapSamplerAllocInfo{};
 		spotLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		spotLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
 		spotLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
@@ -3218,6 +3221,7 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 9, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 10, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[0], 0, nullptr);
+			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 

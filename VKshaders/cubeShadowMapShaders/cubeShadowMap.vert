@@ -29,13 +29,19 @@ void main() {
     outFragmentPosition = ubo.spaceMatrix * ubo.model * vec4(inPosition, 1.0);
 	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
 	// vec3 FragmentPosition = vec3(ubo.spaceMatrix * vec4(outFragmentPosition, 1.0));
-	outLightPosition = ubo.lightPosition;
-	outFarPlane = ubo.farPlane;
+	// outLightPosition = ubo.lightPosition;
+	// outFarPlane = ubo.farPlane;
 	// float lightDistance = length(fragmentPosition - ubo.lightPosition);
 	// lightDistance = lightDistance / ubo.farPlane;
 
 	// float lightDistance = length(outFragmentPosition - vec4(ubo.lightPosition, 1.0));
 
+	
+	// float lightDistance = length(outFragmentPosition - vec4(ubo.lightPosition, 1.0));
+
+	// lightDistance = lightDistance / ubo.farPlane;
+
+	
 	// lightDistance = lightDistance / inFarPlane;
 	
 //	gl_Position.z = fragmentPosition.z;

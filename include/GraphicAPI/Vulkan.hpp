@@ -178,6 +178,7 @@ namespace GLVM::core
 		uint32_t              binding;
 		VkShaderStageFlags    shaderStageFlag;
 		VkDescriptorSetLayout setLayout;
+		uint32_t              descriptorsNumber;
 	};
 
 	struct Pipeline {
@@ -192,13 +193,13 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions;
 
-		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag) {
+		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
 			if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout()});
+				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber});
 				++globalDescriptorsNumber;
 				++uboDescriptorsNumber;
 			} else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
-				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout()});
+				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber});
 				++globalDescriptorsNumber;
 				++combinedImageSamplersNumber;
 			} else {
