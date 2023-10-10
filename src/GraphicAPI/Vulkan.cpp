@@ -2311,41 +2311,52 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * pointLightNumber,
+		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
+		
+		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
 																	   mainRenderScenePipeline.descriptors[11].setLayout);
 		VkDescriptorSetAllocateInfo pointLightCubeShadowMapSamplerAllocInfo{};
 		pointLightCubeShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		pointLightCubeShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightNumber);
+		pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		pointLightCubeShadowMapSamplerAllocInfo.pSetLayouts = pointLightCubeShadowMapSamplerLayouts.data();
 		
-		pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightNumber);
+		pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &pointLightCubeShadowMapSamplerAllocInfo, pointLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightNumber; ++i) {
-			VkDescriptorImageInfo imageInfo[32];
-			for ( unsigned int j = 0; j < 32; ++j ) {
-				imageInfo[j] = {};
-				imageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-				unsigned int textureIndex = i / 2;
-				imageInfo[j].imageView = pointLightShadowMapImages[textureIndex].views[6];
-				imageInfo[j].sampler = pointLightShadowMapImages[textureIndex].sampler;
-			}
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = pointLightSamplerDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 11;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 32;
-			descriptorWrites[0].pImageInfo = imageInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		VkDescriptorImageInfo imageInfo[POINT_LIGHTS_NUMBER];
+		for (size_t i = 0; i < pointLightNumber; ++i) {
+//			unsigned int textureIndex = i / 2;
+			imageInfo[i] = {};
+			imageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			imageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
+			imageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
 		}
 
+		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+			imageInfo[j] = {};
+			imageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			imageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
+			imageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
+		}
+
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			descriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
+			descriptorWrites[m].dstBinding = 11;
+			descriptorWrites[m].dstArrayElement = 0;
+			descriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
+			descriptorWrites[m].pImageInfo = imageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		
+		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
+		
 		std::vector<VkDescriptorSetLayout> spotLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
 																				mainRenderScenePipeline.descriptors[12].setLayout);
 			VkDescriptorSetAllocateInfo spotLightShadowMapSamplerAllocInfo{};
@@ -2674,24 +2685,38 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightNumber; ++i) {
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = pointLightShadowMapImages[textureIndex].views[6];
-			imageInfo.sampler = pointLightShadowMapImages[textureIndex].sampler;
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = pointLightSamplerDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 11;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pImageInfo = &imageInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
+		
+		VkDescriptorImageInfo imageInfo[POINT_LIGHTS_NUMBER];
+		for (size_t i = 0; i < pointLightNumber; ++i) {
+//			unsigned int textureIndex = i / 2;
+			imageInfo[i] = {};
+			imageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			imageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
+			imageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
 		}
+
+		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+			imageInfo[j] = {};
+			imageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			imageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
+			imageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
+		}
+
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			descriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
+			descriptorWrites[m].dstBinding = 11;
+			descriptorWrites[m].dstArrayElement = 0;
+			descriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
+			descriptorWrites[m].pImageInfo = imageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		
+		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
 			VkDescriptorImageInfo imageInfo{};
@@ -3220,7 +3245,7 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 8, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 9, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 10, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[0], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}

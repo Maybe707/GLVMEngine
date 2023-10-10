@@ -248,6 +248,17 @@ int main()
 	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
 	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
+	Entity pointLight2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight2);
+//	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight2)  = { .position = { 0.0f, 3.0f, 0.0f },
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
+		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight2) = { .tPosition = { 0.0f, 3.0f, 0.0f }, .fScale = 0.3f };
+	ComponentManager->GetComponent<cm::mesh>(pointLight2)->id = 0;
+	cm::material* materialPointLight2 = ComponentManager->GetComponent<cm::material>(pointLight2);
+	*materialPointLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	
 // 	Entity pointLight2 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight2);
 // 	*ComponentManager->GetComponent<cm::pointLight>(pointLight2) = { .position = { 9.2f, 3.3f, 7.5f },
