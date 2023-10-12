@@ -1,5 +1,7 @@
 #version 450
 
+#extension GL_EXT_debug_printf : enable
+
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
 #define DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 4
 
@@ -42,6 +44,8 @@ void main() {
 	
 	for (int i = 0; i < 1; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
+
+//	debugPrintfEXT("X COMPONENT OF POSITION VECTOR: %i", inPosition.x);
 	
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
 	outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));

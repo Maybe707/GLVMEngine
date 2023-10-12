@@ -1812,10 +1812,10 @@ namespace GLVM::core
 
 
 		
-        pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-        pointLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+        pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+        pointLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             createBuffer(pointLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 pointLightsUniformBuffers[i], pointLightsUniformBuffersMemory[i]);
 		}
@@ -2149,20 +2149,20 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
+		std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT,
 																mainRenderScenePipeline.descriptors[6].setLayout);
 		VkDescriptorSetAllocateInfo pointLightUboAllocInfo{};
 		pointLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		pointLightUboAllocInfo.descriptorPool = descriptorPool;
-		pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		pointLightUboAllocInfo.pSetLayouts = pointLightUboLayouts.data();
 			
-		pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &pointLightUboAllocInfo, pointLightUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = pointLightsUniformBuffers[i];
 			modelMatrixBufferInfo.offset = 0;
@@ -3105,13 +3105,13 @@ namespace GLVM::core
 				// core::vector<Entity> viewPositionLinkedEntities2 = componentManager->collectLinkedEntities<cm::beholder>();
 				// cm::transform* playerTransformComponent2 = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities2[0]);
 
-				static auto startTime = std::chrono::high_resolution_clock::now();
+				// static auto startTime = std::chrono::high_resolution_clock::now();
 
-				auto currentTime = std::chrono::high_resolution_clock::now();
-				float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+				// auto currentTime = std::chrono::high_resolution_clock::now();
+				// float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
 				unsigned int pointLightEntity = pointLightEntities[i];
-				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
+//				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 
 				for ( unsigned int m = 0; m < linkedEntities.GetSize(); ++m ) {
@@ -3124,26 +3124,26 @@ namespace GLVM::core
 
 //					pointLightComponent->position = playerTransformComponent2->tPosition;
 
-					float deltaTime = time - previousTime;
-					previousTime = time;
+					// float deltaTime = time - previousTime;
+					// previousTime = time;
 					
-					if ( accumulator > 2.0 && animationFlag == false ) {
-						accumulator = 0;
-						animationFlag = true;
-					} else if ( accumulator > 2.0 && animationFlag == true ) {
-						accumulator = 0;
-						animationFlag = false;
-					} else
-						accumulator += deltaTime;
+					// if ( accumulator > 2.0 && animationFlag == false ) {
+					// 	accumulator = 0;
+					// 	animationFlag = true;
+					// } else if ( accumulator > 2.0 && animationFlag == true ) {
+					// 	accumulator = 0;
+					// 	animationFlag = false;
+					// } else
+					// 	accumulator += deltaTime;
 
-					if (animationFlag) {
-						transformPointLightComponent->tPosition += deltaTime;
-						pointLightComponent->position += deltaTime;
-					}
-					else {
-						transformPointLightComponent->tPosition -= deltaTime;
-						pointLightComponent->position -= deltaTime;
-					}
+					// if (animationFlag) {
+					// 	transformPointLightComponent->tPosition += deltaTime;
+					// 	pointLightComponent->position += deltaTime;
+					// }
+					// else {
+					// 	transformPointLightComponent->tPosition -= deltaTime;
+					// 	pointLightComponent->position -= deltaTime;
+					// }
 					
 					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, j);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
@@ -3565,7 +3565,6 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updatePointLightUniformBuffer(uint32_t currentImage) {
 		PointLightsUBO pointLightUboArray{};
-		PointLight pointLightUBO{};
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -3573,13 +3572,23 @@ namespace GLVM::core
 																						   cm::pointLight,
 																						   cm::mesh>();
 
-		assert(pointLightNumber < 32 && "Point lights number greater then 32");
+		assert(pointLightNumber <= POINT_LIGHTS_NUMBER && "Point lights number greater than 32");
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
 			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntities[i]);
-			
-			pointLightUBO.position  = pointLightComponent->position;
-			pointLightUBO.ambient   = pointLightComponent->ambient;
-			pointLightUBO.diffuse   = pointLightComponent->diffuse;
+			PointLight pointLightUBO{};
+
+ 			pointLightUBO.position  = vec4(pointLightComponent->position[0],
+										   pointLightComponent->position[1],
+										   pointLightComponent->position[2], 0.0f);
+			pointLightUBO.ambient   = vec4(pointLightComponent->ambient[0],
+										   pointLightComponent->ambient[1],
+										   pointLightComponent->ambient[2], 0.0f);
+			pointLightUBO.diffuse   = vec4(pointLightComponent->diffuse[0],
+										   pointLightComponent->diffuse[1],
+										   pointLightComponent->diffuse[2], 0.0f);
+			// pointLightUBO.position  = pointLightComponent->position;
+			// pointLightUBO.ambient   = pointLightComponent->ambient;
+			// pointLightUBO.diffuse   = pointLightComponent->diffuse;
 			pointLightUBO.specular  = pointLightComponent->specular;
 			pointLightUBO.constant  = pointLightComponent->constant;
 			pointLightUBO.linear    = pointLightComponent->linear;
@@ -3587,14 +3596,14 @@ namespace GLVM::core
 
 			pointLightUboArray.pointLights[i] = pointLightUBO;
 		}
-
+		std::cout << sizeof(PointLight) << std::endl;
 		pointLightUboArray.pointLightsArraySize = pointLightNumber;
-		pointLightUboArray.farPlane = 25.0f;
+		pointLightUboArray.farPlane = 100.0f;
 
         void* data;
         vkMapMemory(device, pointLightsUniformBuffersMemory[currentImage], 0,
-					sizeof(pointLightUBO) * 32 + sizeof(pointLightNumber) + sizeof(float), 0, &data);
-        memcpy(data, &pointLightUboArray, sizeof(pointLightUBO) * 32 + sizeof(pointLightNumber) + sizeof(float));
+					sizeof(PointLightsUBO), 0, &data);
+        memcpy(data, &pointLightUboArray, sizeof(PointLightsUBO));
         vkUnmapMemory(device, pointLightsUniformBuffersMemory[currentImage]);
 	}
 

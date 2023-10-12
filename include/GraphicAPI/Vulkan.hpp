@@ -74,7 +74,7 @@ namespace GLVM::core
     };
 
     const std::vector<const char*> deviceExtensions = {
-        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_shader_non_semantic_info"
     };
 
 #ifdef NDEBUG
@@ -253,16 +253,23 @@ namespace GLVM::core
 		alignas(16) vec3 specular;
 	};
 
-	struct PointLight {
-		alignas(16) vec3 position;
+	struct alignas(16) PointLight {
+		vec4 position;
 
-		alignas(16) vec3 ambient;
-		alignas(16) vec3 diffuse;
-		alignas(16) vec3 specular;
+		vec4 ambient;
+		vec4 diffuse;
+		// alignas(16) vec3 position;
+		   
+		// alignas(16) vec3 ambient;
+		// alignas(16) vec3 diffuse;
+
+		vec3 specular;
 
 		float constant;
 		float linear;
 		float quadratic;
+		// float padding0;
+		// float padding1;
 	};
 
 	struct SpotLight {
@@ -296,18 +303,18 @@ namespace GLVM::core
 	struct DirectionalLightsUBO {
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 		int directionalLightsArraySize;
-	} __attribute__((packed));
+	};
 
 	struct PointLightsUBO {
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
 		float farPlane;
-	} __attribute__((packed));
+	};
 
 	struct SpotLightsUBO {
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
-	} __attribute__((packed));
+	};
 
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},

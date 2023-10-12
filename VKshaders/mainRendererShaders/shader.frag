@@ -12,6 +12,8 @@
 //     outColor = texture(texSampler, fragTexCoord);
 // }
 
+#extension GL_EXT_debug_printf : enable
+
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
@@ -199,6 +201,8 @@ void main()
 	// 		shadow = 0.0;
 	// }
 
+	debugPrintfEXT("size of point lights array is: %i", pointLights.pointLightsArraySize);
+	
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
 		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 		float shadow = ComputePointShadow(pointLights.pointLightsArray[i],
