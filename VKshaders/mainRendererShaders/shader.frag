@@ -201,9 +201,9 @@ void main()
 	// 		shadow = 0.0;
 	// }
 
-	debugPrintfEXT("size of point lights array is: %i", pointLights.pointLightsArraySize);
-	
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
+		debugPrintfEXT("Quadratic value: %f", pointLights.pointLightsArray[3].quadratic);
+		
 		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 		float shadow = ComputePointShadow(pointLights.pointLightsArray[i],
 										  inFragmentPosition, pointLightsCubeShadowMaps[i]);

@@ -338,7 +338,7 @@ namespace GLVM::core
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 32);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
@@ -1729,11 +1729,15 @@ namespace GLVM::core
 						 shadowMapSpotLightModelMatrixUniformBuffers[i], shadowMapSpotLightModelMatrixUniformBuffersMemory[i]);
 		}
 
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
 																								cm::mesh>();
+		core::vector<Entity> pointLightsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																								cm::material,
+																								cm::mesh>();
+
 		
-		pointLightUboDescriptorsNumber = pointLightLinkedEntities.GetSize();
+		pointLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() * pointLightsLinkedEntities.GetSize();
 		
         shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
         shadowMapPointLightModelMatrixUniformBuffersMemory.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
@@ -1834,16 +1838,17 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
+		uint32_t descriptorCount = 3000;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        poolSizes[0].descriptorCount = static_cast<uint32_t>(1000);
+        poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        poolSizes[1].descriptorCount = static_cast<uint32_t>(1000);
+        poolSizes[1].descriptorCount = static_cast<uint32_t>(descriptorCount);
 
         VkDescriptorPoolCreateInfo poolInfo{};
         poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
         poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
         poolInfo.pPoolSizes = poolSizes.data();
-        poolInfo.maxSets = static_cast<uint32_t>(1000);
+        poolInfo.maxSets = static_cast<uint32_t>(descriptorCount);
 
         if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
             throw std::runtime_error("failed to create descriptor pool!");
@@ -1929,7 +1934,7 @@ namespace GLVM::core
 		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
 																	  pointLightUboDescriptorsNumber);
 		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-			
+
 		shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
@@ -3114,13 +3119,15 @@ namespace GLVM::core
 //				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 
-				for ( unsigned int m = 0; m < linkedEntities.GetSize(); ++m ) {
+				uint32_t actorsNumber = linkedEntities.GetSize();
+				for ( unsigned int m = 0; m < actorsNumber; ++m ) {
 					unsigned int meshOwnerEntity = linkedEntities[m];
 					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 						
-					unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * 6 * m + currentFrame * 6 + j;
+					unsigned int uboIndex = pointLightNumber * actorsNumber * 6 * currentFrame +
+						actorsNumber * 6 * i + 6 * m + j; 
 
 //					pointLightComponent->position = playerTransformComponent2->tPosition;
 
@@ -3144,7 +3151,7 @@ namespace GLVM::core
 					// 	transformPointLightComponent->tPosition -= deltaTime;
 					// 	pointLightComponent->position -= deltaTime;
 					// }
-					
+
 					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, j);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
@@ -3596,7 +3603,7 @@ namespace GLVM::core
 
 			pointLightUboArray.pointLights[i] = pointLightUBO;
 		}
-		std::cout << sizeof(PointLight) << std::endl;
+
 		pointLightUboArray.pointLightsArraySize = pointLightNumber;
 		pointLightUboArray.farPlane = 100.0f;
 
