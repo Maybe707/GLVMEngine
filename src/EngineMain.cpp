@@ -227,45 +227,45 @@ int main()
 	// materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 	// TextureManager->BindTexture(directionalLight1, materialDirectionalLight1.diffuseTextureID_);
 	
-	// Entity pointLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::vertex, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 6.3f, 2.7f },
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.1f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 6.3f, 2.7f }, .fScale = 0.1f };
-	// ComponentManager->GetComponent<cm::vertex>(pointLight0)->vkVertexId_ = 0;
-	// cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	// *materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
-
- 	Entity pointLight1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);
-//	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 0.0f, 0.0f, 0.0f },
-		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
+	Entity pointLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 0.0f, 0.0f },
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::mesh>(pointLight1)->id = 0;
-	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
-	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 0.0f, 0.0f }, .fScale = 0.3f };
+	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
+	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
+	*materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
-// 	Entity pointLight2 = EntityManager->CreateEntity();
-// 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight2);
+//  	Entity pointLight1 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);
 // //	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
-// 	*ComponentManager->GetComponent<cm::pointLight>(pointLight2)  = { .position = { 0.0f, 3.0f, 0.0f },
+// 	*ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 0.0f, 3.0f, 0.0f },
 // 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
 // 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-// 	*ComponentManager->GetComponent<cm::transform>(pointLight2) = { .tPosition = { 0.0f, 3.0f, 0.0f }, .fScale = 0.3f };
-// 	ComponentManager->GetComponent<cm::mesh>(pointLight2)->id = 0;
-// 	cm::material* materialPointLight2 = ComponentManager->GetComponent<cm::material>(pointLight2);
-// 	*materialPointLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+// 	*ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 0.0f, 3.0f, 0.0f }, .fScale = 0.3f };
+// 	ComponentManager->GetComponent<cm::mesh>(pointLight1)->id = 0;
+// 	cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
+// 	*materialPointLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+
+	Entity pointLight2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight2);
+//	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight2)  = { .position = { 0.0f, 3.0f, 2.0f },
+		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
+		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight2) = { .tPosition = { 0.0f, 3.0f, 2.0f }, .fScale = 0.3f };
+	ComponentManager->GetComponent<cm::mesh>(pointLight2)->id = 0;
+	cm::material* materialPointLight2 = ComponentManager->GetComponent<cm::material>(pointLight2);
+	*materialPointLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
 // 	Entity pointLight3 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight3);
 // //	ComponentManager->GetComponent<cm::texture>(pointLight1)->id = 0;
-// 	*ComponentManager->GetComponent<cm::pointLight>(pointLight3)  = { .position = { 0.67f, 1.3f, 0.55f },
+// 	*ComponentManager->GetComponent<cm::pointLight>(pointLight3)  = { .position = { 2.0f, 3.0f, 0.0f },
 // 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
-// 		.constant = 2.2f, .linear = 0.59f, .quadratic = 0.332f };
-// 	*ComponentManager->GetComponent<cm::transform>(pointLight3) = { .tPosition = { 0.5f, 3.0f, 0.8f }, .fScale = 0.3f };
+// 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+// 	*ComponentManager->GetComponent<cm::transform>(pointLight3) = { .tPosition = { 2.0f, 3.0f, 0.0f }, .fScale = 0.3f };
 // 	ComponentManager->GetComponent<cm::mesh>(pointLight3)->id = 0;
 // 	cm::material* materialPointLight3 = ComponentManager->GetComponent<cm::material>(pointLight3);
 // 	*materialPointLight3 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
