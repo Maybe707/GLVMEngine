@@ -3067,8 +3067,9 @@ namespace GLVM::core
 		label.pNext = NULL;
 		
 		CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
-		for ( uint32_t i = 0; i < pointLightEntities.GetSize(); ++i ) {
-			for ( uint32_t j = 0; j < 6; ++j ) {                      ///< 6 is a number of cube map layers.
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+			uint32_t maxCubeMapLayers = 6;
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
 				VkClearValue pointLightShadowMapClearValues[2];
 				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
 				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
@@ -3078,7 +3079,7 @@ namespace GLVM::core
 				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 				pointLightShadowMapRenderPassInfo.pNext = NULL;
 				pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
-				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[i][j];
+				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
 				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
 				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
@@ -3115,19 +3116,20 @@ namespace GLVM::core
 				// auto currentTime = std::chrono::high_resolution_clock::now();
 				// float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-				unsigned int pointLightEntity = pointLightEntities[i];
+				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
 //				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 
 				uint32_t actorsNumber = linkedEntities.GetSize();
-				for ( unsigned int m = 0; m < actorsNumber; ++m ) {
-					unsigned int meshOwnerEntity = linkedEntities[m];
+				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
+					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
 					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
-					/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 						
-					unsigned int uboIndex = pointLightNumber * actorsNumber * 6 * currentFrame +
-						actorsNumber * 6 * i + 6 * m + j; 
+					unsigned int uboIndex = pointLightNumber *
+						actorsNumber * maxCubeMapLayers * currentFrame +                           ///< Choose frame (first 168 or second 168)
+						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
+						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
 
 //					pointLightComponent->position = playerTransformComponent2->tPosition;
 
@@ -3152,7 +3154,7 @@ namespace GLVM::core
 					// 	pointLightComponent->position -= deltaTime;
 					// }
 
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, j);
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
 					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
