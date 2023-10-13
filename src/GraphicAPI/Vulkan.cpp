@@ -337,7 +337,7 @@ namespace GLVM::core
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DIRECTIONAL_LIGHTS_NUMBER);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
 
@@ -1706,9 +1706,13 @@ namespace GLVM::core
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
+
+		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																								cm::material,
+																								cm::mesh>();
 		
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = directionalLightLinkedEntities.GetSize();
+		directionalLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() * directionalLightLinkedEntities.GetSize();
 
         shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
         shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
@@ -1729,12 +1733,9 @@ namespace GLVM::core
 						 shadowMapSpotLightModelMatrixUniformBuffers[i], shadowMapSpotLightModelMatrixUniformBuffersMemory[i]);
 		}
 
-		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::material,
-																								cm::mesh>();
 		core::vector<Entity> pointLightsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::material,
-																								cm::mesh>();
+																								 cm::material,
+																								 cm::mesh>();
 
 		
 		pointLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() * pointLightsLinkedEntities.GetSize();
@@ -2282,40 +2283,50 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+		std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
 																   mainRenderScenePipeline.descriptors[10].setLayout);
 		VkDescriptorSetAllocateInfo directionalLightShadowMapSamplerAllocInfo{};
 		directionalLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		directionalLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		directionalLightShadowMapSamplerAllocInfo.pSetLayouts = directionalLightShadowMapSamplerLayouts.data();
 		
-		directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
 		if (vkAllocateDescriptorSets(device, &directionalLightShadowMapSamplerAllocInfo, directionalLightSamperDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-				
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
+
+		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		for (size_t i = 0; i < directionalLightNumber; ++i) {
+			directionalLightsImageInfo[i] = {};
+			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[i].imageView = directionalLightShadowMapImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightShadowMapImages[i].sampler;
+		}
+//			unsigned int textureIndex = i / 2;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-			imageInfo.imageView = directionalLightShadowMapImages[textureIndex].views[0];
-			imageInfo.sampler = directionalLightShadowMapImages[textureIndex].sampler;
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = directionalLightSamperDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 10;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pImageInfo = &imageInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+			directionalLightsImageInfo[j] = {};
+			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[j].imageView = directionalLightShadowMapImages[0].views[0];
+			directionalLightsImageInfo[j].sampler = directionalLightShadowMapImages[0].sampler;
 		}
 
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
+			directionalLightsDescriptorWrites[m].dstBinding = 10;
+			directionalLightsDescriptorWrites[m].dstArrayElement = 0;
+			directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+			directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+		
 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 		
 		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
@@ -2331,34 +2342,37 @@ namespace GLVM::core
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		VkDescriptorImageInfo imageInfo[POINT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < pointLightNumber; ++i) {
+		if ( pointLightNumber > 0 ) {
+			VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+			for (size_t i = 0; i < pointLightNumber; ++i) {
 //			unsigned int textureIndex = i / 2;
-			imageInfo[i] = {};
-			imageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			imageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
-			imageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
-		}
+				pointLightsImageInfo[i] = {};
+				pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				pointLightsImageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
+				pointLightsImageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
+			}
 
-		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-			imageInfo[j] = {};
-			imageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			imageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
-			imageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
-		}
 
-		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorWrites{};
-		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-			descriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
-			descriptorWrites[m].dstBinding = 11;
-			descriptorWrites[m].dstArrayElement = 0;
-			descriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
-			descriptorWrites[m].pImageInfo = imageInfo;
-		}
+			for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+				pointLightsImageInfo[j] = {};
+				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				pointLightsImageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
+				pointLightsImageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
+			}
 
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
+			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+				pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
+				pointLightsDescriptorWrites[m].dstBinding = 11;
+				pointLightsDescriptorWrites[m].dstArrayElement = 0;
+				pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
+				pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
+			}
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
+		}
 		
 		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 		
@@ -2913,42 +2927,6 @@ namespace GLVM::core
             throw std::runtime_error("failed to begin recording command buffer!");
         }
 
-		VkClearValue shadowMapClearValues[1];
-		shadowMapClearValues[0].depthStencil.depth = 1.0f;
-		shadowMapClearValues[0].depthStencil.stencil = 0;
-
-		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
-		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		shadowMapRenderPassInfo.pNext = NULL;
-		shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
-		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[0];
-		shadowMapRenderPassInfo.renderArea.offset.x = 0;
-		shadowMapRenderPassInfo.renderArea.offset.y = 0;
-		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-		shadowMapRenderPassInfo.clearValueCount = 1;
-		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
-
-		vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		VkViewport shadowMapViewPort;
-		shadowMapViewPort.height = swapChainExtent.height;
-		shadowMapViewPort.width = swapChainExtent.width;
-		shadowMapViewPort.minDepth = 0.0f;
-		shadowMapViewPort.maxDepth = 1.0f;
-		shadowMapViewPort.x = 0;
-		shadowMapViewPort.y = 0;
-		vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
-
-		VkRect2D shadowMapScissor;
-		shadowMapScissor.extent.width = swapChainExtent.width;
-		shadowMapScissor.extent.height = swapChainExtent.height;
-		shadowMapScissor.offset.x = 0;
-		shadowMapScissor.offset.y = 0;
-		vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
-
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipeline);
-
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																									 cm::directionalLight,
@@ -2957,18 +2935,58 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
 																						   cm::mesh>();
-		
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int meshOwnerEntity = linkedEntities[i];
-			unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
-			cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 
-			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
-			for ( unsigned int j = 0; j < directionalLightEntities.GetSize(); ++j ) {
-				unsigned int directionalLightEntity = directionalLightEntities[j];
-				cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+			VkClearValue shadowMapClearValues[1];
+			shadowMapClearValues[0].depthStencil.depth = 1.0f;
+			shadowMapClearValues[0].depthStencil.stencil = 0;
+
+			VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+			shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			shadowMapRenderPassInfo.pNext = NULL;
+			shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
+			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+			shadowMapRenderPassInfo.renderArea.offset.x = 0;
+			shadowMapRenderPassInfo.renderArea.offset.y = 0;
+			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			shadowMapRenderPassInfo.clearValueCount = 1;
+			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport shadowMapViewPort;
+			shadowMapViewPort.height = swapChainExtent.height;
+			shadowMapViewPort.width = swapChainExtent.width;
+			shadowMapViewPort.minDepth = 0.0f;
+			shadowMapViewPort.maxDepth = 1.0f;
+			shadowMapViewPort.x = 0;
+			shadowMapViewPort.y = 0;
+			vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
+
+			VkRect2D shadowMapScissor;
+			shadowMapScissor.extent.width = swapChainExtent.width;
+			shadowMapScissor.extent.height = swapChainExtent.height;
+			shadowMapScissor.offset.x = 0;
+			shadowMapScissor.offset.y = 0;
+			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
+
+			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipeline);
+
+			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+
+			uint32_t actorsNumber = linkedEntities.GetSize();
+			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
+				unsigned int meshOwnerEntity = linkedEntities[actorCounter];
+				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
+				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+
+				/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
+
+				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
+					actorsNumber * directionalLightCounter + actorCounter;
 				
-				unsigned int uboDirectionalLightIndex = MAX_FRAMES_IN_FLIGHT * j + currentFrame;
 				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightComponent);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);			
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
@@ -2980,9 +2998,9 @@ namespace GLVM::core
 				unsigned int indicesContainerSize = aVertices_[meshId].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
-		}
 		
-		vkCmdEndRenderPass(commandBuffer);
+			vkCmdEndRenderPass(commandBuffer);
+		}
 
 		VkClearValue spotLightShadowMapClearValues[1];
 		spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
@@ -3582,9 +3600,9 @@ namespace GLVM::core
 																						   cm::directionalLight,
 																						   cm::mesh>();
 
-		assert(directionalLightUboDescriptorsNumber < 4 && "Directional lights number greater then 4");
+		assert(directionalLightNumber <= 4 && "Directional lights number greater then 4");
 
-		for ( unsigned int i = 0; i < directionalLightUboDescriptorsNumber; ++i ) {
+		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(linkedEntities[i]);
 			
 			directionalLight.position  = directionalLightComponent->position;
@@ -3596,7 +3614,7 @@ namespace GLVM::core
 			directionalLightUbo.directionalLights[i] = directionalLight;			
 		}
 
-		directionalLightUbo.directionalLightsArraySize = directionalLightUboDescriptorsNumber;
+		directionalLightUbo.directionalLightsArraySize = directionalLightNumber;
 
         void* data;
         vkMapMemory(device, directionalLightsUniformBuffersMemory[currentImage], 0,
