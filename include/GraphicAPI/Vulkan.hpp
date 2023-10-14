@@ -56,6 +56,10 @@
 #define VK_DEBUG_DESCRIPTOR_SET_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET\x1b[0m"
 #define VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET LAYOUT\x1b[0m"
 
+#define DIRECTIONAL_LIGHTS_NUMBER                          4
+#define POINT_LIGHTS_NUMBER                                32
+#define SPOT_LIGHTS_NUMBER                                 8
+
 // #ifdef NDEBUG
 // #define WNDCLASS 0xc018
 // #else
@@ -209,7 +213,8 @@ namespace GLVM::core
 	};
 
 	struct alignas(16) DirLightSpaceMatrixUBO {
-		mat4 dirSpaceMatrix;
+		mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
+		uint32_t directionalLightsNumber;
 	};
 
 	struct alignas(16) SpotLightSpaceMatrixUBO {
@@ -245,12 +250,12 @@ namespace GLVM::core
 	};
 	
 	struct DirectionalLight {
-		alignas(16) vec3 position;
-		alignas(16) vec3 direction;
-  
-		alignas(16) vec3 ambient;
-		alignas(16) vec3 diffuse;
-		alignas(16) vec3 specular;
+		vec4 position;
+		vec4 direction;
+
+		vec4 ambient;
+		vec4 diffuse;
+		vec4 specular;
 	};
 
 	struct alignas(16) PointLight {
@@ -295,10 +300,6 @@ namespace GLVM::core
 		vec3  ambient;
 		float shininess;
     };
-
-#define DIRECTIONAL_LIGHTS_NUMBER                          4
-#define POINT_LIGHTS_NUMBER                                32
-#define SPOT_LIGHTS_NUMBER                                 8
 
 	struct DirectionalLightsUBO {
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
@@ -536,7 +537,7 @@ namespace GLVM::core
 		FOR TEST ONLY!!!
 		===================================
 		*/
-		mat4 dirLightSpaceMatrix;
+		mat4 dirLightSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
 		std::vector<VkBuffer> dirLightSpaceMatrixBuffer;
 		std::vector<VkDeviceMemory> dirLightSpaceMatrixMemory;
 		std::vector<VkDescriptorSet> dirLightSpaceMatrixDescriptorSet;
@@ -709,7 +710,7 @@ namespace GLVM::core
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 		void createShadowMapSyncObjects();
         void createSyncObjects();
-		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent);
+		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);

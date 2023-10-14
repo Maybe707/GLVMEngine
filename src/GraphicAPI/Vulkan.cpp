@@ -2994,8 +2994,8 @@ namespace GLVM::core
 
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
-				
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightComponent);
+
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightComponent, directionalLightCounter);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);			
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
 				VkDeviceSize offsets[] = {0};
@@ -3334,7 +3334,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
+    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight) {
         // static auto startTime = std::chrono::high_resolution_clock::now();
 
         // auto currentTime = std::chrono::high_resolution_clock::now();
@@ -3377,7 +3377,7 @@ namespace GLVM::core
 		directionalProjectionMatrixLight[1][1] *= -1;
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * directionalProjectionMatrixLight;
 
-		dirLightSpaceMatrix = modelMatrixUBO.lightSpaceMatrix;                    ///<        DELETE CRINGE!!!!!!!!!!!!!!!
+		dirLightSpaceMatrix[currentLight] = modelMatrixUBO.lightSpaceMatrix;  ///<        DELETE CRINGE!!!!!!!!!!
         void* modelMatrixData;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
@@ -3583,10 +3583,16 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateDirSpaceMatrix(uint32_t currentImage) {
+		DirLightSpaceMatrixUBO directionalLightUBO;
+		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
+			directionalLightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
+		
+		directionalLightUBO.directionalLightsNumber = directionalLightNumber;
+		
         void* data;
         vkMapMemory(device, dirLightSpaceMatrixMemory[currentImage], 0,
 					sizeof(DirLightSpaceMatrixUBO), 0, &data);
-        memcpy(data, &dirLightSpaceMatrix, sizeof(DirLightSpaceMatrixUBO));
+        memcpy(data, &directionalLightUBO, sizeof(DirLightSpaceMatrixUBO));
         vkUnmapMemory(device, dirLightSpaceMatrixMemory[currentImage]);
 	}
 
@@ -3613,11 +3619,21 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(linkedEntities[i]);
 			
-			directionalLight.position  = directionalLightComponent->position;
-			directionalLight.direction = directionalLightComponent->direction;
-			directionalLight.ambient   = directionalLightComponent->ambient;
-			directionalLight.diffuse   = directionalLightComponent->diffuse;
-			directionalLight.specular  = directionalLightComponent->specular;
+			directionalLight.position  = vec4(directionalLightComponent->position[0],
+											  directionalLightComponent->position[1],
+											  directionalLightComponent->position[2], 0.0f);
+			directionalLight.direction = vec4(directionalLightComponent->direction[0],
+											  directionalLightComponent->direction[1],
+											  directionalLightComponent->direction[2], 0.0f);
+			directionalLight.ambient   = vec4(directionalLightComponent->ambient[0],
+											  directionalLightComponent->ambient[1],
+											  directionalLightComponent->ambient[2], 0.0f);
+			directionalLight.diffuse   = vec4(directionalLightComponent->diffuse[0],
+											  directionalLightComponent->diffuse[1],
+											  directionalLightComponent->diffuse[2], 0.0f);
+			directionalLight.specular  = vec4(directionalLightComponent->specular[0],
+											  directionalLightComponent->specular[1],
+											  directionalLightComponent->specular[2], 0.0f);
 
 			directionalLightUbo.directionalLights[i] = directionalLight;			
 		}

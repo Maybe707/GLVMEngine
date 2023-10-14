@@ -29,6 +29,7 @@ layout(location = 2) out vec2 outFragmentTextureCoordinate;
 
 layout(set = 1, binding = 1) uniform TestDirLightSpaceMatrixUBO {
 	mat4 dirSpaceMatrix[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+	int directionalLightsNumber;
 } dirSpaceMat;
 
 layout(set = 2, binding = 2) uniform SpotLightSpaceMatrixUBO {
@@ -39,10 +40,10 @@ void main() {
 	vs_out.fragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
 	vs_out.normal = transpose(inverse(mat3(ubo.model))) * inNormal;
 	vs_out.textureCoords = inTextureCoordinate;
-	for (int i = 0; i < 1; ++i) 
+	for (int i = 0; i < dirSpaceMat.directionalLightsNumber; ++i) 
 		vs_out.fragmentPositionDirectionalLightSpace[i] = dirSpaceMat.dirSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 	
-	for (int i = 0; i < 1; ++i) 
+	for (int i = 0; i < 2; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 
 //	debugPrintfEXT("X COMPONENT OF POSITION VECTOR: %i", inPosition.x);
