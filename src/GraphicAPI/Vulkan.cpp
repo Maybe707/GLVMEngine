@@ -2342,37 +2342,35 @@ namespace GLVM::core
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		if ( pointLightNumber > 0 ) {
-			VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-			for (size_t i = 0; i < pointLightNumber; ++i) {
+		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+		for (size_t i = 0; i < pointLightNumber; ++i) {
 //			unsigned int textureIndex = i / 2;
-				pointLightsImageInfo[i] = {};
-				pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-				pointLightsImageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
-				pointLightsImageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
-			}
-
-
-			for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-				pointLightsImageInfo[j] = {};
-				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-				pointLightsImageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
-				pointLightsImageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
-			}
-
-			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
-			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-				pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
-				pointLightsDescriptorWrites[m].dstBinding = 11;
-				pointLightsDescriptorWrites[m].dstArrayElement = 0;
-				pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
-				pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
-			}
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
+			pointLightsImageInfo[i] = {};
+			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			pointLightsImageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
+			pointLightsImageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
 		}
+
+
+		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+			pointLightsImageInfo[j] = {};
+			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			pointLightsImageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
+			pointLightsImageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
+		}
+
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
+			pointLightsDescriptorWrites[m].dstBinding = 11;
+			pointLightsDescriptorWrites[m].dstArrayElement = 0;
+			pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
+			pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
 		
 		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 		
@@ -2683,27 +2681,37 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-			imageInfo.imageView = spotLightShadowMapImages[textureIndex].views[0];
-			imageInfo.sampler = spotLightShadowMapImages[textureIndex].sampler;
+		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		for (size_t i = 0; i < directionalLightNumber; ++i) {
+			directionalLightsImageInfo[i] = {};
+			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[i].imageView = directionalLightShadowMapImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightShadowMapImages[i].sampler;
+		}
+//			unsigned int textureIndex = i / 2;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = directionalLightSamperDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 10;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pImageInfo = &imageInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+			directionalLightsImageInfo[j] = {};
+			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[j].imageView = directionalLightShadowMapImages[0].views[0];
+			directionalLightsImageInfo[j].sampler = directionalLightShadowMapImages[0].sampler;
 		}
 
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
+			directionalLightsDescriptorWrites[m].dstBinding = 10;
+			directionalLightsDescriptorWrites[m].dstArrayElement = 0;
+			directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+			directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+		
 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 		
 		VkDescriptorImageInfo imageInfo[POINT_LIGHTS_NUMBER];
@@ -3327,10 +3335,10 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent) {
-        static auto startTime = std::chrono::high_resolution_clock::now();
+        // static auto startTime = std::chrono::high_resolution_clock::now();
 
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+        // auto currentTime = std::chrono::high_resolution_clock::now();
+        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 		
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
@@ -3344,15 +3352,15 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 
-		cm::beholder* beholderComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
+//		cm::beholder* beholderComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
 		
 //		vec3 positionDirectionalLight = directionalLightComponent->position + vec3(std::sin(time), std::cos(time), 0.0);
  
-		directionalLightComponent->position[2] = std::cos(time) * 5;
+//		directionalLightComponent->position[2] = std::cos(time) * 5;
 //		directionalLightComponent->position = vec3(std::sin(time) * 5, 0.0, std::cos(time));
 		vec3 positionVectorLight = directionalLightComponent->position;
-//		vec3 directionVectorLight = directionalLightComponent->direction;
-		vec3 directionVectorLight = -beholderComponent->forward;
+		vec3 directionVectorLight = directionalLightComponent->direction;
+//		vec3 directionVectorLight = -beholderComponent->forward;
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
