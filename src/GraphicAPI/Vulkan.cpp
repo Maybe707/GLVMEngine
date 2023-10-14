@@ -3412,8 +3412,11 @@ namespace GLVM::core
 
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 100.0f;
-		mat4 spotProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
-													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		// mat4 spotProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
+		// 											  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+
+		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
+														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
 		vec3 positionVectorLight  = spotLightComponent->position;
 		vec3 directionVectorLight = spotLightComponent->direction;

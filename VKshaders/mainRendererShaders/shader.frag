@@ -193,31 +193,31 @@ void main()
 	vec3 viewDirection  = normalize(viewPos.viewPosition - fs_in.fragmentPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
-	// for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
-	// 	vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-	// 	float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
+		vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
+		float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
-// 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
-// 		debugPrintfEXT("Quadratic value: %f", pointLights.pointLightsArray[3].quadratic);
+	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
+		debugPrintfEXT("Quadratic value: %f", pointLights.pointLightsArray[3].quadratic);
 		
-// 		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-// 		float shadow = ComputePointShadow(pointLights.pointLightsArray[i],
-// 										  inFragmentPosition, pointLightsCubeShadowMaps[i]);
-// 		result += (1.0 - shadow) * light;
+		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+		float shadow = ComputePointShadow(pointLights.pointLightsArray[i],
+										  inFragmentPosition, pointLightsCubeShadowMaps[i]);
+		result += (1.0 - shadow) * light;
 
-// 		// if (shadow == 1.0)
-// 		// 	result = vec3(0.0, 0.0, 1.0);
-// 		// else
-// 		// 	result = vec3(1.0, 0.0, 0.0);
+		// if (shadow == 1.0)
+		// 	result = vec3(0.0, 0.0, 1.0);
+		// else
+		// 	result = vec3(1.0, 0.0, 0.0);
 		
-// //		result += shadow;
-// 		if(shadow > 0.0)
-// 			shadow = 0.0;
-// 	}
+//		result += shadow;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
 	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
 		vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
