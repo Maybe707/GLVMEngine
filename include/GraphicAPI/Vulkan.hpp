@@ -218,7 +218,8 @@ namespace GLVM::core
 	};
 
 	struct alignas(16) SpotLightSpaceMatrixUBO {
-		mat4 spotSpaceMatrix;
+		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
+		uint32_t spotLightsNumber;
 	};
 	
     struct alignas(16) ModelMatrixUBO {
@@ -542,7 +543,7 @@ namespace GLVM::core
 		std::vector<VkDeviceMemory> dirLightSpaceMatrixMemory;
 		std::vector<VkDescriptorSet> dirLightSpaceMatrixDescriptorSet;
 
-		mat4 spotLightSpaceMatrix;
+		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		std::vector<VkBuffer> spotLightSpaceMatrixBuffer;
 		std::vector<VkDeviceMemory> spotLightSpaceMatrixMemory;
 		std::vector<VkDescriptorSet> spotLightSpaceMatrixDescriptorSet;
@@ -711,7 +712,7 @@ namespace GLVM::core
 		void createShadowMapSyncObjects();
         void createSyncObjects();
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
-		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent);
+		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent, uint32_t currentLight);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);

@@ -34,6 +34,7 @@ layout(set = 1, binding = 1) uniform TestDirLightSpaceMatrixUBO {
 
 layout(set = 2, binding = 2) uniform SpotLightSpaceMatrixUBO {
 	mat4 spotSpaceMatrix[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+	int spotLightsNumber;
 } spotSpaceMat;
 
 void main() {
@@ -43,7 +44,7 @@ void main() {
 	for (int i = 0; i < dirSpaceMat.directionalLightsNumber; ++i) 
 		vs_out.fragmentPositionDirectionalLightSpace[i] = dirSpaceMat.dirSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 	
-	for (int i = 0; i < 2; ++i) 
+	for (int i = 0; i < spotSpaceMat.spotLightsNumber; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 
 //	debugPrintfEXT("X COMPONENT OF POSITION VECTOR: %i", inPosition.x);

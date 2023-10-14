@@ -209,13 +209,25 @@ int main()
 	Entity directionalLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
 	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight1) = { .position = { 0.0f, 3.0f, 2.0f },
-		.direction = { -5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+		.direction = { 5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
 		.specular = {1.0f, 1.0f, 1.0f}};
  	*ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
 		.fScale = 0.2f };
 	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 1;
 	cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
 	*materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
+
+	Entity directionalLight2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight2);
+	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight2) = { .position = { 3.0f, 3.0f, 0.0f },
+		.direction = { 1.0f, -1.0f, -5.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+		.specular = {1.0f, 1.0f, 1.0f}};
+ 	*ComponentManager->GetComponent<cm::transform>(directionalLight2) = { .tPosition = { 3.0f, 3.0f, 0.0f },
+		.fScale = 0.2f };
+	ComponentManager->GetComponent<cm::mesh>(directionalLight2)->id = 1;
+	cm::material* materialDirectionalLight2  = ComponentManager->GetComponent<cm::material>(directionalLight2);
+	*materialDirectionalLight2 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 	
 	Entity cube4 = EntityManager->CreateEntity();
@@ -320,11 +332,11 @@ int main()
 
 	Entity spotLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 0.0f, 0.0f, -5.0f },
-		.direction = { -6.0f, -2.0f, 1.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
+	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 0.0f, 3.0f, 0.0f },
+		.direction = { 1.0f, -5.0f, 5.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
 		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 0.0f, 0.0f, -5.0f }, .fScale = 0.6f };
+	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 0.0f, 3.0f, 0.0f }, .fScale = 0.6f };
 	ComponentManager->GetComponent<cm::mesh>(spotLight1)->id = 2;
 	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
 	*materialSpotLight1 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2 };
