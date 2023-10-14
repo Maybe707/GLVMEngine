@@ -1723,7 +1723,7 @@ namespace GLVM::core
 		}
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
-		spotLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() + spotLightLinkedEntities.GetSize();
+		spotLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() * spotLightLinkedEntities.GetSize();
 		
         shadowMapSpotLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
         shadowMapSpotLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
@@ -3000,6 +3000,7 @@ namespace GLVM::core
 
 			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+			updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent, directionalLightCounter);
 
 			uint32_t actorsNumber = linkedEntities.GetSize();
 			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
@@ -3012,7 +3013,7 @@ namespace GLVM::core
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightComponent, directionalLightCounter);
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);			
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
 				VkDeviceSize offsets[] = {0};
@@ -3070,6 +3071,7 @@ namespace GLVM::core
 
 			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
+			updateSpotLightSpaceMatrixShadowMapUBO(spotLightComponent, spotLightCounter);
 
 			uint32_t actorsNumber = linkedEntities.GetSize();
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
@@ -3082,7 +3084,7 @@ namespace GLVM::core
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightComponent, spotLightCounter);
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
 				// updateDirectionalLightShadowMapMatrixUBO(uboIndex, transformComponent, directionalLightComponent);
 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);			 
@@ -3355,37 +3357,26 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight) {
-//		static uint32_t currentSpaceMatricesWrites = 0;
-        // static auto startTime = std::chrono::high_resolution_clock::now();
-
-        // auto currentTime = std::chrono::high_resolution_clock::now();
-        // float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-		
-		ShadowMapMatrixUBO modelMatrixUBO{};
-
+	void CVulkanRenderer::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent,
+																		uint32_t currentLight) {
 		float nearPlaneFlatShadowMap = 1.5f;
 		float farPlaneFlatShadowMap = 100.0f;
 		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-
-//		cm::beholder* beholderComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
-		
-//		vec3 positionDirectionalLight = directionalLightComponent->position + vec3(std::sin(time), std::cos(time), 0.0);
- 
-//		directionalLightComponent->position[2] = std::cos(time) * 5;
-//		directionalLightComponent->position = vec3(std::sin(time) * 5, 0.0, std::cos(time));
 		vec3 positionVectorLight = directionalLightComponent->position;
 		vec3 directionVectorLight = directionalLightComponent->direction;
-//		vec3 directionVectorLight = -beholderComponent->forward;
+
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
+
+		directionalProjectionMatrixLight[1][1] *= -1;
+		dirLightSpaceMatrix[currentLight] = viewMatrixLight * directionalProjectionMatrixLight;
+	}
+	
+    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight) {
+		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
@@ -3396,10 +3387,8 @@ namespace GLVM::core
         modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
-		directionalProjectionMatrixLight[1][1] *= -1;
-		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * directionalProjectionMatrixLight;
-
-		dirLightSpaceMatrix[currentLight] = modelMatrixUBO.lightSpaceMatrix;  ///<        DELETE CRINGE!!!!!!!!!!
+		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
+		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
@@ -3407,14 +3396,10 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage]);
     }
 
-    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::spotLight* spotLightComponent, uint32_t currentLight) {
-		ShadowMapMatrixUBO modelMatrixUBO{};
-
+	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
+																		uint32_t currentLight) {
 		float nearPlaneFlatShadowMap = 1.0f;
 		float farPlaneFlatShadowMap = 100.0f;
-		// mat4 spotProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
-		// 											  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-
 		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
 														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
@@ -3423,7 +3408,14 @@ namespace GLVM::core
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
-		
+
+		spotProjectionMatrixLight[1][1] *= -1;
+		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
+	}
+	
+    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight) {
+		ShadowMapMatrixUBO modelMatrixUBO{};
+
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
         modelMatrixUBO.model[2][2] = _transformComponent->fScale;
@@ -3433,10 +3425,7 @@ namespace GLVM::core
         modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
-		spotProjectionMatrixLight[1][1] *= -1;
-		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * spotProjectionMatrixLight;
-
-		spotLightSpaceMatrix[currentLight] = modelMatrixUBO.lightSpaceMatrix;
+		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage], 0,
