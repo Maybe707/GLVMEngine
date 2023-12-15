@@ -368,15 +368,15 @@ int main()
 
 	core::Engine* GLVM = core::Engine::GetInstance();
 	GLVM->SetTextureVector(TextureVector);
-	GLVM->SetMesh("../waveFrontObj/cube2.obj");
-	GLVM->SetMesh("../waveFrontObj/CoolArrowNegativeZ.obj");
-//	GLVM->SetMesh("../waveFrontObj/plain5.obj");
-	GLVM->SetMesh("../waveFrontObj/chrismas_tree.obj");
-//	GLVM->SetMesh("../waveFrontObj/shama_final.obj");
-	GLVM->SetMesh("../waveFrontObj/shaman.obj");
-	GLVM->SetMesh("../waveFrontObj/sphere.obj");
+	GLVM->SetMesh("../waveFrontObj/cube.obj");
 	GLVM->SetMesh("../waveFrontObj/cone.obj");
+//	GLVM->SetMesh("../waveFrontObj/plain5.obj");
+	GLVM->SetMesh("../waveFrontObj/ico_sphere.obj");
+//	GLVM->SetMesh("../waveFrontObj/shama_final.obj");
 	GLVM->SetMesh("../waveFrontObj/monkey.obj");
+	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
+	GLVM->SetMesh("../waveFrontObj/torus.obj");
+	GLVM->SetMesh("../waveFrontObj/pipe.obj");
 	GLVM->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake32.gltf");
 	
     ///< Game rendering loop
