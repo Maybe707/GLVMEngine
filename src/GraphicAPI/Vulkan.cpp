@@ -3477,32 +3477,32 @@ namespace GLVM::core
 		switch(layer) {
 		case 0:
 			/// Positive X
-			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f, 0.0f);
+			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 1:
 			/// Negative X
-			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
+			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		case 2:
 			/// Positive Y
-			directionalVectorLight = positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
 			upVector = vec3(0.0f, 0.0f,  -1.0f);
 			break;
 		case 3:
 			/// Negative Y
-			directionalVectorLight = positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
 			upVector = vec3(0.0f, 0.0f,  1.0f);
 			break;
 		case 4:
 			/// Positive Z
-			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 			/// Negative Z
 		case 5:
-			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
 			upVector = vec3(0.0f, 1.0f,  0.0f);
 			break;
 		}
@@ -3517,9 +3517,9 @@ namespace GLVM::core
         modelMatrixUBO.model[1][1] = _transformComponent->fScale;
         modelMatrixUBO.model[2][2] = _transformComponent->fScale;
         modelMatrixUBO.model[3][3] = 1.0;
-        modelMatrixUBO.model[0][3] = -_transformComponent->tPosition[0];
-        modelMatrixUBO.model[1][3] = -_transformComponent->tPosition[1];
-        modelMatrixUBO.model[2][3] = -_transformComponent->tPosition[2];
+        modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
         modelMatrixUBO.model.SelfTensorTranspose();
 
 		projectionMatrixCubeShadowMap[1][1] *= -1;
