@@ -516,79 +516,72 @@ namespace GLVM::core
 		mat4 modelMatrix(1.0f);
 
 		Raycasting();
-		// RaycastringDebug();
-		// coreShaderProgram->Use();
-
-//		unsigned int inverseCounter = 0;
-//		coreShaderProgram->SetMat4("inverseMatrices", 3, inverseMatrices[0]);
-
-		
 		
 		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
 				currentFrame = 0;
 				frameAccumulator = 0.0f;
-//				inverseCounter = 0;
 			}
+		}
 
-			// std::cout << "1 matrix: " << std::endl;
-			// std::cout << jointMatricesAccumulatorShader[0][currentFrame] << std::endl;
-			// std::cout << "2 matrix: " << std::endl;
-			// std::cout << jointMatricesAccumulatorShader[1][currentFrame] << std::endl;
-			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+		// std::cout << "1 matrix: " << std::endl;
+		// std::cout << jointMatricesAccumulatorShader[0][currentFrame] << std::endl;
+		// std::cout << "2 matrix: " << std::endl;
+		// std::cout << jointMatricesAccumulatorShader[1][currentFrame] << std::endl;
+		// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+		// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+		// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
 
-			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+		// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+		// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 
-			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
+		unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
-			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
-				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
+		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
+		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
+			jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
 
 			
-			// mat4 jointMatricesData[5];
-			// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-			// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-			// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-			// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
-			// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
-			// for ( int i = 0; i < 4; ++i )
-			// 	std::cout << jointMatricesData[i] << std::endl;
+		// mat4 jointMatricesData[5];
+		// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+		// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+		// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+		// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+		// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
+		// for ( int i = 0; i < 4; ++i )
+		// 	std::cout << jointMatricesData[i] << std::endl;
 //			++inverseCounter;
 //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
-			coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
-			delete [] jointMatricesData;
-			jointMatricesData = nullptr;
-		} else {
-			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
+		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
+		delete [] jointMatricesData;
+		jointMatricesData = nullptr;
+// 		} else {
+// 			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
+// 			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
+// 			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
 
-			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
+// 			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
+// 			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
 
-			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
+// 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
-			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
-				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
+// 			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
+// 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
+// 				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
 			
-			// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-			// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-			// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-			// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
-			// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
-			// for ( int i = 0; i < 4; ++i )
-			// 	std::cout << jointMatricesData[i] << std::endl;
-//			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
-			coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
-			delete [] jointMatricesData;
-			jointMatricesData = nullptr;
-		}
+// 			// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
+// 			// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
+// 			// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
+// 			// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
+// 			// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
+// 			// for ( int i = 0; i < 4; ++i )
+// 			// 	std::cout << jointMatricesData[i] << std::endl;
+// //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
+// 			coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
+// 			delete [] jointMatricesData;
+// 			jointMatricesData = nullptr;
+// 		}
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = pComponent_Manager->collectLinkedEntities<cm::transform,
@@ -877,13 +870,6 @@ namespace GLVM::core
         pGLBind_Buffer(GL_ELEMENT_ARRAY_BUFFER, iEbo_);
         pGLBuffer_Data(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * _aIndices.size(), _aIndices.data(), GL_STATIC_DRAW);
         
-        // pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)VERTEX_OFFSET);
-        // pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
-		// pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
-		// pGLVertex_Attrib_Pointer(2, TEXTURE_SIZE, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-		// pGLEnable_Vertex_Attrib_Array(2);
-		
 		pGLVertex_Attrib_Pointer(LAYOUT_0, VERTEX_SIZE, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)VERTEX_OFFSET);
         pGLEnable_Vertex_Attrib_Array(LAYOUT_0);
 		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 16 * sizeof(float), (void*)(3 * sizeof(float)));
@@ -943,18 +929,9 @@ namespace GLVM::core
 			parser.ReadFile(pathsGLTF_[m]);
 			parser.Parse();
 
-			// const Core::JsonValue* binaryPath = parser.Search("uri");
-			// std::string binary_path;
-			// if ( binaryPath != nullptr ) {
-			// 	binary_path = *binaryPath->value.string;
-			// 	std::cout << binary_path << std::endl;
-			// }
-
 			Core::JsonValue* gltf = parser.GetRoot();
 			std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
-//			std::cout << binary_path << std::endl;
 			int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
-//			std::cout << binary_path << std::endl;
 			std::ifstream in_stream;
 			in_stream.open("/home/cyberdemon/cyber_code/GLVMEngine/gltf/" + binary_path, std::ios::binary);
  			char* buffer = new char[full_byte_size];
