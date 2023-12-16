@@ -377,11 +377,11 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
 	GLVM->SetMesh("../waveFrontObj/torus.obj");
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
-	GLVM->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/snake32.gltf");
+	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 
