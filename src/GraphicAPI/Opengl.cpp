@@ -516,7 +516,9 @@ namespace GLVM::core
 		mat4 modelMatrix(1.0f);
 
 		Raycasting();
-		
+
+
+		/// Start of animation logic
 		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
 			++currentFrame;
 			if ( currentFrame == frames.GetSize() ) {
@@ -525,63 +527,17 @@ namespace GLVM::core
 			}
 		}
 
-		// std::cout << "1 matrix: " << std::endl;
-		// std::cout << jointMatricesAccumulatorShader[0][currentFrame] << std::endl;
-		// std::cout << "2 matrix: " << std::endl;
-		// std::cout << jointMatricesAccumulatorShader[1][currentFrame] << std::endl;
-		// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-		// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-		// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
-
-		// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-		// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
-
 		unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
 		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
 		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
 			jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
 
-			
-		// mat4 jointMatricesData[5];
-		// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-		// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-		// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-		// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
-		// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
-		// for ( int i = 0; i < 4; ++i )
-		// 	std::cout << jointMatricesData[i] << std::endl;
-//			++inverseCounter;
-//			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
 		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
 		delete [] jointMatricesData;
 		jointMatricesData = nullptr;
-// 		} else {
-// 			// coreShaderProgram->SetMat4("transform0", jointMatricesAccumulatorShader[0][currentFrame]);
-// 			// if ( jointMatricesAccumulatorShader.GetSize() > 1 )
-// 			// 	coreShaderProgram->SetMat4("transform1", jointMatricesAccumulatorShader[1][currentFrame]);
-
-// 			// if ( jointMatricesAccumulatorShader.GetSize() > 2 )
-// 			// 	coreShaderProgram->SetMat4("transform2", jointMatricesAccumulatorShader[2][currentFrame]);
-
-// 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
-			
-// 			mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-// 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
-// 				jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
-			
-// 			// jointMatricesData[0] = jointMatricesPerMesh[0][0][currentFrame];
-// 			// jointMatricesData[1] = jointMatricesPerMesh[0][1][currentFrame];
-// 			// jointMatricesData[2] = jointMatricesPerMesh[0][2][currentFrame];
-// 			// jointMatricesData[3] = jointMatricesPerMesh[0][3][currentFrame];
-// 			// jointMatricesData[4] = jointMatricesPerMesh[0][4][currentFrame];
-// 			// for ( int i = 0; i < 4; ++i )
-// 			// 	std::cout << jointMatricesData[i] << std::endl;
-// //			coreShaderProgram->SetMat4("inverseMatrix", inverseMatrices[inverseCounter]);
-// 			coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
-// 			delete [] jointMatricesData;
-// 			jointMatricesData = nullptr;
-// 		}
+		/// End of animation logic
+		
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = pComponent_Manager->collectLinkedEntities<cm::transform,
