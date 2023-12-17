@@ -1249,8 +1249,6 @@ namespace GLVM::core
 					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
 
-				jointMatricesAccumulatorShader = jointMatricesAccumulator;
-				
 				int maximumJoints     = 4;
 				int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 				

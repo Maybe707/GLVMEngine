@@ -126,7 +126,6 @@ namespace GLVM::core {
 		unsigned int currentFrame = 0;
 		core::vector<unsigned int> baseIndices;
 
-		core::vector<core::vector<mat4>> jointMatricesAccumulatorShader;
 //		core::vector<mat4> inverseMatrices;
 		
 //		core::vector<core::vector<Vector<short, 4>>> jointIndicesPerVertex;

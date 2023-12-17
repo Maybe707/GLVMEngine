@@ -38,15 +38,6 @@ uniform bool reverseNormals;
 
 uniform mat4 jointMatrices[6];
 
-//uniform mat4 inverseMatrices[32];
-uniform mat4 inverseMatrix0;
-uniform mat4 inverseMatrix1;
-uniform mat4 inverseMatrix2;
-
-uniform mat4 transform0;
-uniform mat4 transform1;
-uniform mat4 transform2;
-
 void main()
 {
     // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
