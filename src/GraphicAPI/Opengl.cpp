@@ -1281,8 +1281,6 @@ namespace GLVM::core
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 
-			baseIndices = indices;
-			
 			for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
 				aIndices_[m].push_back(i);
 

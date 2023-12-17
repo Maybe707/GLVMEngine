@@ -124,7 +124,6 @@ namespace GLVM::core {
 		core::vector<float> frames;
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrame = 0;
-		core::vector<unsigned int> baseIndices;
 
 //		core::vector<mat4> inverseMatrices;
 		
