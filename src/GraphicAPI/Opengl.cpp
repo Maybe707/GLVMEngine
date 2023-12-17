@@ -1032,8 +1032,6 @@ namespace GLVM::core
 				for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
 					jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
-				jointIndicesToShader = jointsIndices;
-				
 				unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
 				unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
 				unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
@@ -1041,8 +1039,6 @@ namespace GLVM::core
 
 				for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
 					weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
-
-				weightsToShader = weightsContainer;
 			}
 
 			core::vector<Core::JsonValue> animations = parser.Search("animations");
