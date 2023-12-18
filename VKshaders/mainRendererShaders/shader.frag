@@ -22,7 +22,7 @@ layout(location = 0) in vec3 inFragmentPosition;
 layout(location = 1) in vec3 inFragmentNormal;
 layout(location = 2) in vec2 inFragmentTextureCoordinate;
 
-layout(location = 3) in VS_OUT {
+layout(location = 5) in VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;

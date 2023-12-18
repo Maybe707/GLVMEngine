@@ -26,6 +26,7 @@
 #include "MeshManager.hpp"
 #include "Globals.hpp"
 #include "ToString.hpp"
+#include "JsonParser.hpp"
 
 #ifdef __linux__
 #define VK_USE_PLATFORM_XLIB_KHR
@@ -115,6 +116,8 @@ namespace GLVM::core
         vec3 pos;
         vec3 color;
         vec2 texCoord;
+		vec4 joinIndices;
+		vec4 weights;
 
         static VkVertexInputBindingDescription getBindingDescription() {
             VkVertexInputBindingDescription bindingDescription{};
@@ -125,8 +128,8 @@ namespace GLVM::core
             return bindingDescription;
         }
 
-        static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-            std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
+        static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
 
             attributeDescriptions[0].binding = 0;
             attributeDescriptions[0].location = 0;
@@ -143,6 +146,16 @@ namespace GLVM::core
             attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
             attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
 
+            attributeDescriptions[3].binding = 0;
+            attributeDescriptions[3].location = 3;
+            attributeDescriptions[3].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[3].offset = offsetof(Vertex, joinIndices);
+
+            attributeDescriptions[4].binding = 0;
+            attributeDescriptions[4].location = 4;
+            attributeDescriptions[4].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[4].offset = offsetof(Vertex, weights);
+			
             return attributeDescriptions;
         }
     };
@@ -195,7 +208,7 @@ namespace GLVM::core
 		const char* vertShader = nullptr;
 		const char* fragShader = nullptr;
 		VkVertexInputBindingDescription bindingDescription;
-		std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions;
+		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
 		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
 			if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
@@ -226,6 +239,7 @@ namespace GLVM::core
         mat4 model;
         mat4 view;
         mat4 proj;
+		mat4 jointMatrices[6];
     };
 
 	struct alignas(16) ShadowMapMatrixUBO {
@@ -362,15 +376,15 @@ namespace GLVM::core
 //     };
 
     const std::vector<Vertex> vertices = {
-        {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+        {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
 
-        {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
+        {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
     };
     
 // Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
@@ -390,18 +404,6 @@ namespace GLVM::core
         4, 0, 1
     };
 
-    const std::vector<Vertex> hudVertices = {
-        {{0.1f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{-0.1f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{0.1f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-0.1f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-        {{0.5f, -0.1f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-        {{-0.5f, -0.1f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-        {{0.5f, 0.1f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-        {{-0.5f, 0.1f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-    };
-    
 // Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
 
     const std::vector<uint16_t> hudIndices = {
@@ -423,6 +425,13 @@ namespace GLVM::core
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
         std::vector<std::vector<uint16_t>> aIndices_;
+		std::vector<std::vector<float>> aVertexesTemp_;                   ///< Temp
+		std::vector<std::vector<unsigned int>> aIndicesTemp_;             ///< Temp
+		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
+		core::vector<float> frames;
+		float frameAccumulator = 0.0f;
+		unsigned int currentFrameForRander = 0;
+
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
 

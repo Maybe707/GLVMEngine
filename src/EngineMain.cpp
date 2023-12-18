@@ -113,7 +113,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.0f, 5.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 0.2f };
-    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 1;
+    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 0;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
@@ -131,7 +131,7 @@ int main()
     Entity uiWitch2 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch2);
 //	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
-	ComponentManager->GetComponent<cm::mesh>(uiWitch2)->id = 2;
+	ComponentManager->GetComponent<cm::mesh>(uiWitch2)->id = 0;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
 		= { 0.0f, -5.0f, 0.0f }, .fScale = 0.6f };
 	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
@@ -150,7 +150,7 @@ int main()
 	
 	Entity uiWitch3 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch3);
-	ComponentManager->GetComponent<cm::mesh>(uiWitch3)->id = 2;
+	ComponentManager->GetComponent<cm::mesh>(uiWitch3)->id = 0;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch3) = { .tPosition = { 5.0f, 0.0f, 0.0f }, .fScale = 0.6f };
 	cm::material* materialWitch3  = ComponentManager->GetComponent<cm::material>(uiWitch3);
 	*materialWitch3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
@@ -168,7 +168,7 @@ int main()
 	
 	Entity uiWitch4 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch4);
-	ComponentManager->GetComponent<cm::mesh>(uiWitch4)->id = 1;
+	ComponentManager->GetComponent<cm::mesh>(uiWitch4)->id = 0;
 //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
 	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { -5.0f, 0.0f, 0.0f }, .fScale = 0.2f };
 	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
@@ -201,7 +201,7 @@ int main()
 		.specular = {1.0f, 1.0f, 1.0f}};
  	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 0.0f, 0.0f, 0.0f },
 		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 1;
+	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
 	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
 	*materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -213,7 +213,7 @@ int main()
 		.specular = {1.0f, 1.0f, 1.0f}};
  	*ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
 		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 1;
+	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 0;
 	cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
 	*materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -337,7 +337,7 @@ int main()
 		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 0.0f, 3.0f, -10.0f }, .fScale = 1.0f };
-	ComponentManager->GetComponent<cm::mesh>(spotLight1)->id = 6;
+	ComponentManager->GetComponent<cm::mesh>(spotLight1)->id = 0;
 	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
 	*materialSpotLight1 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2 };
 
@@ -348,7 +348,7 @@ int main()
 		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(spotLight2) = { .tPosition = { 0.0f, 3.0f, 10.0f }, .fScale = 1.0f };
-	ComponentManager->GetComponent<cm::mesh>(spotLight2)->id = 6;
+	ComponentManager->GetComponent<cm::mesh>(spotLight2)->id = 0;
 	cm::material* materialSpotLight2   = ComponentManager->GetComponent<cm::material>(spotLight2);
 	*materialSpotLight2 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2 };
 	
@@ -380,8 +380,8 @@ int main()
 	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 	
     ///< Game rendering loop
-	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

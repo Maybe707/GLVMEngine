@@ -9,9 +9,10 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
+	mat4 jointMatrices[6];
 } ubo;
 
-layout(location = 3) out VS_OUT {
+layout(location = 5) out VS_OUT {
 	vec3 fragmentPosition;
 	vec3 normal;
 	vec2 textureCoords;
@@ -22,6 +23,8 @@ layout(location = 3) out VS_OUT {
 layout(location = 0) in vec3 inPosition;
 layout(location = 1) in vec3 inNormal;
 layout(location = 2) in vec2 inTextureCoordinate;
+layout(location = 3) in vec4 inJointIndices;
+layout(location = 4) in vec4 inWeights;
 
 layout(location = 0) out vec3 outFragmentPosition;
 layout(location = 1) out vec3 outFragmentNormal;
@@ -47,9 +50,15 @@ void main() {
 	for (int i = 0; i < spotSpaceMat.spotLightsNumber; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 
-//	debugPrintfEXT("X COMPONENT OF POSITION VECTOR: %i", inPosition.x);
+	mat4 skinMatrix =
+		inWeights.x * ubo.jointMatrices[int(inJointIndices.x)] +
+		inWeights.y * ubo.jointMatrices[int(inJointIndices.y)] +
+		inWeights.z * ubo.jointMatrices[int(inJointIndices.z)] +
+		inWeights.w * ubo.jointMatrices[int(inJointIndices.w)];
+
+	vec4 worldPosition = skinMatrix * vec4(inPosition, 1.0);
 	
-    gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+    gl_Position = ubo.proj * ubo.view * ubo.model * worldPosition;
 	outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     outFragmentNormal = inNormal;
     outFragmentTextureCoordinate = inTextureCoordinate;

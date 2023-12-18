@@ -530,8 +530,11 @@ namespace GLVM::core
 		unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
 			
 		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i )
+		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 			jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
+//			std::cout << jointMatricesData[i] << std::endl;
+//			std::cout << jointMatricesPerMesh[0][i][currentFrame] << std::endl;
+		}
 
 		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
 		delete [] jointMatricesData;
@@ -545,7 +548,7 @@ namespace GLVM::core
 																							 cm::transform>();
 
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();			
-		std::cout << linkedEntitiesVectorSize << std::endl;
+
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			unsigned int uiEntity_refTexture = linkedEntities[i];
 //			cm::texture* texture = componentManager->GetComponent<cm::texture>(uiEntity_refTexture);
@@ -1460,7 +1463,16 @@ namespace GLVM::core
 //		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		
 //		loadWavefrontObj();
-		LoadGLTF();
+//		LoadGLTF();
+
+		Core::CJsonParser jsonParser;
+		jsonParser.LoadGLTF(pathsGLTF_, aVertexes_, aIndices_, jointMatricesPerMesh, frames);
+		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
+		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
+		
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			SetVertices(aIndices_[m], aVertexes_[m]);
+		}
 	}
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
