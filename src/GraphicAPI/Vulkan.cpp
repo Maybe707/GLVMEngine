@@ -120,9 +120,6 @@ namespace GLVM::core
         }
     }
 
-	void CVulkanRenderer::LoadGLTF() {
-	}
-
 	void CVulkanRenderer::EnlargeFrameAccumulator([[maybe_unused]] float value) {
 		frameAccumulator += value;
 	}

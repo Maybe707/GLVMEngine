@@ -166,7 +166,6 @@ namespace GLVM::core {
 		void SetVertices(std::vector<unsigned int>& _aIndices,
 						 std::vector<float>& _aVertices);
 		void loadWavefrontObj() override;
-		void LoadGLTF() override;
 		void EnlargeFrameAccumulator(float value) override;
 		void SetTextureData(std::vector<ecs::Texture>& _texture_data) override;
 		void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF_) override;
