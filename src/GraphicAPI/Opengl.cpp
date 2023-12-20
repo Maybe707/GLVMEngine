@@ -1012,8 +1012,13 @@ namespace GLVM::core
 //		loadWavefrontObj();
 //		LoadGLTF();
 
-		Core::CJsonParser jsonParser;
-		jsonParser.LoadGLTF(pathsGLTF_, aVertexes_, aIndices_, jointMatricesPerMesh, frames);
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			Core::CJsonParser jsonParser;
+			aVertexes_.emplace_back();
+			aIndices_.emplace_back();
+			jointMatricesPerMesh.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames);
+		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
 		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
 		

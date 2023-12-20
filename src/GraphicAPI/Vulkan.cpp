@@ -382,10 +382,15 @@ namespace GLVM::core
 // }
 
     void CVulkanRenderer::initVulkan() {
-		Core::CJsonParser jsonParser;
-		jsonParser.LoadGLTF(pathsGLTF_, aVertexesTemp_, aIndicesTemp_, jointMatricesPerMesh, frames);
-		for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-			std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			Core::CJsonParser jsonParser;
+			aVertexesTemp_.emplace_back();
+			aIndicesTemp_.emplace_back();
+			jointMatricesPerMesh.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames);
+		}
+		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
+		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
 		
         createInstance();
         setupDebugMessenger();

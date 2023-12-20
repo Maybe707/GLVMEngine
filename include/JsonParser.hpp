@@ -252,10 +252,10 @@ namespace GLVM::Core
 		int ParseInteger(core::vector<char> _word);
 		double ParseFloating(core::vector<char> _word);
 		core::vector<JsonValue> Search(const char* key_) const;
-		void LoadGLTF(core::vector<const char*>& pathsGLTF_,
-					  std::vector<std::vector<float>>& aVertexes_,
-					  std::vector<std::vector<unsigned int>>& aIndices_,
-					  core::vector<core::vector<core::vector<mat4>>>& jointMatricesPerMesh,
+		void LoadGLTF(const char* pathsGLTF_,
+					  std::vector<float>& aVertexes_,
+					  std::vector<unsigned int>& aIndices_,
+					  core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 					  core::vector<float>& frames);
     };
 }
