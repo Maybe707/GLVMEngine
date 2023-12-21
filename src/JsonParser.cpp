@@ -748,13 +748,6 @@ namespace GLVM::Core
 						rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
 					}
 
-					mat4 transformTest(0.0f);
-					transformTest[0][0] = 0.0f;
-					transformTest[0][1] = -1.0f;
-					transformTest[1][0] = 1.0f;
-					transformTest[2][2] = 1.0f;
-					transformTest[3][3] = 1.0f;
-
 					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
 				}
 
