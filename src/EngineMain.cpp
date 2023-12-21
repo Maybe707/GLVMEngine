@@ -90,7 +90,7 @@ int main()
 	// *ComponentManager->GetComponent<cm::directionalLight>(uiPlayer) = { .position = { 15.7f, 7.5f, 2.0f },
 	// 	.direction = { 0.0f, 1.0f, 3.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
 	// 	.specular = {0.3f, 0.3f, 0.3f}};
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 0.0f, 1.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 0.0f, 30.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
@@ -378,7 +378,7 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/torus.obj");
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
 	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
-	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
+//	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
 	
     ///< Game rendering loop
 //	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);

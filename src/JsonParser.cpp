@@ -401,7 +401,7 @@ namespace GLVM::Core
 							   core::vector<float>& frames) {
 		ReadFile(pathsGLTF_);
 		Parse();
-
+		
 		Core::JsonValue* gltf = GetRoot();
 		std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
 		int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;

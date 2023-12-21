@@ -2,42 +2,90 @@
 ;; --------------------------------------------------------------------------
 ;; Desktop File for Emacs
 ;; --------------------------------------------------------------------------
-;; Created Thu Dec 21 19:12:53 2023
+;; Created Thu Dec 21 21:57:17 2023
 ;; Desktop file format version 208
 ;; Emacs version 29.1
 
 ;; Global section:
-(setq desktop-saved-frameset [frameset 1 (25988 4005 793188 8000) (desktop . "208") "cyberdemon@cybercore" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-JB-JetBrainsMono Nerd Font-regular-normal-normal-*-16-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#bbc2cf") (background-color . "#282c34") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tab-bar-lines . 1) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 20) (scroll-bar-height) (alpha) (alpha-background) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . icon) (use-frame-synchronization) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#51afef") (font-parameter) (environment) (dnd-root-window-position) (last-focus-update) (tabs (tab (name . "JsonParser.cpp") (explicit-name) (time . 1703153529.3708794) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2048) (pixel-height . 1343) (total-width . 204) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "JsonParser.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 31565) (start . 30028)) (prev-buffers ("ParsingSystem.cpp" 1 1) ("*dashboard*" 1 409) ("*scratch*" 1 1)))) (current-tab (name . "ParsingSystem.cpp") (explicit-name)) (tab (name . "ParsingSystem.cpp") (explicit-name) (time . 1703152996.9745688) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2532) (pixel-height . 1343) (total-width . 253) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "ParsingSystem.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1) (start . 1)))) (tab (name . "ParsingSystem.cpp") (explicit-name) (time . 1703152996.7905235) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2532) (pixel-height . 1343) (total-width . 253) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "ParsingSystem.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1) (start . 1)))) (tab (name . "ParsingSystem.cpp") (explicit-name) (time . 1703152996.5905786) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2532) (pixel-height . 1343) (total-width . 253) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "ParsingSystem.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1) (start . 1))))) (lsp-ui-doc-buffer . "Unprintable entity") (frameset--id . "C395-35CE-7E2E-EAE7") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (height . 62) (width . 203) (left . 496) (top . 40)) ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2048) (pixel-height . 1343) (total-width . 204) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "ParsingSystem.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1) (start . 1))))])
+(setq desktop-saved-frameset [frameset 1 (25988 13869 131516 981000) (desktop . "208") "cyberdemon@cybercore" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-JB-JetBrainsMono Nerd Font-regular-normal-normal-*-16-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#bbc2cf") (background-color . "#282c34") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tab-bar-lines . 1) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 20) (scroll-bar-height) (alpha) (alpha-background) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (use-frame-synchronization) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#51afef") (font-parameter) (environment) (dnd-root-window-position) (last-focus-update . t) (tabs (current-tab (name . "Vulkan.cpp") (explicit-name)) (tab (name . "Vulkan.hpp") (explicit-name) (time . 1703163307.7442882) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1988) (pixel-height . 1343) (total-width . 199) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 27736) (start . 25265)) (prev-buffers ("Vulkan.cpp" 17819 19735) ("Vulkan.hpp" 12270 13103) ("shader.vert" 1 298) ("*Messages*" 1 6158)))) (tab (name . "EngineMain.cpp") (explicit-name) (time . 1703163307.5586686) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1988) (pixel-height . 1343) (total-width . 198) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "EngineMain.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 25896) (start . 23175)) (prev-buffers ("*dashboard*" 1 458) ("JsonParser.cpp" 18322 20673)))) (tab (name . "JsonParser.cpp") (explicit-name) (time . 1703163307.3826575) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1988) (pixel-height . 1343) (total-width . 199) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "JsonParser.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 12780) (start . 12131)) (prev-buffers ("JsonParser.cpp" 12131 12780) ("EngineMain.cpp" 3244 5332) ("shader.vert" 1 298)))) (tab (name . "shader.vert") (explicit-name) (time . 1703155290.6802204) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 2) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 44) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1988) (pixel-height . 1343) (total-width . 199) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "shader.vert" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 267) (start . 1)) (prev-buffers ("shader.vert" 1 298))))) (lsp-ui-doc-buffer . "Unprintable entity") (frameset--id . "C395-35CE-7E2E-EAE7") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (height . 62) (width . 197) (left . 556) (top . 40)) ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1988) (pixel-height . 1343) (total-width . 199) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 19520) (start . 17755)) (prev-buffers ("Vulkan.cpp" 17755 19520) ("Vulkan.hpp" 12321 13288) ("shader.vert" 1 298) ("*Messages*" 1 6577))))])
 (setq desktop-missing-file-warning nil)
 (setq tags-file-name nil)
 (setq tags-table-list nil)
 (setq search-ring nil)
 (setq regexp-search-ring nil)
 (setq register-alist nil)
-(setq file-name-history '("~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/" "~/cyber_code/GLVMEngine/src/Systems/ParsingSystem.cpp" "~/cyber_code/GLVMEngine/src/WavefrontObjParser.cpp" "~/cyber_code/GLVMEngine/GLshaders/CoreShader.frag" "/usr/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/include/VertexMath.hpp" "~/cyber_code/GLVMEngine/include/IRenderer.hpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/include/WavefrontObjParser.hpp" "~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/include/Engine.hpp" "~/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.frag" "~/cyber_code/GLVMEngine/VKshaders/cubeShadowMapShaders/cubeShadowMap.vert" "~/cyber_code/GLVMEngine/VKshaders/flatShadowMapShaders/flatShadowMap.vert" "~/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.vert" "~/cyber_code/GLVMEngine/GLshaders/CoreShader.vert" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Opengl.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/JsonParser.hpp"))
+(setq file-name-history '("~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.vert" "~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/" "~/cyber_code/GLVMEngine/src/Systems/ParsingSystem.cpp" "~/cyber_code/GLVMEngine/src/WavefrontObjParser.cpp" "~/cyber_code/GLVMEngine/GLshaders/CoreShader.frag" "/usr/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/include/VertexMath.hpp" "~/cyber_code/GLVMEngine/include/IRenderer.hpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/include/WavefrontObjParser.hpp" "~/cyber_code/GLVMEngine/src/JsonParser.cpp" "~/cyber_code/GLVMEngine/include/Engine.hpp" "~/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.frag" "~/cyber_code/GLVMEngine/VKshaders/cubeShadowMapShaders/cubeShadowMap.vert" "~/cyber_code/GLVMEngine/VKshaders/flatShadowMapShaders/flatShadowMap.vert" "~/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.vert" "~/cyber_code/GLVMEngine/GLshaders/CoreShader.vert" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Opengl.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/JsonParser.hpp"))
 
 ;; Buffer section -- buffers listed in same order as in buffer list:
 (desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/src/Systems/ParsingSystem.cpp"
-  "ParsingSystem.cpp"
+  "/home/cyberdemon/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp"
+  "Vulkan.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode auto-revert-mode display-line-numbers-mode hl-todo-mode lsp-mode font-lock-mode)
-  1
-  '(19810 nil)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  19520
+  '(19639 nil)
   nil
   nil
-  '((buffer-display-time 25988 3510 673448 441000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (1))))
+  '((buffer-display-time 25988 13831 441667 549000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (19491 19136 14992 4845 4824 3342 1 148649 148629 177506 16324 16459 14992 162519 176672 176680))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp"
+  "Vulkan.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  13288
+  '(27717 nil)
+  nil
+  nil
+  '((buffer-display-time 25988 13770 623440 908000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (25832))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/src/EngineMain.cpp"
+  "EngineMain.cpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  25896
+  '(25427 nil)
+  nil
+  nil
+  '((buffer-display-time 25988 13604 963935 294000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (5227 22111 1))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/JsonParser.cpp"
   "JsonParser.cpp"
   'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  12780
+  '(20673 nil)
+  nil
+  nil
+  '((buffer-display-time 25988 13729 710185 529000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (20614 20614 1 2140 27489 28989 1 28643 28989 12715 1 20614))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/Components/VertexComponent.hpp"
+  "VertexComponent.hpp"
+  'c++-mode
   '(font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode company-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode lsp-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode eldoc-mode lsp-managed-mode tree-sitter-mode tree-sitter-hl-mode)
-  31565
-  '(1 nil)
+  204
+  '(nil nil)
   nil
   nil
-  '((buffer-display-time 25988 3917 175864 334000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (2140 27487 28987 1 28641 28987 12715 1))))
+  '((buffer-display-time 25988 12525 447729 508000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/VKshaders/mainRendererShaders/shader.vert"
+  "shader.vert"
+  'glsl-mode
+  '(tree-sitter-mode tree-sitter-hl-mode company-mode auto-revert-mode flycheck-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  298
+  '(nil nil)
+  nil
+  nil
+  '((buffer-display-time 25988 12567 677770 948000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
 

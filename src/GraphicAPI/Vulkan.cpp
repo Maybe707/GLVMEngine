@@ -386,8 +386,9 @@ namespace GLVM::core
 			Core::CJsonParser jsonParser;
 			aVertexesTemp_.emplace_back();
 			aIndicesTemp_.emplace_back();
+			frames.Push({});
 			jointMatricesPerMesh.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames);
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
 		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
 		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
@@ -463,7 +464,7 @@ namespace GLVM::core
 
 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
 			}
-			
+
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
@@ -3334,7 +3335,7 @@ namespace GLVM::core
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent);
+			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
 			updateDirSpaceMatrix(currentFrame);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 1, 1, &dirLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
@@ -3607,7 +3608,7 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage]);
 	}
 	
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent) {
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID) {
         ModelMatrixUBO modelMatrixUBO{};
 
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
@@ -3623,20 +3624,20 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		if ( frameAccumulator >= frames[currentFrameForRander] * 10.0f ) {
+		if ( frameAccumulator >= frames[meshID][currentFrameForRander] * 10.0f ) {
 			++currentFrameForRander;
-			if ( currentFrameForRander == frames.GetSize() ) {
+			if ( currentFrameForRander == frames[meshID].GetSize() ) {
 				currentFrameForRander = 0;
 				frameAccumulator = 0.0f;
 			}
 		}
 
-		unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
+		unsigned int joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
 			
 		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
 		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 //			std::cout << jointMatricesPerMesh[0][i][1] << std::endl;
-			jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrameForRander];
+			jointMatricesData[i] = jointMatricesPerMesh[meshID][i][currentFrameForRander];
 		}
 
 		for ( unsigned int j = 0; j < 6; ++j ) {

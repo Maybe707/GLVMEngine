@@ -428,7 +428,7 @@ namespace GLVM::core
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< Temp
 		std::vector<std::vector<unsigned int>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
-		core::vector<float> frames;
+		core::vector<core::vector<float>> frames;
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrameForRander = 0;
 
@@ -726,7 +726,7 @@ namespace GLVM::core
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
-        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent);
+        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
