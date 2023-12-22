@@ -388,6 +388,7 @@ namespace GLVM::core
 			aIndicesTemp_.emplace_back();
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
+//			std::cout << "TEST" << std::endl;
 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
 		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
@@ -453,7 +454,7 @@ namespace GLVM::core
 				weights[1] = aVertexesTemp_[m][n + 13];
 				weights[2] = aVertexesTemp_[m][n + 14];
 				weights[3] = aVertexesTemp_[m][n + 15];
-				
+
 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
@@ -3633,14 +3634,15 @@ namespace GLVM::core
 		}
 
 		unsigned int joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-			
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
 		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[0][i][1] << std::endl;
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 			jointMatricesData[i] = jointMatricesPerMesh[meshID][i][currentFrameForRander];
 		}
 
 		for ( unsigned int j = 0; j < 6; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}

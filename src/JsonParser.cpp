@@ -755,9 +755,9 @@ namespace GLVM::Core
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
 
-			int maximumJoints     = 4;
+			int maximumJoints     = 6;
 			int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
-				
+
 			if ( unitMatricesSize > 0 ) {
 				for ( int i = 0; i < unitMatricesSize; ++i) {
 					core::vector<mat4>  globalAllFrameNodeMatrix;
@@ -771,14 +771,14 @@ namespace GLVM::Core
 			}
 
 		} else {
-			unsigned int maximumJoints = 4;
+			unsigned int maximumJoints = 6;
 			for ( unsigned int i = 0; i < maximumJoints; ++i) {
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 				for ( unsigned int j = 0; j < 1; ++j ) {      ///< If we dont have animations then we have 1 frame
 					mat4 unitMatrix(1.0f);
 					globalAllFrameNodeMatrix.Push(unitMatrix);
 				}
-
+				
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
 		}
