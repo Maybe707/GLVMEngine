@@ -770,17 +770,18 @@ namespace GLVM::Core
 				}
 			}
 
-		} else {
-			unsigned int maximumJoints = 6;
-			for ( unsigned int i = 0; i < maximumJoints; ++i) {
-				core::vector<mat4>  globalAllFrameNodeMatrix;
-				for ( unsigned int j = 0; j < 1; ++j ) {      ///< If we dont have animations then we have 1 frame
-					mat4 unitMatrix(1.0f);
-					globalAllFrameNodeMatrix.Push(unitMatrix);
-				}
+		// } else {
+		// 	unsigned int maximumJoints = 6;
+		// 	for ( unsigned int i = 0; i < maximumJoints; ++i) {
+		// 		core::vector<mat4>  globalAllFrameNodeMatrix;
+		// 		for ( unsigned int j = 0; j < 1; ++j ) {      ///< If we dont have animations then we have 1 frame
+		// 			mat4 unitMatrix(1.0f);
+		// 			globalAllFrameNodeMatrix.Push(unitMatrix);
+		// 		}
 				
-				jointMatrices.Push(globalAllFrameNodeMatrix);
-			}
+		// 		jointMatrices.Push(globalAllFrameNodeMatrix);
+		// 	}
+		// }
 		}
 		jointMatricesPerMesh = jointMatrices;
 

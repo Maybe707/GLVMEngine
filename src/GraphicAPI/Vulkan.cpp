@@ -3627,7 +3627,7 @@ namespace GLVM::core
 		/// Start of animation logic
 		if ( frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
 			++_transformComponent->currentAnimationFrame;
-			if ( frames[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;
 				frameAccumulator = 0.0f;
 			}
@@ -3637,10 +3637,20 @@ namespace GLVM::core
 //		std::cout << frames[meshID][currentFrameForRander] << std::endl;
 		unsigned int joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
-		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[6];
+			for ( unsigned int i = 0; i < 6; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[joinMatricesDataSize];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
-			jointMatricesData[i] = jointMatricesPerMesh[meshID][i][currentFrameForRander];
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
 		}
 
 		for ( unsigned int j = 0; j < 6; ++j ) {
