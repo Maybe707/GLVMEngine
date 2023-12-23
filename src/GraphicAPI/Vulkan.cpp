@@ -3625,14 +3625,16 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		if ( frameAccumulator >= frames[meshID][currentFrameForRander] * 10.0f ) {
-			++currentFrameForRander;
-			if ( currentFrameForRander == frames[meshID].GetSize() ) {
-				currentFrameForRander = 0;
+		if ( frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( frames[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
 				frameAccumulator = 0.0f;
 			}
 		}
-
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
 		unsigned int joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = new mat4[joinMatricesDataSize];

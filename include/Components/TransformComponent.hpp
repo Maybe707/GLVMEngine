@@ -16,6 +16,7 @@ namespace GLVM::ecs::components
         float fScale = 1.0f;
         bool hud = false;
 		float GravityAccumulator = 0.0f;
+		float currentAnimationFrame = 0.0f;
 	};
 }
 
