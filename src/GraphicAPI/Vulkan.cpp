@@ -120,8 +120,20 @@ namespace GLVM::core
         }
     }
 
-	void CVulkanRenderer::EnlargeFrameAccumulator([[maybe_unused]] float value) {
-		frameAccumulator += value;
+	void CVulkanRenderer::EnlargeFrameAccumulator(float value) {
+		namespace cm = GLVM::ecs::components;
+		
+		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			Entity currentEntity                = linkedEntities[i];
+			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
+			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->id;
+
+			if ( jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+				transformComponent->frameAccumulator += value;
+		}
 	}
 	
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
@@ -3623,13 +3635,13 @@ namespace GLVM::core
 
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
-
+		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
 		/// Start of animation logic
-		if ( frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
+		if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
 			++_transformComponent->currentAnimationFrame;
 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;
-				frameAccumulator = 0.0f;
+				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
 //		std::cout << frames.GetSize() << std::endl;

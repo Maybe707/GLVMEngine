@@ -429,8 +429,6 @@ namespace GLVM::core
 		std::vector<std::vector<unsigned int>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
-		float frameAccumulator = 0.0f;
-		unsigned int currentFrameForRander = 0;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
