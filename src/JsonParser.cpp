@@ -743,18 +743,18 @@ namespace GLVM::Core
 					frameRotation.SelfTensorTranspose();
 
 					mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
-//					mat4 globalTransformNodeMatrix = frameRotation * frameScale * frameTranslation;
-					std::cout << "scale matrix" << std::endl;
-					std::cout << frameScale << std::endl;
-					std::cout << std::endl;
+//					mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
+					// std::cout << "scale matrix" << std::endl;
+					// std::cout << frameScale << std::endl;
+					// std::cout << std::endl;
 
-					std::cout << "rotation matrix" << std::endl;
-					std::cout << frameRotation << std::endl;
-					std::cout << std::endl;
+					// std::cout << "rotation matrix" << std::endl;
+					// std::cout << frameRotation << std::endl;
+					// std::cout << std::endl;
 
-					std::cout << "translation matrix" << std::endl;
-					std::cout << frameTranslation << std::endl;
-					std::cout << std::endl;
+					// std::cout << "translation matrix" << std::endl;
+					// std::cout << frameTranslation << std::endl;
+					// std::cout << std::endl;
 					
 					globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
 
@@ -767,20 +767,20 @@ namespace GLVM::Core
 						// std::cout << jointMatricesAccumulator[b][i] << std::endl;
 						// std::cout << std::endl;
 					}
-					std::cout << "inverse matrix" << std::endl;
-					std::cout << inverseBindMatrixSet[j] << std::endl;
-					std::cout << std::endl;
+					// std::cout << "inverse matrix" << std::endl;
+					// std::cout << inverseBindMatrixSet[j] << std::endl;
+					// std::cout << std::endl;
 
-					std::cout << "global matrix" << std::endl;
-					std::cout << globalTransformNodeMatrix << std::endl;
-					std::cout << std::endl;
+					// std::cout << "global matrix" << std::endl;
+					// std::cout << globalTransformNodeMatrix << std::endl;
+					// std::cout << std::endl;
 
-					std::cout << "root matrix" << std::endl;
-					std::cout << rootTransform << std::endl;
-					std::cout << std::endl;
+					// std::cout << "root matrix" << std::endl;
+					// std::cout << rootTransform << std::endl;
+					// std::cout << std::endl;
 					
+//					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
 					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
-//					globalAllFrameNodeMatrix.Push(rootTransform * globalTransformNodeMatrix * inverseBindMatrixSet[j]);
 				}
 
 				jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);

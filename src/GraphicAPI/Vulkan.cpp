@@ -473,6 +473,8 @@ namespace GLVM::core
 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
 										 {weights[0], weights[1], weights[2], weights[3]}});
 
+				
+				
 				unsigned int tempIndex = n / 16;
 
 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
@@ -3637,7 +3639,7 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 //		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
 		/// Start of animation logic
-		if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
+		if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
 			++_transformComponent->currentAnimationFrame;
 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;

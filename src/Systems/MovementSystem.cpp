@@ -37,7 +37,7 @@ namespace GLVM::ecs
 																						cm::beholder,
 																						cm::transform>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-        float cameraSpeed = 10.0f * deltaFrameTime;            
+        float cameraSpeed = 20.0f * deltaFrameTime;            
 
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			// std::cout << "i: " << i << std::endl;

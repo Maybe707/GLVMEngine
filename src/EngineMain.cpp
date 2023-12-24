@@ -377,7 +377,7 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
 	GLVM->SetMesh("../waveFrontObj/torus.obj");
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
-	GLVM->SetMeshGLTF("../gltf/snake_new.gltf");
+	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
 
     ///< Game rendering loop
