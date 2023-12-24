@@ -677,7 +677,7 @@ namespace GLVM::Core
 			for ( unsigned int i = 0; i < scaleSamplerIndices.GetSize(); ++i)
 				scaleInputs.Push(samplers[scaleSamplerIndices[i]]["input"].value.iNumber);
 
-			for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i)
+			for ( unsigned int i = 0; i < scaleSamplerIndices.GetSize(); ++i)
 				scaleOutputs.Push(samplers[scaleSamplerIndices[i]]["output"].value.iNumber);
 
 			core::vector<core::vector<float>> frameInputsScale;
@@ -718,7 +718,9 @@ namespace GLVM::Core
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
-				core::vector<float> boneAllFrameScales       = scales[j];
+				core::vector<float> boneAllFrameScales;
+				if ( scales.GetSize() > 0 )
+					boneAllFrameScales       = scales[j];
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;    ///< Delete this sheet!
 				for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); ++i ) {
@@ -726,6 +728,7 @@ namespace GLVM::Core
 					mat4 frameScale(1.0f);
 					for ( unsigned int q = 0; q < 3; ++q ) {
 						frameTranslation[3][q] = boneAllFrameTranslations[i * 3 + q];
+						if ( scales.GetSize() > 0 )
 						frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
 					}
 
