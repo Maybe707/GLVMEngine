@@ -91,23 +91,36 @@ namespace GLVM::core
             aIndices_.emplace_back();
             aVertices_.emplace_back();
             
-            // unsigned int vertexIndex  = 0;
-            // unsigned int textureIndex = 0;
-			// unsigned int normalIndex  = 0;
+            unsigned int vertexIndex  = 0;
+            unsigned int textureIndex = 0;
+			unsigned int normalIndex  = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
 
             for (unsigned int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
-//                    vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
+                    vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
 					aIndices_[m].push_back(i * 3 + j);
-                    // SVertex vertex  = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
-                    // textureIndex    = wavefrontObjParser->getFaces()[i][1][j] - 1;
-                    // SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
-					// normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
-					// SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
-                    // aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
-					// 						 {normal[0], normal[1], normal[2]},
-					// 						 {texture[0], texture[1]}});
+                    SVertex vertex  = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                    textureIndex    = wavefrontObjParser->getFaces()[i][1][j] - 1;
+                    SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
+					normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
+					SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
+
+					SVertex jointIndices;
+					jointIndices[0] = -1;
+					jointIndices[1] = -1;
+					jointIndices[2] = -1;
+
+					SVertex weights;
+					weights[0] = 0.0f;
+					weights[1] = 0.0f;
+					weights[2] = 0.0f;
+					
+                    aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
+											 {normal[0], normal[1], normal[2]},
+											 {texture[0], texture[1]},
+											 {jointIndices[0], jointIndices[1], jointIndices[2]},
+											 {weights[0], weights[1], weights[2]}});
                 }
 			
             vertexBufferContainer.emplace_back();
@@ -131,7 +144,7 @@ namespace GLVM::core
 			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
 			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->id;
 
-			if ( jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[mesh_id].GetSize() > 0 )
 				transformComponent->frameAccumulator += value;
 		}
 	}
@@ -394,15 +407,15 @@ namespace GLVM::core
 // }
 
     void CVulkanRenderer::initVulkan() {
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-			Core::CJsonParser jsonParser;
-			aVertexesTemp_.emplace_back();
-			aIndicesTemp_.emplace_back();
-			frames.Push({});
-			jointMatricesPerMesh.Push({});
-//			std::cout << "TEST" << std::endl;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
-		}
+// 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+// 			Core::CJsonParser jsonParser;
+// 			aVertexesTemp_.emplace_back();
+// 			aIndicesTemp_.emplace_back();
+// 			frames.Push({});
+// 			jointMatricesPerMesh.Push({});
+// //			std::cout << "TEST" << std::endl;
+// 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
+// 		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
 		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
 		
@@ -439,56 +452,57 @@ namespace GLVM::core
 		createPointLightShadowMapTextureSamplers();
 //        loadWavefrontObj();
 
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-            aIndices_.emplace_back();
-            aVertices_.emplace_back();
+// 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+//             aIndices_.emplace_back();
+//             aVertices_.emplace_back();
 			
-			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
-//				std::cout << "number of inner data: " << aVertexesTemp_[m].size() << std::endl;
-				SVertex vertex;
-				vertex[0] = aVertexesTemp_[m][n];
-			    vertex[1] = aVertexesTemp_[m][n + 1];
-				vertex[2] = aVertexesTemp_[m][n + 2];
-				SVertex normal;
-				normal[0] = aVertexesTemp_[m][n + 3];
-				normal[1] = aVertexesTemp_[m][n + 4];
-				normal[2] = aVertexesTemp_[m][n + 5];
-				SVertex texture;
-				texture[0] = aVertexesTemp_[m][n + 6];
-				texture[1] = aVertexesTemp_[m][n + 7];
-				vec4 joinIndices;
-				joinIndices[0] = aVertexesTemp_[m][n + 8];
-				joinIndices[1] = aVertexesTemp_[m][n + 9];
-				joinIndices[2] = aVertexesTemp_[m][n + 10];
-				joinIndices[3] = aVertexesTemp_[m][n + 11];
-				vec4 weights;
-				weights[0] = aVertexesTemp_[m][n + 12];
-				weights[1] = aVertexesTemp_[m][n + 13];
-				weights[2] = aVertexesTemp_[m][n + 14];
-				weights[3] = aVertexesTemp_[m][n + 15];
+// 			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
+// //				std::cout << "number of inner data: " << aVertexesTemp_[m].size() << std::endl;
+// 				SVertex vertex;
+// 				vertex[0] = aVertexesTemp_[m][n];
+// 			    vertex[1] = aVertexesTemp_[m][n + 1];
+// 				vertex[2] = aVertexesTemp_[m][n + 2];
+// 				SVertex normal;
+// 				normal[0] = aVertexesTemp_[m][n + 3];
+// 				normal[1] = aVertexesTemp_[m][n + 4];
+// 				normal[2] = aVertexesTemp_[m][n + 5];
+// 				SVertex texture;
+// 				texture[0] = aVertexesTemp_[m][n + 6];
+// 				texture[1] = aVertexesTemp_[m][n + 7];
+// 				vec4 joinIndices;
+// 				joinIndices[0] = aVertexesTemp_[m][n + 8];
+// 				joinIndices[1] = aVertexesTemp_[m][n + 9];
+// 				joinIndices[2] = aVertexesTemp_[m][n + 10];
+// 				joinIndices[3] = aVertexesTemp_[m][n + 11];
+// 				vec4 weights;
+// 				weights[0] = aVertexesTemp_[m][n + 12];
+// 				weights[1] = aVertexesTemp_[m][n + 13];
+// 				weights[2] = aVertexesTemp_[m][n + 14];
+// 				weights[3] = aVertexesTemp_[m][n + 15];
 
-				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
-										 {normal[0], normal[1], normal[2]},
-										 {texture[0], texture[1]},
-										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-										 {weights[0], weights[1], weights[2], weights[3]}});
+// 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
+// 										 {normal[0], normal[1], normal[2]},
+// 										 {texture[0], texture[1]},
+// 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
+// 										 {weights[0], weights[1], weights[2], weights[3]}});
 
 				
 				
-				unsigned int tempIndex = n / 16;
+// 				unsigned int tempIndex = n / 16;
 
-				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
-			}
+// 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
+// 			}
 
-            vertexBufferContainer.emplace_back();
-            vertexBufferMemoryContainer.emplace_back();
-            createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
+//             vertexBufferContainer.emplace_back();
+//             vertexBufferMemoryContainer.emplace_back();
+//             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
 
-            indexBufferContainer.emplace_back();
-            indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
-		}
+//             indexBufferContainer.emplace_back();
+//             indexBufferMemoryContaner.emplace_back();
+//             createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+// 		}
 
+		loadWavefrontObj();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
@@ -3639,7 +3653,8 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 //		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
 		/// Start of animation logic
-		if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
 			++_transformComponent->currentAnimationFrame;
 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;
@@ -3649,7 +3664,9 @@ namespace GLVM::core
 //		std::cout << frames.GetSize() << std::endl;
 //		std::cout << frames[meshID].GetSize() << std::endl;
 //		std::cout << frames[meshID][currentFrameForRander] << std::endl;
-		unsigned int joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {

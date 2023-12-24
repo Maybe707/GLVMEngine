@@ -50,11 +50,21 @@ void main() {
 	for (int i = 0; i < spotSpaceMat.spotLightsNumber; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * vec4(vs_out.fragmentPosition, 1.0);
 
-	mat4 skinMatrix =
-		inWeights.x * ubo.jointMatrices[int(inJointIndices.x)] +
-		inWeights.y * ubo.jointMatrices[int(inJointIndices.y)] +
-		inWeights.z * ubo.jointMatrices[int(inJointIndices.z)] +
-		inWeights.w * ubo.jointMatrices[int(inJointIndices.w)];
+	mat4 skinMatrix;
+	if (int(inJointIndices.x) != -1) {
+		skinMatrix =
+			inWeights.x * ubo.jointMatrices[int(inJointIndices.x)] +
+			inWeights.y * ubo.jointMatrices[int(inJointIndices.y)] +
+			inWeights.z * ubo.jointMatrices[int(inJointIndices.z)] +
+			inWeights.w * ubo.jointMatrices[int(inJointIndices.w)];
+	} else {
+		skinMatrix = mat4(
+			1.0, 0.0, 0.0, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			0.0, 0.0, 0.0, 1.0
+			);
+	}
 
 	vec4 worldPosition = skinMatrix * vec4(inPosition, 1.0);
 	
