@@ -90,7 +90,7 @@ int main()
 	// *ComponentManager->GetComponent<cm::directionalLight>(uiPlayer) = { .position = { 15.7f, 7.5f, 2.0f },
 	// 	.direction = { 0.0f, 1.0f, 3.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
 	// 	.specular = {0.3f, 0.3f, 0.3f}};
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 0.0f, 150.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 0.0f, 15.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
@@ -118,71 +118,71 @@ int main()
 	*materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
 
- 	Entity cube0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);
-//	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
-	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 0.0f, 18.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->id = 0;
-	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
-	*materialCube0  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
+//  	Entity cube0 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);
+// //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
+// 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 0.0f, 18.0f, 0.0f },
+// 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
+//     ComponentManager->GetComponent<cm::mesh>(cube0)->id = 0;
+// 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
+// 	*materialCube0  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
+// 		.shininess = 128.0f * 0.078125f };
 	
-    Entity uiWitch2 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch2);
-//	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
-	ComponentManager->GetComponent<cm::mesh>(uiWitch2)->id = 0;
-	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
-		= { 0.0f, -5.0f, 0.0f }, .fScale = 0.6f };
-	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
-	*materialWitch2 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+//     Entity uiWitch2 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch2);
+// //	ComponentManager->GetComponent<cm::texture>(uiWitch2)->id = 0;
+// 	ComponentManager->GetComponent<cm::mesh>(uiWitch2)->id = 0;
+// 	*ComponentManager->GetComponent<cm::transform>(uiWitch2) = { .tPosition
+// 		= { 0.0f, -5.0f, 0.0f }, .fScale = 0.6f };
+// 	cm::material* materialWitch2  = ComponentManager->GetComponent<cm::material>(uiWitch2);
+// 	*materialWitch2 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+// 		.shininess = 128.0f * 0.078125f };
 
- 	Entity cube1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube1);
-//	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
-	*ComponentManager->GetComponent<cm::transform>(cube1) = { .tPosition = { 0.0f, -18.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube1)->id = 0;
-	cm::material* materialCube1  = ComponentManager->GetComponent<cm::material>(cube1);
-	*materialCube1  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
+//  	Entity cube1 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube1);
+// //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
+// 	*ComponentManager->GetComponent<cm::transform>(cube1) = { .tPosition = { 0.0f, -18.0f, 0.0f },
+// 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
+//     ComponentManager->GetComponent<cm::mesh>(cube1)->id = 0;
+// 	cm::material* materialCube1  = ComponentManager->GetComponent<cm::material>(cube1);
+// 	*materialCube1  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
+// 		.shininess = 128.0f * 0.078125f };
 	
-	Entity uiWitch3 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch3);
-	ComponentManager->GetComponent<cm::mesh>(uiWitch3)->id = 0;
-	*ComponentManager->GetComponent<cm::transform>(uiWitch3) = { .tPosition = { 5.0f, 0.0f, 0.0f }, .fScale = 0.6f };
-	cm::material* materialWitch3  = ComponentManager->GetComponent<cm::material>(uiWitch3);
-	*materialWitch3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+// 	Entity uiWitch3 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch3);
+// 	ComponentManager->GetComponent<cm::mesh>(uiWitch3)->id = 0;
+// 	*ComponentManager->GetComponent<cm::transform>(uiWitch3) = { .tPosition = { 5.0f, 0.0f, 0.0f }, .fScale = 0.6f };
+// 	cm::material* materialWitch3  = ComponentManager->GetComponent<cm::material>(uiWitch3);
+// 	*materialWitch3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+// 		.shininess = 128.0f * 0.078125f };
 
- 	Entity cube2 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube2);
-//	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
-	*ComponentManager->GetComponent<cm::transform>(cube2) = { .tPosition = { 18.0f, 0.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube2)->id = 0;
-	cm::material* materialCube2  = ComponentManager->GetComponent<cm::material>(cube2);
-	*materialCube2  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
+//  	Entity cube2 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube2);
+// //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
+// 	*ComponentManager->GetComponent<cm::transform>(cube2) = { .tPosition = { 18.0f, 0.0f, 0.0f },
+// 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
+//     ComponentManager->GetComponent<cm::mesh>(cube2)->id = 0;
+// 	cm::material* materialCube2  = ComponentManager->GetComponent<cm::material>(cube2);
+// 	*materialCube2  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
+// 		.shininess = 128.0f * 0.078125f };
 	
-	Entity uiWitch4 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch4);
-	ComponentManager->GetComponent<cm::mesh>(uiWitch4)->id = 0;
-//	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
-	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { -5.0f, 0.0f, 0.0f }, .fScale = 0.2f };
-	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
-	*materialWitch4 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+// 	Entity uiWitch4 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch4);
+// 	ComponentManager->GetComponent<cm::mesh>(uiWitch4)->id = 0;
+// //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
+// 	*ComponentManager->GetComponent<cm::transform>(uiWitch4) = { .tPosition = { -5.0f, 0.0f, 0.0f }, .fScale = 0.2f };
+// 	cm::material* materialWitch4  = ComponentManager->GetComponent<cm::material>(uiWitch4);
+// 	*materialWitch4 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0, .ambient = { 0.05f, 0.05f, 0.0f },
+// 		.shininess = 128.0f * 0.078125f };
 
-	Entity cube3 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube3);
-	ComponentManager->GetComponent<cm::mesh>(cube3)->id = 0;
-//	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
-	*ComponentManager->GetComponent<cm::transform>(cube3) = { .tPosition = { -18.0f, 0.0f, 0.0f }, .fScale = 0.1f };
-	cm::material* materialCube3  = ComponentManager->GetComponent<cm::material>(cube3);
-	*materialCube3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+// 	Entity cube3 = EntityManager->CreateEntity();
+// 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube3);
+// 	ComponentManager->GetComponent<cm::mesh>(cube3)->id = 0;
+// //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
+// 	*ComponentManager->GetComponent<cm::transform>(cube3) = { .tPosition = { -18.0f, 0.0f, 0.0f }, .fScale = 0.1f };
+// 	cm::material* materialCube3  = ComponentManager->GetComponent<cm::material>(cube3);
+// 	*materialCube3 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+// 		.shininess = 128.0f * 0.078125f };
 
 	
     // Entity u_iHud1 = EntityManager->CreateEntity();
@@ -201,7 +201,7 @@ int main()
 		.specular = {1.0f, 1.0f, 1.0f}};
  	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 0.0f, 0.0f, 0.0f },
 		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
+	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 1;
 	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
 	*materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -213,7 +213,7 @@ int main()
 		.specular = {1.0f, 1.0f, 1.0f}};
  	*ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
 		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 0;
+	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 1;
 	cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
 	*materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -232,7 +232,7 @@ int main()
 	
 	Entity cube4 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube4);
-	ComponentManager->GetComponent<cm::mesh>(cube4)->id = 0;
+	ComponentManager->GetComponent<cm::mesh>(cube4)->id = 1;
 //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
 	*ComponentManager->GetComponent<cm::transform>(cube4) = { .tPosition = { 0.0f, 0.0f, 18.0f }, .fScale = 1.0f };
 	cm::material* materialCube4  = ComponentManager->GetComponent<cm::material>(cube4);
@@ -377,9 +377,9 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
 	GLVM->SetMesh("../waveFrontObj/torus.obj");
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
-	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
+	GLVM->SetMeshGLTF("../gltf/snake_new.gltf");
 	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
-	
+
     ///< Game rendering loop
 //	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
 	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);

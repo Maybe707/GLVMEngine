@@ -3635,7 +3635,7 @@ namespace GLVM::core
 
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
-		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
+//		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
 		/// Start of animation logic
 		if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 10.0f ) {
 			++_transformComponent->currentAnimationFrame;

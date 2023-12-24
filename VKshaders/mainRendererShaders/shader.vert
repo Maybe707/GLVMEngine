@@ -59,6 +59,7 @@ void main() {
 	vec4 worldPosition = skinMatrix * vec4(inPosition, 1.0);
 	
     gl_Position = ubo.proj * ubo.view * ubo.model * worldPosition;
+//	gl_Position = worldPosition * ubo.model * ubo.view * ubo.proj;
 	outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
     outFragmentNormal = inNormal;
     outFragmentTextureCoordinate = inTextureCoordinate;
