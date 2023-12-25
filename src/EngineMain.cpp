@@ -356,7 +356,7 @@ int main()
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube5);
 	ComponentManager->GetComponent<cm::mesh>(cube5)->id = 1;
 //	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch4) = { .fMass_ = 4.0f };
-	*ComponentManager->GetComponent<cm::transform>(cube5) = { .tPosition = { 0.0f, 0.0f, -18.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(cube5) = { .tPosition = { 0.0f, 0.0f, -18.0f }, .fScale = 5.0f };
 	cm::material* materialCube5  = ComponentManager->GetComponent<cm::material>(cube5);
 	*materialCube5 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
