@@ -90,7 +90,7 @@ namespace GLVM::ecs
 												unsigned int entityRefMove,
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
-        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
+//        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 
 
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
@@ -107,7 +107,7 @@ namespace GLVM::ecs
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
-        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
+//        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
         rTransformProjectile->fScale = 0.2f;
 		
