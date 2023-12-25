@@ -407,15 +407,15 @@ namespace GLVM::core
 // }
 
     void CVulkanRenderer::initVulkan() {
-// 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-// 			Core::CJsonParser jsonParser;
-// 			aVertexesTemp_.emplace_back();
-// 			aIndicesTemp_.emplace_back();
-// 			frames.Push({});
-// 			jointMatricesPerMesh.Push({});
-// //			std::cout << "TEST" << std::endl;
-// 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
-// 		}
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			Core::CJsonParser jsonParser;
+			aVertexesTemp_.emplace_back();
+			aIndicesTemp_.emplace_back();
+			frames.Push({});
+			jointMatricesPerMesh.Push({});
+//			std::cout << "TEST" << std::endl;
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
+		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
 		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
 		
@@ -452,57 +452,57 @@ namespace GLVM::core
 		createPointLightShadowMapTextureSamplers();
 //        loadWavefrontObj();
 
-// 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-//             aIndices_.emplace_back();
-//             aVertices_.emplace_back();
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+            aIndices_.emplace_back();
+            aVertices_.emplace_back();
 			
-// 			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
-// //				std::cout << "number of inner data: " << aVertexesTemp_[m].size() << std::endl;
-// 				SVertex vertex;
-// 				vertex[0] = aVertexesTemp_[m][n];
-// 			    vertex[1] = aVertexesTemp_[m][n + 1];
-// 				vertex[2] = aVertexesTemp_[m][n + 2];
-// 				SVertex normal;
-// 				normal[0] = aVertexesTemp_[m][n + 3];
-// 				normal[1] = aVertexesTemp_[m][n + 4];
-// 				normal[2] = aVertexesTemp_[m][n + 5];
-// 				SVertex texture;
-// 				texture[0] = aVertexesTemp_[m][n + 6];
-// 				texture[1] = aVertexesTemp_[m][n + 7];
-// 				vec4 joinIndices;
-// 				joinIndices[0] = aVertexesTemp_[m][n + 8];
-// 				joinIndices[1] = aVertexesTemp_[m][n + 9];
-// 				joinIndices[2] = aVertexesTemp_[m][n + 10];
-// 				joinIndices[3] = aVertexesTemp_[m][n + 11];
-// 				vec4 weights;
-// 				weights[0] = aVertexesTemp_[m][n + 12];
-// 				weights[1] = aVertexesTemp_[m][n + 13];
-// 				weights[2] = aVertexesTemp_[m][n + 14];
-// 				weights[3] = aVertexesTemp_[m][n + 15];
+			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
+//				std::cout << "number of inner data: " << aVertexesTemp_[m].size() << std::endl;
+				SVertex vertex;
+				vertex[0] = aVertexesTemp_[m][n];
+			    vertex[1] = aVertexesTemp_[m][n + 1];
+				vertex[2] = aVertexesTemp_[m][n + 2];
+				SVertex normal;
+				normal[0] = aVertexesTemp_[m][n + 3];
+				normal[1] = aVertexesTemp_[m][n + 4];
+				normal[2] = aVertexesTemp_[m][n + 5];
+				SVertex texture;
+				texture[0] = aVertexesTemp_[m][n + 6];
+				texture[1] = aVertexesTemp_[m][n + 7];
+				vec4 joinIndices;
+				joinIndices[0] = aVertexesTemp_[m][n + 8];
+				joinIndices[1] = aVertexesTemp_[m][n + 9];
+				joinIndices[2] = aVertexesTemp_[m][n + 10];
+				joinIndices[3] = aVertexesTemp_[m][n + 11];
+				vec4 weights;
+				weights[0] = aVertexesTemp_[m][n + 12];
+				weights[1] = aVertexesTemp_[m][n + 13];
+				weights[2] = aVertexesTemp_[m][n + 14];
+				weights[3] = aVertexesTemp_[m][n + 15];
 
-// 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
-// 										 {normal[0], normal[1], normal[2]},
-// 										 {texture[0], texture[1]},
-// 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-// 										 {weights[0], weights[1], weights[2], weights[3]}});
+				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
+										 {normal[0], normal[1], normal[2]},
+										 {texture[0], texture[1]},
+										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
+										 {weights[0], weights[1], weights[2], weights[3]}});
 
 				
 				
-// 				unsigned int tempIndex = n / 16;
+				unsigned int tempIndex = n / 16;
 
-// 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
-// 			}
+				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
+			}
 
-//             vertexBufferContainer.emplace_back();
-//             vertexBufferMemoryContainer.emplace_back();
-//             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
+            vertexBufferContainer.emplace_back();
+            vertexBufferMemoryContainer.emplace_back();
+            createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
 
-//             indexBufferContainer.emplace_back();
-//             indexBufferMemoryContaner.emplace_back();
-//             createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
-// 		}
+            indexBufferContainer.emplace_back();
+            indexBufferMemoryContaner.emplace_back();
+            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+		}
 
-		loadWavefrontObj();
+//		loadWavefrontObj();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
