@@ -98,11 +98,12 @@ namespace GLVM::ecs
 															  cm::transform, cm::material,
 															  cm::projectile>(uiEntity_Projectile);
 
-        // core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-        // pSound_Sample->kPath_to_File_ = "../laser2.wav";
-        // pSound_Sample->uiDuration_ = 5;
-        // pSound_Sample->uiRate_ = 22050;
-        // soundEngine->GetSoundContainer().Push(pSound_Sample);
+        core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+        pSound_Sample->kPath_to_File_ = "../laser2.wav";
+        pSound_Sample->uiDuration_ = 5;
+        pSound_Sample->uiRate_ = 22050;
+        soundEngine->GetSoundContainer().Push(pSound_Sample);
+		
 		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->id = 1;
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
