@@ -10,6 +10,7 @@ namespace GLVM::core::Sound
             // std::cout << (*tSound_Contaier[i]).uiDuration_ << std::endl;
             // std::cout << (*tSound_Contaier[i]).uiRate_ << std::endl;
             PlaybackSoundSample(*tSound_Contaier[i]);
+			tSound_Contaier.Remove(i);
 //            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
         }
     }
