@@ -54,34 +54,34 @@ namespace GLVM::ecs
                 {
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*beholderComponent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
+//					componentManager->CreateComponent<cm::move>(currentEntity);
 					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement -=
 						right * cameraSpeed;
 //					result -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*beholderComponent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
+//					componentManager->CreateComponent<cm::move>(currentEntity);
 					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						right * cameraSpeed;
 //					result += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
+//					componentManager->CreateComponent<cm::move>(currentEntity);
 					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement -=
 						forward * cameraSpeed;
 //					result -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
+//					componentManager->CreateComponent<cm::move>(currentEntity);
 					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement +=
 						forward * cameraSpeed;
 //					result += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
-					componentManager->CreateComponent<cm::move>(currentEntity);
+//					componentManager->CreateComponent<cm::move>(currentEntity);
 					componentManager->GetComponent<cm::move>(currentEntity)->gravity[1] += 5.0f * cameraSpeed;
                     break;
                 default:

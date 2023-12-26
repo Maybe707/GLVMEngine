@@ -86,7 +86,7 @@ int main()
 //	core::Engine* GLVM = core::Engine::GetInstance();		
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, ct::controller, cm::collider, cm::animation, cm::beholder,
-									  cm::transform, cm::rigidBody, cm::event>(uiPlayer);
+		cm::transform, cm::rigidBody, cm::event, cm::move>(uiPlayer);
 	// *ComponentManager->GetComponent<cm::directionalLight>(uiPlayer) = { .position = { 15.7f, 7.5f, 2.0f },
 	// 	.direction = { 0.0f, 1.0f, 3.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
 	// 	.specular = {0.3f, 0.3f, 0.3f}};

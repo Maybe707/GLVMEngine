@@ -34,7 +34,7 @@ namespace GLVM::ecs
         for(unsigned int i = 0; i < u_iVector_Move_Size; ++i) {
             for(int n = 0; n < 6; ++n) {
                 unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
-                
+
                 if(inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                     if(projectileCooldown <= 0) {
                         CalculateProjectile(pComponent_Manager,
