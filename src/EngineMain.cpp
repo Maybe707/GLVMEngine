@@ -379,6 +379,7 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
 	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
+//	GLVM->SetMeshGLTF("../gltf/ray.gltf");
 
     ///< Game rendering loop
 //	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);

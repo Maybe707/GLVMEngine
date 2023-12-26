@@ -655,6 +655,7 @@ namespace GLVM::core
         bool framebufferResized = false;
 
         void initWindow();
+		void initializeGLTF();
         void initVulkan();
         void cleanupSwapChain();
         void cleanup();

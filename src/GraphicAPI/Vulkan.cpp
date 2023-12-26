@@ -406,7 +406,7 @@ namespace GLVM::core
 //     app->framebufferResized = true;
 // }
 
-    void CVulkanRenderer::initVulkan() {
+	void CVulkanRenderer::initializeGLTF() {
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			aVertexesTemp_.emplace_back();
@@ -416,41 +416,6 @@ namespace GLVM::core
 //			std::cout << "TEST" << std::endl;
 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
 		}
-		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
-		
-        createInstance();
-        setupDebugMessenger();
-        createSurface();
-        pickPhysicalDevice();
-        createLogicalDevice();
-        createSwapChain();
-        createImageViews();
-        createMainRenderPass();
-		createDirectionalLightShadowMapRenderPass();
-		createSpotLightShadowMapRenderPass();
-		createPointLightShadowMapRenderPass();
-        createDescriptorSetLayout(directionalLightPipeline.descriptors);
-		createDescriptorSetLayout(spotLightPipeline.descriptors);
-		createDescriptorSetLayout(pointLightPipeline.descriptors);
-        createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
-        createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass);
-		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
-		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
-		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
-        createCommandPool();
-        createDepthResources();
-		createShadowMapDepthResources();
-		// createShadowMapTextureImageView();
-		// createShadowMapTextureSampler();
-        createFramebuffers();
-        createTextureImage();
-        createTextureImageView();
-        createTextureSampler();
-		createDirectionalLightShadowMapTextureSamplers();
-		createSpotLightShadowMapTextureSamplers();
-		createPointLightShadowMapTextureSamplers();
-//        loadWavefrontObj();
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
             aIndices_.emplace_back();
@@ -501,8 +466,45 @@ namespace GLVM::core
             indexBufferMemoryContaner.emplace_back();
             createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
 		}
-
-//		loadWavefrontObj();
+	}
+	
+    void CVulkanRenderer::initVulkan() {
+		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
+		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
+		
+        createInstance();
+        setupDebugMessenger();
+        createSurface();
+        pickPhysicalDevice();
+        createLogicalDevice();
+        createSwapChain();
+        createImageViews();
+        createMainRenderPass();
+		createDirectionalLightShadowMapRenderPass();
+		createSpotLightShadowMapRenderPass();
+		createPointLightShadowMapRenderPass();
+        createDescriptorSetLayout(directionalLightPipeline.descriptors);
+		createDescriptorSetLayout(spotLightPipeline.descriptors);
+		createDescriptorSetLayout(pointLightPipeline.descriptors);
+        createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
+        createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass);
+		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
+		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
+		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
+        createCommandPool();
+        createDepthResources();
+		createShadowMapDepthResources();
+		// createShadowMapTextureImageView();
+		// createShadowMapTextureSampler();
+        createFramebuffers();
+        createTextureImage();
+        createTextureImageView();
+        createTextureSampler();
+		createDirectionalLightShadowMapTextureSamplers();
+		createSpotLightShadowMapTextureSamplers();
+		createPointLightShadowMapTextureSamplers();
+//        loadWavefrontObj();
+		initializeGLTF();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
