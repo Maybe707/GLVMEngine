@@ -1,20 +1,5 @@
-#include "ComponentManager.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/DirectionalLightComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/PointLightComponent.hpp"
-#include "Components/RigidBodyComponent.hpp"
-#include "Components/SpotLightComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/VertexComponent.hpp"
-#include "Components/ViewComponent.hpp"
 #include "Engine.hpp"
-#include "MeshManager.hpp"
 #include "SpritesData.hpp"
-#include "TextureManager.hpp"
-#include "Texture.hpp"
-#include <math.h>
 
 int main()
 {
