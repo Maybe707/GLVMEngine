@@ -276,7 +276,7 @@ namespace GLVM::core
         //     glfwGetFramebufferSize(window, &width, &height);
         //     glfwWaitEvents();
         // }
-		
+
         vkDeviceWaitIdle(device);
 
 //        cleanupSwapChain();
@@ -389,6 +389,17 @@ namespace GLVM::core
         createXlibSurfaceInfo.flags = 0;
 #endif
 
+#ifdef VK_USE_PLATFORM_XCB_KHR
+		Window.Disconnect();
+		Window = GLVM::core::WindowXCBVulkan();
+		createXcbSurfaceInfo.window = Window.GetWindow();
+		createXcbSurfaceInfo.connection = Window.GetConnection();
+
+		createXcbSurfaceInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
+		createXcbSurfaceInfo.pNext = nullptr;
+		createXcbSurfaceInfo.flags = 0;
+#endif
+		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         createWin32SurfaceInfo.hwnd = Window.GetModernWindowHWND();
         
@@ -621,6 +632,7 @@ namespace GLVM::core
         createInfo.pApplicationInfo = &appInfo;
 
         std::vector<const char*> extensions = getRequiredExtensions();
+		
         createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -668,6 +680,12 @@ namespace GLVM::core
         }
 #endif
 
+#ifdef VK_USE_PLATFORM_XCB_KHR
+        if (vkCreateXcbSurfaceKHR(instance, &createXcbSurfaceInfo, nullptr, &surface) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create window surface!");
+        }
+#endif
+		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         if (vkCreateWin32SurfaceKHR(instance, &createWin32SurfaceInfo, nullptr, &surface) != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface!");
@@ -4096,6 +4114,16 @@ namespace GLVM::core
             "VK_EXT_direct_mode_display"};
 #endif
 
+#ifdef VK_USE_PLATFORM_XCB_KHR
+        // std::vector<const char*> pRequiredExtentions = {"VK_KHR_xcb_surface",
+        //     "VK_KHR_display", "VK_KHR_surface",
+        //     "VK_EXT_direct_mode_display"};
+
+		std::vector<const char*> pRequiredExtentions = {"VK_KHR_xcb_surface",
+            "VK_KHR_display", "VK_KHR_surface",
+            "VK_EXT_direct_mode_display"};
+#endif
+		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         std::vector<const char*> pRequiredExtentions = {"VK_KHR_win32_surface",
             "VK_KHR_surface"};

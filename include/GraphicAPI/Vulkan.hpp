@@ -29,11 +29,20 @@
 #include "JsonParser.hpp"
 
 #ifdef __linux__
-#define VK_USE_PLATFORM_XLIB_KHR
+//#define VK_USE_PLATFORM_XLIB_KHR
+#define VK_USE_PLATFORM_XCB_KHR
 #endif
 
 #ifdef _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+#include "vulkan/vulkan.h"
+#include <xcb/xcb.h>
+#include "vulkan/vulkan_xcb.h"
+#include "vulkan/vulkan_core.h"
+#include "UnixApi/WindowXCBVulkan.hpp"
 #endif
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
@@ -443,7 +452,11 @@ namespace GLVM::core
         const char* fragShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
 		
         unsigned int texturePool_;
-        
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+		GLVM::core::WindowXCBVulkan Window;
+#endif
+		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         GLVM::core::WindowXVulkan Window;
 #endif
@@ -477,7 +490,11 @@ namespace GLVM::core
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;
 #endif
-    
+
+#ifdef VK_USE_PLATFORM_XCB_KHR
+        VkXcbSurfaceCreateInfoKHR createXcbSurfaceInfo;
+#endif		
+		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         VkWin32SurfaceCreateInfoKHR createWin32SurfaceInfo;
 #endif

@@ -15,6 +15,7 @@
 #include <limits>
 #include <mutex>
 #include <thread>
+#include <xcb/xcb.h>
 
 /*******************************************************************
  * Legends never die...
@@ -203,10 +204,14 @@ namespace GLVM::core
 		vulkanRenderer->run();
 
 #ifdef __linux__
-		XEvent uXEvent;
-		while (XPending(vulkanRenderer->Window.GetDisplay())) {
-			XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
-		}
+		// XEvent uXEvent;
+		// while (XPending(vulkanRenderer->Window.GetDisplay())) {
+		// 	XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
+		// }
+
+		// xcb_generic_event_t* event;
+		// while (( event = xcb_poll_for_event ( vulkanRenderer->Window.GetConnection() ))) {
+		// }
 #endif
 
 #ifdef _WIN32
@@ -231,23 +236,23 @@ namespace GLVM::core
 //			std::cout << "gravity: " << gravity << std::endl;
 //			FPScounter();
 			
-			vulkanRenderer->Window.ClearDisplay();
+			// vulkanRenderer->Window.ClearDisplay();
              
-			while(vulkanRenderer->Window.HandleEvent(g_eEvent))
-			{
-				//                std::cout << g_eEvent.GetEvent() << std::endl;
-				Input_Stack_.ControlInput(g_eEvent);
-				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
-					bGame_Loop_Active = false;
-			}
-			g_eEvent.SetLastEvent(Input_Stack_);
+			// while(vulkanRenderer->Window.HandleEvent(g_eEvent))
+			// {
+			// 	//                std::cout << g_eEvent.GetEvent() << std::endl;
+			// 	Input_Stack_.ControlInput(g_eEvent);
+			// 	if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
+			// 		bGame_Loop_Active = false;
+			// }
+			// g_eEvent.SetLastEvent(Input_Stack_);
 
-			//            Input_Stack_.PrintStack();
+			// //            Input_Stack_.PrintStack();
             
-			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
-								  g_eEvent.mousePointerPosition.position_Y,
-								  &g_eEvent.mousePointerPosition.offset_X,
-								  &g_eEvent.mousePointerPosition.offset_Y);
+			// vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
+			// 					  g_eEvent.mousePointerPosition.position_Y,
+			// 					  &g_eEvent.mousePointerPosition.offset_X,
+			// 					  &g_eEvent.mousePointerPosition.offset_Y);
 
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
@@ -266,11 +271,11 @@ namespace GLVM::core
 			pSystem_Manager->Update();
 //			Input_Stack_.Clear();
 			vulkanRenderer->draw();
-			vulkanRenderer->Window.SwapBuffers();
+//			vulkanRenderer->Window.SwapBuffers();
 			//            g_Sound_Engine.SoundStream();
 		}
 
-		vulkanRenderer->Window.Close();
+//		vulkanRenderer->Window.Close();
 		// delete vulkanRenderer;
 		// vulkanRenderer = nullptr;
 	}
