@@ -485,49 +485,39 @@ Vector<T, 3> Normalize(Vector<T, 3> _vector)
 // }
 
 template <typename T>
-Matrix<T, 4> GLVM_perspectiveRH_ZO(T fov, T aspect, T near, T far) {
+Matrix<T, 4> GLVM_perspectiveRH_ZO(T fov, T aspect, T near_plane, T far_plane) {
 	T const tanHalfFov = std::tan(fov / static_cast<T>(2));
 
 	mat4 Result(static_cast<T>(0));
 
 	Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
 	Result[1][1] = static_cast<T>(1) / (tanHalfFov);
-	Result[2][2] = far / (near - far);
+	Result[2][2] = far_plane / (near_plane - far_plane);
 	Result[2][3] = - static_cast<T>(1);
-	Result[3][2] = -(far * near) / (far - near);
+	Result[3][2] = -(far_plane * near_plane) / (far_plane - near_plane);
 	return Result;
 }
 
 template <typename T>
-Matrix<T, 4> GLVM_perspectiveRH_NO(T fov, T aspect, T near, T far) {
+Matrix<T, 4> GLVM_perspectiveRH_NO(T fov, T aspect, T near_plane, T far_plane) {
 	T const tanHalfFov = std::tan(fov / static_cast<T>(2));
 
 	mat4 Result(static_cast<T>(0));
 
 	Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
 	Result[1][1] = static_cast<T>(1) / (tanHalfFov);
-	Result[2][2] = - (far - near) / (far - near);
+	Result[2][2] = - (far_plane - near_plane) / (far_plane - near_plane);
 	Result[2][3] = - static_cast<T>(1);
-	Result[3][2] = -(static_cast<T>(2) * far * near) / (far - near);
+	Result[3][2] = -(static_cast<T>(2) * far_plane * near_plane) / (far_plane - near_plane);
 	return Result;
 }
 
 template <typename T>
-Matrix<T, 4> Perspective(T fov, T aspect, T near, T far) {
+Matrix<T, 4> Perspective(T fov, T aspect, T near_plane, T far_plane) {
 #ifdef GLVM_OPENGL_RENDER_BIT
 	return GLVM_perspectiveRH_ZO<T>(fov, aspect, near, far);
 #else
-	return GLVM_perspectiveRH_NO<T>(fov, aspect, near, far);
-#endif
-}
-
-template <typename T>
-Matrix<T, 4> LookAtMain(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
-{
-#ifdef GLVM_OPENGL_RENDER_BIT
-	return lookAtLH<T>(_eye, _center, _up);
-#else
-	return lookAtRH<T>(_eye, _center, _up);
+	return GLVM_perspectiveRH_NO<T>(fov, aspect, near_plane, far_plane);
 #endif
 }
 
@@ -577,6 +567,16 @@ Matrix<T, 4> lookAtLH(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
 	Result[3][1] = -Dot(u, _eye);
 	Result[3][2] = -Dot(f, _eye);
 	return Result;
+}
+
+template <typename T>
+Matrix<T, 4> LookAtMain(Vector<T, 3> _eye, Vector<T, 3> _center, Vector<T, 3> _up)
+{
+#ifdef GLVM_OPENGL_RENDER_BIT
+	return lookAtLH<T>(_eye, _center, _up);
+#else
+	return lookAtRH<T>(_eye, _center, _up);
+#endif
 }
 
 template <typename T>
@@ -718,74 +718,74 @@ Matrix<T, var> Ortho(float w, float h, float zn, float zf)
 }
 
 template <class T>
-Matrix<T, 4> orthoRH_ZO(T left, T right, T bottom, T top, T near, T far) {
+Matrix<T, 4> orthoRH_ZO(T left, T right, T bottom, T top, T near_plane, T far_plane) {
 	Matrix<float, 4> tempMatrix(1);
 	tempMatrix[0][0] = static_cast<T>(2) / (right - left);
 	tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
-	tempMatrix[2][2] = - static_cast<T>(1) / (far - near);
+	tempMatrix[2][2] = - static_cast<T>(1) / (far_plane - near_plane);
 	tempMatrix[3][0] = - (right + left) / (right - left);
 	tempMatrix[3][1] = - (top + bottom) / (top - bottom);
-	tempMatrix[3][2] = - near / (far - near);
+	tempMatrix[3][2] = - near_plane / (far_plane - near_plane);
 
 	return tempMatrix;
 }
 
 template <class T>
-Matrix<T, 4> orthoLH_NO(T left, T right, T bottom, T top, T near, T far) {
+Matrix<T, 4> orthoLH_NO(T left, T right, T bottom, T top, T near_plane, T far_plane) {
 	Matrix<float, 4> tempMatrix(1);
 	tempMatrix[0][0] = static_cast<T>(2) / (right - left);
 	tempMatrix[1][1] = static_cast<T>(2) / (top - bottom);
-	tempMatrix[2][2] = - static_cast<T>(2) / (far - near);
+	tempMatrix[2][2] = - static_cast<T>(2) / (far_plane - near_plane);
 	tempMatrix[3][0] = - (right + left) / (right - left);
 	tempMatrix[3][1] = - (top + bottom) / (top - bottom);
-	tempMatrix[3][2] = - (far + near) / (far - near);
+	tempMatrix[3][2] = - (far_plane + near_plane) / (far_plane - near_plane);
 
 	return tempMatrix;
 }
 
 template <class T>
-Matrix<T, 4> ortho(T left, T right, T bottom, T top, T near, T far) {
+Matrix<T, 4> ortho(T left, T right, T bottom, T top, T near_plane, T far_plane) {
 #ifdef GLVM_OPENGL_RENDER_BIT
 	return orthoLH_NO<T>(left, right, bottom, top, near, far);
 #else
-	return orthoRH_ZO<T>(left, right, bottom, top, near, far);
+	return orthoRH_ZO<T>(left, right, bottom, top, near_plane, far_plane);
 #endif
 }
 
 template <class T, int var>
-Matrix<T, var> perspectiveRH_ZO(T fov, T aspect, T near, T far) {
+Matrix<T, var> perspectiveRH_ZO(T fov, T aspect, T near_plane, T far_plane) {
 	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
 	
 	Matrix<float, var> tempMatrix(static_cast<T>(0));
 	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
 	tempMatrix[1][1] = static_cast<T>(1) / tanHalfFov;
-	tempMatrix[2][2] = far / (near - far);
+	tempMatrix[2][2] = far_plane / (near_plane - far_plane);
 	tempMatrix[2][3] = static_cast<T>(1);
-	tempMatrix[3][2] = -(far * near) / (far - near);
+	tempMatrix[3][2] = -(far_plane * near_plane) / (far_plane - near_plane);
 
 	return tempMatrix;
 }
 
 template <class T, int var>
-Matrix<T, var> perspectiveLH_NO(T fov, T aspect, T near, T far) {
+Matrix<T, var> perspectiveLH_NO(T fov, T aspect, T near_plane, T far_plane) {
 	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
 	
 	Matrix<float, var> tempMatrix(static_cast<T>(0));
 	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
 	tempMatrix[1][1] = static_cast<T>(1) / tanHalfFov;
-	tempMatrix[2][2] = - (far + near) / (far - near);
+	tempMatrix[2][2] = - (far_plane + near_plane) / (far_plane - near_plane);
 	tempMatrix[2][3] = - static_cast<T>(1);
-	tempMatrix[3][2] = - (static_cast<T>(2) * far * near) / (far - near);
+	tempMatrix[3][2] = - (static_cast<T>(2) * far_plane * near_plane) / (far_plane - near_plane);
 
 	return tempMatrix;
 }
 
 template <class T, int var>
-Matrix<T, var> Perspective(T fov, T aspect, T near, T far) {
+Matrix<T, var> Perspective(T fov, T aspect, T near_plane, T far_plane) {
 #ifdef GLVM_OPENGL_RENDER_BIT
 	return perspectiveLH_NO(fov, aspect, near, far);
 #else
-	return perspectiveRH_ZO(fov, aspect, near, far);
+	return perspectiveRH_ZO(fov, aspect, near_plane, far_plane);
 #endif
 	// float S = std::tan((fov/2)*(PI/360));
 	// Matrix<float, var> tempMatrix;
