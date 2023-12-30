@@ -2,306 +2,354 @@
 ;; --------------------------------------------------------------------------
 ;; Desktop File for Emacs
 ;; --------------------------------------------------------------------------
-;; Created Sat Dec 30 12:35:12 2023
+;; Created Sat Dec 30 18:21:35 2023
 ;; Desktop file format version 208
 ;; Emacs version 29.1
 
 ;; Global section:
-(setq desktop-saved-frameset [frameset 1 (25999 36848 373331 212000) (desktop . "208") "cyberdemon@cybercore" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-JB-JetBrainsMono Nerd Font-regular-normal-normal-*-16-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#bbc2cf") (background-color . "#282c34") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tab-bar-lines . 1) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 20) (scroll-bar-height) (alpha) (alpha-background) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . icon) (use-frame-synchronization) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#51afef") (font-parameter) (environment) (dnd-root-window-position) (last-focus-update) (tabs (tab (name . "EngineMain.cpp") (explicit-name) (time . 1703869525.26519) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "EngineMain.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 25655) (start . 22354)) (prev-buffers ("VertexMath.hpp" 16827 16984) ("Engine.cpp" 1 1712) ("*dashboard*" 1 409) ("*scratch*" 1 146)))) (tab (name . "Vulkan.hpp") (explicit-name) (time . 1703869525.5850432) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 3109) (start . 1448)) (prev-buffers ("SystemManager.cpp" 1 271) ("Engine.cpp" 1 1712)))) (tab (name . "Vulkan.hpp") (explicit-name) (time . 1703869970.9586167) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 741) (start . 76)) (prev-buffers ("Vulkan.hpp" 308 741)))) (tab (name . "Engine.cpp") (explicit-name) (time . 1703870103.1020033) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Engine.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 8512) (start . 7913)) (prev-buffers ("Engine.cpp" 7913 8783) ("WindowXCBVulkan.cpp" 942 2537) ("Vulkan.hpp" 13140 14515) ("Engine.hpp" 495 1155) ("*dashboard*" 1 409) ("ShaderProgram.hpp" 1 157) ("VertexMath.hpp" 12585 13345)))) (tab (name . "Engine.hpp") (explicit-name) (time . 1703870103.285925) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Engine.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 2108) (start . 1465)) (prev-buffers ("Engine.cpp" 146 312) ("ISoundEngine.hpp" 1 1)))) (tab (name . "WindowXCBVulkan.cpp") (explicit-name) (time . 1703871790.8522353) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 206) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXCBVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 5512) (start . 4155)) (prev-buffers ("WindowXCBVulkan.cpp" 4654 5420) ("xcb.h" 9084 9821) ("xcb_keysyms.h" 1 187) ("WindowXCBVulkan.hpp" 1 372) ("xproto.h" 2566 3180) ("*dashboard*" 1 409) ("Event.hpp" 393 983)))) (tab (name . "WindowXCBVulkan.hpp") (explicit-name) (time . 1703871791.0602672) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXCBVulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 373) (start . 1)) (prev-buffers ("WindowXCBVulkan.hpp" 1 226) ("WindowXCBVulkan.cpp" 1 2087)))) (tab (name . "IWindow.hpp") (explicit-name) (time . 1703871791.6602387) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "IWindow.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 158) (start . 1)) (prev-buffers ("IWindow.hpp" 1 149) ("*dashboard*" 1 1) ("WindowXCBVulkan.hpp" 1 86)))) (current-tab (name . "WindowXVulkan.cpp") (explicit-name)) (tab (name . "WindowXVulkan.hpp") (explicit-name) (time . 1703869148.6514528) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2068) (pixel-height . 1343) (total-width . 207) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 111) (start . 1)) (prev-buffers ("WindowXVulkan.cpp" 3698 4897)))) (tab (name . "Vulkan.hpp") (explicit-name) (time . 1703860503.3505235) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1447) (start . 1085)) (prev-buffers ("Vulkan.hpp" 1107 1321) ("Engine.cpp" 1 1712)))) (tab (name . "WindowWinVulkan.cpp") (explicit-name) (time . 1703851725.4884868) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowWinVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 2936) (start . 1748)) (prev-buffers ("Vulkan.hpp" 1085 1447)))) (tab (name . "Engine.cpp") (explicit-name) (time . 1703851725.606601) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Engine.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 7214) (start . 6007)) (prev-buffers ("WindowWinVulkan.cpp" 1748 2936)))) (tab (name . "Opengl.cpp") (explicit-name) (time . 1703851725.7264578) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Opengl.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 48525) (start . 47746)) (prev-buffers ("VertexMath.hpp" 13151 14289) ("Opengl.cpp" 47746 48553) ("Engine.cpp" 1 1825) ("Vulkan.hpp" 1171 1308)))) (tab (name . "EngineMain.cpp") (explicit-name) (time . 1703851726.006639) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "EngineMain.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 25655) (start . 22797)) (next-buffers "*dashboard*") (prev-buffers ("*dashboard*" 1 409) ("EngineMain.cpp" 22797 25655) ("Opengl.cpp" 47746 48525)))) (tab (name . "WindowXVulkan.hpp") (explicit-name) (time . 1703851726.166568) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 203) (start . 1)) (prev-buffers ("WindowX.cpp" 1 1) ("Engine.cpp" 1 513)))) (tab (name . "WindowXVulkan.cpp") (explicit-name) (time . 1703851726.5425775) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1289) (start . 1)) (prev-buffers ("WindowXVulkan.hpp" 1 203)))) (tab (name . "vulkan_core.h") (explicit-name) (time . 1703851728.518586) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 3) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 66) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 1968) (pixel-height . 1343) (total-width . 197) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "vulkan_core.h" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 454546) (start . 452250)) (prev-buffers ("Engine.cpp" 1 513))))) (lsp-ui-doc-buffer . "Unprintable entity") (frameset--id . "A0A5-E6C5-4D12-4AC5") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (height . 50) (width . 207) (left . 456) (top . 40)) ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2088) (pixel-height . 1090) (total-width . 208) (total-height . 49) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 5631) (start . 4988)) (next-buffers "*dashboard*") (prev-buffers ("*dashboard*" 1 1) ("WindowXVulkan.cpp" 4657 5631) ("keysymdef.h" 27752 30165) ("Xlib.h" 67338 67872) ("WindowXVulkan.hpp" 1 162) ("WindowXCBVulkan.cpp" 1 1915))))])
+(setq desktop-saved-frameset [frameset 1 (25999 57631 824289 414000) (desktop . "208") "cyberdemon@cybercore" nil nil ((((minibuffer . t) (undecorated) (override-redirect) (font . "-JB-JetBrainsMono Nerd Font-regular-normal-normal-*-16-*-*-*-m-0-iso10646-1") (border-width . 0) (internal-border-width . 0) (child-frame-border-width) (right-divider-width . 0) (bottom-divider-width . 0) (vertical-scroll-bars) (horizontal-scroll-bars) (foreground-color . "#bbc2cf") (background-color . "#282c34") (mouse-color . "black") (border-color . "black") (screen-gamma) (line-spacing) (left-fringe . 8) (right-fringe . 8) (no-special-glyphs) (scroll-bar-foreground) (scroll-bar-background) (menu-bar-lines . 0) (tab-bar-lines . 1) (tool-bar-lines . 0) (title) (wait-for-wm . t) (tool-bar-position . top) (inhibit-double-buffering) (icon-type . t) (auto-raise) (auto-lower) (cursor-type . box) (scroll-bar-width . 20) (scroll-bar-height) (alpha) (alpha-background) (no-focus-on-map) (no-accept-focus) (fullscreen) (visibility . t) (use-frame-synchronization) (skip-taskbar) (z-group) (display-type . color) (background-mode . dark) (cursor-color . "#51afef") (font-parameter) (environment) (dnd-root-window-position) (last-focus-update . t) (tabs (tab (name . "EngineMain.cpp") (explicit-name) (time . 1703918384.215945) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "EngineMain.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 25067) (start . 23204)) (prev-buffers ("VertexMath.hpp" 16827 16984) ("Engine.cpp" 1 1712) ("*dashboard*" 1 409) ("*scratch*" 1 146)))) (tab (name . "Engine.cpp") (explicit-name) (time . 1703918384.3917444) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Engine.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 8867) (start . 7913)) (prev-buffers ("WindowXCBVulkan.cpp" 9019 9801) ("Engine.cpp" 7913 8867) ("Vulkan.hpp" 13140 14515) ("Engine.hpp" 495 1155) ("*dashboard*" 1 409) ("ShaderProgram.hpp" 1 157) ("VertexMath.hpp" 12585 13345)))) (tab (name . "Engine.hpp") (explicit-name) (time . 1703918384.5436995) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Engine.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 2108) (start . 1465)) (prev-buffers ("Engine.cpp" 146 312) ("ISoundEngine.hpp" 1 1)))) (tab (name . "Event.hpp") (explicit-name) (time . 1703926519.9445162) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Event.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 713) (start . 78)) (prev-buffers ("Event.hpp" 78 713) ("Engine.hpp" 1465 2108)))) (current-tab (name . "WindowXCBVulkan.cpp") (explicit-name)) (tab (name . "WindowXCBVulkan.hpp") (explicit-name) (time . 1703926545.6002965) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXCBVulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 251) (start . 1)) (next-buffers "xcb_cursor.h") (prev-buffers ("xcb_cursor.h" 2691 4069) ("WindowXCBVulkan.hpp" 1 251) ("WindowXCBVulkan.cpp" 1 6104)))) (tab (name . "WindowXVulkan.cpp") (explicit-name) (time . 1703926532.5524914) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 1666) (start . 208)) (prev-buffers ("WindowXVulkan.hpp" 1 451) ("WindowXVulkan.cpp" 208 1737) ("Xlib.h" 72149 72913) ("X.h" 2787 3406) ("*dashboard*" 1 1) ("keysymdef.h" 27752 30165) ("WindowXCBVulkan.cpp" 1 5358)))) (tab (name . "WindowXVulkan.hpp") (explicit-name) (time . 1703926461.3366241) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "WindowXVulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 111) (start . 1)) (prev-buffers ("WindowXVulkan.cpp" 3698 4897)))) (tab (name . "Vulkan.hpp") (explicit-name) (time . 1703918361.0080836) (ws ((min-height . 4) (min-width . 10) (min-height-ignore . 4) (min-width-ignore . 4) (min-height-safe . 1) (min-width-safe . 2) (min-pixel-height . 88) (min-pixel-width . 100) (min-pixel-height-ignore . 88) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 22) (min-pixel-width-safe . 20)) leaf (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (buffer "Vulkan.hpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 708) (start . 228)) (prev-buffers ("WindowXVulkan.hpp" 1 111))))) (lsp-ui-doc-buffer . "Unprintable entity") (frameset--id . "A0A5-E6C5-4D12-4AC5") (frameset--mini t . t) (modeline . t) (unsplittable) (icon-name) (display . ":0") (explicit-name) (height . 62) (width . 201) (left . 516) (top . 40)) ((min-height . 8) (min-width . 203) (min-height-ignore . 5) (min-width-ignore . 4) (min-height-safe . 2) (min-width-safe . 2) (min-pixel-height . 176) (min-pixel-width . 2028) (min-pixel-height-ignore . 110) (min-pixel-width-ignore . 40) (min-pixel-height-safe . 44) (min-pixel-width-safe . 20)) vc (pixel-width . 2028) (pixel-height . 1343) (total-width . 203) (total-height . 61) (normal-height . 1.0) (normal-width . 1.0) (combination-limit) (leaf (pixel-width . 2028) (pixel-height . 1255) (total-width . 203) (total-height . 57) (normal-height . 0.9344750558451228) (normal-width . 1.0) (buffer "WindowXCBVulkan.cpp" (selected . t) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated) (point . 2800) (start . 2390)) (prev-buffers ("WindowXCBVulkan.cpp" 2390 2800) ("xfixes.h" 54989 55721) ("xproto.h" 345583 346565) ("xcb_cursor.h" 2889 4082) ("xcb.h" 5325 6244) ("Xlib.h" 48583 49900) ("XKBlib.h" 1 1) ("X.h" 2901 3501) ("WindowXCBVulkan.hpp" 1 487) ("*dashboard*" 1 1) ("xcb_keysyms.h" 1 187) ("Event.hpp" 393 1043))) (leaf (last . t) (pixel-width . 2028) (pixel-height . 88) (total-width . 203) (total-height . 4) (normal-height . 0.06552494415487714) (normal-width . 1.0) (buffer " *LV*" (selected) (hscroll . 0) (fringes 8 8 nil nil) (margins nil) (scroll-bars nil 0 t nil 0 nil nil) (vscroll . 0) (dedicated . t) (point . 1) (start . 1)) (prev-buffers ("WindowXCBVulkan.cpp" 2390 2788)))))])
 (setq desktop-missing-file-warning nil)
 (setq tags-file-name nil)
 (setq tags-table-list nil)
 (setq search-ring nil)
 (setq regexp-search-ring nil)
 (setq register-alist nil)
-(setq file-name-history '("~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/include/Engine.hpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/ISoundEngine.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/IWindow.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXCBVulkan.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/src/WinApi/WindowWinVulkan.cpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/ShaderProgram.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowX.cpp" "~/Vulkan-Headers/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/src/SystemManager.cpp" "~/cyber_code/GLVMEngine/include/VertexMath.hpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXCBVulkan.cpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp" "/usr/include/vulkan/vulkan_xcb.h" "/usr/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "/usr/include/sys/types.h" "/usr/include/xcb/xcb.h" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "/usr/include/X11/Xlib.h" "~/cyber_code/GLVMEngine/src/UnixApi/SoundEngineAlsa.cpp" "~/cyber_code/GLVMEngine/include/Vector.hpp" "~/cyber_code/GLVMEngine/include/SoundEngineAlsa.hpp" "~/cyber_code/GLVMEngine/include/ISoundEngine.hpp" "~/cyber_code/GLVMEngine/src/Systems/ProjectileSystem.cpp" "~/cyber_code/GLVMEngine/include/Texture.hpp" "~/cyber_code/GLVMEngine/src/Systems/PhysicsSystem.cpp"))
+(setq file-name-history '("~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/include/Event.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/include/Engine.hpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/ISoundEngine.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/IWindow.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXCBVulkan.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/src/WinApi/WindowWinVulkan.cpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/ShaderProgram.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowX.cpp" "~/Vulkan-Headers/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "~/cyber_code/GLVMEngine/src/SystemManager.cpp" "~/cyber_code/GLVMEngine/include/VertexMath.hpp" "~/cyber_code/GLVMEngine/src/Engine.cpp" "~/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp" "~/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXCBVulkan.cpp" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp" "/usr/include/vulkan/vulkan_xcb.h" "/usr/include/vulkan/vulkan_core.h" "~/cyber_code/GLVMEngine/src/EngineMain.cpp" "/usr/include/sys/types.h" "/usr/include/xcb/xcb.h" "~/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp" "~/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp" "/usr/include/X11/Xlib.h" "~/cyber_code/GLVMEngine/src/UnixApi/SoundEngineAlsa.cpp" "~/cyber_code/GLVMEngine/include/Vector.hpp" "~/cyber_code/GLVMEngine/include/SoundEngineAlsa.hpp" "~/cyber_code/GLVMEngine/include/ISoundEngine.hpp" "~/cyber_code/GLVMEngine/src/Systems/ProjectileSystem.cpp" "~/cyber_code/GLVMEngine/include/Texture.hpp" "~/cyber_code/GLVMEngine/src/Systems/PhysicsSystem.cpp"))
 
 ;; Buffer section -- buffers listed in same order as in buffer list:
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp"
-  "WindowXVulkan.cpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  5631
-  '(5631 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 36811 319627 888000) (buffer-file-coding-system . utf-8-unix))
-  '((mark-ring (5113 5118 5122 2922 4893 4899 4038 2046 1781 2868 1289 6503 5609))))
-
-(desktop-create-buffer 208
-  "/usr/include/X11/keysymdef.h"
-  "keysymdef.h"
-  'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode lsp-mode view-mode tree-sitter-mode tree-sitter-hl-mode)
-  30165
-  '(nil nil)
-  t
-  nil
-  '((buffer-display-time 25999 36742 702244 948000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/include/IWindow.hpp"
-  "IWindow.hpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  158
-  '(159 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34019 533227 818000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (294 199 159))))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp"
-  "WindowXCBVulkan.hpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  373
-  '(445 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34019 446097 690000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (478 797 387 179 646 648 646 86 86 86))))
-
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/UnixApi/WindowXCBVulkan.cpp"
   "WindowXCBVulkan.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  5512
-  '(2895 nil)
+  '(lsp-signature-mode company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  2800
+  '(2819 nil)
   nil
   nil
-  '((buffer-display-time 25999 35205 418649 827000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (2895 2895 2895 2917 5420 5420 5420 5509 5474 5421 5582 5292 2981 4092 4182 5317))))
+  '((buffer-display-time 25999 57586 129532 557000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (2807 2801 3632 3632 3632 3632 3632 3632 3632 3632 3632 3632 3632 3632 3633 3632))))
 
 (desktop-create-buffer 208
-  "/usr/include/X11/Xlib.h"
-  "Xlib.h"
+  "/usr/include/xcb/xfixes.h"
+  "xfixes.h"
   'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode view-mode lsp-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
-  67872
+  '(font-lock-mode hl-todo-mode display-line-numbers-mode company-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode lsp-mode view-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode eldoc-mode lsp-managed-mode tree-sitter-mode tree-sitter-hl-mode)
+  55721
   '(nil nil)
   t
   nil
-  '((buffer-display-time 25999 35414 160667 732000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/include/Engine.hpp"
-  "Engine.hpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  2108
-  '(2174 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 33036 727068 358000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/src/Engine.cpp"
-  "Engine.cpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode lsp-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode tree-sitter-mode tree-sitter-hl-mode)
-  8512
-  '(8841 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34878 998665 539000) (buffer-file-coding-system . utf-8-unix))
-  '((mark-ring (8524 8524 8480 7784 7756 8512 8450 8450 8867 8443 7751 9258 10279 8540 8443 8427))))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp"
-  "Vulkan.hpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  741
-  '(263 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34466 299543 563000) (buffer-file-coding-system . utf-8-unix))
-  '((mark-ring (1249 1298 1308 1372 1357 2370 1923))))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/src/EngineMain.cpp"
-  "EngineMain.cpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  25655
-  '(25662 nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34466 397237 756000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (25446 4088 24931 1))))
-
-(desktop-create-buffer 208
-  "/usr/include/xcb/xcb.h"
-  "xcb.h"
-  'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode view-mode lsp-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
-  9821
-  '(nil nil)
-  t
-  nil
-  '((buffer-display-time 25999 34171 482228 76000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/home/cyberdemon/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp"
-  "WindowXVulkan.hpp"
-  'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  111
-  '(nil nil)
-  nil
-  nil
-  '((buffer-display-time 25999 34029 821943 922000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring nil)))
-
-(desktop-create-buffer 208
-  "/usr/include/xcb/xcb_keysyms.h"
-  "xcb_keysyms.h"
-  'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode view-mode lsp-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
-  187
-  '(1128 nil)
-  t
-  nil
-  '((buffer-display-time 25999 32580 416098 682000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 57504 760957 728000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/usr/include/xcb/xproto.h"
   "xproto.h"
   'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode lsp-mode view-mode tree-sitter-mode tree-sitter-hl-mode)
-  3180
-  '(13642 nil)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode view-mode lsp-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  346565
+  '(275433 nil)
   t
   nil
-  '((buffer-display-time 25999 32494 370463 13000) (buffer-file-coding-system . undecided-unix))
-  '((mark-ring (16487))))
+  '((buffer-display-time 25999 57398 602151 481000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (275312 13642 16487))))
+
+(desktop-create-buffer 208
+  "/usr/include/xcb/xcb_cursor.h"
+  "xcb_cursor.h"
+  'c-mode
+  '(font-lock-mode hl-todo-mode display-line-numbers-mode company-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode lsp-mode view-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode eldoc-mode lsp-managed-mode tree-sitter-mode tree-sitter-hl-mode)
+  4082
+  '(1 nil)
+  t
+  nil
+  '((buffer-display-time 25999 57086 291391 798000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (4350 2557 4069 1418))))
+
+(desktop-create-buffer 208
+  "/usr/include/xcb/xcb.h"
+  "xcb.h"
+  'c-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode lsp-mode view-mode tree-sitter-mode tree-sitter-hl-mode)
+  6244
+  '(3176 nil)
+  t
+  nil
+  '((buffer-display-time 25999 56816 604824 885000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (3176 3180 10521 9980))))
+
+(desktop-create-buffer 208
+  "/usr/include/X11/Xlib.h"
+  "Xlib.h"
+  'c-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode lsp-mode view-mode tree-sitter-mode tree-sitter-hl-mode)
+  49900
+  '(49900 nil)
+  t
+  nil
+  '((buffer-display-time 25999 56142 480756 779000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (49937))))
+
+(desktop-create-buffer 208
+  "/usr/include/X11/XKBlib.h"
+  "XKBlib.h"
+  'c-mode
+  '(font-lock-mode hl-todo-mode display-line-numbers-mode company-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode lsp-mode view-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode eldoc-mode lsp-managed-mode tree-sitter-mode tree-sitter-hl-mode)
+  1
+  '(nil nil)
+  t
+  nil
+  '((buffer-display-time 25999 56090 947711 811000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/UnixApi/WindowXCBVulkan.hpp"
+  "WindowXCBVulkan.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  251
+  '(251 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 54641 368646 660000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (251 421 359 767 497 530 849 439 179 698 700 698 86 86 86))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/src/UnixApi/WindowXVulkan.cpp"
+  "WindowXVulkan.cpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  1666
+  '(1103 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 56035 640449 140000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (1737 1698 1312 1312 1312 1312 1312 1312 1143 1312 1103 1312 1143 1348 1312 1312))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/include/Event.hpp"
   "Event.hpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
-  983
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  713
+  '(662 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 44281 292362 608000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (598))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/UnixApi/WindowXVulkan.hpp"
+  "WindowXVulkan.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  451
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25999 23847 167882 479000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 56034 969170 11000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/usr/include/X11/X.h"
+  "X.h"
+  'c-mode
+  '(font-lock-mode hl-todo-mode display-line-numbers-mode company-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode lsp-mode view-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode eldoc-mode lsp-managed-mode tree-sitter-mode tree-sitter-hl-mode)
+  3406
+  '(3497 nil)
+  t
+  nil
+  '((buffer-display-time 25999 55444 564471 327000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/Engine.hpp"
+  "Engine.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  2108
+  '(2174 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 44282 108243 379000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/src/Engine.cpp"
+  "Engine.cpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode lsp-mode)
+  8867
+  '(8867 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 47901 674458 31000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (8867 8841 8524 8524 8480 7784 7756 8512 8450 8450 8867 8443 7751 9258 10279 8540))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/src/EngineMain.cpp"
+  "EngineMain.cpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  25067
+  '(25662 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 47901 685801 160000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (25446 4088 24931 1))))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/GraphicAPI/Vulkan.hpp"
+  "Vulkan.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  708
+  '(263 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 47826 920954 963000) (buffer-file-coding-system . utf-8-unix))
+  '((mark-ring (1249 1298 1308 1372 1357 2370 1923))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/Vulkan-Headers/include/vulkan/vulkan_core.h"
   "vulkan_core.h"
   'c-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode lsp-mode hl-todo-mode display-line-numbers-mode auto-revert-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode auto-revert-mode display-line-numbers-mode hl-todo-mode lsp-mode font-lock-mode)
   454546
   '(1 nil)
   nil
   nil
-  '((buffer-display-time 25999 16849 254168 120000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 37139 502827 91000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/GraphicAPI/Opengl.cpp"
   "Opengl.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   48525
   '(48624 nil)
   nil
   nil
-  '((buffer-display-time 25999 16848 629391 974000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 37120 172712 518000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring (48525 48553 1 12391 12391 48224 48297 48297 48297 48297 37583 410 31816 1))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/WinApi/WindowWinVulkan.cpp"
   "WindowWinVulkan.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   2936
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25999 16848 566494 821000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 37106 134298 468000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/home/cyberdemon/cyber_code/GLVMEngine/include/IWindow.hpp"
+  "IWindow.hpp"
+  'c++-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  158
+  '(159 nil)
+  nil
+  nil
+  '((buffer-display-time 25999 36995 127690 634000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring (294 199 159))))
+
+(desktop-create-buffer 208
+  "/usr/include/X11/keysymdef.h"
+  "keysymdef.h"
+  'c-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode view-mode lsp-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
+  30165
+  '(nil nil)
+  t
+  nil
+  '((buffer-display-time 25999 36747 726612 965000) (buffer-file-coding-system . undecided-unix))
+  '((mark-ring nil)))
+
+(desktop-create-buffer 208
+  "/usr/include/xcb/xcb_keysyms.h"
+  "xcb_keysyms.h"
+  'c-mode
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode lsp-mode view-mode tree-sitter-mode tree-sitter-hl-mode)
+  187
+  '(1128 nil)
+  t
+  nil
+  '((buffer-display-time 25999 32585 514334 470000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/include/ISoundEngine.hpp"
   "ISoundEngine.hpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   1
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25999 14203 622308 748000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 14208 870727 628000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/include/ShaderProgram.hpp"
   "ShaderProgram.hpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   157
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25999 9849 128232 604000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 9854 468213 571000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/include/VertexMath.hpp"
   "VertexMath.hpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   13701
   '(858 nil)
   nil
   nil
-  '((buffer-display-time 25999 9503 149448 402000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 9508 586208 551000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring (28076 211 15060 15620 14423 15874 19864 14248 24709 23105 79 14422 14422 15874 15832 23789))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/GraphicAPI/Vulkan.cpp"
   "Vulkan.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   21297
   '(21825 nil)
   nil
   nil
-  '((buffer-display-time 25999 9277 593814 939000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 9283 177807 184000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring (21764 21438 21041 21707 21525 20241 16017 10539 21438 21416 21437 21437 16017))))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/UnixApi/WindowX.cpp"
   "WindowX.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   1
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25998 57214 319878 923000) (buffer-file-coding-system . utf-8-unix))
+  '((buffer-display-time 25998 57219 998422 343000) (buffer-file-coding-system . utf-8-unix))
   '((mark-ring nil)))
 
 (desktop-create-buffer 208
   "/home/cyberdemon/cyber_code/GLVMEngine/src/SystemManager.cpp"
   "SystemManager.cpp"
   'c++-mode
-  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode font-lock-mode hl-todo-mode display-line-numbers-mode auto-revert-mode lsp-mode tree-sitter-mode tree-sitter-hl-mode)
+  '(company-mode lsp-completion-mode flycheck-mode lsp-diagnostics-mode lsp-headerline-breadcrumb-mode lsp-modeline-code-actions-mode lsp-modeline-diagnostics-mode lsp-modeline-workspace-status-mode lsp-ui-doc-mode lsp-ui-sideline-mode lsp-ui-mode eldoc-mode lsp-managed-mode tree-sitter-hl-mode tree-sitter-mode lsp-mode auto-revert-mode display-line-numbers-mode hl-todo-mode font-lock-mode)
   271
   '(nil nil)
   nil
   nil
-  '((buffer-display-time 25999 36809 413458 408000) (buffer-file-coding-system . undecided-unix))
+  '((buffer-display-time 25999 39502 524422 658000) (buffer-file-coding-system . undecided-unix))
   '((mark-ring nil)))
 

@@ -36,6 +36,8 @@ namespace GLVM::core
         eMOUSE_POINTER_POSITION,
         eMOUSE_LEFT_BUTTON_RELEASE,
         eMOUSE_LEFT_BUTTON,
+		eMOUSE_RIGHT_BUTTON_RELEASE,
+        eMOUSE_RIGHT_BUTTON,
         eGAME_LOOP_KILL,
         eEmpty,
     };
