@@ -9,7 +9,7 @@ namespace GLVM::core
     class IWindow
     {
     public:
-        virtual ~IWindow() {}
+        virtual ~IWindow() = default;
 
         virtual void SwapBuffers() = 0;
         virtual void ClearDisplay() = 0;

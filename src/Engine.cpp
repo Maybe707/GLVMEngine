@@ -203,10 +203,10 @@ namespace GLVM::core
 		vulkanRenderer->run();
 
 #ifdef __linux__
-		XEvent uXEvent;
-		while (XPending(vulkanRenderer->Window.GetDisplay())) {
-			XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
-		}
+		// XEvent uXEvent;
+		// while (XPending(vulkanRenderer->Window.GetDisplay())) {
+		// 	XNextEvent(vulkanRenderer->Window.GetDisplay(), &uXEvent);
+		// }
 
 		// xcb_generic_event_t* event;
 		// while (( event = xcb_poll_for_event ( vulkanRenderer->Window.GetConnection() ))) {
