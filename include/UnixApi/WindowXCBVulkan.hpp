@@ -9,7 +9,6 @@
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
 #include <xcb/xcb_keysyms.h>
-#include <xcb/xfixes.h>
 #include <xcb/xcb_cursor.h>
 #include <cassert>
 #include <iostream>
