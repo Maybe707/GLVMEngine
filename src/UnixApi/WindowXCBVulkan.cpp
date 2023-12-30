@@ -52,6 +52,10 @@ namespace GLVM::core
 		/// Make sure commands are sent befour we pause so that the window gets shown
 		xcb_flush ( connection );
 
+		HideCursor();
+	}
+
+	void WindowXCBVulkan::HideCursor() {
 		xcb_pixmap_t foreground_pixmap_id = xcb_generate_id (connection);
 		xcb_create_pixmap(connection, 1, foreground_pixmap_id,
 						  window, 8, 8);
@@ -88,7 +92,7 @@ namespace GLVM::core
 
         xcb_free_cursor (connection, cursor);
 	}
-
+	
 	xcb_connection_t* WindowXCBVulkan::GetConnection() { return connection; }
 	
 	xcb_window_t WindowXCBVulkan::GetWindow() { return window; }

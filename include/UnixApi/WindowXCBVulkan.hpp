@@ -27,7 +27,8 @@ namespace GLVM::core
 		static void print_modifiers (uint32_t mask);
 	public:
 		WindowXCBVulkan ();
-		
+
+		void HideCursor();
 		xcb_connection_t* GetConnection();
 		xcb_window_t GetWindow();
 		void Disconnect();
