@@ -40,7 +40,7 @@ namespace GLVM::core
 							window,                          ///< Window id
 							screen->root,                    ///< Parent window
 							0, 0,                            ///< x, y
-							640, 480,                        ///< width, height
+							1920, 1080,                        ///< width, height
 							10,                              ///< Border width
 							XCB_WINDOW_CLASS_INPUT_OUTPUT,   ///< Class
 							screen->root_visual,             ///< Visual

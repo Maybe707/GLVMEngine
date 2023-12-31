@@ -279,20 +279,24 @@ namespace GLVM::core
 
         vkDeviceWaitIdle(device);
 
-//        cleanupSwapChain();
+        cleanupSwapChain();
 
-		initWindow();
-		
-		updateDirectionalLightShadowMapDescriptorSets();
-		updateSpotLightShadowMapDescriptorSets();
-		updatePointLightShadowMapDescriptorSets();
-		updateDescriptorSets();
+//		initWindow();
 		
         createSwapChain();
         createImageViews();
         createDepthResources();
 		createShadowMapDepthResources();
         createFramebuffers();
+
+		createDirectionalLightShadowMapTextureSamplers();
+		createSpotLightShadowMapTextureSamplers();
+		createPointLightShadowMapTextureSamplers();
+		
+		updateDirectionalLightShadowMapDescriptorSets();
+		updateSpotLightShadowMapDescriptorSets();
+		updatePointLightShadowMapDescriptorSets();
+		updateDescriptorSets();
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
@@ -525,7 +529,7 @@ namespace GLVM::core
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
         createCommandBuffers();
-		createShadowMapSyncObjects();
+//		createShadowMapSyncObjects();
         createSyncObjects();
     }
 
@@ -534,6 +538,24 @@ namespace GLVM::core
         vkDestroyImage(device, depthImage, nullptr);
         vkFreeMemory(device, depthImageMemory, nullptr);
 
+		directionalLightShadowMapImages.clear();
+		spotLightShadowMapImages.clear();
+		pointLightShadowMapImages.clear();
+
+        for (auto framebuffer : directionalLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+		for (auto framebuffer : spotLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+		for (auto& inner_vector : pointLightShadowMapFrameBuffers) {
+			for (auto framebuffer : inner_vector) {
+				vkDestroyFramebuffer(device, framebuffer, nullptr);
+			} 
+        }
+		
         for (auto framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
@@ -1263,7 +1285,7 @@ namespace GLVM::core
         for (size_t i = 0; i < spotLightNumber; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightShadowMapImages[i].views[0]);
-
+			
 			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
