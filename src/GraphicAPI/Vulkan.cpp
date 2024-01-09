@@ -472,7 +472,9 @@ namespace GLVM::core
 
 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
 			}
-
+//			std::cout << std::filesystem::current_path();
+//			std::cout << "m: " << m << std::endl;
+//			std::cout << "Vertices: " << aVertices_[m].size() << std::endl;;
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
@@ -1843,7 +1845,7 @@ namespace GLVM::core
 																								cm::mesh>();
 		
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 5) * directionalLightLinkedEntities.GetSize();
+		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * directionalLightLinkedEntities.GetSize();
 
         shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
         shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
@@ -1854,7 +1856,7 @@ namespace GLVM::core
 		}
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
-		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 5) * spotLightLinkedEntities.GetSize();
+		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * spotLightLinkedEntities.GetSize();
 		
         shadowMapSpotLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
         shadowMapSpotLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
@@ -1869,7 +1871,7 @@ namespace GLVM::core
 																								 cm::mesh>();
 
 		
-		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 5) * pointLightsLinkedEntities.GetSize();
+		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * pointLightsLinkedEntities.GetSize();
 		
         shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
         shadowMapPointLightModelMatrixUniformBuffersMemory.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
@@ -1883,7 +1885,7 @@ namespace GLVM::core
 																							cm::material,
 																							cm::mesh>();
 		
-		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * 5;
+		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * 3;
 		
         modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
         modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
@@ -1927,7 +1929,7 @@ namespace GLVM::core
 																							  cm::material,
 																							  cm::mesh>();
 		
-		materialUboDescriptorsNumber = materialLinkedEntities.GetSize() * 5;
+		materialUboDescriptorsNumber = materialLinkedEntities.GetSize() * 3;
 		
         materialUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
         materialUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);

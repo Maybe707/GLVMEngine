@@ -54,8 +54,9 @@
 #endif
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-#include "../../../Vulkan-Headers/include/vulkan/vulkan.h"
-#include "../../../Vulkan-Headers/include/vulkan/vulkan_core.h"
+#include <vulkan/vulkan.h>
+//#include "../Vulkan-Headers/include/vulkan/vulkan.h"
+//#include "../Vulkan-Headers/include/vulkan/vulkan_core.h"
 #include "WinApi/WindowWinVulkan.hpp"
 //#include "WinApi/winVk.hpp"
 #endif

@@ -406,7 +406,7 @@ namespace GLVM::Core
 		std::string binary_path = *(*gltf)["buffers"][0]["uri"].value.string;
 		int full_byte_size = (*gltf)["buffers"][0]["byteLength"].value.iNumber;;
 		std::ifstream in_stream;
-		in_stream.open("/home/cyberdemon/cyber_code/GLVMEngine/gltf/" + binary_path, std::ios::binary);
+		in_stream.open("../gltf/" + binary_path, std::ios::binary);
 		char* buffer = new char[full_byte_size];
 		in_stream.read(buffer, full_byte_size);
 		in_stream.close();

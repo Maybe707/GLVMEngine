@@ -1,14 +1,17 @@
 #include "SoundEngineWaveform.hpp"
 #include <cstdio>
 #include <fstream>
+#include <iostream>
+#include <mmeapi.h>
 
 namespace GLVM::core::Sound
 {
     void CSoundEngineWaveform::SoundStream()
     {
-        for(unsigned int i = 0; i < tSound_Contaier.GetSize(); ++i)
+        for(unsigned int i = 0; i < tSound_Container.GetSize(); ++i)
         {
-            PlaybackSoundSample(*tSound_Contaier[i]);
+            PlaybackSoundSample(*tSound_Container[i]);
+			tSound_Container.Remove(i);
 //            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
         }
     }
@@ -19,23 +22,25 @@ namespace GLVM::core::Sound
         HWAVEOUT     hWaveOut;
         WAVEHDR      lpWaveHdr {};
         WAVEFORMATEX Format;
-  
-        Format.wFormatTag = WAVE_FORMAT_PCM; 
+		
+//        Format.wFormatTag = WAVE_FORMAT_PCM;
+		Format.wFormatTag = WAVE_FORMAT_PCM; 
         Format.nChannels = 2; 
-        Format.nSamplesPerSec = 22050L; 
+        Format.nSamplesPerSec = _sound_sample.uiRate_; 
         Format.nAvgBytesPerSec = Format.nSamplesPerSec * Format.nChannels * 2; 
-        Format.nBlockAlign = 2; 
+        Format.nBlockAlign = 4;                                                        ///< Change this field first if got any problems
         Format.wBitsPerSample = 16; 
         Format.cbSize = 0;
  
         /// Open a waveform device for output using window callback.
-        
-        if(waveOutOpen (&hWaveOut, WAVE_MAPPER, &Format, 0L, 0L, 0L));
-//         if(rc != MMSYSERR_NOERROR) {
-//             std::cerr << "waveOutOpen: ";
-// //            print_waveout_error(rc);        ///< MAKE DIFINITION!
-//             std::exit(-1);
-//         }
+
+		unsigned int rc = 0;
+        rc = waveOutOpen (&hWaveOut, WAVE_MAPPER, &Format, 0L, 0L, 0L);
+         if(rc != MMSYSERR_NOERROR) {
+             std::cerr << "waveOutOpen: " << "error code: " << rc << std::endl;;
+ //            print_waveout_error(rc);        ///< MAKE DIFINITION!
+             std::exit(-1);
+         }
 
         std::ifstream file(_sound_sample.kPath_to_File_, std::ios_base::binary | std::ios_base::in);
         if(!file) {
@@ -71,7 +76,7 @@ namespace GLVM::core::Sound
     }
 
     void CSoundEngineWaveform::SetMasterVolume(long _lVolume) {}
-    vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Contaier; }
+    vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Container; }
 }
 
 // #define FRAMES 32

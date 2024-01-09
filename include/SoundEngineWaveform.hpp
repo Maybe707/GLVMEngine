@@ -12,7 +12,7 @@ namespace GLVM::core::Sound
         HANDLE hData  = NULL;  ///< handle of waveform data memory 
         HPSTR  lpData = NULL;  ///< pointer to waveform data memory
         
-        vector<CSoundSample*> tSound_Contaier;
+        vector<CSoundSample*> tSound_Container;
     public:
         void SoundStream() override;
         void PlaybackSoundSample(CSoundSample& _sound_sample) override;
