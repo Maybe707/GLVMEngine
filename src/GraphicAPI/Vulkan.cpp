@@ -1623,13 +1623,13 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createSpotLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(spotLightShadowMapImages[i].sampler);
+        for(unsigned int i = 0; i < spotLightPipeline.descriptors[0].textureImages.size(); ++i)
+			createRenderPassShadowMapTextureSamplers(spotLightPipeline.descriptors[0].textureImages[i].sampler);
     }
 
     void CVulkanRenderer::createPointLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(pointLightShadowMapImages[i].sampler);
+        for(unsigned int i = 0; i < pointLightPipeline.descriptors[0].textureImages.size(); ++i)
+			createRenderPassShadowMapTextureSamplers(pointLightPipeline.descriptors[0].textureImages[i].sampler);
     }
 	
 	void CVulkanRenderer::createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler) {
@@ -2040,7 +2040,8 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
-		int directionalLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		int directionalLightShadowMapMatrixUboBinding = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
+
 		if ( directionalLightShadowMapMatrixUboBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
 																directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
@@ -2078,7 +2079,7 @@ namespace GLVM::core
 	}
 
     void CVulkanRenderer::createSpotLightShadowMapDescriptorSets() {
-		int spotLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		int spotLightShadowMapMatrixUboBinding = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 		if ( spotLightShadowMapMatrixUboBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
 																spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
@@ -2116,7 +2117,7 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDescriptorSets() {
-		int pointLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		int pointLightShadowMapMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 		if ( pointLightShadowMapMatrixUboBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
 																pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
@@ -2552,8 +2553,12 @@ namespace GLVM::core
 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 
 		int pointLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS);
-		int pointLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		if ( pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 ) {
+//		int pointLightShadowMapsMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		// std::cout << "POINT LIGHT NUMBER: " << pointLightNumber << std::endl;
+		// std::cout << "SHADOW MAP BINDING: " << pointLightShadowMapsMatrixUboBinding << std::endl;
+		// std::cout << "MAIN RENDER BINDING: " << pointLightShadowMapsCisBinding << std::endl;
+
+		if ( pointLightShadowMapsCisBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
 																					 mainRenderScenePipeline.descriptors[pointLightShadowMapsCisBinding].setLayout);
 			VkDescriptorSetAllocateInfo pointLightCubeShadowMapSamplerAllocInfo{};
@@ -2601,8 +2606,8 @@ namespace GLVM::core
 		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 
 		int spotLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS);
-		int spotLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		if ( pointLightShadowMapsCisBinding != -1 && spotLightShadowMapsMatrixUboBinding != -1 ) {
+//		int spotLightShadowMapsMatrixUboBinding = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( spotLightShadowMapsCisBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> spotLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
 																				mainRenderScenePipeline.descriptors[spotLightShadowMapsCisBinding].setLayout);
 			VkDescriptorSetAllocateInfo spotLightShadowMapSamplerAllocInfo{};
@@ -3590,11 +3595,26 @@ namespace GLVM::core
 										directionalLightShadowMapsCisBinding, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 
 			int pointLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS);
-			int pointLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-			if ( pointLightNumber > 0 && pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 )
+			int pointLightShadowMapsMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+			// std::cout << "POINT LIGHT NUMBER: " << pointLightNumber << std::endl;
+			// std::cout << "SHADOW MAP BINDING: " << pointLightShadowMapsMatrixUboBinding << std::endl;
+			// std::cout << "MAIN RENDER BINDING: " << pointLightShadowMapsCisBinding << std::endl;
+			if ( pointLightNumber > 0 && pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 ) {
+				// std::cout << "TEST" << std::endl;
+				// std::cout << "TEST" << std::endl;
+				// std::cout << "TEST" << std::endl;
+				// std::cout << "TEST" << std::endl;
+				// std::cout << "TEST" << std::endl;
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										pointLightShadowMapsCisBinding, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
+			}
 
+			// std::cout << "TEST" << std::endl;
+			// std::cout << "TEST" << std::endl;
+			// std::cout << "TEST" << std::endl;
+			// std::cout << "TEST" << std::endl;
+			// std::cout << "TEST" << std::endl;
+			
 			int spotLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS);
 			int spotLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 			if ( spotLightNumber > 0 && spotLightShadowMapsCisBinding != -1 && spotLightShadowMapsMatrixUboBinding != -1 )
