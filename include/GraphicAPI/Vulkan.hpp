@@ -1,6 +1,7 @@
 #ifndef VULKAN_RENDERER_HG
 #define VULKAN_RENDERER_HG
 
+#include <cstdint>
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
@@ -170,13 +171,25 @@ namespace GLVM::core
         }
     };
 	
-	enum UBOtypes {
+	enum class DescriptorsTypes {
+		/// UBO - uniform buffer object
+		DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
+		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
+		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		MODEL_MATRIX_UBO,
+		DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO,
+		SPOT_LIGHT_SPACE_MATRIX_UBO,
 		VIEW_POSITION_UBO,
 		MATERIAL_UBO,
 		DIRECTIONAL_LIGHTS_UBO,
 		POINT_LIGHTS_UBO,
-		SPOT_LIGHTS_UBO
+		SPOT_LIGHTS_UBO,
+		/// CIS - combined image sampler
+		DIFFUSE_CIS,
+		SPECULAR_CIS,
+		DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS,
+		POINT_LIGHT_SHADOW_MAPS_CIS,
+		SPOT_LIGHT_SHADOW_MAPS_CIS
 	};
 
 	struct VK_Image {
@@ -201,11 +214,17 @@ namespace GLVM::core
 	};
 	
 	struct Descriptor {
-		VkDescriptorType      type;
+		VkDescriptorType      vkType;
+		DescriptorsTypes      type;
 		uint32_t              binding;
 		VkShaderStageFlags    shaderStageFlag;
 		VkDescriptorSetLayout setLayout;
 		uint32_t              descriptorsNumber;
+
+		std::vector<VkBuffer> uniformBuffers;
+		std::vector<VkDeviceMemory> uniformBuffersMemory;
+		
+		std::vector<VK_Image> textureImages;
 	};
 
 	struct Pipeline {
@@ -220,18 +239,27 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
-		void addDescriptor(VkDescriptorType type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
-			if (type == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber});
+		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
+			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
+				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
 				++globalDescriptorsNumber;
 				++uboDescriptorsNumber;
-			} else if (type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
-				descriptors.Push({type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber});
+			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
 				++globalDescriptorsNumber;
 				++combinedImageSamplersNumber;
 			} else {
 				assert(!"unreachable");
 			}
+		}
+
+		int getBindingOfDescriptor(DescriptorsTypes type) {
+			for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
+				if ( type == descriptors[i].type )
+					return descriptors[i].binding;
+			}
+
+			return -1;
 		}
 	};
 
@@ -426,6 +454,7 @@ namespace GLVM::core
 	    float previousTime = 0;
 		float accumulator = 0;
 		bool animationFlag = false;
+		unsigned int actorsNumber = 0;
 		
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<ecs::Texture> texture_load_data_;

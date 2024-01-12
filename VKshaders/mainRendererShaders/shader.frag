@@ -193,13 +193,13 @@ void main()
 	vec3 viewDirection  = normalize(viewPos.viewPosition - fs_in.fragmentPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
-	// for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
-	// 	vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-	// 	float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
+		vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
+		float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
 	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
 		debugPrintfEXT("Quadratic value: %f", pointLights.pointLightsArray[3].quadratic);
@@ -219,16 +219,16 @@ void main()
 			shadow = 0.0;
 	}
 
-	// for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
-	// 	vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
-	// 								  inFragmentPosition, viewDirection);
-	// 	float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
-	// 									 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
+	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
+		vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
+									  inFragmentPosition, viewDirection);
+		float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
+										 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
 
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
 //    float depthValue = texture(directionalLightsShadowMaps, inFragmentTextureCoordinate).r;
 //x	float depthValue = texture(pointLightsCubeShadowMaps, vec3(inFragmentTextureCoordinate, 0)).r;

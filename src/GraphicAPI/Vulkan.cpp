@@ -7,6 +7,7 @@
 #include "Vector.hpp"
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <exception>
 #include <vulkan/vulkan_core.h>
@@ -325,9 +326,14 @@ namespace GLVM::core
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::directionalLight,
 																									  cm::mesh>();
+
+		directionalLightNumber = directionalLightLinkedEntities.GetSize();
+		directionalLightShadowMapTextureSamplers.resize(directionalLightNumber);
+
+		if ( directionalLightNumber > 0 )
+			directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+											   DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		
-		directionalLightShadowMapTextureSamplers.resize(directionalLightLinkedEntities.GetSize());
-		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -335,9 +341,13 @@ namespace GLVM::core
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::mesh>();
+
+		spotLightNumber = spotLightLinkedEntities.GetSize();
+		spotLightShadowMapTextureSamplers.resize(spotLightNumber);
+		if ( spotLightNumber > 0 )
+			spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+											DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		
-		spotLightShadowMapTextureSamplers.resize(spotLightLinkedEntities.GetSize());
-		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -345,29 +355,63 @@ namespace GLVM::core
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::pointLight,
 																							   cm::mesh>();
-		
-		pointLightShadowMapTextureSamplers.resize(pointLightLinkedEntities.GetSize());
 
-		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		pointLightNumber = pointLightLinkedEntities.GetSize();
+		pointLightShadowMapTextureSamplers.resize(pointLightNumber);
+		if ( pointLightNumber > 0 )
+			pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+											 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 //		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+
+
+		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																								cm::material,
+																								cm::mesh>();
+
+		actorsNumber = actorsLinkedEntities.GetSize();
 		
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DIRECTIONAL_LIGHTS_NUMBER);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, SPOT_LIGHTS_NUMBER);
+
+		if ( actorsNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+
+		if ( directionalLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+
+		if ( spotLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+
+		if ( actorsNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::VIEW_POSITION_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+		if ( actorsNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MATERIAL_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+		if ( directionalLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+		if ( pointLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::POINT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+		if ( spotLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+
+		if ( actorsNumber > 0 ) {
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIFFUSE_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		}
+
+		if ( directionalLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, DIRECTIONAL_LIGHTS_NUMBER);
+
+		if ( pointLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
+
+		if ( spotLightNumber > 0 )
+			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, SPOT_LIGHTS_NUMBER);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
@@ -529,7 +573,7 @@ namespace GLVM::core
 		createSpotLightShadowMapDescriptorSets();
 		createPointLightShadowMapDescriptorSets();
         createMainRenderDescriptorSets();
-		setDebugObjectNames();
+//		setDebugObjectNames();
         createCommandBuffers();
 //		createShadowMapSyncObjects();
         createSyncObjects();
@@ -540,7 +584,7 @@ namespace GLVM::core
         vkDestroyImage(device, depthImage, nullptr);
         vkFreeMemory(device, depthImageMemory, nullptr);
 
-		directionalLightShadowMapImages.clear();
+		directionalLightPipeline.descriptors[0].textureImages.clear();
 		spotLightShadowMapImages.clear();
 		pointLightShadowMapImages.clear();
 
@@ -1100,7 +1144,7 @@ namespace GLVM::core
 			VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 			modelMatrixUboLayout.binding = descriptors[i].binding;
 			modelMatrixUboLayout.descriptorCount = descriptors[i].descriptorsNumber;
-			modelMatrixUboLayout.descriptorType = descriptors[i].type;
+			modelMatrixUboLayout.descriptorType = descriptors[i].vkType;
 			modelMatrixUboLayout.pImmutableSamplers = nullptr;
 			modelMatrixUboLayout.stageFlags = descriptors[i].shaderStageFlag;
 
@@ -1277,7 +1321,7 @@ namespace GLVM::core
 		directionalLightShadowMapFrameBuffers.resize(directionalLightNumber);
         for (size_t i = 0; i < directionalLightNumber; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
-			directionalLightsRenderAttachments.push_back(directionalLightShadowMapImages[i].views[0]);
+			directionalLightsRenderAttachments.push_back(directionalLightPipeline.descriptors[0].textureImages[i].views[0]);
 
 			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
@@ -1286,7 +1330,7 @@ namespace GLVM::core
 		spotLightShadowMapFrameBuffers.resize(spotLightNumber);
         for (size_t i = 0; i < spotLightNumber; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
-			spotLightsRenderAttachments.push_back(spotLightShadowMapImages[i].views[0]);
+			spotLightsRenderAttachments.push_back(spotLightPipeline.descriptors[0].textureImages[i].views[0]);
 			
 			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
@@ -1296,7 +1340,7 @@ namespace GLVM::core
 		for ( size_t j = 0; j < pointLightNumber; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
-				pointLightsRenderAttachments.push_back(pointLightShadowMapImages[j].views[m]);
+				pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
 //				pointLightsRenderAttachments.push_back(pointLightImages[j * m + m].views[0]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
@@ -1382,7 +1426,8 @@ namespace GLVM::core
 			createImage(depthImage);
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			directionalLightShadowMapImages.push_back(depthImage);
+//			directionalLightShadowMapImages.push_back(depthImage);
+			directionalLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 		
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -1408,7 +1453,8 @@ namespace GLVM::core
 			createImage(depthImage);
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			spotLightShadowMapImages.push_back(depthImage);
+//			spotLightShadowMapImages.push_back(depthImage);
+			spotLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -1458,14 +1504,18 @@ namespace GLVM::core
 			}
 
 			setImageDebugObjectName(depthImage);
-			pointLightShadowMapImages.push_back(depthImage);
+//			pointLightShadowMapImages.push_back(depthImage);
+			pointLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
-			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+//			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			setImageDebugObjectName(pointLightShadowMapImages[i]);
-			pointLightShadowMapImages[i].views.push_back(createImageView(pointLightShadowMapImages[i], 0, 6));
+			// setImageDebugObjectName(pointLightShadowMapImages[i]);
+			// pointLightShadowMapImages[i].views.push_back(createImageView(pointLightShadowMapImages[i], 0, 6));
+			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
+			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
 		}
 		
 		// createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
@@ -1568,8 +1618,8 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::createDirectionalLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(directionalLightShadowMapImages[i].sampler);
+        for(unsigned int i = 0; directionalLightPipeline.descriptors.GetSize() > 0 && i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i)
+			createRenderPassShadowMapTextureSamplers(directionalLightPipeline.descriptors[0].textureImages[i].sampler);
     }
 
     void CVulkanRenderer::createSpotLightShadowMapTextureSamplers() {
@@ -1990,370 +2040,405 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-															directionalLightPipeline.descriptors[0].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  directionalLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		int directionalLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( directionalLightShadowMapMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+																directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			matrixUboAllocInfo.descriptorPool = descriptorPool;
+			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																		  directionalLightUboDescriptorsNumber);
+			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 0;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+				descriptorWrites[0].dstBinding = directionalLightShadowMapMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 	}
 
     void CVulkanRenderer::createSpotLightShadowMapDescriptorSets() {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
-															spotLightPipeline.descriptors[0].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  spotLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		int spotLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( spotLightShadowMapMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
+																spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			matrixUboAllocInfo.descriptorPool = descriptorPool;
+			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																		  spotLightUboDescriptorsNumber);
+			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapSpotLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			shadowMapSpotLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapSpotLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 0;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = shadowMapSpotLightDescriptorSets[i];
+				descriptorWrites[0].dstBinding = spotLightShadowMapMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDescriptorSets() {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
-															pointLightPipeline.descriptors[0].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
-																	  pointLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		int pointLightShadowMapMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( pointLightShadowMapMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
+																pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			matrixUboAllocInfo.descriptorPool = descriptorPool;
+			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
+																		  pointLightUboDescriptorsNumber);
+			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 
-		shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
+			shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 0;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
+				descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 	}
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
-															mainRenderScenePipeline.descriptors[0].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		int modelMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
+		if ( modelMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
+																mainRenderScenePipeline.descriptors[modelMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			matrixUboAllocInfo.descriptorPool = descriptorPool;
+			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
+			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		matrixUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, matrixUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
+			matrixUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, matrixUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = matrixUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 0;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = matrixUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = modelMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
-
-		std::vector<VkDescriptorSetLayout> dirLightSpaceMatrixUboLayouts(MAX_FRAMES_IN_FLIGHT,
-															mainRenderScenePipeline.descriptors[1].setLayout);
-		VkDescriptorSetAllocateInfo dirLightSpaceMatrixUboAllocInfo{};
-		dirLightSpaceMatrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		dirLightSpaceMatrixUboAllocInfo.descriptorPool = descriptorPool;
-		dirLightSpaceMatrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		dirLightSpaceMatrixUboAllocInfo.pSetLayouts = dirLightSpaceMatrixUboLayouts.data();
-			
-		dirLightSpaceMatrixDescriptorSet.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &dirLightSpaceMatrixUboAllocInfo, dirLightSpaceMatrixDescriptorSet.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = dirLightSpaceMatrixBuffer[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(DirLightSpaceMatrixUBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = dirLightSpaceMatrixDescriptorSet[i];
-			descriptorWrites[0].dstBinding = 1;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		std::vector<VkDescriptorSetLayout> spotLightSpaceMatrixUboLayouts(MAX_FRAMES_IN_FLIGHT,
-															mainRenderScenePipeline.descriptors[2].setLayout);
-		VkDescriptorSetAllocateInfo spotLightSpaceMatrixUboAllocInfo{};
-		spotLightSpaceMatrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		spotLightSpaceMatrixUboAllocInfo.descriptorPool = descriptorPool;
-		spotLightSpaceMatrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		spotLightSpaceMatrixUboAllocInfo.pSetLayouts = spotLightSpaceMatrixUboLayouts.data();
-			
-		spotLightSpaceMatrixDescriptorSet.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &spotLightSpaceMatrixUboAllocInfo, spotLightSpaceMatrixDescriptorSet.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-		//        int textureImageViewsIndex = 0;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = spotLightSpaceMatrixBuffer[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(SpotLightSpaceMatrixUBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = spotLightSpaceMatrixDescriptorSet[i];
-			descriptorWrites[0].dstBinding = 2;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
-		
-		std::vector<VkDescriptorSetLayout> viewPositionUboLayouts(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber,
-																  mainRenderScenePipeline.descriptors[3].setLayout);
-		VkDescriptorSetAllocateInfo viewPositionUboAllocInfo{};
-		viewPositionUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		viewPositionUboAllocInfo.descriptorPool = descriptorPool;
-		viewPositionUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber);
-		viewPositionUboAllocInfo.pSetLayouts = viewPositionUboLayouts.data();
+		int directionalLightSpaceMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO);
+		if ( directionalLightSpaceMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> dirLightSpaceMatrixUboLayouts(MAX_FRAMES_IN_FLIGHT,
+																			 mainRenderScenePipeline.descriptors[directionalLightSpaceMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo dirLightSpaceMatrixUboAllocInfo{};
+			dirLightSpaceMatrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			dirLightSpaceMatrixUboAllocInfo.descriptorPool = descriptorPool;
+			dirLightSpaceMatrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			dirLightSpaceMatrixUboAllocInfo.pSetLayouts = dirLightSpaceMatrixUboLayouts.data();
 			
-		viewPositionUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &viewPositionUboAllocInfo, viewPositionUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+			dirLightSpaceMatrixDescriptorSet.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &dirLightSpaceMatrixUboAllocInfo, dirLightSpaceMatrixDescriptorSet.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = dirLightSpaceMatrixBuffer[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(DirLightSpaceMatrixUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = dirLightSpaceMatrixDescriptorSet[i];
+				descriptorWrites[0].dstBinding = directionalLightSpaceMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = viewPositionUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(ViewPositionUBO);
+		int spotLightSpaceMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SPACE_MATRIX_UBO);
+		if ( spotLightSpaceMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> spotLightSpaceMatrixUboLayouts(MAX_FRAMES_IN_FLIGHT,
+																			  mainRenderScenePipeline.descriptors[spotLightSpaceMatrixUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo spotLightSpaceMatrixUboAllocInfo{};
+			spotLightSpaceMatrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			spotLightSpaceMatrixUboAllocInfo.descriptorPool = descriptorPool;
+			spotLightSpaceMatrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			spotLightSpaceMatrixUboAllocInfo.pSetLayouts = spotLightSpaceMatrixUboLayouts.data();
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			spotLightSpaceMatrixDescriptorSet.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &spotLightSpaceMatrixUboAllocInfo, spotLightSpaceMatrixDescriptorSet.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+			//        int textureImageViewsIndex = 0;
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = spotLightSpaceMatrixBuffer[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(SpotLightSpaceMatrixUBO);
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = viewPositionUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 3;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = spotLightSpaceMatrixDescriptorSet[i];
+				descriptorWrites[0].dstBinding = spotLightSpaceMatrixUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		std::vector<VkDescriptorSetLayout> materialUboLayouts(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber,
-															  mainRenderScenePipeline.descriptors[4].setLayout);
-		VkDescriptorSetAllocateInfo materialUboAllocInfo{};
-		materialUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		materialUboAllocInfo.descriptorPool = descriptorPool;
-		materialUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
-		materialUboAllocInfo.pSetLayouts = materialUboLayouts.data();
+		int viewPositionUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::VIEW_POSITION_UBO);
+		if ( viewPositionUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> viewPositionUboLayouts(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber,
+																	  mainRenderScenePipeline.descriptors[viewPositionUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo viewPositionUboAllocInfo{};
+			viewPositionUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			viewPositionUboAllocInfo.descriptorPool = descriptorPool;
+			viewPositionUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber);
+			viewPositionUboAllocInfo.pSetLayouts = viewPositionUboLayouts.data();
 			
-		materialUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &materialUboAllocInfo, materialUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+			viewPositionUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &viewPositionUboAllocInfo, viewPositionUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * viewPositionUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = viewPositionUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(ViewPositionUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = viewPositionUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = viewPositionUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(MaterialUBO);
+		int materialUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MATERIAL_UBO);
+		if ( materialUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> materialUboLayouts(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber,
+																  mainRenderScenePipeline.descriptors[materialUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo materialUboAllocInfo{};
+			materialUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			materialUboAllocInfo.descriptorPool = descriptorPool;
+			materialUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
+			materialUboAllocInfo.pSetLayouts = materialUboLayouts.data();
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 4;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			materialUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &materialUboAllocInfo, materialUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(MaterialUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = materialUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-																	  mainRenderScenePipeline.descriptors[5].setLayout);
-		VkDescriptorSetAllocateInfo directionalLightUboAllocInfo{};
-		directionalLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		directionalLightUboAllocInfo.descriptorPool = descriptorPool;
-		directionalLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																				directionalLightUboDescriptorsNumber);
-		directionalLightUboAllocInfo.pSetLayouts = directionalLightUboLayouts.data();
+		int directionalLightsUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO);
+		if ( directionalLightsUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+																		  mainRenderScenePipeline.descriptors[directionalLightsUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo directionalLightUboAllocInfo{};
+			directionalLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			directionalLightUboAllocInfo.descriptorPool = descriptorPool;
+			directionalLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																					directionalLightUboDescriptorsNumber);
+			directionalLightUboAllocInfo.pSetLayouts = directionalLightUboLayouts.data();
 			
-		directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &directionalLightUboAllocInfo, directionalLightUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+			directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &directionalLightUboAllocInfo, directionalLightUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = directionalLightsUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(DirectionalLightsUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = directionalLightUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = directionalLightsUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = directionalLightsUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(DirectionalLightsUBO);
+		int pointLightUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHTS_UBO);
+		if ( pointLightUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT,
+																	mainRenderScenePipeline.descriptors[pointLightUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo pointLightUboAllocInfo{};
+			pointLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			pointLightUboAllocInfo.descriptorPool = descriptorPool;
+			pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			pointLightUboAllocInfo.pSetLayouts = pointLightUboLayouts.data();
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = directionalLightUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 5;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &pointLightUboAllocInfo, pointLightUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = pointLightsUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(PointLightsUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = pointLightUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = pointLightUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		std::vector<VkDescriptorSetLayout> pointLightUboLayouts(MAX_FRAMES_IN_FLIGHT,
-																mainRenderScenePipeline.descriptors[6].setLayout);
-		VkDescriptorSetAllocateInfo pointLightUboAllocInfo{};
-		pointLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		pointLightUboAllocInfo.descriptorPool = descriptorPool;
-		pointLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		pointLightUboAllocInfo.pSetLayouts = pointLightUboLayouts.data();
+		int spotLightUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHTS_UBO);
+		if ( spotLightUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> spotLightUboLayouts(MAX_FRAMES_IN_FLIGHT,
+																   mainRenderScenePipeline.descriptors[spotLightUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo spotLightUboAllocInfo{};
+			spotLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			spotLightUboAllocInfo.descriptorPool = descriptorPool;
+			spotLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			spotLightUboAllocInfo.pSetLayouts = spotLightUboLayouts.data();
 			
-		pointLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &pointLightUboAllocInfo, pointLightUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
+			spotLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &spotLightUboAllocInfo, spotLightUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = spotLightsUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(SpotLightsUBO);
+			
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = spotLightUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = spotLightUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = pointLightsUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(PointLightsUBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = pointLightUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 6;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
-
-		std::vector<VkDescriptorSetLayout> spotLightUboLayouts(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber,
-															   mainRenderScenePipeline.descriptors[7].setLayout);
-		VkDescriptorSetAllocateInfo spotLightUboAllocInfo{};
-		spotLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		spotLightUboAllocInfo.descriptorPool = descriptorPool;
-		spotLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
-		spotLightUboAllocInfo.pSetLayouts = spotLightUboLayouts.data();
-			
-		spotLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &spotLightUboAllocInfo, spotLightUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = spotLightsUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(SpotLightsUBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = spotLightUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 7;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
-		
+		int diffuseCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIFFUSE_CIS);
 		std::vector<VkDescriptorSetLayout> diffuseSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(),
-																	mainRenderScenePipeline.descriptors[8].setLayout);
+																	mainRenderScenePipeline.descriptors[diffuseCisBinding].setLayout);
 		VkDescriptorSetAllocateInfo diffuseSamplerUboAllocInfo{};
 		diffuseSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		diffuseSamplerUboAllocInfo.descriptorPool = descriptorPool;
@@ -2375,7 +2460,7 @@ namespace GLVM::core
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 8;
+			descriptorWrites[0].dstBinding = diffuseCisBinding;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -2384,8 +2469,9 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
+		int specularCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_CIS);
 		std::vector<VkDescriptorSetLayout> specularSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(),
-																	 mainRenderScenePipeline.descriptors[9].setLayout);
+																	 mainRenderScenePipeline.descriptors[specularCisBinding].setLayout);
 		VkDescriptorSetAllocateInfo specularSamplerUboAllocInfo{};
 		specularSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		specularSamplerUboAllocInfo.descriptorPool = descriptorPool;
@@ -2407,7 +2493,7 @@ namespace GLVM::core
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = specularSamplerDescriptorSets[i];
-			descriptorWrites[0].dstBinding = 9;
+			descriptorWrites[0].dstBinding = specularCisBinding;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -2416,137 +2502,148 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
-																   mainRenderScenePipeline.descriptors[10].setLayout);
-		VkDescriptorSetAllocateInfo directionalLightShadowMapSamplerAllocInfo{};
-		directionalLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		directionalLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		directionalLightShadowMapSamplerAllocInfo.pSetLayouts = directionalLightShadowMapSamplerLayouts.data();
+		int directionalLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS);
+		if ( directionalLightShadowMapsCisBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
+																					   mainRenderScenePipeline.descriptors[directionalLightShadowMapsCisBinding].setLayout);
+			VkDescriptorSetAllocateInfo directionalLightShadowMapSamplerAllocInfo{};
+			directionalLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			directionalLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
+			directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			directionalLightShadowMapSamplerAllocInfo.pSetLayouts = directionalLightShadowMapSamplerLayouts.data();
 		
-		directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &directionalLightShadowMapSamplerAllocInfo, directionalLightSamperDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+			directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &directionalLightShadowMapSamplerAllocInfo, directionalLightSamperDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 
-		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-		for (size_t i = 0; i < directionalLightNumber; ++i) {
-			directionalLightsImageInfo[i] = {};
-			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[i].imageView = directionalLightShadowMapImages[i].views[0];
-			directionalLightsImageInfo[i].sampler = directionalLightShadowMapImages[i].sampler;
-		}
+			VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+			for (size_t i = 0; i < directionalLightNumber; ++i) {
+				directionalLightsImageInfo[i] = {};
+				directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+				directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+			}
 //			unsigned int textureIndex = i / 2;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
 
-		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-			directionalLightsImageInfo[j] = {};
-			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[j].imageView = directionalLightShadowMapImages[0].views[0];
-			directionalLightsImageInfo[j].sampler = directionalLightShadowMapImages[0].sampler;
-		}
+			for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+				directionalLightsImageInfo[j] = {};
+				directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+				directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
+			}
 
-		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
-		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-			directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
-			directionalLightsDescriptorWrites[m].dstBinding = 10;
-			directionalLightsDescriptorWrites[m].dstArrayElement = 0;
-			directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
-			directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
-		}
+			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
+			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+				directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
+				directionalLightsDescriptorWrites[m].dstBinding = directionalLightShadowMapsCisBinding;
+				directionalLightsDescriptorWrites[m].dstArrayElement = 0;
+				directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+				directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
+			}
 
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+		}
 		
 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-		
-		std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
-																	   mainRenderScenePipeline.descriptors[11].setLayout);
-		VkDescriptorSetAllocateInfo pointLightCubeShadowMapSamplerAllocInfo{};
-		pointLightCubeShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		pointLightCubeShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		pointLightCubeShadowMapSamplerAllocInfo.pSetLayouts = pointLightCubeShadowMapSamplerLayouts.data();
-		
-		pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &pointLightCubeShadowMapSamplerAllocInfo, pointLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
 
-		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < pointLightNumber; ++i) {
+		int pointLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS);
+		int pointLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> pointLightCubeShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
+																					 mainRenderScenePipeline.descriptors[pointLightShadowMapsCisBinding].setLayout);
+			VkDescriptorSetAllocateInfo pointLightCubeShadowMapSamplerAllocInfo{};
+			pointLightCubeShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			pointLightCubeShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
+			pointLightCubeShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			pointLightCubeShadowMapSamplerAllocInfo.pSetLayouts = pointLightCubeShadowMapSamplerLayouts.data();
+		
+			pointLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &pointLightCubeShadowMapSamplerAllocInfo, pointLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+			for (size_t i = 0; i < pointLightNumber; ++i) {
 //			unsigned int textureIndex = i / 2;
-			pointLightsImageInfo[i] = {};
-			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			pointLightsImageInfo[i].imageView = pointLightShadowMapImages[i].views[6];
-			pointLightsImageInfo[i].sampler = pointLightShadowMapImages[i].sampler;
+				pointLightsImageInfo[i] = {};
+				pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
+				pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+			}
+
+
+			for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+				pointLightsImageInfo[j] = {};
+				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
+				pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
+			}
+
+			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
+			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+				pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
+				pointLightsDescriptorWrites[m].dstBinding = pointLightShadowMapsCisBinding;
+				pointLightsDescriptorWrites[m].dstArrayElement = 0;
+				pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
+				pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
+			}
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
 		}
-
-
-		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-			pointLightsImageInfo[j] = {};
-			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			pointLightsImageInfo[j].imageView = pointLightShadowMapImages[0].views[6];
-			pointLightsImageInfo[j].sampler = pointLightShadowMapImages[0].sampler;
-		}
-
-		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
-		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-			pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
-			pointLightsDescriptorWrites[m].dstBinding = 11;
-			pointLightsDescriptorWrites[m].dstArrayElement = 0;
-			pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
-			pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
-		}
-
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
 		
 		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-		
-		std::vector<VkDescriptorSetLayout> spotLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
-																				mainRenderScenePipeline.descriptors[12].setLayout);
+
+		int spotLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS);
+		int spotLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		if ( pointLightShadowMapsCisBinding != -1 && spotLightShadowMapsMatrixUboBinding != -1 ) {
+			std::vector<VkDescriptorSetLayout> spotLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
+																				mainRenderScenePipeline.descriptors[spotLightShadowMapsCisBinding].setLayout);
 			VkDescriptorSetAllocateInfo spotLightShadowMapSamplerAllocInfo{};
-		spotLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		spotLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-		spotLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		spotLightShadowMapSamplerAllocInfo.pSetLayouts = spotLightShadowMapSamplerLayouts.data();
+			spotLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			spotLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
+			spotLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+			spotLightShadowMapSamplerAllocInfo.pSetLayouts = spotLightShadowMapSamplerLayouts.data();
 		
-		spotLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &spotLightShadowMapSamplerAllocInfo, spotLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+			spotLightSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+			if (vkAllocateDescriptorSets(device, &spotLightShadowMapSamplerAllocInfo, spotLightSamplerDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 				
-		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < spotLightNumber; ++i) {
-			spotLightsImageInfo[i] = {};
-			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[i].imageView = spotLightShadowMapImages[i].views[0];
-			spotLightsImageInfo[i].sampler = spotLightShadowMapImages[i].sampler;
-		}
+			VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
+			for (size_t i = 0; i < spotLightNumber; ++i) {
+				spotLightsImageInfo[i] = {};
+				spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
+				spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+			}
 
-		for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-			spotLightsImageInfo[j] = {};
-			spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[j].imageView = spotLightShadowMapImages[0].views[0];
-			spotLightsImageInfo[j].sampler = spotLightShadowMapImages[0].sampler;
-		}
+			for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
+				spotLightsImageInfo[j] = {};
+				spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
+				spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
+			}
 
-		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> spotLightsDescriptorWrites{};
-		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-			spotLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			spotLightsDescriptorWrites[m].dstSet = spotLightSamplerDescriptorSets[m];
-			spotLightsDescriptorWrites[m].dstBinding = 12;
-			spotLightsDescriptorWrites[m].dstArrayElement = 0;
-			spotLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-			spotLightsDescriptorWrites[m].descriptorCount = SPOT_LIGHTS_NUMBER;
-			spotLightsDescriptorWrites[m].pImageInfo = spotLightsImageInfo;
-		}
+			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> spotLightsDescriptorWrites{};
+			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+				spotLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				spotLightsDescriptorWrites[m].dstSet = spotLightSamplerDescriptorSets[m];
+				spotLightsDescriptorWrites[m].dstBinding = spotLightShadowMapsCisBinding;
+				spotLightsDescriptorWrites[m].dstArrayElement = 0;
+				spotLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				spotLightsDescriptorWrites[m].descriptorCount = SPOT_LIGHTS_NUMBER;
+				spotLightsDescriptorWrites[m].pImageInfo = spotLightsImageInfo;
+			}
 
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(spotLightsDescriptorWrites.size()), spotLightsDescriptorWrites.data(), 0, nullptr);
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(spotLightsDescriptorWrites.size()), spotLightsDescriptorWrites.data(), 0, nullptr);
+		}
 	}
 
 	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
@@ -2826,8 +2923,8 @@ namespace GLVM::core
 		for (size_t i = 0; i < directionalLightNumber; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[i].imageView = directionalLightShadowMapImages[i].views[0];
-			directionalLightsImageInfo[i].sampler = directionalLightShadowMapImages[i].sampler;
+			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 //			unsigned int textureIndex = i / 2;
 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
@@ -2836,8 +2933,8 @@ namespace GLVM::core
 		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
 			directionalLightsImageInfo[j] = {};
 			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[j].imageView = directionalLightShadowMapImages[0].views[0];
-			directionalLightsImageInfo[j].sampler = directionalLightShadowMapImages[0].sampler;
+			directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+			directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
 		}
 
 		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
@@ -3147,8 +3244,11 @@ namespace GLVM::core
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);			
+				if ( directionalLightNumber > 2 ) {
+					updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
+				}
+				
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3218,8 +3318,10 @@ namespace GLVM::core
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
+				if ( spotLightNumber > 3 ) {
+					updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
+				}
 				// updateDirectionalLightShadowMapMatrixUBO(uboIndex, transformComponent, directionalLightComponent);
 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);			 
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
@@ -3336,8 +3438,10 @@ namespace GLVM::core
 					// 	pointLightComponent->position -= deltaTime;
 					// }
 
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+					if ( pointLightNumber > 1 ) {
+						updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
+						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+					} 
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
 					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
@@ -3408,22 +3512,45 @@ namespace GLVM::core
 			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
-			updateDirSpaceMatrix(currentFrame);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 1, 1, &dirLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
-			updateSpotSpaceMatrix(currentFrame);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1, &spotLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
-			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			updateMaterialUniformBuffer(uboIndex, materialComponent);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 4, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
-			updateDirectionalLightUniformBuffer(currentFrame);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 5, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
-			updatePointLightUniformBuffer(currentFrame);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 6, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
-			updateSpotLightUniformBuffer(currentFrame);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 7, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
+			if ( actorsNumber > 0 ) {
+				updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
+			}
+			
+			if ( directionalLightNumber > 0 ) {
+				updateDirSpaceMatrix(currentFrame);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 1, 1, &dirLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
+			}
+
+			if ( spotLightNumber > 0 ) {
+				updateSpotSpaceMatrix(currentFrame);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1, &spotLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
+			}
+
+			if ( actorsNumber > 0 ) {
+				updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
+			}
+
+			if ( actorsNumber > 0 ) {
+				updateMaterialUniformBuffer(uboIndex, materialComponent);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 4, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
+			}
+
+			if ( directionalLightNumber > 0 ) {
+				updateDirectionalLightUniformBuffer(currentFrame);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 5, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
+			}
+
+			if ( pointLightNumber > 0 ) { 
+				updatePointLightUniformBuffer(currentFrame);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 6, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
+			}
+
+			if ( spotLightNumber > 0 ) {
+				updateSpotLightUniformBuffer(currentFrame);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 7, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
+			}
 
 			
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -3433,11 +3560,19 @@ namespace GLVM::core
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 8, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 9, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 10, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 12, 1, &spotLightSamplerDescriptorSets[currentFrame], 0, nullptr);
+
+			if ( actorsNumber > 0 ) {
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 8, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 9, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			}
+
+			if ( directionalLightNumber > 0 )
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 10, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
+			// if ( pointLightNumber > 0 )
+			// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 11, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
+
+			// if ( spotLightNumber > 0 )
+			// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 12, 1, &spotLightSamplerDescriptorSets[currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
@@ -4302,14 +4437,14 @@ namespace GLVM::core
 			SetDebugObjectName(device, &spotLightImageObjectInfo);			
 		}
 
-		for ( unsigned long i = 0; i < directionalLightShadowMapImages.size(); ++i ) {
+		for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
 			directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional light shadow map image # ", i);
 			const char* strImageName = imageName.c_str();
 			directionalLightImageObjectInfo.pObjectName = strImageName;
 			directionalLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			directionalLightImageObjectInfo.objectHandle = (uint64_t)directionalLightShadowMapImages[i].image;
+			directionalLightImageObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.descriptors[0].textureImages[i].image;
 			SetDebugObjectName(device, &directionalLightImageObjectInfo);			
 		}
 
