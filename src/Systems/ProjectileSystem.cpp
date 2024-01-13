@@ -23,7 +23,11 @@ namespace GLVM::ecs
 
         core::vector<unsigned int>* pEntity_Container_refView =
 			pComponent_Manager->GetEntityContainer<cm::beholder>();
-        unsigned int iEntity_refView = (*pEntity_Container_refView)[0];
+
+		unsigned int iEntity_refView = 0;
+		if ( pEntity_Container_refView->GetSize() > 0 )
+			iEntity_refView = (*pEntity_Container_refView)[0];
+		
         cm::beholder* view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
         
         float cameraSpeed = 5.5f * deltaFrameTime;            
