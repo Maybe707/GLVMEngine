@@ -330,8 +330,7 @@ namespace GLVM::core
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
 		directionalLightShadowMapTextureSamplers.resize(directionalLightNumber);
 
-		if ( directionalLightNumber > 0 )
-			directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 											   DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
@@ -375,43 +374,19 @@ namespace GLVM::core
 		actorsNumber = actorsLinkedEntities.GetSize();
 		
 
-		if ( actorsNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
-
-		if ( directionalLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
-
-		if ( spotLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
-
-		if ( actorsNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::VIEW_POSITION_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-
-		if ( actorsNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MATERIAL_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-
-		if ( directionalLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-
-		if ( pointLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::POINT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-
-		if ( spotLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-
-		if ( actorsNumber > 0 ) {
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIFFUSE_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
-		}
-
-		if ( directionalLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, DIRECTIONAL_LIGHTS_NUMBER);
-
-		if ( pointLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
-
-		if ( spotLightNumber > 0 )
-			mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, SPOT_LIGHTS_NUMBER);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHT_SPACE_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::VIEW_POSITION_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MATERIAL_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::POINT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHTS_UBO, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIFFUSE_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, 1);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, DIRECTIONAL_LIGHTS_NUMBER);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, POINT_LIGHTS_NUMBER);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS, VK_SHADER_STAGE_FRAGMENT_BIT, SPOT_LIGHTS_NUMBER);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
@@ -1407,7 +1382,9 @@ namespace GLVM::core
 																									  cm::directionalLight,
 																									  cm::mesh>();
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
+		unsigned int actual_size = directionalLightNumber ? directionalLightNumber : 1;
+		
+		for ( unsigned int i = 0; i < actual_size; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
@@ -1897,12 +1874,22 @@ namespace GLVM::core
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
 		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * directionalLightLinkedEntities.GetSize();
 
-        shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-        shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		if ( directionalLightUboDescriptorsNumber > 0 ) {
+			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
-            createBuffer(modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
+				createBuffer(modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
+			}
+		} else {
+			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+				createBuffer(modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
+			}
 		}
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
@@ -1989,15 +1976,23 @@ namespace GLVM::core
 						 materialUniformBuffers[i], materialUniformBuffersMemory[i]);
 		}
 
-		
-        directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-        directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		if ( directionalLightUboDescriptorsNumber > 0 ) {
+			directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
-            createBuffer(directionalLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 directionalLightsUniformBuffers[i], directionalLightsUniformBuffersMemory[i]);
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
+				createBuffer(directionalLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 directionalLightsUniformBuffers[i], directionalLightsUniformBuffersMemory[i]);
+			}
+		} else {
+			directionalLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+			directionalLightsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+				createBuffer(directionalLightsBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 directionalLightsUniformBuffers[i], directionalLightsUniformBuffersMemory[i]);
+			}
 		}
-
 
 		
         pointLightsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -2041,39 +2036,40 @@ namespace GLVM::core
 
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
 		int directionalLightShadowMapMatrixUboBinding = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		if ( directionalLightShadowMapMatrixUboBinding != -1 ) {
-			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-																directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
-			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			matrixUboAllocInfo.descriptorPool = descriptorPool;
-			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																		  directionalLightUboDescriptorsNumber);
-			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-			
-			shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
-			//        int textureImageViewsIndex = 0;
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-				modelMatrixBufferInfo.offset = 0;
-				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-			
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
-				descriptorWrites[0].dstBinding = directionalLightShadowMapMatrixUboBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-			}
+		unsigned int actual_size = directionalLightUboDescriptorsNumber ? directionalLightUboDescriptorsNumber : 1;
+		
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+															directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
+		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		matrixUboAllocInfo.descriptorPool = descriptorPool;
+		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																	  actual_size);
+		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+			
+		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+		//        int textureImageViewsIndex = 0;
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
+			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = directionalLightShadowMapMatrixUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 	}
 
@@ -2331,22 +2327,24 @@ namespace GLVM::core
 		}
 
 		int directionalLightsUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO);
-		if ( directionalLightsUboBinding != -1 ) {
-			std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+
+		unsigned int actual_size = directionalLightUboDescriptorsNumber ? directionalLightUboDescriptorsNumber : 1; 
+		
+			std::vector<VkDescriptorSetLayout> directionalLightUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
 																		  mainRenderScenePipeline.descriptors[directionalLightsUboBinding].setLayout);
 			VkDescriptorSetAllocateInfo directionalLightUboAllocInfo{};
 			directionalLightUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			directionalLightUboAllocInfo.descriptorPool = descriptorPool;
 			directionalLightUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																					directionalLightUboDescriptorsNumber);
+																					actual_size);
 			directionalLightUboAllocInfo.pSetLayouts = directionalLightUboLayouts.data();
 			
-			directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			directionalLightUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
 			if (vkAllocateDescriptorSets(device, &directionalLightUboAllocInfo, directionalLightUboDescriptorSets.data()) != VK_SUCCESS) {
 				throw std::runtime_error("failed to allocate descriptor sets!");
 			}
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
 				modelMatrixBufferInfo.buffer = directionalLightsUniformBuffers[i];
 				modelMatrixBufferInfo.offset = 0;
@@ -2364,7 +2362,6 @@ namespace GLVM::core
 
 				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 			}
-		}
 
 		int pointLightUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHTS_UBO);
 		if ( pointLightUboBinding != -1 ) {
@@ -2503,51 +2500,51 @@ namespace GLVM::core
 		}
 
 		int directionalLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS);
-		if ( directionalLightShadowMapsCisBinding != -1 ) {
-			std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
-																					   mainRenderScenePipeline.descriptors[directionalLightShadowMapsCisBinding].setLayout);
-			VkDescriptorSetAllocateInfo directionalLightShadowMapSamplerAllocInfo{};
-			directionalLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			directionalLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
-			directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-			directionalLightShadowMapSamplerAllocInfo.pSetLayouts = directionalLightShadowMapSamplerLayouts.data();
+
+		std::vector<VkDescriptorSetLayout> directionalLightShadowMapSamplerLayouts(MAX_FRAMES_IN_FLIGHT,
+																				   mainRenderScenePipeline.descriptors[directionalLightShadowMapsCisBinding].setLayout);
+		VkDescriptorSetAllocateInfo directionalLightShadowMapSamplerAllocInfo{};
+		directionalLightShadowMapSamplerAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		directionalLightShadowMapSamplerAllocInfo.descriptorPool = descriptorPool;
+		directionalLightShadowMapSamplerAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+		directionalLightShadowMapSamplerAllocInfo.pSetLayouts = directionalLightShadowMapSamplerLayouts.data();
 		
-			directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-			if (vkAllocateDescriptorSets(device, &directionalLightShadowMapSamplerAllocInfo, directionalLightSamperDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
-
-			VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-			for (size_t i = 0; i < directionalLightNumber; ++i) {
-				directionalLightsImageInfo[i] = {};
-				directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-				directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
-				directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
-			}
-//			unsigned int textureIndex = i / 2;
-			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
-			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-
-			for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-				directionalLightsImageInfo[j] = {};
-				directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-				directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-				directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-			}
-
-			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
-			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-				directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
-				directionalLightsDescriptorWrites[m].dstBinding = directionalLightShadowMapsCisBinding;
-				directionalLightsDescriptorWrites[m].dstArrayElement = 0;
-				directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
-				directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
-			}
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+		directionalLightSamperDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+		if (vkAllocateDescriptorSets(device, &directionalLightShadowMapSamplerAllocInfo, directionalLightSamperDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
+
+		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		for (size_t i = 0; i < directionalLightNumber; ++i) {
+			directionalLightsImageInfo[i] = {};
+			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+//			unsigned int textureIndex = i / 2;
+		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
+		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
+
+		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+			directionalLightsImageInfo[j] = {};
+			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+			directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
+		}
+
+		std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
+		for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
+			directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
+			directionalLightsDescriptorWrites[m].dstBinding = directionalLightShadowMapsCisBinding;
+			directionalLightsDescriptorWrites[m].dstArrayElement = 0;
+			directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+			directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
+		}
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
+
 		
 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
 

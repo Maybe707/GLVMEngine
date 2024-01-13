@@ -179,29 +179,29 @@ int main()
 	// *materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
     // TextureManager->BindTexture(u_iHud1, materialHud0->diffuseTextureID_);
 
-	Entity directionalLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
-	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 0.0f, 0.0f, 0.0f },
-		.direction = { -5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-		.specular = {1.0f, 1.0f, 1.0f}};
- 	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 0.0f, 0.0f, 0.0f },
-		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
-	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
-	*materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+	// Entity directionalLight0 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
+	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 0.0f, 0.0f, 0.0f },
+	// 	.direction = { -5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+	// 	.specular = {1.0f, 1.0f, 1.0f}};
+ 	// *ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 0.0f, 0.0f, 0.0f },
+	// 	.fScale = 0.2f };
+	// ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
+	// cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
+	// *materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+	// 	.shininess = 128.0f * 0.078125f };
 
-	Entity directionalLight1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
-	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight1) = { .position = { 0.0f, 3.0f, 2.0f },
-		.direction = { 5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-		.specular = {1.0f, 1.0f, 1.0f}};
- 	*ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
-		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 0;
-	cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
-	*materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+	// Entity directionalLight1 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
+	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight1) = { .position = { 0.0f, 3.0f, 2.0f },
+	// 	.direction = { 5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+	// 	.specular = {1.0f, 1.0f, 1.0f}};
+ 	// *ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
+	// 	.fScale = 0.2f };
+	// ComponentManager->GetComponent<cm::mesh>(directionalLight1)->id = 0;
+	// cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
+	// *materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+	// 	.shininess = 128.0f * 0.078125f };
 
 	// Entity directionalLight2 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight2);
