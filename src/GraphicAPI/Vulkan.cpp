@@ -3248,10 +3248,8 @@ namespace GLVM::core
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				if ( directionalLightNumber > 2 ) {
-					updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
-				}
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
 				
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
 				VkDeviceSize offsets[] = {0};
@@ -3322,10 +3320,9 @@ namespace GLVM::core
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				if ( spotLightNumber > 3 ) {
-					updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
-				}
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
+
 				// updateDirectionalLightShadowMapMatrixUBO(uboIndex, transformComponent, directionalLightComponent);
 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);			 
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
@@ -3442,10 +3439,9 @@ namespace GLVM::core
 					// 	pointLightComponent->position -= deltaTime;
 					// }
 
-					if ( pointLightNumber > 1 ) {
-						updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
-						vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
-					} 
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
 					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
@@ -3517,60 +3513,60 @@ namespace GLVM::core
 				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 			int modelMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
-			if ( actorsNumber > 0 && modelMatrixUboBinding != -1 ) {
+//			if ( actorsNumber > 0 && modelMatrixUboBinding != -1 ) {
 				updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										modelMatrixUboBinding, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
-			}
+//			}
 
 			int directionalLightSpaceMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO);
-			if ( directionalLightNumber > 0 && directionalLightSpaceMatrixUboBinding != -1 ) {
+//			if ( directionalLightNumber > 0 && directionalLightSpaceMatrixUboBinding != -1 ) {
 				updateDirSpaceMatrix(currentFrame);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										directionalLightSpaceMatrixUboBinding, 1, &dirLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
-			}
+//			}
 
 			int spotLightSpaceMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SPACE_MATRIX_UBO);
-			if ( spotLightNumber > 0 && spotLightSpaceMatrixUboBinding != -1 ) {
+//			if ( spotLightNumber > 0 && spotLightSpaceMatrixUboBinding != -1 ) {
 				updateSpotSpaceMatrix(currentFrame);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										spotLightSpaceMatrixUboBinding, 1, &spotLightSpaceMatrixDescriptorSet[currentFrame], 0, nullptr);
-			}
+//			}
 
 			int viewPositionUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::VIEW_POSITION_UBO);
-			if ( actorsNumber > 0 && viewPositionUboBinding != -1 ) {
+//			if ( actorsNumber > 0 && viewPositionUboBinding != -1 ) {
 				updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										viewPositionUboBinding, 1, &viewPositionUboDescriptorSets[currentFrame], 0, nullptr);
-			}
+//			}
 
 			int materialUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MATERIAL_UBO);
-			if ( actorsNumber > 0 && materialUboBinding != -1 ) {
+//			if ( actorsNumber > 0 && materialUboBinding != -1 ) {
 				updateMaterialUniformBuffer(uboIndex, materialComponent);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										materialUboBinding, 1, &materialUboDescriptorSets[uboIndex], 0, nullptr);
-			}
+//			}
 
 			int directionalLightsUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO);
-			if ( directionalLightNumber > 0 && directionalLightsUboBinding != -1 ) {
+//			if ( directionalLightNumber > 0 && directionalLightsUboBinding != -1 ) {
 				updateDirectionalLightUniformBuffer(currentFrame);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										directionalLightsUboBinding, 1, &directionalLightUboDescriptorSets[currentFrame], 0, nullptr);
-			}
+//			}
 
 			int pointLightUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHTS_UBO);
-			if ( pointLightNumber > 0 && pointLightUboBinding != -1 ) { 
+//			if ( pointLightNumber > 0 && pointLightUboBinding != -1 ) { 
 				updatePointLightUniformBuffer(currentFrame);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										pointLightUboBinding, 1, &pointLightUboDescriptorSets[currentFrame], 0, nullptr);
-			}
+//			}
 
 			int spotLightUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHTS_UBO);
-			if ( spotLightNumber > 0 && spotLightUboBinding != -1 ) {
+//			if ( spotLightNumber > 0 && spotLightUboBinding != -1 ) {
 				updateSpotLightUniformBuffer(currentFrame);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										spotLightUboBinding, 1, &spotLightUboDescriptorSets[currentFrame], 0, nullptr);
-			}
+//			}
 
 			
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
@@ -3583,22 +3579,22 @@ namespace GLVM::core
 
 			int diffuseCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIFFUSE_CIS);
 			int specularCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_CIS);
-			if ( actorsNumber > 0 ) {
+//			if ( actorsNumber > 0 ) {
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, diffuseCisBinding, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, specularCisBinding, 1, &specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			}
+//			}
 
 			int directionalLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS);
-			if ( directionalLightNumber > 0 && directionalLightShadowMapsCisBinding != -1 )
+//			if ( directionalLightNumber > 0 && directionalLightShadowMapsCisBinding != -1 )
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										directionalLightShadowMapsCisBinding, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
 
 			int pointLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAPS_CIS);
-			int pointLightShadowMapsMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+//			int pointLightShadowMapsMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 			// std::cout << "POINT LIGHT NUMBER: " << pointLightNumber << std::endl;
 			// std::cout << "SHADOW MAP BINDING: " << pointLightShadowMapsMatrixUboBinding << std::endl;
 			// std::cout << "MAIN RENDER BINDING: " << pointLightShadowMapsCisBinding << std::endl;
-			if ( pointLightNumber > 0 && pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 ) {
+//			if ( pointLightNumber > 0 && pointLightShadowMapsCisBinding != -1 && pointLightShadowMapsMatrixUboBinding != -1 ) {
 				// std::cout << "TEST" << std::endl;
 				// std::cout << "TEST" << std::endl;
 				// std::cout << "TEST" << std::endl;
@@ -3606,7 +3602,7 @@ namespace GLVM::core
 				// std::cout << "TEST" << std::endl;
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										pointLightShadowMapsCisBinding, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
-			}
+//			}
 
 			// std::cout << "TEST" << std::endl;
 			// std::cout << "TEST" << std::endl;
@@ -3615,8 +3611,8 @@ namespace GLVM::core
 			// std::cout << "TEST" << std::endl;
 			
 			int spotLightShadowMapsCisBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAPS_CIS);
-			int spotLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-			if ( spotLightNumber > 0 && spotLightShadowMapsCisBinding != -1 && spotLightShadowMapsMatrixUboBinding != -1 )
+//			int spotLightShadowMapsMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+//			if ( spotLightNumber > 0 && spotLightShadowMapsCisBinding != -1 && spotLightShadowMapsMatrixUboBinding != -1 )
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 										spotLightShadowMapsCisBinding, 1, &spotLightSamplerDescriptorSets[currentFrame], 0, nullptr);
 			
@@ -4554,16 +4550,16 @@ namespace GLVM::core
 		// 	SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
 		// }
 		
-		// for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Shadow map descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
+		for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Directional light shadow map descriptor set # ", i);
+			const char* strName = name.c_str();
+			descriptorSetObjectInfo.pObjectName = strName;
+			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+			descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
+			SetDebugObjectName(device, &descriptorSetObjectInfo);
+		}
 
  		// for ( unsigned long i = 0; i < matrixUboDescriptorSets.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
