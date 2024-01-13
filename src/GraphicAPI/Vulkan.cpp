@@ -588,25 +588,25 @@ namespace GLVM::core
 		spotLightPipeline.descriptors[0].textureImages.clear();
 		pointLightPipeline.descriptors[0].textureImages.clear();
 		
-        for (auto& framebuffer : directionalLightShadowMapFrameBuffers) {
+        for (VkFramebuffer& framebuffer : directionalLightShadowMapFrameBuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
 
-		for (auto& framebuffer : spotLightShadowMapFrameBuffers) {
+		for (VkFramebuffer& framebuffer : spotLightShadowMapFrameBuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
 
-		for (auto& inner_vector : pointLightShadowMapFrameBuffers) {
-			for (auto& framebuffer : inner_vector) {
+		for (std::vector<VkFramebuffer>& inner_vector : pointLightShadowMapFrameBuffers) {
+			for (VkFramebuffer& framebuffer : inner_vector) {
 				vkDestroyFramebuffer(device, framebuffer, nullptr);
 			} 
         }
 		
-        for (auto& framebuffer : swapChainFramebuffers) {
+        for (VkFramebuffer& framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
 
-        for (auto& imageView : swapChainImageViews) {
+        for (VkImageView& imageView : swapChainImageViews) {
             vkDestroyImageView(device, imageView, nullptr);
         }
 
