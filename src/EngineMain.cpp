@@ -41,20 +41,20 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
 	
 //	core::Engine* GLVM = core::Engine::GetInstance();		
-	ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
-		.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
-	ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
-		.dat_length_ = witch_dat_len, .u_iData_ = witch_dat };
-	ecs::Texture Texture_2{ .iWidth_ = 32, .iHeight_ = 32,
-		.dat_length_ = gray_dat_len, .u_iData_ = gray_dat };
-	ecs::Texture Texture_3{ .iWidth_ = 500, .iHeight_ = 500,
-		.dat_length_ = container2_dat_len, .u_iData_ = container2_dat };
-	ecs::Texture Texture_4{ .iWidth_ = 500, .iHeight_ = 500,
-		.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
-	ecs::Texture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
-		.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
+	// ecs::Texture Texture_0{ .iWidth_ = 128, .iHeight_ = 96,
+	// 	.dat_length_ = chelik_dat_len, .u_iData_ = chelik_dat };
+	// ecs::Texture Texture_1{ .iWidth_ = 32, .iHeight_ = 32,
+	// 	.dat_length_ = witch_dat_len, .u_iData_ = witch_dat };
+	// ecs::Texture Texture_2{ .iWidth_ = 32, .iHeight_ = 32,
+	// 	.dat_length_ = gray_dat_len, .u_iData_ = gray_dat };
+	// ecs::Texture Texture_3{ .iWidth_ = 500, .iHeight_ = 500,
+	// 	.dat_length_ = container2_dat_len, .u_iData_ = container2_dat };
+	// ecs::Texture Texture_4{ .iWidth_ = 500, .iHeight_ = 500,
+	// 	.dat_length_ = container2_specular_dat_len, .u_iData_ = container2_specular_dat };
+	// ecs::Texture hudTexture_0{ .iWidth_ = 32, .iHeight_ = 32,
+	// 	.dat_length_ = Crosshair_dat_len, .u_iData_ = Crosshair_dat };
 
-    std::vector<ecs::Texture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4, hudTexture_0 };
+    // std::vector<ecs::Texture> TextureVector{ Texture_0, Texture_1, Texture_2, Texture_3, Texture_4, hudTexture_0 };
 //    TextureManager->SetTextureVector(TextureVector);
 
     // CTexture hudTexture_1;
@@ -352,7 +352,7 @@ int main()
 	// transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
 
 	core::Engine* GLVM = core::Engine::GetInstance();
-	GLVM->SetTextureVector(TextureVector);
+//	GLVM->SetTextureVector(TextureVector);
 	GLVM->SetMesh("../waveFrontObj/cube.obj");
 	GLVM->SetMesh("../waveFrontObj/cone.obj");
 //	GLVM->SetMesh("../waveFrontObj/plain5.obj");
