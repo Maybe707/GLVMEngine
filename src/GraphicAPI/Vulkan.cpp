@@ -573,7 +573,7 @@ namespace GLVM::core
 		createSpotLightShadowMapDescriptorSets();
 		createPointLightShadowMapDescriptorSets();
         createMainRenderDescriptorSets();
-//		setDebugObjectNames();
+		setDebugObjectNames();
         createCommandBuffers();
 //		createShadowMapSyncObjects();
         createSyncObjects();
@@ -1618,7 +1618,7 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::createDirectionalLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; directionalLightPipeline.descriptors.GetSize() > 0 && i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i)
+        for(unsigned int i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i)
 			createRenderPassShadowMapTextureSamplers(directionalLightPipeline.descriptors[0].textureImages[i].sampler);
     }
 
@@ -2041,7 +2041,6 @@ namespace GLVM::core
 
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
 		int directionalLightShadowMapMatrixUboBinding = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
-
 		if ( directionalLightShadowMapMatrixUboBinding != -1 ) {
 			std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
 																directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
@@ -4408,246 +4407,262 @@ namespace GLVM::core
 	void CVulkanRenderer::setDebugObjectNames() {
  		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
 		mainPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		mainPipelineObjectInfo.pObjectName = "Main pipeline";
+		std::string mainPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31mMain pipeline #\x1b[0m ", 0);
+		const char* mainPipeLineStrImageName = mainPipeLineImageName.c_str();
+		mainPipelineObjectInfo.pObjectName = mainPipeLineStrImageName;
 		mainPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
 		mainPipelineObjectInfo.objectHandle = (uint64_t)mainRenderScenePipeline.pipeline;
 		SetDebugObjectName(device, &mainPipelineObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT mainPipelineLayoutObjectInfo{};
 		mainPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		mainPipelineLayoutObjectInfo.pObjectName = "Main pipeline layout";
+		std::string mainPipelineLayoutImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_LAYOUT_RED, " \x1b[31mMain pipeline layout #\x1b[0m ", 0);
+		const char* mainPipelineLayoutStrImageName = mainPipelineLayoutImageName.c_str();
+		mainPipelineLayoutObjectInfo.pObjectName = mainPipelineLayoutStrImageName;
 		mainPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 		mainPipelineLayoutObjectInfo.objectHandle = (uint64_t)mainRenderScenePipeline.pipelineLayout;
 		SetDebugObjectName(device, &mainPipelineObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT directionalLightPipelineObjectInfo{};
 		directionalLightPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		directionalLightPipelineObjectInfo.pObjectName = "Directional light pipeline";
+		std::string directionalLightPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31mDirectional light pipeline #\x1b[0m ", 0);
+		const char* directionalLightPipeLineStrImageName = directionalLightPipeLineImageName.c_str();
+		directionalLightPipelineObjectInfo.pObjectName = directionalLightPipeLineStrImageName;
 		directionalLightPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
 		directionalLightPipelineObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.pipeline;
 		SetDebugObjectName(device, &directionalLightPipelineObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT directionalLightPipelineLayoutObjectInfo{};
 		directionalLightPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		directionalLightPipelineLayoutObjectInfo.pObjectName = "Directional light pipeline layout";
+		std::string directionalLightPipelineLayoutImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_LAYOUT_RED, " \x1b[31mDirectional light pipeline layout #\x1b[0m ", 0);
+		const char* directionalLightPipelineLayoutStrImageName = directionalLightPipelineLayoutImageName.c_str();
+		directionalLightPipelineLayoutObjectInfo.pObjectName = directionalLightPipelineLayoutStrImageName;
 		directionalLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 		directionalLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &directionalLightPipelineLayoutObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT spotLightPipelineObjectInfo{};
 		spotLightPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		spotLightPipelineObjectInfo.pObjectName = "Spot light pipeline";
+		std::string spotLightPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31mSpot light pipeline #\x1b[0m ", 0);
+		const char* spotLightPipeLineStrImageName = spotLightPipeLineImageName.c_str();
+		spotLightPipelineObjectInfo.pObjectName = spotLightPipeLineStrImageName;
 		spotLightPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
 		spotLightPipelineObjectInfo.objectHandle = (uint64_t)spotLightPipeline.pipeline;
 		SetDebugObjectName(device, &spotLightPipelineObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT spotLightPipelineLayoutObjectInfo{};
 		spotLightPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		spotLightPipelineLayoutObjectInfo.pObjectName = "Spot light pipeline layout";
+		std::string spotLightPipelineLayoutImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_LAYOUT_RED, " \x1b[31mSpot light pipeline layout #\x1b[0m ", 0);
+		const char* spotLightPipelineLayoutStrImageName = spotLightPipelineLayoutImageName.c_str();
+		spotLightPipelineLayoutObjectInfo.pObjectName = spotLightPipelineLayoutStrImageName;
 		spotLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 		spotLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)spotLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &spotLightPipelineLayoutObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT pointLightPipelineObjectInfo{};
 		pointLightPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		pointLightPipelineObjectInfo.pObjectName = "Point light pipeline";
+		std::string pointLightPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31mPoint light pipeline #\x1b[0m ", 0);
+		const char* pointLightPipeLineStrImageName = pointLightPipeLineImageName.c_str();
+		pointLightPipelineObjectInfo.pObjectName = pointLightPipeLineStrImageName;
 		pointLightPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
 		pointLightPipelineObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipeline;
 		SetDebugObjectName(device, &pointLightPipelineObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT pointLightPipelineLayoutObjectInfo{};
 		pointLightPipelineLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		pointLightPipelineLayoutObjectInfo.pObjectName = "Point light pipeline layout";
+		std::string pointLightPipelineLayoutImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_LAYOUT_RED, " \x1b[31mPoint light pipeline layout #\x1b[0m ", 0);
+		const char* pointLightPipelineLayoutStrImageName = pointLightPipelineLayoutImageName.c_str();
+		pointLightPipelineLayoutObjectInfo.pObjectName = pointLightPipelineLayoutStrImageName;
 		pointLightPipelineLayoutObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE_LAYOUT;
 		pointLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &pointLightPipelineLayoutObjectInfo);
 
-		for ( unsigned long i = 0; i < pointLightShadowMapImages.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT pointLightImageObjectInfo{};
-			pointLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point light shadow map image # ", i);
-			const char* strImageName = imageName.c_str();
-			pointLightImageObjectInfo.pObjectName = strImageName;
-			pointLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			pointLightImageObjectInfo.objectHandle = (uint64_t)pointLightShadowMapImages[i].image;
-			SetDebugObjectName(device, &pointLightImageObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < pointLightShadowMapImages.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT pointLightImageObjectInfo{};
+		// 	pointLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point light shadow map image # ", i);
+		// 	const char* strImageName = imageName.c_str();
+		// 	pointLightImageObjectInfo.pObjectName = strImageName;
+		// 	pointLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		// 	pointLightImageObjectInfo.objectHandle = (uint64_t)pointLightShadowMapImages[i].image;
+		// 	SetDebugObjectName(device, &pointLightImageObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < spotLightShadowMapImages.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT spotLightImageObjectInfo{};
-			spotLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot light shadow map image # ", i);
-			const char* strImageName = imageName.c_str();
-			spotLightImageObjectInfo.pObjectName = strImageName;
-			spotLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			spotLightImageObjectInfo.objectHandle = (uint64_t)spotLightShadowMapImages[i].image;
-			SetDebugObjectName(device, &spotLightImageObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < spotLightShadowMapImages.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT spotLightImageObjectInfo{};
+		// 	spotLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot light shadow map image # ", i);
+		// 	const char* strImageName = imageName.c_str();
+		// 	spotLightImageObjectInfo.pObjectName = strImageName;
+		// 	spotLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		// 	spotLightImageObjectInfo.objectHandle = (uint64_t)spotLightShadowMapImages[i].image;
+		// 	SetDebugObjectName(device, &spotLightImageObjectInfo);			
+		// }
 
-		for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
-			directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional light shadow map image # ", i);
-			const char* strImageName = imageName.c_str();
-			directionalLightImageObjectInfo.pObjectName = strImageName;
-			directionalLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			directionalLightImageObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.descriptors[0].textureImages[i].image;
-			SetDebugObjectName(device, &directionalLightImageObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
+		// 	directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional light shadow map image # ", i);
+		// 	const char* strImageName = imageName.c_str();
+		// 	directionalLightImageObjectInfo.pObjectName = strImageName;
+		// 	directionalLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		// 	directionalLightImageObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.descriptors[0].textureImages[i].image;
+		// 	SetDebugObjectName(device, &directionalLightImageObjectInfo);			
+		// }
 
-		for ( unsigned long i = 0; i < textureImages.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT textureImageObjectInfo{};
-			textureImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Texture image # ", i);
-			const char* strImageName = imageName.c_str();
-			textureImageObjectInfo.pObjectName = strImageName;
-			textureImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			textureImageObjectInfo.objectHandle = (uint64_t)textureImages[i].image;
-			SetDebugObjectName(device, &textureImageObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < textureImages.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT textureImageObjectInfo{};
+		// 	textureImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Texture image # ", i);
+		// 	const char* strImageName = imageName.c_str();
+		// 	textureImageObjectInfo.pObjectName = strImageName;
+		// 	textureImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		// 	textureImageObjectInfo.objectHandle = (uint64_t)textureImages[i].image;
+		// 	SetDebugObjectName(device, &textureImageObjectInfo);			
+		// }
 
-		for ( unsigned long i = 0; i < swapChainImages.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT swapChainImageObjectInfo{};
-			swapChainImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " SwapChain image # ", i);
-			const char* strImageName = imageName.c_str();
-			swapChainImageObjectInfo.pObjectName = strImageName;
-			swapChainImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-			swapChainImageObjectInfo.objectHandle = (uint64_t)swapChainImages[i];
-			SetDebugObjectName(device, &swapChainImageObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < swapChainImages.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT swapChainImageObjectInfo{};
+		// 	swapChainImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " SwapChain image # ", i);
+		// 	const char* strImageName = imageName.c_str();
+		// 	swapChainImageObjectInfo.pObjectName = strImageName;
+		// 	swapChainImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
+		// 	swapChainImageObjectInfo.objectHandle = (uint64_t)swapChainImages[i];
+		// 	SetDebugObjectName(device, &swapChainImageObjectInfo);			
+		// }
 		
-		for ( unsigned long i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
-			descriptorSetLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string layoutName = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED, " Directional light shadow map descriptor set layout # ", i);
-			const char* strLayoutName = layoutName.c_str();
-			descriptorSetLayoutObjectInfo.pObjectName = strLayoutName;
-			descriptorSetLayoutObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
-			descriptorSetLayoutObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.descriptors[i].setLayout;
-			SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
+		// 	descriptorSetLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string layoutName = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED, " Directional light shadow map descriptor set layout # ", i);
+		// 	const char* strLayoutName = layoutName.c_str();
+		// 	descriptorSetLayoutObjectInfo.pObjectName = strLayoutName;
+		// 	descriptorSetLayoutObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
+		// 	descriptorSetLayoutObjectInfo.objectHandle = (uint64_t)directionalLightPipeline.descriptors[i].setLayout;
+		// 	SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
+		// }
 
-		for ( unsigned long i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
-			descriptorSetLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string layoutName = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED, " Main render descriptor set layout # ", i);
-			const char* strLayoutName = layoutName.c_str();
-			descriptorSetLayoutObjectInfo.pObjectName = strLayoutName;
-			descriptorSetLayoutObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
-			descriptorSetLayoutObjectInfo.objectHandle = (uint64_t)mainRenderScenePipeline.descriptors[i].setLayout;
-			SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
-		}
+		// for ( unsigned long i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetLayoutObjectInfo{};
+		// 	descriptorSetLayoutObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string layoutName = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_LAYOUT_RED, " Main render descriptor set layout # ", i);
+		// 	const char* strLayoutName = layoutName.c_str();
+		// 	descriptorSetLayoutObjectInfo.pObjectName = strLayoutName;
+		// 	descriptorSetLayoutObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT;
+		// 	descriptorSetLayoutObjectInfo.objectHandle = (uint64_t)mainRenderScenePipeline.descriptors[i].setLayout;
+		// 	SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
+		// }
 		
-		for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Shadow map descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Shadow map descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
- 		for ( unsigned long i = 0; i < matrixUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render model matrix descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)matrixUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+ 		// for ( unsigned long i = 0; i < matrixUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render model matrix descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)matrixUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < viewPositionUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render view position descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)viewPositionUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < viewPositionUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render view position descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)viewPositionUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < materialUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render material descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)materialUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < materialUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render material descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)materialUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < directionalLightUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render directional light descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)directionalLightUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < directionalLightUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render directional light descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)directionalLightUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < pointLightUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render point light descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)pointLightUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < pointLightUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render point light descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)pointLightUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < spotLightUboDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render spot light descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)spotLightUboDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < spotLightUboDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render spot light descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)spotLightUboDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < diffuseSamplerDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render diffuse sampler descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)diffuseSamplerDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < diffuseSamplerDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render diffuse sampler descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)diffuseSamplerDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
- 		for ( unsigned long i = 0; i < specularSamplerDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render specular sampler descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)specularSamplerDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+ 		// for ( unsigned long i = 0; i < specularSamplerDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render specular sampler descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)specularSamplerDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 
-		for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render shadow map directional light descriptor set # ", i);
-			const char* strName = name.c_str();
-			descriptorSetObjectInfo.pObjectName = strName;
-			descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-			descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
-			SetDebugObjectName(device, &descriptorSetObjectInfo);
-		}
+		// for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
+		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render shadow map directional light descriptor set # ", i);
+		// 	const char* strName = name.c_str();
+		// 	descriptorSetObjectInfo.pObjectName = strName;
+		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
+		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
+		// }
 	}
 }
 
