@@ -356,8 +356,7 @@ namespace GLVM::core
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
 		pointLightShadowMapTextureSamplers.resize(pointLightNumber);
-		if ( pointLightNumber > 0 )
-			pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 											 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, 1);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 //		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
@@ -1439,8 +1438,9 @@ namespace GLVM::core
 																								cm::pointLight,
 																								cm::mesh>();
 		pointLightNumber = pointLightLinkedEntities.GetSize();
+		unsigned int point_actual_size = pointLightNumber ? pointLightNumber : 1;
 
-		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
+		for ( unsigned int i = 0; i < point_actual_size; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
@@ -1477,6 +1477,53 @@ namespace GLVM::core
 
 				// createImage(textureImage);
 				// pointLightImages.push_back(textureImage);
+
+				VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+				VkImageMemoryBarrier barrier{};
+				barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+				barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+				barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+				barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+				barrier.image = depthImage.image;
+				barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+				barrier.subresourceRange.baseMipLevel = 0;
+				barrier.subresourceRange.levelCount = 1;
+				barrier.subresourceRange.baseArrayLayer = 0;
+				barrier.subresourceRange.layerCount = 6;
+
+				VkPipelineStageFlags sourceStage;
+				VkPipelineStageFlags destinationStage;
+
+//				if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
+				barrier.srcAccessMask = 0;
+				barrier.dstAccessMask = 0;
+
+				sourceStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+				destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+				// } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
+				// 	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+				// 	barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+				// 	sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+				// 	destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+				// } else {
+				// } else {
+				// 	throw std::invalid_argument("unsupported layout transition!");
+				// }
+
+				vkCmdPipelineBarrier(
+					commandBuffer,
+					sourceStage, destinationStage,
+					0,
+					0, nullptr,
+					0, nullptr,
+					1, &barrier
+					);
+
+				endSingleTimeCommands(commandBuffer);
+
 				
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
 			}
@@ -1486,7 +1533,7 @@ namespace GLVM::core
 			pointLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
-		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
+		for ( unsigned int i = 0; i < point_actual_size; ++i ) {
 //			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
@@ -1671,7 +1718,7 @@ namespace GLVM::core
         imageInfo.arrayLayers = image.arrayLayers;
         imageInfo.format = image.format;
         imageInfo.tiling = image.tiling;
-//        imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+//        imageInfo.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
         imageInfo.usage = image.usageFlags;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = image.createFlags;
@@ -2603,6 +2650,7 @@ namespace GLVM::core
 			for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
 				pointLightsImageInfo[j] = {};
 				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+//				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 				pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
 				pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
 			}
