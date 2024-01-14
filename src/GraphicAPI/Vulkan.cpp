@@ -2410,40 +2410,42 @@ namespace GLVM::core
 
 		int materialUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MATERIAL_UBO);
 		core::vector<Entity> entities_material_cmp = componentManager->collectLinkedEntities<cm::material>();
-		unsigned int entities_material_cmp_size = entities_material_cmp.GetSize();
+//		unsigned int entities_material_cmp_size = entities_material_cmp.GetSize();
 		
-		unsigned int material_ubo_actual_size = entities_material_cmp_size ? entities_material_cmp_size : 1; 
-		
-		std::vector<VkDescriptorSetLayout> materialUboLayouts(MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size,
-															  mainRenderScenePipeline.descriptors[materialUboBinding].setLayout);
-		VkDescriptorSetAllocateInfo materialUboAllocInfo{};
-		materialUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		materialUboAllocInfo.descriptorPool = descriptorPool;
-		materialUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size);
-		materialUboAllocInfo.pSetLayouts = materialUboLayouts.data();
+//		unsigned int material_ubo_actual_size = entities_material_cmp_size ? entities_material_cmp_size : 1; 
+
+		if ( materialUboDescriptorsNumber > 0 ) {
+			std::vector<VkDescriptorSetLayout> materialUboLayouts(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber,
+																  mainRenderScenePipeline.descriptors[materialUboBinding].setLayout);
+			VkDescriptorSetAllocateInfo materialUboAllocInfo{};
+			materialUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			materialUboAllocInfo.descriptorPool = descriptorPool;
+			materialUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
+			materialUboAllocInfo.pSetLayouts = materialUboLayouts.data();
 			
-		materialUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size);
-		if (vkAllocateDescriptorSets(device, &materialUboAllocInfo, materialUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+			materialUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber);
+			if (vkAllocateDescriptorSets(device, &materialUboAllocInfo, materialUboDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(MaterialUBO);
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber; ++i) {
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
+				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.range = sizeof(MaterialUBO);
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = materialUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
+				descriptorWrites[0].dstBinding = materialUboBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
 		}
 
 		int directionalLightsUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO);
