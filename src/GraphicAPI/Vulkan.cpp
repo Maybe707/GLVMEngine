@@ -2409,7 +2409,10 @@ namespace GLVM::core
 		}
 
 		int materialUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MATERIAL_UBO);
-		unsigned int material_ubo_actual_size = matrixUboDescriptorsNumber ? matrixUboDescriptorsNumber : 1; 
+		core::vector<Entity> entities_material_cmp = componentManager->collectLinkedEntities<cm::material>();
+		unsigned int entities_material_cmp_size = entities_material_cmp.GetSize();
+		
+		unsigned int material_ubo_actual_size = entities_material_cmp_size ? entities_material_cmp_size : 1; 
 		
 		std::vector<VkDescriptorSetLayout> materialUboLayouts(MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size,
 															  mainRenderScenePipeline.descriptors[materialUboBinding].setLayout);
@@ -2835,6 +2838,9 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::updateDescriptorSets() {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
+		
 		int modelMatrixUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
 		if ( modelMatrixUboBinding != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
@@ -2925,25 +2931,28 @@ namespace GLVM::core
 		}
 
 		int materialUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MATERIAL_UBO);
-		if ( materialUboBinding != -1 ) {
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * materialUboDescriptorsNumber; ++i) {
-				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
-				modelMatrixBufferInfo.offset = 0;
-				modelMatrixBufferInfo.range = sizeof(MaterialUBO);
+		core::vector<Entity> entities_material_cmp = componentManager->collectLinkedEntities<cm::material>();
+		unsigned int entities_material_cmp_size = entities_material_cmp.GetSize();
+		
+		unsigned int material_ubo_actual_size = entities_material_cmp_size ? entities_material_cmp_size : 1; 
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * material_ubo_actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = materialUniformBuffers[i];
+			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.range = sizeof(MaterialUBO);
 			
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
-				descriptorWrites[0].dstBinding = materialUboBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
+			descriptorWrites[0].dstBinding = materialUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
 		int directionalLightsUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHTS_UBO);

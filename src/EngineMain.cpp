@@ -352,7 +352,7 @@ int main()
 	// transformSpotLight0 = { .tPosition = transformPlayer.tPosition, .fScale = 0.3f };
 
 	core::Engine* GLVM = core::Engine::GetInstance();
-//	GLVM->SetTextureVector(TextureVector);
+	GLVM->SetTextureVector(TextureVector);
 	GLVM->SetMesh("../waveFrontObj/cube.obj");
 	GLVM->SetMesh("../waveFrontObj/cone.obj");
 //	GLVM->SetMesh("../waveFrontObj/plain5.obj");
