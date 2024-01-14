@@ -2434,7 +2434,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.range = sizeof(MaterialUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
+
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = materialUboDescriptorSets[i];
 			descriptorWrites[0].dstBinding = materialUboBinding;
@@ -4536,6 +4536,12 @@ namespace GLVM::core
 		// (void) messageSeverity;
 		// (void) messageType;
 		// (void) pUserData;
+		// if ( pCallbackData->messageIdNumber == 941228658 ) {
+		// 	[[maybe_unused]] int i = 0;
+		// }
+
+		// std::cout << "Error code: " << pCallbackData->messageIdNumber << std::endl;
+		// std::cout << "Message name:: " << pCallbackData->pMessageIdName << std::endl;
         std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
 
         return VK_FALSE;

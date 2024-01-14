@@ -1,4 +1,5 @@
 #include "Components/ColliderComponent.hpp"
+#include "Components/ControllerComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -13,12 +14,13 @@ namespace GLVM::ecs
     void CProjectileSystem::Update()
     {
 		namespace cm = GLVM::ecs::components;
+		namespace ct = GAME_MECHANICS::ECS::components;
 		
         ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
         EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
     
         core::vector<unsigned int>* pEntity_Container_refMove =
-			pComponent_Manager->GetEntityContainer<cm::move>();
+			pComponent_Manager->GetEntityContainer<ct::controller>();
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::vector<unsigned int>* pEntity_Container_refView =
@@ -72,7 +74,7 @@ namespace GLVM::ecs
 //        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-
+			
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
