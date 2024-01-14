@@ -19,12 +19,12 @@ namespace GLVM::ecs
 	bool CCollisionSystem::BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                               float backtrackingScale, float comparedScale)
 	{
-        if(backtrackingPosition[0] + backtrackingScale / 2 > comparedPosition[0] - comparedScale / 2 &&
-           backtrackingPosition[0] - backtrackingScale / 2 < comparedPosition[0] + comparedScale / 2 &&
-           backtrackingPosition[1] + backtrackingScale / 2 > comparedPosition[1] - comparedScale / 2 &&
-           backtrackingPosition[1] - backtrackingScale / 2 < comparedPosition[1] + comparedScale / 2 &&
-           backtrackingPosition[2] + backtrackingScale / 2 > comparedPosition[2] - comparedScale / 2 &&
-           backtrackingPosition[2] - backtrackingScale / 2 < comparedPosition[2] + comparedScale / 2) {
+        if(backtrackingPosition[0] + backtrackingScale  > comparedPosition[0] - comparedScale &&
+           backtrackingPosition[0] - backtrackingScale  < comparedPosition[0] + comparedScale &&
+           backtrackingPosition[1] + backtrackingScale  > comparedPosition[1] - comparedScale &&
+           backtrackingPosition[1] - backtrackingScale  < comparedPosition[1] + comparedScale &&
+           backtrackingPosition[2] + backtrackingScale  > comparedPosition[2] - comparedScale &&
+           backtrackingPosition[2] - backtrackingScale  < comparedPosition[2] + comparedScale) {
 				return true;
 		}
         
