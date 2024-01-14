@@ -71,11 +71,11 @@ int main()
 //	core::Engine* GLVM = core::Engine::GetInstance();		
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, ct::controller, cm::collider, cm::animation, cm::beholder,
-		cm::transform, cm::rigidBody, cm::event, cm::move>(uiPlayer);
+		cm::transform, cm::rigidBody, cm::event>(uiPlayer);
 	// *ComponentManager->GetComponent<cm::directionalLight>(uiPlayer) = { .position = { 15.7f, 7.5f, 2.0f },
 	// 	.direction = { 0.0f, 1.0f, 3.0f}, .ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = {0.5f, 0.5f, 0.5f},
 	// 	.specular = {0.3f, 0.3f, 0.3f}};
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 40.0f, 15.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 40.0f, 7.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
@@ -84,13 +84,13 @@ int main()
 	// *materialPlayer = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 	// 	.shininess = 512.0f * 1.078125f };
 	
-	// Entity plain0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::material, cm::vertex, cm::transform, cm::collider>(plain0);
-	// *ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { -1.5f, 30.5f, 0.0f }, .fScale = 5.2f };
-    // ComponentManager->GetComponent<cm::vertex>(plain0)->vkVertexId_ = 1;
-	// cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
-	// *materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
+	Entity plain0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { -1.5f, 40.5f, 0.0f }, .fScale = 5.2f };
+    ComponentManager->GetComponent<cm::mesh>(plain0)->id = 2;
+	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
+	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
 //    TextureManager->BindTexture(plain0, materialPlain0->diffuseTextureID_);
     
  	Entity uiWitch = EntityManager->CreateEntity();
@@ -364,6 +364,7 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
 	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
+	GLVM->SetMeshGLTF("../gltf/test_cube.gltf");
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
 	
     ///< Game rendering loop
