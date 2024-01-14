@@ -3,6 +3,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
 #include "WavefrontObjParser.hpp"
@@ -2370,8 +2371,10 @@ namespace GLVM::core
 		}
 
 		int viewPositionUboBinding = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::VIEW_POSITION_UBO);
+		core::vector<Entity> entities_beholder_cmp = componentManager->collectLinkedEntities<cm::beholder>();
+		unsigned int entities_beholder_cmp_size = entities_beholder_cmp.GetSize();
 
-		unsigned int view_position_ubo_actual_size = matrixUboDescriptorsNumber ? matrixUboDescriptorsNumber : 1; 
+		unsigned int view_position_ubo_actual_size = entities_beholder_cmp_size ? entities_beholder_cmp_size : 1; 
 		
 		std::vector<VkDescriptorSetLayout> viewPositionUboLayouts(MAX_FRAMES_IN_FLIGHT * view_position_ubo_actual_size,
 																  mainRenderScenePipeline.descriptors[viewPositionUboBinding].setLayout);
