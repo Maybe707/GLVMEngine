@@ -518,34 +518,12 @@ namespace GLVM::core
 		Raycasting();
 
 
-		/// Start of animation logic
-		if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
-			++currentFrame;
-			if ( currentFrame == frames.GetSize() ) {
-				currentFrame = 0;
-				frameAccumulator = 0.0f;
-			}
-		}
-
-		unsigned int joinMatricesDataSize = jointMatricesPerMesh[0].GetSize();
-			
-		mat4* jointMatricesData = new mat4[joinMatricesDataSize];
-		for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-			jointMatricesData[i] = jointMatricesPerMesh[0][i][currentFrame];
-//			std::cout << jointMatricesData[i] << std::endl;
-//			std::cout << jointMatricesPerMesh[0][i][currentFrame] << std::endl;
-		}
-
-		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
-		delete [] jointMatricesData;
-		jointMatricesData = nullptr;
-		/// End of animation logic
 		
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = pComponent_Manager->collectLinkedEntities<cm::transform,
 																							 cm::material,
-																							 cm::transform>();
+																							 cm::mesh>();
 
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();			
 
@@ -567,6 +545,84 @@ namespace GLVM::core
 				specularTextureID = material->specularTextureID_;
 			}
 
+			cm::mesh* mesh = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
+			unsigned int meshID = mesh->id;
+			cm::transform* _transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
+			
+			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+				 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+				++_transformComponent->currentAnimationFrame;
+				if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+					_transformComponent->currentAnimationFrame = 0;
+					_transformComponent->frameAccumulator = 0.0f;
+				}
+			}
+		
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+			unsigned int joinMatricesDataSize{};
+			if ( jointMatricesPerMesh.GetSize() > 0 )
+				joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+			mat4* jointMatricesData = nullptr;
+			if ( joinMatricesDataSize == 0 ) {
+				jointMatricesData = new mat4[6];
+				for ( unsigned int i = 0; i < 6; ++i ) {
+					mat4 unitMatrix(1.0f);
+					jointMatricesData[i] = unitMatrix;
+				}
+				
+			} else {
+				jointMatricesData = new mat4[joinMatricesDataSize];
+				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+					jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+				}
+			}
+
+// 			for ( unsigned int j = 0; j < 6; ++j ) {
+// 			std::cout << jointMatricesData[j] << std::endl;
+// //				modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+// //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+// 			}
+		
+			coreShaderProgram->SetMat4("jointMatrices", 6, jointMatricesData[0]);
+			delete [] jointMatricesData;
+			jointMatricesData = nullptr;
+
+			
+// 			cm::mesh* mesh = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
+// 			unsigned int id = mesh->id;
+
+// 			/// Start of animation logic
+// 			if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
+// 				++currentFrame;
+// 				if ( currentFrame == frames.GetSize() ) {
+// 					currentFrame = 0;
+// 					frameAccumulator = 0.0f;
+// 				}
+// 			}
+
+// 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[id].GetSize();
+// 			std::cout << "entity: " << id << std::endl;
+// 			std::cout << joinMatricesDataSize << std::endl;
+// 			mat4* jointMatricesData = nullptr;
+// 			if ( id > 0 ) {
+// 				jointMatricesData = new mat4[id];
+			
+// 				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+// 					jointMatricesData[i] = jointMatricesPerMesh[id][i][currentFrame];
+// //			std::cout << jointMatricesData[i] << std::endl;
+// //			std::cout << jointMatricesPerMesh[0][i][currentFrame] << std::endl;
+// 				}
+
+// 				coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
+// 				delete [] jointMatricesData;
+// 				jointMatricesData = nullptr;
+// 				/// End of animation logic
+// 			}
+			
 			cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 			if ( transformComponent != nullptr )
 				modelMatrix = SetModelMatrix(*transformComponent);
@@ -882,7 +938,19 @@ namespace GLVM::core
     }
 
 	void COpenglRenderer::EnlargeFrameAccumulator(float value) {
-		frameAccumulator += value;
+		namespace cm = GLVM::ecs::components;
+		
+		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			Entity currentEntity                = linkedEntities[i];
+			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
+			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->id;
+
+			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+				transformComponent->frameAccumulator += value;
+		}
 	}
 	
 	mat4 COpenglRenderer::SetModelMatrix(ecs::components::transform& transformComponent_)
@@ -1017,7 +1085,8 @@ namespace GLVM::core
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 			jointMatricesPerMesh.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames);
+			frames.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
 		}
 		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
 		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;

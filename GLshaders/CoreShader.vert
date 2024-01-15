@@ -40,36 +40,41 @@ uniform mat4 jointMatrices[6];
 
 void main()
 {
+	mat4 skinMatrix;
+	if (int(jointIndices.x) != -1) {
+		skinMatrix =
+			weights.x * jointMatrices[int(jointIndices.x)] +
+			weights.y * jointMatrices[int(jointIndices.y)] +
+			weights.z * jointMatrices[int(jointIndices.z)] +
+			weights.w * jointMatrices[int(jointIndices.w)];
+	}
+
+	vec4 worldPosition = modelMatrix * skinMatrix * vec4(vertexPosition, 1.0);
+
     // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);
 	// fragmentPosition = vec3(modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0));
  	// TextureCoord = vec2(aTextureCoord.x, aTextureCoord.y);	
 	// normal = normal;
-	vs_out.fragmentPosition           = vec3(modelMatrix * vec4(vertexPosition, 1.0));
+	vs_out.fragmentPosition           = worldPosition.xyz;
 //	vs_out.normal                     = transpose(inverse(mat3(modelMatrix))) * normal;
 //	vs_out.normal                     = normal;
 	if(reverseNormals) // a slight hack to make sure the outer large cube displays lighting from the 'inside' instead of the default 'outside'.
-        vs_out.normal = transpose(inverse(mat3(modelMatrix))) * (-1.0 * normal);
+        vs_out.normal = transpose(inverse(mat3(modelMatrix * skinMatrix))) * (-1.0 * normal);
     else
-        vs_out.normal = transpose(inverse(mat3(modelMatrix))) * normal;
+        vs_out.normal = transpose(inverse(mat3(modelMatrix * skinMatrix))) * normal;
 	vs_out.textureCoords              = textureCoordinates;
 	for (int i = 0; i < directionalLightSpaceMatrixContainerSize; ++i) 
-		vs_out.fragmentPositionDirectionalLightSpace[i] = directionalLightSpaceMatrixContainer[i] * vec4(vs_out.fragmentPosition, 1.0);
+		vs_out.fragmentPositionDirectionalLightSpace[i] = directionalLightSpaceMatrixContainer[i] * worldPosition;
 	for (int j = 0; j < spotLightSpaceMatrixContainerSize; ++j) 
-		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * vec4(vs_out.fragmentPosition, 1.0);
+		vs_out.fragmentPositionSpotLightSpace[j] = spotLightSpaceMatrixContainer[j] * worldPosition;
 
 //	vs_out.normal = normalize(vs_out.normal);
 	// spotLightSpaceMatrixArraySize        = spotLightSpaceMatrixContainerSize;
 	// directionalLightSpaceMatrixArraySize = directionalLightSpaceMatrixContainerSize;
 
-	mat4 skinMatrix =
-		weights.x * jointMatrices[int(jointIndices.x)] +
-		weights.y * jointMatrices[int(jointIndices.y)] +
-		weights.z * jointMatrices[int(jointIndices.z)] +
-		weights.w * jointMatrices[int(jointIndices.w)];
-
+	
 //	vec4 worldPosition = skinMatrix * inverseMatrices[int(jointIndices.x)] * vec4(vertexPosition, 1.0);
 //	vec4 worldPosition = transform0 * transform1 * transform2 * vec4(vertexPosition, 1.0);
-	vec4 worldPosition = skinMatrix * vec4(vertexPosition, 1.0);
 //	vec4 worldPosition = transform0 * vec4(vertexPosition, 1.0);
-	gl_Position   = projectionMatrix * viewMatrix * modelMatrix * worldPosition;
+	gl_Position   = projectionMatrix * viewMatrix * worldPosition;
 }

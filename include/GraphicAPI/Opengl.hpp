@@ -121,7 +121,7 @@ namespace GLVM::core {
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
-		core::vector<float> frames;
+		core::vector<core::vector<float>> frames;
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrame = 0;
 

@@ -479,6 +479,8 @@ namespace GLVM::core
 				weights[2] = aVertexesTemp_[m][n + 14];
 				weights[3] = aVertexesTemp_[m][n + 15];
 
+				std::cout << joinIndices << std::endl;
+				
 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
@@ -4159,8 +4161,8 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		ViewPositionUBO viewPositionUBO{};
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GAME_MECHANICS::ECS::components::controller>();
-
 		if ( pointLightEntities.GetSize() > 0 )
+
 			viewPositionUBO.viewPosition = transformComponent->tPosition;
 		
         void* data;

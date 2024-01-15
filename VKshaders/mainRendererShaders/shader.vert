@@ -49,12 +49,12 @@ void main() {
 			inWeights.z * ubo.jointMatrices[int(inJointIndices.z)] +
 			inWeights.w * ubo.jointMatrices[int(inJointIndices.w)];
 	} else {
-		skinMatrix = mat4(
-			1.0, 0.0, 0.0, 0.0,
-			0.0, 1.0, 0.0, 0.0,
-			0.0, 0.0, 1.0, 0.0,
-			0.0, 0.0, 0.0, 1.0
-			);
+		// skinMatrix = mat4(
+		// 	1.0, 0.0, 0.0, 0.0,
+		// 	0.0, 1.0, 0.0, 0.0,
+		// 	0.0, 0.0, 1.0, 0.0,
+		// 	0.0, 0.0, 0.0, 1.0
+		// 	);
 	}
 
 	vec4 worldPosition = ubo.model * skinMatrix * vec4(inPosition, 1.0);
