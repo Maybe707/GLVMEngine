@@ -1,5 +1,6 @@
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
+#include "Components/ControllerComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -1400,6 +1401,42 @@ namespace GLVM::core
 			};
 
 			createImage(depthImage);
+			
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+			VkImageMemoryBarrier barrier{};
+			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier.image = depthImage.image;
+			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			barrier.subresourceRange.baseMipLevel = 0;
+			barrier.subresourceRange.levelCount = 1;
+			barrier.subresourceRange.baseArrayLayer = 0;
+			barrier.subresourceRange.layerCount = 1;
+
+			VkPipelineStageFlags sourceStage;
+			VkPipelineStageFlags destinationStage;
+
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = 0;
+
+			sourceStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+			vkCmdPipelineBarrier(
+				commandBuffer,
+				sourceStage, destinationStage,
+				0,
+				0, nullptr,
+				0, nullptr,
+				1, &barrier
+				);
+
+			endSingleTimeCommands(commandBuffer);
+			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
 //			directionalLightShadowMapImages.push_back(depthImage);
@@ -1429,6 +1466,42 @@ namespace GLVM::core
 			};
 
 			createImage(depthImage);
+
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+			VkImageMemoryBarrier barrier{};
+			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+			barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+			barrier.image = depthImage.image;
+			barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+			barrier.subresourceRange.baseMipLevel = 0;
+			barrier.subresourceRange.levelCount = 1;
+			barrier.subresourceRange.baseArrayLayer = 0;
+			barrier.subresourceRange.layerCount = 1;
+
+			VkPipelineStageFlags sourceStage;
+			VkPipelineStageFlags destinationStage;
+
+			barrier.srcAccessMask = 0;
+			barrier.dstAccessMask = 0;
+
+			sourceStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+			destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+			vkCmdPipelineBarrier(
+				commandBuffer,
+				sourceStage, destinationStage,
+				0,
+				0, nullptr,
+				0, nullptr,
+				1, &barrier
+				);
+
+			endSingleTimeCommands(commandBuffer);
+			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
 //			spotLightShadowMapImages.push_back(depthImage);
@@ -4083,9 +4156,12 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		ViewPositionUBO viewPositionUBO{};
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GAME_MECHANICS::ECS::components::controller>();
 
-		viewPositionUBO.viewPosition = transformComponent->tPosition;
+		if ( pointLightEntities.GetSize() > 0 )
+			viewPositionUBO.viewPosition = transformComponent->tPosition;
 		
         void* data;
         vkMapMemory(device, viewPositionUniformBuffersMemory[currentImage], 0,
