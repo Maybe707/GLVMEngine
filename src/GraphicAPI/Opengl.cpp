@@ -708,10 +708,10 @@ namespace GLVM::core
 					// std::cout << "TEST 2" << std::endl;
 					// std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
 					// std::cout << "other entity: " << entityOther << std::endl;
-					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
+//					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
-					cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
-					textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
+					// cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
+					// textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
 					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
 					/// TODO: There is a big quastion is this decrement have sence.
 //					--linkedEntitiesVectorSize;  
