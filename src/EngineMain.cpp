@@ -87,7 +87,7 @@ int main()
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, 0.5f, 0.0f }, .fScale = 5.2f };
-    ComponentManager->GetComponent<cm::mesh>(plain0)->id = 2;
+    ComponentManager->GetComponent<cm::mesh>(plain0)->id = 0;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -98,7 +98,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.0f, 8.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
-    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 2;
+    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 0;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
@@ -242,7 +242,7 @@ int main()
 		.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 15.0f, 3.0f }, .fScale = 0.3f };
-	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 2;
+	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
 	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
 	*materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
@@ -362,14 +362,14 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
 	GLVM->SetMesh("../waveFrontObj/torus.obj");
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
-	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
-	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
-	GLVM->SetMeshGLTF("../gltf/test_cube.gltf");
+//	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
+//	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
+	GLVM->SetMeshGLTF("../gltf/mega_chel.gltf");
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
 	
     ///< Game rendering loop
-	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

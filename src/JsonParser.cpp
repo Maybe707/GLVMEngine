@@ -1,6 +1,7 @@
 #include "JsonParser.hpp"
 #include "Vector.hpp"
 #include <chrono>
+#include <cstdint>
 #include <ostream>
 #include <pthread.h>
 #include <cassert>
@@ -454,6 +455,7 @@ namespace GLVM::Core
 		core::vector<core::vector<mat4>> jointMatrices;
 		core::vector<float> weightsContainer;
 		core::vector<int> jointsIndices;
+		core::vector<core::vector<int>> children;
 			
 		if ( skins.GetSize() > 0 ) {
 			joints = (*gltf)["skins"][0]["joints"];
@@ -497,6 +499,20 @@ namespace GLVM::Core
 					rotation = rotateQuaternion<float, 4>(rotationQuaternion);
 				}
 
+				core::vector<int> local_children;
+				if ( node.value.object->Contain("children") ) {
+					Core::JsonValue array = (*node.value.object)["children"];
+					for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
+						local_children.Push(array[i].value.iNumber);
+					}
+
+					children.Push(local_children);
+				} else {
+					core::vector<int> emptyChildren;
+					emptyChildren.Push(-1);
+					children.Push(emptyChildren);
+				}
+				
 				if ( node.value.object->Contain("scale") ) {
 					Core::JsonValue array = (*node.value.object)["scale"];
 					for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
@@ -518,11 +534,18 @@ namespace GLVM::Core
 
 
 				}
-
+				
 				mat4 model = translation * scale * rotation;
 				globalTransformJointNode.Push(model);
 			}
 
+			for ( unsigned int i = 0; i < children.GetSize(); ++i ) {
+				std::cout << "next node children: " << std::endl;
+				for ( unsigned int j = 0; j < children[i].GetSize(); ++j )
+					std::cout << "child #: " << children[i][j] << std::endl;
+			}
+
+			
 			unsigned int inverseBindMatricesIndex = (*gltf)["skins"][0]["inverseBindMatrices"].value.iNumber;
 			unsigned int bufferView = (*gltf)["accessors"][inverseBindMatricesIndex]["bufferView"].value.iNumber;
 			unsigned int byteLengthInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteLength"].value.iNumber;
@@ -712,10 +735,75 @@ namespace GLVM::Core
 				scales.Push(temp);
 			}
 
+			/// Searching for parent joins WITH GOAT GOTO OPERATOR!!!
+			core::vector<int> parent_joins;
+			for ( unsigned int s = 0; s < joints.value.array->GetSize(); ++s ) {
+				int current_joint = (*joints.value.array)[s].value.iNumber;
+
+				for ( unsigned w = 0; w < children.GetSize(); ++w ) {
+					for ( unsigned q = 0; q < children[w].GetSize(); ++q ) {
+						if ( children[w][q] == current_joint )
+							goto most_scary_operator_of_all_time;                                        ///< Yes. This is what we all deserve
+					}
+				}
+				parent_joins.Push(current_joint);
+				
+			  most_scary_operator_of_all_time:                                                           ///< Not so scary at all. Am i right?
+				continue;
+			}
+
+			// for ( unsigned e = 0; e < parent_joins.GetSize(); ++e ) {
+			// 	std::cout << "root bone: " << parent_joins[e] << std::endl;
+			// }
+			
 			frames = frameInputsTranslation[0];
 			core::vector<core::vector<mat4>> jointMatricesAccumulator;        ///< Delete this sheet!
-				
+
+			// unsigned int jointsCounter = 0;
+			// unsigned int nextRootJoint = 0;
+			// unsigned int nextRootJointIndex = 0;
+			// unsigned int rootJoint = 0;
+			// unsigned int rootJointIndex = 0;
+			// JsonValue joints = (*gltf)["skins"][0]["joints"];
+			// JsonValue nodes = (*gltf)["nodes"];
+			std::vector<std::vector<int>> joints = { { 0, 1, 2, 3 },
+													 { 0, 4, 5, 6 },
+													 { 0, 7, 8 },
+													 { 9, 10, 11, 12 },
+													 { 13, 14, 15, 16 } };
+
+			std::vector<std::vector<int>> joints_bones { { 0 }, { 0, 1 }, { 0, 1, 2 }, { 0, 1, 2, 3 },
+														 { 0, 4 }, { 0, 4, 5 }, { 0, 4, 5, 6 },
+														 { 0, 7 }, { 0, 7, 8 },
+														 { 9 }, { 9, 10 }, { 9, 10, 11 }, { 9, 10, 11, 12 },
+														 { 13 }, { 13, 14 }, { 13, 14, 15 }, { 13, 14, 15, 16 } };
+			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
+//			for ( unsigned int j = 0; j < 17; ++j ) {
+// 				if ( nextRootJointIndex == j ) {
+// 					rootJoint = parent_joins[jointsCounter];
+// 					rootJointIndex = getJointIndex(joints, rootJoint);
+
+// 					// std::cout << "rootJoint: " << rootJoint << std::endl;
+// 					// std::cout << "rootJointIndex: " << rootJointIndex << std::endl;
+					
+// 					if ( jointsCounter + 1 < parent_joins.GetSize() ) {
+// 						nextRootJoint = parent_joins[jointsCounter + 1];
+// 						nextRootJointIndex = getJointIndex(joints, nextRootJoint);
+// 						// std::cout << "nextRootJoint: " << nextRootJoint << std::endl;
+// 						// std::cout << "nextRootJointIndex: " << nextRootJointIndex << std::endl;
+					
+// 					} else {
+// 						nextRootJointIndex = translations.GetSize();
+// //						std::cout << "Final nextRootJointIndex: " << nextRootJointIndex << std::endl;
+// 					}
+					
+// 					++jointsCounter;
+// 				}
+
+				// unsigned int baseForInnerLoop = j + 1;
+				// mat4 rootBoneTransform(1.0f);
+				
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
 				core::vector<float> boneAllFrameScales;
@@ -723,7 +811,8 @@ namespace GLVM::Core
 					boneAllFrameScales       = scales[j];
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;    ///< Delete this sheet!
-				for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); ++i ) {
+//				for ( unsigned int i = 0; i < frameInputsTranslation[0].GetSize(); ++i ) {
+				for ( unsigned int i = 0; i < 1; ++i ) {
 					mat4 frameTranslation(1.0f);
 					mat4 frameScale(1.0f);
 					for ( unsigned int q = 0; q < 3; ++q ) {
@@ -758,10 +847,20 @@ namespace GLVM::Core
 					
 					globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
 
+					// if ( j == rootJointIndex )
+					// 	rootBoneTransform = inverseBindMatrixSet[j] * globalTransformNodeMatrix;
+						
 					mat4 rootTransform(1.0f);
-					for ( unsigned int b = 0; b < j; ++b ) {
+
+					std::cout << "array size: " << joints_bones[j].size() << std::endl;
+					for ( unsigned int b = 0; b < joints_bones[j].size(); ++b ) {
+//						std::cout << "base: " << baseForInnerLoop << std::endl;
 //						rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
-						rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+						std::cout << "b: " << b << std::endl;
+						if ( joints_bones[j][b] < (int)jointMatricesAccumulator.GetSize() ) {
+							std::cout << "index: " << joints_bones[j][b] << std::endl;
+							rootTransform = jointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
+						}
 						// std::cout << "current joint matrix" << std::endl;
 						// std::cout << "b: " << b << " i: " << i << std::endl;
 						// std::cout << jointMatricesAccumulator[b][i] << std::endl;
@@ -778,15 +877,86 @@ namespace GLVM::Core
 					// std::cout << "root matrix" << std::endl;
 					// std::cout << rootTransform << std::endl;
 					// std::cout << std::endl;
+
 					
-//					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
+					
 					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform);
+					// if ( j != rootJointIndex )
+					// 	globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformNodeMatrix * rootTransform * rootBoneTransform);
+					// else
+					// 	globalAllFrameNodeMatrix.Push(rootBoneTransform);
+
+// 					unsigned int currentJoint = (*joints.value.array)[j].value.iNumber;
+// //					unsigned int currentJointIndex = getJointIndex(joints, currentJoint);
+// 					Core::JsonValue node = nodes[currentJoint];
+// 					if ( !node.value.object->Contain("children") ) {
+// 						baseForInnerLoop = j + 1;
+// 						std::cout << "new base: " << baseForInnerLoop << std::endl;
+// 					} else if ( j == 0 )
+// 						baseForInnerLoop = j + 1;
 				}
 
 				jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
 
+
+
+
+
+// 			Core::JsonValue nodes = (*gltf)["nodes"];
+// 			int globalJointsCounter = 0;
+// 			for ( unsigned int r = 0; r < parent_joins.GetSize(); ++r ) {
+// 				unsigned int rootJoint = parent_joins[r];
+// 				unsigned int rootJointIndex = getJointIndex(joints, rootJoint);
+// 				unsigned int nextRootJoint = 0;
+// 				unsigned int nextRootJointIndex = 0;
+				
+// 				if ( r + 1 < parent_joins.GetSize() ) {
+// 					nextRootJoint = parent_joins[r + 1];
+// 					nextRootJointIndex = getJointIndex(joints, nextRootJoint);
+// 				} else
+// 					nextRootJointIndex = joints.value.array->GetSize();
+
+// 				core::vector<mat4>  globalAllFrameNodeMatrix;
+
+// 				std::cout << "root joint index: " << globalJointsCounter << std::endl;
+// 				std::cout << "next root joint index: " << nextRootJointIndex << std::endl;
+// 				for ( unsigned int x = globalJointsCounter; x < nextRootJointIndex; ++x ) {
+// 					int joint = (*joints.value.array)[x].value.iNumber;
+// //					Core::JsonValue node = nodes[joint];
+
+// 					for ( unsigned int frame = 0; frame < frameInputsTranslation[0].GetSize(); ++frame ) {
+
+// 						std::cout << "inner joint: " << rootJoint << std::endl;
+// 						std::cout << "x: " << x << std::endl;
+
+// 						mat4 accumulatorParentMatrix(1.0);
+// 						for ( unsigned int innerJoints = rootJointIndex; innerJoints < x; ++innerJoints ) {
+// 							accumulatorParentMatrix = inverseBindMatrixSet[joint] * jointMatricesAccumulator[joint][frame] * accumulatorParentMatrix;
+// 							std::cout << accumulatorParentMatrix << std::endl;
+// 						}
+
+// 						globalAllFrameNodeMatrix.Push(accumulatorParentMatrix);		
+// 					}
+					
+// 					++globalJointsCounter;
+// 				}
+// 				jointMatrices.Push(globalAllFrameNodeMatrix);	
+// //				++globalJointsCounter;
+// 			}
+			
+// 			mat4 rootTransform(1.0f);
+// 			for ( unsigned int b = 0; b < j; ++b ) {
+// //						rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+// 				rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
+// 				// std::cout << "current joint matrix" << std::endl;
+// 				// std::cout << "b: " << b << " i: " << i << std::endl;
+// 				// std::cout << jointMatricesAccumulator[b][i] << std::endl;
+// 				// std::cout << std::endl;
+// 			}
+			
+			
 			int maximumJoints     = 6;
 			int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
@@ -862,5 +1032,43 @@ namespace GLVM::Core
 				aVertexes_.push_back(weightsContainer[index + 3]);
 			}
 		}
+	}
+
+	void CJsonParser::traversalBones(Core::JsonValue joints, core::vector<mat4> inverseBindMatrixSet,
+									 [[maybe_unused]] core::vector<core::vector<mat4>>& jointMatricesAccumulator,
+									 [[maybe_unused]] core::vector<core::vector<mat4>>& jointMatrices,
+									 [[maybe_unused]] uint32_t root, [[maybe_unused]] uint32_t nextSkeleton) {
+		uint32_t current_joint = (*joints.value.array)[root].value.iNumber;
+		if ( current_joint == nextSkeleton )
+			return;
+
+		core::vector<mat4> allFrameTransform;
+		for ( unsigned int i = 0; i < jointMatricesAccumulator[root].GetSize(); ++i ) {
+		mat4 rootMatrix(1.0);
+		if ( root != 0 ) {
+			rootMatrix = jointMatrices[root -1][i];
+		}
+			
+		mat4 currentNodeMatrix = inverseBindMatrixSet[root] * jointMatricesAccumulator[root][i] * rootMatrix;
+		allFrameTransform.Push(currentNodeMatrix);
+		}
+
+		jointMatrices.Push(allFrameTransform);
+
+		++root;
+		traversalBones(joints, inverseBindMatrixSet,
+					   jointMatricesAccumulator, jointMatrices,
+					   root, nextSkeleton);
+	}
+
+	unsigned int CJsonParser::getJointIndex(Core::JsonValue joints, int searchingIndex) {
+		for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {
+			int currentJointIndex = (*joints.value.array)[i].value.iNumber;
+
+			if ( currentJointIndex == searchingIndex )
+				return i;
+		}
+
+		return -1;
 	}
 }

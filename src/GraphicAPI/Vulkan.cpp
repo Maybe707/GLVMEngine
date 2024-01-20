@@ -479,7 +479,7 @@ namespace GLVM::core
 				weights[2] = aVertexesTemp_[m][n + 14];
 				weights[3] = aVertexesTemp_[m][n + 15];
 
-				std::cout << joinIndices << std::endl;
+//				std::cout << joinIndices << std::endl;
 				
 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
