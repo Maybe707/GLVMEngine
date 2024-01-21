@@ -4122,8 +4122,8 @@ namespace GLVM::core
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[6];
-			for ( unsigned int i = 0; i < 6; ++i ) {
+			jointMatricesData = new mat4[20];
+			for ( unsigned int i = 0; i < 20; ++i ) {
 				mat4 unitMatrix(1.0f);
 				jointMatricesData[i] = unitMatrix;
 			}
@@ -4136,7 +4136,7 @@ namespace GLVM::core
 			}
 		}
 
-		for ( unsigned int j = 0; j < 6; ++j ) {
+		for ( unsigned int j = 0; j < 20; ++j ) {
 //			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;

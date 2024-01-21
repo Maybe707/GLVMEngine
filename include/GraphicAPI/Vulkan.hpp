@@ -279,7 +279,7 @@ namespace GLVM::core
         mat4 model;
         mat4 view;
         mat4 proj;
-		mat4 jointMatrices[6];
+		mat4 jointMatrices[20];
     };
 
 	struct alignas(16) ShadowMapMatrixUBO {
