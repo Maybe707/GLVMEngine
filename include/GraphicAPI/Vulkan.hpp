@@ -274,12 +274,14 @@ namespace GLVM::core
 		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		uint32_t spotLightsNumber;
 	};
+
+#define MAX_JOINTS_NUMBER 30
 	
     struct alignas(16) ModelMatrixUBO {
         mat4 model;
         mat4 view;
         mat4 proj;
-		mat4 jointMatrices[20];
+		mat4 jointMatrices[MAX_JOINTS_NUMBER];
     };
 
 	struct alignas(16) ShadowMapMatrixUBO {
