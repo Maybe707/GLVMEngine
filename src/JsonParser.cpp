@@ -775,17 +775,17 @@ namespace GLVM::Core
 			// unsigned int rootJointIndex = 0;
 			// JsonValue joints = (*gltf)["skins"][0]["joints"];
 			// JsonValue nodes = (*gltf)["nodes"];
-			std::vector<std::vector<int>> joints = { { 0, 1, 2, 3 },
-													 { 0, 4, 5, 6 },
-													 { 0, 7, 8 },
-													 { 9, 10, 11, 12 },
-													 { 13, 14, 15, 16 } };
+ 			// std::vector<std::vector<int>> joints = { { 0, 1, 2, 3 },
+			// 										 { 0, 4, 5, 6 },
+			// 										 { 0, 7, 8 },
+			// 										 { 9, 10, 11, 12 },
+			// 										 { 13, 14, 15, 16 } };
 
-			std::vector<std::vector<int>> joints_bones { { 0 }, { 0, 1 }, { 0, 1, 2 }, { 0, 1, 2, 3 },                     ///< Mega chel
-														 { 0, 4 }, { 0, 4, 5 }, { 0, 4, 5, 6 },
-														 { 0, 7 }, { 0, 7, 8 },
-														 { 9 }, { 9, 10 }, { 9, 10, 11 }, { 9, 10, 11, 12 },
-														 { 13 }, { 13, 14 }, { 13, 14, 15 }, { 13, 14, 15, 16 } };
+			// std::vector<std::vector<int>> joints_bones { { 0 }, { 0, 1 }, { 0, 1, 2 }, { 0, 1, 2, 3 },                     ///< Mega chel
+			// 											 { 0, 4 }, { 0, 4, 5 }, { 0, 4, 5, 6 },
+			// 											 { 0, 7 }, { 0, 7, 8 },
+			// 											 { 9 }, { 9, 10 }, { 9, 10, 11 }, { 9, 10, 11, 12 },
+			// 											 { 13 }, { 13, 14 }, { 13, 14, 15 }, { 13, 14, 15, 16 } };
 
 			// std::vector<std::vector<int>> joints_bones { { 0 }, { 0, 1 }, { 0, 1, 2 }, { 0, 1, 2, 3 },                         ///< Fox
 			// 											 { 4 }, { 4, 5 }, { 4, 5, 6 },
@@ -796,6 +796,53 @@ namespace GLVM::Core
 			// std::vector<std::vector<int>> joints_bones { { 0 }, { 0, 1 }, { 0, 1, 2 }, { 0, 1, 2, 3 },                      ///< Chel3
 			// 											 { 0, 4 }, { 0, 4, 5 }, { 0, 4, 5, 6 },
 			// 											 { 0, 7 }, { 0, 7, 8 } };
+
+			core::vector<core::vector<unsigned int>> joints_bones;
+			for ( unsigned int w = 0; w < parent_joins.GetSize(); ++w ) {
+				core::vector<core::vector<unsigned int>> nodes_bones;
+				unsigned int branchLevel = 0;
+				unsigned int currentNode = parent_joins[w];
+				// std::cout << "W: " << w << std::endl;
+				// std::cout << "NODE: " << currentNode << std::endl;
+//			Core::JsonValue joints = (*gltf)["skins"][0]["joints"];
+				traversalBones(children, joints, branchLevel, currentNode, currentNode, nodes_bones);
+
+				// for ( unsigned int i = 0; i < nodes_bones.GetSize(); ++i ) {
+				// 	std::cout << "branch #: " << i << std::endl;
+				// 	for ( unsigned int j = 0; j < nodes_bones[i].GetSize(); ++j )
+				// 		std::cout << "bone #: " << nodes_bones[i][j] << std::endl;
+				// }
+
+				core::vector<core::vector<unsigned int>> joints_bones_temp;
+				joints_bones_temp = makeRenderJointsIndices(nodes_bones);
+
+				for ( unsigned int e = 0; e < joints_bones_temp.GetSize(); ++e ) {
+					joints_bones.Push(joints_bones_temp[e]);
+//					std::cout << "SIZE ARRAY: " << joints_bones_temp.GetSize() << std::endl;
+				}
+
+				std::cout << "SIZE ARRAY: " << joints_bones_temp.GetSize() << std::endl;
+				
+				for ( unsigned int i = 0; i < joints_bones_temp.GetSize(); ++i ) {
+//					std::cout << "branch #: " << i << std::endl;
+					std::cout << std::endl;
+					for ( unsigned int j = 0; j < joints_bones_temp[i].GetSize(); ++j )
+						std::cout << "bone #: " << joints_bones_temp[i][j] << std::endl;
+				}
+
+				std::cout << "NEXT ARRAY" << std::endl;
+			}
+
+			
+			
+// 			for ( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+// //				std::cout << "branch #: " << i << std::endl;
+// 				std::cout << std::endl;
+// //				std::cout << "SIZE ARRAY: " << joints_bones.GetSize() << std::endl;
+// 				std::cout << std::endl;
+// 				for ( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j )
+// 					std::cout << "bone #: " << joints_bones[i][j] << std::endl;
+// 			}
 			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 //				std::cout << "Number of joints: " << translations.GetSize() << std::endl;
@@ -853,10 +900,10 @@ namespace GLVM::Core
 					frameRotation.SelfTensorTranspose();
 
 					mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
-					if ( j == 0 || j == 4 || j == 5 || j == 6 ) {
-						std::cout << "matrix #: " << j << std::endl;
-						std::cout << globalTransformNodeMatrix << std::endl;
-					}
+					// if ( j == 0 || j == 4 || j == 5 || j == 6 ) {
+					// 	std::cout << "matrix #: " << j << std::endl;
+					// 	std::cout << globalTransformNodeMatrix << std::endl;
+					// }
 //					mat4 globalTransformNodeMatrix = frameTranslation * frameRotation * frameScale;
 					// std::cout << "scale matrix" << std::endl;
 					// std::cout << frameScale << std::endl;
@@ -938,19 +985,19 @@ namespace GLVM::Core
 //				for ( unsigned int i = 0; i < 1; ++i ) {
 					mat4 rootTransform(1.0f);
 					
-					std::cout << "array size: " << joints_bones[j].size() -1 << std::endl;
-					std::cout << "j: " << j << std::endl;
-					for ( unsigned int b = 0; b < joints_bones[j].size() - 1; ++b ) {
+					// std::cout << "array size: " << joints_bones[j].size() -1 << std::endl;
+					// std::cout << "j: " << j << std::endl;
+					for ( unsigned int b = 0; b < joints_bones[j].GetSize() - 1; ++b ) {
 //						std::cout << "base: " << baseForInnerLoop << std::endl;
 //						rootTransform = jointMatricesAccumulator[b][i] * rootTransform;
-						std::cout << "b: " << b << std::endl;
+//						std::cout << "b: " << b << std::endl;
 //						if ( joints_bones[j][b] < (int)jointMatricesAccumulator.GetSize() ) {
-						std::cout << "index: " << joints_bones[j][b] << std::endl;
+//						std::cout << "index: " << joints_bones[j][b] << std::endl;
 
-						if ( j == 6 ) {
- 							std::cout << "matrix inner index #: " << joints_bones[j][b] << std::endl;
-							std::cout <<  jointMatricesAccumulator[joints_bones[j][b]][i] << std::endl;
-						}
+						// if ( j == 6 ) {
+ 						// 	std::cout << "matrix inner index #: " << joints_bones[j][b] << std::endl;
+						// 	std::cout <<  jointMatricesAccumulator[joints_bones[j][b]][i] << std::endl;
+						// }
 						
 						rootTransform = jointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
 //						}
@@ -960,10 +1007,10 @@ namespace GLVM::Core
 						// std::cout << std::endl;
 					}
 
-					if ( j == 6 ) {
-						std::cout << "matrix #: " << j << std::endl;
-						std::cout <<  jointMatricesAccumulator[j][i] << std::endl;
-					}
+					// if ( j == 6 ) {
+					// 	std::cout << "matrix #: " << j << std::endl;
+					// 	std::cout <<  jointMatricesAccumulator[j][i] << std::endl;
+					// }
 
 					
 					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * jointMatricesAccumulator[j][i] * rootTransform);
@@ -1103,33 +1150,80 @@ namespace GLVM::Core
 		}
 	}
 
-	void CJsonParser::traversalBones(Core::JsonValue joints, core::vector<mat4> inverseBindMatrixSet,
-									 [[maybe_unused]] core::vector<core::vector<mat4>>& jointMatricesAccumulator,
-									 [[maybe_unused]] core::vector<core::vector<mat4>>& jointMatrices,
-									 [[maybe_unused]] uint32_t root, [[maybe_unused]] uint32_t nextSkeleton) {
-		uint32_t current_joint = (*joints.value.array)[root].value.iNumber;
-		if ( current_joint == nextSkeleton )
+	void CJsonParser::traversalBones(core::vector<core::vector<int>> children, Core::JsonValue joints, unsigned int branchCounter,
+									 unsigned int currentNode, unsigned int rootNode, core::vector<core::vector<unsigned int>>& result) {
+		unsigned int currentJoinIndex = getJointIndex(joints, currentNode);
+
+		if ( children.GetSize() == 0 || currentJoinIndex > children.GetSize() || children[currentJoinIndex].GetSize() == 0 )
 			return;
-
-		core::vector<mat4> allFrameTransform;
-		for ( unsigned int i = 0; i < jointMatricesAccumulator[root].GetSize(); ++i ) {
-		mat4 rootMatrix(1.0);
-		if ( root != 0 ) {
-			rootMatrix = jointMatrices[root -1][i];
+		
+		if ( currentNode == rootNode ) {
+			result.Push({});
+			++branchCounter;
 		}
-			
-		mat4 currentNodeMatrix = inverseBindMatrixSet[root] * jointMatricesAccumulator[root][i] * rootMatrix;
-		allFrameTransform.Push(currentNodeMatrix);
-		}
+		
+		if ( children.GetSize() > 0 || currentJoinIndex < children.GetSize() ) {
+			if ( children[currentJoinIndex][0] != -1 ) {
+				unsigned int nextNodeIndex = children[currentJoinIndex][0];
+				children[currentJoinIndex].Remove(0);
+				result[branchCounter - 1].Push(currentJoinIndex);
 
-		jointMatrices.Push(allFrameTransform);
+				traversalBones(children, joints, branchCounter, nextNodeIndex, rootNode, result);
+			} else {
+				result[branchCounter - 1].Push(currentJoinIndex);
 
-		++root;
-		traversalBones(joints, inverseBindMatrixSet,
-					   jointMatricesAccumulator, jointMatrices,
-					   root, nextSkeleton);
+//				return;
+				currentNode = rootNode;
+				traversalBones(children, joints, branchCounter, currentNode, rootNode, result);
+			}
+		} else
+			return;
 	}
 
+	core::vector<core::vector<unsigned int>> CJsonParser::makeRenderJointsIndices(core::vector<core::vector<unsigned int>>& input) {
+		core::vector<core::vector<unsigned int>> result;
+//		core::vector<unsigned int> stack;
+
+		bool accumulatorFlag = false;
+		bool innerFlag  = false;
+		unsigned int accumulator = input[0][0];
+		for ( unsigned int i = 0; i < input.GetSize(); ++i ) {
+			for ( unsigned int j = 0; j < input[i].GetSize(); ++j ) {
+				core::vector<unsigned int> inner;
+				for ( unsigned int v = 0; v < j + 1; ++v ) {
+					if ( input[i][j] == accumulator && accumulatorFlag ) {
+						innerFlag = false;
+						continue;
+					} else {
+						innerFlag = true;
+						inner.Push(input[i][v]);
+
+						if ( accumulatorFlag == false )
+							accumulatorFlag = true;
+					}
+				}
+
+				if ( innerFlag )
+					result.Push(inner);
+			}
+		}
+
+		return result;
+	}
+
+	bool CJsonParser::containsElemnt(core::vector<core::vector<unsigned int>> container, unsigned int element) {
+		bool flag = false;
+		
+		for ( unsigned int i = 0; i < container.GetSize(); ++i ) {
+			for ( unsigned int j = 0; j < container[i].GetSize(); ++j ) {
+				if ( container[i][j] == element )
+					return true;
+			}
+		}
+
+		return flag;
+	}
+	
 	unsigned int CJsonParser::getJointIndex(Core::JsonValue joints, int searchingIndex) {
 		for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {
 			int currentJointIndex = (*joints.value.array)[i].value.iNumber;

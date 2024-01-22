@@ -257,10 +257,10 @@ namespace GLVM::Core
 					  std::vector<unsigned int>& aIndices_,
 					  core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 					  core::vector<float>& frames);
-		void traversalBones(Core::JsonValue joints, core::vector<mat4> inverseBindMatrixSet,
-							core::vector<core::vector<mat4>>& jointMatricesAccumulator,
-							core::vector<core::vector<mat4>>& jointMatrices,
-							uint32_t root, [[maybe_unused]] uint32_t nextSkeleton);
+		void traversalBones(core::vector<core::vector<int>> children, Core::JsonValue joints, unsigned int level,
+							unsigned int currentBone, unsigned int rootJoint, core::vector<core::vector<unsigned int>>& result);
+		core::vector<core::vector<unsigned int>> makeRenderJointsIndices(core::vector<core::vector<unsigned int>>& input);
+		bool containsElemnt(core::vector<core::vector<unsigned int>> container, unsigned int element);
 		unsigned int getJointIndex(Core::JsonValue joints, int searchingIndex);
     };
 }
