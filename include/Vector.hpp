@@ -76,6 +76,7 @@ namespace GLVM::core
         void Print();
         vector& operator=(const vector<T>& _vector);
         bool operator==(const char* string_);
+		bool empty();
 	};
 
     template <class T>
@@ -259,10 +260,10 @@ namespace GLVM::core
 		}
 
 		/// FIXME: FOR DEBUG ONLY!
-		if ( typeid(T).name() == typeid(unsigned int).name() ) {
-			T& element = *(T*)&rowInnerData[(size - 1) * sizeof(T)];
-			element = 0;                                                     ///< For debug purpouses only!!!
-		}
+		// if ( typeid(T).name() == typeid(unsigned int).name() ) {
+		// 	T& element = *(T*)&rowInnerData[(size - 1) * sizeof(T)];
+		// 	element = 0;                                                     ///< For debug purpouses only!!!
+		// }
 		
 	    --size;
 	}
@@ -337,6 +338,9 @@ namespace GLVM::core
 		size     = 0;
 //		capacity = 0;
 	}
+
+ 	template<class T>
+	bool vector<T>::empty() { return size == 0; }
 	
     template<class T>
     void vector<T>::Print()

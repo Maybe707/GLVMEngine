@@ -13,6 +13,8 @@
 #include <string>
 #include <thread>
 #include <string.h>
+#include "stack.hpp"
+#include "typenames.hpp"
 
 namespace GLVM::Core
 {
@@ -257,8 +259,8 @@ namespace GLVM::Core
 					  std::vector<unsigned int>& aIndices_,
 					  core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 					  core::vector<float>& frames);
-		void traversalBones(core::vector<core::vector<int>> children, Core::JsonValue joints, unsigned int level,
-							unsigned int currentBone, unsigned int rootJoint, core::vector<core::vector<unsigned int>>& result);
+		void traversalBones(core::vector<core::vector<int>> children, Core::JsonValue joints,
+							core::stack<u32> node_stack, core::vector<core::vector<u32>>& result, u32 counter, u32 innerCounter, bool firstIterationFlag);
 		core::vector<core::vector<unsigned int>> makeRenderJointsIndices(core::vector<core::vector<unsigned int>>& input);
 		bool containsElemnt(core::vector<core::vector<unsigned int>> container, unsigned int element);
 		unsigned int getJointIndex(Core::JsonValue joints, int searchingIndex);
