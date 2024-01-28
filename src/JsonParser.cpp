@@ -1203,7 +1203,69 @@ namespace GLVM::Core
 		if ( deepness_stack.empty() )
 			return;
 		
-		if ( deepness_stack.top() == children[topJointIndex].GetSize() ) {
+		// if ( !children[topJointIndex].empty() && deepness_stack.top() == children[topJointIndex].GetSize() ) {
+		// 	deepness_stack.pop();
+		// 	node_stack.pop();
+		// 	traversalBones( children, joints, node_stack, deepness_stack, result );
+		// 	return;
+		// }
+
+		u32 nextNodeIndex = 0;
+		if ( !children[topJointIndex].empty() ) {
+			if ( deepness_stack.top() > 0 && deepness_stack.top() == children[topJointIndex].GetSize() ) {
+				deepness_stack.pop();
+				node_stack.pop();
+				traversalBones( children, joints, node_stack, deepness_stack, result );
+				return;
+			}
+
+			if ( deepness_stack.top() > 0 && deepness_stack.top() < children[topJointIndex].GetSize() ) {
+				nextNodeIndex = children[topJointIndex][deepness_stack.top()];
+				node_stack.push(nextNodeIndex);
+
+				core::vector<u32> current_node_indices;
+				for ( u32 i = 0; i < node_stack.size(); ++i ) {
+					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+					current_node_indices.Push(currentJoinIndex);
+				}
+
+				++deepness_stack.top();
+				traversalBones( children, joints, node_stack, deepness_stack, result );
+				return;
+			} else {
+				core::vector<u32> current_node_indices;
+				for ( u32 i = 0; i < node_stack.size(); ++i ) {
+					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+					current_node_indices.Push(currentJoinIndex);
+				}
+		
+				result.Push(current_node_indices);
+			
+				nextNodeIndex = children[topJointIndex][deepness_stack.top()];
+				node_stack.push(nextNodeIndex);
+				++deepness_stack.top();
+				traversalBones( children, joints, node_stack, deepness_stack, result );
+				return;
+			}
+
+			
+			// core::vector<u32> current_node_indices;
+			// for ( u32 i = 0; i < node_stack.size(); ++i ) {
+			// 	u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+			// 	std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+			// 	current_node_indices.Push(currentJoinIndex);
+			// }
+		
+			// result.Push(current_node_indices);
+			
+			// nextNodeIndex = children[topJointIndex][deepness_stack.top()];
+			// node_stack.push(nextNodeIndex);
+			// ++deepness_stack.top();
+			// traversalBones( children, joints, node_stack, deepness_stack, result );
+			// return;
+		} else {
 			core::vector<u32> current_node_indices;
 			for ( u32 i = 0; i < node_stack.size(); ++i ) {
 				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
@@ -1218,29 +1280,6 @@ namespace GLVM::Core
 			traversalBones( children, joints, node_stack, deepness_stack, result );
 			return;
 		}
-
-		u32 nextNodeIndex = 0;
-		if ( !children[topJointIndex].empty() ) {
-			core::vector<u32> current_node_indices;
-			for ( u32 i = 0; i < node_stack.size(); ++i ) {
-				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-				std::cout << "current jonint index: " << currentJoinIndex << std::endl;
-				current_node_indices.Push(currentJoinIndex);
-			}
-		
-			result.Push(current_node_indices);
-			
-			nextNodeIndex = children[topJointIndex][deepness_stack.top()];
-			node_stack.push(nextNodeIndex);
-			++deepness_stack.top();
-			traversalBones( children, joints, node_stack, deepness_stack, result );
-			return;
-		} 
-		deepness_stack.pop();
-		node_stack.pop();
-		
-		traversalBones( children, joints, node_stack, deepness_stack, result );
-		return;
 		
 		// u32 topJointIndex = 0;
 		// if ( firstIterationFlag && !node_stack.empty() ) {
