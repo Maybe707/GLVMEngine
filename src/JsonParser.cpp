@@ -811,7 +811,7 @@ namespace GLVM::Core
 			for ( unsigned int w = 0; w < parent_joins.GetSize(); ++w ) {
 				core::vector<core::vector<unsigned int>> nodes_bones;
 				unsigned int currentNode = parent_joins[w];
-				std::cout << "PARENT JOINT: " << parent_joins[w] << std::endl;
+//				std::cout << "PARENT JOINT: " << parent_joins[w] << std::endl;
 				// std::cout << "W: " << w << std::endl;
 				// std::cout << "NODE: " << currentNode << std::endl;
 //			Core::JsonValue joints = (*gltf)["skins"][0]["joints"];
@@ -870,14 +870,14 @@ namespace GLVM::Core
 
 			
 			
-			for ( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
-//				std::cout << "branch #: " << i << std::endl;
-				std::cout << std::endl;
-//				std::cout << "SIZE ARRAY: " << joints_bones.GetSize() << std::endl;
-				std::cout << std::endl;
-				for ( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j )
-					std::cout << "bone #: " << joints_bones[i][j] << std::endl;
-			}
+// 			for ( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+// //				std::cout << "branch #: " << i << std::endl;
+// 				std::cout << std::endl;
+// //				std::cout << "SIZE ARRAY: " << joints_bones.GetSize() << std::endl;
+// 				std::cout << std::endl;
+// 				for ( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j )
+// 					std::cout << "bone #: " << joints_bones[i][j] << std::endl;
+// 			}
 			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 //				std::cout << "Number of joints: " << translations.GetSize() << std::endl;
@@ -1226,7 +1226,7 @@ namespace GLVM::Core
 				core::vector<u32> current_node_indices;
 				for ( u32 i = 0; i < node_stack.size(); ++i ) {
 					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+//					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
 					current_node_indices.Push(currentJoinIndex);
 				}
 
@@ -1237,7 +1237,7 @@ namespace GLVM::Core
 				core::vector<u32> current_node_indices;
 				for ( u32 i = 0; i < node_stack.size(); ++i ) {
 					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+//					std::cout << "current jonint index: " << currentJoinIndex << std::endl;
 					current_node_indices.Push(currentJoinIndex);
 				}
 		
@@ -1269,7 +1269,7 @@ namespace GLVM::Core
 			core::vector<u32> current_node_indices;
 			for ( u32 i = 0; i < node_stack.size(); ++i ) {
 				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-				std::cout << "current jonint index: " << currentJoinIndex << std::endl;
+//				std::cout << "current jonint index: " << currentJoinIndex << std::endl;
 				current_node_indices.Push(currentJoinIndex);
 			}
 

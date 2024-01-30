@@ -32,11 +32,11 @@ layout(location = 5) in VS_OUT {
 
 layout(location = 0) out vec4 outColor;
 
-layout(set = 3, binding = 3) uniform ViewPositionUBO {
+layout(set = 3, binding = 0) uniform ViewPositionUBO {
 	vec3 viewPosition;
 } viewPos;
 
-layout(set = 4, binding = 4) uniform MaterialUBO {
+layout(set = 4, binding = 0) uniform MaterialUBO {
     vec3      ambient;
     float     shininess;
 } material; 
@@ -81,27 +81,27 @@ struct SpotLight {
 // #define POINT_LIGHTS_NUMBER                                32
 // #define SPOT_LIGHTS_NUMBER                                 8
 
-layout(set = 5, binding = 5) uniform DirectionalLightsUBO {
+layout(set = 5, binding = 0) uniform DirectionalLightsUBO {
 	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
 	int directionalLightsArraySize;
 } directionalLights;
 
-layout(set = 6, binding = 6) uniform PointLightsUBO {
+layout(set = 6, binding = 0) uniform PointLightsUBO {
 	PointLight pointLightsArray[POINT_LIGHTS_NUMBER];
 	int pointLightsArraySize;
 	float farPlane;
 } pointLights;
 
-layout(set = 7, binding = 7) uniform SpotLightsUBO {
+layout(set = 7, binding = 0) uniform SpotLightsUBO {
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 } spotLights;
 
-layout(set = 8, binding = 8) uniform sampler2D diffuse;
-layout(set = 9, binding = 9) uniform sampler2D specular;
-layout(set = 10, binding = 10) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 11, binding = 11) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 12, binding = 12) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
+layout(set = 8, binding = 0) uniform sampler2D diffuse;
+layout(set = 9, binding = 0) uniform sampler2D specular;
+layout(set = 10, binding = 0) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
+layout(set = 11, binding = 0) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+layout(set = 12, binding = 0) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);

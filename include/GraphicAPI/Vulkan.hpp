@@ -244,11 +244,11 @@ namespace GLVM::core
 		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
 			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
 				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
-				++globalDescriptorsNumber;
+//				++globalDescriptorsNumber;
 				++uboDescriptorsNumber;
 			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
 				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
-				++globalDescriptorsNumber;
+//				++globalDescriptorsNumber;
 				++combinedImageSamplersNumber;
 			} else {
 				assert(!"unreachable");

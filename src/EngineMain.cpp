@@ -364,7 +364,8 @@ int main()
 	GLVM->SetMesh("../waveFrontObj/pipe.obj");
 //	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 //	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
-	GLVM->SetMeshGLTF("../gltf/chel5.gltf");
+//	GLVM->SetMeshGLTF("../gltf/chel5.gltf");
+	GLVM->SetMeshGLTF("../gltf/mega_chel.gltf");
 //	GLVM->SetMeshGLTF("../gltf/Fox.gltf");
 //	GLVM->SetMeshGLTF("../gltf/chel3.gltf");
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");

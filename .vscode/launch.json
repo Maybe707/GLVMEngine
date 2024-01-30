@@ -1,5 +1,6 @@
 {
     "configurations": [
+
     {
         "name": "(gdb) Launch",
         "type": "cppdbg",
@@ -7,7 +8,7 @@
         "program": "${workspaceFolder}/build/linGame",
         "args": [],
         "stopAtEntry": false,
-        "cwd": "${workspaceFolder}/",
+        "cwd": "${workspaceFolder}/build",
         "environment": [],
         "externalConsole": false,
         "MIMode": "gdb",
@@ -25,4 +26,4 @@
         ]
     }
     ]
-}
+} 
