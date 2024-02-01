@@ -3666,7 +3666,7 @@ namespace GLVM::core
 					// 	pointLightComponent->position -= deltaTime;
 					// }
 
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter);
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
 
 					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
@@ -3976,7 +3976,7 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage]);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		vec3 positionVectorLight  = pointLightComponent->position;
@@ -4069,6 +4069,47 @@ namespace GLVM::core
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 		modelMatrixUBO.farPlane = 100.0f;
 
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[joinMatricesDataSize];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+		}
+
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
+		
+//		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
+		delete [] jointMatricesData;
+		jointMatricesData = nullptr;
+		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);

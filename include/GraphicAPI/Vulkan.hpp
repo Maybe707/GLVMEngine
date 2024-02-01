@@ -299,6 +299,7 @@ namespace GLVM::core
 		mat4 lightSpaceMatrix;
 		vec3 lightPosition;
 		float farPlane;
+		mat4 jointMatrices[MAX_JOINTS_NUMBER];
 	};
 
 	struct alignas(16) UniformBufferObjectLightUBO {
@@ -774,7 +775,7 @@ namespace GLVM::core
 		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		 uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight);
-		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer);
+		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);

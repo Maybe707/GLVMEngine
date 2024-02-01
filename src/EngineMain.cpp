@@ -98,7 +98,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 0.0f, 8.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
-    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 0;
+    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 1;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
