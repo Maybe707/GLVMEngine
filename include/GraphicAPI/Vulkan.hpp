@@ -179,8 +179,8 @@ namespace GLVM::core
 		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		MODEL_MATRIX_UBO,
-		DIRECTIONAL_LIGHT_SPACE_MATRIX_UBO,
-		SPOT_LIGHT_SPACE_MATRIX_UBO,
+		LIGHT_SPACE_MATRIX_UBO,
+
 		VIEW_POSITION_UBO,
 		MATERIAL_UBO,
 		DIRECTIONAL_LIGHTS_UBO,
@@ -265,12 +265,10 @@ namespace GLVM::core
 		}
 	};
 
-	struct alignas(16) DirLightSpaceMatrixUBO {
+	struct alignas(16) LightSpaceMatrixUBO {
 		mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
 		uint32_t directionalLightsNumber;
-	};
 
-	struct alignas(16) SpotLightSpaceMatrixUBO {
 		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		uint32_t spotLightsNumber;
 	};
@@ -597,14 +595,10 @@ namespace GLVM::core
 		===================================
 		*/
 		mat4 dirLightSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
-		std::vector<VkBuffer> dirLightSpaceMatrixBuffer;
-		std::vector<VkDeviceMemory> dirLightSpaceMatrixMemory;
-		std::vector<VkDescriptorSet> dirLightSpaceMatrixDescriptorSet;
-
 		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
-		std::vector<VkBuffer> spotLightSpaceMatrixBuffer;
-		std::vector<VkDeviceMemory> spotLightSpaceMatrixMemory;
-		std::vector<VkDescriptorSet> spotLightSpaceMatrixDescriptorSet;
+		std::vector<VkBuffer> lightSpaceMatrixBuffer;
+		std::vector<VkDeviceMemory> lightSpaceMatrixMemory;
+		std::vector<VkDescriptorSet> lightSpaceMatrixDescriptorSet;
 		
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<VK_Image> spotLightShadowMapImages;
@@ -781,7 +775,6 @@ namespace GLVM::core
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
-		void updateSpotSpaceMatrix(uint32_t currentImage);
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
 		void updateSpotLightUniformBuffer(uint32_t currentImage);

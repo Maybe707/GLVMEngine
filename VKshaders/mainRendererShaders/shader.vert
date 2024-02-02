@@ -33,12 +33,10 @@ layout(location = 2) out vec2 outFragmentTextureCoordinate;
 layout(set = 1, binding = 0) uniform TestDirLightSpaceMatrixUBO {
 	mat4 dirSpaceMatrix[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 	int directionalLightsNumber;
-} dirSpaceMat;
 
-layout(set = 2, binding = 0) uniform SpotLightSpaceMatrixUBO {
 	mat4 spotSpaceMatrix[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 	int spotLightsNumber;
-} spotSpaceMat;
+} spaceMat;
 
 void main() {
 	mat4 skinMatrix;
@@ -63,11 +61,11 @@ void main() {
 //	vs_out.normal = transpose(inverse(mat3(ubo.model))) * vec3(skinMatrix * vec4(inNormal, 1.0));
 	vs_out.normal = mat3(transpose(inverse(ubo.model * skinMatrix))) * inNormal;
 	vs_out.textureCoords = inTextureCoordinate;
-	for (int i = 0; i < dirSpaceMat.directionalLightsNumber; ++i) 
-		vs_out.fragmentPositionDirectionalLightSpace[i] = dirSpaceMat.dirSpaceMatrix[i] * worldPosition;
+	for (int i = 0; i < spaceMat.directionalLightsNumber; ++i) 
+		vs_out.fragmentPositionDirectionalLightSpace[i] = spaceMat.dirSpaceMatrix[i] * worldPosition;
 	
-	for (int i = 0; i < spotSpaceMat.spotLightsNumber; ++i) 
-		vs_out.fragmentPositionSpotLightSpace[i] = spotSpaceMat.spotSpaceMatrix[i] * worldPosition;
+	for (int i = 0; i < spaceMat.spotLightsNumber; ++i) 
+		vs_out.fragmentPositionSpotLightSpace[i] = spaceMat.spotSpaceMatrix[i] * worldPosition;
 
 	
     gl_Position = ubo.proj * ubo.view * worldPosition;
