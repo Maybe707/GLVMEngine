@@ -36,7 +36,7 @@ uniform int directionalLightSpaceMatrixContainerSize;
 
 uniform bool reverseNormals;
 
-uniform mat4 jointMatrices[6];
+uniform mat4 jointMatrices[30];
 
 void main()
 {

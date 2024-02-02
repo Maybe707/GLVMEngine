@@ -567,8 +567,8 @@ namespace GLVM::core
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 			mat4* jointMatricesData = nullptr;
 			if ( joinMatricesDataSize == 0 ) {
-				jointMatricesData = new mat4[6];
-				for ( unsigned int i = 0; i < 6; ++i ) {
+				jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+				for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
 					mat4 unitMatrix(1.0f);
 					jointMatricesData[i] = unitMatrix;
 				}
@@ -587,7 +587,7 @@ namespace GLVM::core
 // //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 // 			}
 		
-			coreShaderProgram->SetMat4("jointMatrices", 6, jointMatricesData[0]);
+			coreShaderProgram->SetMat4("jointMatrices", MAX_JOINTS_NUMBER, jointMatricesData[0]);
 			delete [] jointMatricesData;
 			jointMatricesData = nullptr;
 

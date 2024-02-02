@@ -317,11 +317,11 @@ int main()
 
 	Entity spotLight1 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 0.0f, 10.0f, -10.0f },
-		.direction = { 0.0f, 0.0f, 5.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
+	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 0.0f, 18.0f, -6.0f },
+		.direction = { 0.0f, -2.0f, 3.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
 		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 0.0f, 10.0f, -10.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 0.0f, 18.0f, -6.0f }, .fScale = 0.5f };
 	ComponentManager->GetComponent<cm::mesh>(spotLight1)->id = 0;
 	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
 	*materialSpotLight1 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2 };
@@ -372,8 +372,8 @@ int main()
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

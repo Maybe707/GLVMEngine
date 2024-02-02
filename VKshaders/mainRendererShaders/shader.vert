@@ -9,7 +9,7 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-	mat4 jointMatrices[20];
+	mat4 jointMatrices[30];
 } ubo;
 
 layout(location = 5) out VS_OUT {
