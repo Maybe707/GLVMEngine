@@ -10,6 +10,9 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 view;
     mat4 proj;
 	mat4 jointMatrices[30];
+
+	vec3      ambient;
+    float     shininess;
 } ubo;
 
 layout(location = 5) out VS_OUT {
@@ -18,6 +21,9 @@ layout(location = 5) out VS_OUT {
 	vec2 textureCoords;
 	vec4 fragmentPositionDirectionalLightSpace[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+
+	vec3      ambient;
+    float     shininess;
 } vs_out;
 
 layout(location = 0) in vec3 inPosition;

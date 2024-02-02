@@ -280,6 +280,9 @@ namespace GLVM::core
         mat4 view;
         mat4 proj;
 		mat4 jointMatrices[MAX_JOINTS_NUMBER];
+
+		vec3  ambient;
+		float shininess;		
     };
 
 	struct alignas(16) ShadowMapMatrixUBO {
@@ -350,11 +353,6 @@ namespace GLVM::core
 	
     struct ViewPositionUBO {
 		vec3 viewPosition;
-    };
-
-    struct alignas(16) MaterialUBO {
-		vec3  ambient;
-		float shininess;
     };
 
 	struct DirectionalLightsUBO {
@@ -669,7 +667,7 @@ namespace GLVM::core
         VkDescriptorPool descriptorPool;
 		unsigned int matrixUboDescriptorsNumber = 0;
 		unsigned int viewPositionUboDescriptorsNumber = 0;
-		unsigned int materialUboDescriptorsNumber = 0;
+//		unsigned int materialUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
 		unsigned int spotLightUboDescriptorsNumber = 0;
@@ -771,9 +769,8 @@ namespace GLVM::core
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
-        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID);
+        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
-		void updateMaterialUniformBuffer(uint32_t currentImage, ecs::components::material* materialComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
 		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
 		void updatePointLightUniformBuffer(uint32_t currentImage);
