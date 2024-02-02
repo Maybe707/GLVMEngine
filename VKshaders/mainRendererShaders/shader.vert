@@ -73,6 +73,8 @@ void main() {
 	for (int i = 0; i < spaceMat.spotLightsNumber; ++i) 
 		vs_out.fragmentPositionSpotLightSpace[i] = spaceMat.spotSpaceMatrix[i] * worldPosition;
 
+	vs_out.ambient = ubo.ambient;
+	vs_out.shininess = ubo.shininess;
 	
     gl_Position = ubo.proj * ubo.view * worldPosition;
 //	gl_Position = worldPosition * ubo.model * ubo.view * ubo.proj;
