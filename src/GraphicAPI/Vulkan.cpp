@@ -3767,11 +3767,11 @@ namespace GLVM::core
 			}
 		}
 
-// 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-// //			std::cout << jointMatricesData[j] << std::endl;
-// 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-// //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
-// 		}
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
 		
 //		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
 		delete [] jointMatricesData;
