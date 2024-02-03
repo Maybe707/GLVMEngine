@@ -108,9 +108,9 @@ layout(set = 2, binding = 0) uniform LightData {
 
 layout(set = 3, binding = 0) uniform sampler2D diffuse;
 layout(set = 3, binding = 1) uniform sampler2D specular;
-layout(set = 3, binding = 2) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 3, binding = 3) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 3, binding = 4) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
+// layout(set = 3, binding = 2) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
+// layout(set = 3, binding = 3) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+// layout(set = 3, binding = 4) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
@@ -204,19 +204,19 @@ void main()
 	vec3 result = vec3(0.0, 0.0, 0.0);
 	for(int i = 0; i < lightData.directionalLightsArraySize; ++i ) {
 		vec3 light = ComputeDirectionalLight(lightData.directionalLightsArray[i], fragmentNormal, viewDirection);
-		float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
-		result += (1.0 - shadow) * light;
-		if(shadow > 0.0)
-			shadow = 0.0;
+		// float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
+		// result += (1.0 - shadow) * light;
+		// if(shadow > 0.0)
+		// 	shadow = 0.0;
 	}
 
 	for(int i = 0; i < lightData.pointLightsArraySize; ++i) {
 		debugPrintfEXT("Quadratic value: %f", lightData.pointLightsArray[3].quadratic);
 		
 		vec3 light = ComputePointLight(lightData.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-		float shadow = ComputePointShadow(lightData.pointLightsArray[i],
-										  inFragmentPosition, pointLightsCubeShadowMaps[i]);
-		result += (1.0 - shadow) * light;
+		// float shadow = ComputePointShadow(lightData.pointLightsArray[i],
+		// 								  inFragmentPosition, pointLightsCubeShadowMaps[i]);
+		// result += (1.0 - shadow) * light;
 
 		// if (shadow == 1.0)
 		// 	result = vec3(0.0, 0.0, 1.0);
@@ -224,19 +224,19 @@ void main()
 		// 	result = vec3(1.0, 0.0, 0.0);
 		
 //		result += shadow;
-		if(shadow > 0.0)
-			shadow = 0.0;
+		// if(shadow > 0.0)
+		// 	shadow = 0.0;
 	}
 
 	for(int i = 0; i < lightData.spotLightArraySize; ++i) {
 		vec3 light = ComputeSpotLight(lightData.spotLightsArray[i], fragmentNormal,
 									  inFragmentPosition, viewDirection);
-		float shadow = ComputeSpotShadow(lightData.spotLightsArray[i],
-										 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
+		// float shadow = ComputeSpotShadow(lightData.spotLightsArray[i],
+		// 								 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
 
-		result += (1.0 - shadow) * light;
-		if(shadow > 0.0)
-			shadow = 0.0;
+		// result += (1.0 - shadow) * light;
+		// if(shadow > 0.0)
+		// 	shadow = 0.0;
 	}
 
 //    float depthValue = texture(directionalLightsShadowMaps, inFragmentTextureCoordinate).r;
@@ -285,13 +285,13 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	// combine results
 	vec3 ambient  = light.ambient * fs_in.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, inFragmentTextureCoordinate));
-	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
+//	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 
 	ambient  *= attenuation;
 	diffuse  *= attenuation;
-	specular *= attenuation;
+//	specular *= attenuation;
 
-	return (ambient + diffuse + specular);
+	return (ambient + diffuse);
 }
 
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection) {
@@ -311,12 +311,12 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	// combine results
 	vec3 ambient  = light.ambient * fs_in.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, inFragmentTextureCoordinate));
-	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
+//	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 	ambient  *= attenuation * intensity;
     diffuse  *= attenuation * intensity;
-    specular *= attenuation * intensity;
+//    specular *= attenuation * intensity;
 	
-    return vec3(ambient + diffuse + specular);
+    return vec3(ambient + diffuse);
 }
 
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace, sampler2D flatShadowMap) {
