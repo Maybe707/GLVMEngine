@@ -35,10 +35,6 @@ layout(location = 5) in VS_OUT {
 
 layout(location = 0) out vec4 outColor;
 
-layout(set = 2, binding = 0) uniform ViewPositionUBO {
-	vec3 viewPosition;
-} viewPos;
-
 // layout(set = 3, binding = 0) uniform MaterialUBO {
 //     vec3      ambient;
 //     float     shininess;
@@ -84,27 +80,37 @@ struct SpotLight {
 // #define POINT_LIGHTS_NUMBER                                32
 // #define SPOT_LIGHTS_NUMBER                                 8
 
-layout(set = 3, binding = 0) uniform DirectionalLightsUBO {
+layout(set = 2, binding = 0) uniform LightData {
+	vec3 viewPosition;
+
 	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
 	int directionalLightsArraySize;
-} directionalLights;
 
-layout(set = 4, binding = 0) uniform PointLightsUBO {
 	PointLight pointLightsArray[POINT_LIGHTS_NUMBER];
 	int pointLightsArraySize;
 	float farPlane;
-} pointLights;
 
-layout(set = 5, binding = 0) uniform SpotLightsUBO {
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
-} spotLights;
+} lightData;
 
-layout(set = 6, binding = 0) uniform sampler2D diffuse;
-layout(set = 7, binding = 0) uniform sampler2D specular;
-layout(set = 8, binding = 0) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 9, binding = 0) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 10, binding = 0) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
+// layout(set = 3, binding = 0) uniform DirectionalLightsUBO {
+
+// } directionalLights;
+
+// layout(set = 4, binding = 0) uniform PointLightsUBO {
+
+// } pointLights;
+
+// layout(set = 5, binding = 0) uniform SpotLightsUBO {
+
+// } spotLights;
+
+layout(set = 3, binding = 0) uniform sampler2D diffuse;
+layout(set = 3, binding = 1) uniform sampler2D specular;
+layout(set = 3, binding = 2) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
+layout(set = 3, binding = 3) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+layout(set = 3, binding = 4) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
@@ -193,22 +199,22 @@ float delinearize_depth(float depth, float near, float far) {
 void main()
 {
 	vec3 fragmentNormal = normalize(fs_in.normal);
-	vec3 viewDirection  = normalize(viewPos.viewPosition - fs_in.fragmentPosition);
+	vec3 viewDirection  = normalize(lightData.viewPosition - fs_in.fragmentPosition);
 
 	vec3 result = vec3(0.0, 0.0, 0.0);
-	for(int i = 0; i < directionalLights.directionalLightsArraySize; ++i ) {
-		vec3 light = ComputeDirectionalLight(directionalLights.directionalLightsArray[i], fragmentNormal, viewDirection);
-		float shadow = ComputeDirectionalShadow(directionalLights.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
+	for(int i = 0; i < lightData.directionalLightsArraySize; ++i ) {
+		vec3 light = ComputeDirectionalLight(lightData.directionalLightsArray[i], fragmentNormal, viewDirection);
+		float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
 		result += (1.0 - shadow) * light;
 		if(shadow > 0.0)
 			shadow = 0.0;
 	}
 
-	for(int i = 0; i < pointLights.pointLightsArraySize; ++i) {
-		debugPrintfEXT("Quadratic value: %f", pointLights.pointLightsArray[3].quadratic);
+	for(int i = 0; i < lightData.pointLightsArraySize; ++i) {
+		debugPrintfEXT("Quadratic value: %f", lightData.pointLightsArray[3].quadratic);
 		
-		vec3 light = ComputePointLight(pointLights.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-		float shadow = ComputePointShadow(pointLights.pointLightsArray[i],
+		vec3 light = ComputePointLight(lightData.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+		float shadow = ComputePointShadow(lightData.pointLightsArray[i],
 										  inFragmentPosition, pointLightsCubeShadowMaps[i]);
 		result += (1.0 - shadow) * light;
 
@@ -222,10 +228,10 @@ void main()
 			shadow = 0.0;
 	}
 
-	for(int i = 0; i < spotLights.spotLightArraySize; ++i) {
-		vec3 light = ComputeSpotLight(spotLights.spotLightsArray[i], fragmentNormal,
+	for(int i = 0; i < lightData.spotLightArraySize; ++i) {
+		vec3 light = ComputeSpotLight(lightData.spotLightsArray[i], fragmentNormal,
 									  inFragmentPosition, viewDirection);
-		float shadow = ComputeSpotShadow(spotLights.spotLightsArray[i],
+		float shadow = ComputeSpotShadow(lightData.spotLightsArray[i],
 										 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
 
 		result += (1.0 - shadow) * light;
@@ -407,8 +413,8 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 //	float bias    = 0.15;
 	float bias    = -0.12514;
 	float samples = 20;
-	float viewDistance = length(viewPos.viewPosition - fragmentPosition);
-	float diskRadius   = (1.0 + (viewDistance / pointLights.farPlane)) / 25.0;
+	float viewDistance = length(lightData.viewPosition - fragmentPosition);
+	float diskRadius   = (1.0 + (viewDistance / lightData.farPlane)) / 25.0;
 	for(int i = 0; i < samples; ++i)
 		{
 			float closestDepth = texture(pointLightsCubeShadowMap, fragmentToLight + sampleOffsetDirections[i] *

@@ -181,17 +181,19 @@ namespace GLVM::core
 		MODEL_MATRIX_UBO,
 		LIGHT_SPACE_MATRIX_UBO,
 
-		VIEW_POSITION_UBO,
-		MATERIAL_UBO,
-		DIRECTIONAL_LIGHTS_UBO,
-		POINT_LIGHTS_UBO,
-		SPOT_LIGHTS_UBO,
+		LIGHT_DATA,
+		// VIEW_POSITION_UBO,
+		// MATERIAL_UBO,
+		// DIRECTIONAL_LIGHTS_UBO,
+		// POINT_LIGHTS_UBO,
+		// SPOT_LIGHTS_UBO,
 		/// CIS - combined image sampler
-		DIFFUSE_CIS,
-		SPECULAR_CIS,
-		DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS,
-		POINT_LIGHT_SHADOW_MAPS_CIS,
-		SPOT_LIGHT_SHADOW_MAPS_CIS
+		// DIFFUSE_CIS,
+		// SPECULAR_CIS,
+		// DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS,
+		// POINT_LIGHT_SHADOW_MAPS_CIS,
+		// SPOT_LIGHT_SHADOW_MAPS_CIS
+		LIGHT_SAMPLERS
 	};
 
 	struct VK_Image {
@@ -216,12 +218,12 @@ namespace GLVM::core
 	};
 	
 	struct Descriptor {
-		VkDescriptorType      vkType;
-		DescriptorsTypes      type;
-		uint32_t              binding;
-		VkShaderStageFlags    shaderStageFlag;
-		VkDescriptorSetLayout setLayout;
-		uint32_t              descriptorsNumber;
+		VkDescriptorType       vkType;
+		DescriptorsTypes       type;
+		core::vector<u32> binding;
+		VkShaderStageFlags     shaderStageFlag;
+		VkDescriptorSetLayout  setLayout;
+		core::vector<u32>               descriptorsNumber;
 
 		std::vector<VkBuffer> uniformBuffers;
 		std::vector<VkDeviceMemory> uniformBuffersMemory;
@@ -241,13 +243,14 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
-		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag, uint32_t descriptorsNumber) {
+		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag,
+						   core::vector<u32> descriptorsNumbers, core::vector<uint32_t> bindings) {
 			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
+				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
 //				++globalDescriptorsNumber;
 				++uboDescriptorsNumber;
 			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
-				descriptors.Push({vkType, type, globalDescriptorsNumber, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumber, {}, {}, {}});
+				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
 //				++globalDescriptorsNumber;
 				++combinedImageSamplersNumber;
 			} else {
@@ -255,13 +258,14 @@ namespace GLVM::core
 			}
 		}
 
-		int getBindingOfDescriptor(DescriptorsTypes type) {
+		core::vector<u32> getBindingOfDescriptor(DescriptorsTypes type) {
 			for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
 				if ( type == descriptors[i].type )
 					return descriptors[i].binding;
 			}
 
-			return -1;
+			core::vector<u32> empty;
+			return empty;
 		}
 	};
 
@@ -351,25 +355,29 @@ namespace GLVM::core
 		float quadratic;
 	};
 	
-    struct ViewPositionUBO {
+    struct LightData {
 		vec3 viewPosition;
-    };
 
-	struct DirectionalLightsUBO {
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 		int directionalLightsArraySize;
-	};
 
-	struct PointLightsUBO {
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
 		float farPlane;
-	};
 
-	struct SpotLightsUBO {
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
-	};
+    };
+
+	// struct DirectionalLightsUBO {
+
+	// };
+
+	// struct PointLightsUBO {
+	// };
+
+	// struct SpotLightsUBO {
+	// };
 
 //     const std::vector<Vertex> vertices = {
 //         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
@@ -653,8 +661,8 @@ namespace GLVM::core
 
         std::vector<VkBuffer> modelMatrixUniformBuffers;
         std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
-        std::vector<VkBuffer> viewPositionUniformBuffers;
-        std::vector<VkDeviceMemory> viewPositionUniformBuffersMemory;
+        std::vector<VkBuffer> lightDataUniformBuffers;
+        std::vector<VkDeviceMemory> lightDataUniformBuffersMemory;
         std::vector<VkBuffer> materialUniformBuffers;
         std::vector<VkDeviceMemory> materialUniformBuffersMemory;
         std::vector<VkBuffer> directionalLightsUniformBuffers;
@@ -671,8 +679,9 @@ namespace GLVM::core
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
 		unsigned int spotLightUboDescriptorsNumber = 0;
+		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number
         std::vector<VkDescriptorSet> matrixUboDescriptorSets;
-		std::vector<VkDescriptorSet> viewPositionUboDescriptorSets;
+		std::vector<VkDescriptorSet> lightDataUboDescriptorSets;
 		std::vector<VkDescriptorSet> materialUboDescriptorSets;
 		std::vector<VkDescriptorSet> directionalLightUboDescriptorSets;
 		std::vector<VkDescriptorSet> pointLightUboDescriptorSets;
@@ -772,9 +781,6 @@ namespace GLVM::core
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
-		void updateDirectionalLightUniformBuffer(uint32_t currentImage);
-		void updatePointLightUniformBuffer(uint32_t currentImage);
-		void updateSpotLightUniformBuffer(uint32_t currentImage);
         void drawFrame();
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
