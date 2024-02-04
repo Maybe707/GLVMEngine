@@ -23,8 +23,8 @@ layout(location = 1) in vec3 inFragmentNormal;
 layout(location = 2) in vec2 inFragmentTextureCoordinate;
 
 layout(location = 5) in VS_OUT {
-	alignas(16) vec3 fragmentPosition;
-	alignas(16) vec3 normal;
+	vec3 fragmentPosition;
+	vec3 normal;
 	vec2 textureCoords;
 	vec4 fragmentPositionDirectionalLightSpace[DIRECTIONAL_LIGHTS_NUMBER];
 	vec4 fragmentPositionSpotLightSpace[SPOT_LIGHTS_NUMBER];
