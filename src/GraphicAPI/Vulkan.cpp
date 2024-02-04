@@ -3594,10 +3594,15 @@ namespace GLVM::core
 			}
 				
 		} else {
-			jointMatricesData = new mat4[joinMatricesDataSize];
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
 			}
 		}
 
@@ -3682,7 +3687,7 @@ namespace GLVM::core
 				jointMatricesData[j] = unitMatrix;
 			}
 		}
-		std::cout << "size: " << joinMatricesDataSize << std::endl;
+
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 //			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
