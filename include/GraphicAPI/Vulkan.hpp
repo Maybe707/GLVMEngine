@@ -193,7 +193,8 @@ namespace GLVM::core
 		// DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS,
 		// POINT_LIGHT_SHADOW_MAPS_CIS,
 		// SPOT_LIGHT_SHADOW_MAPS_CIS
-		LIGHT_SAMPLERS
+		LIGHT_SAMPLERS,
+		LIGHT_SHADOW_MAPS
 	};
 
 	struct VK_Image {
@@ -271,10 +272,10 @@ namespace GLVM::core
 
 	struct alignas(16) LightSpaceMatrixUBO {
 		mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
-		uint32_t directionalLightsNumber;
-
+		alignas(16) uint32_t spotLightsNumber;
+		
 		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
-		uint32_t spotLightsNumber;
+		alignas(16) uint32_t directionalLightsNumber;
 	};
 
 #define MAX_JOINTS_NUMBER 30
@@ -357,6 +358,7 @@ namespace GLVM::core
 	
     struct LightData {
 		vec3 viewPosition;
+		float padding;
 
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 		int directionalLightsArraySize;
