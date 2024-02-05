@@ -289,16 +289,16 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createDepthResources();
-		createShadowMapDepthResources();
-        createFramebuffers();
+//		createShadowMapDepthResources();
+//        createFramebuffers();
 
-		createDirectionalLightShadowMapTextureSamplers();
-		createSpotLightShadowMapTextureSamplers();
-		createPointLightShadowMapTextureSamplers();
+		// createDirectionalLightShadowMapTextureSamplers();
+		// createSpotLightShadowMapTextureSamplers();
+		// createPointLightShadowMapTextureSamplers();
 		
-		updateDirectionalLightShadowMapDescriptorSets();
-		updateSpotLightShadowMapDescriptorSets();
-		updatePointLightShadowMapDescriptorSets();
+		// updateDirectionalLightShadowMapDescriptorSets();
+		// updateSpotLightShadowMapDescriptorSets();
+		// updatePointLightShadowMapDescriptorSets();
 		updateDescriptorSets();
     }
     
@@ -568,8 +568,8 @@ namespace GLVM::core
 
     void CVulkanRenderer::cleanupSwapChain() {
         vkDestroyImageView(device, depthImageView, nullptr);
-        vkDestroyImage(device, depthImage, nullptr);
-        vkFreeMemory(device, depthImageMemory, nullptr);
+//        vkDestroyImage(device, depthImage, nullptr);
+//        vkFreeMemory(device, depthImageMemory, nullptr);
 
 		directionalLightPipeline.descriptors[0].textureImages.clear();
 		spotLightPipeline.descriptors[0].textureImages.clear();
@@ -823,7 +823,7 @@ namespace GLVM::core
 
         VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
         VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-        VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+        VkExtent2D  extent = chooseSwapExtent(swapChainSupport.capabilities);
 
         uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
         if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
@@ -3650,7 +3650,7 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 
 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
 			++_transformComponent->currentAnimationFrame;
 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;
@@ -3663,6 +3663,7 @@ namespace GLVM::core
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
@@ -3732,7 +3733,7 @@ namespace GLVM::core
 //		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
 		/// Start of animation logic
 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
 			++_transformComponent->currentAnimationFrame;
 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 				_transformComponent->currentAnimationFrame = 0;
@@ -3745,6 +3746,7 @@ namespace GLVM::core
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
 //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
@@ -4022,7 +4024,7 @@ namespace GLVM::core
             //     static_cast<uint32_t>(height)
             // };
 
-			VkExtent2D actualExtent;
+			VkExtent2D actualExtent{};
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 

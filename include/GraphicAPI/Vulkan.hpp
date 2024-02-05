@@ -577,8 +577,8 @@ namespace GLVM::core
         VkCommandPool commandPool;
 
 		/// Main pipeline depth.
-        VkImage depthImage;
-        VkDeviceMemory depthImageMemory;
+//        VkImage depthImage;
+//        VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
 
 		/// Depth varialbes for shadow map.
