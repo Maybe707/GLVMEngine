@@ -289,16 +289,16 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createDepthResources();
-//		createShadowMapDepthResources();
-//        createFramebuffers();
+		createShadowMapDepthResources();
+		createFramebuffers();
 
-		// createDirectionalLightShadowMapTextureSamplers();
-		// createSpotLightShadowMapTextureSamplers();
-		// createPointLightShadowMapTextureSamplers();
+		createDirectionalLightShadowMapTextureSamplers();
+		createSpotLightShadowMapTextureSamplers();
+		createPointLightShadowMapTextureSamplers();
 		
-		// updateDirectionalLightShadowMapDescriptorSets();
-		// updateSpotLightShadowMapDescriptorSets();
-		// updatePointLightShadowMapDescriptorSets();
+		updateDirectionalLightShadowMapDescriptorSets();
+		updateSpotLightShadowMapDescriptorSets();
+		updatePointLightShadowMapDescriptorSets();
 		updateDescriptorSets();
     }
     
@@ -2748,7 +2748,7 @@ namespace GLVM::core
 			imageInfo.imageView = textureImages[textureIndex].views[0];
 			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
-			std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+			std::array<VkWriteDescriptorSet, 5> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[i];
 			descriptorWrites[0].dstBinding = diffuseCisBinding;
