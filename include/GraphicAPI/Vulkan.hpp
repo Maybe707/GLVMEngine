@@ -270,12 +270,12 @@ namespace GLVM::core
 		}
 	};
 
-	struct alignas(16) LightSpaceMatrixUBO {
-		mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
-		alignas(16) uint32_t spotLightsNumber;
+	struct LightSpaceMatrixUBO {
+		// mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
+		// alignas(16) uint32_t directionalLightsNumber;
 		
 		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
-		alignas(16) uint32_t directionalLightsNumber;
+		alignas(16) uint32_t spotLightsNumber;
 	};
 
 #define MAX_JOINTS_NUMBER 30

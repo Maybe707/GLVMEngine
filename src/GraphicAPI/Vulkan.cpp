@@ -2685,7 +2685,62 @@ namespace GLVM::core
 
 		core::vector<u32> lightsSamplersBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
 		int diffuseCisBinding = lightsSamplersBindings[0];
-		int specularCisBinding = lightsSamplersBindings[1];		
+		int specularCisBinding = lightsSamplersBindings[1];
+		int directionalLightShadowMapsCisBinding = lightsSamplersBindings[2];
+		int pointLightShadowMapsCisBinding = lightsSamplersBindings[3];
+		int spotLightShadowMapsCisBinding = lightsSamplersBindings[4];
+
+		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		for (size_t i = 0; i < directionalLightNumber; ++i) {
+			directionalLightsImageInfo[i] = {};
+			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+//			unsigned int textureIndex = i / 2;
+		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
+		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
+
+		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+			directionalLightsImageInfo[j] = {};
+			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+			directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
+		}
+
+		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+		for (size_t i = 0; i < pointLightNumber; ++i) {
+//			unsigned int textureIndex = i / 2;
+			pointLightsImageInfo[i] = {};
+			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
+			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+
+
+		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+			pointLightsImageInfo[j] = {};
+			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+//				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
+			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
+		}
+
+		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
+		for (size_t i = 0; i < spotLightNumber; ++i) {
+			spotLightsImageInfo[i] = {};
+			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
+			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+
+		for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
+			spotLightsImageInfo[j] = {};
+			spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
+			spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
+		}
+		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -2709,6 +2764,30 @@ namespace GLVM::core
 			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[1].descriptorCount = 1;
 			descriptorWrites[1].pImageInfo = &imageInfo;
+
+			descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[2].dstSet = diffuseSamplerDescriptorSets[i];
+			descriptorWrites[2].dstBinding = directionalLightShadowMapsCisBinding;
+			descriptorWrites[2].dstArrayElement = 0;
+			descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[2].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+			descriptorWrites[2].pImageInfo = directionalLightsImageInfo;
+
+			descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[3].dstSet = diffuseSamplerDescriptorSets[i];
+			descriptorWrites[3].dstBinding = pointLightShadowMapsCisBinding;
+			descriptorWrites[3].dstArrayElement = 0;
+			descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[3].descriptorCount = POINT_LIGHTS_NUMBER;
+			descriptorWrites[3].pImageInfo = pointLightsImageInfo;
+
+			descriptorWrites[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[4].dstSet = diffuseSamplerDescriptorSets[i];
+			descriptorWrites[4].dstBinding = spotLightShadowMapsCisBinding;
+			descriptorWrites[4].dstArrayElement = 0;
+			descriptorWrites[4].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			descriptorWrites[4].descriptorCount = SPOT_LIGHTS_NUMBER;
+			descriptorWrites[4].pImageInfo = spotLightsImageInfo;
 			
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
@@ -3819,13 +3898,13 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateDirSpaceMatrix(uint32_t currentImage) {
 		LightSpaceMatrixUBO lightUBO{};
-		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
-			lightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
+		// for ( uint32_t i = 0; i < directionalLightNumber; ++i )
+		// 	lightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
 
 		for ( uint32_t i = 0; i < spotLightNumber; ++i )
 			lightUBO.spotSpaceMatrix[i] = spotLightSpaceMatrix[i];
 		
-		lightUBO.directionalLightsNumber = directionalLightNumber;
+//		lightUBO.directionalLightsNumber = directionalLightNumber;
 		lightUBO.spotLightsNumber        = spotLightNumber;
 		
         void* data;
