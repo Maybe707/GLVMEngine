@@ -393,8 +393,11 @@ namespace GLVM::core
 		DS_0_4_count.Push(32);
 		DS_0_4_count.Push(8);
 
-		for ( u32 i = 0; i < 5; ++i )
-			DS_0_4_bindigs.Push(i);
+		DS_0_4_bindigs.Push(0);
+		DS_0_4_bindigs.Push(1);
+		DS_0_4_bindigs.Push(2);
+		DS_0_4_bindigs.Push(6);
+		DS_0_4_bindigs.Push(38);
 			
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_4_count, DS_0_4_bindigs);
 
