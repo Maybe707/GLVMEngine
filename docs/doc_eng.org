@@ -1,0 +1,59 @@
+#+title: Grey Lane Vertex Machine (GLVM) documentation
+#+author: Yuriorkis_Scream
+
+* Common engine description
+GLVM engine based on simple entity component system (ECS) that using
+sparse arrays provided cache friendly data. ECS gives opportunity to
+easily add or remove new systems that working with components. Common
+working with GLVM based on creating of three super objects. One of them -
+is instance of engine itself, and we also need EntityManager and
+ComponentManager for using ECS system. Most of common GLVM object is
+located in special namespaces.
+
+
+* Common GLVM functions
+- Create engine instance
+  This is main super object of GLVM engine. Actualy its engine itself.
+#+begin_src c++
+  GLVM::core::Engine* GLVM = GLVM::core::Engine::GetInstance();
+#+end_src
+
+- Create entity manager instance
+  With this super object you can manage entities.
+#+begin_src c++
+  GLVM::ecs::EntityManager* EntityManager = GLVM::ecs::EntityManager::GetInstance();
+#+end_src
+
+- Create component manager instance
+  With this super object you can manage components.
+#+begin_src c++
+  GLVM::ecs::ComponentManager* ComponentManager  = GLVM::ecs::ComponentManager::GetInstance();
+#+end_src
+
+- Create entity
+  All entities in GLVM exposed just as an integer number. When you call function CreateEntity
+  you have to catch return value because its marked with [discard].
+#+begin_src c++
+  Entity uiPlayer = EntityManager->CreateEntity();
+#+end_src
+
+- Create component
+  When you create entity you can link components to it with call to a function 
+  CreateComponent<...place your list of components here...>(entity). This function is method of
+  ComponentManager and it supports any number of components as template variadic parameters.
+  Set all components you need in <> and pass target entity in ().
+#+begin_src c++ 
+  GLVM::ecs::ComponentManager->CreateComponent<GLVM::ecs::components::mesh,
+											   GLVM::ecs::components::transform,
+											   GLVM::ecs::components::rigidBody>(entity);
+#+end_src
+
+- Get component
+  After you link components to any entity you can access each single component
+  to change it for your purposes. This can be achieved with a call to a GetComponent function.
+  This function is method of ComponentManager. When you call it, pass target entity to () and pass target
+  component that linked to target entity to <>. 
+#+begin_src c++ 
+  *GLVM::ecs::ComponentManager->GetComponent<cm::transform>(uiPlayer) = {
+	  .tPosition = { 5.7f, 10.0f, 7.0f }, .fScale = 0.1f };
+#+end_src
