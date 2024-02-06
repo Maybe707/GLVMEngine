@@ -37,11 +37,11 @@ layout(location = 1) out vec3 outFragmentNormal;
 layout(location = 2) out vec2 outFragmentTextureCoordinate;
 
 layout(set = 1, binding = 0) uniform TestDirLightSpaceMatrixUBO {
-	mat4 dirSpaceMatrix[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
-	int directionalLightsNumber;
-
 	mat4 spotSpaceMatrix[SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
 	int spotLightsNumber;
+	
+	mat4 dirSpaceMatrix[DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE];
+	int directionalLightsNumber;
 } spaceMat;
 
 void main() {
