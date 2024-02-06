@@ -2010,8 +2010,9 @@ namespace GLVM::core
 		core::vector<Entity> matrixLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							cm::material,
 																							cm::mesh>();
-		
-		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * 3;
+
+		constexpr u32 UBO_multiplier = 30;
+		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
 
 		if ( matrixUboDescriptorsNumber > 0 ) {
 			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
@@ -2044,7 +2045,7 @@ namespace GLVM::core
 																								cm::mesh>();
 		
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * directionalLightLinkedEntities.GetSize();
+		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * directionalLightLinkedEntities.GetSize();
 
 		if ( directionalLightUboDescriptorsNumber > 0 ) {
 			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
@@ -2065,7 +2066,7 @@ namespace GLVM::core
 		}
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
-		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * spotLightLinkedEntities.GetSize();
+		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * spotLightLinkedEntities.GetSize();
 
 		if ( spotLightUboDescriptorsNumber > 0 ) {
 			shadowMapSpotLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber);
@@ -2090,7 +2091,7 @@ namespace GLVM::core
 																								 cm::mesh>();
 
 		
-		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * 3) * pointLightsLinkedEntities.GetSize();
+		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * pointLightsLinkedEntities.GetSize();
 
 		if ( pointLightUboDescriptorsNumber > 0 ) {
 			shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
