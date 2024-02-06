@@ -330,8 +330,8 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.normal);
-//	vec3 lightDir = normalize(lightPos - fs_in.fragmentPositionPointLightSpace.xyz);
-	vec3 lightDir = normalize(light.position - vec3(fs_in.fragmentPosition));
+	vec3 lightDir = normalize(light.position - fragmentPositionDirectionalLightSpace.xyz);
+//	vec3 lightDir = normalize(light.position - vec3(fs_in.fragmentPosition));
 //	vec3 lightDir = normalize(vec3(fs_in.fragmentPosition) - light.position);
 	float bias                 = max(0.01 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;

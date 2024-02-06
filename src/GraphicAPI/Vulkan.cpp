@@ -3486,7 +3486,7 @@ namespace GLVM::core
 																		uint32_t currentLight) {
 		float nearPlaneFlatShadowMap = 1.5f;
 		float farPlaneFlatShadowMap = 100.0f;
-		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
+		mat4 directionalProjectionMatrixLight = ortho(-15.0f, 15.0f, -15.0f, 15.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
 		vec3 positionVectorLight = directionalLightComponent->position;
