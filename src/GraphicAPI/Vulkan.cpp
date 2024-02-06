@@ -3130,7 +3130,7 @@ namespace GLVM::core
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter);
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
 				
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
@@ -3202,7 +3202,7 @@ namespace GLVM::core
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter);
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
 
 				// updateDirectionalLightShadowMapMatrixUBO(uboIndex, transformComponent, directionalLightComponent);
@@ -3500,7 +3500,7 @@ namespace GLVM::core
 		dirLightSpaceMatrix[currentLight] = viewMatrixLight * directionalProjectionMatrixLight;
 	}
 	
-    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight) {
+    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		modelMatrixUBO.model[0][0] = _transformComponent->fScale;
@@ -3513,6 +3513,49 @@ namespace GLVM::core
         modelMatrixUBO.model.SelfTensorTranspose();
 
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
+
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
+
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
 		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
@@ -3538,7 +3581,7 @@ namespace GLVM::core
 		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
 	}
 	
-    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight) {
+    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
         modelMatrixUBO.model[0][0] = _transformComponent->fScale;
@@ -3551,6 +3594,49 @@ namespace GLVM::core
         modelMatrixUBO.model.SelfTensorTranspose();
 
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
+
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
+
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
 		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage], 0,
@@ -3903,13 +3989,13 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateDirSpaceMatrix(uint32_t currentImage) {
 		LightSpaceMatrixUBO lightUBO{};
-		// for ( uint32_t i = 0; i < directionalLightNumber; ++i )
-		// 	lightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
+		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
+			lightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
 
 		for ( uint32_t i = 0; i < spotLightNumber; ++i )
 			lightUBO.spotSpaceMatrix[i] = spotLightSpaceMatrix[i];
 		
-//		lightUBO.directionalLightsNumber = directionalLightNumber;
+		lightUBO.directionalLightsNumber = directionalLightNumber;
 		lightUBO.spotLightsNumber        = spotLightNumber;
 		
         void* data;

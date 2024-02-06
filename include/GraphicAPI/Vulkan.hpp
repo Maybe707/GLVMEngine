@@ -271,8 +271,8 @@ namespace GLVM::core
 	};
 
 	struct LightSpaceMatrixUBO {
-		// mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
-		// alignas(16) uint32_t directionalLightsNumber;
+		mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
+		alignas(16) uint32_t directionalLightsNumber;
 		
 		mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		alignas(16) uint32_t spotLightsNumber;
@@ -293,6 +293,7 @@ namespace GLVM::core
 	struct alignas(16) ShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
+		mat4 jointMatrices[30];
 	};
 
 	struct alignas(16) SpotLightShadowMapMatrixUBO {
@@ -774,10 +775,10 @@ namespace GLVM::core
 		void createShadowMapSyncObjects();
         void createSyncObjects();
 		void updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
-		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight);
+		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		 uint32_t currentLight);
-		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight);
+		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
         void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent);
