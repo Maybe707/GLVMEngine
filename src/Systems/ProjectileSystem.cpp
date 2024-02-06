@@ -63,9 +63,9 @@ namespace GLVM::ecs
 																						   cm::mesh,
 																						   cm::collider>();
 		
-		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
+//		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
 		
-        for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
+        for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
 			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.01f;
@@ -73,7 +73,7 @@ namespace GLVM::ecs
 
 //        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
 		
-        for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+        for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
 			
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
@@ -81,7 +81,7 @@ namespace GLVM::ecs
 				// cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
 				// TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-				--linkedEntitiesVectorSize;
+//				--linkedEntitiesVectorSize;
             }
 //			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
 //			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();

@@ -2743,7 +2743,8 @@ namespace GLVM::core
 			spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
 			spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
 		}
-		
+
+		constexpr u32 DS_writes_size = 5;
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -2751,7 +2752,7 @@ namespace GLVM::core
 			imageInfo.imageView = textureImages[textureIndex].views[0];
 			imageInfo.sampler = textureImages[textureIndex].sampler;
 			
-			std::array<VkWriteDescriptorSet, 5> descriptorWrites{};
+			std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[i];
 			descriptorWrites[0].dstBinding = diffuseCisBinding;
@@ -3557,7 +3558,7 @@ namespace GLVM::core
 //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}
 		
-        void* modelMatrixData;
+        void* modelMatrixData = nullptr;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));

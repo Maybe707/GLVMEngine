@@ -1,3 +1,5 @@
+#include "Components/ControllerComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 
