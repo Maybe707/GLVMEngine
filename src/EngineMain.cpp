@@ -88,7 +88,7 @@ int main()
 	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, 0.5f, 0.0f }, .pitch = 30.0f, .fScale = 5.2f };
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, 0.5f, 0.0f }, .pitch = 15.0f, .fScale = 5.2f };
     ComponentManager->GetComponent<cm::mesh>(plain0)->id = 0;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
