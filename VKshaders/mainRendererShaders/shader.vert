@@ -9,7 +9,7 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-	mat4 jointMatrices[30];
+	mat4 jointMatrices[18];
 
 	vec3      ambient;
     float     shininess;

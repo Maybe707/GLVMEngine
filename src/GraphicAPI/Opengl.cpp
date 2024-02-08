@@ -550,7 +550,7 @@ namespace GLVM::core
 			cm::transform* _transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 			
 			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-				 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 3.0f ) {
+				 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
 				++_transformComponent->currentAnimationFrame;
 				if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
 					_transformComponent->currentAnimationFrame = 0;

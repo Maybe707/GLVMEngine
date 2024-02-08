@@ -94,16 +94,18 @@ int main()
 	*materialPlain0 = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 //    TextureManager->BindTexture(plain0, materialPlain0->diffuseTextureID_);
-    
-  	Entity uiWitch = EntityManager->CreateEntity();
+
+	for ( u32 i = 0; i < 40; ++i ) {
+	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch);
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { 2.0f, 10.0f, 0.0f },
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i, 10.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
-    ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 1;
+	ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 1;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
+	}
 
  	Entity cube0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);

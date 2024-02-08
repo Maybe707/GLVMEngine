@@ -278,7 +278,7 @@ namespace GLVM::core
 		alignas(16) uint32_t directionalLightsNumber;
 	};
 
-#define MAX_JOINTS_NUMBER 30
+#define MAX_JOINTS_NUMBER 18
 	
     struct alignas(16) ModelMatrixUBO {
         mat4 model;

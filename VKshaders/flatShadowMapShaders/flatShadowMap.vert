@@ -6,7 +6,7 @@
 layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 lightSpace;
-	mat4 jointMatrices[30];
+	mat4 jointMatrices[18];
 } ubo;
 
 layout(location = 0) in vec3 inPosition;

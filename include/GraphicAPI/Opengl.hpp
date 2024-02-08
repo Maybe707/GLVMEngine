@@ -35,7 +35,7 @@
 #include "WinApi/WindowWinOpengl.hpp"
 #endif
 
-#define MAX_JOINTS_NUMBER 30
+#define MAX_JOINTS_NUMBER 18
 
 /*! \class Renderer.
   \brief Render all game objects.
