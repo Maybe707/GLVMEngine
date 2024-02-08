@@ -38,7 +38,7 @@ namespace GLVM::core::Sound
         iFile_Descritor = fopen(_sound_sample.kPath_to_File_, "r");
             
         buf = (char*)malloc(FRAMES * uiFrame_Size);
-        for (;;) {
+        for (int i = 0; i < 300; ++i) {
             frames = fread(buf, uiFrame_Size, FRAMES, iFile_Descritor);
             if (frames <= 0)
                 break;

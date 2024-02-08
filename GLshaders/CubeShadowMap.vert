@@ -29,5 +29,6 @@ void main()
 
 	vec4 worldPosition = modelMatrix * skinMatrix * vec4(aPosition, 1.0);
 	
-	gl_Position = modelMatrix * worldPosition;
+//	gl_Position = worldPosition;
+	gl_Position = modelMatrix * vec4(aPosition, 1.0);
 }
