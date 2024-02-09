@@ -36,7 +36,7 @@ uniform int directionalLightSpaceMatrixContainerSize;
 
 uniform bool reverseNormals;
 
-uniform mat4 jointMatrices[30];
+uniform mat4 jointMatrices[18];
 
 void main()
 {
@@ -47,8 +47,16 @@ void main()
 			weights.y * jointMatrices[int(jointIndices.y)] +
 			weights.z * jointMatrices[int(jointIndices.z)] +
 			weights.w * jointMatrices[int(jointIndices.w)];
+	} else {
+		skinMatrix = mat4(
+			1.0, 0.0, 0.0, 0.0,
+			0.0, 1.0, 0.0, 0.0,
+			0.0, 0.0, 1.0, 0.0,
+			0.0, 0.0, 0.0, 1.0
+			);
 	}
 
+	
 	vec4 worldPosition = modelMatrix * skinMatrix * vec4(vertexPosition, 1.0);
 
     // gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vertexPosition.x, vertexPosition.y, vertexPosition.z, 1.0);

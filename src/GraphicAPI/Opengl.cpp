@@ -932,6 +932,15 @@ namespace GLVM::core
 					aVertexes_[m].push_back(normal[2]);
 					aVertexes_[m].push_back(texture[0]);
 					aVertexes_[m].push_back(texture[1]);
+
+					aVertexes_[m].push_back(-1);
+					aVertexes_[m].push_back(-1);
+					aVertexes_[m].push_back(-1);
+					aVertexes_[m].push_back(-1);
+					aVertexes_[m].push_back(0);
+					aVertexes_[m].push_back(0);
+					aVertexes_[m].push_back(0);
+					aVertexes_[m].push_back(0);
                 }
 			SetVertices(aIndices_[m], aVertexes_[m]);
         }
@@ -1077,23 +1086,23 @@ namespace GLVM::core
 
 //		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		
-//		loadWavefrontObj();
+		loadWavefrontObj();
 //		LoadGLTF();
 
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-			Core::CJsonParser jsonParser;
-			aVertexes_.emplace_back();
-			aIndices_.emplace_back();
-			jointMatricesPerMesh.Push({});
-			frames.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
-		}
-		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
+		// for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+		// 	Core::CJsonParser jsonParser;
+		// 	aVertexes_.emplace_back();
+		// 	aIndices_.emplace_back();
+		// 	jointMatricesPerMesh.Push({});
+		// 	frames.Push({});
+		// 	jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
+		// }
+		// // for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
+		// // 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
 		
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-			SetVertices(aIndices_[m], aVertexes_[m]);
-		}
+		// for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+		// 	SetVertices(aIndices_[m], aVertexes_[m]);
+		// }
 	}
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
