@@ -1316,17 +1316,16 @@ namespace GLVM::core
 		}
 
 		/// Directional lights shadow map renderer frame buffers initialization
-		directionalLightShadowMapFrameBuffers.resize(directionalLightNumber);
-        for (size_t i = 0; i < directionalLightNumber; ++i) {
+		directionalLightShadowMapFrameBuffers.resize(DIRECTIONAL_LIGHTS_NUMBER);
+        for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
 			directionalLightsRenderAttachments.push_back(directionalLightPipeline.descriptors[0].textureImages[i].views[0]);
-
 			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
-		spotLightShadowMapFrameBuffers.resize(spotLightNumber);
-        for (size_t i = 0; i < spotLightNumber; ++i) {
+		spotLightShadowMapFrameBuffers.resize(SPOT_LIGHTS_NUMBER);
+        for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightPipeline.descriptors[0].textureImages[i].views[0]);
 			
@@ -1334,8 +1333,8 @@ namespace GLVM::core
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
-		pointLightShadowMapFrameBuffers.resize(pointLightNumber);
-		for ( size_t j = 0; j < pointLightNumber; ++j ) {
+		pointLightShadowMapFrameBuffers.resize(POINT_LIGHTS_NUMBER);
+		for ( size_t j = 0; j < POINT_LIGHTS_NUMBER; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
@@ -1400,14 +1399,14 @@ namespace GLVM::core
 //        VkFormat depthFormat = findDepthFormat();
 
 		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																									  cm::directionalLight,
-																									  cm::mesh>();
-		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		unsigned int dir_actual_size = directionalLightNumber ? directionalLightNumber : 1;
+		// ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
+		// core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+		// 																							  cm::directionalLight,
+		// 																							  cm::mesh>();
+		// directionalLightNumber = directionalLightLinkedEntities.GetSize();
+		// unsigned int dir_actual_size = directionalLightNumber ? directionalLightNumber : 1;
 		
-		for ( unsigned int i = 0; i < dir_actual_size; ++i ) {
+		for ( unsigned int i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
@@ -1466,13 +1465,13 @@ namespace GLVM::core
 			directionalLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 		
-		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::spotLight,
-																							   cm::mesh>();
-		spotLightNumber = spotLightLinkedEntities.GetSize();
-		unsigned int spot_actual_size = spotLightNumber ? spotLightNumber : 1;
+		// core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+		// 																					   cm::spotLight,
+		// 																					   cm::mesh>();
+		// spotLightNumber = spotLightLinkedEntities.GetSize();
+		// unsigned int spot_actual_size = spotLightNumber ? spotLightNumber : 1;
 		
-		for ( unsigned int i = 0; i < spot_actual_size; ++i ) {
+		for ( unsigned int i = 0; i < SPOT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
@@ -1531,13 +1530,13 @@ namespace GLVM::core
 			spotLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::pointLight,
-																								cm::mesh>();
-		pointLightNumber = pointLightLinkedEntities.GetSize();
-		unsigned int point_actual_size = pointLightNumber ? pointLightNumber : 1;
+ 		// core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+		// 																						cm::pointLight,
+		// 																						cm::mesh>();
+		// pointLightNumber = pointLightLinkedEntities.GetSize();
+		// unsigned int point_actual_size = pointLightNumber ? pointLightNumber : 1;
 
-		for ( unsigned int i = 0; i < point_actual_size; ++i ) {
+		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
 				.deviceMemory		 = VkDeviceMemory{},
@@ -1630,7 +1629,7 @@ namespace GLVM::core
 			pointLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
-		for ( unsigned int i = 0; i < point_actual_size; ++i ) {
+		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 //			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
@@ -2435,7 +2434,7 @@ namespace GLVM::core
 		int spotLightShadowMapsCisBinding = lightsSamplersBindigs[4];
 
 		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-		for (size_t i = 0; i < directionalLightNumber; ++i) {
+		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
@@ -2445,15 +2444,15 @@ namespace GLVM::core
 		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
 
-		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-			directionalLightsImageInfo[j] = {};
-			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-			directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
+		// for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+		// 	directionalLightsImageInfo[j] = {};
+		// 	directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+		// 	directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+		// 	directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
+		// }
 
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < pointLightNumber; ++i) {
+		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 //			unsigned int textureIndex = i / 2;
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -2462,44 +2461,45 @@ namespace GLVM::core
 		}
 
 
-		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-			pointLightsImageInfo[j] = {};
-			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-//				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
-			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
+//  		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+// 			pointLightsImageInfo[j] = {};
+// 			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+// //				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+// 			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
+// 			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
+// 		}
 
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < spotLightNumber; ++i) {
+		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
 			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-			spotLightsImageInfo[j] = {};
-			spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
-			spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
+		// for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
+		// 	spotLightsImageInfo[j] = {};
+		// 	spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+		// 	spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
+		// 	spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
+		// }
 		
 		if ( initializeTextureData_.size() > 0 ) {
-			std::vector<VkDescriptorSetLayout> diffuseSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(),
+			u32 DS_number = initializeTextureData_.size();
+			std::vector<VkDescriptorSetLayout> diffuseSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_number,
 																		mainRenderScenePipeline.descriptors[3].setLayout);
 			VkDescriptorSetAllocateInfo diffuseSamplerUboAllocInfo{};
 			diffuseSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			diffuseSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			diffuseSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+			diffuseSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_number);
 			diffuseSamplerUboAllocInfo.pSetLayouts = diffuseSamplerUboLayouts.data();
 		
-			diffuseSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size());
+			diffuseSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_number);
 			if (vkAllocateDescriptorSets(device, &diffuseSamplerUboAllocInfo, diffuseSamplerDescriptorSets.data()) != VK_SUCCESS) {
 				throw std::runtime_error("failed to allocate descriptor sets!");
 			}
 				
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				unsigned int textureIndex = i / 2;
@@ -4110,6 +4110,7 @@ namespace GLVM::core
 																						   cm::directionalLight,
 																						   cm::mesh>();
 
+		directionalLightNumber = linkedEntitiesDirLight.GetSize();
 		assert(directionalLightNumber <= 4 && "Directional lights number greater then 4");
 
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
@@ -4140,6 +4141,7 @@ namespace GLVM::core
 																						   cm::pointLight,
 																						   cm::mesh>();
 
+		pointLightNumber = linkedEntitiesPointLight.GetSize();
 		assert(pointLightNumber <= POINT_LIGHTS_NUMBER && "Point lights number greater than 32");
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
 			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntitiesPointLight[i]);
@@ -4173,6 +4175,7 @@ namespace GLVM::core
 																						   cm::spotLight,
 																						   cm::mesh>();
 
+		spotLightNumber = linkedEntitiesSpotLight.GetSize();
 		assert(spotLightNumber <= 8 && "Spot light number greater then 8");
 		for ( unsigned int i = 0; i < spotLightNumber; ++i ) {
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(linkedEntitiesSpotLight[i]);
