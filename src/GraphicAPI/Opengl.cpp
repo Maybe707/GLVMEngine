@@ -594,7 +594,7 @@ namespace GLVM::core
 // //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 // 			}
 		
-			coreShaderProgram->SetMat4("jointMatrices", MAX_JOINTS_NUMBER, jointMatricesData[0]);
+			shaderProgram_->SetMat4("jointMatrices", MAX_JOINTS_NUMBER, jointMatricesData[0]);
 			delete [] jointMatricesData;
 			jointMatricesData = nullptr;
 
