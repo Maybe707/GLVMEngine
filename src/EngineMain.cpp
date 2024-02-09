@@ -240,15 +240,15 @@ int main()
 	// *materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 //	TextureManager->BindTexture(directionalLight1, materialDirectionalLight1.diffuseTextureID_);
 	
-	// Entity pointLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 5.0f, 17.0f, 2.0f },
-	// 	.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 5.0f, 17.0f, 2.0f }, .fScale = 0.2f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
-	// cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	// *materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	Entity pointLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 5.0f, 17.0f, 2.0f },
+		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
+		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 5.0f, 17.0f, 2.0f }, .fScale = 0.2f };
+	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
+	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
+	*materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
 //  	Entity pointLight1 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);
@@ -376,8 +376,8 @@ int main()
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
 	
     ///< Game rendering loop
-	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 

@@ -429,8 +429,8 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 			if(currentDepth - bias > closestDepth)
 				shadow += 1.0;
 		}
-//	shadow /= float(samples);
-	shadow /= 5;
+	shadow /= float(samples);
+//	shadow /= float(100);
 
 //	return closestDepth;
 	return shadow;
