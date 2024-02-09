@@ -1,6 +1,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -68,7 +69,9 @@ namespace GLVM::ecs
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.01f;
+			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.002f;
+			*(componentManager->GetComponent<cm::pointLight>(uiEntity_refProjectile)) = { .position = { rTransformProjectile->tPosition[0],
+					rTransformProjectile->tPosition[1], rTransformProjectile->tPosition[2] } };
 		}
 
 //        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
@@ -102,25 +105,29 @@ namespace GLVM::ecs
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
 															  cm::transform, cm::material,
-															  cm::projectile>(uiEntity_Projectile);
+															  cm::projectile, cm::pointLight>(uiEntity_Projectile);
 
         core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";
         pSound_Sample->uiDuration_ = 5;
         pSound_Sample->uiRate_ = 22050;
         soundEngine->GetSoundContainer().Push(pSound_Sample);
-		
+
 		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->id = 0;
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 //        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile->fScale = 0.2f;
+        rTransformProjectile->fScale = 0.1f;
 		
 		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
 		if ( transform != nullptr )
 			rTransformProjectile->tPosition = transform->tPosition;
+
+		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = { transform->tPosition[0], transform->tPosition[1], transform->tPosition[2] },
+			.ambient = { 0.1f, 0.0f, 0.0f }, .diffuse = { 0.5f, 0.0f, 0.0f }, .specular = { 1.0f, 0.0f, 0.0f },
+			.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
 		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
 		rTransformProjectile->yaw        = fYaw;

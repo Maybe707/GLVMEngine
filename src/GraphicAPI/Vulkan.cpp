@@ -2012,7 +2012,7 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		u32 memory = 0;
-		constexpr u32 UBO_multiplier = 1;
+		constexpr u32 UBO_multiplier = 5;
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
 
 		if ( matrixUboDescriptorsNumber > 0 ) {

@@ -306,7 +306,7 @@ namespace GLVM::core
 
 		return lightSpaceMatrix;
 	}
-
+ 
 	mat4 COpenglRenderer::EvaluateFlatShadowMap(unsigned int& shadowMapFBO, ecs::components::spotLight& directionalLightComponent, mat4 projectionMatrixLight) {
 			vec3 positionVectorLight = directionalLightComponent.position;
 			vec3 directionVectorLight = directionalLightComponent.direction;
@@ -578,6 +578,7 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 					jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+//					std::cout << jointMatricesData[i] << std::endl;
 				}
 
 				for ( unsigned int i = joinMatricesDataSize; i < MAX_JOINTS_NUMBER; ++i ) {
@@ -943,10 +944,10 @@ namespace GLVM::core
 					aVertexes_[m].push_back(-1);
 					aVertexes_[m].push_back(-1);
 					aVertexes_[m].push_back(-1);
-					aVertexes_[m].push_back(0);
-					aVertexes_[m].push_back(0);
-					aVertexes_[m].push_back(0);
-					aVertexes_[m].push_back(0);
+					aVertexes_[m].push_back(0.0);
+					aVertexes_[m].push_back(0.0);
+					aVertexes_[m].push_back(0.0);
+					aVertexes_[m].push_back(0.0);
                 }
 			SetVertices(aIndices_[m], aVertexes_[m]);
         }
