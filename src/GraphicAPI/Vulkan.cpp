@@ -2012,7 +2012,7 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		u32 memory = 0;
-		constexpr u32 UBO_multiplier = 5;
+		constexpr u32 UBO_multiplier = 10;
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
 
 		if ( matrixUboDescriptorsNumber > 0 ) {
@@ -3314,8 +3314,13 @@ namespace GLVM::core
 
 				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
 //				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
+				
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
+				// cm::transform* pointLightTransformComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 
+				// pointLightComponent->position += 0.0001;
+				// pointLightTransformComponent->tPosition += 0.0001;
+				
 				uint32_t actorsNumber = linkedEntities.GetSize();
 				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
 					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
@@ -3766,6 +3771,16 @@ namespace GLVM::core
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
+		// f32 delta_move = _transformComponent->frameAccumulator * 0.001;
+		// std::cout << "delta move: " << delta_move << std::endl;
+		// pointLightComponent->position[0] += delta_move;
+		// pointLightComponent->position[1] += delta_move;
+		// pointLightComponent->position[2] += delta_move;
+
+		// pointLightComponent->position[0] += delta_move;
+		// pointLightComponent->position[1] += delta_move;
+		// pointLightComponent->position[2] += delta_move;
+		
 		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight = vec3(0.0f, 0.0f, 0.0f);
 		vec3 upVector = { 0.0, 0.0, 0.0 };

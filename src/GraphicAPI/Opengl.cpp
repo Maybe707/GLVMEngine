@@ -158,10 +158,10 @@ namespace GLVM::core
 		coreShaderProgram->SetInt("sampledSpotShadowOrdinalNumbersArraySize",
 								  sampledSpotLightEntityIDcontainer.size());
 		
-		core::vector<unsigned int>* pEntityContainerRefView =
-			pComponent_Manager->GetEntityContainer<cm::beholder>();
-		unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-		cm::transform* playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
+		// core::vector<unsigned int>* pEntityContainerRefView =
+		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
+		// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
+		// cm::transform* playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 		core::vector<unsigned int>* pEntityContainerRefPointLight =
 			pComponent_Manager->GetEntityContainer<cm::pointLight>();
 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
@@ -171,9 +171,9 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < pointLightComponentContainerSize; ++i ) {
 			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(entityID);
-			float distance = VectorLength(playerTransformComponent->tPosition, pointLightComponent->position);
+//			float distance = VectorLength(playerTransformComponent->tPosition, pointLightComponent->position);
 
-			if ( distance < 4.5f ) {
+//			if ( distance < 4.5f ) {
 				glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 				sampledPointLightEntityIDcontainer.push_back(i);
@@ -185,7 +185,7 @@ namespace GLVM::core
 				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("pointLightCubeShadowMapComponentIndices[",
 																	 appropriatePointLightComponentIndex, "]"), i);
 				++appropriatePointLightComponentIndex;
-			}
+//			}
 		}
 		
 		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize",

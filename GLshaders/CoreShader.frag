@@ -203,9 +203,9 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(material.diffuse, fs_in.textureCoords));
 	vec3 specular = light.specular * specularComponent * vec3(texture(material.specular, fs_in.textureCoords));
 
-	// ambient  *= attenuation;
-	// diffuse  *= attenuation;
-	// specular *= attenuation;
+	ambient  *= attenuation;
+	diffuse  *= attenuation;
+	specular *= attenuation;
 
 	return (ambient + diffuse + specular);
 }
