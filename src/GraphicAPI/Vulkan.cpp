@@ -3538,103 +3538,103 @@ namespace GLVM::core
 																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-// 		// modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[3][3] = 1.0;
-//         // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-//         // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-//         // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-//         // modelMatrixUBO.model.SelfTensorTranspose();
+		// modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
+        // modelMatrixUBO.model[3][3] = 1.0;
+        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
+        // modelMatrixUBO.model.SelfTensorTranspose();
 
-//         mat4 rotationMatrix(1.0f);
-//         mat4 scalingMatrix(1.0f);
-//         mat4 translationMatrix(1.0f);
+        mat4 rotationMatrix(1.0f);
+        mat4 scalingMatrix(1.0f);
+        mat4 translationMatrix(1.0f);
 		
-//         // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[3][3] = 1.0;
-//         // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-//         // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-//         // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
+        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
+        // modelMatrixUBO.model[3][3] = 1.0;
+        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
 
-// 		scalingMatrix[0][0] = _transformComponent->fScale;
-// 		scalingMatrix[1][1] = _transformComponent->fScale;
-// 		scalingMatrix[2][2] = _transformComponent->fScale;
+		scalingMatrix[0][0] = _transformComponent->fScale;
+		scalingMatrix[1][1] = _transformComponent->fScale;
+		scalingMatrix[2][2] = _transformComponent->fScale;
 
-// 		translationMatrix[3][0] = _transformComponent->tPosition[0];
-// 		translationMatrix[3][1] = _transformComponent->tPosition[1];
-// 		translationMatrix[3][2] = _transformComponent->tPosition[2];
-// 		translationMatrix[3][3] = 1.0f;
+		translationMatrix[3][0] = _transformComponent->tPosition[0];
+		translationMatrix[3][1] = _transformComponent->tPosition[1];
+		translationMatrix[3][2] = _transformComponent->tPosition[2];
+		translationMatrix[3][3] = 1.0f;
 
-// 		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-// 		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-// 		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-// 		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
+		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
+		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
+		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
+		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
 		
-// 		Quaternion pitchQuat;
-// 		Quaternion yawQuat;
-// 		pitchQuat.w = cosPitch;
-// 		pitchQuat.x = 0.0f;
-// 		pitchQuat.y = 0.0f;
-// 		pitchQuat.z = sinPitch;
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = 0.0f;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = sinPitch;
 
-// 		yawQuat.w = cosYaw;
-// 		yawQuat.x = 0.0f;
-// 		yawQuat.y = sinYaw;
-// 		yawQuat.z = 0.0f;
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
 
-// 		Quaternion result;
-// 		result = multiplyQuaternion(pitchQuat, yawQuat);
-// 		rotationMatrix = rotateQuaternion<float, 4>(result);
+		Quaternion result;
+		result = multiplyQuaternion(pitchQuat, yawQuat);
+		rotationMatrix = rotateQuaternion<float, 4>(result);
 		
-//         modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
+        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
 		
-// 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
+		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-// 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-// 			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-// 			++_transformComponent->currentAnimationFrame;
-// 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-// 				_transformComponent->currentAnimationFrame = 0;
-// 				_transformComponent->frameAccumulator = 0.0f;
-// 			}
-// 		}
-// //		std::cout << frames.GetSize() << std::endl;
-// //		std::cout << frames[meshID].GetSize() << std::endl;
-// //		std::cout << frames[meshID][currentFrameForRander] << std::endl;
-// 		unsigned int joinMatricesDataSize{};
-// 		if ( jointMatricesPerMesh.GetSize() > 0 )
-// 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-// //		std::cout << "size: " << joinMatricesDataSize << std::endl;
-// //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
-// 		mat4* jointMatricesData = nullptr;
-// 		if ( joinMatricesDataSize == 0 ) {
-// 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-// 			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-// 				mat4 unitMatrix(1.0f);
-// 				jointMatricesData[i] = unitMatrix;
-// 			}
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
 				
-// 		} else {
-// 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-// 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-// //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
-// 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-// 			}
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
 
-// 			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-// 				mat4 unitMatrix(1.0f);
-// 				jointMatricesData[j] = unitMatrix;
-// 			}
-// 		}
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
 
-// 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-// //			std::cout << jointMatricesData[j] << std::endl;
-// 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-// //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
-// 		}
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
 		
         void* modelMatrixData = nullptr;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
@@ -3663,103 +3663,103 @@ namespace GLVM::core
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent, [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-//         // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[3][3] = 1.0;
-//         // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-//         // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-//         // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-//         // modelMatrixUBO.model.SelfTensorTranspose();
+        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
+        // modelMatrixUBO.model[3][3] = 1.0;
+        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
+        // modelMatrixUBO.model.SelfTensorTranspose();
 
-//         mat4 rotationMatrix(1.0f);
-//         mat4 scalingMatrix(1.0f);
-//         mat4 translationMatrix(1.0f);
+        mat4 rotationMatrix(1.0f);
+        mat4 scalingMatrix(1.0f);
+        mat4 translationMatrix(1.0f);
 		
-//         // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-//         // modelMatrixUBO.model[3][3] = 1.0;
-//         // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-//         // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-//         // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
+        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
+        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
+        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
+        // modelMatrixUBO.model[3][3] = 1.0;
+        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
+        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
+        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
 
-// 		scalingMatrix[0][0] = _transformComponent->fScale;
-// 		scalingMatrix[1][1] = _transformComponent->fScale;
-// 		scalingMatrix[2][2] = _transformComponent->fScale;
+		scalingMatrix[0][0] = _transformComponent->fScale;
+		scalingMatrix[1][1] = _transformComponent->fScale;
+		scalingMatrix[2][2] = _transformComponent->fScale;
 
-// 		translationMatrix[3][0] = _transformComponent->tPosition[0];
-// 		translationMatrix[3][1] = _transformComponent->tPosition[1];
-// 		translationMatrix[3][2] = _transformComponent->tPosition[2];
-// 		translationMatrix[3][3] = 1.0f;
+		translationMatrix[3][0] = _transformComponent->tPosition[0];
+		translationMatrix[3][1] = _transformComponent->tPosition[1];
+		translationMatrix[3][2] = _transformComponent->tPosition[2];
+		translationMatrix[3][3] = 1.0f;
 
-// 		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-// 		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-// 		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-// 		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
+		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
+		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
+		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
+		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
 		
-// 		Quaternion pitchQuat;
-// 		Quaternion yawQuat;
-// 		pitchQuat.w = cosPitch;
-// 		pitchQuat.x = 0.0f;
-// 		pitchQuat.y = 0.0f;
-// 		pitchQuat.z = sinPitch;
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = 0.0f;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = sinPitch;
 
-// 		yawQuat.w = cosYaw;
-// 		yawQuat.x = 0.0f;
-// 		yawQuat.y = sinYaw;
-// 		yawQuat.z = 0.0f;
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
 
-// 		Quaternion result;
-// 		result = multiplyQuaternion(pitchQuat, yawQuat);
-// 		rotationMatrix = rotateQuaternion<float, 4>(result);
+		Quaternion result;
+		result = multiplyQuaternion(pitchQuat, yawQuat);
+		rotationMatrix = rotateQuaternion<float, 4>(result);
 		
-//         modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
+        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
 		
-// 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
+		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-// 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-// 			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-// 			++_transformComponent->currentAnimationFrame;
-// 			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-// 				_transformComponent->currentAnimationFrame = 0;
-// 				_transformComponent->frameAccumulator = 0.0f;
-// 			}
-// 		}
-// //		std::cout << frames.GetSize() << std::endl;
-// //		std::cout << frames[meshID].GetSize() << std::endl;
-// //		std::cout << frames[meshID][currentFrameForRander] << std::endl;
-// 		unsigned int joinMatricesDataSize{};
-// 		if ( jointMatricesPerMesh.GetSize() > 0 )
-// 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-// //		std::cout << "size: " << joinMatricesDataSize << std::endl;
-// //		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
-// 		mat4* jointMatricesData = nullptr;
-// 		if ( joinMatricesDataSize == 0 ) {
-// 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-// 			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-// 				mat4 unitMatrix(1.0f);
-// 				jointMatricesData[i] = unitMatrix;
-// 			}
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+//		std::cout << frames.GetSize() << std::endl;
+//		std::cout << frames[meshID].GetSize() << std::endl;
+//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+//		std::cout << "size: " << joinMatricesDataSize << std::endl;
+//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
 				
-// 		} else {
-// 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-// 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-// //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
-// 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-// 			}
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
 
-// 			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-// 				mat4 unitMatrix(1.0f);
-// 				jointMatricesData[j] = unitMatrix;
-// 			}
-// 		}
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
 
-// 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-// //			std::cout << jointMatricesData[j] << std::endl;
-// 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-// //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
-// 		}
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+//			std::cout << jointMatricesData[j] << std::endl;
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
+		}
 		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage], 0,
