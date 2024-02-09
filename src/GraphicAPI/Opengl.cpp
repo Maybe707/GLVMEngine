@@ -574,10 +574,16 @@ namespace GLVM::core
 				}
 				
 			} else {
-				jointMatricesData = new mat4[joinMatricesDataSize];
+				jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 //			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 					jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+				}
+
+				for ( unsigned int i = joinMatricesDataSize; i < MAX_JOINTS_NUMBER; ++i ) {
+//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+					mat4 unitMatrix(1.0f);
+					jointMatricesData[i] = unitMatrix;
 				}
 			}
 
@@ -1086,23 +1092,23 @@ namespace GLVM::core
 
 //		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		
-		loadWavefrontObj();
+//		loadWavefrontObj();
 //		LoadGLTF();
 
-		// for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-		// 	Core::CJsonParser jsonParser;
-		// 	aVertexes_.emplace_back();
-		// 	aIndices_.emplace_back();
-		// 	jointMatricesPerMesh.Push({});
-		// 	frames.Push({});
-		// 	jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
-		// }
-		// // for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-		// // 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			Core::CJsonParser jsonParser;
+			aVertexes_.emplace_back();
+			aIndices_.emplace_back();
+			jointMatricesPerMesh.Push({});
+			frames.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
+		}
+		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
+		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
 		
-		// for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-		// 	SetVertices(aIndices_[m], aVertexes_[m]);
-		// }
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			SetVertices(aIndices_[m], aVertexes_[m]);
+		}
 	}
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
