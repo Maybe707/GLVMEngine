@@ -554,8 +554,8 @@ namespace GLVM::core
 		createDirectionalLightShadowMapTextureSamplers();
 		createSpotLightShadowMapTextureSamplers();
 		createPointLightShadowMapTextureSamplers();
-//        loadWavefrontObj();
-		initializeGLTF();
+        loadWavefrontObj();
+//		initializeGLTF();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
