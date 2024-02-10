@@ -2498,7 +2498,8 @@ namespace GLVM::core
 			if (vkAllocateDescriptorSets(device, &diffuseSamplerUboAllocInfo, diffuseSamplerDescriptorSets.data()) != VK_SUCCESS) {
 				throw std::runtime_error("failed to allocate descriptor sets!");
 			}
-				
+
+			constexpr u32 DS_writes_size = 5;
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -2506,7 +2507,7 @@ namespace GLVM::core
 				imageInfo.imageView = textureImages[textureIndex].views[0];
 				imageInfo.sampler = textureImages[textureIndex].sampler;
 			
-				std::array<VkWriteDescriptorSet, 5> descriptorWrites{};
+				std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[i];
 				descriptorWrites[0].dstBinding = diffuseCisBinding;
@@ -2720,7 +2721,7 @@ namespace GLVM::core
 		int spotLightShadowMapsCisBinding = lightsSamplersBindings[4];
 
 		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-		for (size_t i = 0; i < directionalLightNumber; ++i) {
+		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
@@ -2730,15 +2731,15 @@ namespace GLVM::core
 		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
 		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
 
-		for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-			directionalLightsImageInfo[j] = {};
-			directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-			directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
+		// for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
+		// 	directionalLightsImageInfo[j] = {};
+		// 	directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+		// 	directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
+		// 	directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
+		// }
 
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < pointLightNumber; ++i) {
+		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 //			unsigned int textureIndex = i / 2;
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -2747,31 +2748,31 @@ namespace GLVM::core
 		}
 
 
-		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-			pointLightsImageInfo[j] = {};
-			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-//				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
-			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
+// 		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
+// 			pointLightsImageInfo[j] = {};
+// 			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+// //				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+// 			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
+// 			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
+// 		}
 
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
-		for (size_t i = 0; i < spotLightNumber; ++i) {
+		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
 			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-			spotLightsImageInfo[j] = {};
-			spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
-			spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
-		}
-
+		// for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
+		// 	spotLightsImageInfo[j] = {};
+		// 	spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+		// 	spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
+		// 	spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
+		// }
+		u32 DS_number = initializeTextureData_.size();
 		constexpr u32 DS_writes_size = 5;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size(); ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_number; ++i) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
