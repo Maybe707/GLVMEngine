@@ -83,13 +83,13 @@ struct SpotLight {
 layout(set = 2, binding = 0) uniform LightData {
 	vec3 viewPosition;
 
-	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
-	int directionalLightsArraySize;
-
 	PointLight pointLightsArray[POINT_LIGHTS_NUMBER];
 	int pointLightsArraySize;
 	float farPlane;
 
+	DirectionalLight directionalLightsArray[DIRECTIONAL_LIGHTS_NUMBER];
+	int directionalLightsArraySize;
+	
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 } lightData;

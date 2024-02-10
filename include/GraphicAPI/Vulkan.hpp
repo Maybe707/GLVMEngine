@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include <new>
 #include <stdexcept>
 #include <algorithm>
 #include <chrono>
@@ -314,7 +315,7 @@ namespace GLVM::core
 		float farPlane;
 	};
 	
-	struct DirectionalLight {
+	struct alignas(16) DirectionalLight {
 		vec4 position;
 		vec4 direction;
 
@@ -324,17 +325,19 @@ namespace GLVM::core
 	};
 
 	struct alignas(16) PointLight {
-		vec4 position;
+		vec3 position;
+		float padding0;
 
-		vec4 ambient;
-		vec4 diffuse;
+		vec3 ambient;
+		float padding1;
+		vec3 diffuse;
+		float padding2;
 		// alignas(16) vec3 position;
 		   
 		// alignas(16) vec3 ambient;
 		// alignas(16) vec3 diffuse;
 
 		vec3 specular;
-
 		float constant;
 		float linear;
 		float quadratic;
@@ -342,7 +345,7 @@ namespace GLVM::core
 		// float padding1;
 	};
 
-	struct SpotLight {
+	struct alignas(16) SpotLight {
 		alignas(16) vec3  position;
 		alignas(16) vec3  direction;
 		float cutOff;
@@ -359,15 +362,17 @@ namespace GLVM::core
 	
     struct LightData {
 		vec3 viewPosition;
-		float padding;
-
-		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
-		int directionalLightsArraySize;
+		float padding0;
 
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
 		float farPlane;
+		float padding1;
+		float padding2;
 
+		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
+		int directionalLightsArraySize;
+		
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
     };

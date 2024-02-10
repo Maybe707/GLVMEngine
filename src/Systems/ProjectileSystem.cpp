@@ -129,8 +129,8 @@ namespace GLVM::ecs
 			rTransformProjectile->tPosition = transform->tPosition;
 
 		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = { transform->tPosition[0], transform->tPosition[1], transform->tPosition[2] },
-			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.0f, 1.0f, 1.0f },
-			.constant = 1.0f, .linear = 0.1f, .quadratic = 0.128f };
+			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
+			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
 		rTransformProjectile->yaw        = fYaw;

@@ -2011,7 +2011,7 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		u32 memory = 0;
-		constexpr u32 UBO_multiplier = 10;
+		constexpr u32 UBO_multiplier = 3;
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
 
 		if ( matrixUboDescriptorsNumber > 0 ) {
@@ -4147,22 +4147,26 @@ namespace GLVM::core
 			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntitiesPointLight[i]);
 			PointLight pointLightUBO{};
 
- 			pointLightUBO.position  = vec4(pointLightComponent->position[0],
+ 			pointLightUBO.position  = vec3(pointLightComponent->position[0],
 										   pointLightComponent->position[1],
-										   pointLightComponent->position[2], 0.0f);
-			pointLightUBO.ambient   = vec4(pointLightComponent->ambient[0],
+										   pointLightComponent->position[2]);
+			pointLightUBO.ambient   = vec3(pointLightComponent->ambient[0],
 										   pointLightComponent->ambient[1],
-										   pointLightComponent->ambient[2], 0.0f);
-			pointLightUBO.diffuse   = vec4(pointLightComponent->diffuse[0],
+										   pointLightComponent->ambient[2]);
+			pointLightUBO.diffuse   = vec3(pointLightComponent->diffuse[0],
 										   pointLightComponent->diffuse[1],
-										   pointLightComponent->diffuse[2], 0.0f);
+										   pointLightComponent->diffuse[2]);
 			// pointLightUBO.position  = pointLightComponent->position;
 			// pointLightUBO.ambient   = pointLightComponent->ambient;
 			// pointLightUBO.diffuse   = pointLightComponent->diffuse;
 			pointLightUBO.specular  = pointLightComponent->specular;
+
 			pointLightUBO.constant  = pointLightComponent->constant;
+
 			pointLightUBO.linear    = pointLightComponent->linear;
+
 			pointLightUBO.quadratic = pointLightComponent->quadratic;
+
 
 			lightDataUBO.pointLights[i] = pointLightUBO;
 		}
@@ -4195,6 +4199,15 @@ namespace GLVM::core
 		}
 
 		lightDataUBO.spotLightArraySize = spotLightNumber;
+
+		std::cout << "position: " << lightDataUBO.pointLights[1].position << std::endl;
+		std::cout << "ambient: " << lightDataUBO.pointLights[1].ambient << std::endl;
+		std::cout << "diffuse: " << lightDataUBO.pointLights[1].diffuse << std::endl;
+		std::cout << "specular: " << lightDataUBO.pointLights[1].specular << std::endl;
+		std::cout << "constant: " << lightDataUBO.pointLights[1].constant << std::endl;
+		std::cout << "linear: " << lightDataUBO.pointLights[1].linear << std::endl;
+		std::cout << "quadratic: " << lightDataUBO.pointLights[1].quadratic << std::endl;
+
 		
         void* data;
         vkMapMemory(device, lightDataUniformBuffersMemory[currentImage], 0,
