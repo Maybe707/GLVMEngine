@@ -4167,10 +4167,10 @@ namespace GLVM::core
 
 			pointLightUBO.quadratic = pointLightComponent->quadratic;
 
-
+			std::cout << "size: " << sizeof(lightDataUBO.pointLights[i]) << std::endl;
 			lightDataUBO.pointLights[i] = pointLightUBO;
 		}
-
+		
 		lightDataUBO.pointLightsArraySize = pointLightNumber;
 		lightDataUBO.farPlane = 100.0f;
 
@@ -4200,13 +4200,13 @@ namespace GLVM::core
 
 		lightDataUBO.spotLightArraySize = spotLightNumber;
 
-		std::cout << "position: " << lightDataUBO.pointLights[1].position << std::endl;
-		std::cout << "ambient: " << lightDataUBO.pointLights[1].ambient << std::endl;
-		std::cout << "diffuse: " << lightDataUBO.pointLights[1].diffuse << std::endl;
-		std::cout << "specular: " << lightDataUBO.pointLights[1].specular << std::endl;
-		std::cout << "constant: " << lightDataUBO.pointLights[1].constant << std::endl;
-		std::cout << "linear: " << lightDataUBO.pointLights[1].linear << std::endl;
-		std::cout << "quadratic: " << lightDataUBO.pointLights[1].quadratic << std::endl;
+		// std::cout << "position: " << lightDataUBO.pointLights[1].position << std::endl;
+		// std::cout << "ambient: " << lightDataUBO.pointLights[1].ambient << std::endl;
+		// std::cout << "diffuse: " << lightDataUBO.pointLights[1].diffuse << std::endl;
+		// std::cout << "specular: " << lightDataUBO.pointLights[1].specular << std::endl;
+		// std::cout << "constant: " << lightDataUBO.pointLights[1].constant << std::endl;
+		// std::cout << "linear: " << lightDataUBO.pointLights[1].linear << std::endl;
+		// std::cout << "quadratic: " << lightDataUBO.pointLights[1].quadratic << std::endl;
 
 		
         void* data;

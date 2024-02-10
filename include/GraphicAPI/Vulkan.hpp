@@ -324,6 +324,7 @@ namespace GLVM::core
 		vec4 specular;
 	};
 
+//#pragma pack(push, 1)
 	struct alignas(16) PointLight {
 		vec3 position;
 		float padding0;
@@ -344,6 +345,7 @@ namespace GLVM::core
 		// float padding0;
 		// float padding1;
 	};
+//#pragma pack(pop)
 
 	struct alignas(16) SpotLight {
 		alignas(16) vec3  position;
