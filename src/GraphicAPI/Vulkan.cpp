@@ -3851,7 +3851,7 @@ namespace GLVM::core
 			break;
 		}
 		
-		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 1.0f, 100.0f);
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 0.3f, 100.0f);
 
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionalVectorLight,

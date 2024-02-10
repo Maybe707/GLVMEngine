@@ -183,17 +183,17 @@ int main()
 	// *materialHud0 = { .diffuseTextureID_ = 0, .specularTextureID_ = 0 };
     // TextureManager->BindTexture(u_iHud1, materialHud0->diffuseTextureID_);
 
-	Entity directionalLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
-	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 10.0f, 15.0f, 0.0f },
-		.direction = { -5.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-		.specular = {1.0f, 1.0f, 1.0f}};
- 	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 10.0f, 15.0f, 0.0f },
-		.fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
-	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
-	*materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+	// Entity directionalLight0 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
+	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 10.0f, 15.0f, 0.0f },
+	// 	.direction = { -5.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+	// 	.specular = {1.0f, 1.0f, 1.0f}};
+ 	// *ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .tPosition = { 10.0f, 15.0f, 0.0f },
+	// 	.fScale = 0.2f };
+	// ComponentManager->GetComponent<cm::mesh>(directionalLight0)->id = 0;
+	// cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
+	// *materialDirectionalLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
+	// 	.shininess = 128.0f * 0.078125f };
 
 	// Entity directionalLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
@@ -240,15 +240,15 @@ int main()
 	// *materialDirectionalLight1 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 //	TextureManager->BindTexture(directionalLight1, materialDirectionalLight1.diffuseTextureID_);
 	
-	// Entity pointLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 10.0f, 2.0f },
-	// 	.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 10.0f, 2.0f }, .fScale = 0.2f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
-	// cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	// *materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
+	Entity pointLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 15.0f, 2.0f },
+		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f },
+		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 15.0f, 2.0f }, .fScale = 0.2f };
+	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
+	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
+	*materialPointLight0 = { .diffuseTextureID_ = 1, .specularTextureID_ = 1 };
 
 //  	Entity pointLight1 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);

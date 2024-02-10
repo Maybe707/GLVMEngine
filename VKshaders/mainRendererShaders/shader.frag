@@ -410,8 +410,8 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 		);  
 	
 	float shadow  = 0.0;
-//	float bias    = 0.15;
-	float bias    = -0.12514;
+	float bias    = 0.15;
+//	float bias    = -0.12514;
 	float samples = 20;
 	float viewDistance = length(lightData.viewPosition - fragmentPosition);
 	float diskRadius   = (1.0 + (viewDistance / lightData.farPlane)) / 25.0;
