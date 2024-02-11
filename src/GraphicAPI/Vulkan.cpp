@@ -80,7 +80,10 @@ namespace GLVM::core
 		
 		SetProjectionMatrix();
         drawFrame();
-//        vkDeviceWaitIdle(device);
+
+		#ifdef VK_USE_PLATFORM_XCB_KHR
+        vkDeviceWaitIdle(device);
+		#endif
     }
 
     void CVulkanRenderer::loadWavefrontObj() {
