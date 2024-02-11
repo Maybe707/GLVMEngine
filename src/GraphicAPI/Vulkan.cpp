@@ -14,10 +14,6 @@
 #include <exception>
 #include <vulkan/vulkan_core.h>
 
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#define GLM_FORCE_RIGHT_HANDED
-
 namespace GLVM::core
 {    
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
@@ -3203,14 +3199,7 @@ namespace GLVM::core
 		
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
-			}
-		}
+		updateAnimationFrames(_transformComponent, meshID);
 
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
@@ -3306,15 +3295,8 @@ namespace GLVM::core
 		
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
-			}
-		}
-
+		updateAnimationFrames(_transformComponent, meshID);
+		
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
@@ -3437,15 +3419,8 @@ namespace GLVM::core
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 		modelMatrixUBO.farPlane = 100.0f;
 
-		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
-			}
-		}
-
+		updateAnimationFrames(_transformComponent, meshID);
+		
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
@@ -3539,14 +3514,7 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
-			}
-		}
+		updateAnimationFrames(_transformComponent, meshID);
 
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
@@ -4000,6 +3968,17 @@ namespace GLVM::core
         return VK_FALSE;
     }
 
+	void CVulkanRenderer::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
+		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+	}
+	
 	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {
 		VkDebugUtilsObjectNameInfoEXT imageObjectInfo{};
 		imageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
