@@ -3161,42 +3161,7 @@ namespace GLVM::core
 																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-        mat4 rotationMatrix(1.0f);
-        mat4 scalingMatrix(1.0f);
-        mat4 translationMatrix(1.0f);
-
-		scalingMatrix[0][0] = _transformComponent->fScale;
-		scalingMatrix[1][1] = _transformComponent->fScale;
-		scalingMatrix[2][2] = _transformComponent->fScale;
-
-		translationMatrix[3][0] = _transformComponent->tPosition[0];
-		translationMatrix[3][1] = _transformComponent->tPosition[1];
-		translationMatrix[3][2] = _transformComponent->tPosition[2];
-		translationMatrix[3][3] = 1.0f;
-
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
-		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = 0.0f;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = sinPitch;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		Quaternion result;
-		result = multiplyQuaternion(pitchQuat, yawQuat);
-		rotationMatrix = rotateQuaternion<float, 4>(result);
-		
-        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
-		
+        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
 		updateAnimationFrames(_transformComponent, meshID);
@@ -3256,43 +3221,8 @@ namespace GLVM::core
 	
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent, [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
-
-        mat4 rotationMatrix(1.0f);
-        mat4 scalingMatrix(1.0f);
-        mat4 translationMatrix(1.0f);
-
-		scalingMatrix[0][0] = _transformComponent->fScale;
-		scalingMatrix[1][1] = _transformComponent->fScale;
-		scalingMatrix[2][2] = _transformComponent->fScale;
-
-		translationMatrix[3][0] = _transformComponent->tPosition[0];
-		translationMatrix[3][1] = _transformComponent->tPosition[1];
-		translationMatrix[3][2] = _transformComponent->tPosition[2];
-		translationMatrix[3][3] = 1.0f;
-
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
 		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = 0.0f;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = sinPitch;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		Quaternion result;
-		result = multiplyQuaternion(pitchQuat, yawQuat);
-		rotationMatrix = rotateQuaternion<float, 4>(result);
-		
-        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
-		
+        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
 		updateAnimationFrames(_transformComponent, meshID);
@@ -3378,41 +3308,7 @@ namespace GLVM::core
 										  directionalVectorLight,
 										  upVector);
 
-        mat4 rotationMatrix(1.0f);
-        mat4 scalingMatrix(1.0f);
-        mat4 translationMatrix(1.0f);
-
-		scalingMatrix[0][0] = _transformComponent->fScale;
-		scalingMatrix[1][1] = _transformComponent->fScale;
-		scalingMatrix[2][2] = _transformComponent->fScale;
-
-		translationMatrix[3][0] = _transformComponent->tPosition[0];
-		translationMatrix[3][1] = _transformComponent->tPosition[1];
-		translationMatrix[3][2] = _transformComponent->tPosition[2];
-		translationMatrix[3][3] = 1.0f;
-
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
-		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = 0.0f;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = sinPitch;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		Quaternion result;
-		result = multiplyQuaternion(pitchQuat, yawQuat);
-		rotationMatrix = rotateQuaternion<float, 4>(result);
-		
-        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
+        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		
 //		projectionMatrixCubeShadowMap[1][1] *= 1;
 		
@@ -3474,41 +3370,8 @@ namespace GLVM::core
 	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent) {
         ModelMatrixUBO modelMatrixUBO{};
-        mat4 rotationMatrix(1.0f);
-        mat4 scalingMatrix(1.0f);
-        mat4 translationMatrix(1.0f);
 		
-		scalingMatrix[0][0] = _transformComponent->fScale;
-		scalingMatrix[1][1] = _transformComponent->fScale;
-		scalingMatrix[2][2] = _transformComponent->fScale;
-
-		translationMatrix[3][0] = _transformComponent->tPosition[0];
-		translationMatrix[3][1] = _transformComponent->tPosition[1];
-		translationMatrix[3][2] = _transformComponent->tPosition[2];
-		translationMatrix[3][3] = 1.0f;
-
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
-		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = 0.0f;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = sinPitch;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		Quaternion result;
-		result = multiplyQuaternion(pitchQuat, yawQuat);
-		rotationMatrix = rotateQuaternion<float, 4>(result);
-		
-        modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
+        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
@@ -3977,6 +3840,44 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
+	}
+
+	mat4 CVulkanRenderer::computeModelMatrix(ecs::components::transform* _transformComponent) {
+		mat4 rotationMatrix(1.0f);
+        mat4 scalingMatrix(1.0f);
+        mat4 translationMatrix(1.0f);
+		
+		scalingMatrix[0][0] = _transformComponent->fScale;
+		scalingMatrix[1][1] = _transformComponent->fScale;
+		scalingMatrix[2][2] = _transformComponent->fScale;
+
+		translationMatrix[3][0] = _transformComponent->tPosition[0];
+		translationMatrix[3][1] = _transformComponent->tPosition[1];
+		translationMatrix[3][2] = _transformComponent->tPosition[2];
+		translationMatrix[3][3] = 1.0f;
+
+		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
+		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
+		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
+		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
+		
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = 0.0f;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = sinPitch;
+
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
+
+		Quaternion result;
+		result = multiplyQuaternion(pitchQuat, yawQuat);
+		rotationMatrix = rotateQuaternion<float, 4>(result);
+		
+        return scalingMatrix * rotationMatrix * translationMatrix;
 	}
 	
 	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {

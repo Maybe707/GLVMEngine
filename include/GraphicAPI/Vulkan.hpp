@@ -678,6 +678,7 @@ namespace GLVM::core
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 		void updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
+		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void setImageDebugObjectName(VK_Image image);
 		void setDebugObjectNames();
     };
