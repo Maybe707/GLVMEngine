@@ -17,9 +17,6 @@
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_RIGHT_HANDED
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
-// #include <glm/gtx/string_cast.hpp>
 
 namespace GLVM::core
 {    
@@ -209,7 +206,6 @@ namespace GLVM::core
 		forward[1] = result.y;
 		forward[2] = result.z;
         cameraComponent.forward = Normalize(forward);
-//		std::cout << cameraComponent.forward << std::endl;
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
@@ -221,7 +217,6 @@ namespace GLVM::core
 	{
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
-//		projectionMatrix.SelfTensorTranspose();
 		projectionMatrix[1][1] *= -1.0f;
 	}
 	
@@ -276,18 +271,9 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::recreateSwapChain() {
-        // int width = 0, height = 0;
-        // glfwGetFramebufferSize(window, &width, &height);
-        // while (width == 0 || height == 0) {
-        //     glfwGetFramebufferSize(window, &width, &height);
-        //     glfwWaitEvents();
-        // }
-
         vkDeviceWaitIdle(device);
 
         cleanupSwapChain();
-
-//		initWindow();
 		
         createSwapChain();
         createImageViews();
@@ -321,10 +307,6 @@ namespace GLVM::core
         GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
-
-//		unsigned int mainTexturesQuantity = initializeTextureData_.size();
-
-//        textureImages.resize(mainTexturesQuantity);
 
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -412,8 +394,6 @@ namespace GLVM::core
 		
         initWindow();
         initVulkan();
-//        mainLoop();
-//        cleanup();
     }
     
     void CVulkanRenderer::initWindow() {
@@ -446,15 +426,7 @@ namespace GLVM::core
         createWin32SurfaceInfo.pNext = nullptr;
         createWin32SurfaceInfo.flags = 0;
 #endif
-
-		
-        ///< glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
     }
-
-// static void framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-//     auto app = reinterpret_cast<HelloTriangleApplication*>(glfwGetWindowUserPointer(window));
-//     app->framebufferResized = true;
-// }
 
 	void CVulkanRenderer::initializeGLTF() {
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -463,7 +435,6 @@ namespace GLVM::core
 			aIndicesTemp_.emplace_back();
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
-//			std::cout << "TEST" << std::endl;
 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
 		}
 
@@ -472,7 +443,6 @@ namespace GLVM::core
             aVertices_.emplace_back();
 			
 			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
-//				std::cout << "number of inner data: " << aVertexesTemp_[m].size() << std::endl;
 				SVertex vertex;
 				vertex[0] = aVertexesTemp_[m][n];
 			    vertex[1] = aVertexesTemp_[m][n + 1];
@@ -495,8 +465,6 @@ namespace GLVM::core
 				weights[2] = aVertexesTemp_[m][n + 14];
 				weights[3] = aVertexesTemp_[m][n + 15];
 
-//				std::cout << joinIndices << std::endl;
-				
 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
@@ -509,9 +477,6 @@ namespace GLVM::core
 
 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
 			}
-//			std::cout << std::filesystem::current_path();
-//			std::cout << "m: " << m << std::endl;
-//			std::cout << "Vertices: " << aVertices_[m].size() << std::endl;;
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
@@ -523,9 +488,6 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::initVulkan() {
-		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-		// 	std::cout << jointMatricesPerMesh[0][i][0] << std::endl;
-		
         createInstance();
         setupDebugMessenger();
         createSurface();
@@ -548,8 +510,6 @@ namespace GLVM::core
         createCommandPool();
         createDepthResources();
 		createShadowMapDepthResources();
-		// createShadowMapTextureImageView();
-		// createShadowMapTextureSampler();
         createFramebuffers();
         createTextureImage();
         createTextureImageView();
@@ -568,14 +528,11 @@ namespace GLVM::core
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
         createCommandBuffers();
-//		createShadowMapSyncObjects();
         createSyncObjects();
     }
 
     void CVulkanRenderer::cleanupSwapChain() {
         vkDestroyImageView(device, depthImageView, nullptr);
-//        vkDestroyImage(device, depthImage, nullptr);
-//        vkFreeMemory(device, depthImageMemory, nullptr);
 
 		directionalLightPipeline.descriptors[0].textureImages.clear();
 		spotLightPipeline.descriptors[0].textureImages.clear();
@@ -616,14 +573,6 @@ namespace GLVM::core
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroyBuffer(device, modelMatrixUniformBuffers[i], nullptr);
             vkFreeMemory(device, modelMatrixUniformBuffersMemory[i], nullptr);
-			// vkDestroyBuffer(device, viewPositionUniformBuffers[i], nullptr);
-            // vkFreeMemory(device, viewPositionUniformBuffersMemory[i], nullptr);
-			// vkDestroyBuffer(device, materialUniformBuffers[i], nullptr);
-            // vkFreeMemory(device, materialUniformBuffersMemory[i], nullptr);
-			// vkDestroyBuffer(device, directionalLightsUniformBuffers[i], nullptr);
-            // vkFreeMemory(device, directionalLightsUniformBuffersMemory[i], nullptr);
-			// vkDestroyBuffer(device, pointLightsUniformBuffers[i], nullptr);
-            // vkFreeMemory(device, pointLightsUniformBuffersMemory[i], nullptr);
 			vkDestroyBuffer(device, spotLightsUniformBuffers[i], nullptr);
             vkFreeMemory(device, spotLightsUniformBuffersMemory[i], nullptr);
         }
@@ -767,8 +716,6 @@ namespace GLVM::core
 
         for (const VkPhysicalDevice& device : devices) {
             if (isDeviceSuitable(device)) {
-				// VkPhysicalDeviceProperties properties;
-				// vkGetPhysicalDeviceProperties(device, &properties);
                 physicalDevice = device;
                 break;
             }
@@ -1064,16 +1011,6 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createPointLightShadowMapRenderPass() {
-        // VkAttachmentDescription colorAttachment{};
-        // colorAttachment.format = VK_FORMAT_R8G8B8A8_SRGB;
-        // colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-        // colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-        // colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        // colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-        // colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        // colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-        // colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		
         VkAttachmentDescription attachmentDescription{};
         
 		attachmentDescription.format = findDepthFormat();
@@ -1090,10 +1027,6 @@ namespace GLVM::core
         depthAttachmentRef.attachment = 0;
         depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
-        // VkAttachmentReference colorAttachmentRef{};
-        // colorAttachmentRef.attachment = 1;
-        // colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-		
 		/// Subpass 0: shadow map rendering
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -1139,7 +1072,6 @@ namespace GLVM::core
 			for ( u32 j = 0; j < bindigs_size; ++j ) {
 				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 				modelMatrixUboLayout.binding = descriptors[i].binding[j];
-//			std::cout << "binding: " << modelMatrixUboLayout.binding << std::endl;
 				modelMatrixUboLayout.descriptorCount = descriptors[i].descriptorsNumber[j];
 				modelMatrixUboLayout.descriptorType = descriptors[i].vkType;
 				modelMatrixUboLayout.pImmutableSamplers = nullptr;
@@ -1194,9 +1126,6 @@ namespace GLVM::core
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
 
-        // VkVertexInputBindingDescription bindingDescription = Vertex::getBindingDescription();
-		// std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = Vertex::getAttributeDescriptions();
-
         vertexInputInfo.vertexBindingDescriptionCount = 1;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(pipeline.attributeDescriptions.size());
         vertexInputInfo.pVertexBindingDescriptions = &pipeline.bindingDescription;
@@ -1216,11 +1145,8 @@ namespace GLVM::core
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
-//        rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
         rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
-//        rasterizer.polygonMode = VK_POLYGON_MODE_POINT;
         rasterizer.lineWidth = 1.0f;
-//        rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
         rasterizer.cullMode = 0;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
         rasterizer.depthBiasEnable = VK_FALSE;
@@ -1265,7 +1191,6 @@ namespace GLVM::core
 		unsigned int descriptorLayoutsNumber = pipeline.descriptors.GetSize();
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		for (unsigned int i = 0; i < descriptorLayoutsNumber; ++i) {
-//			std::cout << "binding: " << pipeline.descriptors[i].binding << std::endl;
 			descriptorSetLayouts.push_back(pipeline.descriptors[i].setLayout);
 		}
 			
@@ -1341,7 +1266,6 @@ namespace GLVM::core
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
 				pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
-//				pointLightsRenderAttachments.push_back(pointLightImages[j * m + m].views[0]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
@@ -1399,16 +1323,6 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createShadowMapDepthResources() {
-//        VkFormat depthFormat = findDepthFormat();
-
-		namespace cm = GLVM::ecs::components;
-		// ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-		// core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-		// 																							  cm::directionalLight,
-		// 																							  cm::mesh>();
-		// directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		// unsigned int dir_actual_size = directionalLightNumber ? directionalLightNumber : 1;
-		
 		for ( unsigned int i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -1464,15 +1378,8 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-//			directionalLightShadowMapImages.push_back(depthImage);
 			directionalLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
-		
-		// core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-		// 																					   cm::spotLight,
-		// 																					   cm::mesh>();
-		// spotLightNumber = spotLightLinkedEntities.GetSize();
-		// unsigned int spot_actual_size = spotLightNumber ? spotLightNumber : 1;
 		
 		for ( unsigned int i = 0; i < SPOT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
@@ -1529,15 +1436,8 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-//			spotLightShadowMapImages.push_back(depthImage);
 			spotLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
-
- 		// core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-		// 																						cm::pointLight,
-		// 																						cm::mesh>();
-		// pointLightNumber = pointLightLinkedEntities.GetSize();
-		// unsigned int point_actual_size = pointLightNumber ? pointLightNumber : 1;
 
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
@@ -1558,25 +1458,6 @@ namespace GLVM::core
 			createImage(depthImage);
 
 			for ( unsigned int j = 0; j < 6; ++j ) {
-				// VK_Image textureImage = {
-				// 	.image = VkImage{},
-				// 	.deviceMemory = VkDeviceMemory{},
-				// 	.viewType = VK_IMAGE_VIEW_TYPE_2D,
-				// 	.createFlags  = 0,
-				// 	.memoryPropertyFlags = VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-				// 	.usageFlags = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT |
-				// 	VK_IMAGE_USAGE_SAMPLED_BIT,
-				// 	.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
-				// 	.format = VK_FORMAT_R8G8B8A8_SRGB,
-				// 	.tiling = VK_IMAGE_TILING_OPTIMAL,
-				// 	.arrayLayers = 1,
-				// 	.width = SHADOW_MAP_SIZE,
-				// 	.height = SHADOW_MAP_SIZE
-				// };
-
-				// createImage(textureImage);
-				// pointLightImages.push_back(textureImage);
-
 				VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
 				VkImageMemoryBarrier barrier{};
@@ -1595,22 +1476,11 @@ namespace GLVM::core
 				VkPipelineStageFlags sourceStage;
 				VkPipelineStageFlags destinationStage;
 
-//				if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL) {
 				barrier.srcAccessMask = 0;
 				barrier.dstAccessMask = 0;
 
 				sourceStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 				destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-				// } else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL) {
-				// 	barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-				// 	barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-				// 	sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
-				// 	destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-				// } else {
-				// } else {
-				// 	throw std::invalid_argument("unsupported layout transition!");
-				// }
 
 				vkCmdPipelineBarrier(
 					commandBuffer,
@@ -1628,24 +1498,15 @@ namespace GLVM::core
 			}
 
 			setImageDebugObjectName(depthImage);
-//			pointLightShadowMapImages.push_back(depthImage);
 			pointLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
 
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
-//			pointLightShadowMapImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			// setImageDebugObjectName(pointLightShadowMapImages[i]);
-			// pointLightShadowMapImages[i].views.push_back(createImageView(pointLightShadowMapImages[i], 0, 6));
 			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
 			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
 		}
-		
-		// createShadowMapData(pointLightNumber, pointLightShadowMapDepthImages,
-		// 					pointLightShadowMapDepthImageMemories, pointLightShadowMapDepthImageViews,
-		// 					pointImageBaseArrayLayer, pointImageLayersCount,
-		// 					VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, VK_IMAGE_VIEW_TYPE_CUBE, swapChainExtent.width, swapChainExtent.width);
     }
 
     VkFormat CVulkanRenderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
@@ -1817,11 +1678,9 @@ namespace GLVM::core
         imageInfo.arrayLayers = image.arrayLayers;
         imageInfo.format = image.format;
         imageInfo.tiling = image.tiling;
-//        imageInfo.initialLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
         imageInfo.usage = image.usageFlags;
         imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.flags = image.createFlags;
-//        imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
         if (vkCreateImage(device, &imageInfo, nullptr, &image.image) != VK_SUCCESS) {
             throw std::runtime_error("failed to create image!");
@@ -2209,7 +2068,7 @@ namespace GLVM::core
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-		//        int textureImageViewsIndex = 0;
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
@@ -2250,7 +2109,7 @@ namespace GLVM::core
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-		//        int textureImageViewsIndex = 0;
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
@@ -2292,7 +2151,7 @@ namespace GLVM::core
 			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
 				throw std::runtime_error("failed to allocate descriptor sets!");
 			}
-			//        int textureImageViewsIndex = 0;
+
 			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
 				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
@@ -2333,7 +2192,7 @@ namespace GLVM::core
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, matrixUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-		//        int textureImageViewsIndex = 0;
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
@@ -2370,7 +2229,7 @@ namespace GLVM::core
 		if (vkAllocateDescriptorSets(device, &dirLightSpaceMatrixUboAllocInfo, lightSpaceMatrixDescriptorSet.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
-		//        int textureImageViewsIndex = 0;
+
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = lightSpaceMatrixBuffer[i];
@@ -2393,8 +2252,6 @@ namespace GLVM::core
 		core::vector<u32> lightDataBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
 
 		int lightDataUboBinding = lightDataBindings[0];
-		
-//		unsigned int light_data_ubo_actual_size = lightDataSize ? lightDataSize : 1; 
 		
 		std::vector<VkDescriptorSetLayout> lightDataUboLayouts(MAX_FRAMES_IN_FLIGHT,
 																  mainRenderScenePipeline.descriptors[2].setLayout);
@@ -2443,34 +2300,14 @@ namespace GLVM::core
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
 			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
-//			unsigned int textureIndex = i / 2;
-		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
-		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-
-		// for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-		// 	directionalLightsImageInfo[j] = {};
-		// 	directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-		// 	directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-		// 	directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-		// }
 
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
-//			unsigned int textureIndex = i / 2;
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
 			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
-
-
-//  		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-// 			pointLightsImageInfo[j] = {};
-// 			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// //				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-// 			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
-// 			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
-// 		}
 
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
@@ -2480,13 +2317,6 @@ namespace GLVM::core
 			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		// for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-		// 	spotLightsImageInfo[j] = {};
-		// 	spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-		// 	spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
-		// 	spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
-		// }
-		
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_number = initializeTextureData_.size();
 			std::vector<VkDescriptorSetLayout> diffuseSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_number,
@@ -2554,20 +2384,6 @@ namespace GLVM::core
 				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 			}
 		}
-
-
-		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-
-//		int pointLightShadowMapsMatrixUboBinding = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		// std::cout << "POINT LIGHT NUMBER: " << pointLightNumber << std::endl;
-		// std::cout << "SHADOW MAP BINDING: " << pointLightShadowMapsMatrixUboBinding << std::endl;
-		// std::cout << "MAIN RENDER BINDING: " << pointLightShadowMapsCisBinding << std::endl;
-
-		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-
-//		int spotLightShadowMapsMatrixUboBinding = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-				
-
 	}
 
 	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
@@ -2730,34 +2546,14 @@ namespace GLVM::core
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
 			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
-//			unsigned int textureIndex = i / 2;
-		// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
-		// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-
-		// for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-		// 	directionalLightsImageInfo[j] = {};
-		// 	directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-		// 	directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-		// 	directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-		// }
 
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
-//			unsigned int textureIndex = i / 2;
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
 			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
-
-
-// 		for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-// 			pointLightsImageInfo[j] = {};
-// 			pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// //				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-// 			pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
-// 			pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
-// 		}
 
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
@@ -2767,12 +2563,6 @@ namespace GLVM::core
 			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		// for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-		// 	spotLightsImageInfo[j] = {};
-		// 	spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-		// 	spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
-		// 	spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
-		// }
 		u32 DS_number = initializeTextureData_.size();
 		constexpr u32 DS_writes_size = 5;
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_number; ++i) {
@@ -2825,108 +2615,6 @@ namespace GLVM::core
 			
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
-
-// 		int directionalLightShadowMapsCisBinding = lightsSamplersBindings[2];
-// 		if ( directionalLightShadowMapsCisBinding != -1 ) {
-// 			VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-// 			for (size_t i = 0; i < directionalLightNumber; ++i) {
-// 				directionalLightsImageInfo[i] = {};
-// 				directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
-// 				directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
-// 			}
-// //			unsigned int textureIndex = i / 2;
-// 			// imageInfo.imageView = directionalLightShadowMapDepthImageViews[0];
-// 			// imageInfo.sampler = directionalLightShadowMapTextureSamplers[0];
-
-// 			for ( unsigned int j = directionalLightNumber; j < DIRECTIONAL_LIGHTS_NUMBER; ++j ) {
-// 				directionalLightsImageInfo[j] = {};
-// 				directionalLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				directionalLightsImageInfo[j].imageView = directionalLightPipeline.descriptors[0].textureImages[0].views[0];
-// 				directionalLightsImageInfo[j].sampler = directionalLightPipeline.descriptors[0].textureImages[0].sampler;
-// 			}
-
-// 			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> directionalLightsDescriptorWrites{};
-// 			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-// 				directionalLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-// 				directionalLightsDescriptorWrites[m].dstSet = directionalLightSamperDescriptorSets[m];
-// 				directionalLightsDescriptorWrites[m].dstBinding = directionalLightShadowMapsCisBinding;
-// 				directionalLightsDescriptorWrites[m].dstArrayElement = 0;
-// 				directionalLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-// 				directionalLightsDescriptorWrites[m].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
-// 				directionalLightsDescriptorWrites[m].pImageInfo = directionalLightsImageInfo;
-// 			}
-
-// 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(directionalLightsDescriptorWrites.size()), directionalLightsDescriptorWrites.data(), 0, nullptr);
-// 		}
-		
-// 		/// STARTING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-
-// 		int pointLightShadowMapsCisBinding = lightsSamplersBindings[3];
-// 		if ( pointLightShadowMapsCisBinding != -1 ) {
-// 			VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-// 			for (size_t i = 0; i < pointLightNumber; ++i) {
-// //			unsigned int textureIndex = i / 2;
-// 				pointLightsImageInfo[i] = {};
-// 				pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
-// 				pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
-// 			}
-
-
-// 			for ( unsigned int j = pointLightNumber; j < POINT_LIGHTS_NUMBER; ++j ) {
-// 				pointLightsImageInfo[j] = {};
-// 				pointLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				pointLightsImageInfo[j].imageView = pointLightPipeline.descriptors[0].textureImages[0].views[6];
-// 				pointLightsImageInfo[j].sampler = pointLightPipeline.descriptors[0].textureImages[0].sampler;
-// 			}
-
-// 			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> pointLightsDescriptorWrites{};
-// 			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-// 				pointLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-// 				pointLightsDescriptorWrites[m].dstSet = pointLightSamplerDescriptorSets[m];
-// 				pointLightsDescriptorWrites[m].dstBinding = pointLightShadowMapsCisBinding;
-// 				pointLightsDescriptorWrites[m].dstArrayElement = 0;
-// 				pointLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-// 				pointLightsDescriptorWrites[m].descriptorCount = POINT_LIGHTS_NUMBER;
-// 				pointLightsDescriptorWrites[m].pImageInfo = pointLightsImageInfo;
-// 			}
-
-// 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(pointLightsDescriptorWrites.size()), pointLightsDescriptorWrites.data(), 0, nullptr);
-// 		}
-		
-// 		/// ENDING OF POINT LIGHTS DESCRIPTOR SETS CREATION
-
-// 		int spotLightShadowMapsCisBinding = lightsSamplersBindings[4];
-// 		if ( spotLightShadowMapsCisBinding != -1 ) {
-// 			VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
-// 			for (size_t i = 0; i < spotLightNumber; ++i) {
-// 				spotLightsImageInfo[i] = {};
-// 				spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
-// 				spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
-// 			}
-
-// 			for ( unsigned int j = spotLightNumber; j < SPOT_LIGHTS_NUMBER; ++j ) {
-// 				spotLightsImageInfo[j] = {};
-// 				spotLightsImageInfo[j].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-// 				spotLightsImageInfo[j].imageView = spotLightPipeline.descriptors[0].textureImages[0].views[0];
-// 				spotLightsImageInfo[j].sampler = spotLightPipeline.descriptors[0].textureImages[0].sampler;
-// 			}
-
-// 			std::array<VkWriteDescriptorSet, MAX_FRAMES_IN_FLIGHT> spotLightsDescriptorWrites{};
-// 			for ( unsigned int m = 0; m < MAX_FRAMES_IN_FLIGHT; ++m ) {
-// 				spotLightsDescriptorWrites[m].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-// 				spotLightsDescriptorWrites[m].dstSet = spotLightSamplerDescriptorSets[m];
-// 				spotLightsDescriptorWrites[m].dstBinding = spotLightShadowMapsCisBinding;
-// 				spotLightsDescriptorWrites[m].dstArrayElement = 0;
-// 				spotLightsDescriptorWrites[m].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-// 				spotLightsDescriptorWrites[m].descriptorCount = SPOT_LIGHTS_NUMBER;
-// 				spotLightsDescriptorWrites[m].pImageInfo = spotLightsImageInfo;
-// 			}
-
-// 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(spotLightsDescriptorWrites.size()), spotLightsDescriptorWrites.data(), 0, nullptr);
-// 		}
 	}
 	
 	void CVulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -3158,8 +2846,6 @@ namespace GLVM::core
 				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
 				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 
-				/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
-
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
@@ -3227,19 +2913,13 @@ namespace GLVM::core
 			uint32_t actorsNumber = linkedEntities.GetSize();
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
 				unsigned int meshOwnerEntity = linkedEntities[actorsCounter];
-//			unsigned int directionalLightEntity = directionalLightEntities[0];
 				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
 				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
-//			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
-				/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
 				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
-
-				// updateDirectionalLightShadowMapMatrixUBO(uboIndex, transformComponent, directionalLightComponent);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboIndex], 0, nullptr);			 
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3307,23 +2987,9 @@ namespace GLVM::core
 
 				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-
-				// core::vector<Entity> viewPositionLinkedEntities2 = componentManager->collectLinkedEntities<cm::beholder>();
-				// cm::transform* playerTransformComponent2 = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities2[0]);
-
-				// static auto startTime = std::chrono::high_resolution_clock::now();
-
-				// auto currentTime = std::chrono::high_resolution_clock::now();
-				// float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
 				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
-//				cm::transform* transformPointLightComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
 				
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
-				// cm::transform* pointLightTransformComponent = componentManager->GetComponent<cm::transform>(pointLightEntity);
-
-				// pointLightComponent->position += 0.0001;
-				// pointLightTransformComponent->tPosition += 0.0001;
 				
 				uint32_t actorsNumber = linkedEntities.GetSize();
 				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
@@ -3336,34 +3002,9 @@ namespace GLVM::core
 						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
 						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
 
-//					pointLightComponent->position = playerTransformComponent2->tPosition;
-
-					// float deltaTime = time - previousTime;
-					// previousTime = time;
-					
-					// if ( accumulator > 2.0 && animationFlag == false ) {
-					// 	accumulator = 0;
-					// 	animationFlag = true;
-					// } else if ( accumulator > 2.0 && animationFlag == true ) {
-					// 	accumulator = 0;
-					// 	animationFlag = false;
-					// } else
-					// 	accumulator += deltaTime;
-
-					// if (animationFlag) {
-					// 	transformPointLightComponent->tPosition += deltaTime;
-					// 	pointLightComponent->position += deltaTime;
-					// }
-					// else {
-					// 	transformPointLightComponent->tPosition -= deltaTime;
-					// 	pointLightComponent->position -= deltaTime;
-					// }
-
 					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
 
-					// updatePointLightShadowMapDataUBO(uboIndex, pointLightComponent, 100.0f);
-					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 1, 1, &shadowMapPointLightDataDescriptorSets[uboIndex], 0, nullptr);			
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
 					VkDeviceSize offsets[] = {0};
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3420,20 +3061,12 @@ namespace GLVM::core
 		if ( viewPositionLinkedEntities.GetSize() > 0 )
 			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		// cm::directionalLight* playerDirLightComponent = componentManager->GetComponent<cm::directionalLight>(viewPositionLinkedEntities[0]);
-		// cm::beholder* beholderPlayerComponent = componentManager->GetComponent<cm::beholder>(viewPositionLinkedEntities[0]);
-		// playerDirLightComponent->position = playerTransformComponent->tPosition;
-		// playerDirLightComponent->direction = -beholderPlayerComponent->forward;
-		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
-//			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-
-			/// TODO: Second line work with no MAX_FRAMES_IN_FLIGHT define. Its litle bit wierd. Need to figure out why so.
 				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
 			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent);
@@ -3457,16 +3090,6 @@ namespace GLVM::core
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * initializeTextureData_.size() + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
-			// 						4, 1, &directionalLightSamperDescriptorSets[currentFrame], 0, nullptr);
-
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
-			// 						3, 1, &pointLightSamplerDescriptorSets[currentFrame], 0, nullptr);
-
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
-			// 						3, 1, &spotLightSamplerDescriptorSets[currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
@@ -3542,26 +3165,9 @@ namespace GLVM::core
 																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		// modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-        // modelMatrixUBO.model.SelfTensorTranspose();
-
         mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
-		
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
 
 		scalingMatrix[0][0] = _transformComponent->fScale;
 		scalingMatrix[1][1] = _transformComponent->fScale;
@@ -3605,14 +3211,11 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
-//		std::cout << frames.GetSize() << std::endl;
-//		std::cout << frames[meshID].GetSize() << std::endl;
-//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-//		std::cout << "size: " << joinMatricesDataSize << std::endl;
-//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
@@ -3624,7 +3227,7 @@ namespace GLVM::core
 		} else {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
+
 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
 			}
 
@@ -3635,9 +3238,7 @@ namespace GLVM::core
 		}
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-//			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}
 		
         void* modelMatrixData = nullptr;
@@ -3667,26 +3268,9 @@ namespace GLVM::core
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent, [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-        // modelMatrixUBO.model.SelfTensorTranspose();
-
         mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
-		
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
 
 		scalingMatrix[0][0] = _transformComponent->fScale;
 		scalingMatrix[1][1] = _transformComponent->fScale;
@@ -3730,14 +3314,11 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
-//		std::cout << frames.GetSize() << std::endl;
-//		std::cout << frames[meshID].GetSize() << std::endl;
-//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-//		std::cout << "size: " << joinMatricesDataSize << std::endl;
-//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
@@ -3749,7 +3330,6 @@ namespace GLVM::core
 		} else {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
 			}
 
@@ -3760,9 +3340,7 @@ namespace GLVM::core
 		}
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-//			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}
 		
         void* modelMatrixData;
@@ -3775,56 +3353,10 @@ namespace GLVM::core
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
-		// f32 delta_move = _transformComponent->frameAccumulator * 0.1;
-		// std::cout << "delta move: " << delta_move << std::endl;
-		// pointLightComponent->position[0] += delta_move;
-		// pointLightComponent->position[1] += delta_move;
-		// pointLightComponent->position[2] += delta_move;
-
-		// pointLightComponent->position[0] += delta_move;
-		// pointLightComponent->position[1] += delta_move;
-		// pointLightComponent->position[2] += delta_move;
-
-		// pointLightComponent->position = vec3(std::sin(_transformComponent->frameAccumulator / 100)* 0.5,
-		// 									 std::cos(_transformComponent->frameAccumulator / 100)*0.5, 1.0);
-		
 		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight = vec3(0.0f, 0.0f, 0.0f);
 		vec3 upVector = { 0.0, 0.0, 0.0 };
 
-		// switch(layer) {
-		// case 0:
-		// 	/// Positive X
-		// 	directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// 	break;
-		// case 1:
-		// 	/// Negative X
-		// 	directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 1.0f,  0.0f);
-		// 	break;
-		// case 2:
-		// 	/// Positive Y
-		// 	directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  -1.0f);
-		// 	break;
-		// case 3:
-		// 	/// Negative Y
-		// 	directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f,  0.0f);
-		// 	upVector = vec3(0.0f, 0.0f,  1.0f);
-		// 	break;
-		// case 4:
-		// 	/// Positive Z
-		// 	directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
-		// 	upVector = vec3(1.0f, 0.0f,  0.0f);
-		// 	break;
-		// 	/// Negative Z
-		// case 5:
-		// 	directionalVectorLight = positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
-		// 	upVector = vec3(1.0f, 0.0f,  0.0f);
-		// 	break;
-		// }
-		
 		switch(layer) {
 		case 0:
 			/// Positive X
@@ -3864,26 +3396,9 @@ namespace GLVM::core
 										  directionalVectorLight,
 										  upVector);
 
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-        // modelMatrixUBO.model.SelfTensorTranspose();
-
         mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
-		
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
 
 		scalingMatrix[0][0] = _transformComponent->fScale;
 		scalingMatrix[1][1] = _transformComponent->fScale;
@@ -3930,14 +3445,11 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
-//		std::cout << frames.GetSize() << std::endl;
-//		std::cout << frames[meshID].GetSize() << std::endl;
-//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-//		std::cout << "size: " << joinMatricesDataSize << std::endl;
-//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
@@ -3949,7 +3461,6 @@ namespace GLVM::core
 		} else {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
 			}
 
@@ -3960,12 +3471,9 @@ namespace GLVM::core
 		}
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-//			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}
 		
-//		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
 		delete [] jointMatricesData;
 		jointMatricesData = nullptr;
 		
@@ -3995,14 +3503,6 @@ namespace GLVM::core
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
 		
-        // modelMatrixUBO.model[0][0] = _transformComponent->fScale;
-        // modelMatrixUBO.model[1][1] = _transformComponent->fScale;
-        // modelMatrixUBO.model[2][2] = _transformComponent->fScale;
-        // modelMatrixUBO.model[3][3] = 1.0;
-        // modelMatrixUBO.model[0][3] = _transformComponent->tPosition[0];
-        // modelMatrixUBO.model[1][3] = _transformComponent->tPosition[1];
-        // modelMatrixUBO.model[2][3] = _transformComponent->tPosition[2];
-
 		scalingMatrix[0][0] = _transformComponent->fScale;
 		scalingMatrix[1][1] = _transformComponent->fScale;
 		scalingMatrix[2][2] = _transformComponent->fScale;
@@ -4035,11 +3535,9 @@ namespace GLVM::core
 		
         modelMatrixUBO.model = scalingMatrix * rotationMatrix * translationMatrix;
 		
-//        modelMatrixUBO.model.SelfTensorTranspose();
-
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
-//		std::cout << "Mesh id: " << meshID << " frame: " << _transformComponent->currentAnimationFrame << std::endl;
+
 		/// Start of animation logic
 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
 			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
@@ -4049,14 +3547,11 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
-//		std::cout << frames.GetSize() << std::endl;
-//		std::cout << frames[meshID].GetSize() << std::endl;
-//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
+
 		unsigned int joinMatricesDataSize{};
 		if ( jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-//		std::cout << "size: " << joinMatricesDataSize << std::endl;
-//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
+
 		mat4* jointMatricesData = nullptr;
 		if ( joinMatricesDataSize == 0 ) {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
@@ -4068,7 +3563,6 @@ namespace GLVM::core
 		} else {
 			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
 			}
 
@@ -4079,18 +3573,12 @@ namespace GLVM::core
 		}
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-//			std::cout << jointMatricesData[j] << std::endl;
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-//			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
 		}
 		
-//		coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
 		delete [] jointMatricesData;
 		jointMatricesData = nullptr;
 		/// End of animation logic
-
-		
-//        modelMatrixUBO.proj[1][1] *= -1;
 
 		modelMatrixUBO.ambient = materialComponent->ambient;
 		modelMatrixUBO.shininess = materialComponent->shininess;
@@ -4163,9 +3651,6 @@ namespace GLVM::core
 			pointLightUBO.diffuse   = vec3(pointLightComponent->diffuse[0],
 										   pointLightComponent->diffuse[1],
 										   pointLightComponent->diffuse[2]);
-			// pointLightUBO.position  = pointLightComponent->position;
-			// pointLightUBO.ambient   = pointLightComponent->ambient;
-			// pointLightUBO.diffuse   = pointLightComponent->diffuse;
 			pointLightUBO.specular  = pointLightComponent->specular;
 
 			pointLightUBO.constant  = pointLightComponent->constant;
@@ -4174,7 +3659,6 @@ namespace GLVM::core
 
 			pointLightUBO.quadratic = pointLightComponent->quadratic;
 
-			std::cout << "size: " << sizeof(lightDataUBO.pointLights[i]) << std::endl;
 			lightDataUBO.pointLights[i] = pointLightUBO;
 		}
 		
@@ -4207,15 +3691,6 @@ namespace GLVM::core
 
 		lightDataUBO.spotLightArraySize = spotLightNumber;
 
-		// std::cout << "position: " << lightDataUBO.pointLights[1].position << std::endl;
-		// std::cout << "ambient: " << lightDataUBO.pointLights[1].ambient << std::endl;
-		// std::cout << "diffuse: " << lightDataUBO.pointLights[1].diffuse << std::endl;
-		// std::cout << "specular: " << lightDataUBO.pointLights[1].specular << std::endl;
-		// std::cout << "constant: " << lightDataUBO.pointLights[1].constant << std::endl;
-		// std::cout << "linear: " << lightDataUBO.pointLights[1].linear << std::endl;
-		// std::cout << "quadratic: " << lightDataUBO.pointLights[1].quadratic << std::endl;
-
-		
         void* data;
         vkMapMemory(device, lightDataUniformBuffersMemory[currentImage], 0,
 					sizeof(lightDataUBO), 0, &data);
@@ -4330,7 +3805,6 @@ namespace GLVM::core
     VkPresentModeKHR CVulkanRenderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR || availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-//				if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 				std::cout << "present mode found!" << std::endl;
                 return availablePresentMode;
             }
@@ -4343,13 +3817,6 @@ namespace GLVM::core
         if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
             return capabilities.currentExtent;
         } else {
-            // int width = 0, height = 0;
-            // glfwGetFramebufferSize(window, &width, &height);
-
-            // VkExtent2D actualExtent = {
-            //     static_cast<uint32_t>(width),
-            //     static_cast<uint32_t>(height)
-            // };
 
 			VkExtent2D actualExtent{};
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -4456,10 +3923,6 @@ namespace GLVM::core
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-        // std::vector<const char*> pRequiredExtentions = {"VK_KHR_xcb_surface",
-        //     "VK_KHR_display", "VK_KHR_surface",
-        //     "VK_EXT_direct_mode_display"};
-
 		std::vector<const char*> pRequiredExtentions = {"VK_KHR_xcb_surface",
             "VK_KHR_display", "VK_KHR_surface",
             "VK_EXT_direct_mode_display"};
@@ -4528,9 +3991,6 @@ namespace GLVM::core
 		// 	[[maybe_unused]] int i = 0;
 		// }
 
-		// if ( pCallbackData->messageIdNumber == 4294967294 ) {
-		// 	[[maybe_unused]] int i = 0;
-		// }
 
 		
 		// std::cout << "Error code: " << pCallbackData->messageIdNumber << std::endl;
