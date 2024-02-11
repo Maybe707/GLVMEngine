@@ -14,6 +14,7 @@
 #include <array>
 #include <optional>
 #include <set>
+#include <cmath>
 
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -342,8 +343,8 @@ namespace GLVM::core
 		float constant;
 		float linear;
 		float quadratic;
-		// float padding0;
-		// float padding1;
+		// float padding3;
+		// float padding4;
 	};
 //#pragma pack(pop)
 
@@ -363,14 +364,12 @@ namespace GLVM::core
 	};
 	
     struct LightData {
-		vec3 viewPosition;
-		float padding0;
+		alignas(16) vec3 viewPosition;
+//		float padding0;
 
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
 		float farPlane;
-		float padding1;
-		float padding2;
 
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
 		int directionalLightsArraySize;

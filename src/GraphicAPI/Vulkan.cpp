@@ -3772,7 +3772,7 @@ namespace GLVM::core
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
-		// f32 delta_move = _transformComponent->frameAccumulator * 0.001;
+		// f32 delta_move = _transformComponent->frameAccumulator * 0.1;
 		// std::cout << "delta move: " << delta_move << std::endl;
 		// pointLightComponent->position[0] += delta_move;
 		// pointLightComponent->position[1] += delta_move;
@@ -3781,6 +3781,9 @@ namespace GLVM::core
 		// pointLightComponent->position[0] += delta_move;
 		// pointLightComponent->position[1] += delta_move;
 		// pointLightComponent->position[2] += delta_move;
+
+		// pointLightComponent->position = vec3(std::sin(_transformComponent->frameAccumulator / 100)* 0.5,
+		// 									 std::cos(_transformComponent->frameAccumulator / 100)*0.5, 1.0);
 		
 		vec3 positionVectorLight  = pointLightComponent->position;
 		vec3 directionalVectorLight = vec3(0.0f, 0.0f, 0.0f);
