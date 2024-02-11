@@ -3164,36 +3164,14 @@ namespace GLVM::core
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		updateAnimationFrames(_transformComponent, meshID);
-
-		unsigned int joinMatricesDataSize{};
-		if ( jointMatricesPerMesh.GetSize() > 0 )
-			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-
-		mat4* jointMatricesData = nullptr;
-		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
-			}
-				
-		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-
-				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-			}
-
-			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
-			}
-		}
+		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
+
+		delete [] jointMatricesData;
+		jointMatricesData = nullptr;
 		
         void* modelMatrixData = nullptr;
         vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
@@ -3225,35 +3203,14 @@ namespace GLVM::core
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 		
-		unsigned int joinMatricesDataSize{};
-		if ( jointMatricesPerMesh.GetSize() > 0 )
-			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-
-		mat4* jointMatricesData = nullptr;
-		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
-			}
-				
-		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-			}
-
-			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
-			}
-		}
-
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
+
+		delete [] jointMatricesData;
+		jointMatricesData = nullptr;
 		
         void* modelMatrixData;
         vkMapMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[currentImage], 0,
@@ -3315,32 +3272,8 @@ namespace GLVM::core
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 		modelMatrixUBO.farPlane = 100.0f;
 
-		updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 		
-		unsigned int joinMatricesDataSize{};
-		if ( jointMatricesPerMesh.GetSize() > 0 )
-			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-
-		mat4* jointMatricesData = nullptr;
-		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
-			}
-				
-		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-			}
-
-			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
-			}
-		}
-
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
@@ -3377,31 +3310,7 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		updateAnimationFrames(_transformComponent, meshID);
-
-		unsigned int joinMatricesDataSize{};
-		if ( jointMatricesPerMesh.GetSize() > 0 )
-			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-
-		mat4* jointMatricesData = nullptr;
-		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
-			}
-				
-		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-			}
-
-			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
-			}
-		}
+		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
@@ -3831,7 +3740,7 @@ namespace GLVM::core
         return VK_FALSE;
     }
 
-	void CVulkanRenderer::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
+	[[nodiscard]] mat4* CVulkanRenderer::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
 		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
 			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
 			++_transformComponent->currentAnimationFrame;
@@ -3840,6 +3749,32 @@ namespace GLVM::core
 				_transformComponent->frameAccumulator = 0.0f;
 			}
 		}
+
+		unsigned int joinMatricesDataSize{};
+		if ( jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
+
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
+
+		return jointMatricesData;
 	}
 
 	mat4 CVulkanRenderer::computeModelMatrix(ecs::components::transform* _transformComponent) {
