@@ -58,10 +58,7 @@
 
 #ifdef VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.h>
-//#include "../Vulkan-Headers/include/vulkan/vulkan.h"
-//#include "../Vulkan-Headers/include/vulkan/vulkan_core.h"
 #include "WinApi/WindowWinVulkan.hpp"
-//#include "WinApi/winVk.hpp"
 #endif
 
 #define SHADOW_MAP_SIZE 2048
@@ -75,12 +72,6 @@
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER                                 8
-
-// #ifdef NDEBUG
-// #define WNDCLASS 0xc018
-// #else
-// #define WNDCLASS "static"
-// #endif
 
 namespace GLVM::core
 {
@@ -184,19 +175,7 @@ namespace GLVM::core
 		LIGHT_SPACE_MATRIX_UBO,
 
 		LIGHT_DATA,
-		// VIEW_POSITION_UBO,
-		// MATERIAL_UBO,
-		// DIRECTIONAL_LIGHTS_UBO,
-		// POINT_LIGHTS_UBO,
-		// SPOT_LIGHTS_UBO,
-		/// CIS - combined image sampler
-		// DIFFUSE_CIS,
-		// SPECULAR_CIS,
-		// DIRECTIONAL_LIGHT_SHADOW_MAPS_CIS,
-		// POINT_LIGHT_SHADOW_MAPS_CIS,
-		// SPOT_LIGHT_SHADOW_MAPS_CIS
 		LIGHT_SAMPLERS,
-//		LIGHT_SHADOW_MAPS
 	};
 
 	struct VK_Image {
@@ -250,11 +229,9 @@ namespace GLVM::core
 						   core::vector<u32> descriptorsNumbers, core::vector<uint32_t> bindings) {
 			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
 				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
-//				++globalDescriptorsNumber;
 				++uboDescriptorsNumber;
 			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
 				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
-//				++globalDescriptorsNumber;
 				++combinedImageSamplersNumber;
 			} else {
 				assert(!"unreachable");
@@ -325,7 +302,6 @@ namespace GLVM::core
 		vec4 specular;
 	};
 
-//#pragma pack(push, 1)
 	struct alignas(16) PointLight {
 		vec3 position;
 		float padding0;
@@ -334,19 +310,12 @@ namespace GLVM::core
 		float padding1;
 		vec3 diffuse;
 		float padding2;
-		// alignas(16) vec3 position;
-		   
-		// alignas(16) vec3 ambient;
-		// alignas(16) vec3 diffuse;
 
 		vec3 specular;
 		float constant;
 		float linear;
 		float quadratic;
-		// float padding3;
-		// float padding4;
 	};
-//#pragma pack(pop)
 
 	struct alignas(16) SpotLight {
 		alignas(16) vec3  position;
@@ -365,7 +334,6 @@ namespace GLVM::core
 	
     struct LightData {
 		alignas(16) vec3 viewPosition;
-//		float padding0;
 
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
@@ -377,59 +345,6 @@ namespace GLVM::core
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
     };
-
-	// struct DirectionalLightsUBO {
-
-	// };
-
-	// struct PointLightsUBO {
-	// };
-
-	// struct SpotLightsUBO {
-	// };
-
-//     const std::vector<Vertex> vertices = {
-//         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{-0.5f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-//         {{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-//         {{0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-//         {{-0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{-0.5f, 0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{-0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{-0.5f, -0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-//         {{-0.5f, 0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{0.5f, 0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}},
-
-//         {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}},
-//         {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}},
-//         {{0.5f, -0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}},
-//         {{-0.5f, -0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}}
-//     };
-    
-// // Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
-
-//     const std::vector<uint16_t> indices = {
-//         0, 1, 2, 2, 3, 0,
-//         4, 5, 6, 6, 7, 4,
-//         8, 9, 10, 10, 11, 8,
-//         12, 13, 14, 14, 15, 12,
-//         16, 17, 18, 18, 19, 16,
-//         20, 21, 22, 22, 23, 20
-//     };
 
     const std::vector<Vertex> vertices = {
         {{0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
@@ -443,8 +358,6 @@ namespace GLVM::core
         {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
     };
     
-// Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
-
     const std::vector<uint16_t> indices = {
         4, 2, 0,
         2, 7, 3,
@@ -459,8 +372,6 @@ namespace GLVM::core
         0, 2, 3,
         4, 0, 1
     };
-
-// Выдай в шейдере output = vec4(uv.xy, 0,1) чтобы было наглядно.
 
     const std::vector<uint16_t> hudIndices = {
         0, 1, 2, 2, 1, 3,
@@ -564,39 +475,24 @@ namespace GLVM::core
 
         VkRenderPass renderPass;
 
-		// core::vector<Descriptor> descriptors;
-		// core::vector<Descriptor> shadowMapDescriptors;
-
 		Pipeline mainRenderScenePipeline;
 		Pipeline directionalLightPipeline;
 		Pipeline spotLightPipeline;
 		Pipeline pointLightPipeline;
 		
-        // VkDescriptorSetLayout descriptorSetLayout;
-		// VkDescriptorSetLayout descriptorSetLayout2;
-//        VkDescriptorSetLayout descriptorSetLayoutHUD;
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
-
-        // VkPipelineLayout pipelineLayoutHUD;
-        // VkPipeline graphicsPipelineHUD;
 
         VkCommandPool commandPool;
 
 		/// Main pipeline depth.
-//        VkImage depthImage;
-//        VkDeviceMemory depthImageMemory;
         VkImageView depthImageView;
 
 		/// Depth varialbes for shadow map.
-//		VkPipelineLayout shadowMapPipelineLayout;
 		VkPipeline shadowMapPipeline;
 
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VK_Image> directionalLightShadowMapImages;
-		// core::vector<VkImage> directionalLightShadowMapDepthImages;
-		// core::vector<VkDeviceMemory> directionalLightShadowMapDepthImageMemories;
-		// core::vector<VkImageView> directionalLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
 		std::vector<VkSampler> directionalLightShadowMapTextureSamplers;
@@ -617,10 +513,6 @@ namespace GLVM::core
 		
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<VK_Image> spotLightShadowMapImages;
-		// core::vector<VkImage> pointLightShadowMapDepthImages;
-		// core::vector<VkDeviceMemory> pointLightShadowMapDepthImageMemories;
-		// core::vector<VkImageView> pointLightShadowMapDepthImageViews;
-//		std::vector<std::vector<std::vector<VkImageView>>> pointLightShadowMapDepthImageViewLayers;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
@@ -634,9 +526,6 @@ namespace GLVM::core
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VK_Image> pointLightShadowMapImages;
 		std::vector<VK_Image> pointLightImages;
-		// core::vector<VkImage> spotLightShadowMapDepthImages;
-		// core::vector<VkDeviceMemory> spotLightShadowMapDepthImageMemories;
-		// core::vector<VkImageView> spotLightShadowMapDepthImageViews;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;
 		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
@@ -648,25 +537,11 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
 
 		std::vector<VK_Image> textureImages;
-        // std::vector<VkImage> textureImages;
-        // std::vector<VkDeviceMemory> textureImageMemories;
-        // std::vector<VkImageView> textureImageViews;
-        // std::vector<VkSampler> textureSamplers;
-
-        // VkBuffer vertexBuffer;
-        // VkDeviceMemory vertexBufferMemory;
-        // VkBuffer indexBuffer;
-        // VkDeviceMemory indexBufferMemory;
 
         std::vector<VkBuffer> vertexBufferContainer;
         std::vector<VkDeviceMemory> vertexBufferMemoryContainer;
         std::vector<VkBuffer> indexBufferContainer;
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
-
-        // VkBuffer hudVertexBuffer;
-        // VkDeviceMemory hudVertexBufferMemory;
-        // VkBuffer hudIndexBuffer;
-        // VkDeviceMemory hudIndexBufferMemory;
 
         std::vector<VkBuffer> modelMatrixUniformBuffers;
         std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
@@ -684,7 +559,6 @@ namespace GLVM::core
         VkDescriptorPool descriptorPool;
 		unsigned int matrixUboDescriptorsNumber = 0;
 		unsigned int viewPositionUboDescriptorsNumber = 0;
-//		unsigned int materialUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
 		unsigned int spotLightUboDescriptorsNumber = 0;
