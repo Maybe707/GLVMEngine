@@ -489,8 +489,6 @@ namespace GLVM::core
         VkImageView depthImageView;
 
 		/// Depth varialbes for shadow map.
-		VkPipeline shadowMapPipeline;
-
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VK_Image> directionalLightShadowMapImages;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
@@ -650,9 +648,7 @@ namespace GLVM::core
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers();
-		void recordShadowMapCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-		void createShadowMapSyncObjects();
         void createSyncObjects();
 		void updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);

@@ -2711,71 +2711,6 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::recordShadowMapCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
-
-		VkClearValue shadowMapClearValues[1];
-		shadowMapClearValues[0].depthStencil.depth = 1.0f;
-		shadowMapClearValues[0].depthStencil.stencil = 0;
-
-		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
-		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		shadowMapRenderPassInfo.pNext = NULL;
-		shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
-		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[imageIndex];
-		shadowMapRenderPassInfo.renderArea.offset.x = 0;
-		shadowMapRenderPassInfo.renderArea.offset.y = 0;
-		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-		shadowMapRenderPassInfo.clearValueCount = 1;
-		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
-
-		vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		VkViewport shadowMapViewPort;
-		shadowMapViewPort.height = swapChainExtent.height;
-		shadowMapViewPort.width = swapChainExtent.width;
-		shadowMapViewPort.minDepth = 0.0f;
-		shadowMapViewPort.maxDepth = 1.0f;
-		shadowMapViewPort.x = 0;
-		shadowMapViewPort.y = 0;
-		vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
-
-		VkRect2D shadowMapScissor;
-		shadowMapScissor.extent.width = swapChainExtent.width;
-		shadowMapScissor.extent.height = swapChainExtent.height;
-		shadowMapScissor.offset.x = 0;
-		shadowMapScissor.offset.y = 0;
-		vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
-
-		vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shadowMapPipeline);
-
-		const VkDeviceSize shadowMapOffsets[1] = { 0 };
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> shadowMapLinkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh>();
-
-		for ( unsigned int i = 0; i < shadowMapLinkedEntities.GetSize(); ++i ) {
-			unsigned int entity = shadowMapLinkedEntities[i];
-		unsigned int vertexID = componentManager->GetComponent<ecs::components::mesh>(entity)->id;
-		VkBuffer shadowMapVertexBuffers[] = {vertexBufferContainer[vertexID]};
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, shadowMapVertexBuffers, shadowMapOffsets);
-		}
-
-		vkCmdEndRenderPass(commandBuffer);
-		
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
-    }
-	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
@@ -3097,27 +3032,6 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::createShadowMapSyncObjects() {
-        shadowMapImageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        shadowMapRenderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-        shadowMapInFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
-		
-        VkSemaphoreCreateInfo semaphoreInfo{};
-        semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-		
-        VkFenceCreateInfo fenceInfo{};
-        fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-		
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &shadowMapImageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &shadowMapRenderFinishedSemaphores[i]) != VK_SUCCESS ||
-                vkCreateFence(device, &fenceInfo, nullptr, &shadowMapInFlightFences[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create synchronization objects for a frame!");
-            }
-        }
-    }
-	
     void CVulkanRenderer::createSyncObjects() {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
