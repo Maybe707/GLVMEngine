@@ -69,8 +69,6 @@ namespace GLVM::core
 							  GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, 8, "spotLightFlatShadowMapArray", 16);
 		AllocateTextureMemory(directionalLightFlatShadowMapFBOcontainer, directionalLightFlatShadowMapTextureContainer,
 							  GL_TEXTURE_2D, GL_CLAMP_TO_BORDER, 4, "directionalLightFlatShadowMapArray", 24);
-		
-//		InitializeFlatShadowMap();
 
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -197,23 +195,6 @@ namespace GLVM::core
 
 	    EvaluateCoreShader();
 		RenderScene(coreShaderProgram);
-
-//		Window.SwapBuffers();
-
-		/*!
-		  \brief DEBUG
-		  ====================================================================
-		  glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-		  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		  debugQuadDepth_->Use();
-		  debugQuadDepth_->SetFloat("nearPlane", nearPlaneFlatShadowMap);
-		  debugQuadDepth_->SetFloat("fatPlane", farPlaneFlatShadowMap);
-		  glActiveTexture(GL_TEXTURE30);
-		  glBindTexture(GL_TEXTURE_2D, spotLightFlatShadowMapFBOContainer[0]);
-		  RenderQuad();
-		  ====================================================================
-        */
 	}
 
 	void COpenglRenderer::AllocateTextureMemory(std::vector<unsigned int>& shadowMapFBOcontainer,
@@ -248,10 +229,6 @@ namespace GLVM::core
 				pGLActive_Texture(GL_TEXTURE0);
 				glBindTexture(textureTarget_, texture_);
 				AllocateTexture(textureTarget_, clampType_);
-				
-				// int currentActiveTexture;
-				// glGetIntegerv(GL_ACTIVE_TEXTURE, &currentActiveTexture);
-				// std::cout << "Cube texture unit: " << currentActiveTexture << std::endl;
 				
 				// Attach depth texture as FBO's depth buffer
 				pGLBind_Framebuffer(GL_FRAMEBUFFER, fbo_);
@@ -299,9 +276,7 @@ namespace GLVM::core
 		glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, shadowMapFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
-//		glCullFace(GL_FRONT);
 		RenderScene(flatShadowMapShaderProgram);
-//		glCullFace(GL_BACK);
 		pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 
 		return lightSpaceMatrix;
@@ -321,9 +296,7 @@ namespace GLVM::core
 			glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, shadowMapFBO);
 			glClear(GL_DEPTH_BUFFER_BIT);
-//		glCullFace(GL_FRONT);
 			RenderScene(flatShadowMapShaderProgram);
-//		glCullFace(GL_BACK);
 			pGLBind_Framebuffer(GL_FRAMEBUFFER, 0);
 
 			return lightSpaceMatrix;
@@ -331,8 +304,6 @@ namespace GLVM::core
 	
 	void COpenglRenderer::EvaluateCubeShadowMap(unsigned int& shadowMapFBO, ecs::components::pointLight& pointLightComponent) {
 				vec3 positionVectorPointLight = pointLightComponent.position;
-//		positionVectorPointLight = playerTransformComponent.tPosition;
-//		positionVectorPointLight = vec3(timeAccumulator * 5, 3.0f, timeAccumulator * 5);
 				mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_WIDTH / (float)SHADOW_HEIGHT, nearPlaneCubeShadowMap, farPlaneCubeShadowMap);
 				vector<mat4> cubeShadowMapTransforms;
 				cubeShadowMapTransforms.Push(LookAtMain(positionVectorPointLight, positionVectorPointLight + vec3( 1.0f,  0.0f,  0.0f), vec3(0.0f, -1.0f,  0.0f)) * projectionMatrixCubeShadowMap);
@@ -363,14 +334,12 @@ namespace GLVM::core
 		cm::beholder* playerViewComponent = pComponent_Manager->GetComponent<cm::beholder>(uiPlayerEntity);
 		cm::transform* playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
 		
-//		viewPosition = playerViewComponent.Position;
 		vec3 viewPosition = playerTransformComponent->tPosition;
 		bool reverseNormalsFlag = false;
 		
 		// Render scene as normal
 		glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//		coreShaderProgram->Use();
 		ComputeProjectionMatrix(coreShaderProgram);
 		ComputeViewMatrix(coreShaderProgram, *playerTransformComponent, *playerViewComponent);
 		coreShaderProgram->SetInt("shadows", shadows);
@@ -451,16 +420,10 @@ namespace GLVM::core
 		for(unsigned int x = 0; x < pointLightComponentContainerSize; ++x) {
 			unsigned int uiPointLightEntity = (*pEntityContainerRefPointLight)[x];
 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiPointLightEntity);
-			
-			// core::vector<unsigned int>* pEntityContainerRefView = ecs::GetEntityContainer<ecs::beholder>(*pComponent_Manager);
-			// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
-			// ecs::transform& playerTransformComponent = pComponent_Manager->GetComponent<ecs::transform>(uiPlayerEntity);
 
 			std::string leftString = "pointLights[";
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
 									   pointLightComponent->position);
-			// coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].position"),
-			// 						   playerTransformComponent.tPosition);
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].ambient"),
 									   pointLightComponent->ambient);
 			coreShaderProgram->SetVec3(ConcatIntBetweenTwoStrings(leftString, x, "].diffuse"),
@@ -529,8 +492,6 @@ namespace GLVM::core
 
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			unsigned int uiEntity_refTexture = linkedEntities[i];
-//			cm::texture* texture = componentManager->GetComponent<cm::texture>(uiEntity_refTexture);
-
 
 			cm::mesh* vertexComponent = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
 			unsigned int uiVertexId = 0;
@@ -558,13 +519,9 @@ namespace GLVM::core
 				}
 			}
 		
-//		std::cout << frames.GetSize() << std::endl;
-//		std::cout << frames[meshID].GetSize() << std::endl;
-//		std::cout << frames[meshID][currentFrameForRander] << std::endl;
 			unsigned int joinMatricesDataSize{};
 			if ( jointMatricesPerMesh.GetSize() > 0 )
 				joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-//		std::cout << "Number of matrices: " << joinMatricesDataSize << std::endl;
 			mat4* jointMatricesData = nullptr;
 			if ( joinMatricesDataSize == 0 ) {
 				jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
@@ -576,59 +533,18 @@ namespace GLVM::core
 			} else {
 				jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
 				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 					jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-//					std::cout << jointMatricesData[i] << std::endl;
 				}
 
 				for ( unsigned int i = joinMatricesDataSize; i < MAX_JOINTS_NUMBER; ++i ) {
-//			std::cout << jointMatricesPerMesh[meshID][i][0] << std::endl;
 					mat4 unitMatrix(1.0f);
 					jointMatricesData[i] = unitMatrix;
 				}
 			}
-
-// 			for ( unsigned int j = 0; j < 6; ++j ) {
-// 			std::cout << jointMatricesData[j] << std::endl;
-// //				modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-// //			std::cout << modelMatrixUBO.jointMatrices[j] << std::endl;
-// 			}
 		
 			shaderProgram_->SetMat4("jointMatrices", MAX_JOINTS_NUMBER, jointMatricesData[0]);
 			delete [] jointMatricesData;
 			jointMatricesData = nullptr;
-
-			
-// 			cm::mesh* mesh = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
-// 			unsigned int id = mesh->id;
-
-// 			/// Start of animation logic
-// 			if ( frameAccumulator >= frames[currentFrame] * 10.0f ) {
-// 				++currentFrame;
-// 				if ( currentFrame == frames.GetSize() ) {
-// 					currentFrame = 0;
-// 					frameAccumulator = 0.0f;
-// 				}
-// 			}
-
-// 			unsigned int joinMatricesDataSize = jointMatricesPerMesh[id].GetSize();
-// 			std::cout << "entity: " << id << std::endl;
-// 			std::cout << joinMatricesDataSize << std::endl;
-// 			mat4* jointMatricesData = nullptr;
-// 			if ( id > 0 ) {
-// 				jointMatricesData = new mat4[id];
-			
-// 				for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-// 					jointMatricesData[i] = jointMatricesPerMesh[id][i][currentFrame];
-// //			std::cout << jointMatricesData[i] << std::endl;
-// //			std::cout << jointMatricesPerMesh[0][i][currentFrame] << std::endl;
-// 				}
-
-// 				coreShaderProgram->SetMat4("jointMatrices", joinMatricesDataSize, jointMatricesData[0]);
-// 				delete [] jointMatricesData;
-// 				jointMatricesData = nullptr;
-// 				/// End of animation logic
-// 			}
 			
 			cm::transform* transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 			if ( transformComponent != nullptr )
@@ -643,21 +559,8 @@ namespace GLVM::core
 			cm::material* materialComponent = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 			shaderProgram_->SetFloat("material.shininess", materialComponent->shininess);
 			shaderProgram_->SetVec3("material.ambient",  materialComponent->ambient[0], materialComponent->ambient[1], materialComponent->ambient[2]);
-			// coreShaderProgram->SetVec3("material.diffuse",  materialComponent.diffuse[0], materialComponent.diffuse[1], materialComponent.diffuse[2]); // darken diffuse light a bit
-//				coreShaderProgram->SetVec3("material.specular", materialComponent.specular[0], materialComponent.specular[1], materialComponent.specular[2]);
 			glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
 		}
-
-		// for(unsigned int i = 0; i < hudTexture_load_data_.size(); ++i)
-		// 	for (unsigned int j = 0; j < hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_.size(); ++j) {
-		// 		unsigned int uiEntity_refTexture = hudTexture_load_data_[i].entitiesOwnsThisTypeOfTexture_[j];
-        //         unsigned int uiVertexId = pComponent_Manager->GetComponent<cm::vertex>(uiEntity_refTexture)->vkVertexId_;
-		// 		modelMatrix = SetModelMatrix(*pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture));
-		// 		shaderProgram_->SetMat4("modelMatrix", modelMatrix);
-		// 		pGLActive_Texture(GL_TEXTURE30);
-		// 		pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
-		// 		glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
-		// 	}
 	}
 
 	void COpenglRenderer::Raycasting() {
@@ -674,12 +577,6 @@ namespace GLVM::core
 																								 cm::mesh,
 																								 cm::transform>();
 
-		// std::cout << "linged entities size " << linkedEntities.GetSize() << std::endl;
-		// linkedEntities.Print();
-
-		// std::cout << "other linged entities size :" << otherLinkedEntities.GetSize() << std::endl;
-		// otherLinkedEntities.Print();
-		
 		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
 		unsigned int otherLinkedEntitiesVectorSize = otherLinkedEntities.GetSize();
 
@@ -712,13 +609,7 @@ namespace GLVM::core
 				}
 
 				if ( max > min ) {
-					// std::cout << "TEST 2" << std::endl;
-					// std::cout << "projectile entity: " << uiEntity_refProjectile << std::endl;
-					// std::cout << "other entity: " << entityOther << std::endl;
-//					GLVM::ecs::TextureManager* textureSystem = GLVM::ecs::TextureManager::GetInstance();
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
-					// cm::material* textureProjectile = componentManager->GetComponent<cm::material>(uiEntity_refProjectile);
-					// textureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
 					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
 					/// TODO: There is a big quastion is this decrement have sence.
 //					--linkedEntitiesVectorSize;  
@@ -751,15 +642,6 @@ namespace GLVM::core
 		planeModelMatrix[3][1] = 5.0;
 		planeModelMatrix[3][2] = 3.0;
 
-		// for ( int i = 0; i < 4; ++i )
-		// 	for ( int j = 0; j < 4; ++j)
-		// 		std::cout << planeModelMatrix[i][j] << std::endl;
-		
-        // Matrix<float, 4> planeModelMatrix(1.0);
-        // planeModelMatrix[0][0] = 0.05;
-        // planeModelMatrix[1][1] = 0.05;
-        // planeModelMatrix[2][2] = 0.05;
-
 		namespace cm = GLVM::ecs::components;
         ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
 		core::vector<unsigned int>* pEntityContainerRefView =
@@ -768,9 +650,6 @@ namespace GLVM::core
 		cm::beholder* playerViewComponent = componentManager->GetComponent<cm::beholder>(uiPlayerEntity);
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(uiPlayerEntity);
 		
-//		viewPosition = playerViewComponent.Position;
-		
-//		debugLines->SetMat4("modelMatrix", planeModelMatrix);
 		unsigned int location = pGLGet_Uniform_Location(debugLines->iID, "modelMatrix");
 		pGLUniform_Matrix4fv(location, NUMBER_OF_MATRICES, GL_FALSE, &planeModelMatrix[0][0]);
 		ComputeProjectionMatrix(debugLines);
@@ -786,15 +665,8 @@ namespace GLVM::core
 		pGLVertex_Attrib_Pointer(LAYOUT_1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 		pGLEnable_Vertex_Attrib_Array(LAYOUT_1);
 		
-		// pGLBind_Buffer(GL_ARRAY_BUFFER, 0);
-		// pGLBind_Vertex_Array(0);
-
         glClear(GL_DEPTH_BUFFER_BIT);
-		
-//		pGLBind_Buffer(GL_ARRAY_BUFFER, vboLines);
-//		pGLBind_Vertex_Array(vaoPlane);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-
 		pGLBind_Buffer(GL_ARRAY_BUFFER, 0); 
 
         // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
@@ -986,11 +858,6 @@ namespace GLVM::core
 		translationMatrix[3][2] = transformComponent_.tPosition[2];
         translationMatrix[3][3] = 1.0f;
 
-		// std::cout << "yaw: " << transformComponent_.yaw << std::endl;
-		// std::cout << "pitch: " << transformComponent_.pitch << std::endl;
-
-//		transformComponent_.rotate += delta;
-
 		float sinPitch = std::sin(Radians(-transformComponent_.pitch / 2));
 		float cosPitch = std::cos(Radians(-transformComponent_.pitch / 2));
 		float sinYaw = std::sin(Radians(-(transformComponent_.yaw)  / 2));
@@ -1009,38 +876,10 @@ namespace GLVM::core
 		yawQuat.z = 0.0f;
 
 		Quaternion result;
-//		result = eulerToQuaternion(0.0f, Radians(pitch) , Radians(fYaw));
-//		result = multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 1.0f, .y = 0.0f, .z = 0.0f });
-
-//		std::cout << result << std::endl;
-		// yawQuat = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
-		// 				.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
-
-		// pitchQuat = multiplyQuaternion(multiplyQuaternion(pitchQuat, Quaternion{ .w = 0.0f, .x = 1.0f,
-		// 				.y = 0.0f, .z = 0.0f }), inverseQuaternion(pitchQuat));
-
 		result = multiplyQuaternion(pitchQuat, yawQuat);
-		// mat4 yaw   = Rotate<float, 4>(Vector<float, 3>(0.0f, 1.0f, 0.0f), -transformComponent_.yaw);
-		// mat4 pitch = Rotate<float, 4>(Vector<float, 3>(0.0f, 0.0f, 1.0f), transformComponent_.pitch);
-
-//		result = eulerToQuaternion(0.0f, transformComponent_.pitch, transformComponent_.yaw);
-		
-		// std::cout << "yaw: " << yaw << std::endl;
-		// std::cout << "pitch: " << pitch << std::endl;
 		rotationMatrix = rotateQuaternion<float, 4>(result);
-//		std::cout << "rotation: " << rotationMatrix << std::endl;
-		// std::cout << "x: " << transformComponent_.tPosition[0] << std::endl;
-		// std::cout << "y: " << transformComponent_.tPosition[1] << std::endl;
-		// std::cout << "z: " << transformComponent_.tPosition[2] << std::endl;
-
-//		std::cout << rotationMatrix << std::endl;
-		
         modelMatrix = scalingMatrix * rotationMatrix * translationMatrix;
 
-		// rotationMatrix[0][0] = 30.0f;
-		// rotationMatrix[1][1] = 30.0f;
-		// rotationMatrix[2][2] = 30.0f;
-		
 		return modelMatrix;
 	}
 
@@ -1079,22 +918,13 @@ namespace GLVM::core
 		///< Setting applying parameters
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		
-		// glEnable(GL_BLEND);
-		// glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	
     void COpenglRenderer::run() {
-//		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
-
 		for ( unsigned int i = 0; i < textureVector.size(); ++i ) {
 			LoadTextureData(textureVector[i]);
 		}
-
-//		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
-		
 //		loadWavefrontObj();
-//		LoadGLTF();
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
@@ -1104,9 +934,6 @@ namespace GLVM::core
 			frames.Push({});
 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
 		}
-		// for ( unsigned int i = 0; i < jointMatricesPerMesh[0].GetSize(); ++i )
-		// 	std::cout << jointMatricesPerMesh[0][i][2] << std::endl;
-		
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			SetVertices(aIndices_[m], aVertexes_[m]);
 		}
@@ -1158,9 +985,6 @@ namespace GLVM::core
 		forward[1] = result.y;
 		forward[2] = result.z;
         beholder.forward = Normalize(forward);
-
-//		std::cout << beholder.forward << std::endl;
-		
         viewMatrix = LookAtMain(player.tPosition,
 								player.tPosition + beholder.forward,
 								beholder.up);
