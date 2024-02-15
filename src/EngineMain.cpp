@@ -1,5 +1,3 @@
-#include "Components/ControllerComponent.hpp"
-#include "Components/ViewComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 #include "Texture.hpp"
@@ -15,20 +13,20 @@ int main()
 
 	core::Engine* GLVM = core::Engine::GetInstance();
 //	GLVM->SetTextureVector(TextureVector);
-	GLVM->SetMesh("../waveFrontObj/cube.obj");
-	GLVM->SetMesh("../waveFrontObj/cone.obj");
+	[[maybe_unused]] cm::MeshHandle cubeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cube.obj");
+	[[maybe_unused]] cm::MeshHandle coneHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cone.obj");
 //	GLVM->SetMesh("../waveFrontObj/plain5.obj");
-	GLVM->SetMesh("../waveFrontObj/ico_sphere.obj");
+	[[maybe_unused]] cm::MeshHandle icoSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/ico_sphere.obj");
 //	GLVM->SetMesh("../waveFrontObj/shama_final.obj");
-	GLVM->SetMesh("../waveFrontObj/monkey.obj");
-	GLVM->SetMesh("../waveFrontObj/uv_sphere.obj");
-	GLVM->SetMesh("../waveFrontObj/torus.obj");
-	GLVM->SetMesh("../waveFrontObj/pipe.obj");
+	[[maybe_unused]] cm::MeshHandle monkeyHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/monkey.obj");
+	[[maybe_unused]] cm::MeshHandle uvSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/uv_sphere.obj");
+	[[maybe_unused]] cm::MeshHandle torusHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/torus.obj");
+	[[maybe_unused]] cm::MeshHandle pipeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/pipe.obj");
 //	GLVM->SetMeshGLTF("../gltf/snake32.gltf");
 //	GLVM->SetMeshGLTF("../gltf/cone_new.gltf");
 //	GLVM->SetMeshGLTF("../gltf/chel5.gltf");
-	GLVM->SetMeshGLTF("../gltf/hyper_cube.gltf");
-	GLVM->SetMeshGLTF("../gltf/mega_chel.gltf");
+	[[maybe_unused]] cm::MeshHandle hyperCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube.gltf");
+	[[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 //	GLVM->SetMeshGLTF("../gltf/Fox.gltf");
 //	GLVM->SetMeshGLTF("../gltf/chel3.gltf");
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
@@ -93,7 +91,7 @@ int main()
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
-    ComponentManager->GetComponent<cm::mesh>(uiPlayer)->id = 0;
+    ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = hyperCubeHandle_GLTF;
 	// cm::material* materialPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
 	// *materialPlayer = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 	// 	.shininess = 512.0f * 1.078125f };
@@ -101,7 +99,7 @@ int main()
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, 0.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 5.2f };
-    ComponentManager->GetComponent<cm::mesh>(plain0)->id = 0;
+    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -113,7 +111,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i, 10.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
-	ComponentManager->GetComponent<cm::mesh>(uiWitch)->id = 1;
+	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = chelikTextureHandle, .specularTextureID_ = chelikTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
@@ -124,7 +122,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->id = 0;
+    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
@@ -258,7 +256,7 @@ int main()
 		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.1f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 15.0f, 2.0f }, .fScale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(pointLight0)->id = 0;
+	ComponentManager->GetComponent<cm::mesh>(pointLight0)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
 	*materialPointLight0 = { .diffuseTextureID_ = witchTexturehandle, .specularTextureID_ = witchTexturehandle };
 

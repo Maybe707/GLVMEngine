@@ -1,4 +1,5 @@
 #include "Engine.hpp"
+#include "Components/VertexComponent.hpp"
 #include "ISoundEngine.hpp"
 #include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -202,6 +203,7 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		projectileSystem->textureHandlers = textureHandlers;
+		projectileSystem->meshHandlers    = meshHandlers;
 		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
@@ -297,12 +299,24 @@ namespace GLVM::core
 		return textureHandle;
     }
 
-	void Engine::SetMesh(const char* _pathToMesh) {
+	ecs::components::MeshHandle Engine::LoadMeshFromFile_OBJ(const char* _pathToMesh) {
+		uint32_t meshID = pathsArray_.size();
+		ecs::components::MeshHandle meshHandle;
+		meshHandle.id = meshID;
         pathsArray_.push_back(_pathToMesh);
+		meshHandlers.Push(meshHandle);
+
+		return meshHandle;
     }
 
-	void Engine::SetMeshGLTF(const char* pathToMesh) {
-		pathsGLTF_.Push(pathToMesh);
+	ecs::components::MeshHandle Engine::LoadMeshFromFile_GLTF(const char* pathToMesh) {
+		uint32_t meshID = pathsGLTF_.GetSize();
+		ecs::components::MeshHandle meshHandle;
+		meshHandle.id = meshID;
+        pathsGLTF_.Push(pathToMesh);
+		meshHandlers.Push(meshHandle);
+
+		return meshHandle;
 	}
 	
 	void Engine::FPScounter() {

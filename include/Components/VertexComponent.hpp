@@ -15,7 +15,7 @@ namespace GLVM::ecs::components
 	
 	struct mesh
 	{
-        unsigned int id;
+        MeshHandle handle;
 	};
 }
 

@@ -141,7 +141,7 @@ namespace GLVM::core
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			Entity currentEntity                = linkedEntities[i];
 			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->id;
+			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->handle.id;
 
 			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[mesh_id].GetSize() > 0 )
 				transformComponent->frameAccumulator += value;
@@ -2774,7 +2774,7 @@ namespace GLVM::core
 			uint32_t actorsNumber = linkedEntities.GetSize();
 			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
 				unsigned int meshOwnerEntity = linkedEntities[actorCounter];
-				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
+				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
 				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
@@ -2844,7 +2844,7 @@ namespace GLVM::core
 			uint32_t actorsNumber = linkedEntities.GetSize();
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
 				unsigned int meshOwnerEntity = linkedEntities[actorsCounter];
-				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
+				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
 				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
@@ -2925,7 +2925,7 @@ namespace GLVM::core
 				uint32_t actorsNumber = linkedEntities.GetSize();
 				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
 					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
-					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->id;
+					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 						
 					unsigned int uboIndex = pointLightNumber *
@@ -2994,7 +2994,7 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);

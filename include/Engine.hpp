@@ -1,6 +1,7 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "Components/VertexComponent.hpp"
 #include "ComponentsFullSet.hpp"
 #include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -49,6 +50,7 @@ namespace GLVM::core
 		core::vector<ecs::TextureHandle> textureHandlers;
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
+		core::vector<ecs::components::MeshHandle> meshHandlers;
 		CVulkanRenderer*     vulkanRenderer;
 		COpenglRenderer*     openglRenderer;
 //        ecs::CRenderSystem * renderSystemInterface;
@@ -81,8 +83,8 @@ namespace GLVM::core
 		void RenderVulkan();
 		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
 								  unsigned int dat_length, const unsigned char* u_iData);
-		void SetMesh(const char* _pathToMesh);
-		void SetMeshGLTF(const char* pathToMesh);
+		ecs::components::MeshHandle LoadMeshFromFile_OBJ(const char* _pathToMesh);
+		ecs::components::MeshHandle LoadMeshFromFile_GLTF(const char* pathToMesh);
 		void FPScounter();
 		void GameKill();
 //        void PlaybackSound(core::CSoundEngine& _sound_Engine);

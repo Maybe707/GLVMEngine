@@ -30,6 +30,7 @@ namespace GLVM::ecs
         bool bFirst_Mouse = true;
         core::CStack&              inputStack;
 		core::vector<ecs::TextureHandle> textureHandlers;
+		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::Sound::ISoundEngine* soundEngine;
         float                      projectileCooldown = 2.0f; 
 		float                      deltaFrameTime;

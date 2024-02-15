@@ -496,7 +496,7 @@ namespace GLVM::core
 			cm::mesh* vertexComponent = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
 			unsigned int uiVertexId = 0;
 			if ( vertexComponent != nullptr )
-				uiVertexId = vertexComponent->id;
+				uiVertexId = vertexComponent->handle.id;
 
 			cm::material* material = pComponent_Manager->GetComponent<cm::material>(uiEntity_refTexture);
 			unsigned int diffuseTextureID  = 0;
@@ -507,7 +507,7 @@ namespace GLVM::core
 			}
 
 			cm::mesh* mesh = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);
-			unsigned int meshID = mesh->id;
+			unsigned int meshID = mesh->handle.id;
 			cm::transform* _transformComponent = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refTexture);
 			
 			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
@@ -834,7 +834,7 @@ namespace GLVM::core
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			Entity currentEntity                = linkedEntities[i];
 			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->id;
+			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->handle.id;
 
 			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[mesh_id].GetSize() > 0 )
 				transformComponent->frameAccumulator += value;

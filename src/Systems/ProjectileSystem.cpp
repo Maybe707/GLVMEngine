@@ -117,7 +117,10 @@ namespace GLVM::ecs
         pSound_Sample->uiRate_ = 22050;
         soundEngine->GetSoundContainer().Push(pSound_Sample);
 
-		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->id = 0;
+		ecs::components::MeshHandle meshHandle{};
+		if ( meshHandlers.GetSize() > 0 )
+			meshHandle = meshHandlers[0];
+		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->handle = meshHandle;
 		ecs::TextureHandle textureHandle{};
 		if ( textureHandlers.GetSize() > 0 )
 			textureHandle = textureHandlers[0];
