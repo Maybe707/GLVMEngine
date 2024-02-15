@@ -12,6 +12,7 @@
 #include "ShaderProgram.hpp"
 #include "Stack.hpp"
 #include "Event.hpp"
+#include "Texture.hpp"
 #include "TimerCreator.hpp"
 #include "Vector.hpp"
 #include "EntityManager.hpp"
@@ -45,6 +46,7 @@ namespace GLVM::core
 		float                gravity;
 		CStack               Input_Stack_;
 		std::vector<ecs::Texture> textureVector;
+		core::vector<ecs::TextureHandle> textureHandlers;
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
 		CVulkanRenderer*     vulkanRenderer;
@@ -77,7 +79,8 @@ namespace GLVM::core
 		void EventQueueFlush();
 		void RenderOpengl();
 		void RenderVulkan();
-		void SetTextureVector(std::vector<ecs::Texture> _textureVector);
+		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
+								  unsigned int dat_length, const unsigned char* u_iData);
 		void SetMesh(const char* _pathToMesh);
 		void SetMeshGLTF(const char* pathToMesh);
 		void FPScounter();

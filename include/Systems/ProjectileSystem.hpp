@@ -29,6 +29,7 @@ namespace GLVM::ecs
         float fLast_Y = 1080.0f / 2.0f;
         bool bFirst_Mouse = true;
         core::CStack&              inputStack;
+		core::vector<ecs::TextureHandle> textureHandlers;
 		core::Sound::ISoundEngine* soundEngine;
         float                      projectileCooldown = 2.0f; 
 		float                      deltaFrameTime;

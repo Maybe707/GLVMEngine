@@ -1,6 +1,7 @@
 #ifndef TEXTURE
 #define TEXTURE
 
+#include <cstdint>
 #include <vector>
 #include <GL/gl.h>
 
@@ -8,6 +9,10 @@ typedef unsigned int Entity;
 
 namespace GLVM::ecs
 {
+	struct TextureHandle {
+		uint32_t id;
+	};
+	
     struct Texture
     {
         unsigned int vkAvailableInnerId_ = 0; ///< This field using to choose specific instance of texture image in Vulkan.

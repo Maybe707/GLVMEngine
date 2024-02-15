@@ -2996,7 +2996,7 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_;
+			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
 			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;

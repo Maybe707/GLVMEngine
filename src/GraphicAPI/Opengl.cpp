@@ -502,8 +502,8 @@ namespace GLVM::core
 			unsigned int diffuseTextureID  = 0;
 			unsigned int specularTextureID = 0;
 			if ( material != nullptr ) {
-				diffuseTextureID  = material->diffuseTextureID_;
-				specularTextureID = material->specularTextureID_;
+				diffuseTextureID  = material->diffuseTextureID_.id;
+				specularTextureID = material->specularTextureID_.id;
 			}
 
 			cm::mesh* mesh = pComponent_Manager->GetComponent<cm::mesh>(uiEntity_refTexture);

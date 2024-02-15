@@ -5,6 +5,7 @@
 #include "Components/ProjectileComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Texture.hpp"
 #include <Systems/ProjectileSystem.hpp>
 
 namespace GLVM::ecs
@@ -117,8 +118,11 @@ namespace GLVM::ecs
         soundEngine->GetSoundContainer().Push(pSound_Sample);
 
 		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->id = 0;
+		ecs::TextureHandle textureHandle{};
+		if ( textureHandlers.GetSize() > 0 )
+			textureHandle = textureHandlers[0];
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
-		*rTextureProjectile = { .diffuseTextureID_ = 2, .specularTextureID_ = 2, .ambient = { 0.05f, 0.05f, 0.05f },
+		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
 //        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
@@ -128,14 +132,14 @@ namespace GLVM::ecs
 		if ( transform != nullptr )
 			rTransformProjectile->tPosition = transform->tPosition;
 
-		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = { transform->tPosition[0], transform->tPosition[1], transform->tPosition[2] },
-			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
-			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
-		
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
 		rTransformProjectile->yaw        = fYaw;
 		rTransformProjectile->pitch      = fPitch;
         rTransformProjectile->tPosition += rTransformProjectile->tForward;
+		
+		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
+			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
+			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 //		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tForward };
     }
 

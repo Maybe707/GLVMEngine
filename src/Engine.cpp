@@ -12,8 +12,11 @@
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
+#include "Texture.hpp"
+#include <cstdint>
 #include <limits>
 #include <mutex>
+#include <sys/types.h>
 #include <thread>
 
 /*******************************************************************
@@ -118,6 +121,8 @@ namespace GLVM::core
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 		bool bGame_Loop_Active = true;
 
+		projectileSystem->textureHandlers = textureHandlers;
+		
 		openglRenderer = new COpenglRenderer();
 		openglRenderer->textureVector = textureVector;
 		openglRenderer->pathsArray_            = pathsArray_;
@@ -196,6 +201,8 @@ namespace GLVM::core
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 		bool bGame_Loop_Active = true;
 
+		projectileSystem->textureHandlers = textureHandlers;
+		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->pathsArray_            = pathsArray_;
@@ -279,8 +286,15 @@ namespace GLVM::core
 		// vulkanRenderer = nullptr;
 	}
 
-    void Engine::SetTextureVector(std::vector<ecs::Texture> _textureVector) {
-        textureVector = _textureVector;
+	ecs::TextureHandle Engine::LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
+								  unsigned int dat_length, const unsigned char* u_iData) {
+		uint32_t textureID = textureVector.size();
+		ecs::TextureHandle textureHandle;
+		textureHandle.id = textureID;
+		textureVector.push_back({ .iWidth_ = iWidth, .iHeight_ = iHeight, .dat_length_ = dat_length, .u_iData_ = u_iData});
+		textureHandlers.Push(textureHandle);
+
+		return textureHandle;
     }
 
 	void Engine::SetMesh(const char* _pathToMesh) {
