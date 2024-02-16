@@ -556,7 +556,7 @@ namespace GLVM::core
 		
         VkDescriptorPool descriptorPool;
 		unsigned int matrixUboDescriptorsNumber = 0;
-		unsigned int viewPositionUboDescriptorsNumber = 0;
+//		unsigned int viewPositionUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
 		unsigned int spotLightUboDescriptorsNumber = 0;

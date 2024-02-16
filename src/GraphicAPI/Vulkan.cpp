@@ -1871,35 +1871,24 @@ namespace GLVM::core
 		u32 memory = 0;
 		constexpr u32 UBO_multiplier = 2;
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
-		if ( matrixUboDescriptorsNumber > 0 ) {
-			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-			modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+		modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
-				// createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-				// 			 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
+			// createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+			// 			 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
 
-				memory += modelMatrixBufferSize;
-			}
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
-
-//				memory += modelMatrixBufferSize;
-			}
-		} else {
-			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-			modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
-
-				memory += modelMatrixBufferSize;
-			}
+			memory += modelMatrixBufferSize;
 		}
 
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+
+//				memory += modelMatrixBufferSize;
+		}
+		memory = 0;
+		
 		lightSpaceMatrixBuffer.resize(MAX_FRAMES_IN_FLIGHT);
         lightSpaceMatrixMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -1998,35 +1987,15 @@ namespace GLVM::core
 																								  cm::beholder,
 																								  cm::mesh>();
 		
-		viewPositionUboDescriptorsNumber = viewPositionLinkedEntities.GetSize();
+		lightDataUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		lightDataUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		/// Choose maximum from dir, spot, point lights number and number of beholders
-		u32 lightDataSize = viewPositionUboDescriptorsNumber > directionalLightNumber ? viewPositionUboDescriptorsNumber : directionalLightNumber;
-		lightDataSize = lightDataSize > spotLightNumber ? lightDataSize : spotLightNumber;
-		lightDataSize = lightDataSize > pointLightNumber ? lightDataSize : pointLightNumber;
-		
-		if ( lightDataSize > 0 ) {
-			lightDataUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * lightDataSize);
-			lightDataUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * lightDataSize);
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 lightDataUniformBuffers[i], lightDataUniformBuffersMemory[i]);
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * lightDataSize; i++) {
-				createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 lightDataUniformBuffers[i], lightDataUniformBuffersMemory[i]);
-
-				memory += lightDataBufferSize;
-			}
-		} else {
-			lightDataUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-			lightDataUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 lightDataUniformBuffers[i], lightDataUniformBuffersMemory[i]);
-
-				memory += lightDataBufferSize;
-			}
+			memory += lightDataBufferSize;
 		}
-
 		std::cout << "memory size: " << memory << std::endl;
     }
 
