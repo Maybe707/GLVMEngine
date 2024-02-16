@@ -2162,7 +2162,7 @@ namespace GLVM::core
 			if ( i > MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size / 2 )
 				uboIndex = 1;
 			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[uboIndex];
-			modelMatrixBufferInfo.offset = i * 1408;
+			modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2358,8 +2358,8 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[0];
+				modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2382,8 +2382,8 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2406,8 +2406,8 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2431,8 +2431,11 @@ namespace GLVM::core
 		if ( modelMatrixUboBinding != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
-				modelMatrixBufferInfo.offset = 0;
+				uint32_t uboIndex = 0;
+				if ( i > MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber / 2 )
+					uboIndex = 1;
+				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[uboIndex];
+				modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
 				modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
 				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
