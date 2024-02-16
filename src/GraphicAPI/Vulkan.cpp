@@ -1860,7 +1860,7 @@ namespace GLVM::core
 		VkDeviceSize lightSpaceMatrixSize = sizeof(LightSpaceMatrixUBO);
 		VkDeviceSize modelShadowMapMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
-
+		std::cout << "struct size: " << modelMatrixBufferSize << std::endl;
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -1871,16 +1871,22 @@ namespace GLVM::core
 		u32 memory = 0;
 		constexpr u32 UBO_multiplier = 2;
 		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
-
 		if ( matrixUboDescriptorsNumber > 0 ) {
-			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
-			modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
+			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+			modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
-				createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+				// createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+				// 			 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
 
 				memory += modelMatrixBufferSize;
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+				createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+
+//				memory += modelMatrixBufferSize;
 			}
 		} else {
 			modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -2191,8 +2197,11 @@ namespace GLVM::core
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
+			uint32_t uboIndex = 0;
+			if ( i > MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size / 2 )
+				uboIndex = 1;
+			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[uboIndex];
+			modelMatrixBufferInfo.offset = i * 1408;
 			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2999,8 +3008,8 @@ namespace GLVM::core
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
-			unsigned int uboIndex = MAX_FRAMES_IN_FLIGHT * i + currentFrame;
-			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent);
+			unsigned int uboIndex = i;
+			updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 									0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
 
@@ -3215,7 +3224,8 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage]);
 	}
 	
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent) {
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
+													unsigned int meshID, ecs::components::material* materialComponent) {
         ModelMatrixUBO modelMatrixUBO{};
 		
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
@@ -3238,7 +3248,7 @@ namespace GLVM::core
 		modelMatrixUBO.shininess = materialComponent->shininess;
 		
         void* modelMatrixData;
-        vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], 0,
+        vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], sizeof(modelMatrixUBO) * offset,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
         vkUnmapMemory(device, modelMatrixUniformBuffersMemory[currentImage]);

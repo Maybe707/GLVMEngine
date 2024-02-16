@@ -259,7 +259,7 @@ namespace GLVM::core
 
 #define MAX_JOINTS_NUMBER 18
 	
-    struct alignas(16) ModelMatrixUBO {
+    struct alignas(64) ModelMatrixUBO {
         mat4 model;
         mat4 view;
         mat4 proj;
@@ -657,7 +657,8 @@ namespace GLVM::core
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
 		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
-        void updateMatrixUniformBuffer(uint32_t currentImage, ecs::components::transform* _transformComponent, unsigned int meshID, ecs::components::material* materialComponent);
+        void updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
+									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
         void drawFrame();
