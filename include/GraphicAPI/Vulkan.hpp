@@ -280,7 +280,7 @@ namespace GLVM::core
 		mat4 lightSpaceMatrix;
 	};
 
-	struct alignas(16) PointLightShadowMapMatrixUBO {
+	struct alignas(64) PointLightShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
 		vec3 lightPosition;

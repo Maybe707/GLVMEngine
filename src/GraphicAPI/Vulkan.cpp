@@ -1957,27 +1957,23 @@ namespace GLVM::core
 		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * pointLightsLinkedEntities.GetSize();
 
 		if ( pointLightUboDescriptorsNumber > 0 ) {
-			shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
+			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(1);
 
 			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; i++) {
-				createBuffer(modelCubeShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 shadowMapPointLightModelMatrixUniformBuffers[i], shadowMapPointLightModelMatrixUniformBuffersMemory[i]);
-
 				memory += modelCubeShadowMapMatrixBufferSize;
 			}
+
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+							 shadowMapPointLightModelMatrixUniformBuffers[0], shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
 		} else {
-			shadowMapPointLightModelMatrixUniformBuffers.resize(6 * MAX_FRAMES_IN_FLIGHT);
-			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(6 * MAX_FRAMES_IN_FLIGHT);
+			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
+			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(1);
 
-			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT; i++) {
-				createBuffer(modelCubeShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 shadowMapPointLightModelMatrixUniformBuffers[i], shadowMapPointLightModelMatrixUniformBuffersMemory[i]);
-
-				memory += modelCubeShadowMapMatrixBufferSize;
-			}
+			createBuffer(6 * 2 * modelCubeShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 shadowMapPointLightModelMatrixUniformBuffers[0], shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
 		}
-			
+		memory += modelCubeShadowMapMatrixBufferSize;			
 		
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								  cm::beholder,
@@ -2121,8 +2117,8 @@ namespace GLVM::core
 
 			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[i];
-				modelMatrixBufferInfo.offset = 0;
+				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[0];
+				modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
 				modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
 				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -3170,10 +3166,10 @@ namespace GLVM::core
 		jointMatricesData = nullptr;
 		
         void* modelMatrixData;
-        vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage], 0,
+        vkMapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[0], currentImage * sizeof(modelMatrixUBO),
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
     }
 
     void CVulkanRenderer::updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane) {
