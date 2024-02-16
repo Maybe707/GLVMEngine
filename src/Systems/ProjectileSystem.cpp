@@ -144,6 +144,9 @@ namespace GLVM::ecs
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 //		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tForward };
+		static unsigned int val = 0;
+		std::cout << val << std::endl;
+		++val;
     }
 
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
