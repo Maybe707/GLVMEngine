@@ -1898,6 +1898,7 @@ namespace GLVM::core
 
 			memory += lightDataBufferSize;
 		}
+		memory = 0;
 
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -1907,26 +1908,24 @@ namespace GLVM::core
 		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * directionalLightLinkedEntities.GetSize();
 
 		if ( directionalLightUboDescriptorsNumber > 0 ) {
-			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
+			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(1);
 
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
-				createBuffer(modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
-
 				memory += modelShadowMapMatrixBufferSize;
 			}
+
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 shadowMapDirectionalLightModelMatrixUniformBuffers[0], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
 		} else {
-			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
+			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(1);
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-				createBuffer(modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 shadowMapDirectionalLightModelMatrixUniformBuffers[i], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[i]);
+			createBuffer(2 * modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 shadowMapDirectionalLightModelMatrixUniformBuffers[0], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
 
-				memory += modelShadowMapMatrixBufferSize;
-			}
 		}
+		memory = 0;
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
 		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * spotLightLinkedEntities.GetSize();
@@ -2042,8 +2041,8 @@ namespace GLVM::core
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-			modelMatrixBufferInfo.offset = 0;
+			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -3066,10 +3065,10 @@ namespace GLVM::core
 		jointMatricesData = nullptr;
 		
         void* modelMatrixData = nullptr;
-        vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage], 0,
+        vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0], currentImage * sizeof(modelMatrixUBO),
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
     }
 
 	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
