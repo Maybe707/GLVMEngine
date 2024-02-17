@@ -25,14 +25,18 @@ namespace GLVM::core
         }
     }
 
-    void CreateBeginDebugUtilsLabelEXT(VkInstance instance, VkCommandBuffer commandBuffer, const VkDebugUtilsLabelEXT* labelInfo) {
+    void CreateBeginDebugUtilsLabelEXT([[maybe_unused]] VkInstance instance, [[maybe_unused]] VkCommandBuffer commandBuffer, [[maybe_unused]] const VkDebugUtilsLabelEXT* labelInfo) {
+#ifndef NDEBUG
         static auto func = (PFN_vkCmdBeginDebugUtilsLabelEXT) vkGetInstanceProcAddr(instance, "vkCmdBeginDebugUtilsLabelEXT");
             func(commandBuffer, labelInfo);
+#endif
     }
 
-    void CreateEndDebugUtilsLabelEXT(VkInstance instance, VkCommandBuffer commandBuffer) {
+    void CreateEndDebugUtilsLabelEXT([[maybe_unused]] VkInstance instance, [[maybe_unused]] VkCommandBuffer commandBuffer) {
+#ifndef NDEBUG
         static auto func = (PFN_vkCmdEndDebugUtilsLabelEXT) vkGetInstanceProcAddr(instance, "vkCmdEndDebugUtilsLabelEXT");
             func(commandBuffer);
+#endif
     }
 	
 	VkResult SetDebugObjectName(VkDevice device, const VkDebugUtilsObjectNameInfoEXT* objectNameInfo) {
