@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
+#include <thread>
 #include <vulkan/vulkan_core.h>
 
 namespace GLVM::core
@@ -76,10 +77,14 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
-		directionalLightShadowMapDrawFrame();
-		spotLightShadowMapDrawFrame();
-		pointLightShadowMapDrawFrame();
-        mainRenderDrawFrame();
+		std::thread directionalLightShadowMapThread(&CVulkanRenderer::directionalLightShadowMapDrawFrame, this);
+		directionalLightShadowMapThread.join();
+		std::thread spotLightShadowMapThread(&CVulkanRenderer::spotLightShadowMapDrawFrame, this);
+		spotLightShadowMapThread.join();
+		std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
+		pointLightShadowMapThread.join();
+		std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
+		mainRenderThread.join();
 
 		#ifdef VK_USE_PLATFORM_XCB_KHR
         vkDeviceWaitIdle(device);
