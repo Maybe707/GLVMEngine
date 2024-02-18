@@ -76,7 +76,10 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
-        drawFrame();
+		directionalLightShadowMapDrawFrame();
+		spotLightShadowMapDrawFrame();
+		pointLightShadowMapDrawFrame();
+        mainRenderDrawFrame();
 
 		#ifdef VK_USE_PLATFORM_XCB_KHR
         vkDeviceWaitIdle(device);
@@ -278,7 +281,9 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createDepthResources();
-		createShadowMapDepthResources();
+		createDirectionalLightShadowMapDepthResources();
+		createSpotLightShadowMapDepthResources();
+		createPointLightShadowMapDepthResources();
 		createFramebuffers();
 
 		createDirectionalLightShadowMapTextureSamplers();
@@ -507,9 +512,14 @@ namespace GLVM::core
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
 		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
-        createCommandPool();
+        createCommandPool(directionalLightCommandPool);
+		createCommandPool(spotLightCommandPool);
+		createCommandPool(pointLightCommandPool);
+		createCommandPool(mainRenderCommandPool);
         createDepthResources();
-		createShadowMapDepthResources();
+		createDirectionalLightShadowMapDepthResources();
+		createSpotLightShadowMapDepthResources();
+		createPointLightShadowMapDepthResources();
         createFramebuffers();
         createTextureImage();
         createTextureImageView();
@@ -527,8 +537,20 @@ namespace GLVM::core
 		createPointLightShadowMapDescriptorSets();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
-        createCommandBuffers();
-        createSyncObjects();
+        createCommandBuffers(directionalLightCommandPool, directionalLightCommandBuffers);
+		createCommandBuffers(spotLightCommandPool, spotLightCommandBuffers);
+		createCommandBuffers(pointLightCommandPool, pointLightCommandBuffers);
+		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
+		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
+						  directionalLightShadowMapRenderFinishedSemaphores,
+						  directionalLightShadowMapInFlightFences);
+		createSyncObjects(spotLightShadowMapImageAvailableSemaphores,
+						  spotLightShadowMapRenderFinishedSemaphores,
+						  spotLightShadowMapInFlightFences);
+		createSyncObjects(pointLightShadowMapImageAvailableSemaphores,
+						  pointLightShadowMapRenderFinishedSemaphores,
+						  pointLightShadowMapInFlightFences);
+        createSyncObjects(imageAvailableSemaphores, renderFinishedSemaphores, inFlightFences);
     }
 
     void CVulkanRenderer::cleanupSwapChain() {
@@ -611,7 +633,10 @@ namespace GLVM::core
             vkDestroyFence(device, inFlightFences[i], nullptr);
         }
 
-        vkDestroyCommandPool(device, commandPool, nullptr);
+        vkDestroyCommandPool(device, directionalLightCommandPool, nullptr);
+		vkDestroyCommandPool(device, spotLightCommandPool, nullptr);
+		vkDestroyCommandPool(device, pointLightCommandPool, nullptr);
+		vkDestroyCommandPool(device, mainRenderCommandPool, nullptr);
 
         vkDestroyDevice(device, nullptr);
 
@@ -1287,7 +1312,7 @@ namespace GLVM::core
             }
     }
 	
-    void CVulkanRenderer::createCommandPool() {
+    void CVulkanRenderer::createCommandPool(VkCommandPool& commandPool) {
         QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
         VkCommandPoolCreateInfo poolInfo{};
@@ -1322,7 +1347,7 @@ namespace GLVM::core
         depthImageView = createImageView(depthImage, 0, 1);
     }
 
-    void CVulkanRenderer::createShadowMapDepthResources() {
+	void CVulkanRenderer::createDirectionalLightShadowMapDepthResources() {
 		for ( unsigned int i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -1341,7 +1366,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 			
-			VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands(directionalLightCommandPool);
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1374,13 +1399,15 @@ namespace GLVM::core
 				1, &barrier
 				);
 
-			endSingleTimeCommands(commandBuffer);
+			endSingleTimeCommands(directionalLightCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
 			directionalLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
-		
+	}
+
+	void CVulkanRenderer::createSpotLightShadowMapDepthResources() {
 		for ( unsigned int i = 0; i < SPOT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -1399,7 +1426,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 
-			VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands(spotLightCommandPool);
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1432,13 +1459,15 @@ namespace GLVM::core
 				1, &barrier
 				);
 
-			endSingleTimeCommands(commandBuffer);
+			endSingleTimeCommands(spotLightCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
 			spotLightPipeline.descriptors[0].textureImages.push_back(depthImage);
 		}
+	}
 
+	void CVulkanRenderer::createPointLightShadowMapDepthResources() {
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -1458,7 +1487,7 @@ namespace GLVM::core
 			createImage(depthImage);
 
 			for ( unsigned int j = 0; j < 6; ++j ) {
-				VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+				VkCommandBuffer commandBuffer = beginSingleTimeCommands(pointLightCommandPool);
 
 				VkImageMemoryBarrier barrier{};
 				barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1491,7 +1520,7 @@ namespace GLVM::core
 					1, &barrier
 					);
 
-				endSingleTimeCommands(commandBuffer);
+				endSingleTimeCommands(pointLightCommandPool, commandBuffer);
 
 				
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
@@ -1507,8 +1536,8 @@ namespace GLVM::core
 			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
 			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
 		}
-    }
-
+	}
+	
     VkFormat CVulkanRenderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
         for (VkFormat format : candidates) {
             VkFormatProperties props;
@@ -1702,7 +1731,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1745,11 +1774,11 @@ namespace GLVM::core
             1, &barrier
             );
 
-        endSingleTimeCommands(commandBuffer);
+        endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
     }
 
     void CVulkanRenderer::transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout) {
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = beginSingleTimeCommands(directionalLightCommandPool);
 
         VkImageMemoryBarrier barrier{};
         barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -1792,11 +1821,11 @@ namespace GLVM::core
             1, &barrier
             );
 
-        endSingleTimeCommands(commandBuffer);
+        endSingleTimeCommands(directionalLightCommandPool, commandBuffer);
     }
 	
     void CVulkanRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
         VkBufferImageCopy region{};
         region.bufferOffset = 0;
@@ -1815,7 +1844,7 @@ namespace GLVM::core
 
         vkCmdCopyBufferToImage(commandBuffer, buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
 
-        endSingleTimeCommands(commandBuffer);
+        endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
     }
 
     void CVulkanRenderer::createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices) {
@@ -2618,7 +2647,7 @@ namespace GLVM::core
         vkBindBufferMemory(device, buffer, bufferMemory, 0);
     }
 
-    VkCommandBuffer CVulkanRenderer::beginSingleTimeCommands() {
+    VkCommandBuffer CVulkanRenderer::beginSingleTimeCommands(VkCommandPool& commandPool) {
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -2637,7 +2666,7 @@ namespace GLVM::core
         return commandBuffer;
     }
 
-    void CVulkanRenderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+    void CVulkanRenderer::endSingleTimeCommands(VkCommandPool& commandPool, VkCommandBuffer& commandBuffer) {
         vkEndCommandBuffer(commandBuffer);
 
         VkSubmitInfo submitInfo{};
@@ -2652,13 +2681,13 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-        VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+        VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
         VkBufferCopy copyRegion{};
         copyRegion.size = size;
         vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-        endSingleTimeCommands(commandBuffer);
+        endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
     }
 
     uint32_t CVulkanRenderer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) {
@@ -2674,7 +2703,7 @@ namespace GLVM::core
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void CVulkanRenderer::createCommandBuffers() {
+    void CVulkanRenderer::createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers) {
         commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo allocInfo{};
@@ -2688,7 +2717,7 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex) {
+    void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -2697,236 +2726,11 @@ namespace GLVM::core
             throw std::runtime_error("failed to begin recording command buffer!");
         }
 
-		
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									 cm::directionalLight,
-																									 cm::mesh>();
-
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
 																						   cm::mesh>();
-
-		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-			VkClearValue shadowMapClearValues[1];
-			shadowMapClearValues[0].depthStencil.depth = 1.0f;
-			shadowMapClearValues[0].depthStencil.stencil = 0;
-
-			VkRenderPassBeginInfo shadowMapRenderPassInfo{};
-			shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			shadowMapRenderPassInfo.pNext = NULL;
-			shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
-			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
-			shadowMapRenderPassInfo.renderArea.offset.x = 0;
-			shadowMapRenderPassInfo.renderArea.offset.y = 0;
-			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-			shadowMapRenderPassInfo.clearValueCount = 1;
-			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
-
-			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-			VkViewport shadowMapViewPort;
-			shadowMapViewPort.height = swapChainExtent.height;
-			shadowMapViewPort.width = swapChainExtent.width;
-			shadowMapViewPort.minDepth = 0.0f;
-			shadowMapViewPort.maxDepth = 1.0f;
-			shadowMapViewPort.x = 0;
-			shadowMapViewPort.y = 0;
-			vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
-
-			VkRect2D shadowMapScissor;
-			shadowMapScissor.extent.width = swapChainExtent.width;
-			shadowMapScissor.extent.height = swapChainExtent.height;
-			shadowMapScissor.offset.x = 0;
-			shadowMapScissor.offset.y = 0;
-			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
-
-			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipeline);
-
-			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
-			updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent, directionalLightCounter);
-
-			uint32_t actorsNumber = linkedEntities.GetSize();
-			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
-				unsigned int meshOwnerEntity = linkedEntities[actorCounter];
-				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
-
-				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
-					actorsNumber * directionalLightCounter + actorCounter;
-
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
-				
-				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
-				VkDeviceSize offsets[] = {0};
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshId], 0, VK_INDEX_TYPE_UINT16);
-
-				unsigned int indicesContainerSize = aVertices_[meshId].size();
-				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-			}
 		
-			vkCmdEndRenderPass(commandBuffer);
-		}
-		
-		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::spotLight,
-																							  cm::mesh>();
-			
-		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-			VkClearValue spotLightShadowMapClearValues[1];
-			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-			spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
-
-			VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
-			spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			spotLightShadowMapRenderPassInfo.pNext = NULL;
-			spotLightShadowMapRenderPassInfo.renderPass = spotLightShadowMapRenderPass;
-			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
-			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
-			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
-
-			vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-			VkViewport spotLightShadowMapViewPort;
-			spotLightShadowMapViewPort.height = swapChainExtent.height;
-			spotLightShadowMapViewPort.width = swapChainExtent.width;
-			spotLightShadowMapViewPort.minDepth = 0.0f;
-			spotLightShadowMapViewPort.maxDepth = 1.0f;
-			spotLightShadowMapViewPort.x = 0;
-			spotLightShadowMapViewPort.y = 0;
-			vkCmdSetViewport(commandBuffer, 0, 1, &spotLightShadowMapViewPort);
-
-			VkRect2D spotLightShadowMapScissor;
-			spotLightShadowMapScissor.extent.width = swapChainExtent.width;
-			spotLightShadowMapScissor.extent.height = swapChainExtent.height;
-			spotLightShadowMapScissor.offset.x = 0;
-			spotLightShadowMapScissor.offset.y = 0;
-			vkCmdSetScissor(commandBuffer, 0, 1, &spotLightShadowMapScissor);
-
-			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipeline);
-
-			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
-			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
-			updateSpotLightSpaceMatrixShadowMapUBO(spotLightComponent, spotLightCounter);
-
-			uint32_t actorsNumber = linkedEntities.GetSize();
-			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
-				unsigned int meshOwnerEntity = linkedEntities[actorsCounter];
-				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
-				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
-					actorsNumber * spotLightCounter + actorsCounter;
-
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
-				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
-				VkDeviceSize offsets[] = {0};
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
-
-				unsigned int indicesContainerSize = aVertices_[meshID].size();
-				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-			}
-		
-			vkCmdEndRenderPass(commandBuffer);
-		}
-
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																						  cm::pointLight,
-																						  cm::mesh>();
-
-		VkDebugUtilsLabelEXT label;
-		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
-		label.color[0] = 0.1;
-		label.color[0] = 0.7;
-		label.color[0] = 0.2;
-		label.color[0] = 1.0;
-		label.pLabelName = "pointLightShadowMap";
-		label.pNext = NULL;
-		
-		CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
-			uint32_t maxCubeMapLayers = 6;
-			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
-				VkClearValue pointLightShadowMapClearValues[2];
-				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
-				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
-
-				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
-				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-				pointLightShadowMapRenderPassInfo.pNext = NULL;
-				pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
-				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
-				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
-				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
-
-				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-				VkViewport pointLightShadowMapViewPort;
-				pointLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapViewPort.width = SHADOW_MAP_SIZE;
-				pointLightShadowMapViewPort.minDepth = 0.0f;
-				pointLightShadowMapViewPort.maxDepth = 1.0f;
-				pointLightShadowMapViewPort.x = 0;
-				pointLightShadowMapViewPort.y = 0;
-				vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
-
-				VkRect2D pointLightShadowMapScissor;
-				pointLightShadowMapScissor.extent.width = SHADOW_MAP_SIZE;
-				pointLightShadowMapScissor.extent.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapScissor.offset.x = 0;
-				pointLightShadowMapScissor.offset.y = 0;
-				vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
-
-				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
-
-				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
-				
-				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
-				
-				uint32_t actorsNumber = linkedEntities.GetSize();
-				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
-					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
-					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
-						
-					unsigned int uboIndex = pointLightNumber *
-						actorsNumber * maxCubeMapLayers * currentFrame +                           ///< Choose frame (first 168 or second 168)
-						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
-						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
-
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID);
-					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
-
-					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
-					VkDeviceSize offsets[] = {0};
-					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-					
-					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
-
-					unsigned int indicesContainerSize = aVertices_[meshID].size();
-					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-				}
-		
-				vkCmdEndRenderPass(commandBuffer);
-			}
-		}
-
 		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -3009,7 +2813,9 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::createSyncObjects() {
+    void CVulkanRenderer::createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
+											std::vector<VkSemaphore>& renderFinishedSemaphores,
+											std::vector<VkFence>& inFlightFences) {
         imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
         inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
@@ -3348,7 +3154,7 @@ namespace GLVM::core
         vkUnmapMemory(device, lightSpaceMatrixMemory[currentImage]);
 	}
 
-    void CVulkanRenderer::drawFrame() {
+    void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
@@ -3363,8 +3169,8 @@ namespace GLVM::core
         }
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
-        vkResetCommandBuffer(commandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
+        vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -3376,7 +3182,7 @@ namespace GLVM::core
         submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &commandBuffers[currentFrame];
+        submitInfo.pCommandBuffers = &mainRenderCommandBuffers[currentFrame];
 
         VkSemaphore signalSemaphores[] = {renderFinishedSemaphores[currentFrame]};
         submitInfo.signalSemaphoreCount = 1;
@@ -3410,6 +3216,475 @@ namespace GLVM::core
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 
+    void CVulkanRenderer::directionalLightShadowMapDrawFrame() {
+		namespace cm = GLVM::ecs::components;
+        vkWaitForFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        vkResetFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame]);
+        vkResetCommandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        directionalLightRecordCoomandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &directionalLightCommandBuffers[directionalLightCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {directionalLightShadowMapRenderFinishedSemaphores[directionalLightCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, directionalLightShadowMapInFlightFences[directionalLightCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        directionalLightCurrentFrame = (directionalLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+
+	    void CVulkanRenderer::spotLightShadowMapDrawFrame() {
+		namespace cm = GLVM::ecs::components;
+        vkWaitForFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        vkResetFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame]);
+        vkResetCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        spotLightRecordCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &spotLightCommandBuffers[spotLightCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {spotLightShadowMapRenderFinishedSemaphores[spotLightCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, spotLightShadowMapInFlightFences[spotLightCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        spotLightCurrentFrame = (spotLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+
+	    void CVulkanRenderer::pointLightShadowMapDrawFrame() {
+		namespace cm = GLVM::ecs::components;
+        vkWaitForFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        vkResetFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame]);
+        vkResetCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        pointLightRecordCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &pointLightCommandBuffers[pointLightCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {pointLightShadowMapRenderFinishedSemaphores[pointLightCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, pointLightShadowMapInFlightFences[pointLightCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        pointLightCurrentFrame = (pointLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+	
+	void CVulkanRenderer::directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+		
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									 cm::directionalLight,
+																									 cm::mesh>();
+
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::mesh>();
+
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+			VkClearValue shadowMapClearValues[1];
+			shadowMapClearValues[0].depthStencil.depth = 1.0f;
+			shadowMapClearValues[0].depthStencil.stencil = 0;
+
+			VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+			shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			shadowMapRenderPassInfo.pNext = NULL;
+			shadowMapRenderPassInfo.renderPass = directionalLightShadowMapRenderPass;
+			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+			shadowMapRenderPassInfo.renderArea.offset.x = 0;
+			shadowMapRenderPassInfo.renderArea.offset.y = 0;
+			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			shadowMapRenderPassInfo.clearValueCount = 1;
+			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport shadowMapViewPort;
+			shadowMapViewPort.height = swapChainExtent.height;
+			shadowMapViewPort.width = swapChainExtent.width;
+			shadowMapViewPort.minDepth = 0.0f;
+			shadowMapViewPort.maxDepth = 1.0f;
+			shadowMapViewPort.x = 0;
+			shadowMapViewPort.y = 0;
+			vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
+
+			VkRect2D shadowMapScissor;
+			shadowMapScissor.extent.width = swapChainExtent.width;
+			shadowMapScissor.extent.height = swapChainExtent.height;
+			shadowMapScissor.offset.x = 0;
+			shadowMapScissor.offset.y = 0;
+			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
+
+			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipeline);
+
+			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+			updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent, directionalLightCounter);
+
+			uint32_t actorsNumber = linkedEntities.GetSize();
+			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
+				unsigned int meshOwnerEntity = linkedEntities[actorCounter];
+				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
+				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+
+				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * directionalLightCurrentFrame +
+					actorsNumber * directionalLightCounter + actorCounter;
+
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, directionalLightPipeline.pipelineLayout, 0, 1, &shadowMapDirectionalLightDescriptorSets[uboDirectionalLightIndex], 0, nullptr);
+				
+				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
+				VkDeviceSize offsets[] = {0};
+				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshId], 0, VK_INDEX_TYPE_UINT16);
+
+				unsigned int indicesContainerSize = aVertices_[meshId].size();
+				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			}
+		
+			vkCmdEndRenderPass(commandBuffer);
+		}
+
+		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+	}
+
+	void CVulkanRenderer::spotLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::mesh>();
+
+		
+		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::spotLight,
+																							  cm::mesh>();
+			
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+			VkClearValue spotLightShadowMapClearValues[1];
+			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+			spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
+
+			VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
+			spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			spotLightShadowMapRenderPassInfo.pNext = NULL;
+			spotLightShadowMapRenderPassInfo.renderPass = spotLightShadowMapRenderPass;
+			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
+			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
+			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
+
+			vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+			VkViewport spotLightShadowMapViewPort;
+			spotLightShadowMapViewPort.height = swapChainExtent.height;
+			spotLightShadowMapViewPort.width = swapChainExtent.width;
+			spotLightShadowMapViewPort.minDepth = 0.0f;
+			spotLightShadowMapViewPort.maxDepth = 1.0f;
+			spotLightShadowMapViewPort.x = 0;
+			spotLightShadowMapViewPort.y = 0;
+			vkCmdSetViewport(commandBuffer, 0, 1, &spotLightShadowMapViewPort);
+
+			VkRect2D spotLightShadowMapScissor;
+			spotLightShadowMapScissor.extent.width = swapChainExtent.width;
+			spotLightShadowMapScissor.extent.height = swapChainExtent.height;
+			spotLightShadowMapScissor.offset.x = 0;
+			spotLightShadowMapScissor.offset.y = 0;
+			vkCmdSetScissor(commandBuffer, 0, 1, &spotLightShadowMapScissor);
+
+			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipeline);
+
+			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
+			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
+			updateSpotLightSpaceMatrixShadowMapUBO(spotLightComponent, spotLightCounter);
+
+			uint32_t actorsNumber = linkedEntities.GetSize();
+			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
+				unsigned int meshOwnerEntity = linkedEntities[actorsCounter];
+				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
+				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * spotLightCurrentFrame +
+					actorsNumber * spotLightCounter + actorsCounter;
+
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, spotLightPipeline.pipelineLayout, 0, 1, &shadowMapSpotLightDescriptorSets[uboSpotLightIndex], 0, nullptr);
+				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
+				VkDeviceSize offsets[] = {0};
+				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
+
+				unsigned int indicesContainerSize = aVertices_[meshID].size();
+				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			}
+		
+			vkCmdEndRenderPass(commandBuffer);
+		}
+
+		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+	}
+
+	void CVulkanRenderer::pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::mesh>();
+		
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh>();
+
+		VkDebugUtilsLabelEXT label;
+		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		label.color[0] = 0.1;
+		label.color[0] = 0.7;
+		label.color[0] = 0.2;
+		label.color[0] = 1.0;
+		label.pLabelName = "pointLightShadowMap";
+		label.pNext = NULL;
+		
+		CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+			uint32_t maxCubeMapLayers = 6;
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
+				VkClearValue pointLightShadowMapClearValues[2];
+				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
+
+				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
+				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				pointLightShadowMapRenderPassInfo.pNext = NULL;
+				pointLightShadowMapRenderPassInfo.renderPass = pointLightShadowMapRenderPass;
+				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
+				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
+				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
+				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+
+				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+				VkViewport pointLightShadowMapViewPort;
+				pointLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
+				pointLightShadowMapViewPort.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapViewPort.minDepth = 0.0f;
+				pointLightShadowMapViewPort.maxDepth = 1.0f;
+				pointLightShadowMapViewPort.x = 0;
+				pointLightShadowMapViewPort.y = 0;
+				vkCmdSetViewport(commandBuffer, 0, 1, &pointLightShadowMapViewPort);
+
+				VkRect2D pointLightShadowMapScissor;
+				pointLightShadowMapScissor.extent.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapScissor.extent.height = SHADOW_MAP_SIZE;
+				pointLightShadowMapScissor.offset.x = 0;
+				pointLightShadowMapScissor.offset.y = 0;
+				vkCmdSetScissor(commandBuffer, 0, 1, &pointLightShadowMapScissor);
+
+				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
+
+				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
+				
+				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
+				
+				uint32_t actorsNumber = linkedEntities.GetSize();
+				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
+					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
+					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
+					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+						
+					unsigned int uboIndex = pointLightNumber *
+						actorsNumber * maxCubeMapLayers * pointLightCurrentFrame +                           ///< Choose frame (first 168 or second 168)
+						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
+						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
+
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipelineLayout, 0, 1, &shadowMapPointLightDescriptorSets[uboIndex], 0, nullptr);
+
+					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
+					VkDeviceSize offsets[] = {0};
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					
+					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
+
+					unsigned int indicesContainerSize = aVertices_[meshID].size();
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				}
+		
+				vkCmdEndRenderPass(commandBuffer);
+			}
+		}
+
+		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+	}
+	
     VkShaderModule CVulkanRenderer::createShaderModule(const std::vector<char>& code) {
         VkShaderModuleCreateInfo createInfo{};
         createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;

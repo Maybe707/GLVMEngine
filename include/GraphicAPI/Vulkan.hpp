@@ -79,7 +79,7 @@ namespace GLVM::core
     const uint32_t HEIGHT = 600;
 
     const int MAX_FRAMES_IN_FLIGHT = 2;
-
+#define NDEBUG
     const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
     };
@@ -483,7 +483,10 @@ namespace GLVM::core
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
 
-        VkCommandPool commandPool;
+        VkCommandPool directionalLightCommandPool;
+		VkCommandPool spotLightCommandPool;
+		VkCommandPool pointLightCommandPool;
+		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
         VkImageView depthImageView;
@@ -573,18 +576,35 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> pointLightSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> spotLightSamplerDescriptorSets;
 
-        std::vector<VkCommandBuffer> commandBuffers;
-		std::vector<VkCommandBuffer> shadowMapCommandBuffers;
+        std::vector<VkCommandBuffer> directionalLightCommandBuffers;
+		std::vector<VkCommandBuffer> spotLightCommandBuffers;
+		std::vector<VkCommandBuffer> pointLightCommandBuffers;
+		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
+		/// Main render pipe line sync objects
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
 
-        std::vector<VkSemaphore> shadowMapImageAvailableSemaphores;
-        std::vector<VkSemaphore> shadowMapRenderFinishedSemaphores;
-        std::vector<VkFence> shadowMapInFlightFences;
+		/// Directional light shadow map sync objects
+        std::vector<VkSemaphore> directionalLightShadowMapImageAvailableSemaphores;
+        std::vector<VkSemaphore> directionalLightShadowMapRenderFinishedSemaphores;
+        std::vector<VkFence> directionalLightShadowMapInFlightFences;
+
+		/// Spot light shadow map sync objects
+        std::vector<VkSemaphore> spotLightShadowMapImageAvailableSemaphores;
+        std::vector<VkSemaphore> spotLightShadowMapRenderFinishedSemaphores;
+        std::vector<VkFence> spotLightShadowMapInFlightFences;
+
+		/// Point light shadow map sync objects
+        std::vector<VkSemaphore> pointLightShadowMapImageAvailableSemaphores;
+        std::vector<VkSemaphore> pointLightShadowMapRenderFinishedSemaphores;
+        std::vector<VkFence> pointLightShadowMapInFlightFences;
 		
         uint32_t currentFrame = 0;
+		uint32_t directionalLightCurrentFrame = 0;
+		uint32_t spotLightCurrentFrame = 0;
+		uint32_t pointLightCurrentFrame = 0;
 
         bool framebufferResized = false;
 
@@ -611,9 +631,11 @@ namespace GLVM::core
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
 										  uint32_t height);
 		void createFramebuffers();
-        void createCommandPool();
+        void createCommandPool(VkCommandPool& commandPool);
         void createDepthResources();
-		void createShadowMapDepthResources();
+		void createDirectionalLightShadowMapDepthResources();
+		void createSpotLightShadowMapDepthResources();
+		void createPointLightShadowMapDepthResources();
         VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
@@ -643,13 +665,15 @@ namespace GLVM::core
 		void updatePointLightShadowMapDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-        VkCommandBuffer beginSingleTimeCommands();
-        void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+        VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);
+        void endSingleTimeCommands(VkCommandPool& commandPool, VkCommandBuffer& commandBuffer);
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        void createCommandBuffers();
-        void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-        void createSyncObjects();
+        void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
+        void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+        void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
+							   std::vector<VkSemaphore>& renderFinishedSemaphores,
+							   std::vector<VkFence>& inFlightFences);
 		void updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
@@ -661,7 +685,13 @@ namespace GLVM::core
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
-        void drawFrame();
+        void mainRenderDrawFrame();
+		void directionalLightShadowMapDrawFrame();
+		void spotLightShadowMapDrawFrame();
+		void pointLightShadowMapDrawFrame();
+		void directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void spotLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
         VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
