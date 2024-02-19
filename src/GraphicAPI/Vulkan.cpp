@@ -3295,7 +3295,7 @@ namespace GLVM::core
 		mutex0.unlock();
     }
 
-	    void CVulkanRenderer::spotLightShadowMapDrawFrame() {
+	void CVulkanRenderer::spotLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
 		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame], VK_TRUE, UINT64_MAX);

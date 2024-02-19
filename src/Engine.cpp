@@ -45,7 +45,6 @@
     exit(1)
 
 GLVM::core::CEvent g_eEvent;
-//GLVM::core::CSoundEngine g_Sound_Engine;
 
 namespace GLVM::core
 {
@@ -53,27 +52,19 @@ namespace GLVM::core
     std::mutex Engine::Mutex_;
 
     void PlaybackSound(Sound::ISoundEngine* _sound_Engine) {
-		//        _sound_Engine->SetMasterVolume(10);
         while(1) {
 			_sound_Engine->SoundStream();
 		}
     }
 
     Engine::Engine() {
-		//		Window_             = CWindowCreator().Create();
-		//   Render_System_Interface_ = new ecs::CRenderSystem();
-		// TODO: Remove render system interface and make both renderers to be a systems that user can
-		// handle and using those methods for setting up texture and mesh data.
-//		renderSystemInterface    = new ecs::CRenderSystem();
 		chrono                   = Time::CTimerCreator().Create();
 		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
 
 		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
-//		GUI_System               = new ecs::CGUISystem();
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
-//		cameraSystem             = new ecs::CCameraSystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -81,15 +72,10 @@ namespace GLVM::core
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
-
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
 		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
-		//		pSystem_Manager->ActivateSystem(Animation_System);
-//		pSystem_Manager->ActivateSystem(cameraSystem);
-//		pSystem_Manager->ActivateSystem(renderSystemInterface);
-//		pSystem_Manager->ActivateSystem(GUI_System);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();
@@ -146,27 +132,20 @@ namespace GLVM::core
 		}
 #endif
 		
-		while(bGame_Loop_Active)
-		{
+		while(bGame_Loop_Active) {
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
 		    gravity += deltaFrameTime;
-//			std::cout << "gravity: " << gravity << std::endl;
-//			FPScounter();
 			
 			openglRenderer->Window.ClearDisplay();
              
-			while(openglRenderer->Window.HandleEvent(g_eEvent))
-			{
-				//                std::cout << g_eEvent.GetEvent() << std::endl;
+			while(openglRenderer->Window.HandleEvent(g_eEvent)) {
 				Input_Stack_.ControlInput(g_eEvent);
 				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
 					bGame_Loop_Active = false;
 			}
 			g_eEvent.SetLastEvent(Input_Stack_);
 
-			//            Input_Stack_.PrintStack();
-            
 			openglRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,
@@ -181,21 +160,13 @@ namespace GLVM::core
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
-			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-			// cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
-//			cameraSystem->Render_System_                = renderSystemInterface;
 			openglRenderer->EnlargeFrameAccumulator(deltaFrameTime);
-//			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
 			pSystem_Manager->Update();
-//			Input_Stack_.Clear();
 			openglRenderer->draw();
 			openglRenderer->Window.SwapBuffers();
-			//            g_Sound_Engine.SoundStream();
 		}
 
 		openglRenderer->Window.Close();
-		// delete openglRenderer;
-		// openglRenderer = nullptr;
 	}
 	
 	void Engine::RenderVulkan() {
@@ -236,26 +207,19 @@ namespace GLVM::core
 		// }
 #endif
 		
-		while(bGame_Loop_Active)
-		{
+		while(bGame_Loop_Active) {
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
 		    gravity += deltaFrameTime;
-//			std::cout << "gravity: " << gravity << std::endl;
-//			FPScounter();
 			
 			vulkanRenderer->Window.ClearDisplay();
              
-			while(vulkanRenderer->Window.HandleEvent(g_eEvent))
-			{
-				//                std::cout << g_eEvent.GetEvent() << std::endl;
+			while(vulkanRenderer->Window.HandleEvent(g_eEvent)) {
 				Input_Stack_.ControlInput(g_eEvent);
 				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
 					bGame_Loop_Active = false;
 			}
 			g_eEvent.SetLastEvent(Input_Stack_);
-
-			//            Input_Stack_.PrintStack();
             
 			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
@@ -271,21 +235,13 @@ namespace GLVM::core
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
-			//            GUI_System->_Shader_Program                   = ((RENDERER_TYPE_PTR)Render_System_Interface_->GetRenderSystemInstance())->GUI_Shader_Program_;
-			// cameraSystem->Shader_Program_               = ((RENDERER_TYPE_PTR)renderSystemInterface->GetRenderSystemInstance())->coreShaderProgram;
-//			cameraSystem->Render_System_                = renderSystemInterface;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
-//			(dynamic_cast<RENDERER_TYPE_PTR>(renderSystemInterface->GetRenderSystemInstance()))->delta = deltaFrameTime;
 			pSystem_Manager->Update();
-//			Input_Stack_.Clear();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window.SwapBuffers();
-			//            g_Sound_Engine.SoundStream();
 		}
 
 		vulkanRenderer->Window.Close();
-		// delete vulkanRenderer;
-		// vulkanRenderer = nullptr;
 	}
 
 	ecs::TextureHandle Engine::LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
