@@ -41,39 +41,6 @@ namespace GLVM::ecs
         return false;
     }
 
-	// bool CCollisionSystem::RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
-	// 							   float rayCasterScale, float receiverScale) {
-	// 	float yaw, pitch;
-	// 	const float kSensitivity = 0.1;
-    //     yaw = g_eEvent.mousePointerPosition.offset_X;
-    //     pitch = g_eEvent.mousePointerPosition.offset_Y;
-    //     yaw *= kSensitivity;
-    //     pitch *= kSensitivity;
-
-    //     g_eEvent.mousePointerPosition.pitch = pitch;
-    //     g_eEvent.mousePointerPosition.yaw = yaw;
-        
-    //     if(pitch > 89.0f)
-    //         pitch = 89.0f;
-    //     if(pitch < -89.0f)
-    //         pitch = -89.0f;
-	// 	vec3 forward;
-    //     forward[0] = std::cos(Radians(yaw)) * std::cos(Radians(pitch));
-    //     forward[1] = std::sin(Radians(pitch));
-    //     forward[2] = std::sin(Radians(yaw)) * std::cos(Radians(pitch));
-    //     forward = Normalize(forward);
-
-	// 	// vec3 vectorXZ = vec3{ rayCasterPosition[0], 0.0f, rayCasterPosition[2] } -
-	// 	// 				vec3{ receiverPosition[0], 0.0f, receiverPosition[2] };
-
-	// 	// vectorXZ -= receiverScale / 2;
-	// 	// float distance = std::sqrt(vectorXZ[0] * vectorXZ[0] + vectorXZ[1] * vectorXZ[1] + vectorXZ[2] *\ vectorXZ[2]);
-	// 	// forward *= distance;
-	// 	forward *= 5.0f;
-		
-	// 	if ( forward[0] 
-	// }
-	
 	void CCollisionSystem::Update()
 	{
 		namespace cm = GLVM::ecs::components;
@@ -111,7 +78,6 @@ namespace GLVM::ecs
 					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
 				for ( unsigned int m = 0; m < linkedEntitiesVectorSizeWithMove; ++m) {
 					if ( backtrackingEntityRefCollider == linkedEntitiesWithMove[m] ) {
-//						std::cout << "backtrack" << std::endl;
 						cm::move* backtrackingMove = componentManager->
 							GetComponent<cm::move>(backtrackingEntityRefCollider);
 						backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
@@ -120,7 +86,6 @@ namespace GLVM::ecs
 				}
 				for ( unsigned int n = 0; n < linkedEntitiesVectorSizeWithMove; ++n) {
 					if ( comparedEntityRefCollider == linkedEntitiesWithMove[n] ) {
-//						std::cout << "compared" << std::endl;
 						cm::move* comparedMove     = componentManager->
 							GetComponent<cm::move>(comparedEntityRefCollider);
 						comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
@@ -142,19 +107,14 @@ namespace GLVM::ecs
 				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
-//					std::cout << "TEST 1" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
-//                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->roofCollision = true;
                     continue;
                 }
                     
                 if(boxColliderFlag) {
-//					std::cout << "TEST 2" << std::endl;
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
-//                    componentManager->GetComponent<cm::collider>(comparedEntityRefCollider)->bWall_Collision_ = true;
                     continue;
                 }
-//				std::cout << "No collissions" << std::endl;
 			}
 		}
 	}
