@@ -287,9 +287,17 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
-		// delete soundEngine;
-		// soundEngine = nullptr;
+		delete soundEngine;
+		soundEngine = nullptr;
 		delete chrono;
 		chrono = nullptr;
+		delete collisionSystem;
+		collisionSystem = nullptr;
+		delete movementSystem;
+		movementSystem = nullptr;
+		delete physicsSystem;
+		physicsSystem = nullptr;
+		delete projectileSystem;
+		projectileSystem = nullptr;
     }
 } // namespace GLVM::core
