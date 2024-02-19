@@ -287,8 +287,8 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
-		delete soundEngine;
-		soundEngine = nullptr;
+		// delete soundEngine;
+		// soundEngine = nullptr;
 		delete chrono;
 		chrono = nullptr;
 		delete collisionSystem;

@@ -1,7 +1,6 @@
 #ifndef ENGINE
 #define ENGINE
 
-#include "Components/VertexComponent.hpp"
 #include "ComponentsFullSet.hpp"
 #include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -53,14 +52,11 @@ namespace GLVM::core
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		CVulkanRenderer*     vulkanRenderer;
 		COpenglRenderer*     openglRenderer;
-//        ecs::CRenderSystem * renderSystemInterface;
         
         ecs::CCollisionSystem  * collisionSystem;
 		ecs::CMovementSystem   * movementSystem;
         ecs::CPhysicsSystem    * physicsSystem;
         ecs::CProjectileSystem * projectileSystem;
-//		ecs::CCameraSystem     * cameraSystem;
-//        ecs::CGUISystem        * GUI_System;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
@@ -87,9 +83,7 @@ namespace GLVM::core
 		ecs::components::MeshHandle LoadMeshFromFile_GLTF(const char* pathToMesh);
 		void FPScounter();
 		void GameKill();
-//        void PlaybackSound(core::CSoundEngine& _sound_Engine);
 	};
-		
 }
 
 #endif
