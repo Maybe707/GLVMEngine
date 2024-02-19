@@ -77,18 +77,21 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
+		mutex0.lock();
+		mutex1.lock();
+		mutex2.lock();
 		std::thread directionalLightShadowMapThread(&CVulkanRenderer::directionalLightShadowMapDrawFrame, this);
-		directionalLightShadowMapThread.join();
 		std::thread spotLightShadowMapThread(&CVulkanRenderer::spotLightShadowMapDrawFrame, this);
-		spotLightShadowMapThread.join();
 		std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
-		pointLightShadowMapThread.join();
 		std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
-		mainRenderThread.join();
 
 		#ifdef VK_USE_PLATFORM_XCB_KHR
         vkDeviceWaitIdle(device);
 		#endif
+		directionalLightShadowMapThread.join();
+		spotLightShadowMapThread.join();
+		pointLightShadowMapThread.join();
+		mainRenderThread.join();
     }
 
     void CVulkanRenderer::loadWavefrontObj() {
@@ -3161,6 +3164,12 @@ namespace GLVM::core
 
     void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
+		mutex0.lock();
+		mutex0.unlock();
+		mutex1.lock();
+		mutex1.unlock();
+		mutex2.lock();
+		mutex2.unlock();
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -3223,6 +3232,7 @@ namespace GLVM::core
 
     void CVulkanRenderer::directionalLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
+		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -3281,10 +3291,13 @@ namespace GLVM::core
         }
 
         directionalLightCurrentFrame = (directionalLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		shadowMapPassesMutex.unlock();
+		mutex0.unlock();
     }
 
 	    void CVulkanRenderer::spotLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
+		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -3343,10 +3356,13 @@ namespace GLVM::core
         }
 
         spotLightCurrentFrame = (spotLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		shadowMapPassesMutex.unlock();
+		mutex1.unlock();
     }
 
 	    void CVulkanRenderer::pointLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
+		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -3405,6 +3421,8 @@ namespace GLVM::core
         }
 
         pointLightCurrentFrame = (pointLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		shadowMapPassesMutex.unlock();
+		mutex2.unlock();
     }
 	
 	void CVulkanRenderer::directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {

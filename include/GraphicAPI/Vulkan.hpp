@@ -606,6 +606,11 @@ namespace GLVM::core
 		uint32_t spotLightCurrentFrame = 0;
 		uint32_t pointLightCurrentFrame = 0;
 
+		std::mutex mutex0; 
+		std::mutex mutex1;
+		std::mutex mutex2;
+		std::mutex shadowMapPassesMutex;
+		
         bool framebufferResized = false;
 
         void initWindow();
