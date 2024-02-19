@@ -226,7 +226,7 @@ namespace GLVM::core
 
     void CVulkanRenderer::SetProjectionMatrix()
 	{
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 1.0f, 100.0f);
+		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
 		projectionMatrix[1][1] *= -1.0f;
 	}
