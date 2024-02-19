@@ -66,29 +66,20 @@ namespace GLVM::ecs
 																						   cm::collider,
 																						   cm::pointLight>();
 		
-//		unsigned int linkedEntitiesVectorSize      = linkedEntities.GetSize();
-		
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
 			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.002f;
-			// *(componentManager->GetComponent<cm::pointLight>(uiEntity_refProjectile)) = { .position = { rTransformProjectile->tPosition[0],
-			// 		rTransformProjectile->tPosition[1], rTransformProjectile->tPosition[2] } };
 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiEntity_refProjectile);
 			pointLightComponent->position += rTransformProjectile->tForward * 0.002f;
 		}
 
-//        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
-		
         for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
 			
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
-				// cm::material* textureProjectile = pComponent_Manager->GetComponent<cm::material>(uiEntity_refProjectile);
-				// TextureSystem->UnbindTexture(*textureProjectile, uiEntity_refProjectile);
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
-//				--linkedEntitiesVectorSize;
             }
 //			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
 //			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
@@ -103,8 +94,6 @@ namespace GLVM::ecs
 												unsigned int entityRefMove,
 												components::beholder& beholder) {
 		namespace cm = GLVM::ecs::components;
-//        GLVM::ecs::TextureManager* TextureSystem = GLVM::ecs::TextureManager::GetInstance();
-
 
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
@@ -127,7 +116,6 @@ namespace GLVM::ecs
 		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
 		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
-//        TextureSystem->BindTexture(uiEntity_Projectile, rTextureProjectile->diffuseTextureID_);
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
         rTransformProjectile->fScale = 0.1f;
 		
@@ -143,10 +131,6 @@ namespace GLVM::ecs
 		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
-//		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tForward };
-		static unsigned int val = 0;
-		std::cout << val << std::endl;
-		++val;
     }
 
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
