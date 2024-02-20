@@ -37,7 +37,7 @@ namespace GLVM::ecs
 																						cm::beholder,
 																						cm::transform>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-        float cameraSpeed = 5.0f * deltaFrameTime;            
+        float cameraSpeed = 5.5f * deltaFrameTime;            
 
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			// std::cout << "i: " << i << std::endl;
@@ -81,8 +81,13 @@ namespace GLVM::ecs
 //					result += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
-					componentManager->CreateComponent<cm::move>(currentEntity);
-					componentManager->GetComponent<cm::move>(currentEntity)->gravity[1] += 5.0f * cameraSpeed;
+				{
+					cm::collider* collider = componentManager->GetComponent<cm::collider>(currentEntity);
+					if ( collider->bGround_Collision_ ) {
+						componentManager->CreateComponent<cm::move>(currentEntity);
+						componentManager->GetComponent<cm::move>(currentEntity)->gravity[1] += 700.0f * cameraSpeed;
+					}
+				}
                     break;
                 default:
                     break;

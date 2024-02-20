@@ -33,8 +33,8 @@ namespace GLVM::ecs
 
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 										   float backtrackingScale, float comparedScale) {
-        if((backtrackingPosition[1] - backtrackingScale / 2) >
-		   (comparedPosition[1] + (comparedScale / 2))) {
+        if((backtrackingPosition[1] - backtrackingScale) + 0.01f >
+		   (comparedPosition[1] + (comparedScale))) {
             return true;
         }
 
@@ -57,11 +57,12 @@ namespace GLVM::ecs
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		unsigned int linkedEntitiesVectorSizeWithMove = linkedEntitiesWithMove.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
+			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = false;
 			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
 				if ( i == j )
 					continue;
 				
-                unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
                 unsigned int comparedEntityRefCollider     = linkedEntities[j];
 				
 				vec3 backtrackingTransform = componentManager->
