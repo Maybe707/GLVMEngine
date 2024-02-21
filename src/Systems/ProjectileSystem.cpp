@@ -69,9 +69,9 @@ namespace GLVM::ecs
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.002f;
+			rTransformProjectile->tPosition += rTransformProjectile->tForward * cameraSpeed;
 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiEntity_refProjectile);
-			pointLightComponent->position += rTransformProjectile->tForward * 0.002f;
+			pointLightComponent->position += rTransformProjectile->tForward * cameraSpeed;
 		}
 
         for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
@@ -126,7 +126,7 @@ namespace GLVM::ecs
         rTransformProjectile->tForward   = GetDirectionVector(beholder);
 		rTransformProjectile->yaw        = fYaw;
 		rTransformProjectile->pitch      = fPitch;
-        rTransformProjectile->tPosition += rTransformProjectile->tForward + 1.0;
+        rTransformProjectile->tPosition += rTransformProjectile->tForward * 1.3;
 		
 		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
