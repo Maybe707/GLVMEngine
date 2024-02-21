@@ -25,6 +25,8 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::move,
 																					  cm::transform>();
+
+		float deltaTime = 5.5f * fDelta_Time_;
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
         for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i)
         {
@@ -45,6 +47,13 @@ namespace GLVM::ecs
 				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;
 				componentManager->RemoveComponent<cm::move>(entityRefMove);
+
+				cm::rigidBody* rigidBody = componentManager->GetComponent<cm::rigidBody>(entityRefMove);
+				if ( rigidBody->jumpAccumulator > 0.0f ) {
+					rigidBody->jumpAccumulator -= deltaTime;
+					rigidBody->jump = vec3{ 0.0f, 5.0f, 0.0f } * deltaTime;
+					transformComponent->tPosition += rigidBody->jump;
+				}
         }
     }
 }

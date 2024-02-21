@@ -84,8 +84,8 @@ namespace GLVM::ecs
 				{
 					cm::collider* collider = componentManager->GetComponent<cm::collider>(currentEntity);
 					if ( collider->bGround_Collision_ ) {
-						componentManager->CreateComponent<cm::move>(currentEntity);
-						componentManager->GetComponent<cm::move>(currentEntity)->gravity[1] += 700.0f * cameraSpeed;
+						cm::rigidBody* rigidBody = componentManager->GetComponent<cm::rigidBody>(currentEntity);
+						rigidBody->jumpAccumulator = 1.5f;
 					}
 				}
                     break;
@@ -114,16 +114,12 @@ namespace GLVM::ecs
 			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
 			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
 			rTransform_Component->GravityAccumulator += deltaFrameTime;
-			// std::cout << "gravity accumulator: " << rTransform_Component->GravityAccumulator << std::endl;
-			// std::cout << "y position: " << rTransform_Component->tPosition[1] << std::endl;
 			float gravity = 9.8f * rTransform_Component->GravityAccumulator
-				* rigidBodyComponennt->fMass_ /
-				(rTransform_Component->tPosition[1] * rTransform_Component->tPosition[1]) * 0.01;
+				* rigidBodyComponennt->fMass_ * 0.0005;
 			if ( gravity > 0.2f )
 				gravity = 0.2;
-				
+
 			moveComponent->gravity[1] -= gravity;
-//			std::cout << "gravity: " << gravity << std::endl;
         }
     }
 
