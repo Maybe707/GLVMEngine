@@ -9,7 +9,7 @@ void main()
 	float lightDistance = length(inFragmentPosition - vec4(inLightPosition, 1.0));
 //	float lightDistance = length(inFragmentPosition);
 
-	lightDistance = lightDistance / 100.0;
+	lightDistance = lightDistance / inFarPlane;
 
 	gl_FragDepth = lightDistance;
 }

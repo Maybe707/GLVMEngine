@@ -44,6 +44,7 @@ void main() {
     outFragmentPosition = worldPosition;
 //	outFragmentPosition = ubo.spaceMatrix * worldPosition;
 	outLightPosition = ubo.lightPosition;
+	outFarPlane = ubo.farPlane;
 
 	gl_Position = ubo.spaceMatrix * worldPosition;
 }
