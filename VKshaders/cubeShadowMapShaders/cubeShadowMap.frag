@@ -4,6 +4,8 @@ layout(location = 0) in vec4 inFragmentPosition;
 layout(location = 1) in	vec3 inLightPosition;
 layout(location = 2) in float inFarPlane;
 
+layout (location = 0) out float outFragColor;
+
 // layout(set = 1, binding = 1) uniform UniformBufferObjectLight {
 // 	vec3 lightPosition;
 // 	float farPlane;
@@ -13,10 +15,11 @@ void main()
 {             
 	float lightDistance = length(inFragmentPosition - vec4(inLightPosition, 1.0));
 
-	lightDistance = lightDistance / inFarPlane;
+	lightDistance = lightDistance / 100.0;
 
-//	gl_FragDepth = lightDistance;
-//	gl_FragDepth = 1.0;;
+//	outFragColor = lightDistance;
+	gl_FragDepth = lightDistance;
+//	gl_FragDepth = inFragmentPosition.z;
 }
 
 // layout(set = 1, binding = 1) uniform sampler2D texSampler;

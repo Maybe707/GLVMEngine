@@ -85,6 +85,8 @@ namespace GLVM::core
 		std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
 		std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
 
+//		pointLightShadowMapDrawFrame();
+		
 		#ifdef VK_USE_PLATFORM_XCB_KHR
         vkDeviceWaitIdle(device);
 		#endif
@@ -364,7 +366,7 @@ namespace GLVM::core
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
-//		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
+		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -2962,6 +2964,8 @@ namespace GLVM::core
 			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
 			upVector = vec3(0.0f, -1.0f,  0.0f);
 			break;
+		default:
+			break;
 		}
 		
 		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 0.3f, 100.0f);
@@ -2972,10 +2976,11 @@ namespace GLVM::core
 
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		
-//		projectionMatrixCubeShadowMap[1][1] *= 1;
+//		projectionMatrixCubeShadowMap[1][1] *= -1;
 		
 		modelMatrixUBO.lightSpaceMatrix = viewMatrixLight * projectionMatrixCubeShadowMap;
 		modelMatrixUBO.farPlane = 100.0f;
+		modelMatrixUBO.lightPosition = positionVectorLight;
 
 		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 		

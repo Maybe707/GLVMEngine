@@ -419,10 +419,10 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 		{
 			float closestDepth = texture(pointLightsCubeShadowMap, fragmentToLight + sampleOffsetDirections[i] *
 										 diskRadius).r;
-			closestDepth = linearize_depth(closestDepth, 1.0, 100.0);
-//			closestDepth *= 100.0;
-			bias = linearize_depth(bias, 1.0, 100.0);
-			closestDepth += 1.0;
+//			closestDepth = linearize_depth(closestDepth, 1.0, 100.0);
+			closestDepth *= 100.0;
+			// bias = linearize_depth(bias, 1.0, 100.0);
+			// closestDepth += 1.0;
 			
 //			closestDepth *= pointLights.farPlane; // undo mapping [0;1]
 //			closestDepth *= 100.0; // undo mapping [0;1]
