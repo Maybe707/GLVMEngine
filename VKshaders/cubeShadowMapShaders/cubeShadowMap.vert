@@ -41,36 +41,11 @@ void main() {
 	}
 
 	vec4 worldPosition = ubo.model * skinMatrix * vec4(inPosition, 1.0);
-	
-	// if (gl_VertexIndex % 2 == 0) {
-	// 	gl_Position = vec4(0.5, 0.5, 0.5, 1.0);
-	// 	} else {
-	// 	gl_Position = vec4(0.7, 0.7, 0.7, 1.0);
-	// 	}
     outFragmentPosition = worldPosition;
-	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
-	// vec3 FragmentPosition = vec3(ubo.spaceMatrix * vec4(outFragmentPosition, 1.0));
+//	outFragmentPosition = ubo.spaceMatrix * worldPosition;
 	outLightPosition = ubo.lightPosition;
-	// outFarPlane = ubo.farPlane;
-	// float lightDistance = length(fragmentPosition - ubo.lightPosition);
-	// lightDistance = lightDistance / ubo.farPlane;
 
-	// float lightDistance = length(outFragmentPosition - vec4(ubo.lightPosition, 1.0));
-
-	
-//	 float lightDistance = length(outFragmentPosition - vec4(ubo.lightPosition, 1.0));
-
-//	 lightDistance = lightDistance / ubo.farPlane;
-//	 gl_Position = vec4(0.5, 0.0, 0.0, 1.0);
-	
-	// lightDistance = lightDistance / inFarPlane;
-	
-//	gl_Position.z = fragmentPosition.z;
-//	gl_Position = (outFragmentPosition - vec4(ubo.lightPosition, 1.0));
 	gl_Position = ubo.spaceMatrix * worldPosition;
-	// outFragmentPosition = vec3(ubo.model * vec4(inPosition, 1.0));
-    // outFragmentNormal = inNormal;
-    // outFragmentTextureCoordinate = inTextureCoordinate;
 }
 
 
