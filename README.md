@@ -21,6 +21,8 @@ This is my simple game engine for Linux and Windows OS's with both Vulkan and Op
         emerge --ask x11-libs/libX11 \
                      x11-libs/libXi \
                      x11-apps/xrandr \
+                     media-libs/vulkan-loader \
+                     dev-util/vulkan-tools \
                      media-libs/mesa \
                      media-libs/alsa-lib \
                      media-sound/pulseaudio
