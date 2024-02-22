@@ -6,7 +6,9 @@ This is my simple game engine for Linux and Windows OS's with both Vulkan and Op
     
 * ### Development libraries:
 
-        X11, Xi, XRandR
+        X11, Xi, XRandR.
+
+        Vulkan.
 
         Opengl.
     
