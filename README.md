@@ -53,3 +53,24 @@ This is my simple game engine for Linux and Windows OS's with both Vulkan and Op
                     pulseaudio-libs-devel \
                     libudev-devel \
                     libstdc++-static
+  
+## Windows
+
+* ### Development libraries:
+
+        Vulkan
+        
+        Opengl
+
+* ### Specific tools:
+* #### First of all you need MSYS2:
+        You can get it from official website (https://www.msys2.org/) or
+
+         winget install MSYS2.MSYS2
+
+        From msys2 we need to take compiler with standard libraries:
+
+        pacman -S mingw-w64-ucrt-x86_64-llvm
+
+        
+
