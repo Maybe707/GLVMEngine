@@ -42,6 +42,9 @@
 #include <sstream>
 #include <thread>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace GLVM::core
 {
     COpenglRenderer::COpenglRenderer()
@@ -911,6 +914,13 @@ namespace GLVM::core
 		glGenTextures(NUMBER_OF_CREATING_TEXTURE_OBJECT_1, &texture.iTexture_);
 		glBindTexture(GL_TEXTURE_2D, texture.iTexture_);
 
+		[[maybe_unused]] const char* path_to_stb_image = nullptr;
+		int channels = 0;
+#ifdef STB_IMAGE_IMPLEMENTATION
+		path_to_stb_image = texture.path_to_image;
+		texture.u_iData_ = stbi_load(path_to_stb_image, reinterpret_cast<int*>(&texture.iWidth_), reinterpret_cast<int*>(&texture.iHeight_), &channels, 0);
+#endif
+		
 		///< Loading image, creating texture and generation mipmap-levels
 		glTexImage2D(GL_TEXTURE_2D, MIPMAP_LEVEL, GL_RGBA, texture.iWidth_, texture.iHeight_, SOME_OLD_STUFF, GL_RGBA, GL_UNSIGNED_BYTE, texture.u_iData_);
 		pGLGenerate_Mipmap(GL_TEXTURE_2D);

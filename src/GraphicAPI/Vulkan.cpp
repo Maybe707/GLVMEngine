@@ -15,8 +15,6 @@
 #include <thread>
 #include <vulkan/vulkan_core.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 namespace GLVM::core
 {    
@@ -244,7 +242,7 @@ namespace GLVM::core
         {
 			VkDeviceSize imageSize{};
 			unsigned char* pixels;
-			const char* path_to_stb_image = nullptr;
+			[[maybe_unused]] const char* path_to_stb_image = nullptr;
 
 			#ifndef STB_IMAGE_IMPLEMENTATION
             imageSize = initializeTextureData_[i].dat_length_;

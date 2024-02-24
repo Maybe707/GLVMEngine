@@ -72,9 +72,11 @@ int main()
 
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
 	// [[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromFile("../textures/witch.h");
+	
 	[[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromFile("../textures/data/gray.png");
 	[[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromFile("../textures/data/container2.png");
 	[[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromFile("../textures/data/container2_specular.png");
+	
 //	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromFile("../textures/crosshair.h");
 	
     // CTexture hudTexture_1;
@@ -376,8 +378,8 @@ int main()
 
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
 
 	GLVM->GameKill();
 
