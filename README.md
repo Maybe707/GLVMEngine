@@ -68,6 +68,7 @@ This is my simple game engine for Linux and Windows OS's with both Vulkan and Op
 
          winget install MSYS2.MSYS2
 
+* #### Then get needed compiler tools:
         From msys2 we need to take compiler with standard libraries:
 
         pacman -S mingw-w64-ucrt-x86_64-llvm
