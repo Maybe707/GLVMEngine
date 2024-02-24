@@ -63,12 +63,19 @@ int main()
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/cb.gltf");	
 //	MeshManager->SetMeshGLTF("/home/cyberdemon/cyberdemon_code/GLVMEngine/gltf/stick.gltf");
 
-	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
-	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
-	[[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromAddress(32, 32, gray_dat_len, gray_dat);
-	[[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromAddress(500, 500, container2_dat_len, container2_dat);
-	[[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromAddress(500, 500, container2_specular_dat_len, container2_specular_dat);
-	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromAddress(32, 32, Crosshair_dat_len, Crosshair_dat);
+	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
+	// [[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
+	// [[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromAddress(32, 32, gray_dat_len, gray_dat);
+	// [[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromAddress(500, 500, container2_dat_len, container2_dat);
+	// [[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromAddress(500, 500, container2_specular_dat_len, container2_specular_dat);
+	// [[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromAddress(32, 32, Crosshair_dat_len, Crosshair_dat);
+
+	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
+	// [[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromFile("../textures/witch.h");
+	[[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromFile("../textures/data/gray.png");
+	[[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromFile("../textures/data/container2.png");
+	[[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromFile("../textures/data/container2_specular.png");
+//	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromFile("../textures/crosshair.h");
 	
     // CTexture hudTexture_1;
     // hudTexture_1.iWidth_ = 32;
@@ -114,7 +121,7 @@ int main()
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
-	*materialWitch  = { .diffuseTextureID_ = chelikTextureHandle, .specularTextureID_ = chelikTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+	*materialWitch  = { .diffuseTextureID_ = container2SpecularTextureHandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
 	}
 
@@ -259,7 +266,7 @@ int main()
 	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 15.0f, 2.0f }, .fScale = 0.2f };
 	ComponentManager->GetComponent<cm::mesh>(pointLight0)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	*materialPointLight0 = { .diffuseTextureID_ = witchTexturehandle, .specularTextureID_ = witchTexturehandle };
+	*materialPointLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
 
 //  	Entity pointLight1 = EntityManager->CreateEntity();
 // 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);

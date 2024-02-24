@@ -15,6 +15,9 @@
 #include <thread>
 #include <vulkan/vulkan_core.h>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 namespace GLVM::core
 {    
     VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
@@ -234,16 +237,30 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::createTextureImage() {
-        unsigned int texWidth, texHeight;
+		uint32_t texWidth, texHeight;
+		[[maybe_unused]] uint32_t texChannels;
 
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
-            VkDeviceSize imageSize = initializeTextureData_[i].dat_length_;
-            const unsigned char* pixels = initializeTextureData_[i].u_iData_;
+			VkDeviceSize imageSize{};
+			unsigned char* pixels;
+			const char* path_to_stb_image = nullptr;
+
+			#ifndef STB_IMAGE_IMPLEMENTATION
+            imageSize = initializeTextureData_[i].dat_length_;
+            pixels = initializeTextureData_[i].u_iData_;
             texWidth = initializeTextureData_[i].iWidth_;
             texHeight = initializeTextureData_[i].iHeight_;
+			#endif
 
-            if (!pixels) {
+			#ifdef STB_IMAGE_IMPLEMENTATION
+			path_to_stb_image = initializeTextureData_[i].path_to_image;
+			pixels = stbi_load(path_to_stb_image, reinterpret_cast<int*>(&texWidth), reinterpret_cast<int*>(&texHeight),
+							   reinterpret_cast<int*>(&texChannels), STBI_rgb_alpha);
+			imageSize = texWidth * texHeight * 4;
+			#endif
+
+			if (!pixels) {
                 throw std::runtime_error("failed to load texture image!");
             }
 

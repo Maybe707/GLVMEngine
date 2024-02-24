@@ -19,12 +19,13 @@ namespace GLVM::ecs
         unsigned int vkInnerIdLimit_ = 10;
         
         GLuint iTexture_;
+		const char* path_to_image;
         std::vector<Entity> entitiesOwnsThisTypeOfTexture_;
         unsigned int id_;
 		unsigned int iWidth_;
 		unsigned int iHeight_;
         unsigned int dat_length_;
-		const unsigned char* u_iData_;
+		unsigned char* u_iData_;
     };
 }
 

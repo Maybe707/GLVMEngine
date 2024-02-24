@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <thread>
 
+
 /*******************************************************************
  * Legends never die...
  * You are about to face most terrifying data structures of all time.
@@ -244,8 +245,18 @@ namespace GLVM::core
 		vulkanRenderer->Window.Close();
 	}
 
+	ecs::TextureHandle Engine::LoadTextureFromFile(const char* path_to_texture) {
+		uint32_t textureID = textureVector.size();
+		ecs::TextureHandle textureHandle;
+		textureHandle.id = textureID;
+		textureVector.push_back({ .path_to_image = path_to_texture });
+		textureHandlers.Push(textureHandle);
+
+		return textureHandle;
+	}
+	
 	ecs::TextureHandle Engine::LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
-								  unsigned int dat_length, const unsigned char* u_iData) {
+								  unsigned int dat_length, unsigned char* u_iData) {
 		uint32_t textureID = textureVector.size();
 		ecs::TextureHandle textureHandle;
 		textureHandle.id = textureID;
