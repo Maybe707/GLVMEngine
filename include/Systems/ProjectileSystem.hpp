@@ -4,7 +4,6 @@
 #include "ISystem.hpp"
 #include "Vector.hpp"
 #include "ComponentManager.hpp"
-#include "chelik.hpp"
 #include "Globals.hpp"
 #include "TextureManager.hpp"
 #include "ComponentManager.hpp"

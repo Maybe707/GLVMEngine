@@ -57,3 +57,49 @@ located in special namespaces.
   *GLVM::ecs::ComponentManager->GetComponent<cm::transform>(uiPlayer) = {
 	  .tPosition = { 5.7f, 10.0f, 7.0f }, .fScale = 0.1f };
 #+end_src
+
+- Loading textures
+  GLVM takes raw data arrays for loading images. If you want to load some common format like PNG or JPG
+  you need to transfer it to raw data. This can easily achived with simple tools like ImageMagick and XXD.
+  Imagine that we have image called robot.png.
+
+  1. Convert it to .dat format:
+
+	 convert robot.png robot.dat
+
+  2. Convert robot.dat to c-header file with static array inside:
+
+	 xxd -i robot.dat > robot.h
+
+  3. Place it in "textures" directory:
+
+     mv robot.h /path/to/GLVM/textures
+
+  4. Then just include this header in "SpritesData.hpp":
+
+#+begin_src c++	 
+      #ifndef SPRITES_DATA
+      #define SPRITES_DATA
+
+      #include "robot.h"
+
+      #endif
+#+end_src
+  
+  When its done you need to check actual height and width of your texture. Its easy to do with ImageMagick.
+  Just give it robot.dat or robot.png with "identify" flag.
+  
+  5. magick identify robot.png
+
+  Its give you simple output like:
+  
+  robot.png PNG 120x279 120x279+0+0 8-bit sRGB 44103B 0.000u 0:00.000
+
+  We need numbers that have "x" between them. In this case this is 120x279. Width is 120 and height is 279.
+
+  6.   Now we can call function "LoadTextureFromAddress" that load image to GLVM. You need to give it width, height,
+	 length of image array and actual array that contain "robot.h".
+
+#+begin_src c++
+	[[maybe_unused]] ecs::TextureHandle robotTextureHandle = GLVM->LoadTextureFromAddress(120, 279, robot_dat_len, robot_dat);
+#+end_src
