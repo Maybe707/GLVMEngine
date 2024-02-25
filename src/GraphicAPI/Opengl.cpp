@@ -42,9 +42,6 @@
 #include <sstream>
 #include <thread>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 namespace GLVM::core
 {
     COpenglRenderer::COpenglRenderer()
@@ -915,7 +912,7 @@ namespace GLVM::core
 		glBindTexture(GL_TEXTURE_2D, texture.iTexture_);
 
 		[[maybe_unused]] const char* path_to_stb_image = nullptr;
-		int channels = 0;
+		[[maybe_unused]] int channels = 0;
 #ifdef STB_IMAGE_IMPLEMENTATION
 		path_to_stb_image = texture.path_to_image;
 		texture.u_iData_ = stbi_load(path_to_stb_image, reinterpret_cast<int*>(&texture.iWidth_), reinterpret_cast<int*>(&texture.iHeight_), &channels, 0);
