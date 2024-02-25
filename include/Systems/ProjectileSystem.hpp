@@ -15,7 +15,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "EntityManager.hpp"
-#include "Stack.hpp"
+#include "EventsStack.hpp"
 #include "ISoundEngine.hpp"
 
 namespace GLVM::ecs

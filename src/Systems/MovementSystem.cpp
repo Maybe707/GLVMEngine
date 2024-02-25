@@ -17,7 +17,6 @@
 #include "EntityManager.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
-#include "Stack.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include <cstdio>

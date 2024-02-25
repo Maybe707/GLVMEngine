@@ -10,7 +10,7 @@
 #include "IWindow.hpp"
 #include "ISoundEngine.hpp"
 #include "ShaderProgram.hpp"
-#include "Stack.hpp"
+#include "EventsStack.hpp"
 #include "Event.hpp"
 #include "Texture.hpp"
 #include "TimerCreator.hpp"
