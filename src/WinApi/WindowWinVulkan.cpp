@@ -24,7 +24,7 @@ namespace GLVM::core
         window_Class_.cbWndExtra = 0;
         window_Class_.hInstance = NULL;
         window_Class_.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        window_Class_.hCursor = LoadCursor(NULL, IDC_ARROW);
+        window_Class_.hCursor = LoadCursor(NULL, NULL);
         window_Class_.hbrBackground = NULL;
         window_Class_.lpszMenuName = NULL;
         window_Class_.lpszClassName = "Window class";
@@ -47,6 +47,7 @@ namespace GLVM::core
         // Show the window and paint its contents.
         ShowWindow(pModern_Window_, SW_SHOWDEFAULT);
         UpdateWindow(pModern_Window_);
+		SetCursorPos(0, 0);		
     }
 
     void WindowWinVulkan::SwapBuffers() {}

@@ -34,6 +34,8 @@ namespace GLVM::core
 
         XMapWindow(pDisp_, Win_);
 
+        XWarpPointer(pDisp_, None, Win_, 0, 0, 0, 0, 0, 0);
+		
         Cursor invisibleCursor;
         Pixmap bitmapNoData;
         XColor black;

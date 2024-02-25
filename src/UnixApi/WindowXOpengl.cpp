@@ -98,6 +98,8 @@ namespace GLVM::core
         XMapWindow(pDisp_, Win_);
         glXMakeCurrent(pDisp_, Win_, Context_);
 
+        XWarpPointer(pDisp_, None, Win_, 0, 0, 0, 0, 0, 0);
+		
         int iMajor = 0, iMinor = 0;
         glGetIntegerv(GL_MAJOR_VERSION, &iMajor);
         glGetIntegerv(GL_MINOR_VERSION, &iMinor);

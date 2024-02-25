@@ -67,7 +67,7 @@ namespace GLVM::core
         window_Class_.cbClsExtra = 0;
         window_Class_.cbWndExtra = 0;
         window_Class_.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-        window_Class_.hCursor = LoadCursor(NULL, IDC_ARROW);
+        window_Class_.hCursor = LoadCursor(NULL, NULL);
         window_Class_.lpszClassName = (LPCSTR)aClass_Name;
         window_Class_.hInstance = GetModuleHandleA(NULL);
         window_Class_.lpszClassName = aClass_Name;
@@ -97,6 +97,8 @@ namespace GLVM::core
 
         ///< Clean up
         wglMakeCurrent( pModern_DC_, pModern_Context_);
+
+		SetCursorPos(0, 0);
         
 		Initializer();
 		const int kInterval = 1;
