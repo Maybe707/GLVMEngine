@@ -556,6 +556,10 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> pointLightsUniformBuffersMemory;
 		std::vector<VkBuffer> spotLightsUniformBuffers;
         std::vector<VkDeviceMemory> spotLightsUniformBuffersMemory;
+
+		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		
         VkDescriptorPool descriptorPool;
 		unsigned int matrixUboDescriptorsNumber = 0;
@@ -665,6 +669,7 @@ namespace GLVM::core
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();
         void createMainRenderDescriptorSets();
+		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
 		void updateDirectionalLightShadowMapDescriptorSets();
 		void updateSpotLightShadowMapDescriptorSets();
 		void updatePointLightShadowMapDescriptorSets();

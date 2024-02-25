@@ -2317,7 +2317,6 @@ namespace GLVM::core
 		int pointLightShadowMapsCisBinding = lightsSamplersBindigs[3];
 		int spotLightShadowMapsCisBinding = lightsSamplersBindigs[4];
 
-		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
 		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -2325,7 +2324,6 @@ namespace GLVM::core
 			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -2333,7 +2331,6 @@ namespace GLVM::core
 			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
 		}
 
-		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
@@ -2410,6 +2407,92 @@ namespace GLVM::core
 		}
 	}
 
+	void CVulkanRenderer::updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id) {
+		core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
+
+		int diffuseCisBinding = lightsSamplersBindigs[0];
+		int specularCisBinding = lightsSamplersBindigs[1];
+		int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[2];
+		int pointLightShadowMapsCisBinding = lightsSamplersBindigs[3];
+		int spotLightShadowMapsCisBinding = lightsSamplersBindigs[4];
+
+		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
+			directionalLightsImageInfo[i] = {};
+			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+
+		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
+			pointLightsImageInfo[i] = {};
+			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
+			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+
+		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
+			spotLightsImageInfo[i] = {};
+			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
+			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+		}
+		
+		constexpr u32 DS_writes_size = 5;
+		
+		VkDescriptorImageInfo diffuseImageInfo{};
+		diffuseImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		diffuseImageInfo.imageView = textureImages[diffuse_id].views[0];
+		diffuseImageInfo.sampler = textureImages[diffuse_id].sampler;
+
+		VkDescriptorImageInfo specularImageInfo{};
+		specularImageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		specularImageInfo.imageView = textureImages[specular_id].views[0];
+		specularImageInfo.sampler = textureImages[specular_id].sampler;
+		
+		std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[currentFrame];
+		descriptorWrites[0].dstBinding = diffuseCisBinding;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pImageInfo = &diffuseImageInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = diffuseSamplerDescriptorSets[currentFrame];
+		descriptorWrites[1].dstBinding = specularCisBinding;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pImageInfo = &specularImageInfo;
+
+		descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[2].dstSet = diffuseSamplerDescriptorSets[currentFrame];
+		descriptorWrites[2].dstBinding = directionalLightShadowMapsCisBinding;
+		descriptorWrites[2].dstArrayElement = 0;
+		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[2].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+		descriptorWrites[2].pImageInfo = directionalLightsImageInfo;
+
+		descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[3].dstSet = diffuseSamplerDescriptorSets[currentFrame];
+		descriptorWrites[3].dstBinding = pointLightShadowMapsCisBinding;
+		descriptorWrites[3].dstArrayElement = 0;
+		descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[3].descriptorCount = POINT_LIGHTS_NUMBER;
+		descriptorWrites[3].pImageInfo = pointLightsImageInfo;
+
+		descriptorWrites[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[4].dstSet = diffuseSamplerDescriptorSets[currentFrame];
+		descriptorWrites[4].dstBinding = spotLightShadowMapsCisBinding;
+		descriptorWrites[4].dstArrayElement = 0;
+		descriptorWrites[4].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[4].descriptorCount = SPOT_LIGHTS_NUMBER;
+		descriptorWrites[4].pImageInfo = spotLightsImageInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+	}
+	
 	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
 		core::vector<u32> directionalLightBindigs = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
 		int directionalLightShadowMapMatrixUboBinding = directionalLightBindigs[0];
@@ -2803,6 +2886,7 @@ namespace GLVM::core
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
 			unsigned int uboIndex = i;
@@ -2826,7 +2910,8 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1, &diffuseSamplerDescriptorSets[currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
