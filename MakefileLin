@@ -14,7 +14,9 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c \
 	  ./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp ./src/Systems/CameraSystem.cpp \
 	  ./src/UnixApi/SoundEngineAlsa.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Opengl.cpp ./src/GraphicAPI/Vulkan.cpp \
 	  ./src/TextureManager.cpp ./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
-	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXOpengl.cpp ./src/UnixApi/WindowXCBVulkan.cpp
+	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXOpengl.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
+	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
+	  ./textures/container2.cpp ./textures/container2_specular.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 
