@@ -172,9 +172,9 @@ namespace GLVM::core
 		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		MODEL_MATRIX_UBO,
-		LIGHT_SPACE_MATRIX_UBO,
 
 		LIGHT_DATA,
+		SPECULAR_SAMPLER,
 		LIGHT_SAMPLERS,
 	};
 
@@ -266,7 +266,13 @@ namespace GLVM::core
 		mat4 jointMatrices[MAX_JOINTS_NUMBER];
 
 		vec3  ambient;
-		float shininess;		
+		float shininess;
+
+		alignas(16) mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
+		alignas(16) uint32_t spotLightsNumber;
+		
+		alignas(16) mat4 dirSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
+		alignas(16) uint32_t directionalLightsNumber;
     };
 
 	struct alignas(16) ShadowMapMatrixUBO {

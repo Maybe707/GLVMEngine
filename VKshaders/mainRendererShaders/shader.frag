@@ -80,7 +80,7 @@ struct SpotLight {
 // #define POINT_LIGHTS_NUMBER                                32
 // #define SPOT_LIGHTS_NUMBER                                 8
 
-layout(set = 2, binding = 0) uniform LightData {
+layout(set = 1, binding = 0) uniform LightData {
 	vec3 viewPosition;
 
 	PointLight pointLightsArray[POINT_LIGHTS_NUMBER];
@@ -106,11 +106,12 @@ layout(set = 2, binding = 0) uniform LightData {
 
 // } spotLights;
 
+layout(set = 2, binding = 0) uniform sampler2D specular;
+
 layout(set = 3, binding = 0) uniform sampler2D diffuse;
-layout(set = 3, binding = 1) uniform sampler2D specular;
-layout(set = 3, binding = 2) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 3, binding = 6) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 3, binding = 38) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
+layout(set = 3, binding = 1) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
+layout(set = 3, binding = 5) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+layout(set = 3, binding = 37) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
