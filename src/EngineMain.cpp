@@ -344,7 +344,7 @@ int main()
 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
 	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 1.0f, 15.0f, -5.0f },
 		.direction = { 0.0f, -1.0f, 1.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f }, .constant = 1.0f, .linear = 0.09f,
+		.diffuse = { 1.8f, 1.8f, 1.8f }, .specular = { 2.0f, 2.0f, 2.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 1.0f, 15.0f, -5.0f }, .fScale = 0.5f };
 	ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = simpleCubeHandle_GLTF;

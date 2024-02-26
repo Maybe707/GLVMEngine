@@ -932,18 +932,44 @@ namespace GLVM::core
 			LoadTextureData(textureVector[i]);
 		}
 //		loadWavefrontObj();
-
-		bool noAnimations = true;
+		
+		core::vector<bool> animationFlags;
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 			jointMatricesPerMesh.Push({});
 			frames.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m], noAnimations);
+			animationFlags.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m], animationFlags[m]);
 		}
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-			SetVertices(aIndices_[m], aVertexes_[m]);
+			std::vector<float> currentVertices;
+			if ( animationFlags[m] ) {
+				for ( unsigned int n = 0; n < aVertexes_[m].size(); n += 8 ) {
+					currentVertices.push_back(aVertexes_[m][n]);
+					currentVertices.push_back(aVertexes_[m][n + 1]);
+					currentVertices.push_back(aVertexes_[m][n + 2]);
+					currentVertices.push_back(aVertexes_[m][n + 3]);
+					currentVertices.push_back(aVertexes_[m][n + 4]);
+					currentVertices.push_back(aVertexes_[m][n + 5]);
+					currentVertices.push_back(aVertexes_[m][n + 6]);
+					currentVertices.push_back(aVertexes_[m][n + 7]);
+					
+					currentVertices.push_back(-1);
+					currentVertices.push_back(-1);
+					currentVertices.push_back(-1);
+					currentVertices.push_back(-1);
+					currentVertices.push_back(1);
+					currentVertices.push_back(1);
+					currentVertices.push_back(1);
+					currentVertices.push_back(1);
+				}
+			
+				SetVertices(aIndices_[m], currentVertices);
+			} else {
+				SetVertices(aIndices_[m], aVertexes_[m]);
+			}
 		}
 	}
 
