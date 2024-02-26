@@ -400,7 +400,8 @@ namespace GLVM::Core
 							   std::vector<float>& aVertexes_,
 							   std::vector<unsigned int>& aIndices_,
 							   core::vector<core::vector<mat4>>& jointMatricesPerMesh,
-							   core::vector<float>& frames) {
+							   core::vector<float>& frames,
+							   bool& noAnimations) {
 		ReadFile(pathsGLTF_);
 		Parse();
 		
@@ -428,8 +429,10 @@ namespace GLVM::Core
 		int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> vertices_position;
-		for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 )
+		for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 ) {
+			std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
 			vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
+		}
 
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
 		int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;
@@ -587,6 +590,7 @@ namespace GLVM::Core
 		core::vector<Core::JsonValue> animations = Search("animations");
 
 		if ( animations.GetSize() > 0 ) {
+			noAnimations = false;
 			core::vector<Core::JsonValue> samplerIndices;
 			core::vector<Core::JsonValue> targetNodes;
 			core::vector<Core::JsonValue> targetPaths;
@@ -1135,6 +1139,8 @@ namespace GLVM::Core
 		// 		jointMatrices.Push(globalAllFrameNodeMatrix);
 		// 	}
 		// }
+		} else {
+			noAnimations = true;
 		}
 		jointMatricesPerMesh = jointMatrices;
 

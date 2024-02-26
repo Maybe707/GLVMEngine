@@ -459,20 +459,27 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::initializeGLTF() {
+		core::vector<bool> animationFlags;
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			aVertexesTemp_.emplace_back();
 			aIndicesTemp_.emplace_back();
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m]);
+			animationFlags.Push({});
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m], animationFlags[m]);
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
             aIndices_.emplace_back();
             aVertices_.emplace_back();
-			
-			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += 16 ) {
+
+			int stepOffset = 0;
+			if ( animationFlags[m] )
+				stepOffset = 8;
+			else
+				stepOffset = 16;
+			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += stepOffset ) {
 				SVertex vertex;
 				vertex[0] = aVertexesTemp_[m][n];
 			    vertex[1] = aVertexesTemp_[m][n + 1];
@@ -485,16 +492,29 @@ namespace GLVM::core
 				texture[0] = aVertexesTemp_[m][n + 6];
 				texture[1] = aVertexesTemp_[m][n + 7];
 				vec4 joinIndices;
-				joinIndices[0] = aVertexesTemp_[m][n + 8];
-				joinIndices[1] = aVertexesTemp_[m][n + 9];
-				joinIndices[2] = aVertexesTemp_[m][n + 10];
-				joinIndices[3] = aVertexesTemp_[m][n + 11];
 				vec4 weights;
-				weights[0] = aVertexesTemp_[m][n + 12];
-				weights[1] = aVertexesTemp_[m][n + 13];
-				weights[2] = aVertexesTemp_[m][n + 14];
-				weights[3] = aVertexesTemp_[m][n + 15];
+				if ( animationFlags[m] ) { 
+					joinIndices[0] = -1;
+					joinIndices[1] = -1;
+					joinIndices[2] = -1;
+					joinIndices[3] = -1;
 
+					weights[0] = 1;
+					weights[1] = 1;
+					weights[2] = 1;
+					weights[3] = 1;
+				} else {
+					joinIndices[0] = aVertexesTemp_[m][n + 8];
+					joinIndices[1] = aVertexesTemp_[m][n + 9];
+					joinIndices[2] = aVertexesTemp_[m][n + 10];
+					joinIndices[3] = aVertexesTemp_[m][n + 11];
+
+					weights[0] = aVertexesTemp_[m][n + 12];
+					weights[1] = aVertexesTemp_[m][n + 13];
+					weights[2] = aVertexesTemp_[m][n + 14];
+					weights[3] = aVertexesTemp_[m][n + 15];
+				}
+				
 				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
@@ -503,7 +523,7 @@ namespace GLVM::core
 
 				
 				
-				unsigned int tempIndex = n / 16;
+				unsigned int tempIndex = n / stepOffset;
 
 				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
 			}

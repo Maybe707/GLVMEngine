@@ -933,13 +933,14 @@ namespace GLVM::core
 		}
 //		loadWavefrontObj();
 
+		bool noAnimations = true;
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			aVertexes_.emplace_back();
 			aIndices_.emplace_back();
 			jointMatricesPerMesh.Push({});
 			frames.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m]);
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m], noAnimations);
 		}
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			SetVertices(aIndices_[m], aVertexes_[m]);

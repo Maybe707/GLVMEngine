@@ -28,6 +28,7 @@ int main()
 //	GLVM->SetMeshGLTF("../gltf/chel5.gltf");
 	[[maybe_unused]] cm::MeshHandle hyperCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube.gltf");
 	[[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
+	[[maybe_unused]] cm::MeshHandle simpleCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/simpleCube2.gltf");
 //	GLVM->SetMeshGLTF("../gltf/Fox.gltf");
 //	GLVM->SetMeshGLTF("../gltf/chel3.gltf");
 //	GLVM->SetMeshGLTF("../gltf/ray.gltf");
@@ -101,7 +102,7 @@ int main()
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
-    ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = megaChelHandle_GLTF;
+    ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = simpleCubeHandle_GLTF;
 	// cm::material* materialPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
 	// *materialPlayer = { .diffuseTextureID_ = 1, .specularTextureID_ = 1, .ambient = { 0.05f, 0.05f, 0.0f },
 	// 	.shininess = 512.0f * 1.078125f };
@@ -109,7 +110,7 @@ int main()
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -200.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 200.2f };
-    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = hyperCubeHandle_GLTF;
+    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = simpleCubeHandle_GLTF;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
@@ -132,7 +133,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = hyperCubeHandle_GLTF;
+    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = simpleCubeHandle_GLTF;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
@@ -346,7 +347,7 @@ int main()
 		.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .tPosition = { 1.0f, 15.0f, -5.0f }, .fScale = 0.5f };
-	ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = hyperCubeHandle_GLTF;
+	ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = simpleCubeHandle_GLTF;
 	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
 	*materialSpotLight1 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
 
