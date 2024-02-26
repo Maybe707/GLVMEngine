@@ -462,6 +462,7 @@ namespace GLVM::Core
 		core::vector<core::vector<int>> children;
 			
 		if ( skins.GetSize() > 0 ) {
+			noAnimations = false;
 			joints = (*gltf)["skins"][0]["joints"];
 
 			Core::JsonValue nodes = (*gltf)["nodes"];
@@ -585,12 +586,13 @@ namespace GLVM::Core
 
 			for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
 				weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
+		} else {
+			noAnimations = true;
 		}
 
 		core::vector<Core::JsonValue> animations = Search("animations");
 
 		if ( animations.GetSize() > 0 ) {
-			noAnimations = false;
 			core::vector<Core::JsonValue> samplerIndices;
 			core::vector<Core::JsonValue> targetNodes;
 			core::vector<Core::JsonValue> targetPaths;
@@ -1139,9 +1141,8 @@ namespace GLVM::Core
 		// 		jointMatrices.Push(globalAllFrameNodeMatrix);
 		// 	}
 		// }
-		} else {
-			noAnimations = true;
 		}
+
 		jointMatricesPerMesh = jointMatrices;
 
 		for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
