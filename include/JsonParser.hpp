@@ -256,7 +256,7 @@ namespace GLVM::Core
 		core::vector<JsonValue> Search(const char* key_) const;
 		void LoadGLTF(const char* pathsGLTF_,
 					  std::vector<float>& aVertexes_,
-					  std::vector<unsigned int>& aIndices_,
+					  std::vector<uint32_t>& aIndices_,
 					  core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 					  core::vector<float>& frames,
 					  bool& noAnimations);

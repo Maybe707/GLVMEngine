@@ -398,7 +398,7 @@ namespace GLVM::Core
 
 	void CJsonParser::LoadGLTF(const char* pathsGLTF_,
 							   std::vector<float>& aVertexes_,
-							   std::vector<unsigned int>& aIndices_,
+							   std::vector<uint32_t>& aIndices_,
 							   core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 							   core::vector<float>& frames,
 							   bool& noAnimations) {
@@ -1145,7 +1145,7 @@ namespace GLVM::Core
 
 		jointMatricesPerMesh = jointMatrices;
 
-		for ( unsigned int i = 0; i < indices.GetSize(); ++i ) {
+		for ( uint32_t i = 0; i < indices.GetSize(); ++i ) {
 			aIndices_.push_back(i);
 
 			unsigned int index = indices[i] * 3;

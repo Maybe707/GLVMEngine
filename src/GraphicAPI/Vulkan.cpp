@@ -520,12 +520,6 @@ namespace GLVM::core
 										 {texture[0], texture[1]},
 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
 										 {weights[0], weights[1], weights[2], weights[3]}});
-
-				
-				
-				unsigned int tempIndex = n / stepOffset;
-
-				aIndices_[m].push_back(aIndicesTemp_[m][tempIndex]);
 			}
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
@@ -533,7 +527,7 @@ namespace GLVM::core
 
             indexBufferContainer.emplace_back();
             indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndicesTemp_[m]);
 		}
 	}
 	
@@ -1912,7 +1906,7 @@ namespace GLVM::core
         vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
-    void CVulkanRenderer::createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices) {
+    void CVulkanRenderer::createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices) {
         VkDeviceSize bufferSize = sizeof(_indices[0]) * _indices.size();
 
         VkBuffer stagingBuffer;
@@ -2905,7 +2899,7 @@ namespace GLVM::core
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT16);
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
 			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
 

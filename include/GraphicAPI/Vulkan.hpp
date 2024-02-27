@@ -398,9 +398,9 @@ namespace GLVM::core
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
-        std::vector<std::vector<uint16_t>> aIndices_;
+        std::vector<std::vector<uint32_t>> aIndices_;
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< Temp
-		std::vector<std::vector<unsigned int>> aIndicesTemp_;             ///< Temp
+		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 
@@ -668,7 +668,7 @@ namespace GLVM::core
 		void transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
-        void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint16_t>& _indices);
+        void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices);
         void createMainRenderUniformBuffers();
         void createMainRenderDescriptorPool();
 		void createDirectionalLightShadowMapDescriptorSets();
