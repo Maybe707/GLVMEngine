@@ -117,30 +117,32 @@ namespace GLVM::Core
 				}
 			} else if (currentChar_ == '{') {
 				if (stackOfJsonValues_.GetSize() == 0) {
-					root_ = CreateJsonHashMap();
+					root_ = new JsonValue;
+					*root_ = CreateJsonHashMap();
 					stackOfJsonValues_.Push(root_);
 				} else if (keyFlag) {
-					JsonValue* jsonObject = CreateJsonHashMap();
-					(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()] = *jsonObject;
+					JsonValue jsonObject = CreateJsonHashMap();
+					(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()] = jsonObject;
 					stackOfJsonValues_.Push(&(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()]);
 				} else if (!keyFlag) {
-					JsonValue* jsonObject = CreateJsonHashMap();
-					stackOfJsonValues_.GetHead()->value.array->Push(*jsonObject);
+					JsonValue jsonObject = CreateJsonHashMap();
+					stackOfJsonValues_.GetHead()->value.array->Push(jsonObject);
 					stackOfJsonValues_.Push(&stackOfJsonValues_.GetHead()->value.array->GetHead());
 				}
 
 				keyFlag = true;
 			} else if (currentChar_ == '[') {
 				if (stackOfJsonValues_.GetSize() == 0) {
-					root_ = CreateJsonArray();
+					root_ = new JsonValue;
+					*root_ = CreateJsonArray();
 					stackOfJsonValues_.Push(root_);
 				} else if (keyFlag) {
-					JsonValue* jsonArray = CreateJsonArray();
-					(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()] = *jsonArray;
+					JsonValue jsonArray = CreateJsonArray();
+					(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()] = jsonArray;
 					stackOfJsonValues_.Push(&(*stackOfJsonValues_.GetHead()->value.object)[lastKey_.c_str()]);
 				} else if (!keyFlag) {
-					JsonValue* jsonArray = CreateJsonArray();
-					stackOfJsonValues_.GetHead()->value.array->Push(*jsonArray);
+					JsonValue jsonArray = CreateJsonArray();
+					stackOfJsonValues_.GetHead()->value.array->Push(jsonArray);
 					stackOfJsonValues_.Push(&stackOfJsonValues_.GetHead()->value.array->GetHead());
 				}
 
@@ -165,18 +167,17 @@ namespace GLVM::Core
 		}
 	}
 
-	JsonValue* CJsonParser::CreateJsonHashMap() {
-		JsonValue* jsonObject = new JsonValue;
-		jsonObject->type = JSON_OBJECT;
-		jsonObject->value.object = new HashMap<JsonValue>;
+	JsonValue CJsonParser::CreateJsonHashMap() {
+		JsonValue jsonObject;
+		jsonObject.type = JSON_OBJECT;
+		jsonObject.value.object = new HashMap<JsonValue>;
 		return jsonObject;
 	}
 
-	JsonValue* CJsonParser::CreateJsonArray() {
-		JsonValue* jsonArray = new JsonValue;
-		jsonArray->type = JSON_ARRAY;
-		jsonArray->value.array = new core::vector<JsonValue>;
-		new (jsonArray->value.array) core::vector<JsonValue>;
+	JsonValue CJsonParser::CreateJsonArray() {
+		JsonValue jsonArray;
+		jsonArray.type = JSON_ARRAY;
+		jsonArray.value.array = new core::vector<JsonValue>;
 		return jsonArray;
 	}
 	
@@ -1400,5 +1401,9 @@ namespace GLVM::Core
 		}
 
 		return -1;
+	}
+
+	CJsonParser::~CJsonParser() {
+		delete root_;
 	}
 }

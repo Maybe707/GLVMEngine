@@ -234,11 +234,12 @@ namespace GLVM::Core
 							   core::vector<JsonValue>& resultVector) const;
 
     public:
+		~CJsonParser();
 		JsonValue* GetRoot() { return root_; }
         void ReadFile(const char* _filePath);
         void Parse();
-		JsonValue* CreateJsonHashMap();
-		JsonValue* CreateJsonArray();
+		JsonValue CreateJsonHashMap();
+		JsonValue CreateJsonArray();
 		std::string BoolOrNullParse();
 		bool IsContainChar(std::string _string, char _char);
 		std::string NumberAsStringParse();
