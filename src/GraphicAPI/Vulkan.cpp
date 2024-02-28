@@ -653,21 +653,25 @@ namespace GLVM::core
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
+        for(unsigned int i = 0; i < textureImages.size(); ++i)
         {
-            // vkDestroySampler(device, textureSamplers[i], nullptr);
-            // vkDestroyImageView(device, textureImageViews[i], nullptr);
-        }
-
-        for (unsigned int i = 0; i < initializeTextureData_.size(); ++i)
-        {
-            // vkDestroyImage(device, textureImages[i], nullptr);
-            // vkFreeMemory(device, textureImageMemories[i], nullptr);
+            vkDestroySampler(device, textureImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < textureImages[i].views.size(); ++j )
+				vkDestroyImageView(device, textureImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, textureImages[i].image, nullptr);
+            vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         }
 
 		for ( unsigned int i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) 
 			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptors[i].setLayout, nullptr);
 
+		for ( unsigned int i = 0; i < spotLightPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < pointLightPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptors[i].setLayout, nullptr);
+		
 		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) 
 			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptors[i].setLayout, nullptr);
 		
@@ -680,6 +684,18 @@ namespace GLVM::core
         }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+            vkDestroySemaphore(device, directionalLightShadowMapImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, directionalLightShadowMapInFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, spotLightShadowMapImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, spotLightShadowMapInFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, pointLightShadowMapImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, pointLightShadowMapInFlightFences[i], nullptr);
+			
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
