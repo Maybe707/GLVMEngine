@@ -110,6 +110,9 @@ namespace GLVM::core
 
             aIndices_.emplace_back();
             aVertices_.emplace_back();
+
+			frames.Push({});
+			jointMatricesPerMesh.Push({});
             
             unsigned int vertexIndex  = 0;
             unsigned int textureIndex = 0;
@@ -471,7 +474,8 @@ namespace GLVM::core
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
 			animationFlags.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[m], frames[m], animationFlags[m]);
+			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -3618,7 +3622,7 @@ namespace GLVM::core
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshId], 0, VK_INDEX_TYPE_UINT16);
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshId], 0, VK_INDEX_TYPE_UINT32);
 
 				unsigned int indicesContainerSize = aVertices_[meshId].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
@@ -3706,7 +3710,7 @@ namespace GLVM::core
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT32);
 
 				unsigned int indicesContainerSize = aVertices_[meshID].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
@@ -3810,7 +3814,7 @@ namespace GLVM::core
 					VkDeviceSize offsets[] = {0};
 					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 					
-					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT16);
+					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT32);
 
 					unsigned int indicesContainerSize = aVertices_[meshID].size();
 					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
