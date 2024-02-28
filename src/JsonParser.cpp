@@ -1188,6 +1188,9 @@ namespace GLVM::Core
 				aVertexes_.push_back(weightsContainer[index + 3]);
 			}
 		}
+
+		delete [] buffer;
+		buffer = nullptr;
 	}
 
 	void CJsonParser::traversalBones( core::vector<core::vector<int>> children,
