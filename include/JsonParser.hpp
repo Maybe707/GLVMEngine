@@ -57,8 +57,7 @@ namespace GLVM::Core
 		JsonValue() { type = JSON_INVALID_VALUE; }
 		JsonValue(std::string _string) {
 			type = JSON_STRING;
-			value.string = new std::string;
-			new (value.string) std::string{_string};
+			value.string = new std::string(_string);
 		}
 		JsonValue(double _float) {
 			type = JSON_FLOAT_NUMBER;
@@ -82,8 +81,7 @@ namespace GLVM::Core
 			
 			switch (_value.type) {
 			case JSON_OBJECT:
-				value.object = new HashMap<JsonValue>;
-				new (value.object) HashMap<JsonValue>{*_value.value.object};
+				value.object = new HashMap<JsonValue>(*_value.value.object);
 				break;
 			case JSON_INTEGER_NUMBER:
 				value.iNumber = _value.value.iNumber;
@@ -92,8 +90,7 @@ namespace GLVM::Core
 				value.fNumber = _value.value.fNumber;
 				break;
 			case JSON_STRING:
-				value.string = new std::string;
-				new (value.string) std::string{*_value.value.string};
+				value.string = new std::string(*_value.value.string);
 				break;
 			case JSON_BOOLEAN:
 				value.boolean = _value.value.boolean;
@@ -102,8 +99,7 @@ namespace GLVM::Core
 				value.null = _value.value.null;
 				break;
 			case JSON_ARRAY:
-				value.array = new core::vector<JsonValue>;
-				new (value.array) core::vector<JsonValue>{*_value.value.array};
+				value.array = new core::vector<JsonValue>(*_value.value.array);
 				break;
 			default:
 				break;
@@ -116,21 +112,21 @@ namespace GLVM::Core
 			case JSON_INVALID_VALUE:
 				break;
 			case JSON_OBJECT:
-				value.object->~HashMap();
+				delete value.object;
 				break;
 			case JSON_INTEGER_NUMBER:
 				break;
 			case JSON_FLOAT_NUMBER:
 				break;
 			case JSON_STRING:
-				value.string->~basic_string();
+				delete value.string;
 				break;
 			case JSON_BOOLEAN:
 				break;
 			case JSON_NULL:
 				break;
 			case JSON_ARRAY:
-				value.array->~vector();
+				delete value.array;
 				break;
 			}
 		}
@@ -140,28 +136,27 @@ namespace GLVM::Core
 			case JSON_INVALID_VALUE:
 				break;
 			case JSON_OBJECT:
-				value.object->~HashMap();
+				delete value.object;
 				break;
 			case JSON_INTEGER_NUMBER:
 				break;
 			case JSON_FLOAT_NUMBER:
 				break;
 			case JSON_STRING:
-				value.string->~basic_string();
+				delete value.string;
 				break;
 			case JSON_BOOLEAN:
 				break;
 			case JSON_NULL:
 				break;
 			case JSON_ARRAY:
-				value.array->~vector();
+				delete value.array;
 				break;
 			}
 
 			switch (_value.type) {
 			case JSON_OBJECT:
-				value.object = new HashMap<JsonValue>;
-				new (value.object) HashMap<JsonValue>{*_value.value.object};
+				value.object = new HashMap<JsonValue>(*_value.value.object);
 				break;
 			case JSON_INTEGER_NUMBER:
 				value.iNumber = _value.value.iNumber;
@@ -170,8 +165,7 @@ namespace GLVM::Core
 				value.fNumber = _value.value.fNumber;
 				break;
 			case JSON_STRING:
-				value.string = new std::string;
-				new (value.string) std::string{*_value.value.string};
+				value.string = new std::string(*_value.value.string);
 				break;
 			case JSON_BOOLEAN:
 				value.boolean = _value.value.boolean;
@@ -180,8 +174,7 @@ namespace GLVM::Core
 				value.null = _value.value.null;
 				break;
 			case JSON_ARRAY:
-				value.array = new core::vector<JsonValue>;
-				new (value.array) core::vector<JsonValue>{*_value.value.array};
+				value.array = new core::vector<JsonValue>(*_value.value.array);
 				break;
 			default:
 				break;

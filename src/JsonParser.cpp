@@ -169,7 +169,6 @@ namespace GLVM::Core
 		JsonValue* jsonObject = new JsonValue;
 		jsonObject->type = JSON_OBJECT;
 		jsonObject->value.object = new HashMap<JsonValue>;
-		new (jsonObject->value.object) HashMap<JsonValue>;
 		return jsonObject;
 	}
 
