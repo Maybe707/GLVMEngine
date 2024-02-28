@@ -19,7 +19,7 @@ namespace GLVM::core
 			if (size_ == capacity) {
 				capacity += capacity / 2 + expander;
 
-				delete data;
+				delete [] data;
 				data = nullptr;
 			
 				data = new T[capacity];
@@ -37,7 +37,7 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < half_size; ++i )
 					temp[i] = data[i];
 				
-				delete data;
+				delete [] data;
 				data = temp;
 
 				temp = nullptr;

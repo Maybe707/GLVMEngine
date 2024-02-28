@@ -133,7 +133,7 @@ int main()
 //	ComponentManager->GetComponent<cm::texture>(uiWitch)->id = 1;
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.0f };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = simpleCubeHandle_GLTF;
+    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = monkeyHandle_OBJ;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
