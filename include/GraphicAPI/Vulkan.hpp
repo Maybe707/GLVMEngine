@@ -399,8 +399,8 @@ namespace GLVM::core
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
 //		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
-        std::vector<std::vector<uint32_t>> aIndices_;
-		std::vector<std::vector<float>> aVertexesTemp_;                   ///< Temp
+        std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
+		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
 		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;

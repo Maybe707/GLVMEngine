@@ -470,12 +470,12 @@ namespace GLVM::core
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			aVertexesTemp_.emplace_back();
-			aIndicesTemp_.emplace_back();
+			aIndices_.emplace_back();
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
 			animationFlags.Push({});
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndicesTemp_[m], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -540,7 +540,7 @@ namespace GLVM::core
 
             indexBufferContainer.emplace_back();
             indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndicesTemp_[m]);
+            createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
 		}
 	}
 	
@@ -2912,7 +2912,7 @@ namespace GLVM::core
 
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-			unsigned int indicesContainerSize = aVertices_[uiVertexId].size();
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
@@ -3624,7 +3624,7 @@ namespace GLVM::core
 
 				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshId], 0, VK_INDEX_TYPE_UINT32);
 
-				unsigned int indicesContainerSize = aVertices_[meshId].size();
+				unsigned int indicesContainerSize = aIndices_[meshId].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
 		
@@ -3712,7 +3712,7 @@ namespace GLVM::core
 
 				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT32);
 
-				unsigned int indicesContainerSize = aVertices_[meshID].size();
+				unsigned int indicesContainerSize = aIndices_[meshID].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
 		
@@ -3816,7 +3816,7 @@ namespace GLVM::core
 					
 					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[meshID], 0, VK_INDEX_TYPE_UINT32);
 
-					unsigned int indicesContainerSize = aVertices_[meshID].size();
+					unsigned int indicesContainerSize = aIndices_[meshID].size();
 					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 				}
 		
