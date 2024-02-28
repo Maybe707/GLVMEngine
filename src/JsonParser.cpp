@@ -429,10 +429,8 @@ namespace GLVM::Core
 		int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> vertices_position;
-		for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 ) {
-			std::cout << reinterpret_cast<float &>(buffer[i]) << std::endl;
+		for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 )
 			vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
-		}
 
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
 		int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;

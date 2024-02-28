@@ -398,6 +398,7 @@ namespace GLVM::core
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
+//		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
         std::vector<std::vector<uint32_t>> aIndices_;
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< Temp
 		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
@@ -549,6 +550,7 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> vertexBufferMemoryContainer;
         std::vector<VkBuffer> indexBufferContainer;
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
+		uint32_t wavefrontObjCounter = 0;
 
         std::vector<VkBuffer> modelMatrixUniformBuffers;
         std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;

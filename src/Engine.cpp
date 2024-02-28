@@ -267,21 +267,21 @@ namespace GLVM::core
     }
 
 	ecs::components::MeshHandle Engine::LoadMeshFromFile_OBJ(const char* _pathToMesh) {
-		uint32_t meshID = pathsArray_.size();
 		ecs::components::MeshHandle meshHandle;
 		meshHandle.id = meshID;
         pathsArray_.push_back(_pathToMesh);
 		meshHandlers.Push(meshHandle);
+		++meshID;
 
 		return meshHandle;
     }
 
 	ecs::components::MeshHandle Engine::LoadMeshFromFile_GLTF(const char* pathToMesh) {
-		uint32_t meshID = pathsGLTF_.GetSize();
 		ecs::components::MeshHandle meshHandle;
 		meshHandle.id = meshID;
         pathsGLTF_.Push(pathToMesh);
 		meshHandlers.Push(meshHandle);
+		++meshID;
 
 		return meshHandle;
 	}

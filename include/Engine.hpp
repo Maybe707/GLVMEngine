@@ -49,6 +49,7 @@ namespace GLVM::core
 		core::vector<ecs::TextureHandle> textureHandlers;
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
+		uint32_t meshID = 0;
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		CVulkanRenderer*     vulkanRenderer;
 		COpenglRenderer*     openglRenderer;

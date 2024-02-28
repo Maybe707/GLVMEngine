@@ -126,15 +126,18 @@ namespace GLVM::core
 					normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
 					SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
 
-					SVertex jointIndices;
+					vec4 jointIndices;
+					vec4 weights;
+
 					jointIndices[0] = -1;
 					jointIndices[1] = -1;
 					jointIndices[2] = -1;
+					jointIndices[3] = -1;
 
-					SVertex weights;
-					weights[0] = 0.0f;
-					weights[1] = 0.0f;
-					weights[2] = 0.0f;
+					weights[0] = 1.0f;
+					weights[1] = 1.0f;
+					weights[2] = 1.0f;
+					weights[2] = 1.0f;
 					
                     aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
 											 {normal[0], normal[1], normal[2]},
@@ -150,6 +153,7 @@ namespace GLVM::core
             indexBufferContainer.emplace_back();
             indexBufferMemoryContaner.emplace_back();
             createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+			++wavefrontObjCounter;
         }
     }
 
@@ -471,8 +475,9 @@ namespace GLVM::core
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-            aIndices_.emplace_back();
-            aVertices_.emplace_back();
+//            aIndices_.emplace_back();
+//            aVertices_.emplace_back();
+			aVertices_.emplace_back();
 
 			int stepOffset = 0;
 			if ( animationFlags[m] )
@@ -493,7 +498,7 @@ namespace GLVM::core
 				texture[1] = aVertexesTemp_[m][n + 7];
 				vec4 joinIndices;
 				vec4 weights;
-				if ( animationFlags[m] ) { 
+				if ( animationFlags[m] ) {
 					joinIndices[0] = -1;
 					joinIndices[1] = -1;
 					joinIndices[2] = -1;
@@ -503,6 +508,7 @@ namespace GLVM::core
 					weights[1] = 1;
 					weights[2] = 1;
 					weights[3] = 1;
+					
 				} else {
 					joinIndices[0] = aVertexesTemp_[m][n + 8];
 					joinIndices[1] = aVertexesTemp_[m][n + 9];
@@ -514,20 +520,23 @@ namespace GLVM::core
 					weights[2] = aVertexesTemp_[m][n + 14];
 					weights[3] = aVertexesTemp_[m][n + 15];
 				}
-				
-				aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
+
+				uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+				aVertices_[nextIndexGLTF].push_back({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
 										 {weights[0], weights[1], weights[2], weights[3]}});
 			}
+			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
-            createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
+            createVertexBuffer(vertexBufferContainer[nextIndexGLTF], vertexBufferMemoryContainer[nextIndexGLTF], aVertices_[nextIndexGLTF]);
 
             indexBufferContainer.emplace_back();
             indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndicesTemp_[m]);
+            createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndicesTemp_[m]);
 		}
 	}
 	
@@ -566,7 +575,7 @@ namespace GLVM::core
 		createDirectionalLightShadowMapTextureSamplers();
 		createSpotLightShadowMapTextureSamplers();
 		createPointLightShadowMapTextureSamplers();
-//        loadWavefrontObj();
+        loadWavefrontObj();
 		initializeGLTF();
 		
         createMainRenderUniformBuffers();
@@ -1932,7 +1941,6 @@ namespace GLVM::core
 		VkDeviceSize lightSpaceMatrixSize = sizeof(LightSpaceMatrixUBO);
 		VkDeviceSize modelShadowMapMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
-		std::cout << "struct size: " << modelMatrixBufferSize << std::endl;
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -2060,7 +2068,6 @@ namespace GLVM::core
 
 			memory += lightDataBufferSize;
 		}
-		std::cout << "memory size: " << memory << std::endl;
     }
 
     void CVulkanRenderer::createMainRenderDescriptorPool() {
@@ -2894,7 +2901,7 @@ namespace GLVM::core
 			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 									1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
-			
+
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3845,7 +3852,7 @@ namespace GLVM::core
     VkPresentModeKHR CVulkanRenderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR || availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
-				std::cout << "present mode found!" << std::endl;
+//				std::cout << "present mode found!" << std::endl;
                 return availablePresentMode;
             }
         }
