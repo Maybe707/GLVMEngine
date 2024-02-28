@@ -15,14 +15,31 @@ namespace GLVM::core
 	
 		T* data = nullptr;
 	public:
+		stack() {
+			data = new T[expander];
+		}
+
+		stack(const stack& stack) {
+			this->size_ = stack.size_;
+			this->capacity = stack.capacity;
+			this->expander = stack.expander;
+			T* temp = new T[stack.capacity];
+			for ( unsigned int i = 0; i < stack.size_; ++ i )
+				temp[i] = stack.data[i];
+
+			data = temp;
+		}
+		
 		void push(T element) {
 			if (size_ == capacity) {
+				unsigned int oldCapacity = capacity;
 				capacity += capacity / 2 + expander;
+				T* temp = new T[capacity];
+				for ( unsigned int i = 0; i < oldCapacity; ++i )
+					temp[i] = data[i];
 
 				delete [] data;
-				data = nullptr;
-			
-				data = new T[capacity];
+				data = temp;
 			}
 
 			data[size_] = element;
@@ -31,17 +48,6 @@ namespace GLVM::core
 	
 		T pop() {
 			assert(size_ > 0);
-			unsigned int half_size = expander / 2;
-			if ( size_ < half_size ) {
-				T* temp = new T[half_size];
-				for ( unsigned int i = 0; i < half_size; ++i )
-					temp[i] = data[i];
-				
-				delete [] data;
-				data = temp;
-
-				temp = nullptr;
-			}
 			
 			--size_;
 			data[size_] = 999;
@@ -82,6 +88,10 @@ namespace GLVM::core
 
 			if ( flag )
 				size_ -= 1;
+		}
+
+		~stack() {
+			delete [] data;
 		}
 	};
 
