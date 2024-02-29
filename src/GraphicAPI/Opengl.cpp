@@ -790,6 +790,9 @@ namespace GLVM::core
 			aVertexes_.emplace_back();
             aIndices_.emplace_back();
 
+			jointMatricesPerMesh.Push({});
+			frames.Push({});
+			
             unsigned int vertexIndex = 0;
             unsigned int textureIndex = 0;
 			unsigned int normalIndex = 0;
@@ -816,12 +819,13 @@ namespace GLVM::core
 					aVertexes_[m].push_back(-1);
 					aVertexes_[m].push_back(-1);
 					aVertexes_[m].push_back(-1);
-					aVertexes_[m].push_back(0.0);
-					aVertexes_[m].push_back(0.0);
-					aVertexes_[m].push_back(0.0);
-					aVertexes_[m].push_back(0.0);
+					aVertexes_[m].push_back(1.0);
+					aVertexes_[m].push_back(1.0);
+					aVertexes_[m].push_back(1.0);
+					aVertexes_[m].push_back(1.0);
                 }
 			SetVertices(aIndices_[m], aVertexes_[m]);
+			++wavefrontObjCounter;
         }
     }
 
@@ -931,7 +935,7 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < textureVector.size(); ++i ) {
 			LoadTextureData(textureVector[i]);
 		}
-//		loadWavefrontObj();
+		loadWavefrontObj();
 		
 		core::vector<bool> animationFlags;
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -941,20 +945,22 @@ namespace GLVM::core
 			jointMatricesPerMesh.Push({});
 			frames.Push({});
 			animationFlags.Push({});
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[m], aIndices_[m], jointMatricesPerMesh[m], frames[m], animationFlags[m]);
+			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[nextIndexGLTF], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
 		}
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
 			std::vector<float> currentVertices;
 			if ( animationFlags[m] ) {
-				for ( unsigned int n = 0; n < aVertexes_[m].size(); n += 8 ) {
-					currentVertices.push_back(aVertexes_[m][n]);
-					currentVertices.push_back(aVertexes_[m][n + 1]);
-					currentVertices.push_back(aVertexes_[m][n + 2]);
-					currentVertices.push_back(aVertexes_[m][n + 3]);
-					currentVertices.push_back(aVertexes_[m][n + 4]);
-					currentVertices.push_back(aVertexes_[m][n + 5]);
-					currentVertices.push_back(aVertexes_[m][n + 6]);
-					currentVertices.push_back(aVertexes_[m][n + 7]);
+				for ( unsigned int n = 0; n < aVertexes_[nextIndexGLTF].size(); n += 8 ) {
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 1]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 2]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 3]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 4]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 5]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 6]);
+					currentVertices.push_back(aVertexes_[nextIndexGLTF][n + 7]);
 					
 					currentVertices.push_back(-1);
 					currentVertices.push_back(-1);
@@ -966,9 +972,9 @@ namespace GLVM::core
 					currentVertices.push_back(1);
 				}
 			
-				SetVertices(aIndices_[m], currentVertices);
+				SetVertices(aIndices_[nextIndexGLTF], currentVertices);
 			} else {
-				SetVertices(aIndices_[m], aVertexes_[m]);
+				SetVertices(aIndices_[nextIndexGLTF], aVertexes_[nextIndexGLTF]);
 			}
 		}
 	}

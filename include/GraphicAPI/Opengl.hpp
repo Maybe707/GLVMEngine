@@ -122,6 +122,7 @@ namespace GLVM::core {
         std::vector<ecs::Texture> hudTexture_load_data_;
 		std::vector<std::vector<float>> aVertexes_;
 		std::vector<std::vector<unsigned int>> aIndices_;
+		uint32_t wavefrontObjCounter = 0;
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 		float frameAccumulator = 0.0f;
