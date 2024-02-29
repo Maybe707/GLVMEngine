@@ -78,26 +78,26 @@ namespace GLVM::core
 		}
 		
 		SetProjectionMatrix();
-		mutex0.lock();
-		mutex1.lock();
-		mutex2.lock();
-		std::thread directionalLightShadowMapThread(&CVulkanRenderer::directionalLightShadowMapDrawFrame, this);
-		std::thread spotLightShadowMapThread(&CVulkanRenderer::spotLightShadowMapDrawFrame, this);
-		std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
-		std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
+		// mutex0.lock();
+		// mutex1.lock();
+		// mutex2.lock();
+		// std::thread directionalLightShadowMapThread(&CVulkanRenderer::directionalLightShadowMapDrawFrame, this);
+		// std::thread spotLightShadowMapThread(&CVulkanRenderer::spotLightShadowMapDrawFrame, this);
+		// std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
+		// std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
 
-		// directionalLightShadowMapDrawFrame();
-		// spotLightShadowMapDrawFrame();
-		// pointLightShadowMapDrawFrame();
-		// mainRenderDrawFrame();
+		directionalLightShadowMapDrawFrame();
+		spotLightShadowMapDrawFrame();
+		pointLightShadowMapDrawFrame();
+		mainRenderDrawFrame();
 		
 		#ifdef VK_USE_PLATFORM_XCB_KHR
         vkDeviceWaitIdle(device);
 		#endif
-		directionalLightShadowMapThread.join();
-		spotLightShadowMapThread.join();
-		pointLightShadowMapThread.join();
-		mainRenderThread.join();
+		// directionalLightShadowMapThread.join();
+		// spotLightShadowMapThread.join();
+		// pointLightShadowMapThread.join();
+		// mainRenderThread.join();
     }
 
     void CVulkanRenderer::loadWavefrontObj() {
@@ -3301,12 +3301,12 @@ namespace GLVM::core
 
     void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
-		mutex0.lock();
-		mutex0.unlock();
-		mutex1.lock();
-		mutex1.unlock();
-		mutex2.lock();
-		mutex2.unlock();
+		// mutex0.lock();
+		// mutex0.unlock();
+		// mutex1.lock();
+		// mutex1.unlock();
+		// mutex2.lock();
+		// mutex2.unlock();
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
@@ -3369,18 +3369,18 @@ namespace GLVM::core
 
     void CVulkanRenderer::directionalLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
-		shadowMapPassesMutex.lock();
+//		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+        uint32_t imageIndex = 0;
+        // VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        //     recreateSwapChain();
+        //     return;
+        // } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        //     throw std::runtime_error("failed to acquire swap chain image!");
+        // }
 
         vkResetFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame]);
         vkResetCommandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
@@ -3389,63 +3389,63 @@ namespace GLVM::core
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
+        // VkSemaphore waitSemaphores[] = {directionalLightShadowMapImageAvailableSemaphores[directionalLightCurrentFrame]};
+        // VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        // submitInfo.waitSemaphoreCount = 1;
+        // submitInfo.pWaitSemaphores = waitSemaphores;
+        // submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &directionalLightCommandBuffers[directionalLightCurrentFrame];
 
-        VkSemaphore signalSemaphores[] = {directionalLightShadowMapRenderFinishedSemaphores[directionalLightCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        // VkSemaphore signalSemaphores[] = {directionalLightShadowMapRenderFinishedSemaphores[directionalLightCurrentFrame]};
+        // submitInfo.signalSemaphoreCount = 1;
+        // submitInfo.pSignalSemaphores = signalSemaphores;
 
         if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, directionalLightShadowMapInFlightFences[directionalLightCurrentFrame]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        // VkPresentInfoKHR presentInfo{};
+        // presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
+        // presentInfo.waitSemaphoreCount = 1;
+        // presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
+        // VkSwapchainKHR swapChains[] = {swapChain};
+        // presentInfo.swapchainCount = 1;
+        // presentInfo.pSwapchains = swapChains;
 
-        presentInfo.pImageIndices = &imageIndex;
+        // presentInfo.pImageIndices = &imageIndex;
 
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+        // result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        //     framebufferResized = false;
+        //     recreateSwapChain();
+        // } else if (result != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to present swap chain image!");
+        // }
 
         directionalLightCurrentFrame = (directionalLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-		shadowMapPassesMutex.unlock();
-		mutex0.unlock();
+		// shadowMapPassesMutex.unlock();
+		// mutex0.unlock();
     }
 
 	void CVulkanRenderer::spotLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
-		shadowMapPassesMutex.lock();
+//		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+        uint32_t imageIndex = 0;
+        // VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        //     recreateSwapChain();
+        //     return;
+        // } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        //     throw std::runtime_error("failed to acquire swap chain image!");
+        // }
 
         vkResetFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame]);
         vkResetCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
@@ -3454,63 +3454,63 @@ namespace GLVM::core
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
+        // VkSemaphore waitSemaphores[] = {spotLightShadowMapImageAvailableSemaphores[spotLightCurrentFrame]};
+        // VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        // submitInfo.waitSemaphoreCount = 1;
+        // submitInfo.pWaitSemaphores = waitSemaphores;
+        // submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &spotLightCommandBuffers[spotLightCurrentFrame];
 
-        VkSemaphore signalSemaphores[] = {spotLightShadowMapRenderFinishedSemaphores[spotLightCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        // VkSemaphore signalSemaphores[] = {spotLightShadowMapRenderFinishedSemaphores[spotLightCurrentFrame]};
+        // submitInfo.signalSemaphoreCount = 1;
+        // submitInfo.pSignalSemaphores = signalSemaphores;
 
         if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, spotLightShadowMapInFlightFences[spotLightCurrentFrame]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        // VkPresentInfoKHR presentInfo{};
+        // presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
+        // presentInfo.waitSemaphoreCount = 1;
+        // presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
+        // VkSwapchainKHR swapChains[] = {swapChain};
+        // presentInfo.swapchainCount = 1;
+        // presentInfo.pSwapchains = swapChains;
 
-        presentInfo.pImageIndices = &imageIndex;
+        // presentInfo.pImageIndices = &imageIndex;
 
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+        // result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        //     framebufferResized = false;
+        //     recreateSwapChain();
+        // } else if (result != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to present swap chain image!");
+        // }
 
         spotLightCurrentFrame = (spotLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-		shadowMapPassesMutex.unlock();
-		mutex1.unlock();
+		// shadowMapPassesMutex.unlock();
+		// mutex1.unlock();
     }
 
 	    void CVulkanRenderer::pointLightShadowMapDrawFrame() {
 		namespace cm = GLVM::ecs::components;
-		shadowMapPassesMutex.lock();
+//		shadowMapPassesMutex.lock();
         vkWaitForFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+        uint32_t imageIndex = 0;
+        // VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame], VK_NULL_HANDLE, &imageIndex);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        //     recreateSwapChain();
+        //     return;
+        // } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+        //     throw std::runtime_error("failed to acquire swap chain image!");
+        // }
 
         vkResetFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame]);
         vkResetCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
@@ -3519,47 +3519,47 @@ namespace GLVM::core
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-        VkSemaphore waitSemaphores[] = {pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
+        // VkSemaphore waitSemaphores[] = {pointLightShadowMapImageAvailableSemaphores[pointLightCurrentFrame]};
+        // VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        // submitInfo.waitSemaphoreCount = 1;
+        // submitInfo.pWaitSemaphores = waitSemaphores;
+        // submitInfo.pWaitDstStageMask = waitStages;
 
         submitInfo.commandBufferCount = 1;
         submitInfo.pCommandBuffers = &pointLightCommandBuffers[pointLightCurrentFrame];
 
-        VkSemaphore signalSemaphores[] = {pointLightShadowMapRenderFinishedSemaphores[pointLightCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
+        // VkSemaphore signalSemaphores[] = {pointLightShadowMapRenderFinishedSemaphores[pointLightCurrentFrame]};
+        // submitInfo.signalSemaphoreCount = 1;
+        // submitInfo.pSignalSemaphores = signalSemaphores;
 
         if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, pointLightShadowMapInFlightFences[pointLightCurrentFrame]) != VK_SUCCESS) {
             throw std::runtime_error("failed to submit draw command buffer!");
         }
 
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        // VkPresentInfoKHR presentInfo{};
+        // presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
 
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
+        // presentInfo.waitSemaphoreCount = 1;
+        // presentInfo.pWaitSemaphores = signalSemaphores;
 
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
+        // VkSwapchainKHR swapChains[] = {swapChain};
+        // presentInfo.swapchainCount = 1;
+        // presentInfo.pSwapchains = swapChains;
 
-        presentInfo.pImageIndices = &imageIndex;
+        // presentInfo.pImageIndices = &imageIndex;
 
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+        // result = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
+        // if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+        //     framebufferResized = false;
+        //     recreateSwapChain();
+        // } else if (result != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to present swap chain image!");
+        // }
 
         pointLightCurrentFrame = (pointLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-		shadowMapPassesMutex.unlock();
-		mutex2.unlock();
+		// shadowMapPassesMutex.unlock();
+		// mutex2.unlock();
     }
 	
 	void CVulkanRenderer::directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
