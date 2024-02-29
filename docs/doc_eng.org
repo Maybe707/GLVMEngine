@@ -1,4 +1,4 @@
-#+title: Grey Lane Vertex Machine (GLVM) documentation
+#+title: Game Loop Versetile Module (GLVM) documentation
 #+author: Yuriorkis_Scream
 
 * Common engine description
@@ -12,68 +12,96 @@ located in special namespaces.
 
 
 * Common GLVM functions
-- Create engine instance
-  This is main super object of GLVM engine. Actualy its engine itself.
+** Create engine instance
+   This is main super object of GLVM engine. Actualy its engine itself.
 #+begin_src c++
   GLVM::core::Engine* GLVM = GLVM::core::Engine::GetInstance();
 #+end_src
 
-- Create entity manager instance
-  With this super object you can manage entities.
+** Create entity manager instance
+   With this super object you can manage entities.
 #+begin_src c++
   GLVM::ecs::EntityManager* EntityManager = GLVM::ecs::EntityManager::GetInstance();
 #+end_src
 
-- Create component manager instance
-  With this super object you can manage components.
+** Create component manager instance
+   With this super object you can manage components.
 #+begin_src c++
   GLVM::ecs::ComponentManager* ComponentManager  = GLVM::ecs::ComponentManager::GetInstance();
 #+end_src
 
-- Create entity
-  All entities in GLVM exposed just as an integer number. When you call function CreateEntity
-  you have to catch return value because its marked with [discard].
+** Create entity
+   All entities in GLVM exposed just as an integer number. When you call function CreateEntity
+   you have to catch return value because its marked with [discard].
 #+begin_src c++
   Entity uiPlayer = EntityManager->CreateEntity();
 #+end_src
 
-- Create component
-  When you create entity you can link components to it with call to a function 
-  CreateComponent<...place your list of components here...>(entity). This function is method of
-  ComponentManager and it supports any number of components as template variadic parameters.
-  Set all components you need in <> and pass target entity in ().
+** Create component
+   When you create entity you can link components to it with call to a function 
+   CreateComponent<...place your list of components here...>(entity). This function is method of
+   ComponentManager and it supports any number of components as template variadic parameters.
+   Set all components you need in <> and pass target entity in ().
 #+begin_src c++ 
   GLVM::ecs::ComponentManager->CreateComponent<GLVM::ecs::components::mesh,
 											   GLVM::ecs::components::transform,
 											   GLVM::ecs::components::rigidBody>(entity);
 #+end_src
 
-- Get component
-  After you link components to any entity you can access each single component
-  to change it for your purposes. This can be achieved with a call to a GetComponent function.
-  This function is method of ComponentManager. When you call it, pass target entity to () and pass target
-  component that linked to target entity to <>. 
+** Get component
+   After you link components to any entity you can access each single component
+   to change it for your purposes. This can be achieved with a call to a GetComponent function.
+   This function is method of ComponentManager. When you call it, pass target entity to () and pass target
+   component that linked to target entity to <>. 
 #+begin_src c++ 
   *GLVM::ecs::ComponentManager->GetComponent<cm::transform>(uiPlayer) = {
 	  .tPosition = { 5.7f, 10.0f, 7.0f }, .fScale = 0.1f };
 #+end_src
 
-- Loading textures
-  GLVM takes raw data arrays for loading images. If you want to load some common format like PNG or JPG
-  you need to transfer it to raw data. This can easily achived with simple tools like ImageMagick and XXD.
-  Imagine that we have image called robot.png.
+** Loading textures
+*** First variant
+   GLVM takes raw data arrays for loading images. If you want to load some common format like PNG or JPG
+   you need to transfer it to raw data. This can easily achived with simple tools like ImageMagick and XXD.
+   Imagine that we have image called robot.png.
 
   1. Convert it to .dat format:
 
+#+begin_src
 	 convert robot.png robot.dat
+#+end_src  
 
   2. Convert robot.dat to c-header file with static array inside:
 
+#+begin_src
 	 xxd -i robot.dat > robot.h
+#+end_src
+  
+	 Then create new file called robot.cpp and place in it all content of robot.h file. Then delete all code
+	 from robot.h except declaration of array and size of array and add to it "extern" key word. For example,
+	 if we had something like this in robot.h:
+
+#+begin_src c++	 
+  unsigned char robot_dat[] = {
+	  0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
+	  .......................................
+	  0x30, 0x48, 0x2d, 0x72, 0x01, 0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e,
+	  0x44, 0xae, 0x42, 0x60, 0x82
+  };
+  unsigned int robot_dat_len = 43997;
+#+end_src
+
+     After fixed this must be like:
+
+#+begin_src c++	 
+  extern unsigned char robot_dat[];
+  extern unsigned int robot_dat_len;
+#+end_src
 
   3. Place it in "textures" directory:
 
+#+begin_src
      mv robot.h /path/to/GLVM/textures
+#+end_src
 
   4. Then just include this header in "SpritesData.hpp":
 
@@ -86,20 +114,73 @@ located in special namespaces.
       #endif
 #+end_src
   
-  When its done you need to check actual height and width of your texture. Its easy to do with ImageMagick.
-  Just give it robot.dat or robot.png with "identify" flag.
+  When it's done you need to check actual height and width of your texture. It's easy to do with ImageMagick.
   
-  5. magick identify robot.png
+  5. Just give it robot.dat or robot.png with "identify" flag.
+
+#+begin_src
+  magick identify robot.png
+#+end_src
 
   Its give you simple output like:
-  
+
+#+begin_src
   robot.png PNG 120x279 120x279+0+0 8-bit sRGB 44103B 0.000u 0:00.000
+#+end_src
 
   We need numbers that have "x" between them. In this case this is 120x279. Width is 120 and height is 279.
 
   6.   Now we can call function "LoadTextureFromAddress" that load image to GLVM. You need to give it width, height,
 	 length of image array and actual array that contain "robot.h".
-
+  
 #+begin_src c++
 	[[maybe_unused]] ecs::TextureHandle robotTextureHandle = GLVM->LoadTextureFromAddress(120, 279, robot_dat_len, robot_dat);
+#+end_src
+
+*** Second variant
+  If you are a bit struggling with first version of loading textures you can use sbi_image library.
+  For that you need to add this define and include in source file of preferred API's:
+
+  For Vulkan.cpp:
+#+begin_src c++
+  .........
+  #include <vulkan/vulkan_core.h>
+
+  #define STB_IMAGE_IMPLEMENTATION
+  #include "stb_image.h"
+
+  namespace GLVM::core
+  ........
+#+end_src
+
+  For Opengl.cpp:
+#+begin_src c++
+  .........
+  #include <thread>
+
+  #define STB_IMAGE_IMPLEMENTATION
+  #include "stb_image.h"
+  
+  namespace GLVM::core
+  ........
+#+end_src
+
+  2. Now you can simply call function "LoadTextureFromFile". Just give it a path to your texture.
+
+#+begin_src c++
+  [[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromFile("../textures/data/gray.png");
+#+end_src
+	 
+** Loading model format files
+   You can use Wavefron.obj and GLTF model file formats for loading your models into GLVM. Just pass path to file
+   as argument to appropriate function.
+
+   For Wavefront.obj:
+#+begin_src c++
+  [[maybe_unused]] cm::MeshHandle coneHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cone.obj");
+#+end_src
+   
+For GLTF:
+#+begin_src c++
+  [[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 #+end_src
