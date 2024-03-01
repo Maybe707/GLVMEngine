@@ -62,12 +62,9 @@ ECS даёт возможность легко добавлять новые и 
 
 ** Загрузка текстур
 *** Первый способ
-   GLVM takes raw data arrays for loading images. If you want to load some common format like PNG or JPG
-   you need to transfer it to raw data. This can easily achived with simple tools like ImageMagick and XXD.
-   Imagine that we have image called robot.png.
    GLVM принимает массивы сырых данных для загрузки текстур. Если вы хотите загрузить типичный формат, такой
    как PNG или JPG, вам необходимо преобразовать его в сырые данные. Это можно легко сделать с помощью простых
-   инструментов. Таких как ImageMagic и XXD. Предположим у нас есть текстура в файле robot.png.
+   инструментов. Таких как ImageMagic и XXD (для XXD необходимо установить Vim). Предположим у нас есть текстура в файле robot.png.
 
   1. Преобразуйте её к .dat формату:
 
