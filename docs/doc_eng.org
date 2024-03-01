@@ -180,3 +180,33 @@ For GLTF:
   [[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 #+end_src
  
+** Creating new systems
+   GLVM from the box have four common systems: 'CollisionSystem', 'MovementSystem', 'PhysicsSystem', 'ProjectileSystem'.
+   If you want you can make your own custom systems. 
+
+   1. Add in Engine.hpp pointer on your new system class:
+   
+   In Engine.hpp:
+#+begin_src c++
+  class Engine
+  {
+	  ......
+	  ecs::NewSystem* newSystem;
+	  ......
+  };
+#+end_src
+
+   2. Initialize pointer and activate it with calling 'ActivateSystem(newSystem)' method of 'SystemManager' class in constructor of Engine class:
+
+#+begin_src c++
+  Engine::Engine() {
+	  ......
+	  newSystem          = new ecs::NewSystem();
+
+	  pSystem_Manager->ActivateSystem(newSystem);
+	  ......
+  };
+#+end_src
+
+** Choosing Xlib or XCB window system (For Linux only)
+   

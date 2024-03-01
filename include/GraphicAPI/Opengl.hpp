@@ -29,6 +29,7 @@
 
 #ifdef __linux__
 #include "UnixApi/WindowXOpengl.hpp"
+#include "UnixApi/WindowXCBVulkan.hpp"
 #endif
 
 #ifdef _WIN32
