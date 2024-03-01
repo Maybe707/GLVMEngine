@@ -68,10 +68,23 @@ This is my simple game engine for Linux and Windows OS's with both Vulkan and Op
 
          winget install MSYS2.MSYS2
 
-* #### Then get needed compiler tools:
-        From msys2 we need to take compiler with standard libraries:
+* #### Then get needed compiler tools and Vulkan:
+  Inside MSYS2 for simplier way of installing packages frist of all we need to install pactoys:
 
-        pacman -S mingw-w64-ucrt-x86_64-llvm
+      pacman -S pactoys
 
-        
+  Now we can use just shortened names of packages inside any MSYS2 toolchain:
 
+      pacboy -S gcc:p
+      pacboy -S vulkan:p
+
+ ## Building GLVM:
+    1. In main project firectory create directory called "build".
+    2. Then copy to main directory preffered Makefile depends on operating system from Makefiles/Lin or Makefiles/Win.
+       If you building from Windows you can choose one of the four make files to build inside cmd, power shell, ucrt MSYS2 or
+       clang64 MSYS2 toolchain.
+    3. After copying make file type next command in project main directory from inside cmd, poiwer shell or MSYS2 terminal:
+
+           make -f Makefile
+
+       where "Makefile" - is a make file you choosen.
