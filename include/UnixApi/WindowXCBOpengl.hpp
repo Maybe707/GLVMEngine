@@ -21,13 +21,21 @@
 namespace GLVM::core
 {
     typedef uint32_t xcb_window_t;
+
+	enum KeySyms {
+		X_SPACE_KEY_SYM = 32,
+		X_ESC_KEY_SYM = 97,
+		X_W_KEY_SYM = 100,
+		X_S_KEY_SYM = 115,
+		X_A_KEY_SYM = 119,
+		S_D_KEY_SYM = 65307
+	};
 	
 	class WindowXCBOpengl : public IWindow
 	{
 		xcb_connection_t*  connection;
 		xcb_screen_t*      screen;
 		xcb_window_t       window;
-		xcb_key_symbols_t* key_symbols;
 
 		Display* display;
 		int default_screen;
@@ -52,6 +60,7 @@ namespace GLVM::core
 		void SwapBuffers() override;
         void ClearDisplay() override;
         bool HandleEvent(CEvent& _Event) override;
+		xcb_keysym_t convertKeyCodeToSym(xcb_key_release_event_t *key_release_event);
         void Close() override;
         void CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset) override;
 	};

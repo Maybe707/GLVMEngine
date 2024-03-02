@@ -258,7 +258,7 @@ namespace GLVM::core
 
 				xcb_generic_event_t* next_generic_event = xcb_poll_for_queued_event(connection);
 				if ( next_generic_event != NULL ) {
-					xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)generic_event;
+					xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)next_generic_event;
 					xcb_keysym_t press_keysym = xcb_key_press_lookup_keysym(key_symbols, key_press_event, 0);
 					xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
 					

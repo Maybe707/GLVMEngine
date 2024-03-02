@@ -300,6 +300,11 @@ namespace GLVM::core
 // 		}
 
 		while ((generic_event = xcb_poll_for_event (connection))) {
+			// int num_events = 0;
+			// while (xcb_poll_for_queued_event(connection)) {
+			// 	num_events++;
+			// }
+			// std::cout << num_events << std::endl;
 			switch (generic_event->response_type & ~0x80) {
 			case XCB_EXPOSE: {
 				[[maybe_unused]] xcb_expose_event_t *expose_event = (xcb_expose_event_t *)generic_event;
@@ -310,7 +315,7 @@ namespace GLVM::core
 			}
 			case XCB_BUTTON_PRESS: {
 				xcb_button_press_event_t *expose_event = (xcb_button_press_event_t *)generic_event;
-				print_modifiers(expose_event->state);
+//				print_modifiers(expose_event->state);
 
 				switch (expose_event->detail) {
 				case 1:
@@ -337,7 +342,7 @@ namespace GLVM::core
 			}
 			case XCB_BUTTON_RELEASE: {
 				xcb_button_release_event_t *expose_event = (xcb_button_release_event_t *)generic_event;
-				print_modifiers(expose_event->state);
+//				print_modifiers(expose_event->state);
 
 				switch (expose_event->detail) {
 				case 1:
@@ -391,36 +396,38 @@ namespace GLVM::core
 			// }
 			case XCB_KEY_PRESS: {
 				xcb_key_press_event_t *expose_event = (xcb_key_press_event_t *)generic_event;
-				print_modifiers(expose_event->state);
-
+//				print_modifiers(expose_event->state);
+				std::cout << "KEY PRESS" << std::endl;
 				// printf ("Key pressed in window %i\n",
 				// 		expose_event->event);
 
 //				xcb_keycode_t key_code = expose_event->detail;
 //				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
-				[[maybe_unused]] xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
-				std::cout << "KEYSYM: " << (int)expose_event->detail << std::endl;
-				int keycode = (int)expose_event->detail;
-				switch ( keycode ) {
-					case 9:
-						keysym = 65307;
-						break;
-					case 38:
-						keysym = 97;
-						break;
-					case 40:
-						keysym = 100;
-						break;
-					case 39:
-						keysym = 115;
-						break;
-					case 25:
-						keysym = 119;
-						break;
-					case 65:
-						keysym = 32;
-						break;
-				}
+				// [[maybe_unused]] xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
+				// std::cout << "KEYSYM: " << (int)expose_event->detail << std::endl;
+//				int keycode = (int)expose_event->detail;
+
+				xcb_keysym_t keysym = convertKeyCodeToSym(expose_event);
+				// switch ( keycode ) {
+				// 	case 9:
+				// 		keysym = 65307;
+				// 		break;
+				// 	case 38:
+				// 		keysym = 97;
+				// 		break;
+				// 	case 40:
+				// 		keysym = 100;
+				// 		break;
+				// 	case 39:
+				// 		keysym = 115;
+				// 		break;
+				// 	case 25:
+				// 		keysym = 119;
+				// 		break;
+				// 	case 65:
+				// 		keysym = 32;
+				// 		break;
+				// }
 
 				switch(keysym)
 					{
@@ -448,66 +455,105 @@ namespace GLVM::core
 			}
 			case XCB_KEY_RELEASE: {
 				xcb_key_release_event_t *key_release_event = (xcb_key_release_event_t *)generic_event;
-				print_modifiers(key_release_event->state);
+//				print_modifiers(key_release_event->state);
 
-				printf ("Key released in window %i\n",
-						key_release_event->event);
+				// int num_events = 0;
+				// while (xcb_poll_for_queued_event(connection)) {
+				// 	num_events++;
+				// }
+				// std::cout << "first check: " << num_events << std::endl;
 
+				// num_events = 0;
+				// while (xcb_poll_for_queued_event(connection)) {
+				// 	num_events++;
+				// }
+				// std::cout << "second check: " << num_events << std::endl;
+
+				// printf ("Key released in window %i\n",
+				// 		key_release_event->event);
+				std::cout << "KEY REALEASE" << std::endl;
 				xcb_generic_event_t* next_generic_event = xcb_poll_for_queued_event(connection);
 				if ( next_generic_event != NULL ) {
-					xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)generic_event;
-					xcb_keysym_t press_keysym = xcb_key_press_lookup_keysym(key_symbols, key_press_event, 0);
-					xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
+					xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)next_generic_event;
+					// xcb_keysym_t press_keysym = xcb_key_press_lookup_keysym(key_symbols, key_press_event, 0);
+					// xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
+
+					xcb_keysym_t press_keysym = convertKeyCodeToSym(key_press_event);
+					xcb_keysym_t release_keysym = convertKeyCodeToSym(key_release_event);
 					
 					if (next_generic_event->response_type == XCB_KEY_PRESS &&
 						key_press_event->time == key_release_event->time &&
 						press_keysym == release_keysym)
 					{
 						///< Key wasn’t actually released
+						// printf ("Key FAKE released in window %i\n",
+						// 		key_release_event->event);
+						std::cout << "Key FAKE released in window" << std::endl;
 						generic_event = xcb_poll_for_event (connection);
+//						free (generic_event);
 						continue;
+					} else {
+						switch(release_keysym)
+							{
+							case 97:
+								printf ("Key released in window %i\n",
+										key_release_event->event);
+								_Event.SetEvent(GLVM::core::eKEYRELEASE_A);
+								break;
+							case 100:
+								printf ("Key released in window %i\n",
+										key_release_event->event);
+								_Event.SetEvent(GLVM::core::eKEYRELEASE_D);
+								break;
+							case 115:
+								printf ("Key released in window %i\n",
+										key_release_event->event);
+								_Event.SetEvent(GLVM::core::eKEYRELEASE_S);
+								break;
+							case 119:
+								printf ("Key released in window %i\n",
+										key_release_event->event);
+								_Event.SetEvent(GLVM::core::eKEYRELEASE_W);
+								break;
+							case 32:
+								printf ("Key released in window %i\n",
+										key_release_event->event);
+								_Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
+								break;
+							}
 					}
 				}
 				
-				xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
-				std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
-				int keycode = (int)key_release_event->detail;
-				switch ( keycode ) {
-					case 9:
-						release_keysym = 65307;
-						break;
-					case 38:
-						release_keysym = 97;
-						break;
-					case 40:
-						release_keysym = 100;
-						break;
-					case 39:
-						release_keysym = 115;
-						break;
-					case 25:
-						release_keysym = 119;
-						break;
-					case 65:
-						release_keysym = 32;
-						break;
-				}
-				
+				// xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
+				// std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
+
+				xcb_keysym_t release_keysym = convertKeyCodeToSym(key_release_event);
+
                 switch(release_keysym)
                 {
                 case 97:
+					printf ("Key released in window %i\n",
+							key_release_event->event);
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
                 case 100:
+					printf ("Key released in window %i\n",
+							key_release_event->event);
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_D);
                     break;
                 case 115:
+ 					printf ("Key released in window %i\n",
+							key_release_event->event);
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_S);
                     break;
                 case 119:
+ 					printf ("Key released in window %i\n",
+							key_release_event->event);
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_W);
                     break;
                 case 32:
+ 					printf ("Key released in window %i\n",
+							key_release_event->event);
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
                     break;
                 }
@@ -526,6 +572,33 @@ namespace GLVM::core
 
 		return false;
 	};
+
+	xcb_keysym_t WindowXCBOpengl::convertKeyCodeToSym(xcb_key_release_event_t *key_release_event) {
+		xcb_keysym_t release_keysym = -1;
+		int keycode = (int)key_release_event->detail;
+		switch ( keycode ) {
+		case 9:
+			release_keysym = 65307;
+			break;
+		case 38:
+			release_keysym = 97;
+			break;
+		case 40:
+			release_keysym = 100;
+			break;
+		case 39:
+			release_keysym = 115;
+			break;
+		case 25:
+			release_keysym = 119;
+			break;
+		case 65:
+			release_keysym = 32;
+			break;
+		}
+
+		return release_keysym;
+	}
 	
 	void WindowXCBOpengl::Close() {};
 	void WindowXCBOpengl::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
