@@ -1,7 +1,7 @@
 C = clang
 CC = clang++
 SANITIZE = -fsanitize=null -fno-omit-frame-pointer
-LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor
+LDFLAGS = -lGL -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb
 CXXFLAGS = -c -std=c++20 -g -static -Wall -Wextra -Werror -Wpedantic -O3
 CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic
 INC = -I./include
@@ -16,7 +16,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c \
 	  ./src/TextureManager.cpp ./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
 	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXOpengl.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
 	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
-	  ./textures/container2.cpp ./textures/container2_specular.cpp
+	  ./textures/container2.cpp ./textures/container2_specular.cpp ./src/UnixApi/WindowXCBOpengl.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 

@@ -28,8 +28,8 @@
 #include <fstream>
 
 #ifdef __linux__
-#include "UnixApi/WindowXOpengl.hpp"
-#include "UnixApi/WindowXCBVulkan.hpp"
+//#include "UnixApi/WindowXOpengl.hpp"
+#include "UnixApi/WindowXCBOpengl.hpp"
 #endif
 
 #ifdef _WIN32
@@ -48,7 +48,13 @@ namespace GLVM::core {
 	class COpenglRenderer : public IRenderer {
 	public:
 #ifdef __linux__
+		#ifdef WINDOW_X_OPENGL
 		WindowXOpengl Window;
+		#endif
+
+		#ifdef WINDOW_XCB_OPENGL
+		WindowXCBOpengl Window;
+		#endif
 #endif
 
 #ifdef _WIN32

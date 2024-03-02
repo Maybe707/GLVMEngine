@@ -118,10 +118,14 @@ namespace GLVM::core
 		openglRenderer->run();
 
 #ifdef __linux__
-		XEvent uXEvent;
-		while (XPending(openglRenderer->Window.GetDisplay())) {
-			XNextEvent(openglRenderer->Window.GetDisplay(), &uXEvent);
-		}
+		// XEvent uXEvent;
+		// while (XPending(openglRenderer->Window.GetDisplay())) {
+		// 	XNextEvent(openglRenderer->Window.GetDisplay(), &uXEvent);
+		// }
+
+		// xcb_generic_event_t* event;
+		// while (( event = xcb_poll_for_event ( openglRenderer->Window.GetConnection() ))) {
+		// }
 #endif
 
 #ifdef _WIN32
