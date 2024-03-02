@@ -35,6 +35,7 @@ namespace GLVM::core
 		void Remove(const EEvents& _Event)
 		{
 			EEvents aTemp_Stack[iStack_Range_] = {};
+			bool removeFlag = false;
 			int n = 0;
 		
 			for(int j = 0; j < iStack_Range_; ++j)
@@ -42,15 +43,19 @@ namespace GLVM::core
 
 			for(int i = 0; i < iHead_; ++i)
 			{
-				if(_Event == aTemp_Stack[i])
+				if(_Event == aTemp_Stack[i]) {
+					removeFlag = true;
 					continue;
+				}
 
 				aStack_[n] = aTemp_Stack[i];
 				++n;
 			}
 
-			--iHead_;
-			aStack_[iHead_] = EEvents::eDEFAULT;
+			if ( removeFlag ) {
+				--iHead_;
+				aStack_[iHead_] = EEvents::eDEFAULT;
+			}
 		}
 
         ///<       !!!!!!!!!!!!!!!!!!!!!!!!!!! DELETE ALL THIS IF'S WHITH CHECKEVENT FUNCTION !!!!!!!!!!!!!!!!!!!!!!!!!!

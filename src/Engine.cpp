@@ -146,14 +146,18 @@ namespace GLVM::core
              
 			while(openglRenderer->Window.HandleEvent(g_eEvent)) {
 				Input_Stack_.ControlInput(g_eEvent);
+//				std::cout << "First input stack: " << g_eEvent.GetEvent() << std::endl;
 				if ( g_eEvent.nextEventFlag ) {
+//					std::cout << "NEXT EVENT FLAG" << std::endl;
 					g_eEvent.SetEvent(g_eEvent.GetNextEvent());
+//					std::cout << "Second input stack: " << g_eEvent.GetEvent() << std::endl;
 					Input_Stack_.ControlInput(g_eEvent);
 					g_eEvent.nextEventFlag = false;
 				}
 				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
 					bGame_Loop_Active = false;
 			}
+//			Input_Stack_.PrintStack();
 			g_eEvent.SetLastEvent(Input_Stack_);
 
 			openglRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
