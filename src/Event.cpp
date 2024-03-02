@@ -17,6 +17,13 @@ namespace GLVM::core
         eEvent_ = _eEvent;
     }
 
+    void CEvent::SetNextEvent(EEvents _eEvent)
+    {
+        nextEvent = _eEvent;
+    }
+
+	EEvents CEvent::GetNextEvent() { return nextEvent; }
+	
 	void CEvent::SetLastEvent(CStack _Stack)
 	{
 		switch(_Stack.Pop())

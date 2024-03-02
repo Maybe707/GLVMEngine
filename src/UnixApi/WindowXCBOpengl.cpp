@@ -489,7 +489,7 @@ namespace GLVM::core
 						// printf ("Key FAKE released in window %i\n",
 						// 		key_release_event->event);
 						std::cout << "Key FAKE released in window" << std::endl;
-						generic_event = xcb_poll_for_event (connection);
+//						generic_event = xcb_poll_for_event (connection);
 //						free (generic_event);
 						continue;
 					} else {
@@ -498,27 +498,32 @@ namespace GLVM::core
 							case 97:
 								printf ("Key released in window %i\n",
 										key_release_event->event);
-								_Event.SetEvent(GLVM::core::eKEYRELEASE_A);
+								_Event.SetNextEvent(GLVM::core::eKEYRELEASE_A);
+								_Event.nextEventFlag = true;
 								break;
 							case 100:
 								printf ("Key released in window %i\n",
 										key_release_event->event);
-								_Event.SetEvent(GLVM::core::eKEYRELEASE_D);
+								_Event.SetNextEvent(GLVM::core::eKEYRELEASE_D);
+								_Event.nextEventFlag = true;
 								break;
 							case 115:
 								printf ("Key released in window %i\n",
 										key_release_event->event);
-								_Event.SetEvent(GLVM::core::eKEYRELEASE_S);
+								_Event.SetNextEvent(GLVM::core::eKEYRELEASE_S);
+								_Event.nextEventFlag = true;
 								break;
 							case 119:
 								printf ("Key released in window %i\n",
 										key_release_event->event);
-								_Event.SetEvent(GLVM::core::eKEYRELEASE_W);
+								_Event.SetNextEvent(GLVM::core::eKEYRELEASE_W);
+								_Event.nextEventFlag = true;
 								break;
 							case 32:
 								printf ("Key released in window %i\n",
 										key_release_event->event);
-								_Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
+								_Event.SetNextEvent(GLVM::core::eKEYRELEASE_JUMP);
+								_Event.nextEventFlag = true;
 								break;
 							}
 					}

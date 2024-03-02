@@ -59,13 +59,17 @@ namespace GLVM::core
     class CEvent
     {
         EEvents eEvent_;
+		EEvents nextEvent;
     
     public:
         SMousePointerPosition mousePointerPosition;
+		bool nextEventFlag = false;
         
         CEvent();
         EEvents& GetEvent();
         void SetEvent(EEvents _eEvent);
+		void SetNextEvent(EEvents _eEvent);
+		EEvents GetNextEvent();
 		void SetLastEvent(CStack _Stack);
     };
 

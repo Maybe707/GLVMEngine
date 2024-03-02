@@ -146,6 +146,11 @@ namespace GLVM::core
              
 			while(openglRenderer->Window.HandleEvent(g_eEvent)) {
 				Input_Stack_.ControlInput(g_eEvent);
+				if ( g_eEvent.nextEventFlag ) {
+					g_eEvent.SetEvent(g_eEvent.GetNextEvent());
+					Input_Stack_.ControlInput(g_eEvent);
+					g_eEvent.nextEventFlag = false;
+				}
 				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
 					bGame_Loop_Active = false;
 			}

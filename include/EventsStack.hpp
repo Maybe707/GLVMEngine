@@ -15,7 +15,7 @@ namespace GLVM::core
 		void Push(const EEvents& _Event)
 		{
 			for(int i = 0; i < iHead_; ++i) {
-				if(aStack_[iHead_ - 1] == _Event)
+				if(aStack_[i] == _Event)
 					return;
 			}
 
