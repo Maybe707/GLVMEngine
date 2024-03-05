@@ -225,7 +225,7 @@ namespace GLVM::core
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
 		    gravity += deltaFrameTime;
-			
+			std::cout << "delta" << std::endl;
 			vulkanRenderer->Window.ClearDisplay();
              
 			while(vulkanRenderer->Window.HandleEvent(g_eEvent)) {
