@@ -141,7 +141,7 @@ namespace GLVM::core
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
 		    gravity += deltaFrameTime;
-			
+			std::cout << "delta" << std::endl;
 			openglRenderer->Window.ClearDisplay();
              
 			while(openglRenderer->Window.HandleEvent(g_eEvent)) {

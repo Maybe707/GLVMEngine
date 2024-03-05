@@ -47,6 +47,13 @@ namespace GLVM::core
 		
 		HideCursor();
 		Initializer();
+
+		const int kInterval = 0;
+
+		if (drawable)
+		{
+			pGLXSwap_Interval_EXT(display, drawable, kInterval);
+		}
 	}
 
 	void draw()
@@ -366,9 +373,9 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_X = expose_event->event_x;
                 _Event.mousePointerPosition.position_Y = expose_event->event_y;
 				
-				// printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
-				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
-				break;
+				printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
+						expose_event->event, expose_event->event_x, expose_event->event_y);
+//				break;
 			}
 			case XCB_MAP_WINDOW: {
 //				std::cout << "MAP WINDOW" << std::endl;
@@ -376,8 +383,9 @@ namespace GLVM::core
 				/// Make sure commands are sent befour we pause so that the window gets shown
 				xcb_flush ( connection );
 				
-				xcb_grab_pointer(connection, 1, window, XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS,
+				xcb_grab_pointer_cookie_t cookie = xcb_grab_pointer(connection, 1, window, XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS,
                 XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, window, XCB_NONE, XCB_CURRENT_TIME);
+				xcb_grab_pointer_reply(connection, cookie, NULL);
 				break;
 			}
 			case XCB_ENTER_NOTIFY: {
