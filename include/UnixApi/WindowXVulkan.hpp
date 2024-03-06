@@ -5,28 +5,22 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include "IWindow.hpp"
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {    
     class WindowXVulkan : public IWindow
     {
-        int iNum_Fbc_ = 0;
-        GLXContext (*pGLXCreateContextAttribsARB_) (Display*, GLXFBConfig,
-                                                  GLXContext, Bool, const int*) = 0;
-        GLXContext Context_;
         XWindowAttributes GWindow_Attributes_;
         Window Root_Window_;
         XSetWindowAttributes Set_Window_Attributes_;
-        Colormap Color_Map_;
-        XVisualInfo* pVisual_;
-        GLXFBConfig* pFbc_;
-		GLXDrawable Drawable;
         
         //XWindowAttributes gwa_;
 
     public:
         Display* pDisp_;
         Window Win_;
+		CStack           * Input_Stack_;
         
         WindowXVulkan();
         ~WindowXVulkan();

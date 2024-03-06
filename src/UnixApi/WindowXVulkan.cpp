@@ -1,7 +1,6 @@
 #include "UnixApi/WindowXVulkan.hpp"
 
 #include "GLPointer.h"
-#include "Event.hpp"
 #include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <bits/types/time_t.h>
