@@ -116,7 +116,8 @@ namespace GLVM::core
 		openglRenderer->pathsArray_            = pathsArray_;
 		openglRenderer->pathsGLTF_             = pathsGLTF_;
 		openglRenderer->run();
-
+		openglRenderer->Window.Input_Stack_    = &Input_Stack_;
+		
 #ifdef __linux__
 		// XEvent uXEvent;
 		// while (XPending(openglRenderer->Window.GetDisplay())) {
@@ -144,19 +145,10 @@ namespace GLVM::core
 			std::cout << "delta" << std::endl;
 			openglRenderer->Window.ClearDisplay();
              
-			while(openglRenderer->Window.HandleEvent(g_eEvent)) {
-				Input_Stack_.ControlInput(g_eEvent);
-//				std::cout << "First input stack: " << g_eEvent.GetEvent() << std::endl;
-				if ( g_eEvent.nextEventFlag ) {
-//					std::cout << "NEXT EVENT FLAG" << std::endl;
-					g_eEvent.SetEvent(g_eEvent.GetNextEvent());
-//					std::cout << "Second input stack: " << g_eEvent.GetEvent() << std::endl;
-					Input_Stack_.ControlInput(g_eEvent);
-					g_eEvent.nextEventFlag = false;
-				}
-				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
-					bGame_Loop_Active = false;
-			}
+			openglRenderer->Window.HandleEvent(g_eEvent);
+			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL)
+				bGame_Loop_Active = false;
+						
 //			Input_Stack_.PrintStack();
 			g_eEvent.SetLastEvent(Input_Stack_);
 
@@ -194,8 +186,8 @@ namespace GLVM::core
 		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->pathsArray_            = pathsArray_;
 		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
-
 		vulkanRenderer->run();
+		vulkanRenderer->Window.Input_Stack_    = &Input_Stack_;		
 
 #ifdef __linux__
 		// XEvent uXEvent;
@@ -221,7 +213,7 @@ namespace GLVM::core
 		// 		// DispatchMessage( &msg );
 		// }
 #endif
-		vulkanRenderer->Window.Input_Stack_    = &Input_Stack_;		
+
 		while(bGame_Loop_Active) {
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();

@@ -17,6 +17,7 @@
 #include <cassert>
 #include <iostream>
 #include "GLPointer.h"
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {
@@ -36,6 +37,7 @@ namespace GLVM::core
 		xcb_connection_t*  connection;
 		xcb_screen_t*      screen;
 		xcb_window_t       window;
+		xcb_generic_event_t* next_generic_event;
 
 		Display* display;
 		int default_screen;
@@ -48,6 +50,8 @@ namespace GLVM::core
 		
 		static void print_modifiers (uint32_t mask);
 	public:
+		CStack           * Input_Stack_;
+		
 		WindowXCBOpengl ();
 
 		int main_loop(Display *display, xcb_connection_t *connection, xcb_window_t window, GLXDrawable drawable);
