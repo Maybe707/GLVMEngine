@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include "IWindow.hpp"
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {    
@@ -27,6 +28,7 @@ namespace GLVM::core
     public:
         Display* pDisp_;
         Window Win_;
+		CStack* Input_Stack_;
         
         WindowXOpengl();
         ~WindowXOpengl();

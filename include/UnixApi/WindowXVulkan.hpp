@@ -20,7 +20,7 @@ namespace GLVM::core
     public:
         Display* pDisp_;
         Window Win_;
-		CStack           * Input_Stack_;
+		CStack* Input_Stack_;
         
         WindowXVulkan();
         ~WindowXVulkan();

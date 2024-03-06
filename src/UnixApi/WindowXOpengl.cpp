@@ -284,7 +284,8 @@ namespace GLVM::core
                 }
 				break;
 			}
-			return true;
+
+			Input_Stack_->ControlInput(_Event);
         }
 		return false;
     }
