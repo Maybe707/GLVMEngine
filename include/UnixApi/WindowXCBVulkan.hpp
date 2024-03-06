@@ -12,6 +12,7 @@
 #include <xcb/xcb_cursor.h>
 #include <cassert>
 #include <iostream>
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {
@@ -23,9 +24,13 @@ namespace GLVM::core
 		xcb_screen_t*      screen;
 		xcb_window_t       window;
 		xcb_key_symbols_t* key_symbols;
+		xcb_generic_event_t* next_generic_event;
+
 
 		static void print_modifiers (uint32_t mask);
 	public:
+		CStack           * Input_Stack_;
+		
 		WindowXCBVulkan ();
 
 		void HideCursor();

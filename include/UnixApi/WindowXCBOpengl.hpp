@@ -44,6 +44,7 @@ namespace GLVM::core
 		GLXFBConfig fb_config;
 		GLXContext (*pGLXCreateContextAttribsARB_) (Display*, GLXFBConfig,
 													GLXContext, Bool, const int*) = 0;
+
 		
 		static void print_modifiers (uint32_t mask);
 	public:

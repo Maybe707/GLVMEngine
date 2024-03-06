@@ -194,6 +194,7 @@ namespace GLVM::core
 		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->pathsArray_            = pathsArray_;
 		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
+
 		vulkanRenderer->run();
 
 #ifdef __linux__
@@ -220,19 +221,19 @@ namespace GLVM::core
 		// 		// DispatchMessage( &msg );
 		// }
 #endif
-		
+		vulkanRenderer->Window.Input_Stack_    = &Input_Stack_;		
 		while(bGame_Loop_Active) {
 			deltaFrameTime = chrono->GetElapsed();
 			chrono->Reset();
 		    gravity += deltaFrameTime;
-			std::cout << "delta" << std::endl;
+//			std::cout << "delta" << std::endl;
 			vulkanRenderer->Window.ClearDisplay();
              
-			while(vulkanRenderer->Window.HandleEvent(g_eEvent)) {
-				Input_Stack_.ControlInput(g_eEvent);
-				if(g_eEvent.GetEvent() == EEvents::eGAME_LOOP_KILL)
-					bGame_Loop_Active = false;
-			}
+			vulkanRenderer->Window.HandleEvent(g_eEvent);
+			// 	Input_Stack_.ControlInput(g_eEvent);
+			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL)
+				bGame_Loop_Active = false;
+			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
             
 			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,

@@ -1,4 +1,5 @@
 #include "UnixApi/WindowXCBVulkan.hpp"
+#include "Event.hpp"
 #include <X11/X.h>
 #include <X11/XKBlib.h>
 #include <cstdint>
@@ -123,8 +124,10 @@ namespace GLVM::core
 // 		while (( event = xcb_poll_for_event ( GetConnection() ))) {
 // //			std::cout << event->response_type << std::endl;
 // 		}
-
-		while ((generic_event = xcb_poll_for_event (connection))) {
+		bool next_generic_event_flag = false;
+		while (next_generic_event_flag || (generic_event = xcb_poll_for_event (connection))) {
+			next_generic_event_flag = false;
+//		  buffer_event:
 			switch (generic_event->response_type & ~0x80) {
 			case XCB_EXPOSE: {
 				xcb_expose_event_t *expose_event = (xcb_expose_event_t *)generic_event;
@@ -186,8 +189,8 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_X = expose_event->event_x;
                 _Event.mousePointerPosition.position_Y = expose_event->event_y;
 				
-				printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
-						expose_event->event, expose_event->event_x, expose_event->event_y);
+				// printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
+				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 //				break;
 			}
 			case XCB_MAP_WINDOW: {
@@ -257,7 +260,7 @@ namespace GLVM::core
 				printf ("Key released in window %i\n",
 						key_release_event->event);
 
-				xcb_generic_event_t* next_generic_event = xcb_poll_for_queued_event(connection);
+				next_generic_event = xcb_poll_for_event(connection);
 				if ( next_generic_event != NULL ) {
 					xcb_key_press_event_t *key_press_event = (xcb_key_press_event_t *)next_generic_event;
 					xcb_keysym_t press_keysym = xcb_key_press_lookup_keysym(key_symbols, key_press_event, 0);
@@ -268,10 +271,13 @@ namespace GLVM::core
 						press_keysym == release_keysym)
 					{
 						///< Key wasn’t actually released
-						generic_event = xcb_poll_for_event (connection);
+//						generic_event = xcb_poll_for_event (connection);
+						next_generic_event = NULL;
 						continue;
+					} else {
+						next_generic_event_flag = true;
 					}
-				}
+				} 
 				
 				xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
 				std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
@@ -301,9 +307,17 @@ namespace GLVM::core
 			// 	printf("Unknown event: %d\n", generic_event->response_type);
 			// 	break;
 			}
+			if ( next_generic_event != NULL ) {
+//				Input_Stack_->ControlInput(_Event);
+				*generic_event = *next_generic_event;
+				next_generic_event = NULL;
+//				goto buffer_event;
+			} else {
+				free (generic_event);
+			}
+
+			Input_Stack_->ControlInput(_Event);
 			/* Free the Generic Event */
-			free (generic_event);
-			return true;
 		}
 
 		return false;
