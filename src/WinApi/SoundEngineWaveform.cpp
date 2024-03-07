@@ -48,7 +48,7 @@ namespace GLVM::core::Sound
             std::exit(-1);
         }
         
-        char *buf = (char*)malloc(Format.nAvgBytesPerSec);
+        char *buf = (char*)malloc(Format.nAvgBytesPerSec * 2);
 //        frames = fread(buf, uiFrame_Size, FRAMES, iFile_Descritor);
 
         /// After allocation, set up and prepare header.
@@ -57,7 +57,7 @@ namespace GLVM::core::Sound
 
         while(1)
         {
-            file.read(buf, Format.nAvgBytesPerSec);
+            file.read(buf, Format.nAvgBytesPerSec * 2);
             if(file.gcount() == 0)
                 break;
             
@@ -67,7 +67,7 @@ namespace GLVM::core::Sound
             lpWaveHdr.dwLoops = 0L;
             waveOutPrepareHeader(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
             waveOutWrite(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
-            Sleep(1000);
+            Sleep((lpWaveHdr.dwBufferLength * 1000) / (Format.nAvgBytesPerSec * 2));
             waveOutUnprepareHeader(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
         }
         
