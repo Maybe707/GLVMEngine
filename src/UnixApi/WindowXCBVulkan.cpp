@@ -189,9 +189,9 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_X = expose_event->event_x;
                 _Event.mousePointerPosition.position_Y = expose_event->event_y;
 				
-				// printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
-				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
-//				break;
+				printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
+						expose_event->event, expose_event->event_x, expose_event->event_y);
+				break;
 			}
 			case XCB_MAP_WINDOW: {
 //				std::cout << "MAP WINDOW" << std::endl;
