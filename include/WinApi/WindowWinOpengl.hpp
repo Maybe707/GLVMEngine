@@ -9,6 +9,7 @@
 #include <GL/gl.h>
 #include "glext.h"
 #include "GLPointer.h"
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {
@@ -41,6 +42,7 @@ namespace GLVM::core
         HWND pModern_Window_;
         
     public:
+		CStack           * Input_Stack_;
         WindowWinOpengl();
 
         void SwapBuffers() override;

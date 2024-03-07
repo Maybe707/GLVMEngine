@@ -12,6 +12,7 @@
 
 //#define VULKAN_API
 #define OPENGL_API
+#include "EventsStack.hpp"
 
 namespace GLVM::core
 {
@@ -44,6 +45,7 @@ namespace GLVM::core
         HWND pModern_Window_;
         
     public:
+		CStack           * Input_Stack_;
         WindowWinVulkan();
 
         void SwapBuffers() override;

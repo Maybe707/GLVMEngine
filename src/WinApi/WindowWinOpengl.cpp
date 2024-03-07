@@ -126,7 +126,7 @@ namespace GLVM::core
         {
             TranslateMessage( &msg );
             DispatchMessage( &msg );
-			return true;
+			Input_Stack_->ControlInput(_Event);
         }
 		return false;
     }
