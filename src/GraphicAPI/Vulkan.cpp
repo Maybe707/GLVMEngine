@@ -91,9 +91,9 @@ namespace GLVM::core
 		pointLightShadowMapDrawFrame();
 		mainRenderDrawFrame();
 		
-		#ifdef VK_USE_PLATFORM_XCB_KHR
-        vkDeviceWaitIdle(device);
-		#endif
+		// #ifdef VK_USE_PLATFORM_XCB_KHR
+        // vkDeviceWaitIdle(device);
+		// #endif
 		// directionalLightShadowMapThread.join();
 		// spotLightShadowMapThread.join();
 		// pointLightShadowMapThread.join();
