@@ -196,7 +196,7 @@ For GLTF:
   };
 #+end_src
 
-   2. Initialize pointer and activate it with calling 'ActivateSystem(newSystem)' method of 'SystemManager' class in constructor of Engine class:
+   2. Initialize pointer and activate it with calling 'ActivateSystem(newSystem)' method of 'SystemManager' class in constructor of 'Engine' class:
 
 #+begin_src c++
   Engine::Engine() {
@@ -208,5 +208,60 @@ For GLTF:
   };
 #+end_src
 
-** Choosing Xlib or XCB window system (For Linux only)
+** Choosing Xlib or XCB library for X11 window system (For Linux only)
+
+*** For Vulkan API open Vulkan.hpp file and define one of macro command:
+
+#+begin_src c++
+  ...
+  #ifdef __linux__
+  #define VK_USE_PLATFORM_XLIB_KHR
+  //#define VK_USE_PLATFORM_XCB_KHR
+  #endif
+  ...
+#+end_src
+
+*** For Opengl API openg Opengl.hpp file and define one of macro command:
+
+#+begin_src c++
+  ...
+  #ifdef __linux__
+  //#include "UnixApi/WindowXOpengl.hpp"
+  #include "UnixApi/WindowXCBOpengl.hpp"
+  #endif
+  ...
+#+end_src
+
+** Choosing renderer type
+You can choose Vulkan or Opengl as renderer when calling 'GameLoop' method and give it corresponding argument:
+
+   1. For Vulkan:
+#+begin_src c++
+  ...
+    ///< Game rendering loop
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+  ...
+#+end_src
+
+   2. For Opengl:
+#+begin_src c++
+  ...
+    ///< Game rendering loop
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+  ...
+#+end_src
+
+** Loading sound files in wav format
+Sound files working in seperate thread. You need to create instance of special class 'CSoundSample' and set all
+necessary fields. Then call 'GetSoundContainer' method of 'ISoundEngine' class and push to it created instance.
+
+#+begin_src c++
+  ...
+  core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+  pSound_Sample->kPath_to_File_ = "../laser2.wav";
+  pSound_Sample->uiDuration_ = 5;
+  pSound_Sample->uiRate_ = 22050;
+  soundEngine->GetSoundContainer().Push(pSound_Sample);
+  ...
+#+end_src
    

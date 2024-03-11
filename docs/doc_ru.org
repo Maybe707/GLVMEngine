@@ -187,3 +187,95 @@ ECS даёт возможность легко добавлять новые и 
 #+begin_src c++
   [[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 #+end_src
+
+** Создание новых систем
+   GLVM из "коробки" имеет чертыре базовых системы: 'CollisionSystem', 'MovementSystem', 'PhysicsSystem', 'ProjectileSystem'.
+   При желании вы моежет создавать свои собственные системы.
+
+   1. Добавьте в Engine.hpp указатель на вашу новую систему:
+   
+   В Engine.hpp:
+#+begin_src c++
+  class Engine
+  {
+	  ......
+	  ecs::NewSystem* newSystem;
+	  ......
+  };
+#+end_src
+
+   2. Инициализируйте оказатель и активируйте его с помощью вызова метода 'ActivateSystem(newSystem)' класса 'SystemManager' в конструкторе класса Engine"
+
+#+begin_src c++
+  Engine::Engine() {
+	  ......
+	  newSystem          = new ecs::NewSystem();
+
+	  pSystem_Manager->ActivateSystem(newSystem);
+	  ......
+  };
+#+end_src
+
+** Выбор библиотеки Xlib или XCB для оконной системы X11 (Только для Linux)
+
+*** Для Vulkan API откройте Vulkan.hpp файл и определите одну из макро-комманд:
+
+#+begin_src c++
+  ...
+  #ifdef __linux__
+  #define VK_USE_PLATFORM_XLIB_KHR
+  //#define VK_USE_PLATFORM_XCB_KHR
+  #endif
+  ...
+#+end_src
+
+*** For Opengl API openg Opengl.hpp file and define one of macro command:
+*** Для Opengl API откройте Opengl.hpp файл и определите одну из макро-комманд:
+
+#+begin_src c++
+  ...
+  #ifdef __linux__
+  //#include "UnixApi/WindowXOpengl.hpp"
+  #include "UnixApi/WindowXCBOpengl.hpp"
+  #endif
+  ...
+#+end_src
+
+** Выбор типа рендерера
+Вы можете выбрать Vulkan или Opengl в качестве рендерера вызвав метод 'GameLoop' и передав сообветствующий аргумент:
+
+   1. For Vulkan:
+#+begin_src c++
+  ...
+    ///< Game rendering loop
+	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+  ...
+#+end_src
+
+   2. For Opengl:
+#+begin_src c++
+  ...
+    ///< Game rendering loop
+	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+  ...
+#+end_src
+
+** Loading sound files in wav format
+Sound files working in seperate thread. You need to create instance of special class 'CSoundSample' and set all
+necessary fields. Then call 'GetSoundContainer' method of 'ISoundEngine' class and push to it created instance.
+
+** Загрузка звуковых файлов в wav формате
+Звуковые файлы работают в отдельном потоке. Вам необходимо создать инстанс специального класса 'CSoundSample' и
+проинициализировать необходимые поля. Затем вызовите метод 'GetSoundContainer' класса 'ISoundEngine' и запушьте в
+него созданный инстанс.
+
+#+begin_src c++
+  ...
+  core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+  pSound_Sample->kPath_to_File_ = "../laser2.wav";
+  pSound_Sample->uiDuration_ = 5;
+  pSound_Sample->uiRate_ = 22050;
+  soundEngine->GetSoundContainer().Push(pSound_Sample);
+  ...
+#+end_src
+   
