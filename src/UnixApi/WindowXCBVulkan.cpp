@@ -130,10 +130,10 @@ namespace GLVM::core
 //		  buffer_event:
 			switch (generic_event->response_type & ~0x80) {
 			case XCB_EXPOSE: {
-				xcb_expose_event_t *expose_event = (xcb_expose_event_t *)generic_event;
+				[[maybe_unused]] xcb_expose_event_t *expose_event = (xcb_expose_event_t *)generic_event;
 
-				printf ("Window %i exposed. Region to be redrawn at location (%d,%d), with dimension (%d,%d)\n",
-						expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
+				// printf ("Window %i exposed. Region to be redrawn at location (%d,%d), with dimension (%d,%d)\n",
+				// 		expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
 				break;
 			}
 			case XCB_BUTTON_PRESS: {
@@ -143,21 +143,21 @@ namespace GLVM::core
 				switch (expose_event->detail) {
 				case 1:
 					_Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
-					printf ("Button %d pressed in window %i, at coordinates (%d,%d)\n",
-							expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Button %d pressed in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				case 3:
 					_Event.SetEvent(EEvents::eMOUSE_RIGHT_BUTTON);
-					printf ("Button %d pressed in window %i, at coordinates (%d,%d)\n",
-							expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Button %d pressed in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				case 4:
-					printf ("Wheel Button up in window %i, at coordinates (%d,%d)\n",
-							expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Wheel Button up in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				case 5:
-					printf ("Wheel Button down in window %i, at coordinates (%d,%d)\n",
-							expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Wheel Button down in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				}
 				
@@ -170,13 +170,13 @@ namespace GLVM::core
 				switch (expose_event->detail) {
 				case 1:
 					_Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
-					printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
-							expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				case 3:
 					_Event.SetEvent(EEvents::eMOUSE_RIGHT_BUTTON_RELEASE);
-					printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
-							expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
+					// printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
+					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
 				}
 				
@@ -189,8 +189,8 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_X = expose_event->event_x;
                 _Event.mousePointerPosition.position_Y = expose_event->event_y;
 				
-				printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
-						expose_event->event, expose_event->event_x, expose_event->event_y);
+				// printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
+				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 			}
 			case XCB_MAP_WINDOW: {
 //				std::cout << "MAP WINDOW" << std::endl;
@@ -204,10 +204,10 @@ namespace GLVM::core
 				break;
 			}
 			case XCB_ENTER_NOTIFY: {
-				xcb_enter_notify_event_t *expose_event = (xcb_enter_notify_event_t *)generic_event;
+				[[maybe_unused]] xcb_enter_notify_event_t *expose_event = (xcb_enter_notify_event_t *)generic_event;
 
-				printf ("Mouse entered window %i, at coordinates (%d,%d)\n",
-						expose_event->event, expose_event->event_x, expose_event->event_y);
+				// printf ("Mouse entered window %i, at coordinates (%d,%d)\n",
+				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 				break;
 			}
 			// case XCB_LEAVE_NOTIFY: {
@@ -219,13 +219,13 @@ namespace GLVM::core
 			// }
 			case XCB_KEY_PRESS: {
 				xcb_key_press_event_t *expose_event = (xcb_key_press_event_t *)generic_event;
-				print_modifiers(expose_event->state);
+				// print_modifiers(expose_event->state);
 
-				printf ("Key pressed in window %i\n",
-						expose_event->event);
+				// printf ("Key pressed in window %i\n",
+				// 		expose_event->event);
 
 //				xcb_keycode_t key_code = expose_event->detail;
-				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
+//				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
 				xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
 				
 				switch(keysym)
@@ -254,10 +254,10 @@ namespace GLVM::core
 			}
 			case XCB_KEY_RELEASE: {
 				xcb_key_release_event_t *key_release_event = (xcb_key_release_event_t *)generic_event;
-				print_modifiers(key_release_event->state);
+				// print_modifiers(key_release_event->state);
 
-				printf ("Key released in window %i\n",
-						key_release_event->event);
+				// printf ("Key released in window %i\n",
+				// 		key_release_event->event);
 
 				next_generic_event = xcb_poll_for_event(connection);
 				if ( next_generic_event != NULL ) {
@@ -279,7 +279,7 @@ namespace GLVM::core
 				} 
 				
 				xcb_keysym_t release_keysym = xcb_key_press_lookup_keysym(key_symbols, key_release_event, 0);
-				std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
+//				std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
                 switch(release_keysym)
                 {
                 case 97:
