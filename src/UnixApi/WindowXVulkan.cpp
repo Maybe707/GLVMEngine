@@ -107,7 +107,7 @@ namespace GLVM::core
                 _Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
                 _Event.mousePointerPosition.position_X = motion.x;
                 _Event.mousePointerPosition.position_Y = motion.y;
-				std::cout << "mouse move" << std::endl;
+
                 ///< Search MapNotify events depend on XMapWindow(pDisp_, Win_) function.
 				break;
             case MapNotify:

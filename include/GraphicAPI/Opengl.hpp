@@ -28,8 +28,8 @@
 #include <fstream>
 
 #ifdef __linux__
-#include "UnixApi/WindowXOpengl.hpp"
-//#include "UnixApi/WindowXCBOpengl.hpp"
+//#include "UnixApi/WindowXOpengl.hpp"
+#include "UnixApi/WindowXCBOpengl.hpp"
 #endif
 
 #ifdef _WIN32

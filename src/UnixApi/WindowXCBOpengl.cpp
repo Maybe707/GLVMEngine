@@ -374,8 +374,8 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_X = expose_event->event_x;
                 _Event.mousePointerPosition.position_Y = expose_event->event_y;
 				
-				printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
-						expose_event->event, expose_event->event_x, expose_event->event_y);
+				// printf ("Mouse moved in window %i, at coordinates (%d,%d)\n",
+				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 //				break;
 			}
 			case XCB_MAP_WINDOW: {
@@ -390,10 +390,10 @@ namespace GLVM::core
 				break;
 			}
 			case XCB_ENTER_NOTIFY: {
-				xcb_enter_notify_event_t *expose_event = (xcb_enter_notify_event_t *)generic_event;
+				[[maybe_unused]] xcb_enter_notify_event_t *expose_event = (xcb_enter_notify_event_t *)generic_event;
 
-				printf ("Mouse entered window %i, at coordinates (%d,%d)\n",
-						expose_event->event, expose_event->event_x, expose_event->event_y);
+				// printf ("Mouse entered window %i, at coordinates (%d,%d)\n",
+				// 		expose_event->event, expose_event->event_x, expose_event->event_y);
 				break;
 			}
 			// case XCB_LEAVE_NOTIFY: {
@@ -413,30 +413,8 @@ namespace GLVM::core
 //				xcb_keycode_t key_code = expose_event->detail;
 //				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
 				// [[maybe_unused]] xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
-				// std::cout << "KEYSYM: " << (int)expose_event->detail << std::endl;
-//				int keycode = (int)expose_event->detail;
 
 				xcb_keysym_t keysym = convertKeyCodeToSym(expose_event);
-				// switch ( keycode ) {
-				// 	case 9:
-				// 		keysym = 65307;
-				// 		break;
-				// 	case 38:
-				// 		keysym = 97;
-				// 		break;
-				// 	case 40:
-				// 		keysym = 100;
-				// 		break;
-				// 	case 39:
-				// 		keysym = 115;
-				// 		break;
-				// 	case 25:
-				// 		keysym = 119;
-				// 		break;
-				// 	case 65:
-				// 		keysym = 32;
-				// 		break;
-				// }
 
 				switch(keysym)
 					{
@@ -444,19 +422,19 @@ namespace GLVM::core
 						_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
 						break;
 					case 97:
-						std::cout << "A key press" << std::endl;
+//						std::cout << "A key press" << std::endl;
 						_Event.SetEvent(EEvents::eMOVE_LEFT);
 						break;
 					case 100:
-						std::cout << "D key press" << std::endl;
+//						std::cout << "D key press" << std::endl;
 						_Event.SetEvent(EEvents::eMOVE_RIGHT);
 						break;
 					case 115:
-						std::cout << "S key press" << std::endl;
+//						std::cout << "S key press" << std::endl;
 						_Event.SetEvent(EEvents::eMOVE_BACKWARD);
 						break;
 					case 119:
-						std::cout << "W key press" << std::endl;
+//						std::cout << "W key press" << std::endl;
 						_Event.SetEvent(EEvents::eMOVE_FORWARD);
 						break;
 					case 32:
@@ -521,25 +499,25 @@ namespace GLVM::core
                 case 97:
 					// printf ("Key released in window %i\n",
 					// 		key_release_event->event);
-					std::cout << "A key release" << std::endl;
+//					std::cout << "A key release" << std::endl;
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
                 case 100:
 					// printf ("Key released in window %i\n",
 					// 		key_release_event->event);
-					std::cout << "D key release" << std::endl;
+//					std::cout << "D key release" << std::endl;
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_D);
                     break;
                 case 115:
  					// printf ("Key released in window %i\n",
 					// 		key_release_event->event);
-					std::cout << "S key release" << std::endl;
+//					std::cout << "S key release" << std::endl;
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_S);
                     break;
                 case 119:
  					// printf ("Key released in window %i\n",
 					// 		key_release_event->event);
-					std::cout << "W key release" << std::endl;
+//					std::cout << "W key release" << std::endl;
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_W);
                     break;
                 case 32:
