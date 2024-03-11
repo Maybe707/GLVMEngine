@@ -29,10 +29,9 @@ namespace GLVM::ecs
     void CMovementSystem::Update()
     {
 		namespace cm = GLVM::ecs::components;
-		namespace ct = GAME_MECHANICS::ECS::components;
 		
         ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<ct::controller,
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::controller,
 																						cm::beholder,
 																						cm::transform>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();

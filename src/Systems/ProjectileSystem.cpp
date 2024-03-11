@@ -16,13 +16,12 @@ namespace GLVM::ecs
     void CProjectileSystem::Update()
     {
 		namespace cm = GLVM::ecs::components;
-		namespace ct = GAME_MECHANICS::ECS::components;
 		
         ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
         EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
     
         core::vector<unsigned int>* pEntity_Container_refMove =
-			pComponent_Manager->GetEntityContainer<ct::controller>();
+			pComponent_Manager->GetEntityContainer<cm::controller>();
         unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
         core::vector<unsigned int>* pEntity_Container_refView =

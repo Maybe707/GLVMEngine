@@ -301,8 +301,8 @@ namespace GLVM::ecs
 				} else if ( componentsTypes[i] == typeid(components::mesh).name() ) {
 					RemoveComponent<components::mesh>(entity);
 //					std::cout << "Delete vertex" << std::endl;
-				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::controller).name() ) {
-					RemoveComponent<GAME_MECHANICS::ECS::components::controller>(entity);
+				} else if ( componentsTypes[i] == typeid(GLVM::ecs::components::controller).name() ) {
+					RemoveComponent<GLVM::ecs::components::controller>(entity);
 //					std::cout << "Delete controller" << std::endl;
 				} else if ( componentsTypes[i] == typeid(GAME_MECHANICS::ECS::components::attack).name() ) {
 					RemoveComponent<GAME_MECHANICS::ECS::components::attack>(entity);

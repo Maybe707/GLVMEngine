@@ -3177,7 +3177,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		LightData lightDataUBO{};
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GAME_MECHANICS::ECS::components::controller>();
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GLVM::ecs::components::controller>();
 		if ( pointLightEntities.GetSize() > 0 )
 
 			lightDataUBO.viewPosition = transformComponent->tPosition;

@@ -7,7 +7,6 @@ int main()
 {
 	using namespace GLVM;
 	namespace cm  = GLVM::ecs::components;
-	namespace ct = GAME_MECHANICS::ECS::components;
 
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
@@ -39,7 +38,7 @@ int main()
 	// [[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromFile("../textures/data/container2_specular.png");
 	
     Entity uiPlayer = EntityManager->CreateEntity();
-    ComponentManager->CreateComponent<cm::mesh, ct::controller, cm::collider, cm::animation, cm::beholder,
+    ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::animation, cm::beholder,
 		cm::transform, cm::rigidBody, cm::event>(uiPlayer);
 	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 2.7f, 10.0f, 3.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };

@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_COMPONENT
 #define CONTROLLER_COMPONENT
 
-namespace GAME_MECHANICS::ECS::components
+namespace GLVM::ecs::components
 {
 	struct controller
 	{
