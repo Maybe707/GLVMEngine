@@ -71,12 +71,16 @@ namespace GLVM::ecs
 					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
 				float backtrackingScale = componentManager->
 					GetComponent<cm::transform>(backtrackingEntityRefCollider)->fScale;
+				float backtrackingGltfFlag = componentManager->
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->gltf;
 			    vec3  comparedTransform     = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
 				vec3 comparedTransformUpper = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
 				float comparedScale     = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
+				float comparedGltfFlag = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider)->gltf;
 				for ( unsigned int m = 0; m < linkedEntitiesVectorSizeWithMove; ++m) {
 					if ( backtrackingEntityRefCollider == linkedEntitiesWithMove[m] ) {
 						cm::move* backtrackingMove = componentManager->
@@ -92,6 +96,14 @@ namespace GLVM::ecs
 						comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
 						comparedTransform += comparedMove->gravity;
 					}
+				}
+
+				if ( !backtrackingGltfFlag ) {
+					backtrackingScale /= 2;
+				}
+
+				if ( !comparedGltfFlag ) {
+					comparedScale /= 2;
 				}
 				
 				bool boxColliderFlag;

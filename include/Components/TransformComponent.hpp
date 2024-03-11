@@ -18,6 +18,7 @@ namespace GLVM::ecs::components
 		float GravityAccumulator = 0.0f;
 		unsigned int currentAnimationFrame = 0;
 		float frameAccumulator = 0.0f;
+		bool gltf = true;
 	};
 }
 

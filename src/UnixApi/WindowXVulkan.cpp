@@ -109,7 +109,7 @@ namespace GLVM::core
                 _Event.mousePointerPosition.position_Y = motion.y;
 
                 ///< Search MapNotify events depend on XMapWindow(pDisp_, Win_) function.
-				break;
+//				break;
             case MapNotify:
                 ///< Link mouse cursor to specified window.
                 XGrabPointer

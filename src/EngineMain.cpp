@@ -49,8 +49,8 @@ int main()
 	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -200.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 200.2f };
-    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = simpleCubeHandle_GLTF;
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -10.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 20.2f, .gltf = false };
+    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
