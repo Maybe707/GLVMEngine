@@ -189,7 +189,7 @@ ECS даёт возможность легко добавлять новые и 
 #+end_src
 
 ** Создание новых систем
-   GLVM из "коробки" имеет чертыре базовых системы: 'CollisionSystem', 'MovementSystem', 'PhysicsSystem', 'ProjectileSystem'.
+   GLVM из "коробки" имеет чертыре базовых системы: ~CollisionSystem~, ~MovementSystem~, ~PhysicsSystem~, ~ProjectileSystem~.
    При желании вы моежет создавать свои собственные системы.
 
    1. Добавьте в Engine.hpp указатель на вашу новую систему:
@@ -204,7 +204,7 @@ ECS даёт возможность легко добавлять новые и 
   };
 #+end_src
 
-   2. Инициализируйте оказатель и активируйте его с помощью вызова метода 'ActivateSystem(newSystem)' класса 'SystemManager' в конструкторе класса Engine"
+   2. Инициализируйте оказатель и активируйте его с помощью вызова метода ~ActivateSystem(newSystem)~ класса ~SystemManager~ в конструкторе класса Engine"
 
 #+begin_src c++
   Engine::Engine() {
@@ -242,7 +242,7 @@ ECS даёт возможность легко добавлять новые и 
 #+end_src
 
 ** Выбор типа рендерера
-Вы можете выбрать Vulkan или Opengl в качестве рендерера вызвав метод 'GameLoop' и передав сообветствующий аргумент:
+Вы можете выбрать Vulkan или Opengl в качестве рендерера вызвав метод ~GameLoop~ и передав сообветствующий аргумент:
 
    1. For Vulkan:
 #+begin_src c++
@@ -261,12 +261,12 @@ ECS даёт возможность легко добавлять новые и 
 #+end_src
 
 ** Loading sound files in wav format
-Sound files working in seperate thread. You need to create instance of special class 'CSoundSample' and set all
-necessary fields. Then call 'GetSoundContainer' method of 'ISoundEngine' class and push to it created instance.
+Sound files working in seperate thread. You need to create instance of special class ~CSoundSample~ and set all
+necessary fields. Then call ~GetSoundContainer~ method of ~ISoundEngine~ class and push to it created instance.
 
 ** Загрузка звуковых файлов в wav формате
-Звуковые файлы работают в отдельном потоке. Вам необходимо создать инстанс специального класса 'CSoundSample' и
-проинициализировать необходимые поля. Затем вызовите метод 'GetSoundContainer' класса 'ISoundEngine' и запушьте в
+Звуковые файлы работают в отдельном потоке. Вам необходимо создать инстанс специального класса ~CSoundSample~ и
+проинициализировать необходимые поля. Затем вызовите метод ~GetSoundContainer~ класса ~ISoundEngine~ и запушьте в
 него созданный инстанс.
 
 #+begin_src c++
