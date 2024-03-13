@@ -9,7 +9,6 @@
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "Components/CrosshairComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
 #include "Components/EventComponent.hpp"
 #include "Components/MaterialComponent.hpp"
@@ -282,9 +281,6 @@ namespace GLVM::ecs
 				} else if ( componentsTypes[i] == typeid(components::collider).name() ) {
 					RemoveComponent<components::collider>(entity);
 //					std::cout << "Delete collider" << std::endl;
-				} else if ( componentsTypes[i] == typeid(components::crosshair).name() ) {
-					RemoveComponent<components::crosshair>(entity);
-//					std::cout << "Delete crosshair" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::directionalLight).name() ) {
 					RemoveComponent<components::directionalLight>(entity);
 //					std::cout << "Delete directional light" << std::endl;

@@ -17,7 +17,6 @@
 #include "Components/EventComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Components/CrosshairComponent.hpp"
 #include "Components/PointLightComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/TextureComponent.hpp"
