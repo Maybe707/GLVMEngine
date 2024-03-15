@@ -16,7 +16,8 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c \
 	  ./src/TextureManager.cpp ./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
 	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXOpengl.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
 	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
-	  ./textures/container2.cpp ./textures/container2_specular.cpp ./src/UnixApi/WindowXCBOpengl.cpp
+	  ./textures/container2.cpp ./textures/container2_specular.cpp ./src/UnixApi/WindowXCBOpengl.cpp \
+	  ./src/Systems/DamageSystem.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 

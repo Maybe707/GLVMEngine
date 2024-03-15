@@ -126,11 +126,13 @@ namespace GLVM::ecs
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
+					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
                     continue;
                 }
                     
                 if(boxColliderFlag) {
                     componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
+					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
                     continue;
                 }
 			}

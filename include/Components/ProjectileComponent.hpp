@@ -16,6 +16,7 @@ namespace GLVM::ecs::components
         float fDamage_;
         float fSpeed_;
         float fFlying_Range_;
+		float damage;
     };
 }
 

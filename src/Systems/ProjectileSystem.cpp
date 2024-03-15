@@ -5,6 +5,7 @@
 
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
@@ -69,7 +70,7 @@ namespace GLVM::ecs
 																						   cm::mesh,
 																						   cm::collider,
 																						   cm::pointLight>();
-		
+
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
@@ -83,6 +84,17 @@ namespace GLVM::ecs
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
+				cm::projectile* projectileComponent = pComponent_Manager->GetComponent<cm::projectile>(uiEntity_refProjectile);
+				for ( unsigned int j = 0; j < pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders.GetSize(); ++j ) {
+					unsigned int collidedEntity = pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders[j];
+					cm::health* healthComponent = pComponent_Manager->GetComponent<cm::health>(collidedEntity);
+					if ( healthComponent != nullptr ) {
+						healthComponent->currentHealth -= projectileComponent->damage;
+						std::cout << "current health: " << healthComponent->currentHealth << std::endl;
+						if ( healthComponent->currentHealth <= 0 )
+							pEntity_Manager->RemoveEntity(collidedEntity, pComponent_Manager);
+					}
+				}
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
             }
 //			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
@@ -135,6 +147,9 @@ namespace GLVM::ecs
 		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
+
+		cm::projectile* projectileComponent = componentManager->GetComponent<cm::projectile>(uiEntity_Projectile);
+		projectileComponent->damage = 30.0f;
     }
 
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)

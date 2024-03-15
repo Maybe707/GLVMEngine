@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/HealthComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
@@ -61,9 +62,10 @@ int main()
 
 	for ( u32 i = 0; i < 40; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i, 10.0f, 0.0f },
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health>(uiWitch);
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 10.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
+	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
