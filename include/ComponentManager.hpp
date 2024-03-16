@@ -15,6 +15,7 @@
 #include "Components/MoveComponent.hpp"
 #include "Components/PointLightComponent.hpp"
 #include "Components/ProjectileComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/SpotLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -291,6 +292,9 @@ namespace GLVM::ecs
 //					std::cout << "Delete beholder" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::animation).name() ) {
 					RemoveComponent<components::animation>(entity);
+//					std::cout << "Delete animation" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::rigidBody).name() ) {
+					RemoveComponent<components::rigidBody>(entity);
 //					std::cout << "Delete animation" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::collider).name() ) {
 					RemoveComponent<components::collider>(entity);

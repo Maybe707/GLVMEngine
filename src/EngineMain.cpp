@@ -65,6 +65,7 @@ int main()
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 10.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
+//	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
