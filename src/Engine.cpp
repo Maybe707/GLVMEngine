@@ -15,6 +15,7 @@
 #include "Systems/CameraSystem.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/DamageSystem.hpp"
+#include "Systems/EnemySystem.hpp"
 #include "Systems/GUISystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
@@ -73,6 +74,7 @@ namespace GLVM::core
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
 		damageSystem             = new ecs::DamageSystem();
+		enemySytem               = new ecs::EnemySystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -82,6 +84,7 @@ namespace GLVM::core
 		///< Call of ActivateSystem function must be in this order.
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
+		pSystem_Manager->ActivateSystem(enemySytem);
 		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
@@ -189,6 +192,9 @@ namespace GLVM::core
 
 		projectileSystem->textureHandlers = textureHandlers;
 		projectileSystem->meshHandlers    = meshHandlers;
+
+		enemySytem->textureHandlers       = textureHandlers;
+		enemySytem->meshHandlers          = meshHandlers;
 		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
@@ -245,6 +251,8 @@ namespace GLVM::core
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
+			enemySytem->deltaFrameTime                = deltaFrameTime;
+			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
 			projectileSystem->soundEngine             = soundEngine;
 			physicsSystem->fDelta_Time_               = deltaFrameTime;

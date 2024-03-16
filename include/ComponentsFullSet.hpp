@@ -22,5 +22,6 @@
 #include "Components/TextureComponent.hpp"
 #include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/EnemyComponent.hpp"
 
 #endif

@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/EnemyComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Engine.hpp"
@@ -44,9 +45,9 @@ int main()
 	// [[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromFile("../textures/data/container2_specular.png");
 	
     Entity uiPlayer = EntityManager->CreateEntity();
-    ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::animation, cm::beholder,
+    ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
 		cm::transform, cm::rigidBody, cm::event>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 10.0f, 5.0f }, .fScale = 1.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 10.0f, 15.0f }, .fScale = 1.0f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
@@ -54,18 +55,19 @@ int main()
 	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -10.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 20.2f, .gltf = false };
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -20.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 40.2f, .gltf = false };
     ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 
-	for ( u32 i = 0; i < 40; ++i ) {
+	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health>(uiWitch);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 10.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
-//	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
+	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
+	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);

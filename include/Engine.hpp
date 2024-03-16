@@ -10,6 +10,7 @@
 #include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Systems/DamageSystem.hpp"
+#include "Systems/EnemySystem.hpp"
 #include "SystemsFullSet.hpp"
 #include "GLPointer.h"
 #include "IChrono.hpp"
@@ -65,6 +66,7 @@ namespace GLVM::core
         ecs::CPhysicsSystem    * physicsSystem;
         ecs::CProjectileSystem * projectileSystem;
 		ecs::DamageSystem      * damageSystem;
+		ecs::EnemySystem       * enemySytem;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
