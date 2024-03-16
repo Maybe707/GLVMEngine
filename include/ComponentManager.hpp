@@ -187,6 +187,20 @@ namespace GLVM::ecs
 
 			return checkAvailability(sparse, dense, entity);
 		}
+
+        template <typename componentType>
+        bool isComponentExists(const Entity& entity)
+        {
+            unsigned int localContainerID;
+            localContainerID = CreateComponentContainer<componentType>();
+
+			core::vector<Entity>& sparse = *static_cast<core::vector<Entity>*>
+				(worldSparseEntitiesMapToComponents[localContainerID]);
+			core::vector<Entity>& dense = *static_cast<core::vector<Entity>*>
+				(worldDenseComponentsMapToEntities[localContainerID]);
+
+			return checkAvailability( sparse, dense, entity );
+        }
 		
         template <typename componentType>
         componentType* GetComponent(const Entity& entity)

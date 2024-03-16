@@ -54,13 +54,8 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::transform>();
 		
-		core::vector<Entity> linkedEntitiesWithMove = componentManager->collectLinkedEntities<cm::collider,
-																					  cm::transform,
-																					  cm::move>();
-		
         float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-		unsigned int linkedEntitiesVectorSizeWithMove = linkedEntitiesWithMove.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = false;
@@ -86,23 +81,21 @@ namespace GLVM::ecs
 					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
 				float comparedGltfFlag = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->gltf;
-				for ( unsigned int m = 0; m < linkedEntitiesVectorSizeWithMove; ++m) {
-					if ( backtrackingEntityRefCollider == linkedEntitiesWithMove[m] ) {
-						cm::move* backtrackingMove = componentManager->
-							GetComponent<cm::move>(backtrackingEntityRefCollider);
-						backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
-						backtrackingTransform += backtrackingMove->gravity;
-					}
-				}
-				for ( unsigned int n = 0; n < linkedEntitiesVectorSizeWithMove; ++n) {
-					if ( comparedEntityRefCollider == linkedEntitiesWithMove[n] ) {
-						cm::move* comparedMove     = componentManager->
-							GetComponent<cm::move>(comparedEntityRefCollider);
-						comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
-						comparedTransform += comparedMove->gravity;
-					}
+
+				if ( componentManager->isComponentExists<cm::move>(backtrackingEntityRefCollider) ) {
+					cm::move* backtrackingMove = componentManager->
+						GetComponent<cm::move>(backtrackingEntityRefCollider);
+					backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+					backtrackingTransform += backtrackingMove->gravity;
 				}
 
+				if ( componentManager->isComponentExists<cm::move>(comparedEntityRefCollider) ) {
+					cm::move* comparedMove = componentManager->
+						GetComponent<cm::move>(comparedEntityRefCollider);
+					comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
+					comparedTransform += comparedMove->gravity;
+				}
+				
 				if ( !backtrackingGltfFlag ) {
 					backtrackingScale /= 2;
 				}
@@ -111,7 +104,7 @@ namespace GLVM::ecs
 					comparedScale /= 2;
 				}
 				
-				bool boxColliderFlag;
+				bool boxColliderFlag = false;
 				bool upperActorCheckFlag = false;
                 boxColliderFlag = BoxCollider(backtrackingTransform,
 											  comparedTransform,
