@@ -14,6 +14,7 @@
 #include "SystemManager.hpp"
 #include "Systems/CameraSystem.hpp"
 #include "Systems/CollisionSystem.hpp"
+#include "Systems/DamageSystem.hpp"
 #include "Systems/GUISystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
@@ -71,6 +72,7 @@ namespace GLVM::core
 		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
+		damageSystem             = new ecs::DamageSystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -81,6 +83,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
 		pSystem_Manager->ActivateSystem(collisionSystem);
+		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));

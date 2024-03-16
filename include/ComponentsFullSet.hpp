@@ -20,5 +20,7 @@
 #include "Components/PointLightComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/TextureComponent.hpp"
+#include "Components/DamageComponent.hpp"
+#include "Components/HealthComponent.hpp"
 
 #endif

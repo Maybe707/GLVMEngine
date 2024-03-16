@@ -6,11 +6,11 @@
 #ifndef ATTACK_COMPONENT
 #define ATTACK_COMPONENT
 
-namespace GAME_MECHANICS::ECS::components
+namespace GLVM::ecs::components
 {
 	struct attack
 	{
-		
+		float damage;
 	};
 }
 

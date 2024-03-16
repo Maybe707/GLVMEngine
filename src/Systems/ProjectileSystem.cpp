@@ -3,8 +3,10 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
+#include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
@@ -84,15 +86,12 @@ namespace GLVM::ecs
             unsigned int uiEntity_refProjectile = linkedEntities[i];
             if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
                pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
-				cm::projectile* projectileComponent = pComponent_Manager->GetComponent<cm::projectile>(uiEntity_refProjectile);
+				cm::damage* projectileDamageComponent = pComponent_Manager->GetComponent<cm::damage>(uiEntity_refProjectile);
 				for ( unsigned int j = 0; j < pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders.GetSize(); ++j ) {
 					unsigned int collidedEntity = pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders[j];
-					cm::health* healthComponent = pComponent_Manager->GetComponent<cm::health>(collidedEntity);
-					if ( healthComponent != nullptr ) {
-						healthComponent->currentHealth -= projectileComponent->damage;
-						std::cout << "current health: " << healthComponent->currentHealth << std::endl;
-						if ( healthComponent->currentHealth <= 0 )
-							pEntity_Manager->RemoveEntity(collidedEntity, pComponent_Manager);
+					if ( pComponent_Manager->isComponentExists<cm::health>(collidedEntity) ) {
+						pComponent_Manager->CreateComponent<cm::attack>(collidedEntity);
+						pComponent_Manager->GetComponent<cm::attack>(collidedEntity)->damage = projectileDamageComponent->maximumDamage;
 					}
 				}
                 pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
@@ -114,7 +113,8 @@ namespace GLVM::ecs
         unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
 															  cm::transform, cm::material,
-															  cm::projectile, cm::pointLight>(uiEntity_Projectile);
+															  cm::projectile, cm::pointLight,
+															  cm::damage>(uiEntity_Projectile);
 
         core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";
@@ -148,8 +148,9 @@ namespace GLVM::ecs
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 
-		cm::projectile* projectileComponent = componentManager->GetComponent<cm::projectile>(uiEntity_Projectile);
-		projectileComponent->damage = 30.0f;
+		cm::damage* damageComponent = componentManager->GetComponent<cm::damage>(uiEntity_Projectile);
+		damageComponent->maximumDamage = 40;
+		damageComponent->minimumDamage = 20;
     }
 
     Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)

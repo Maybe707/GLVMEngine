@@ -6,7 +6,7 @@
 #ifndef DAMAGE_COMPONENT
 #define DAMAGE_COMPONENT
 
-namespace GAME_MECHANICS::ecs::components
+namespace GLVM::ecs::components
 {
 	struct damage
 	{
