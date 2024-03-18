@@ -48,7 +48,7 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
 		cm::transform, cm::rigidBody, cm::health>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 10.0f, 15.0f }, .fScale = 0.1f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 130.0f, 15.0f }, .fScale = 1.1f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
@@ -61,7 +61,7 @@ int main()
 	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -30.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 60.2f, .gltf = false };
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -15.5f, 0.0f }, .yaw = 0.0f, .pitch = 0.0f, .fScale = 15.2f, .gltf = true };
     ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
