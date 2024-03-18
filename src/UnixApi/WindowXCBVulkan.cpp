@@ -61,6 +61,19 @@ namespace GLVM::core
 		HideCursor();
 	}
 
+	void WindowXCBVulkan::configureWindow() {
+		uint16_t mask = XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT;
+		const uint32_t values[] = {
+			320,    /* x */
+			180,    /* y */
+			1920, /* width */
+			1080   /* height */
+		};
+
+		xcb_configure_window(connection, window, mask, values);
+		xcb_flush(connection);
+	}
+	
 	void WindowXCBVulkan::HideCursor() {
 		xcb_pixmap_t foreground_pixmap_id = xcb_generate_id (connection);
 		xcb_create_pixmap(connection, 1, foreground_pixmap_id,
@@ -137,8 +150,8 @@ namespace GLVM::core
 			case XCB_EXPOSE: {
 				[[maybe_unused]] xcb_expose_event_t *expose_event = (xcb_expose_event_t *)generic_event;
 
-				// printf ("Window %i exposed. Region to be redrawn at location (%d,%d), with dimension (%d,%d)\n",
-				// 		expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
+				printf ("Window %i exposed. Region to be redrawn at location (%d,%d), with dimension (%d,%d)\n",
+						expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
 				break;
 			}
 			case XCB_BUTTON_PRESS: {

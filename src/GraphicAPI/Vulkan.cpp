@@ -316,6 +316,10 @@ namespace GLVM::core
     void CVulkanRenderer::recreateSwapChain() {
         vkDeviceWaitIdle(device);
 
+#ifdef VK_USE_PLATFORM_XCB_KHR
+		Window.configureWindow();
+#endif
+		
         cleanupSwapChain();
 		
         createSwapChain();

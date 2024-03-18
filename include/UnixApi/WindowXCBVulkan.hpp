@@ -37,6 +37,7 @@ namespace GLVM::core
 		
 		WindowXCBVulkan ();
 
+		void configureWindow();
 		void HideCursor();
 		xcb_connection_t* GetConnection();
 		xcb_window_t GetWindow();
