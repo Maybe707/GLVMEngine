@@ -12,7 +12,6 @@
 #include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
 #include "Event.hpp"
-#include "Components/EventComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "EventsStack.hpp"
@@ -38,7 +37,7 @@ namespace GLVM::ecs
 
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 										   float backtrackingScale, float comparedScale) {
-        if((backtrackingPosition[1] - backtrackingScale) + 0.01f >
+        if((backtrackingPosition[1] - backtrackingScale) + 1.7f >
 		   (comparedPosition[1] + (comparedScale))) {
             return true;
         }

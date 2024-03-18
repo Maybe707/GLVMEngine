@@ -3,17 +3,17 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef EVENT_COMPONENT
-#define EVENT_COMPONENT
+#ifndef STATES_TYPES
+#define STATES_TYPES
 
-#include "../Event.hpp"
-
-namespace GLVM::ecs::components
+namespace GLVM::core
 {
-	struct event
+	enum States
 	{
-		core::EEvents eEvent_;
+		IDLE,
+		ATTACK,
+		ROAMING
 	};
-}
+} // namespace GLVM::core
 
 #endif

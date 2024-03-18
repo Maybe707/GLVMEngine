@@ -9,7 +9,6 @@
 #include "Components/ColliderComponent.hpp"
 #include "../ComponentManager.hpp"
 #include "../Event.hpp"
-#include "Components/EventComponent.hpp"
 #include "ISystem.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Vector.hpp"

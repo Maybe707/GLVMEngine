@@ -13,6 +13,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/EnemyComponent.hpp"
 #include "Components/DamageComponent.hpp"
+#include "Components/StateComponent.hpp"
 #include "ISoundEngine.hpp"
 
 namespace GLVM::ecs
@@ -30,6 +31,6 @@ namespace GLVM::ecs
 		float projectileCooldown = 5.0f; 
 		float deltaFrameTime;
 	};
-} // namespace GLVM::ecs::core
+} // namespace GLVM::ecs
 
 #endif

@@ -7,7 +7,6 @@
 #define COLLISION_SYSTEM
 
 #include "Vector.hpp"
-#include "Components/EventComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -37,7 +36,7 @@ namespace GLVM::ecs
 				   float& _fDelta_Time,
 				   components::beholder& _view_Component,
 				   core::CEvent& _event);
-        bool Gravity(components::transform& _transform_Component, components::event& _event_Component);
+        bool Gravity(components::transform& _transform_Component);
 		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                 float backtrackingScale, float comparedScale);
 		void Update() override;

@@ -14,7 +14,7 @@
 #include "Components/VertexComponent.hpp"
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/ViewComponent.hpp"
-#include "Components/EventComponent.hpp"
+#include "Components/StateComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/PointLightComponent.hpp"

@@ -8,7 +8,6 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
-#include "Components/EventComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"

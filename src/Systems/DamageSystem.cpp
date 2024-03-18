@@ -21,10 +21,12 @@ namespace GLVM::ecs
 			cm::attack* attackComponent = componentManager->GetComponent<cm::attack>(entity);
 
 			healthComponent->currentHealth -= attackComponent->damage;
-			std::cout << "current health: " << healthComponent->currentHealth << std::endl;
+			std::cout << "current health: " << healthComponent->currentHealth << " entity: " << entity << std::endl;
 			componentManager->RemoveComponent<cm::attack>(entity);
-			if ( healthComponent->currentHealth <= 0 )
+			if ( healthComponent->currentHealth <= 0 ) {
+				std::cout << "remove entity: " << entity << std::endl;
 				entityManager->RemoveEntity(entity, componentManager);
+			}
 		}
 	}
 } // namespace GLVM::ecs

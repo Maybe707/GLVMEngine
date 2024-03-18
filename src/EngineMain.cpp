@@ -5,6 +5,7 @@
 
 #include "Components/EnemyComponent.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
@@ -46,17 +47,21 @@ int main()
 	
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
-		cm::transform, cm::rigidBody, cm::event, cm::health>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 10.0f, 15.0f }, .fScale = 1.0f };
+		cm::transform, cm::rigidBody, cm::health>(uiPlayer);
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 10.0f, 15.0f }, .fScale = 0.1f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, 1.0f, 0.0f } };
     ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = simpleCubeHandle_GLTF;
+	// cm::material* materialPlainPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
+	// *materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
+	// 	.shininess = 128.0f * 0.078125f };
+
 	
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -20.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 40.2f, .gltf = false };
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -30.5f, 0.0f }, .yaw = 10.0f, .pitch = 0.0f, .fScale = 60.2f, .gltf = false };
     ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
@@ -64,9 +69,10 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 10.0f, 0.0f },
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state>(uiWitch);
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 100.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
+	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
@@ -78,7 +84,7 @@ int main()
 
  	Entity cube0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);
-	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 2.0f, 0.0f },
+	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 1.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 6.0f, .gltf = false };
     ComponentManager->GetComponent<cm::mesh>(cube0)->handle = cubeHandle_OBJ;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);

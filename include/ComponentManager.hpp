@@ -10,7 +10,6 @@
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
-#include "Components/EventComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/PointLightComponent.hpp"
@@ -308,9 +307,6 @@ namespace GLVM::ecs
 				} else if ( componentsTypes[i] == typeid(components::spotLight).name() ) {
 					RemoveComponent<components::spotLight>(entity);
 //					std::cout << "Delete spot light" << std::endl;
-				} else if ( componentsTypes[i] == typeid(components::event).name() ) {
-					RemoveComponent<components::event>(entity);
-//					std::cout << "Delete event" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::material).name() ) {
 					RemoveComponent<components::material>(entity);
 //					std::cout << "Delete material" << std::endl;

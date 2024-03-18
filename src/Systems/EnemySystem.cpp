@@ -17,11 +17,12 @@ namespace GLVM::ecs
 		unsigned int playerEntity = (*entityContainerRefController)[0];
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
 		
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::enemy>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::enemy, cm::transform, cm::state>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int enememyEntity = linkedEntities[i];
 			cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enememyEntity);
+            cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enememyEntity);
 			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enememyEntity);
 
 			vec3 distance = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
@@ -31,10 +32,24 @@ namespace GLVM::ecs
 				projectileCooldown -= cameraSpeed;
 //			std::cout << distance << std::endl;
 			if ( distance.Length() < enemyComponent->detectRadius ) {
-				if(projectileCooldown <= 0) {
+ 				if(projectileCooldown <= 0) {
 					CalculateProjectile(playerTransformComponent, enemyTransformComponent);
 					projectileCooldown = 5.0;
 				}
+
+				stateEnemyComponent->state = core::States::ATTACK;
+			}
+
+			if ( distance.Length() > enemyComponent->detectRadius && stateEnemyComponent->state == core::States::ATTACK ) {
+ 				if(projectileCooldown <= 0) {
+					CalculateProjectile(playerTransformComponent, enemyTransformComponent);
+					projectileCooldown = 5.0;
+				}
+
+				float deltaLenth = distance.Length() - enemyComponent->detectRadius;
+				vec3 enemyMove = distance * (deltaLenth / distance.Length());
+
+				enemyTransformComponent->tPosition += enemyMove;
 			}
 		}
 	}
@@ -80,4 +95,4 @@ namespace GLVM::ecs
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;
 	}
-} // namespace GLVM::ecs::core
+} // namespace GLVM::ecs

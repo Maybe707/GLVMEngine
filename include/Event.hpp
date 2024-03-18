@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef EVENT
-#define EVENT
+#ifndef EVENT_HPP
+#define EVENT_HPP
 
 //#include "Stack.hpp"
 
