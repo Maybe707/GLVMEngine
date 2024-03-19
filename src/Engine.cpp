@@ -121,6 +121,10 @@ namespace GLVM::core
 		bool bGame_Loop_Active = true;
 
 		projectileSystem->textureHandlers = textureHandlers;
+		projectileSystem->meshHandlers    = meshHandlers;
+
+		enemySytem->textureHandlers       = textureHandlers;
+		enemySytem->meshHandlers          = meshHandlers;
 		
 		openglRenderer = new COpenglRenderer();
 		openglRenderer->textureVector = textureVector;
@@ -172,6 +176,8 @@ namespace GLVM::core
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
+			enemySytem->deltaFrameTime                = deltaFrameTime;
+			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
 			projectileSystem->soundEngine             = soundEngine;
 			physicsSystem->fDelta_Time_               = deltaFrameTime;

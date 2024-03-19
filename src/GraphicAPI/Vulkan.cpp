@@ -411,7 +411,6 @@ namespace GLVM::core
 																								cm::mesh>();
 
 		actorsNumber = actorsLinkedEntities.GetSize();
-		
 
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::LIGHT_DATA, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
@@ -2064,6 +2063,7 @@ namespace GLVM::core
 
 		
 		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * pointLightsLinkedEntities.GetSize();
+		pointLightUboDescriptorsNumber = 200;
 
 		if ( pointLightUboDescriptorsNumber > 0 ) {
 			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
