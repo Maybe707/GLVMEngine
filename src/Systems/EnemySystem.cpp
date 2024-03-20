@@ -20,10 +20,10 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::enemy, cm::transform, cm::state>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int enememyEntity = linkedEntities[i];
-			cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enememyEntity);
-            cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enememyEntity);
-			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enememyEntity);
+			unsigned int enemyEntity = linkedEntities[i];
+			cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
+            cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enemyEntity);
+			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enemyEntity);
 
 			vec3 distance = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
 			float cameraSpeed = 5.5f * deltaFrameTime;            
@@ -45,7 +45,7 @@ namespace GLVM::ecs
 			
 			if ( distance.Length() <= enemyComponent->detectRadius ) {
  				if(projectileCooldown <= 0) {
-					CalculateProjectile(playerTransformComponent, enemyTransformComponent);
+					CalculateProjectile(playerEntity, enemyEntity);
 					projectileCooldown = 5.0;
 				}
 
@@ -54,8 +54,7 @@ namespace GLVM::ecs
 		}
 	}
 
-	void EnemySystem::CalculateProjectile(components::transform* playerTransformComponent,
-										  components::transform* enemyTransformComponent) {
+	void EnemySystem::CalculateProjectile(unsigned int playerEntity, unsigned int enemyEntity) {
 		ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
 
@@ -84,6 +83,9 @@ namespace GLVM::ecs
 		cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
 		rTransformProjectile->fScale = 0.1f;
 
+		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
+		cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
+		
 		rTransformProjectile->tPosition = enemyTransformComponent->tPosition;
 		rTransformProjectile->tForward   = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
 		rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.3;

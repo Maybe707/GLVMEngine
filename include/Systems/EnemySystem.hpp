@@ -22,8 +22,7 @@ namespace GLVM::ecs
 	{
 	public:
 		void Update() override;
-		void CalculateProjectile(components::transform* playerTransformComponent,
-								 components::transform* enemyTransformComponent);
+		void CalculateProjectile(unsigned int playerEntity, unsigned int enemyEntity);
 
 		core::Sound::ISoundEngine* soundEngine;
 		core::vector<ecs::TextureHandle> textureHandlers;
