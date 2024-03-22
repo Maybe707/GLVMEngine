@@ -84,7 +84,7 @@ namespace GLVM::core
     const uint32_t HEIGHT = 600;
 
     const int MAX_FRAMES_IN_FLIGHT = 2;
-#define NDEBUG
+//#define NDEBUG
     const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
     };
@@ -176,6 +176,7 @@ namespace GLVM::core
 		DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
+		HUD_UBO,
 		MODEL_MATRIX_UBO,
 
 		LIGHT_DATA,
@@ -280,6 +281,13 @@ namespace GLVM::core
 		alignas(16) uint32_t directionalLightsNumber;
     };
 
+	struct alignas(64) HUD_UBO {
+		vec3 entityPosition;
+		bool isHudExists;
+		int maxHP;
+		int currentHP;
+	};
+	
 	struct alignas(16) ShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
@@ -421,6 +429,9 @@ namespace GLVM::core
 
         const char* vertShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/vertCubeShadowMap.spv";
         const char* fragShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
+
+		const char* vertShaderHUD = "../VKshaders/hudShaders/hud_vert.spv";
+		const char* fragShaderHUD = "../VKshaders/hudShaders/hud_frag.spv";
 		
         unsigned int texturePool_;
 
@@ -488,6 +499,12 @@ namespace GLVM::core
         VkRenderPass renderPass;
 
 		Pipeline mainRenderScenePipeline;
+		Pipeline hudPipeline;
+		VkRenderPass hudRenderPass;
+		std::vector<VkDescriptorSet> hudDescriptorSets;
+		std::vector<VkBuffer> hudUniformBuffers;
+		std::vector<VkDeviceMemory> hudUniformBuffersMemory;
+		std::vector<VkFramebuffer> hudSwapChainFramebuffers;
 		Pipeline directionalLightPipeline;
 		Pipeline spotLightPipeline;
 		Pipeline pointLightPipeline;
@@ -498,6 +515,7 @@ namespace GLVM::core
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
 		VkCommandPool pointLightCommandPool;
+		VkCommandPool hudCommandPool;
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
@@ -576,6 +594,7 @@ namespace GLVM::core
 		
         VkDescriptorPool descriptorPool;
 		unsigned int matrixUboDescriptorsNumber = 0;
+		unsigned int hudUboDescriptorNumber = 0;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
@@ -596,6 +615,7 @@ namespace GLVM::core
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
 		std::vector<VkCommandBuffer> pointLightCommandBuffers;
+		std::vector<VkCommandBuffer> hudCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
 		/// Main render pipe line sync objects
@@ -603,6 +623,11 @@ namespace GLVM::core
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
 
+		/// Main render pipe line sync objects
+        std::vector<VkSemaphore> hudImageAvailableSemaphores;
+        std::vector<VkSemaphore> hudRenderFinishedSemaphores;
+        std::vector<VkFence> hudInFlightFences;
+		
 		/// Directional light shadow map sync objects
         std::vector<VkSemaphore> directionalLightShadowMapImageAvailableSemaphores;
         std::vector<VkSemaphore> directionalLightShadowMapRenderFinishedSemaphores;
@@ -619,6 +644,7 @@ namespace GLVM::core
         std::vector<VkFence> pointLightShadowMapInFlightFences;
 		
         uint32_t currentFrame = 0;
+		uint32_t hudCurrentFrame = 0;
 		uint32_t directionalLightCurrentFrame = 0;
 		uint32_t spotLightCurrentFrame = 0;
 		uint32_t pointLightCurrentFrame = 0;
@@ -644,6 +670,7 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createMainRenderPass();
+		void createHudRenderPass();
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
@@ -681,6 +708,7 @@ namespace GLVM::core
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();
+		void createHudDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
 		void updateDirectionalLightShadowMapDescriptorSets();
@@ -693,6 +721,7 @@ namespace GLVM::core
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
+		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
 							   std::vector<VkSemaphore>& renderFinishedSemaphores,
@@ -708,6 +737,7 @@ namespace GLVM::core
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
+		void hudDrawFrame();
         void mainRenderDrawFrame();
 		void directionalLightShadowMapDrawFrame();
 		void spotLightShadowMapDrawFrame();

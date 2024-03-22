@@ -94,6 +94,7 @@ namespace GLVM::core
 		directionalLightShadowMapDrawFrame();
 		spotLightShadowMapDrawFrame();
 		pointLightShadowMapDrawFrame();
+//		hudDrawFrame();
 		mainRenderDrawFrame();
 		
 		// #ifdef VK_USE_PLATFORM_XCB_KHR
@@ -405,7 +406,13 @@ namespace GLVM::core
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
+		hudPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+		hudPipeline.vertShader = vertShaderHUD;
+		hudPipeline.fragShader = fragShaderHUD;
 
+		hudPipeline.bindingDescription = Vertex::getBindingDescription();
+		hudPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
 																								cm::mesh>();
@@ -561,20 +568,24 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createMainRenderPass();
+		createHudRenderPass();
 		createDirectionalLightShadowMapRenderPass();
 		createSpotLightShadowMapRenderPass();
 		createPointLightShadowMapRenderPass();
         createDescriptorSetLayout(directionalLightPipeline.descriptors);
 		createDescriptorSetLayout(spotLightPipeline.descriptors);
 		createDescriptorSetLayout(pointLightPipeline.descriptors);
+		createDescriptorSetLayout(hudPipeline.descriptors);
         createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
         createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass);
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
+		createGraphicsPipeline(hudPipeline, hudRenderPass);
 		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
         createCommandPool(directionalLightCommandPool);
 		createCommandPool(spotLightCommandPool);
 		createCommandPool(pointLightCommandPool);
+		createCommandPool(hudCommandPool);
 		createCommandPool(mainRenderCommandPool);
         createDepthResources();
 		createDirectionalLightShadowMapDepthResources();
@@ -595,12 +606,17 @@ namespace GLVM::core
 		createDirectionalLightShadowMapDescriptorSets();
 		createSpotLightShadowMapDescriptorSets();
 		createPointLightShadowMapDescriptorSets();
+		createHudDescriptorSets();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
         createCommandBuffers(directionalLightCommandPool, directionalLightCommandBuffers);
 		createCommandBuffers(spotLightCommandPool, spotLightCommandBuffers);
 		createCommandBuffers(pointLightCommandPool, pointLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
+		createCommandBuffers(hudCommandPool, hudCommandBuffers);
+		createSyncObjects(hudImageAvailableSemaphores,
+						  hudRenderFinishedSemaphores,
+						  hudInFlightFences);
 		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 						  directionalLightShadowMapRenderFinishedSemaphores,
 						  directionalLightShadowMapInFlightFences);
@@ -1003,6 +1019,64 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::createHudRenderPass() {
+        VkAttachmentDescription colorAttachment{};
+        colorAttachment.format = swapChainImageFormat;
+        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        
+        VkAttachmentDescription depthAttachment{};
+        depthAttachment.format = findDepthFormat();
+        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference colorAttachmentRef{};
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthAttachmentRef{};
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = 0;
+        dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+//        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT ;
+        
+        std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments = attachments.data();
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 1;
+        renderPassInfo.pDependencies = &dependency;
+
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &hudRenderPass) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create render pass!");
+        }
+    }
+	
     void CVulkanRenderer::createDirectionalLightShadowMapRenderPass() {
         VkAttachmentDescription attachmentDescription{};
         
@@ -1344,6 +1418,16 @@ namespace GLVM::core
 										 swapChainExtent.width, swapChainExtent.height);
 		}
 
+		hudSwapChainFramebuffers.resize(swapChainImageViews.size());
+        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+			std::vector<VkImageView> hudRenderAttachments;
+			hudRenderAttachments.push_back(swapChainImageViews[i]);
+			hudRenderAttachments.push_back(depthImageView);
+
+			createRenderPassFramebuffers(hudRenderAttachments, hudRenderPass, hudSwapChainFramebuffers[i],
+										 swapChainExtent.width, swapChainExtent.height);
+		}
+		
 		/// Directional lights shadow map renderer frame buffers initialization
 		directionalLightShadowMapFrameBuffers.resize(DIRECTIONAL_LIGHTS_NUMBER);
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
@@ -1969,6 +2053,7 @@ namespace GLVM::core
 		VkDeviceSize lightSpaceMatrixSize = sizeof(LightSpaceMatrixUBO);
 		VkDeviceSize modelShadowMapMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
+//		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -1992,6 +2077,22 @@ namespace GLVM::core
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
+
+//				memory += modelMatrixBufferSize;
+		}
+		memory = 0;
+
+		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		hudUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
+			memory += modelMatrixBufferSize;
+		}
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 hudUniformBuffers[i], hudUniformBuffersMemory[i]);
 
 //				memory += modelMatrixBufferSize;
 		}
@@ -2241,6 +2342,47 @@ namespace GLVM::core
 
 				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 			}
+		}
+	}
+
+    void CVulkanRenderer::createHudDescriptorSets() {
+		core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
+ 
+		int hudUboBinding = hudBindings[0];
+		
+		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
+		
+		std::vector<VkDescriptorSetLayout> hudUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+															spotLightPipeline.descriptors[hudUboBinding].setLayout);
+		VkDescriptorSetAllocateInfo hudUboAllocInfo{};
+		hudUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		hudUboAllocInfo.descriptorPool = descriptorPool;
+		hudUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																	  actual_size);
+		hudUboAllocInfo.pSetLayouts = hudUboLayouts.data();
+			
+		hudDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		if (vkAllocateDescriptorSets(device, &hudUboAllocInfo, hudDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = hudUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
+			modelMatrixBufferInfo.range = sizeof(HUD_UBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = hudDescriptorSets[i];
+			descriptorWrites[0].dstBinding = hudUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 	}
 	
@@ -2858,6 +3000,103 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::mesh>();
+		
+		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = hudRenderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+
+		// cm::transform* playerTransformComponent = nullptr;
+
+		// if ( viewPositionLinkedEntities.GetSize() > 0 )
+		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
+
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+				
+			// unsigned int uboIndex = i;
+			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+
+			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
@@ -2950,9 +3189,9 @@ namespace GLVM::core
 
         vkCmdEndRenderPass(commandBuffer);
 
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
     }
 
     void CVulkanRenderer::createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
@@ -3308,6 +3547,74 @@ namespace GLVM::core
         vkUnmapMemory(device, lightSpaceMatrixMemory[currentImage]);
 	}
 
+    void CVulkanRenderer::hudDrawFrame() {
+		namespace cm = GLVM::ecs::components;
+		// mutex0.lock();
+		// mutex0.unlock();
+		// mutex1.lock();
+		// mutex1.unlock();
+		// mutex2.lock();
+		// mutex2.unlock();
+        vkWaitForFences(device, 1, &hudInFlightFences[hudCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, hudImageAvailableSemaphores[hudCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        vkResetFences(device, 1, &hudInFlightFences[hudCurrentFrame]);
+        vkResetCommandBuffer(hudCommandBuffers[hudCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        hudRecordCommandBuffer(hudCommandBuffers[hudCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {hudImageAvailableSemaphores[hudCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &hudCommandBuffers[hudCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {hudRenderFinishedSemaphores[hudCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, hudInFlightFences[hudCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        hudCurrentFrame = (hudCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
+	
     void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
 		// mutex0.lock();
@@ -3330,7 +3637,9 @@ namespace GLVM::core
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
