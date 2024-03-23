@@ -27,21 +27,21 @@ layout(location = 0) out VS_OUT {
 
 void main()
 {
-	float scale = 0.3;
+	float scale = 0.2;
 
 	mat4 modelMatrix = mat4(
 		1.0, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
-		hudUBO.entityPosition.x,
+		hudUBO.entityPosition.x - 2.0,
 		hudUBO.entityPosition.y,
-		hudUBO.entityPosition.z + 1.5,
+		hudUBO.entityPosition.z - 0.5,
 		1.0
 		);
 	
 	mat4 scaleMatrix = mat4(
 		scale, 0.0, 0.0, 0.0,
-		0.0, scale, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, scale, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
