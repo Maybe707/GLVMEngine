@@ -406,7 +406,8 @@ namespace GLVM::Core
 							   std::vector<uint32_t>& aIndices_,
 							   core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 							   core::vector<float>& frames,
-							   bool& noAnimations) {
+							   bool& noAnimations,
+							   float& topY) {
 		ReadFile(pathsGLTF_);
 		Parse();
 		
@@ -836,7 +837,7 @@ namespace GLVM::Core
 		}
 
 		jointMatricesPerMesh = jointMatrices;
-
+		
 		for ( uint32_t i = 0; i < indices.GetSize(); ++i ) {
 			aIndices_.push_back(i);
 
@@ -846,6 +847,9 @@ namespace GLVM::Core
 					vertices_position[index + 1],
 					vertices_position[index + 2] };
 
+				if ( position[1] > topY )
+					topY = position[1];
+				
 				aVertexes_.push_back(position[0]);
 				aVertexes_.push_back(position[1]);
 				aVertexes_.push_back(position[2]);

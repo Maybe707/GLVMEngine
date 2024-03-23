@@ -258,7 +258,8 @@ namespace GLVM::Core
 					  std::vector<uint32_t>& aIndices_,
 					  core::vector<core::vector<mat4>>& jointMatricesPerMesh,
 					  core::vector<float>& frames,
-					  bool& noAnimations);
+					  bool& noAnimations,
+					  float& topY);
 		void traversalBones(core::vector<core::vector<int>> children, Core::JsonValue joints,
 							core::stack<u32> node_stack, core::stack<u32> deepness_stack, core::vector<core::vector<u32>>& result);
 		core::vector<core::vector<unsigned int>> makeRenderJointsIndices(core::vector<core::vector<unsigned int>>& input);

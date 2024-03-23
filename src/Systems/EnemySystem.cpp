@@ -28,6 +28,7 @@ namespace GLVM::ecs
 			vec3 distance = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
 			float cameraSpeed = 5.5f * deltaFrameTime;            
 
+
 			if(projectileCooldown > 0)
 				projectileCooldown -= cameraSpeed;
 //			std::cout << distance << std::endl;

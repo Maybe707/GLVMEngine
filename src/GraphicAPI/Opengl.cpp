@@ -951,7 +951,9 @@ namespace GLVM::core
 			frames.Push({});
 			animationFlags.Push({});
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[nextIndexGLTF], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
+			highest_gltf_Y.emplace_back();
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[nextIndexGLTF], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF],
+								frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[m]);
 		}
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;

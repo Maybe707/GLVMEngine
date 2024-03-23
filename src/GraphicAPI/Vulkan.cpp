@@ -6,6 +6,7 @@
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/ControllerComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -339,6 +340,7 @@ namespace GLVM::core
 		updateSpotLightShadowMapDescriptorSets();
 		updatePointLightShadowMapDescriptorSets();
 		updateDescriptorSets();
+		updateHudDescriptorSets();
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
@@ -489,8 +491,9 @@ namespace GLVM::core
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
 			animationFlags.Push({});
+			highest_gltf_Y.emplace_back();
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m]);
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[m]);
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -1027,7 +1030,7 @@ namespace GLVM::core
         colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
         colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
         colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
         
         VkAttachmentDescription depthAttachment{};
@@ -2750,6 +2753,32 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 	}
+
+    void CVulkanRenderer::updateHudDescriptorSets() {
+		core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
+		int hudUboBinding = hudBindings[0];
+		
+		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = hudUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
+			modelMatrixBufferInfo.range = sizeof(HUD_UBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = hudDescriptorSets[i];
+			descriptorWrites[0].dstBinding = hudUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
 	
     void CVulkanRenderer::updateDescriptorSets() {
 		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
@@ -3000,6 +3029,28 @@ namespace GLVM::core
         }
     }
 
+	void CVulkanRenderer::updateHudUBO(uint32_t currentImage, uint32_t offset,
+									   ecs::components::transform* entityOwnHudTransform,
+									   ecs::components::health* entityOwnHudHealth, bool isHudExists,
+									   float highestY) {
+		HUD_UBO hudUBO{};
+
+		hudUBO.view = viewMatrix;
+		hudUBO.proj = projectionMatrix;
+		
+		hudUBO.isHudExists = isHudExists;
+		hudUBO.currentHP   = entityOwnHudHealth->currentHealth;
+		hudUBO.maxHP       = entityOwnHudHealth->maxHealth;
+		hudUBO.entityPosition = entityOwnHudTransform->tPosition;
+		hudUBO.highestY    = highestY;
+
+		void* hudMatrixData;
+        vkMapMemory(device, hudUniformBuffersMemory[currentImage], sizeof(HUD_UBO) * offset,
+					sizeof(HUD_UBO), 0, &hudMatrixData);
+        memcpy(hudMatrixData, &hudUBO, sizeof(HUD_UBO));
+        vkUnmapMemory(device, hudUniformBuffersMemory[currentImage]);
+	}
+	
     void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
@@ -3011,8 +3062,7 @@ namespace GLVM::core
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh>();
+																						   cm::health>();
 		
 		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -3049,7 +3099,7 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 
 		// cm::transform* playerTransformComponent = nullptr;
 
@@ -3059,6 +3109,13 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
+
+			unsigned int uboIndex = i;
+			updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiEntity]);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+									0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
@@ -3637,7 +3694,6 @@ namespace GLVM::core
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 

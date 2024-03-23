@@ -24,6 +24,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/TextureComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "IRenderer.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
@@ -282,10 +283,13 @@ namespace GLVM::core
     };
 
 	struct alignas(64) HUD_UBO {
+		mat4 view;
+		mat4 proj;
 		vec3 entityPosition;
-		bool isHudExists;
-		int maxHP;
-		int currentHP;
+		int isHudExists;
+		float maxHP;
+		float currentHP;
+		float highestY;
 	};
 	
 	struct alignas(16) ShadowMapMatrixUBO {
@@ -414,6 +418,7 @@ namespace GLVM::core
 //		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
         std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
+		std::vector<float> highest_gltf_Y;                                 /// highest gltf y
 		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
@@ -714,6 +719,7 @@ namespace GLVM::core
 		void updateDirectionalLightShadowMapDescriptorSets();
 		void updateSpotLightShadowMapDescriptorSets();
 		void updatePointLightShadowMapDescriptorSets();
+		void updateHudDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);
@@ -721,6 +727,9 @@ namespace GLVM::core
         void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
+		void updateHudUBO(uint32_t currentImage, uint32_t offset,
+						  ecs::components::transform* entityOwnHudTransform,
+						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
