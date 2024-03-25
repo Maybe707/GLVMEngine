@@ -332,10 +332,6 @@ namespace GLVM::core
 		createPointLightShadowMapDepthResources();
 		createFramebuffers();
 
-		createDirectionalLightShadowMapTextureSamplers();
-		createSpotLightShadowMapTextureSamplers();
-		createPointLightShadowMapTextureSamplers();
-		
 		updateDirectionalLightShadowMapDescriptorSets();
 		updateSpotLightShadowMapDescriptorSets();
 		updatePointLightShadowMapDescriptorSets();
@@ -598,9 +594,6 @@ namespace GLVM::core
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-		createDirectionalLightShadowMapTextureSamplers();
-		createSpotLightShadowMapTextureSamplers();
-		createPointLightShadowMapTextureSamplers();
         loadWavefrontObj();
 		initializeGLTF();
 		
@@ -1739,102 +1732,30 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::createTextureSampler() {
-        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
-        {
-            VkPhysicalDeviceProperties properties{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-
-            VkSamplerCreateInfo samplerInfo{};
-            samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerInfo.magFilter = VK_FILTER_NEAREST;
-            samplerInfo.minFilter = VK_FILTER_NEAREST;
-            samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.anisotropyEnable = VK_TRUE;
-            samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-            samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-            samplerInfo.unnormalizedCoordinates = VK_FALSE;
-            samplerInfo.compareEnable = VK_FALSE;
-            samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-            samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
-			textureImages[i].sampler = {};              /// TODO: Is it realy need here?
-            if (vkCreateSampler(device, &samplerInfo, nullptr, &textureImages[i].sampler) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create texture sampler!");
-            }
-        }
-    }
-
-    void CVulkanRenderer::createShadowMapTextureSampler() {
-        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
-        {
-            VkPhysicalDeviceProperties properties{};
-            vkGetPhysicalDeviceProperties(physicalDevice, &properties);
-
-            VkSamplerCreateInfo samplerInfo{};
-            samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-            samplerInfo.magFilter = VK_FILTER_NEAREST;
-            samplerInfo.minFilter = VK_FILTER_NEAREST;
-            samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
-            samplerInfo.anisotropyEnable = VK_TRUE;
-            samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-            samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
-            samplerInfo.unnormalizedCoordinates = VK_FALSE;
-            samplerInfo.compareEnable = VK_FALSE;
-            samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
-            samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
-			pointLightImages[i].sampler = {};              /// TODO: Is it realy need here?
-            if (vkCreateSampler(device, &samplerInfo, nullptr, &pointLightImages[i].sampler) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create texture sampler!");
-            }
-        }
-    }
-	
-    void CVulkanRenderer::createDirectionalLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(directionalLightPipeline.descriptors[0].textureImages[i].sampler);
-    }
-
-    void CVulkanRenderer::createSpotLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < spotLightPipeline.descriptors[0].textureImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(spotLightPipeline.descriptors[0].textureImages[i].sampler);
-    }
-
-    void CVulkanRenderer::createPointLightShadowMapTextureSamplers() {
-        for(unsigned int i = 0; i < pointLightPipeline.descriptors[0].textureImages.size(); ++i)
-			createRenderPassShadowMapTextureSamplers(pointLightPipeline.descriptors[0].textureImages[i].sampler);
-    }
-	
-	void CVulkanRenderer::createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler) {
 		VkPhysicalDeviceProperties properties{};
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);
 
-		VkFilter shadowMapFilter = VK_FILTER_LINEAR;
-			
 		VkSamplerCreateInfo samplerInfo{};
 		samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-		samplerInfo.magFilter = shadowMapFilter;
-		samplerInfo.minFilter = shadowMapFilter;
-		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-		samplerInfo.addressModeV = samplerInfo.addressModeU;
-		samplerInfo.addressModeW = samplerInfo.addressModeU;
-		samplerInfo.mipLodBias = 0.0f;
+		samplerInfo.magFilter = VK_FILTER_NEAREST;
+		samplerInfo.minFilter = VK_FILTER_NEAREST;
+		samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+		samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
 		samplerInfo.anisotropyEnable = VK_TRUE;
 		samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
-		samplerInfo.minLod = 0.0f;
-		samplerInfo.maxLod = 1.0f;
-		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_WHITE;
+		samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+		samplerInfo.unnormalizedCoordinates = VK_FALSE;
+		samplerInfo.compareEnable = VK_FALSE;
+		samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+		samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
-		if (vkCreateSampler(device, &samplerInfo, nullptr, &shadowMapTextureSampler) != VK_SUCCESS) {
+		textureSampler = {};              /// TODO: Is it realy need here?
+		if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create texture sampler!");
 		}
-	}
-	
+    }
+
     VkImageView CVulkanRenderer::createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount) {
         VkImageViewCreateInfo viewInfo{};
         viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -2491,7 +2412,7 @@ namespace GLVM::core
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[textureIndex].views[0];
-				imageInfo.sampler = textureImages[textureIndex].sampler;
+				imageInfo.sampler = textureSampler;
 
 				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -2518,21 +2439,21 @@ namespace GLVM::core
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
-			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+			directionalLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
-			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+			pointLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
-			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+			spotLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		if ( initializeTextureData_.size() > 0 ) {
@@ -2556,7 +2477,7 @@ namespace GLVM::core
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[textureIndex].views[0];
-				imageInfo.sampler = textureImages[textureIndex].sampler;
+				imageInfo.sampler = textureSampler;
 			
 				std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2816,7 +2737,7 @@ namespace GLVM::core
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
 			imageInfo.imageView = textureImages[textureIndex].views[0];
-			imageInfo.sampler = textureImages[textureIndex].sampler;
+			imageInfo.sampler = textureSampler;
 
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -2866,7 +2787,7 @@ namespace GLVM::core
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
-			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+			directionalLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
@@ -2874,7 +2795,7 @@ namespace GLVM::core
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
-			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+			pointLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
@@ -2882,7 +2803,7 @@ namespace GLVM::core
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
-			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+			spotLightsImageInfo[i].sampler = textureSampler;
 		}
 
 		u32 DS_number = initializeTextureData_.size();
@@ -2892,7 +2813,7 @@ namespace GLVM::core
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
 			imageInfo.imageView = textureImages[textureIndex].views[0];
-			imageInfo.sampler = textureImages[textureIndex].sampler;
+			imageInfo.sampler = textureSampler;
 			
 			std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

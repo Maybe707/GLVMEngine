@@ -573,6 +573,7 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
 
 		std::vector<VK_Image> textureImages;
+		VkSampler textureSampler;
 
         std::vector<VkBuffer> vertexBufferContainer;
         std::vector<VkDeviceMemory> vertexBufferMemoryContainer;
@@ -696,11 +697,6 @@ namespace GLVM::core
         void createTextureImageView();
 		void createShadowMapTextureImageView();
         void createTextureSampler();
-		void createShadowMapTextureSampler();
-		void createDirectionalLightShadowMapTextureSamplers();
-		void createSpotLightShadowMapTextureSamplers();
-		void createPointLightShadowMapTextureSamplers();
-		void createRenderPassShadowMapTextureSamplers(VkSampler& shadowMapTextureSampler);
         VkImageView createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount);
         void createImage(VK_Image& image);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
