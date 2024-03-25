@@ -55,6 +55,7 @@ namespace GLVM::core
 		flatShadowMapShaderProgram  = new Shader("../GLshaders/FlatShadowMap.vert", "../GLshaders/FlatShadowMap.frag");
  		cubeShadowMapShaderProgram  = new Shader("../GLshaders/CubeShadowMap.vert", "../GLshaders/CubeShadowMap.frag",
 			                                     "../GLshaders/CubeShadowMap.geom");
+		hudShaderProgram            = new Shader("../GLshaders/hud_shader.vert", "../GLshaders/hud_shader.frag");
 		debugQuadDepth_             = new Shader("../GLshaders/DebugQuadDepth.vert", "../GLshaders/DebugQuadDepth.frag");
 		debugLines                  = new Shader("../GLshaders/debugLines.vert", "../GLshaders/debugLines.frag");
 		
@@ -193,6 +194,7 @@ namespace GLVM::core
 		
 		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize",
 								  sampledPointLightEntityIDcontainer.size());
+
 		
 		ComputeDirectionalLight();
 		ComputePointLight();
@@ -200,6 +202,51 @@ namespace GLVM::core
 
 	    EvaluateCoreShader();
 		RenderScene(coreShaderProgram);
+
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::health>();
+
+		
+		genBuffers.clear();
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			genBuffers.Push(i);
+		}
+		
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
+
+			hudUBO.view = viewMatrix;
+			hudUBO.proj = tProjection_Matrix;
+		
+			hudUBO.isHudExists = 1;
+			hudUBO.currentHP   = healthComponent->currentHealth;
+			hudUBO.maxHP       = healthComponent->maxHealth;
+			hudUBO.entityPosition = transformComponent->tPosition;
+			hudUBO.highestY    = highest_gltf_Y[uiEntity];
+			
+			hudShaderProgram->Use();
+			unsigned int binding = 0;
+			unsigned int uniformBlockIndex = pGLGetUniformBlockIndex(hudShaderProgram->iID, "HUD_UBO");
+			pGLUniformBlockBinding(hudShaderProgram->iID, uniformBlockIndex, binding);
+			
+			pGLGen_Buffers(1, &genBuffers[i]);
+			pGLBind_Buffer(GL_UNIFORM_BUFFER, genBuffers[i]);
+			pGLBuffer_Data(GL_UNIFORM_BUFFER, 224, NULL, GL_STATIC_DRAW); // allocate 224 bytes of memory
+			pGLBind_Buffer(GL_UNIFORM_BUFFER, 0);
+			pGLBindBufferRange(GL_UNIFORM_BUFFER, 0, genBuffers[i], 0, 224);
+
+			pGLBind_Buffer(GL_UNIFORM_BUFFER, genBuffers[i]);
+			pGLBufferSubData(GL_UNIFORM_BUFFER, 0, 224, &hudUBO);
+			pGLBind_Buffer(GL_UNIFORM_BUFFER, 0);  
+			
+			pGLBind_Vertex_Array(VAOcontainer_[uiVertexId]);
+			glDrawElements(GL_TRIANGLES, aIndices_[uiVertexId].size(), GL_UNSIGNED_INT, 0);
+		}
 	}
 
 	void COpenglRenderer::AllocateTextureMemory(std::vector<unsigned int>& shadowMapFBOcontainer,
@@ -988,7 +1035,6 @@ namespace GLVM::core
 
 	void COpenglRenderer::ComputeViewMatrix(Shader* shaderProgram, ecs::components::transform& player, ecs::components::beholder& beholder)
     {
-        Matrix<float, 4> viewMatrix(1.0f);
         const float kSensitivity = 0.1f;
 
         fYaw = g_eEvent.mousePointerPosition.offset_X;
@@ -1040,7 +1086,7 @@ namespace GLVM::core
     }
 
 	void COpenglRenderer::ComputeProjectionMatrix(Shader* shaderProgram) {
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 1000.0f);
+		tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 1000.0f);
 		shaderProgram->SetMat4("projectionMatrix", tProjection_Matrix);
 	}
 }

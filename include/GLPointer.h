@@ -124,6 +124,14 @@ EXTERN void (*pGLUniformMatrix4fv)(GLint location, GLsizei count, GLboolean tran
 
 EXTERN void (*pGLUniform1iv)(GLint location, GLsizei count, const GLint* value);
 
+EXTERN GLuint (*pGLGetUniformBlockIndex)(GLuint, const GLchar *);
+
+EXTERN void (*pGLUniformBlockBinding)(GLuint, GLuint, GLuint);
+
+EXTERN void (*pGLBindBufferRange)(GLenum, GLuint, GLuint, GLintptr, GLsizeiptr);
+
+EXTERN void (*pGLBufferSubData)(GLenum, GLintptr, GLsizeiptr, const GLvoid *);
+
 #ifdef __linux__
 EXTERN void (*pGLXSwap_Interval_EXT)(Display *, GLXDrawable, int);
 #endif

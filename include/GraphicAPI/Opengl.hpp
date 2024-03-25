@@ -15,6 +15,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
 #include "Components/SpotLightComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Constants.hpp"
 #include "Event.hpp"
 #include "GLPointer.h"
@@ -31,6 +32,7 @@
 #include "ShaderProgram.hpp"
 #include "ToString.hpp"
 #include <fstream>
+#include "ShaderStructs.hpp"
 
 #ifdef __linux__
 //#include "UnixApi/WindowXOpengl.hpp"
@@ -74,6 +76,7 @@ namespace GLVM::core {
 		Shader* coreShaderProgram;
 		Shader* flatShadowMapShaderProgram;
 		Shader* cubeShadowMapShaderProgram;
+		Shader* hudShaderProgram;
 		Shader* debugQuadDepth_;
 		Shader* debugLines;                            ///< For debug only
 		GLuint quadVAO_;
@@ -140,6 +143,10 @@ namespace GLVM::core {
 		core::vector<core::vector<float>> frames;
 		float frameAccumulator = 0.0f;
 		unsigned int currentFrame = 0;
+		Matrix<float, 4> viewMatrix;
+		mat4 tProjection_Matrix;
+		core::vector<unsigned int> genBuffers;
+		HUD_UBO hudUBO{};
 
 //		core::vector<mat4> inverseMatrices;
 		

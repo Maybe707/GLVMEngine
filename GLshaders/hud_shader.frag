@@ -1,0 +1,26 @@
+#version 410
+
+in VS_OUT {
+	vec4 vertexPosition;
+	vec4 entityPosition;
+	float maxHP;
+	float currentHP;
+	float highestY;
+} fs_in;
+
+out vec4 outColor;
+
+void main()
+{
+	float hpScale = fs_in.maxHP / fs_in.currentHP;
+	
+//	vec4 color = vec4((fs_in.currentHP / fs_in.maxHP) / fs_in.maxHP, fs_in.maxHP - fs_in.currentHP, 0.0, 1.0);
+	vec4 color = vec4(0.0, 0.0, 0.0, 1.0);
+	
+	if ( fs_in.vertexPosition.y * hpScale < fs_in.highestY )
+		color = vec4(0.1, 0.5, 0.1, 1.0);
+	else
+		color = vec4(0.5, 0.1, 0.1, 1.0);
+	
+	outColor = color;
+}

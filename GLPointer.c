@@ -106,6 +106,14 @@ EXTERN_C void Initializer()
 
 	pGLUniform1iv = (void (*)(GLint location, GLsizei count, const GLint* value))GET_PROC_ADDRESS((const GLubyte *)"glUniform1iv");
 
+	pGLGetUniformBlockIndex = (GLuint (*)(GLuint, const GLchar*))GET_PROC_ADDRESS((const GLubyte *)"glGetUniformBlockIndex");
+
+	pGLUniformBlockBinding = (void (*)(GLuint, GLuint, GLuint))GET_PROC_ADDRESS((const GLubyte *)"glUniformBlockIndex");
+
+	pGLBindBufferRange =  (void (*)(GLenum, GLuint, GLuint, GLintptr, GLsizeiptr))GET_PROC_ADDRESS((const GLubyte *)"glBindBufferRange");
+
+	pGLBufferSubData = (void (*)(GLenum, GLintptr, GLsizeiptr, const GLvoid *))GET_PROC_ADDRESS((const GLubyte *)"glBufferSubData");
+
 #ifdef __linux__
 pGLXSwap_Interval_EXT = (void (*)(Display*, GLXDrawable, int))GET_PROC_ADDRESS((const GLubyte *)"glXSwapIntervalEXT");
 #endif

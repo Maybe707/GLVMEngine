@@ -36,6 +36,7 @@
 #include "Globals.hpp"
 #include "ToString.hpp"
 #include "JsonParser.hpp"
+#include "ShaderStructs.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
@@ -282,15 +283,16 @@ namespace GLVM::core
 		alignas(16) uint32_t directionalLightsNumber;
     };
 
-	struct alignas(64) HUD_UBO {
-		mat4 view;
-		mat4 proj;
-		vec3 entityPosition;
-		int isHudExists;
-		float maxHP;
-		float currentHP;
-		float highestY;
-	};
+
+	// struct alignas(64) HUD_UBO {
+	// 	mat4 view;
+	// 	mat4 proj;
+	// 	vec3 entityPosition;
+	// 	int isHudExists;
+	// 	float maxHP;
+	// 	float currentHP;
+	// 	float highestY;
+	// };
 	
 	struct alignas(16) ShadowMapMatrixUBO {
 		mat4 model;
