@@ -837,7 +837,7 @@ namespace GLVM::Core
 		}
 
 		jointMatricesPerMesh = jointMatrices;
-		
+		topY = -999.999f;
 		for ( uint32_t i = 0; i < indices.GetSize(); ++i ) {
 			aIndices_.push_back(i);
 

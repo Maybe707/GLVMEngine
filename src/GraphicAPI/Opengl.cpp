@@ -216,18 +216,17 @@ namespace GLVM::core
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
 
 			hudUBO.view = viewMatrix;
 			hudUBO.proj = tProjection_Matrix;
-		
 			hudUBO.isHudExists = 1;
 			hudUBO.currentHP   = healthComponent->currentHealth;
 			hudUBO.maxHP       = healthComponent->maxHealth;
 			hudUBO.entityPosition = transformComponent->tPosition;
-			hudUBO.highestY    = highest_gltf_Y[uiEntity];
+			hudUBO.highestY    = highest_gltf_Y[uiVertexId];
 			
 			hudShaderProgram->Use();
 			unsigned int binding = 0;
@@ -841,6 +840,8 @@ namespace GLVM::core
             wavefrontObjParser->ParseFile();
 			aVertexes_.emplace_back();
             aIndices_.emplace_back();
+			highest_gltf_Y.emplace_back();
+			highest_gltf_Y[m] = -999.999f;
 
 			jointMatricesPerMesh.Push({});
 			frames.Push({});
@@ -858,6 +859,9 @@ namespace GLVM::core
                     SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
 					normalIndex = wavefrontObjParser->getFaces()[i][2][j] - 1;
 					SVertex normal = wavefrontObjParser->getNormals()[normalIndex];
+					if ( vertex[1] > highest_gltf_Y[m] )
+						highest_gltf_Y[m] = vertex[1];
+					
 					aVertexes_[m].push_back(vertex[0]);
 					aVertexes_[m].push_back(vertex[1]);
 					aVertexes_[m].push_back(vertex[2]);
@@ -1000,7 +1004,7 @@ namespace GLVM::core
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
 			highest_gltf_Y.emplace_back();
 			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexes_[nextIndexGLTF], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF],
-								frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[m]);
+								frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[nextIndexGLTF]);
 		}
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;

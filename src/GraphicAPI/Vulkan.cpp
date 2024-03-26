@@ -117,6 +117,8 @@ namespace GLVM::core
 
             aIndices_.emplace_back();
             aVertices_.emplace_back();
+			highest_gltf_Y.emplace_back();
+			highest_gltf_Y[m] = -999.999f;
 
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
@@ -139,6 +141,9 @@ namespace GLVM::core
 					vec4 jointIndices;
 					vec4 weights;
 
+					if ( vertex[1] > highest_gltf_Y[m] )
+						highest_gltf_Y[m] = vertex[1];
+					
 					jointIndices[0] = -1;
 					jointIndices[1] = -1;
 					jointIndices[2] = -1;
@@ -489,7 +494,7 @@ namespace GLVM::core
 			animationFlags.Push({});
 			highest_gltf_Y.emplace_back();
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[m]);
+			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[nextIndexGLTF]);
 		}
 
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -3029,12 +3034,12 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
 
 			unsigned int uboIndex = i;
-			updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiEntity]);
+			updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 									0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
