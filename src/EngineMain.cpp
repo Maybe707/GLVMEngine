@@ -84,8 +84,8 @@ int main()
 
  	Entity cube0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);
-	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 1.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .fScale = 6.0f, .gltf = false };
+	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 3.0f, 0.0f },
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
     ComponentManager->GetComponent<cm::mesh>(cube0)->handle = cubeHandle_OBJ;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
@@ -129,7 +129,7 @@ int main()
 	
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 15.0f, 2.0f },
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 10.0f, 5.0f },
 		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
 	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .tPosition = { 0.0f, 15.0f, 2.0f }, .fScale = 0.2f };

@@ -14,6 +14,13 @@ void main()
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
+
+	mat4 scaleMatrix = mat4(
+		0.9, 0.0, 0.0, 0.0,
+		0.0, 1.6, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
+		);
 	
-	gl_Position = projectionMatrix * vec4(inPosition, 1.0);
+	gl_Position = projectionMatrix * scaleMatrix * vec4(inPosition, 1.0);
 }
