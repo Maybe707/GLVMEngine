@@ -574,11 +574,11 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < 1; ++i ) {
 			fontVertexBufferContainer.emplace_back();
 			fontVertexBufferMemoryContainer.emplace_back();
-			createVertexBuffer(fontVertexBufferContainer[i], fontVertexBufferMemoryContainer[i], vertices);
+			createVertexBuffer(fontVertexBufferContainer[i], fontVertexBufferMemoryContainer[i], symbol_g_vertices);
 
 			fontIndexBufferContainer.emplace_back();
 			fontIndexBufferMemoryContaner.emplace_back();
-			createIndexBuffer(fontIndexBufferContainer[i], fontIndexBufferMemoryContaner[i], indices);
+			createIndexBuffer(fontIndexBufferContainer[i], fontIndexBufferMemoryContaner[i], symbol_g_indices);
 		}
 	}
 
@@ -3272,7 +3272,7 @@ namespace GLVM::core
 
 		vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[0], 0, VK_INDEX_TYPE_UINT32);
 
-		unsigned int indicesContainerSize = indices.size();
+		unsigned int indicesContainerSize = symbol_g_indices.size();
 
 
 		

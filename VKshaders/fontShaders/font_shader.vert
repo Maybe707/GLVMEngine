@@ -8,5 +8,12 @@ layout(location = 4) in vec4 inWeights;
 
 void main()
 {
-	gl_Position = vec4(inPosition, 1.0);
+	mat4 projectionMatrix = mat4(
+		1.0, 0.0, 0.0, 0.0,
+		0.0, -1.0, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
+		0.0, 0.0, 0.0, 1.0
+		);
+	
+	gl_Position = projectionMatrix * vec4(inPosition, 1.0);
 }
