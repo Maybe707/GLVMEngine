@@ -383,7 +383,7 @@ namespace GLVM::core
         {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
     };
     
-    const std::vector<uint16_t> indices = {
+    const std::vector<uint32_t> indices = {
         4, 2, 0,
         2, 7, 3,
         6, 5, 7,
@@ -417,8 +417,10 @@ namespace GLVM::core
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
         std::vector<std::vector<core::Vertex>> aVertices_;
+		std::vector<std::vector<core::Vertex>> aVertices_Font;
 //		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
         std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
+		std::vector<std::vector<uint32_t>> aIndices_Font;                 ///< wavefront.obj indices
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
 		std::vector<float> highest_gltf_Y;                                 /// highest gltf y
 		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
@@ -439,6 +441,9 @@ namespace GLVM::core
 
 		const char* vertShaderHUD = "../VKshaders/hudShaders/hud_vert.spv";
 		const char* fragShaderHUD = "../VKshaders/hudShaders/hud_frag.spv";
+
+		const char* vertShaderFont = "../VKshaders/fontShaders/font_vert.spv";
+		const char* fragShaderFont = "../VKshaders/fontShaders/font_frag.spv";
 		
         unsigned int texturePool_;
 
@@ -515,6 +520,9 @@ namespace GLVM::core
 		Pipeline directionalLightPipeline;
 		Pipeline spotLightPipeline;
 		Pipeline pointLightPipeline;
+		Pipeline fontPipeline;
+		VkRenderPass fontRenderPass;
+		std::vector<VkFramebuffer> fontSwapChainFramebuffers;
 		
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
@@ -522,6 +530,7 @@ namespace GLVM::core
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
 		VkCommandPool pointLightCommandPool;
+		VkCommandPool fontCommandPool;
 		VkCommandPool hudCommandPool;
 		VkCommandPool mainRenderCommandPool;
 
@@ -583,6 +592,11 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
 		uint32_t wavefrontObjCounter = 0;
 
+        std::vector<VkBuffer> fontVertexBufferContainer;
+        std::vector<VkDeviceMemory> fontVertexBufferMemoryContainer;
+        std::vector<VkBuffer> fontIndexBufferContainer;
+        std::vector<VkDeviceMemory> fontIndexBufferMemoryContaner;
+		
         std::vector<VkBuffer> modelMatrixUniformBuffers;
         std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
         std::vector<VkBuffer> lightDataUniformBuffers;
@@ -623,6 +637,7 @@ namespace GLVM::core
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
 		std::vector<VkCommandBuffer> pointLightCommandBuffers;
+		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
@@ -631,10 +646,15 @@ namespace GLVM::core
         std::vector<VkSemaphore> renderFinishedSemaphores;
         std::vector<VkFence> inFlightFences;
 
-		/// Main render pipe line sync objects
+		/// Hud render pipe line sync objects
         std::vector<VkSemaphore> hudImageAvailableSemaphores;
         std::vector<VkSemaphore> hudRenderFinishedSemaphores;
         std::vector<VkFence> hudInFlightFences;
+
+		/// Font render pipe line sync objects
+        std::vector<VkSemaphore> fontImageAvailableSemaphores;
+        std::vector<VkSemaphore> fontRenderFinishedSemaphores;
+        std::vector<VkFence> fontInFlightFences;
 		
 		/// Directional light shadow map sync objects
         std::vector<VkSemaphore> directionalLightShadowMapImageAvailableSemaphores;
@@ -652,6 +672,7 @@ namespace GLVM::core
         std::vector<VkFence> pointLightShadowMapInFlightFences;
 		
         uint32_t currentFrame = 0;
+		uint32_t fontCurrentFrame = 0;
 		uint32_t hudCurrentFrame = 0;
 		uint32_t directionalLightCurrentFrame = 0;
 		uint32_t spotLightCurrentFrame = 0;
@@ -665,6 +686,7 @@ namespace GLVM::core
         bool framebufferResized = false;
 
         void initWindow();
+		void initializeFontData();
 		void initializeGLTF();
         void initVulkan();
         void cleanupSwapChain();
@@ -678,12 +700,13 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createMainRenderPass();
+		void createFontRenderPass();
 		void createHudRenderPass();
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
         void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
-        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass);
+        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
 										  uint32_t height);
@@ -729,6 +752,7 @@ namespace GLVM::core
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
 							   std::vector<VkSemaphore>& renderFinishedSemaphores,
@@ -745,6 +769,7 @@ namespace GLVM::core
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void updateDirSpaceMatrix(uint32_t currentImage);
 		void hudDrawFrame();
+		void fontDrawFrame();
         void mainRenderDrawFrame();
 		void directionalLightShadowMapDrawFrame();
 		void spotLightShadowMapDrawFrame();

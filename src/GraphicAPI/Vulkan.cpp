@@ -95,6 +95,7 @@ namespace GLVM::core
 		directionalLightShadowMapDrawFrame();
 		spotLightShadowMapDrawFrame();
 		pointLightShadowMapDrawFrame();
+//		fontDrawFrame();
 //		hudDrawFrame();
 		mainRenderDrawFrame();
 		
@@ -415,6 +416,12 @@ namespace GLVM::core
 
 		hudPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+
+		fontPipeline.vertShader = vertShaderFont;
+		fontPipeline.fragShader = fragShaderFont;
+
+		fontPipeline.bindingDescription = Vertex::getBindingDescription();
+		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -562,6 +569,19 @@ namespace GLVM::core
             createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
 		}
 	}
+
+	void CVulkanRenderer::initializeFontData() {
+		for ( unsigned int i = 0; i < 1; ++i ) {
+			fontVertexBufferContainer.emplace_back();
+			fontVertexBufferMemoryContainer.emplace_back();
+			createVertexBuffer(fontVertexBufferContainer[i], fontVertexBufferMemoryContainer[i], vertices);
+
+			fontIndexBufferContainer.emplace_back();
+			fontIndexBufferMemoryContaner.emplace_back();
+			createIndexBuffer(fontIndexBufferContainer[i], fontIndexBufferMemoryContaner[i], indices);
+		}
+	}
+
 	
     void CVulkanRenderer::initVulkan() {
         createInstance();
@@ -572,6 +592,7 @@ namespace GLVM::core
         createSwapChain();
         createImageViews();
         createMainRenderPass();
+		createFontRenderPass();
 		createHudRenderPass();
 		createDirectionalLightShadowMapRenderPass();
 		createSpotLightShadowMapRenderPass();
@@ -579,16 +600,19 @@ namespace GLVM::core
         createDescriptorSetLayout(directionalLightPipeline.descriptors);
 		createDescriptorSetLayout(spotLightPipeline.descriptors);
 		createDescriptorSetLayout(pointLightPipeline.descriptors);
+		createDescriptorSetLayout(fontPipeline.descriptors);
 		createDescriptorSetLayout(hudPipeline.descriptors);
         createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
-        createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass);
-		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass);
-		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass);
-		createGraphicsPipeline(hudPipeline, hudRenderPass);
-		createGraphicsPipeline(mainRenderScenePipeline, renderPass);
+        createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(fontPipeline, fontRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(hudPipeline, hudRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(mainRenderScenePipeline, renderPass, VK_POLYGON_MODE_FILL);
         createCommandPool(directionalLightCommandPool);
 		createCommandPool(spotLightCommandPool);
 		createCommandPool(pointLightCommandPool);
+		createCommandPool(fontCommandPool);
 		createCommandPool(hudCommandPool);
 		createCommandPool(mainRenderCommandPool);
         createDepthResources();
@@ -601,6 +625,7 @@ namespace GLVM::core
         createTextureSampler();
         loadWavefrontObj();
 		initializeGLTF();
+		initializeFontData();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
@@ -614,7 +639,11 @@ namespace GLVM::core
 		createCommandBuffers(spotLightCommandPool, spotLightCommandBuffers);
 		createCommandBuffers(pointLightCommandPool, pointLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
+		createCommandBuffers(fontCommandPool, fontCommandBuffers);
 		createCommandBuffers(hudCommandPool, hudCommandBuffers);
+		createSyncObjects(fontImageAvailableSemaphores,
+						  fontRenderFinishedSemaphores,
+						  fontInFlightFences);
 		createSyncObjects(hudImageAvailableSemaphores,
 						  hudRenderFinishedSemaphores,
 						  hudInFlightFences);
@@ -1020,6 +1049,64 @@ namespace GLVM::core
         }
     }
 
+    void CVulkanRenderer::createFontRenderPass() {
+        VkAttachmentDescription colorAttachment{};
+        colorAttachment.format = swapChainImageFormat;
+        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        
+        VkAttachmentDescription depthAttachment{};
+        depthAttachment.format = findDepthFormat();
+        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference colorAttachmentRef{};
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthAttachmentRef{};
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = 0;
+        dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+//        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT ;
+        
+        std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments = attachments.data();
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 1;
+        renderPassInfo.pDependencies = &dependency;
+
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &fontRenderPass) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create render pass!");
+        }
+    }
+	
     void CVulkanRenderer::createHudRenderPass() {
         VkAttachmentDescription colorAttachment{};
         colorAttachment.format = swapChainImageFormat;
@@ -1268,7 +1355,7 @@ namespace GLVM::core
 		}
     }
 
-    void CVulkanRenderer::createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass) {
+    void CVulkanRenderer::createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode) {
 		std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
 
 		VkShaderModule vertShaderModule;
@@ -1321,7 +1408,7 @@ namespace GLVM::core
         rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         rasterizer.depthClampEnable = VK_FALSE;
         rasterizer.rasterizerDiscardEnable = VK_FALSE;
-        rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+        rasterizer.polygonMode = polygonMode;
         rasterizer.lineWidth = 1.0f;
         rasterizer.cullMode = 0;
         rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
@@ -1426,6 +1513,16 @@ namespace GLVM::core
 			hudRenderAttachments.push_back(depthImageView);
 
 			createRenderPassFramebuffers(hudRenderAttachments, hudRenderPass, hudSwapChainFramebuffers[i],
+										 swapChainExtent.width, swapChainExtent.height);
+		}
+
+		fontSwapChainFramebuffers.resize(swapChainImageViews.size());
+        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
+			std::vector<VkImageView> fontRenderAttachments;
+			fontRenderAttachments.push_back(swapChainImageViews[i]);
+			fontRenderAttachments.push_back(depthImageView);
+
+			createRenderPassFramebuffers(fontRenderAttachments, hudRenderPass, fontSwapChainFramebuffers[i],
 										 swapChainExtent.width, swapChainExtent.height);
 		}
 		
@@ -3075,6 +3172,121 @@ namespace GLVM::core
 
         vkCmdEndRenderPass(commandBuffer);
 
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
+    }
+
+    void CVulkanRenderer::fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::health>();
+		
+		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = fontRenderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+
+		// cm::transform* playerTransformComponent = nullptr;
+
+		// if ( viewPositionLinkedEntities.GetSize() > 0 )
+		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
+
+		// for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+		// 	unsigned int uiEntity = linkedEntities[i];
+		// 	unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+		// 	[[maybe_unused]] cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+		// 	[[maybe_unused]] cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
+
+		// 	unsigned int uboIndex = i;
+		// 	updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
+		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+		// 							0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+			
+//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+				
+			// unsigned int uboIndex = i;
+			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+
+			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+
+			// VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			// VkDeviceSize offsets[] = {0};
+			// vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			// vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+			// unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+		
+		VkBuffer vertexBuffers[] = { fontVertexBufferContainer[0] };
+		VkDeviceSize offsets[] = {0};
+		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+		vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[0], 0, VK_INDEX_TYPE_UINT32);
+
+		unsigned int indicesContainerSize = indices.size();
+
+
+		
+//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+//		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
         if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -3597,6 +3809,74 @@ namespace GLVM::core
 
         hudCurrentFrame = (hudCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
+
+    void CVulkanRenderer::fontDrawFrame() {
+		namespace cm = GLVM::ecs::components;
+		// mutex0.lock();
+		// mutex0.unlock();
+		// mutex1.lock();
+		// mutex1.unlock();
+		// mutex2.lock();
+		// mutex2.unlock();
+        vkWaitForFences(device, 1, &fontInFlightFences[fontCurrentFrame], VK_TRUE, UINT64_MAX);
+
+        uint32_t imageIndex;
+        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, fontImageAvailableSemaphores[fontCurrentFrame], VK_NULL_HANDLE, &imageIndex);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+            recreateSwapChain();
+            return;
+        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+            throw std::runtime_error("failed to acquire swap chain image!");
+        }
+
+        vkResetFences(device, 1, &fontInFlightFences[fontCurrentFrame]);
+        vkResetCommandBuffer(fontCommandBuffers[fontCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+        fontRecordCommandBuffer(fontCommandBuffers[fontCurrentFrame], imageIndex);
+
+        VkSubmitInfo submitInfo{};
+        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+        VkSemaphore waitSemaphores[] = {fontImageAvailableSemaphores[fontCurrentFrame]};
+        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submitInfo.waitSemaphoreCount = 1;
+        submitInfo.pWaitSemaphores = waitSemaphores;
+        submitInfo.pWaitDstStageMask = waitStages;
+
+        submitInfo.commandBufferCount = 1;
+        submitInfo.pCommandBuffers = &fontCommandBuffers[fontCurrentFrame];
+
+        VkSemaphore signalSemaphores[] = {fontRenderFinishedSemaphores[fontCurrentFrame]};
+        submitInfo.signalSemaphoreCount = 1;
+        submitInfo.pSignalSemaphores = signalSemaphores;
+
+        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, fontInFlightFences[fontCurrentFrame]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to submit draw command buffer!");
+        }
+
+        VkPresentInfoKHR presentInfo{};
+        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+        presentInfo.waitSemaphoreCount = 1;
+        presentInfo.pWaitSemaphores = signalSemaphores;
+
+        VkSwapchainKHR swapChains[] = {swapChain};
+        presentInfo.swapchainCount = 1;
+        presentInfo.pSwapchains = swapChains;
+
+        presentInfo.pImageIndices = &imageIndex;
+
+        result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+            framebufferResized = false;
+            recreateSwapChain();
+        } else if (result != VK_SUCCESS) {
+            throw std::runtime_error("failed to present swap chain image!");
+        }
+
+        fontCurrentFrame = (fontCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+    }
 	
     void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
@@ -3622,6 +3902,7 @@ namespace GLVM::core
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		fontRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
