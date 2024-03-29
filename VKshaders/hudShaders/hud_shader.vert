@@ -27,7 +27,7 @@ layout(location = 0) out VS_OUT {
 
 void main()
 {
-	float scale = 0.2;
+	float scale = 0.1;
 
 	mat4 modelMatrix = mat4(
 		1.0, 0.0, 0.0, 0.0,
@@ -46,9 +46,11 @@ void main()
 		0.0, 0.0, 0.0, 1.0
 		);
 
-	vs_out.vertexPosition = modelMatrix * vec4(inPosition, 1.0);
+	vs_out.vertexPosition = modelMatrix * scaleMatrix * vec4(inPosition, 1.0);
 	vs_out.entityPosition = vec4(hudUBO.entityPosition, 1.0);
-	vs_out.highestY  = hudUBO.highestY + hudUBO.entityPosition.y;
+//	float hpScale = hudUBO.currentHP / hudUBO.maxHP;
+	
+	vs_out.highestY  = hudUBO.entityPosition.y;
 	vs_out.currentHP = hudUBO.currentHP;
 	vs_out.maxHP = hudUBO.maxHP;
     gl_Position = hudUBO.proj * hudUBO.view * modelMatrix * scaleMatrix * vec4(inPosition, 1.0);
