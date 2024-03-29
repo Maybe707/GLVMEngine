@@ -3131,7 +3131,7 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
 

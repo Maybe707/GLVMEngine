@@ -45,9 +45,9 @@ void main()
 		0.0, 0.0, 0.0, 1.0
 		);
 
-	vs_out.vertexPosition = modelMatrix * vec4(inPosition, 1.0);
+	vs_out.vertexPosition = modelMatrix * scaleMatrix * vec4(inPosition, 1.0);
 	vs_out.entityPosition = vec4(hudUBO.entityPosition, 1.0);
-	vs_out.highestY  = hudUBO.highestY + hudUBO.entityPosition.y;
+	vs_out.highestY  = hudUBO.entityPosition.y;
 	vs_out.currentHP = hudUBO.currentHP;
 	vs_out.maxHP = hudUBO.maxHP;
     gl_Position = hudUBO.proj * hudUBO.view * modelMatrix * scaleMatrix * vec4(inPosition, 1.0);
