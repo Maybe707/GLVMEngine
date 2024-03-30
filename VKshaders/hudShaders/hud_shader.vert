@@ -19,7 +19,6 @@ layout (set = 0, binding = 0) uniform HUD_UBO {
 layout(location = 0) out VS_OUT {
 	int value;
 	vec4 vertexPosition;
-	vec4 entityPosition;
 	float maxHP;
 	float currentHP;
 	float highestY;
@@ -40,14 +39,13 @@ void main()
 		);
 	
 	mat4 scaleMatrix = mat4(
-		scale, 0.0, 0.0, 0.0,
+		0.9 * scale, 0.0, 0.0, 0.0,
 		0.0, 1.0, 0.0, 0.0,
-		0.0, 0.0, scale, 0.0,
+		0.0, 0.0, 1.6 * scale, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
 	vs_out.vertexPosition = modelMatrix * scaleMatrix * vec4(inPosition, 1.0);
-	vs_out.entityPosition = vec4(hudUBO.entityPosition, 1.0);
 //	float hpScale = hudUBO.currentHP / hudUBO.maxHP;
 	
 	vs_out.highestY  = hudUBO.entityPosition.y;

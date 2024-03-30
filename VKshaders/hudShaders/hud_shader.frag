@@ -3,7 +3,6 @@
 layout(location = 0) in VS_OUT {
 	int value;
 	vec4 vertexPosition;
-	vec4 entityPosition;
 	float maxHP;
 	float currentHP;
 	float highestY;

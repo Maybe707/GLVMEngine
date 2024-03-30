@@ -2,7 +2,6 @@
 
 in VS_OUT {
 	vec4 vertexPosition;
-	vec4 entityPosition;
 	float maxHP;
 	float currentHP;
 	float highestY;
