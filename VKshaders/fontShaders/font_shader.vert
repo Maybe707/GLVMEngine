@@ -6,6 +6,8 @@ layout(location = 2) in vec2 inTextureCoordinate;
 layout(location = 3) in vec4 inJointIndices;
 layout(location = 4) in vec4 inWeights;
 
+layout(location = 0) out vec2 outFragmentTextureCoordinate;
+
 void main()
 {
 	mat4 projectionMatrix = mat4(
@@ -21,6 +23,7 @@ void main()
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
-	
+
+	outFragmentTextureCoordinate = inTextureCoordinate;
 	gl_Position = projectionMatrix * scaleMatrix * vec4(inPosition, 1.0);
 }

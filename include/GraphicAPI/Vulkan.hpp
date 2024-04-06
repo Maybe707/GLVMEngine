@@ -179,6 +179,7 @@ namespace GLVM::core
 		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		HUD_UBO,
+		FONT_ATLAS_SAMPLER,
 		MODEL_MATRIX_UBO,
 
 		LIGHT_DATA,
@@ -398,38 +399,50 @@ namespace GLVM::core
         4, 0, 1
     };
 
+    // const std::vector<Vertex> symbol_g_vertices = {
+    //     {{0.0f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.0f, 0.06f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.01f, 0.01f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.01f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+
+    //     {{0.01f, 0.07f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.04f, 0.07f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.04f, 0.06f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+		
+    //     {{0.05f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+	// 	{{0.05f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.04f, 0.01f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+		
+    //     {{0.04f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.01f, 0.0f,  0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+
+	// 	{{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    // };
+    
+    // const std::vector<uint32_t> symbol_g_indices = {
+	// 	0, 1, 2,
+	// 	2, 1, 3,
+	// 	3, 4, 5,
+	// 	5, 3, 6,
+	// 	6, 7, 8,
+	// 	8, 6, 9,
+	// 	9, 10, 2,
+	// 	2, 10, 11
+    // };
+
     const std::vector<Vertex> symbol_g_vertices = {
-        {{0.0f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.0f, 0.06f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.01f, 0.01f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.01f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-
-        {{0.01f, 0.07f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.04f, 0.07f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.04f, 0.06f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-		
-        {{0.05f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-		{{0.05f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.04f, 0.01f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-		
-        {{0.04f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.01f, 0.0f,  0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-
-		{{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, 0.2f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.2f, 0.0f}, {1.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, -0.2f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.2f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
     };
     
     const std::vector<uint32_t> symbol_g_indices = {
 		0, 1, 2,
-		2, 1, 3,
-		3, 4, 5,
-		5, 3, 6,
-		6, 7, 8,
-		8, 6, 9,
-		9, 10, 2,
-		2, 10, 11
+		2, 1, 3
     };
 	
     const std::vector<uint16_t> hudIndices = {
@@ -556,6 +569,7 @@ namespace GLVM::core
 		Pipeline pointLightPipeline;
 		Pipeline fontPipeline;
 		VkRenderPass fontRenderPass;
+		std::vector<VkDescriptorSet> fontDescriptorSets;
 		std::vector<VkFramebuffer> fontSwapChainFramebuffers;
 		
         VkPipelineLayout pipelineLayout;
@@ -769,12 +783,14 @@ namespace GLVM::core
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();
 		void createHudDescriptorSets();
+		void createFontRenderDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
 		void updateDirectionalLightShadowMapDescriptorSets();
 		void updateSpotLightShadowMapDescriptorSets();
 		void updatePointLightShadowMapDescriptorSets();
 		void updateHudDescriptorSets();
+		void updateFontRenderDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);

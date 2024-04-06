@@ -343,6 +343,7 @@ namespace GLVM::core
 		updatePointLightShadowMapDescriptorSets();
 		updateDescriptorSets();
 		updateHudDescriptorSets();
+		updateFontRenderDescriptorSets();
     }
     
     void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
@@ -422,6 +423,7 @@ namespace GLVM::core
 
 		fontPipeline.bindingDescription = Vertex::getBindingDescription();
 		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -633,6 +635,7 @@ namespace GLVM::core
 		createSpotLightShadowMapDescriptorSets();
 		createPointLightShadowMapDescriptorSets();
 		createHudDescriptorSets();
+		createFontRenderDescriptorSets();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
         createCommandBuffers(directionalLightCommandPool, directionalLightCommandBuffers);
@@ -2411,6 +2414,78 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 	}
+
+	void CVulkanRenderer::createFontRenderDescriptorSets() {
+		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
+ 
+		int fontSamplerBinding = fontSamplerBindigs[0];
+
+		if ( initializeTextureData_.size() > 0 ) {
+			u32 DS_specular_number = 1;
+			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
+																		 fontPipeline.descriptors[0].setLayout);
+			VkDescriptorSetAllocateInfo fontSamplerUboAllocInfo{};
+			fontSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			fontSamplerUboAllocInfo.descriptorPool = descriptorPool;
+			fontSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
+			fontSamplerUboAllocInfo.pSetLayouts = fontSamplerUboLayouts.data();
+			
+			fontDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
+			if (vkAllocateDescriptorSets(device, &fontSamplerUboAllocInfo, fontDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//				unsigned int textureIndex = i / 2;
+				imageInfo.imageView = textureImages[6].views[0];
+				imageInfo.sampler = textureSampler;
+				
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = fontDescriptorSets[i];
+				descriptorWrites[0].dstBinding = fontSamplerBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
+		}
+	}
+
+	void CVulkanRenderer::updateFontRenderDescriptorSets() {
+		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
+ 
+		int fontSamplerBinding = fontSamplerBindigs[0];
+
+		if ( initializeTextureData_.size() > 0 ) {
+			u32 DS_specular_number = 1;
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//				unsigned int textureIndex = i / 2;
+				imageInfo.imageView = textureImages[6].views[0];
+				imageInfo.sampler = textureSampler;
+
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = fontDescriptorSets[i];
+				descriptorWrites[0].dstBinding = fontSamplerBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
+		}
+	}
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
 		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
@@ -3279,8 +3354,8 @@ namespace GLVM::core
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
 			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
+									&fontDescriptorSets[currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 //		}
