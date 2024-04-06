@@ -573,15 +573,37 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::initializeFontData() {
-		for ( unsigned int i = 0; i < 1; ++i ) {
-			fontVertexBufferContainer.emplace_back();
-			fontVertexBufferMemoryContainer.emplace_back();
-			createVertexBuffer(fontVertexBufferContainer[i], fontVertexBufferMemoryContainer[i], symbol_g_vertices);
+		constexpr float fontStep = 1.0 / 12;
+		constexpr unsigned int glyph_row = 7;
+		constexpr unsigned int glyph_column = 12;
 
-			fontIndexBufferContainer.emplace_back();
-			fontIndexBufferMemoryContaner.emplace_back();
-			createIndexBuffer(fontIndexBufferContainer[i], fontIndexBufferMemoryContaner[i], symbol_g_indices);
-		}
+		fontVertexBufferContainer.resize(128);
+		fontVertexBufferMemoryContainer.resize(128);
+
+		fontIndexBufferContainer.resize(128);
+		fontIndexBufferMemoryContaner.resize(128);
+		
+		const std::vector<uint32_t> symbol_g_indices = {
+			0, 1, 2,
+			2, 1, 3
+		};
+		
+		for ( unsigned int i = 0; i < glyph_row; ++i )
+			for ( unsigned int j = 0; j < glyph_column; ++j ) {
+				const std::vector<Vertex> symbol_g_vertices = {
+					{{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * j, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+					{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+					{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * j, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+					{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+				};
+				unsigned int currentBufferIndex = i * glyph_column + j;
+				
+//				glyphs_map[(int)glyphs[currentBufferIndex]] = symbol_g_vertices;
+
+				createVertexBuffer(fontVertexBufferContainer[currentBufferIndex], fontVertexBufferMemoryContainer[currentBufferIndex], symbol_g_vertices);
+
+				createIndexBuffer(fontIndexBufferContainer[currentBufferIndex], fontIndexBufferMemoryContaner[currentBufferIndex], symbol_g_indices);
+			}
 	}
 
 	
@@ -3341,11 +3363,11 @@ namespace GLVM::core
 			// unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
 		
-		VkBuffer vertexBuffers[] = { fontVertexBufferContainer[0] };
+		VkBuffer vertexBuffers[] = { fontVertexBufferContainer[83] };
 		VkDeviceSize offsets[] = {0};
 		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[0], 0, VK_INDEX_TYPE_UINT32);
+		vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[83], 0, VK_INDEX_TYPE_UINT32);
 
 		unsigned int indicesContainerSize = symbol_g_indices.size();
 
@@ -4528,6 +4550,7 @@ namespace GLVM::core
     VkPresentModeKHR CVulkanRenderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
         for (const auto& availablePresentMode : availablePresentModes) {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR || availablePresentMode == VK_PRESENT_MODE_IMMEDIATE_KHR) {
+//			if (availablePresentMode == VK_PRESENT_MODE_FIFO_KHR) {
 //				std::cout << "present mode found!" << std::endl;
                 return availablePresentMode;
             }

@@ -438,12 +438,21 @@ namespace GLVM::core
 	constexpr unsigned int glyph_column = 2;
 	
     const std::vector<Vertex> symbol_g_vertices = {
-        {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
     };
-    
+
+//	unsigned int glyphs_ascii_codes[128] = { static_cast<unsigned int>('A'), 
+	
+    // const std::vector<Vertex> symbol_g_vertices = {
+    //     {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    //     {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
+    // };
+	
     const std::vector<uint32_t> symbol_g_indices = {
 		0, 1, 2,
 		2, 1, 3
@@ -460,7 +469,10 @@ namespace GLVM::core
 		float accumulator = 0;
 		bool animationFlag = false;
 		unsigned int actorsNumber = 0;
-		
+
+		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
+			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W' };
+		std::vector<Vertex> glyphs_map[128];
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<ecs::Texture> texture_load_data_;
         std::vector<ecs::Texture> hudTexture_load_data_;
