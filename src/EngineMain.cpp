@@ -4,9 +4,12 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Components/EnemyComponent.hpp"
+#include "Components/FontComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 #include "Texture.hpp"
@@ -70,13 +73,18 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state>(uiWitch);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::font>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 100.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
+	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
+	fontComponentWitch->font_string.Push('G');
+	fontComponentWitch->font_string.Push('L');
+	fontComponentWitch->font_string.Push('V');
+	fontComponentWitch->font_string.Push('M');
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
@@ -91,6 +99,12 @@ int main()
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
+
+	// Entity font = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::font>(font);
+	// *ComponentManager->GetComponent<cm::transform>(font) = { .tPosition = { 5.0f, 5.0f, 5.0f },
+	// 	.fScale = 1.0f, .gltf = true };
+	// ComponentManager->GetComponent<cm::mesh>(font)->handle = cubeHandle_OBJ;
 	
 	// Entity directionalLight0 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);

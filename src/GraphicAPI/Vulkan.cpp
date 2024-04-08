@@ -2443,7 +2443,7 @@ namespace GLVM::core
 		int fontSamplerBinding = fontSamplerBindigs[0];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = 1;
+			u32 DS_specular_number = 64;
 			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
 																		 fontPipeline.descriptors[0].setLayout);
 			VkDescriptorSetAllocateInfo fontSamplerUboAllocInfo{};
@@ -2485,7 +2485,7 @@ namespace GLVM::core
 		int fontSamplerBinding = fontSamplerBindigs[0];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = 1;
+			u32 DS_specular_number = 64;
 
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
@@ -3284,8 +3284,6 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::health>();
 		
 		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -3361,26 +3359,34 @@ namespace GLVM::core
 			// vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
 			// unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::font>();
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			unsigned int entity = linkedEntities[i];
+			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			for ( unsigned int j = 0; j < fontComponent->font_string.GetSize(); ++j ) {
+				unsigned int ascii_code = static_cast<unsigned int>(fontComponent->font_string[j]);
+				std::cout << "ascii code: " << ascii_code << std::endl;
+				sleep(10);
+				VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
+				VkDeviceSize offsets[] = {0};
+				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-		
-		VkBuffer vertexBuffers[] = { fontVertexBufferContainer[83] };
-		VkDeviceSize offsets[] = {0};
-		vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+				vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[ascii_code], 0, VK_INDEX_TYPE_UINT32);
 
-		vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[83], 0, VK_INDEX_TYPE_UINT32);
-
-		unsigned int indicesContainerSize = symbol_g_indices.size();
+				unsigned int indicesContainerSize = symbol_g_indices.size();
 
 
 		
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
-									&fontDescriptorSets[currentFrame], 0, nullptr);
+				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
+										&fontDescriptorSets[i * 32 + j * MAX_FRAMES_IN_FLIGHT + currentFrame], 0, nullptr);
 			
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-//		}
+				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			}
+		}
 
         vkCmdEndRenderPass(commandBuffer);
 
