@@ -180,6 +180,7 @@ namespace GLVM::core
 		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
 		HUD_UBO,
+		FONT_UBO,
 		FONT_ATLAS_SAMPLER,
 		MODEL_MATRIX_UBO,
 
@@ -472,7 +473,11 @@ namespace GLVM::core
 		unsigned int actorsNumber = 0;
 
 		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W' };
+			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+			'p', 'q', 'r', 's', 't', 'u', 'v', 'y', 'x', 'y', 'z', '0', '1', '2', '3',
+			'4', '5', '6', '7', '8', '9', '.', ',', '"', '"', '\'', '\'', '"', '"', '\'', '\'',
+			'?', '!', '_', '$', '(', ')', '+', '-', '/', ':', ';', '<', '>', '=', '[', ']', '\\'};
 		std::vector<Vertex> glyphs_map[128];
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<ecs::Texture> texture_load_data_;
@@ -587,6 +592,9 @@ namespace GLVM::core
 		Pipeline fontPipeline;
 		VkRenderPass fontRenderPass;
 		std::vector<VkDescriptorSet> fontDescriptorSets;
+		std::vector<VkDescriptorSet> fontDescriptorUboSets;
+		std::vector<VkBuffer> fontUniformBuffers;
+		std::vector<VkDeviceMemory> fontUniformBuffersMemory;
 		std::vector<VkFramebuffer> fontSwapChainFramebuffers;
 		
         VkPipelineLayout pipelineLayout;

@@ -13,6 +13,10 @@ namespace GLVM::core {
 		float currentHP;
 		float highestY;
 	};
+
+	struct alignas(64) FONT_UBO {
+		vec3 position;
+	};
 } // namespace GLVM::core
 
 #endif

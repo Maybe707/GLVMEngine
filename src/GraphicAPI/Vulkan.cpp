@@ -11,6 +11,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
 #include "WavefrontObjParser.hpp"
@@ -423,6 +424,7 @@ namespace GLVM::core
 
 		fontPipeline.bindingDescription = Vertex::getBindingDescription();
 		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::FONT_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -600,9 +602,10 @@ namespace GLVM::core
 				
 //				glyphs_map[(int)glyphs[currentBufferIndex]] = symbol_g_vertices;
 
-				createVertexBuffer(fontVertexBufferContainer[currentBufferIndex], fontVertexBufferMemoryContainer[currentBufferIndex], symbol_g_vertices);
+				const unsigned int nextBufferIndex = static_cast<const unsigned int>(glyphs[currentBufferIndex]);
+				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
 
-				createIndexBuffer(fontIndexBufferContainer[currentBufferIndex], fontIndexBufferMemoryContaner[currentBufferIndex], symbol_g_indices);
+				createIndexBuffer(fontIndexBufferContainer[nextBufferIndex], fontIndexBufferMemoryContaner[nextBufferIndex], symbol_g_indices);
 			}
 	}
 
@@ -2104,6 +2107,7 @@ namespace GLVM::core
 		VkDeviceSize lightSpaceMatrixSize = sizeof(LightSpaceMatrixUBO);
 		VkDeviceSize modelShadowMapMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
+		VkDeviceSize fontUboSize = sizeof(FONT_UBO);
 //		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -2144,6 +2148,22 @@ namespace GLVM::core
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 hudUniformBuffers[i], hudUniformBuffersMemory[i]);
+
+//				memory += modelMatrixBufferSize;
+		}
+		memory = 0;
+
+		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		fontUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		fontUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * 64; i++) {
+			memory += fontUboSize;
+		}
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 fontUniformBuffers[i], fontUniformBuffersMemory[i]);
 
 //				memory += modelMatrixBufferSize;
 		}
@@ -2438,6 +2458,45 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::createFontRenderDescriptorSets() {
+		core::vector<u32> fontUboBindings = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_UBO);
+ 
+		int fontUboBinding = fontUboBindings[0];
+		
+		constexpr u32 font_ubo_ds = 64;
+		
+		std::vector<VkDescriptorSetLayout> fontUboLayouts(MAX_FRAMES_IN_FLIGHT * font_ubo_ds,
+															spotLightPipeline.descriptors[0].setLayout);
+		VkDescriptorSetAllocateInfo fontUboAllocInfo{};
+		fontUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		fontUboAllocInfo.descriptorPool = descriptorPool;
+		fontUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																	  font_ubo_ds);
+		fontUboAllocInfo.pSetLayouts = fontUboLayouts.data();
+			
+		fontDescriptorUboSets.resize(MAX_FRAMES_IN_FLIGHT * font_ubo_ds);
+		if (vkAllocateDescriptorSets(device, &fontUboAllocInfo, fontDescriptorUboSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = fontUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
+			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = fontDescriptorUboSets[i];
+			descriptorWrites[0].dstBinding = fontUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+
 		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
  
 		int fontSamplerBinding = fontSamplerBindigs[0];
@@ -2445,7 +2504,7 @@ namespace GLVM::core
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_specular_number = 64;
 			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																		 fontPipeline.descriptors[0].setLayout);
+																		 fontPipeline.descriptors[1].setLayout);
 			VkDescriptorSetAllocateInfo fontSamplerUboAllocInfo{};
 			fontSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			fontSamplerUboAllocInfo.descriptorPool = descriptorPool;
@@ -2480,6 +2539,31 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateFontRenderDescriptorSets() {
+		core::vector<u32> fontUboBindings = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_UBO);
+ 
+		int fontUboBinding = fontUboBindings[0];
+		
+		constexpr u32 font_ubo_ds = 64;
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = fontUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
+			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = fontDescriptorUboSets[i];
+			descriptorWrites[0].dstBinding = fontUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+		
 		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
  
 		int fontSamplerBinding = fontSamplerBindigs[0];
@@ -3364,10 +3448,11 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int entity = linkedEntities[i];
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
 			for ( unsigned int j = 0; j < fontComponent->font_string.GetSize(); ++j ) {
 				unsigned int ascii_code = static_cast<unsigned int>(fontComponent->font_string[j]);
-				std::cout << "ascii code: " << ascii_code << std::endl;
-				sleep(10);
+				// std::cout << "ascii code: " << ascii_code << std::endl;
+				// sleep(10);
 				VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -3381,8 +3466,25 @@ namespace GLVM::core
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
 				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+//				const unsigned int currentIndex = 32 * currentFrame + j;
+				FONT_UBO fontUBO{};
+				// transformComponent->tPosition[0] += (float)j / 10;
+				// transformComponent->tPosition[1] += (float)j / 10;
+				vec3 fontPosition = transformComponent->tPosition;
+				fontPosition[1] -= (float)j * 1.5f;
+				fontPosition[1] += 0.8f;
+				fontUBO.position = fontPosition;
+				
+				void* modelMatrixData;
+				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * j,
+							sizeof(fontUBO), 0, &modelMatrixData);
+				memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
+				vkUnmapMemory(device, fontUniformBuffersMemory[currentFrame]);
+
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
-										&fontDescriptorSets[i * 32 + j * MAX_FRAMES_IN_FLIGHT + currentFrame], 0, nullptr);
+										&fontDescriptorUboSets[j], 0, nullptr);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 1, 1,
+										&fontDescriptorSets[j], 0, nullptr);
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
