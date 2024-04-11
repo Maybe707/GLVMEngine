@@ -218,7 +218,8 @@ namespace GLVM::core
 				
 				xcb_grab_pointer_cookie_t cookie = xcb_grab_pointer(connection, 1, window, XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_BUTTON_PRESS,
                 XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC, window, XCB_NONE, XCB_CURRENT_TIME);
-				xcb_grab_pointer_reply(connection, cookie, NULL);
+				xcb_grab_pointer_reply_t* grab_pointer_reply = xcb_grab_pointer_reply(connection, cookie, NULL);
+				free(grab_pointer_reply);
 				break;
 			}
 			case XCB_ENTER_NOTIFY: {
@@ -289,6 +290,9 @@ namespace GLVM::core
 					{
 						///< Key wasn’t actually released
 //						generic_event = xcb_poll_for_event (connection);
+						free(generic_event);
+						generic_event = NULL;
+						free(next_generic_event);
 						next_generic_event = NULL;
 						continue;
 					} else {
@@ -327,6 +331,7 @@ namespace GLVM::core
 			if ( next_generic_event != NULL ) {
 //				Input_Stack_->ControlInput(_Event);
 				*generic_event = *next_generic_event;
+				free(next_generic_event);
 				next_generic_event = NULL;
 //				goto buffer_event;
 			} else {

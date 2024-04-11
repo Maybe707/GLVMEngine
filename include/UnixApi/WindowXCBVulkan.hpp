@@ -29,7 +29,7 @@ namespace GLVM::core
 		xcb_screen_t*      screen;
 		xcb_window_t       window;
 		xcb_key_symbols_t* key_symbols;
-		xcb_generic_event_t* next_generic_event;
+		xcb_generic_event_t* next_generic_event = NULL;
 
 		static void print_modifiers (uint32_t mask);
 	public:
