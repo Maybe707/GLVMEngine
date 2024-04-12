@@ -3470,6 +3470,10 @@ namespace GLVM::core
 				FONT_UBO fontUBO{};
 				// transformComponent->tPosition[0] += (float)j / 10;
 				// transformComponent->tPosition[1] += (float)j / 10;
+
+				fontUBO.view = viewMatrix;
+				fontUBO.proj = projectionMatrix;
+
 				vec3 fontPosition = transformComponent->tPosition;
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;

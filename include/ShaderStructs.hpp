@@ -15,6 +15,8 @@ namespace GLVM::core {
 	};
 
 	struct alignas(64) FONT_UBO {
+		mat4 view;
+		mat4 proj;
 		vec3 position;
 	};
 } // namespace GLVM::core
