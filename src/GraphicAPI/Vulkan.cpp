@@ -14,6 +14,7 @@
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
+#include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
 #include <cstddef>
 #include <cstdint>
@@ -3475,7 +3476,7 @@ namespace GLVM::core
 				float vx = transformComponent->tPosition[0];
 				float vy = transformComponent->tPosition[1];
 				float vz = transformComponent->tPosition[2];
-				std::cout << "position: " << transformComponent->tPosition << std::endl;
+//				std::cout << "position: " << transformComponent->tPosition << std::endl;
 
 				// mat4 tempView = viewMatrix;
 				// mat4 tempProjection = projectionMatrix;
@@ -3504,8 +3505,36 @@ namespace GLVM::core
 				vec3 fontPosition = transformComponent->tPosition;
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;
-				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
+//				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
 				fontUBO.position = result;
+
+				// mat2 testMatrix (1.0f);
+				// testMatrix[0][0] = 2.0f;
+				// testMatrix[0][1] = 3.0f;
+				// testMatrix[1][0] = 5.0f;
+				// testMatrix[1][1] = 7.0f;
+
+				// std::cout << "determinantus: " << determinant_2x2<float>(testMatrix) << std::endl;
+
+				mat4 testMatrix (1.0f);
+				testMatrix[0][0] = 2.0f;
+				testMatrix[0][1] = 3.0f;
+				testMatrix[0][2] = 3.0f;
+				testMatrix[0][3] = 15.0f;
+				testMatrix[1][0] = 5.0f;
+				testMatrix[1][1] = 7.0f;
+				testMatrix[1][2] = 12.0f;
+				testMatrix[1][3] = 13.0f;
+				testMatrix[2][0] = 23.0f;
+				testMatrix[2][1] = 10.0f;
+				testMatrix[2][2] = 50.0f;
+				testMatrix[2][3] = 52.0f;
+				testMatrix[3][0] = 23.0f;
+				testMatrix[3][1] = 10.0f;
+				testMatrix[3][2] = 55.0f;
+				testMatrix[3][3] = 25.0f;
+				
+				std::cout << "inverse of matrix: " << inverse_matrix_4x4<float>(testMatrix) << std::endl;
 				
 				void* modelMatrixData;
 				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * j,

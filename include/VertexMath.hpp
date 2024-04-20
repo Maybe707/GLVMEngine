@@ -316,6 +316,334 @@ Vector<T2, var2> Vector<T2, var2>::operator*(T2 _scalar)
     return temp_vec;
 }
 
+// template <typename T, int size, int row, int col>
+// Matrix<T, size - 1> matrix_minor( Matrix<T, size> matrix ) {
+// 	Matrix<T, size - 1> minor(0.0f);
+// 	unsigned int minor_row = 0;
+// 	unsigned int minor_col = 0;
+	
+// 	for ( unsigned int i = 0; i < size; ++i ) {
+// 		if ( i == row )
+// 			continue;
+// 		for ( unsigned int j = 0; j < size; ++j ) {
+// 			if ( j == col )
+// 				continue;
+
+// 			minor[minor_row][minor_col] = matrix[i][j];
+// 			++minor_col;
+// 		}
+// 		++minor_row;
+// 	}
+
+// 	return minor;
+// }
+
+template <typename T>
+T determinant_2x2( Matrix<T, 2> matrix ) {
+	return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+}
+
+template <typename T>
+T determinant_3x3( Matrix<T, 3> matrix ) {
+	Matrix<T, 2> remove_1row_1col(0.0f);
+	remove_1row_1col[0][0] = matrix[1][1];
+	remove_1row_1col[0][1] = matrix[1][2];
+	remove_1row_1col[1][0] = matrix[2][1];
+	remove_1row_1col[1][1] = matrix[2][2];
+
+	Matrix<T, 2> remove_1row_2col(0.0f);
+	remove_1row_2col[0][0] = matrix[1][0];
+	remove_1row_2col[0][1] = matrix[1][2];
+	remove_1row_2col[1][0] = matrix[2][0];
+	remove_1row_2col[1][1] = matrix[2][2];
+
+	Matrix<T, 2> remove_1row_3col(0.0f);
+	remove_1row_3col[0][0] = matrix[1][0];
+	remove_1row_3col[0][1] = matrix[1][1];
+	remove_1row_3col[1][0] = matrix[2][0];
+	remove_1row_3col[1][1] = matrix[2][1];
+
+	T determinant = matrix[0][0] * determinant_2x2<T>(remove_1row_1col) -
+		matrix[0][1] * determinant_2x2<T>(remove_1row_2col) +
+		matrix[0][2] * determinant_2x2<T>(remove_1row_3col);
+	
+	return determinant;
+}
+
+template <typename T>
+T determinant_4x4( Matrix<T, 4> matrix ) {
+	Matrix<T, 3> remove_1row_1col(0.0f);
+	remove_1row_1col[0][0] = matrix[1][1];
+	remove_1row_1col[0][1] = matrix[1][2];
+	remove_1row_1col[0][2] = matrix[1][3];
+	remove_1row_1col[1][0] = matrix[2][1];
+	remove_1row_1col[1][1] = matrix[2][2];
+	remove_1row_1col[1][2] = matrix[2][3];
+	remove_1row_1col[2][0] = matrix[3][1];
+	remove_1row_1col[2][1] = matrix[3][2];
+	remove_1row_1col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_2col(0.0f);
+	remove_1row_2col[0][0] = matrix[1][0];
+	remove_1row_2col[0][1] = matrix[1][2];
+	remove_1row_2col[0][2] = matrix[1][3];
+	remove_1row_2col[1][0] = matrix[2][0];
+	remove_1row_2col[1][1] = matrix[2][2];
+	remove_1row_2col[1][2] = matrix[2][3];
+	remove_1row_2col[2][0] = matrix[3][0];
+	remove_1row_2col[2][1] = matrix[3][2];
+	remove_1row_2col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_3col(0.0f);
+	remove_1row_3col[0][0] = matrix[1][0];
+	remove_1row_3col[0][1] = matrix[1][1];
+	remove_1row_3col[0][2] = matrix[1][3];
+	remove_1row_3col[1][0] = matrix[2][0];
+	remove_1row_3col[1][1] = matrix[2][1];
+	remove_1row_3col[1][2] = matrix[2][3];
+	remove_1row_3col[2][0] = matrix[3][0];
+	remove_1row_3col[2][1] = matrix[3][1];
+	remove_1row_3col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_4col(0.0f);
+	remove_1row_4col[0][0] = matrix[1][0];
+	remove_1row_4col[0][1] = matrix[1][1];
+	remove_1row_4col[0][2] = matrix[1][2];
+	remove_1row_4col[1][0] = matrix[2][0];
+	remove_1row_4col[1][1] = matrix[2][1];
+	remove_1row_4col[1][2] = matrix[2][2];
+	remove_1row_4col[2][0] = matrix[3][0];
+	remove_1row_4col[2][1] = matrix[3][1];
+	remove_1row_4col[2][2] = matrix[3][2];
+
+	T determinant = matrix[0][0] * determinant_3x3<float>(remove_1row_1col) -
+		matrix[0][1] * determinant_3x3<float>(remove_1row_2col) +
+		matrix[0][2] * determinant_3x3<float>(remove_1row_3col) -
+		matrix[0][3] * determinant_3x3<float>(remove_1row_4col);
+
+	return determinant;
+}
+
+template <typename T>
+Matrix<T, 4> inverse_matrix_4x4( Matrix<T, 4> matrix ) {
+	Matrix<T, 3> remove_1row_1col(0.0f);
+	remove_1row_1col[0][0] = matrix[1][1];
+	remove_1row_1col[0][1] = matrix[1][2];
+	remove_1row_1col[0][2] = matrix[1][3];
+	remove_1row_1col[1][0] = matrix[2][1];
+	remove_1row_1col[1][1] = matrix[2][2];
+	remove_1row_1col[1][2] = matrix[2][3];
+	remove_1row_1col[2][0] = matrix[3][1];
+	remove_1row_1col[2][1] = matrix[3][2];
+	remove_1row_1col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_2col(0.0f);
+	remove_1row_2col[0][0] = matrix[1][0];
+	remove_1row_2col[0][1] = matrix[1][2];
+	remove_1row_2col[0][2] = matrix[1][3];
+	remove_1row_2col[1][0] = matrix[2][0];
+	remove_1row_2col[1][1] = matrix[2][2];
+	remove_1row_2col[1][2] = matrix[2][3];
+	remove_1row_2col[2][0] = matrix[3][0];
+	remove_1row_2col[2][1] = matrix[3][2];
+	remove_1row_2col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_3col(0.0f);
+	remove_1row_3col[0][0] = matrix[1][0];
+	remove_1row_3col[0][1] = matrix[1][1];
+	remove_1row_3col[0][2] = matrix[1][3];
+	remove_1row_3col[1][0] = matrix[2][0];
+	remove_1row_3col[1][1] = matrix[2][1];
+	remove_1row_3col[1][2] = matrix[2][3];
+	remove_1row_3col[2][0] = matrix[3][0];
+	remove_1row_3col[2][1] = matrix[3][1];
+	remove_1row_3col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_1row_4col(0.0f);
+	remove_1row_4col[0][0] = matrix[1][0];
+	remove_1row_4col[0][1] = matrix[1][1];
+	remove_1row_4col[0][2] = matrix[1][2];
+	remove_1row_4col[1][0] = matrix[2][0];
+	remove_1row_4col[1][1] = matrix[2][1];
+	remove_1row_4col[1][2] = matrix[2][2];
+	remove_1row_4col[2][0] = matrix[3][0];
+	remove_1row_4col[2][1] = matrix[3][1];
+	remove_1row_4col[2][2] = matrix[3][2];
+
+	Matrix<T, 3> remove_2row_1col(0.0f);
+	remove_2row_1col[0][0] = matrix[0][1];
+	remove_2row_1col[0][1] = matrix[0][2];
+	remove_2row_1col[0][2] = matrix[0][3];
+	remove_2row_1col[1][0] = matrix[2][1];
+	remove_2row_1col[1][1] = matrix[2][2];
+	remove_2row_1col[1][2] = matrix[2][3];
+	remove_2row_1col[2][0] = matrix[3][1];
+	remove_2row_1col[2][1] = matrix[3][2];
+	remove_2row_1col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_2row_2col(0.0f);
+	remove_2row_2col[0][0] = matrix[0][0];
+	remove_2row_2col[0][1] = matrix[0][2];
+	remove_2row_2col[0][2] = matrix[0][3];
+	remove_2row_2col[1][0] = matrix[2][0];
+	remove_2row_2col[1][1] = matrix[2][2];
+	remove_2row_2col[1][2] = matrix[2][3];
+	remove_2row_2col[2][0] = matrix[3][0];
+	remove_2row_2col[2][1] = matrix[3][2];
+	remove_2row_2col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_2row_3col(0.0f);
+	remove_2row_3col[0][0] = matrix[0][0];
+	remove_2row_3col[0][1] = matrix[0][1];
+	remove_2row_3col[0][2] = matrix[0][3];
+	remove_2row_3col[1][0] = matrix[2][0];
+	remove_2row_3col[1][1] = matrix[2][1];
+	remove_2row_3col[1][2] = matrix[2][3];
+	remove_2row_3col[2][0] = matrix[3][0];
+	remove_2row_3col[2][1] = matrix[3][1];
+	remove_2row_3col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_2row_4col(0.0f);
+	remove_2row_4col[0][0] = matrix[0][0];
+	remove_2row_4col[0][1] = matrix[0][1];
+	remove_2row_4col[0][2] = matrix[0][2];
+	remove_2row_4col[1][0] = matrix[2][0];
+	remove_2row_4col[1][1] = matrix[2][1];
+	remove_2row_4col[1][2] = matrix[2][2];
+	remove_2row_4col[2][0] = matrix[3][0];
+	remove_2row_4col[2][1] = matrix[3][1];
+	remove_2row_4col[2][2] = matrix[3][2];
+
+	Matrix<T, 3> remove_3row_1col(0.0f);
+	remove_3row_1col[0][0] = matrix[0][1];
+	remove_3row_1col[0][1] = matrix[0][2];
+	remove_3row_1col[0][2] = matrix[0][3];
+	remove_3row_1col[1][0] = matrix[1][1];
+	remove_3row_1col[1][1] = matrix[1][2];
+	remove_3row_1col[1][2] = matrix[1][3];
+	remove_3row_1col[2][0] = matrix[3][1];
+	remove_3row_1col[2][1] = matrix[3][2];
+	remove_3row_1col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_3row_2col(0.0f);
+	remove_3row_2col[0][0] = matrix[0][0];
+	remove_3row_2col[0][1] = matrix[0][2];
+	remove_3row_2col[0][2] = matrix[0][3];
+	remove_3row_2col[1][0] = matrix[1][0];
+	remove_3row_2col[1][1] = matrix[1][2];
+	remove_3row_2col[1][2] = matrix[1][3];
+	remove_3row_2col[2][0] = matrix[3][0];
+	remove_3row_2col[2][1] = matrix[3][2];
+	remove_3row_2col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_3row_3col(0.0f);
+	remove_3row_3col[0][0] = matrix[0][0];
+	remove_3row_3col[0][1] = matrix[0][1];
+	remove_3row_3col[0][2] = matrix[0][3];
+	remove_3row_3col[1][0] = matrix[1][0];
+	remove_3row_3col[1][1] = matrix[1][1];
+	remove_3row_3col[1][2] = matrix[1][3];
+	remove_3row_3col[2][0] = matrix[3][0];
+	remove_3row_3col[2][1] = matrix[3][1];
+	remove_3row_3col[2][2] = matrix[3][3];
+
+	Matrix<T, 3> remove_3row_4col(0.0f);
+	remove_3row_4col[0][0] = matrix[0][0];
+	remove_3row_4col[0][1] = matrix[0][1];
+	remove_3row_4col[0][2] = matrix[0][2];
+	remove_3row_4col[1][0] = matrix[1][0];
+	remove_3row_4col[1][1] = matrix[1][1];
+	remove_3row_4col[1][2] = matrix[1][2];
+	remove_3row_4col[2][0] = matrix[3][0];
+	remove_3row_4col[2][1] = matrix[3][1];
+	remove_3row_4col[2][2] = matrix[3][2];
+
+	Matrix<T, 3> remove_4row_1col(0.0f);
+	remove_4row_1col[0][0] = matrix[0][1];
+	remove_4row_1col[0][1] = matrix[0][2];
+	remove_4row_1col[0][2] = matrix[0][3];
+	remove_4row_1col[1][0] = matrix[1][1];
+	remove_4row_1col[1][1] = matrix[1][2];
+	remove_4row_1col[1][2] = matrix[1][3];
+	remove_4row_1col[2][0] = matrix[2][1];
+	remove_4row_1col[2][1] = matrix[2][2];
+	remove_4row_1col[2][2] = matrix[2][3];
+
+	Matrix<T, 3> remove_4row_2col(0.0f);
+	remove_4row_2col[0][0] = matrix[0][0];
+	remove_4row_2col[0][1] = matrix[0][2];
+	remove_4row_2col[0][2] = matrix[0][3];
+	remove_4row_2col[1][0] = matrix[1][0];
+	remove_4row_2col[1][1] = matrix[1][2];
+	remove_4row_2col[1][2] = matrix[1][3];
+	remove_4row_2col[2][0] = matrix[2][0];
+	remove_4row_2col[2][1] = matrix[2][2];
+	remove_4row_2col[2][2] = matrix[2][3];
+
+	Matrix<T, 3> remove_4row_3col(0.0f);
+	remove_4row_3col[0][0] = matrix[0][0];
+	remove_4row_3col[0][1] = matrix[0][1];
+	remove_4row_3col[0][2] = matrix[0][3];
+	remove_4row_3col[1][0] = matrix[1][0];
+	remove_4row_3col[1][1] = matrix[1][1];
+	remove_4row_3col[1][2] = matrix[1][3];
+	remove_4row_3col[2][0] = matrix[2][0];
+	remove_4row_3col[2][1] = matrix[2][1];
+	remove_4row_3col[2][2] = matrix[2][3];
+
+	Matrix<T, 3> remove_4row_4col(0.0f);
+	remove_4row_4col[0][0] = matrix[0][0];
+	remove_4row_4col[0][1] = matrix[0][1];
+	remove_4row_4col[0][2] = matrix[0][2];
+	remove_4row_4col[1][0] = matrix[1][0];
+	remove_4row_4col[1][1] = matrix[1][1];
+	remove_4row_4col[1][2] = matrix[1][2];
+	remove_4row_4col[2][0] = matrix[2][0];
+	remove_4row_4col[2][1] = matrix[2][1];
+	remove_4row_4col[2][2] = matrix[2][2];
+
+	Matrix<T, 4> matrix_of_minors(0.0f);
+	matrix_of_minors[0][0] = determinant_3x3<T>(remove_1row_1col);
+	matrix_of_minors[0][1] = determinant_3x3<T>(remove_1row_2col);
+	matrix_of_minors[0][2] = determinant_3x3<T>(remove_1row_3col);
+	matrix_of_minors[0][3] = determinant_3x3<T>(remove_1row_4col);
+	matrix_of_minors[1][0] = determinant_3x3<T>(remove_2row_1col);
+	matrix_of_minors[1][1] = determinant_3x3<T>(remove_2row_2col);
+	matrix_of_minors[1][2] = determinant_3x3<T>(remove_2row_3col);
+	matrix_of_minors[1][3] = determinant_3x3<T>(remove_2row_4col);
+	matrix_of_minors[2][0] = determinant_3x3<T>(remove_3row_1col);
+	matrix_of_minors[2][1] = determinant_3x3<T>(remove_3row_2col);
+	matrix_of_minors[2][2] = determinant_3x3<T>(remove_3row_3col);
+	matrix_of_minors[2][3] = determinant_3x3<T>(remove_3row_4col);
+	matrix_of_minors[3][0] = determinant_3x3<T>(remove_4row_1col);
+	matrix_of_minors[3][1] = determinant_3x3<T>(remove_4row_2col);
+	matrix_of_minors[3][2] = determinant_3x3<T>(remove_4row_3col);
+//	std::cout << "3 2: " << determinant_3x3<T>(remove_4row_3col) << std::endl;
+	matrix_of_minors[3][3] = determinant_3x3<T>(remove_4row_4col);
+
+	// Compute matrix of cofactors
+	Matrix<T, 4> matrix_of_cofactors(0.0f);
+	for ( unsigned int i = 0; i < 4; ++i )
+		for ( unsigned int j = 0; j < 4; ++j ) {
+			if ( ( i + j ) % 2 == 0 ) {
+				matrix_of_cofactors[i][j] = matrix_of_minors[i][j];
+			} else {
+				matrix_of_cofactors[i][j] = -matrix_of_minors[i][j];
+			}
+		}
+
+	// Compute adjoint matrix
+	Matrix<T, 4> adjoint_matrix(0.0f);
+	adjoint_matrix = matrix_of_cofactors;
+	adjoint_matrix.SelfTensorTranspose();
+
+	T determinant_of_basic_matrix = determinant_4x4<T>(matrix);
+	Matrix<T, 4> inverse_matrix(0.0f);
+	inverse_matrix = adjoint_matrix * (1 / determinant_of_basic_matrix);
+	
+	return inverse_matrix;
+}
+
 template <class T, class T2,int var, int var2>
 Matrix<T, var> LookAt(Matrix<T, var> matrix, Vector<T2, var2> vector)
 {
