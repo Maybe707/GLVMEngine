@@ -21,7 +21,7 @@ void main()
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		font_ubo.position.x,
-		font_ubo.position.y + 7.0,
+		font_ubo.position.y,
 		font_ubo.position.z,
 		1.0
 		);
@@ -41,5 +41,5 @@ void main()
 		);
 
 	outFragmentTextureCoordinate = inTextureCoordinate;
-	gl_Position = font_ubo.proj * font_ubo.view * translationMatrix * scaleMatrix * vec4(inPosition, 1.0);
+	gl_Position = translationMatrix * projectionMatrix * scaleMatrix * vec4(inPosition, 1.0);
 }
