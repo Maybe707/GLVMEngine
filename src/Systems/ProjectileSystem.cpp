@@ -71,7 +71,8 @@ namespace GLVM::ecs
 																						   cm::material,
 																						   cm::mesh,
 																						   cm::collider,
-																						   cm::pointLight>();
+																						   cm::pointLight,
+																						   cm::damage>();
 
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];

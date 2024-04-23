@@ -21,7 +21,7 @@ void main()
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		font_ubo.position.x,
-		font_ubo.position.y - 0.3,
+		font_ubo.position.y,
 		font_ubo.position.z,
 		1.0
 		);
@@ -35,7 +35,7 @@ void main()
 
 	mat4 scaleMatrix = mat4(
 		0.9, 0.0, 0.0, 0.0,
-		0.0, -1.6, 0.0, 0.0,
+		0.0, 1.6, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
