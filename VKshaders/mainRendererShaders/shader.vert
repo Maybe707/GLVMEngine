@@ -81,6 +81,14 @@ void main() {
 
 	vs_out.ambient = ubo.ambient;
 	vs_out.shininess = ubo.shininess;
+
+	// mat4 projMatrix = mat4(
+	// 	1.0, 0.0, 0.0, 0.0,
+	// 	0.0, -1.0, 0.0, 0.0,
+	// 	0.0, 0.0, 1.0, 0.0,
+	// 	0.0, 0.0, 0.0, 1.0
+	// 	);
+
 	
     gl_Position = ubo.proj * ubo.view * worldPosition;
 //	gl_Position = worldPosition * ubo.model * ubo.view * ubo.proj;

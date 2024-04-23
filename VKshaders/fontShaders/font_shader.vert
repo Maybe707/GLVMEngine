@@ -21,12 +21,12 @@ void main()
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		font_ubo.position.x,
-		font_ubo.position.y,
+		font_ubo.position.y - 0.3,
 		font_ubo.position.z,
 		1.0
 		);
 
-	mat4 projectionMatrix = mat4(
+	mat4 commonScale = mat4(
 		0.2, 0.0, 0.0, 0.0,
 		0.0, 0.2, 0.0, 0.0,
 		0.0, 0.0, 0.2, 0.0,
@@ -40,6 +40,9 @@ void main()
 		0.0, 0.0, 0.0, 1.0
 		);
 
+	
+	
 	outFragmentTextureCoordinate = inTextureCoordinate;
-	gl_Position = translationMatrix * projectionMatrix * scaleMatrix * vec4(inPosition, 1.0);
+	vec4 p = translationMatrix * commonScale * scaleMatrix * vec4(inPosition, 1.0);
+	gl_Position = vec4(p.xy, 0.1, 1.0);
 }

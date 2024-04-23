@@ -3473,31 +3473,35 @@ namespace GLVM::core
 				// transformComponent->tPosition[1] += (float)j / 10;
 
 				vec3 result;
-				float vx = transformComponent->tPosition[0];
-				float vy = transformComponent->tPosition[1];
-				float vz = transformComponent->tPosition[2];
+				// float vx = transformComponent->tPosition[0];
+				// float vy = transformComponent->tPosition[1];
+				// float vz = transformComponent->tPosition[2];
 //				std::cout << "position: " << transformComponent->tPosition << std::endl;
 
 				// mat4 tempView = viewMatrix;
 				// mat4 tempProjection = projectionMatrix;
 				// tempView.SelfTensorTranspose();
 				// tempProjection.SelfTensorTranspose();
-				mat4 viewProjection = viewMatrix * projectionMatrix;
-				result[0] = viewProjection[0][0] * vx + viewProjection[0][1] * vy + viewProjection[0][2] * vz + viewProjection[0][3];
-				result[1] = viewProjection[1][0] * vx + viewProjection[1][1] * vy + viewProjection[1][2] * vz + viewProjection[1][3];
-				result[2] = viewProjection[2][0] * vx + viewProjection[2][1] * vy + viewProjection[2][2] * vz + viewProjection[2][3];
+				vec4 pos = vec4(transformComponent->tPosition[0],
+								transformComponent->tPosition[1],
+								transformComponent->tPosition[2], 1.0f);
 
-				float w;
-				w = viewProjection[3][0] * vx + viewProjection[3][1] * vy + viewProjection[3][2] * vz + viewProjection[3][3];
-				float devider = 1.0f / w;
-				result[0] *= devider;
-				result[1] *= devider;
-				result[2] *= devider;
+				std::cout << "pos: " << pos << std::endl;
+				std::cout << "view matrix: " << viewMatrix << std::endl;
+				std::cout << "projection matrix: " << projectionMatrix << std::endl;
 
-				float viewPortLeft = 0.0f, viewPortRight = 1.0f, viewPortTop = 1.0f, viewPortBottom = 0.0f;
-				result[0] = ((result[0] + 1.0f) * (viewPortRight - viewPortLeft) / 2.0f + 1.0f) * 1920.0f;
-				result[1] = ((result[1] + 1.0f) * (viewPortTop - viewPortBottom) / 2.0f + 1.0f) * 1080.0f;
-				result[2] = (result[2] + 1.0f) / 2.0f;
+				vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
+				std::cout << "w: " << clipSpacePosition[3] << std::endl;
+				vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
+										clipSpacePosition[1] / clipSpacePosition[3],
+										clipSpacePosition[2] / clipSpacePosition[3]);
+
+				vec4 ndc = vec4(ndcPosition[0], ndcPosition[1], ndcPosition[2], 1.0);
+				
+				std::cout << "dnc: " << ndc << std::endl;
+				
+				// ndcPosition[0] = (ndcPosition[0] + 1.0f) * 0.5f * 1920.0f;
+				// ndcPosition[1] = (ndcPosition[1] + 1.0f) * 0.5f * 1080.0f;
 				
 				fontUBO.view = viewMatrix;
 				fontUBO.proj = projectionMatrix;
@@ -3506,7 +3510,7 @@ namespace GLVM::core
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;
 //				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
-				fontUBO.position = result;
+				fontUBO.position = ndcPosition;
 
 				// mat2 testMatrix (1.0f);
 				// testMatrix[0][0] = 2.0f;
@@ -3534,7 +3538,7 @@ namespace GLVM::core
 				testMatrix[3][2] = 55.0f;
 				testMatrix[3][3] = 25.0f;
 				
-				std::cout << "inverse of matrix: " << inverse_matrix_4x4<float>(testMatrix) << std::endl;
+//				std::cout << "inverse of matrix: " << inverse_matrix_4x4<float>(testMatrix) << std::endl;
 				
 				void* modelMatrixData;
 				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * j,
