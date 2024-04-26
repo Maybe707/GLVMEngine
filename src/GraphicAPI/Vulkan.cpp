@@ -3486,19 +3486,19 @@ namespace GLVM::core
 								transformComponent->tPosition[1],
 								transformComponent->tPosition[2], 1.0f);
 
-				std::cout << "pos: " << pos << std::endl;
-				std::cout << "view matrix: " << viewMatrix << std::endl;
-				std::cout << "projection matrix: " << projectionMatrix << std::endl;
+				// std::cout << "pos: " << pos << std::endl;
+				// std::cout << "view matrix: " << viewMatrix << std::endl;
+				// std::cout << "projection matrix: " << projectionMatrix << std::endl;
 
 				vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
-				std::cout << "w: " << clipSpacePosition[3] << std::endl;
+//				std::cout << "w: " << clipSpacePosition[3] << std::endl;
 				vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
 										clipSpacePosition[1] / clipSpacePosition[3],
 										clipSpacePosition[2] / clipSpacePosition[3]);
 
 				vec4 ndc = vec4(ndcPosition[0], ndcPosition[1], ndcPosition[2], 1.0);
 				
-				std::cout << "dnc: " << ndc << std::endl;
+//				std::cout << "dnc: " << ndc << std::endl;
 				
 				// ndcPosition[0] = (ndcPosition[0] + 1.0f) * 0.5f * 1920.0f;
 				// ndcPosition[1] = (ndcPosition[1] + 1.0f) * 0.5f * 1080.0f;

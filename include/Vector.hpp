@@ -155,7 +155,7 @@ namespace GLVM::core
     
 	template<class T>
 	void vector<T>::Push(T item) {
-		if(size == capacity) {
+		if(size == capacity || size == 0) {
 				unsigned char* aTemp_Vector_Container = new unsigned char[(capacity + expander) * sizeof(T)];
 				for(unsigned int i = 0; i < size; ++i) {
 					T& element = *(T*)&rowInnerData[i * sizeof(T)];
@@ -276,8 +276,12 @@ namespace GLVM::core
 	template<class T>
 	void vector<T>::RemoveFirstItem()
 	{
-		if(size < 1)
+		--size;				
+		if(size == 0) {
+			delete [] this->rowInnerData;
+			this->rowInnerData = nullptr;
 			return;
+		}
 		
 		unsigned char* aTemp_Vector_Container = new unsigned char[size * sizeof(T)];
 		for(unsigned int i = 0; i < size; ++i) {
@@ -289,12 +293,14 @@ namespace GLVM::core
 		delete [] this->rowInnerData;
 		this->rowInnerData = nullptr;
 
-		--size;				
 		rowInnerData = new unsigned char[size * sizeof(T)];
         for(unsigned int i = 0; i < size; ++i) {
 			T& sourceElement = *(T*)&aTemp_Vector_Container[(i + 1) * sizeof(T)];
 			new (&rowInnerData[i * sizeof(T)]) T(sourceElement);
 		}
+
+		delete [] aTemp_Vector_Container;
+		aTemp_Vector_Container = nullptr;
 	}
 	
 	template<class T>
