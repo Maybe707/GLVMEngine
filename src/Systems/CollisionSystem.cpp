@@ -58,6 +58,7 @@ namespace GLVM::ecs
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = false;
+			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
 			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
 				if ( i == j )
 					continue;

@@ -327,18 +327,21 @@ namespace GLVM::core
 		if(size < 1)
 			return;
 
-		/// FIXME: FOR DEBUG ONLY!
-		if ( typeid(T).name() == typeid(unsigned int).name() ) {
-			for ( unsigned int i = 0; i < capacity; ++i ) {
-				T& element = *(T*)&rowInnerData[i * sizeof(T)];
-				element = 0;                                                     ///< For debug purpouses only!!!
-			}
-		}
+		// /// FIXME: FOR DEBUG ONLY!
+		// if ( typeid(T).name() == typeid(unsigned int).name() ) {
+		// 	for ( unsigned int i = 0; i < capacity; ++i ) {
+		// 		T& element = *(T*)&rowInnerData[i * sizeof(T)];
+		// 		element = 0;                                                     ///< For debug purpouses only!!!
+		// 	}
+		// }
 
 		for(unsigned int i = 0; i < size; ++i) {
 			T& element = *(T*)&rowInnerData[i * sizeof(T)];
 			element.~T();
 		}
+
+		delete [] this->rowInnerData;
+		this->rowInnerData = nullptr;
 		
 		/// FIXME: DEBUG ONLY!
 		// unsigned int sizeOfType = sizeof(T);
