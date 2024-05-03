@@ -162,7 +162,7 @@ namespace GLVM::core
 					new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
 					element.~T();
 				}
-
+				
 				delete [] rowInnerData;
 				rowInnerData = aTemp_Vector_Container;
 
@@ -283,8 +283,8 @@ namespace GLVM::core
 			return;
 		}
 		
-		unsigned char* aTemp_Vector_Container = new unsigned char[size * sizeof(T)];
-		for(unsigned int i = 0; i < size; ++i) {
+		unsigned char* aTemp_Vector_Container = new unsigned char[(size + 1) * sizeof(T)];
+		for(unsigned int i = 0; i < size + 1; ++i) {
 			T& element = *(T*)&rowInnerData[i * sizeof(T)];
 			new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
 			element.~T();
@@ -293,7 +293,7 @@ namespace GLVM::core
 		delete [] this->rowInnerData;
 		this->rowInnerData = nullptr;
 
-		rowInnerData = new unsigned char[size * sizeof(T)];
+		rowInnerData = new unsigned char[capacity * sizeof(T)];
         for(unsigned int i = 0; i < size; ++i) {
 			T& sourceElement = *(T*)&aTemp_Vector_Container[(i + 1) * sizeof(T)];
 			new (&rowInnerData[i * sizeof(T)]) T(sourceElement);
