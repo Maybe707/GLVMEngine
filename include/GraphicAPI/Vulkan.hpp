@@ -182,6 +182,7 @@ namespace GLVM::core
 		HUD_UBO,
 		FONT_UBO,
 		FONT_ATLAS_SAMPLER,
+		HUD_SCREEN_UBO,
 		MODEL_MATRIX_UBO,
 
 		LIGHT_DATA,
@@ -513,6 +514,9 @@ namespace GLVM::core
 
 		const char* vertShaderFont = "../VKshaders/fontShaders/font_vert.spv";
 		const char* fragShaderFont = "../VKshaders/fontShaders/font_frag.spv";
+
+		const char* vertexShaderHudScreen = "../VKshaders/hud_screen_shaders/vert_hud_screen.spv";
+		const char* fragmentShaderHudScreen = "../VKshaders/hud_screen_shaders/frag_hud_screen.spv";
 		
         unsigned int texturePool_;
 
@@ -596,6 +600,12 @@ namespace GLVM::core
 		std::vector<VkBuffer> fontUniformBuffers;
 		std::vector<VkDeviceMemory> fontUniformBuffersMemory;
 		std::vector<VkFramebuffer> fontSwapChainFramebuffers;
+		Pipeline hudScreenPipeline;
+		VkRenderPass hudScreenRenderPass;
+		std::vector<VkDescriptorSet> hudScreenDescriptorSets;
+		std::vector<VkBuffer> hudScreenUniformBuffers;
+		std::vector<VkDeviceMemory> hudScreenUniformBuffersMemory;
+		std::vector<VkFramebuffer> hudScreenSwapChainFramebuffers;
 		
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
@@ -605,6 +615,7 @@ namespace GLVM::core
 		VkCommandPool pointLightCommandPool;
 		VkCommandPool fontCommandPool;
 		VkCommandPool hudCommandPool;
+		VkCommandPool hudScreenCommandPool;
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
@@ -712,6 +723,7 @@ namespace GLVM::core
 		std::vector<VkCommandBuffer> pointLightCommandBuffers;
 		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
+		std::vector<VkCommandBuffer> hudScreenCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
 		/// Main render pipe line sync objects
@@ -775,6 +787,7 @@ namespace GLVM::core
         void createMainRenderPass();
 		void createFontRenderPass();
 		void createHudRenderPass();
+		void createHudScreenRenderPass();
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
@@ -808,6 +821,7 @@ namespace GLVM::core
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();
 		void createHudDescriptorSets();
+		void createHudScreenDescriptorSets();
 		void createFontRenderDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
@@ -827,6 +841,7 @@ namespace GLVM::core
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,

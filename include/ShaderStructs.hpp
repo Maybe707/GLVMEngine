@@ -14,6 +14,10 @@ namespace GLVM::core {
 		float highestY;
 	};
 
+	struct alignas(64) HUD_SCREEN_UBO {
+		mat4 model;
+	};
+	
 	struct alignas(64) FONT_UBO {
 		mat4 view;
 		mat4 proj;

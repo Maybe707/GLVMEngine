@@ -21,7 +21,7 @@ void main()
 		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		font_ubo.position.x,
-		font_ubo.position.y - 0.32,
+		font_ubo.position.y - 1.0,
 		font_ubo.position.z,
 		1.0
 		);
@@ -34,15 +34,15 @@ void main()
 		);
 
 	mat4 scaleMatrix = mat4(
-		0.9, 0.0, 0.0, 0.0,
-		0.0, 1.6, 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
+		0.01, 0.0, 0.0, 0.0,
+		0.0, 0.0176, 0.0, 0.0,
+		0.0, 0.0, 0.011, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
 	
 	
 	outFragmentTextureCoordinate = inTextureCoordinate;
-	vec4 p = translationMatrix * commonScale * scaleMatrix * vec4(inPosition, 1.0);
-	gl_Position = vec4(p.xy, 0.1, 1.0);
+//	vec4 p = translationMatrix * commonScale * scaleMatrix * vec4(inPosition, 1.0);
+	gl_Position = scaleMatrix * vec4(inPosition, 1.0);
 }
