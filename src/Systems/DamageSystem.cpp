@@ -31,6 +31,7 @@ namespace GLVM::ecs
 
 			componentManager->CreateComponent<cm::font>(entity);
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			fontComponent->font_string.clear();
 			fontComponent->font_string.Push('4');
 			fontComponent->font_string.Push('0');
 			fontComponent->lifeTime = 0;
