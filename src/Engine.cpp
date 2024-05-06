@@ -172,6 +172,7 @@ namespace GLVM::core
 								  &g_eEvent.mousePointerPosition.offset_X,
 								  &g_eEvent.mousePointerPosition.offset_Y);
 
+			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
@@ -253,6 +254,7 @@ namespace GLVM::core
 								  &g_eEvent.mousePointerPosition.offset_X,
 								  &g_eEvent.mousePointerPosition.offset_Y);
 
+			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;

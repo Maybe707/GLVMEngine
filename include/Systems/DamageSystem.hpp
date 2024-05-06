@@ -19,6 +19,8 @@ namespace GLVM::ecs
 	{
 	public:
 		void Update() override;
+
+		float deltaTime;
 	};
 } // namespace GLVM::ecs
 

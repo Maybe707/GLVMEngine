@@ -33,7 +33,18 @@ namespace GLVM::ecs
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
 			fontComponent->font_string.Push('4');
 			fontComponent->font_string.Push('0');
+			fontComponent->lifeTime = 0;
+		}
 
+		core::vector<Entity> linkedEntitiesFont = componentManager->collectLinkedEntities<cm::font>();
+		for ( unsigned int i = 0; i < linkedEntitiesFont.GetSize(); ++i ) {
+			unsigned int entity = linkedEntitiesFont[i];
+
+			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			fontComponent->lifeTime += deltaTime;
+			std::cout << "lifeTime" << fontComponent->lifeTime << std::endl;
+			if ( fontComponent->lifeTime >= 1.5 )
+				componentManager->RemoveComponent<cm::font>(entity);
 		}
 	}
 } // namespace GLVM::ecs

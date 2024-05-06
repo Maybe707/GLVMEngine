@@ -3745,6 +3745,7 @@ namespace GLVM::core
 				fontUBO.scale    = 0.3f;
 				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
 //				ndcPosition[0] += 0.01f;
+				ndcPosition[1] -= fontComponent->lifeTime / 5.0f;
 				fontUBO.position = ndcPosition;
 
 

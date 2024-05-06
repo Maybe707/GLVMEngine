@@ -7,6 +7,7 @@ namespace GLVM::ecs::components
 {
 	struct font {
 		core::vector<char> font_string;
+		float lifeTime;
 	};
 } // namespace GLVM::ecs::components
 
