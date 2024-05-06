@@ -3742,9 +3742,11 @@ namespace GLVM::core
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;
 //				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
-				ndcPosition[0] += (float)j * 0.17f;
+				fontUBO.scale    = 0.3f;
+				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
 //				ndcPosition[0] += 0.01f;
 				fontUBO.position = ndcPosition;
+
 
 				// mat2 testMatrix (1.0f);
 				// testMatrix[0][0] = 2.0f;

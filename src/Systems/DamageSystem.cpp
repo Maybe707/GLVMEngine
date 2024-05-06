@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/DamageSystem.hpp"
+#include "Components/FontComponent.hpp"
 
 namespace GLVM::ecs
 {
@@ -27,6 +28,12 @@ namespace GLVM::ecs
 				std::cout << "remove entity: " << entity << std::endl;
 				entityManager->RemoveEntity(entity, componentManager);
 			}
+
+			componentManager->CreateComponent<cm::font>(entity);
+			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			fontComponent->font_string.Push('4');
+			fontComponent->font_string.Push('0');
+
 		}
 	}
 } // namespace GLVM::ecs

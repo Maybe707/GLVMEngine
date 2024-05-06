@@ -74,18 +74,18 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::font>(uiWitch);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 100.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
-	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
-	fontComponentWitch->font_string.Push('G');
-	fontComponentWitch->font_string.Push('L');
-	fontComponentWitch->font_string.Push('V');
-	fontComponentWitch->font_string.Push('M');
+	// cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
+	// fontComponentWitch->font_string.Push('G');
+	// fontComponentWitch->font_string.Push('L');
+	// fontComponentWitch->font_string.Push('V');
+	// fontComponentWitch->font_string.Push('M');
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },

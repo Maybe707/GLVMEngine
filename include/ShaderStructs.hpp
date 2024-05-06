@@ -22,6 +22,7 @@ namespace GLVM::core {
 		mat4 view;
 		mat4 proj;
 		vec3 position;
+		float scale;
 	};
 } // namespace GLVM::core
 

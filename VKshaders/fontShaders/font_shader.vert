@@ -12,6 +12,7 @@ layout(set = 0, binding = 0) uniform FONT_UBO {
 	mat4 view;
 	mat4 proj;
 	vec3 position;
+	float scale;
 } font_ubo;
 
 void main()
@@ -34,9 +35,9 @@ void main()
 		);
 
 	mat4 scaleMatrix = mat4(
-		0.9, 0.0, 0.0, 0.0,
-		0.0, 1.6, 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
+		0.9 * font_ubo.scale, 0.0, 0.0, 0.0,
+		0.0, 1.6 * font_ubo.scale, 0.0, 0.0,
+		0.0, 0.0, 1.0 * font_ubo.scale, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
