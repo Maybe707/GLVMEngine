@@ -496,6 +496,10 @@ namespace GLVM::core
 		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
+		bool isInventoryOpened = false;
+		vec3 forward;
+		float hud_screen_x = 0.0f;
+		float hud_screen_y;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -552,6 +556,7 @@ namespace GLVM::core
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
 		mat4 viewMatrix;
+		mat4 viewMatrixForWorldHUD;
 		mat4 projectionMatrix;
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR
@@ -840,6 +845,10 @@ namespace GLVM::core
 		void updateHudUBO(uint32_t currentImage, uint32_t offset,
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
+		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset,
+												 [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
+												 ecs::components::health* entityOwnHudHealth, bool isHudExists,
+												 float highestY);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

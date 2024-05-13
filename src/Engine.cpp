@@ -244,8 +244,10 @@ namespace GLVM::core
              
 			vulkanRenderer->Window.HandleEvent(g_eEvent);
 			// 	Input_Stack_.ControlInput(g_eEvent);
-			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL)
-				bGame_Loop_Active = false;
+			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
+				vulkanRenderer->isInventoryOpened = true;
+//				bGame_Loop_Active = false;
+			}
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
             

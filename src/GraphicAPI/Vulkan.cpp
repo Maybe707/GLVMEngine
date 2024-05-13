@@ -204,6 +204,19 @@ namespace GLVM::core
 		Matrix<float, 4> viewMatrix_(1.0f);
         const float kSensitivity = 0.1f;
 
+		hud_screen_y = g_eEvent.mousePointerPosition.offset_Y / 880.0f;
+		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+		std::cout << "x: " << hud_screen_x << std::endl;
+		if ( hud_screen_x > 1.0f )
+			hud_screen_x = 1.0f;
+		else if ( hud_screen_x < -1.0f )
+			hud_screen_x = -1.0f;
+		
+		if ( hud_screen_y > 1.0f )
+			hud_screen_y = 1.0f;
+		else if ( hud_screen_y < -1.0f )
+			hud_screen_y = -1.0f;
+		
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         fPitch = g_eEvent.mousePointerPosition.offset_Y;
         fYaw *= kSensitivity;
@@ -211,13 +224,12 @@ namespace GLVM::core
 
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
-        
+
         if(fPitch > 89.0f)
             fPitch = 89.0f;
         if(fPitch < -89.0f)
             fPitch = -89.0f;
 
-		vec3 forward;
 		float sinPitch = std::sin(Radians(fPitch / 2));
 		float cosPitch = std::cos(Radians(fPitch / 2));
 		float sinYaw = std::sin(Radians(-fYaw / 2));
@@ -244,12 +256,14 @@ namespace GLVM::core
 		forward[0] = result.x;
 		forward[1] = result.y;
 		forward[2] = result.z;
+
         cameraComponent.forward = Normalize(forward);
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
 
-		viewMatrix = viewMatrix_;
+		if ( !isInventoryOpened )
+			viewMatrix = viewMatrix_;
     }
 
     void CVulkanRenderer::SetProjectionMatrix()
@@ -3363,7 +3377,7 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::updateHudUBO(uint32_t currentImage, uint32_t offset,
-									   ecs::components::transform* entityOwnHudTransform,
+									   [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
 									   ecs::components::health* entityOwnHudHealth, bool isHudExists,
 									   float highestY) {
 		HUD_UBO hudUBO{};
@@ -3382,6 +3396,30 @@ namespace GLVM::core
 					sizeof(HUD_UBO), 0, &hudMatrixData);
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_UBO));
         vkUnmapMemory(device, hudUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset,
+									   [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
+									   [[maybe_unused]] ecs::components::health* entityOwnHudHealth, [[maybe_unused]] bool isHudExists,
+									   [[maybe_unused]] float highestY) {
+		HUD_SCREEN_UBO hudUBO{};
+		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
+
+		if ( !isInventoryOpened ) {
+			hudUBO.position = defaultPosition;
+		} else {
+			defaultPosition[0] = hud_screen_x;
+			defaultPosition[1] = -hud_screen_y;
+			
+			hudUBO.position = defaultPosition;
+			std::cout << "position: " << hudUBO.position << std::endl;
+		}
+
+		void* hudMatrixData;
+        vkMapMemory(device, hudScreenUniformBuffersMemory[currentImage], sizeof(HUD_SCREEN_UBO) * offset,
+					sizeof(HUD_SCREEN_UBO), 0, &hudMatrixData);
+        memcpy(hudMatrixData, &hudUBO, sizeof(HUD_SCREEN_UBO));
+        vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
 	}
 	
     void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -3550,9 +3588,9 @@ namespace GLVM::core
 			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
 
 			unsigned int uboIndex = i;
-			updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
+			updateHudScreenUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudScreenPipeline.pipelineLayout,
-									0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+									0, 1, &hudScreenDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;

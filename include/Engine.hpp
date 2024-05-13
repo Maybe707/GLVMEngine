@@ -71,7 +71,7 @@ namespace GLVM::core
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
 		double fpsAccumulator   = 0;
-		
+
         Engine();
         
 	public:

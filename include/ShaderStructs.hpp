@@ -15,7 +15,7 @@ namespace GLVM::core {
 	};
 
 	struct alignas(64) HUD_SCREEN_UBO {
-		mat4 model;
+		vec3 position;
 	};
 	
 	struct alignas(64) FONT_UBO {
