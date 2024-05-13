@@ -3397,7 +3397,7 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::health>();
 		
-		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -3500,7 +3500,7 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::health>();
 		
-		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -3602,7 +3602,7 @@ namespace GLVM::core
 
 		namespace cm = GLVM::ecs::components;
 		
-		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
