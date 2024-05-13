@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Event.hpp"
 #include "ISoundEngine.hpp"
 #include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -245,7 +246,8 @@ namespace GLVM::core
 			vulkanRenderer->Window.HandleEvent(g_eEvent);
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
-				vulkanRenderer->isInventoryOpened = true;
+				vulkanRenderer->isInventoryOpened = !vulkanRenderer->isInventoryOpened;
+				Input_Stack_.Remove(EEvents::eGAME_LOOP_KILL);
 //				bGame_Loop_Active = false;
 			}
 			// }
