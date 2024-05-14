@@ -206,7 +206,7 @@ namespace GLVM::core
 
 		hud_screen_y = g_eEvent.mousePointerPosition.offset_Y / 880.0f;
 		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
-		std::cout << "x: " << hud_screen_x << std::endl;
+//		std::cout << "x: " << hud_screen_x << std::endl;
 		if ( hud_screen_x > 1.0f )
 			hud_screen_x = 1.0f;
 		else if ( hud_screen_x < -1.0f )
@@ -3412,7 +3412,6 @@ namespace GLVM::core
 			defaultPosition[1] = -hud_screen_y;
 			
 			hudUBO.position = defaultPosition;
-			std::cout << "position: " << hudUBO.position << std::endl;
 		}
 
 		void* hudMatrixData;

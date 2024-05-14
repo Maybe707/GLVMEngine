@@ -30,6 +30,8 @@ namespace GLVM::core
         eATACK,
         eSPAWN,
         eJUMP,
+		eINVENTORY,
+		eINVENTORY_RELEASE,
 		eMOVE_FORWARD,
 		eMOVE_BACKWARD,
 		eMOVE_LEFT,

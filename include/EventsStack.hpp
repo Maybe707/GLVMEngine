@@ -86,6 +86,9 @@ namespace GLVM::core
 			case eKEYRELEASE_W:
 				Remove(eMOVE_FORWARD); 
 				break;
+			case eINVENTORY_RELEASE:
+				Remove(eINVENTORY);
+				break;
             case eKEYRELEASE_JUMP:
                 Remove(eJUMP);
                 break;
@@ -107,6 +110,9 @@ namespace GLVM::core
             case eJUMP:
                 Push(eJUMP);
                 break;
+			case eINVENTORY:
+				Push(eINVENTORY);
+				break;
             case eMOUSE_LEFT_BUTTON:
                 Push(eMOUSE_LEFT_BUTTON);
                 break;

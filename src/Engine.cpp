@@ -246,8 +246,12 @@ namespace GLVM::core
 			vulkanRenderer->Window.HandleEvent(g_eEvent);
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
+				bGame_Loop_Active = false;
+			}
+			
+			if((Input_Stack_.SearchElement(EEvents::eINVENTORY)) == EEvents::eINVENTORY) {
 				vulkanRenderer->isInventoryOpened = !vulkanRenderer->isInventoryOpened;
-				Input_Stack_.Remove(EEvents::eGAME_LOOP_KILL);
+				Input_Stack_.Remove(EEvents::eINVENTORY);
 				if ( vulkanRenderer->isInventoryOpened )
 					pSystem_Manager->DeactivateSystem(ecs::DeactivatedSystems::DEACTIVATED_MOVEMENT_SYSTEM);
 				else
@@ -256,7 +260,7 @@ namespace GLVM::core
 			}
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
-            
+
 			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,

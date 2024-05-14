@@ -246,11 +246,15 @@ namespace GLVM::core
 //				xcb_keycode_t key_code = expose_event->detail;
 //				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
 				xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
+				std::cout << "keysym: " << keysym << std::endl;
 				
 				switch(keysym)
 					{
 					case 65307:
 						_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
+						break;
+					case 105:
+						_Event.SetEvent(EEvents::eINVENTORY);
 						break;
 					case 97:
 						_Event.SetEvent(EEvents::eMOVE_LEFT);
@@ -304,6 +308,9 @@ namespace GLVM::core
 //				std::cout << "KEYSYM RELEASE: " << release_keysym << std::endl;
                 switch(release_keysym)
                 {
+				case 105:
+					_Event.SetEvent(GLVM::core::eINVENTORY_RELEASE);
+					break;
                 case 97:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
