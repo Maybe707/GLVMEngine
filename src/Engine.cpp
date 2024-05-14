@@ -248,6 +248,10 @@ namespace GLVM::core
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
 				vulkanRenderer->isInventoryOpened = !vulkanRenderer->isInventoryOpened;
 				Input_Stack_.Remove(EEvents::eGAME_LOOP_KILL);
+				if ( vulkanRenderer->isInventoryOpened )
+					pSystem_Manager->DeactivateSystem(ecs::DeactivatedSystems::DEACTIVATED_MOVEMENT_SYSTEM);
+				else
+					pSystem_Manager->ReturnSystemToActivatedState(ecs::DeactivatedSystems::DEACTIVATED_MOVEMENT_SYSTEM);
 //				bGame_Loop_Active = false;
 			}
 			// }

@@ -34,9 +34,36 @@ namespace GLVM::ecs
         ++s_iSystem_ID;
     }
 
+	void CSystemManager::DeactivateSystem(DeactivatedSystems system) {
+		deactivatedSystems.Push(system);
+	}
+
+	void CSystemManager::ReturnSystemToActivatedState(DeactivatedSystems system) {
+		for ( unsigned int i = 0; i < deactivatedSystems.GetSize(); ++i ) {
+			if ( system == deactivatedSystems[i] ) {
+				deactivatedSystems.Remove(i);
+				return;
+			}
+		}
+	}
+	
     void CSystemManager::Update()
     {
-        for(unsigned int i = 0; i < s_iSystem_ID; ++i)
-            tSystemContainer[i]->Update();
+		bool removedSystemFlag  = false;
+        for(unsigned int i = 0; i < s_iSystem_ID; ++i) {
+			for ( unsigned int j = 0; j < deactivatedSystems.GetSize(); ++j ) {
+				if ( (unsigned int)deactivatedSystems[j] == i ) {
+					removedSystemFlag = true;
+					continue;
+				}
+			}
+
+			if ( removedSystemFlag ) {
+				removedSystemFlag = false;
+				continue;
+			} else {
+				tSystemContainer[i]->Update();
+			}
+		}
     }
 }

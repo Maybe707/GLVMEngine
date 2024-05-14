@@ -12,10 +12,15 @@
 
 namespace GLVM::ecs
 {
+	enum DeactivatedSystems {
+		DEACTIVATED_MOVEMENT_SYSTEM
+	};
+	
 	class CSystemManager : public ISystem
 	{
         static CSystemManager* pInstance_;
         static std::mutex Mutex_;
+		core::vector<DeactivatedSystems> deactivatedSystems;
 
         CSystemManager();
         ~CSystemManager();
@@ -29,6 +34,8 @@ namespace GLVM::ecs
 		core::vector<ISystem*> tSystemContainer;
 
 		void ActivateSystem(ISystem* _System);
+		void DeactivateSystem(DeactivatedSystems system);
+		void ReturnSystemToActivatedState(DeactivatedSystems system);
 
 		void Update() override;
 	};
