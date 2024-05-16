@@ -3,9 +3,12 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/CrosshairComponent.hpp"
 #include "Components/EnemyComponent.hpp"
 #include "Components/FontComponent.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/InterfaceComponent.hpp"
+#include "Components/InterfaceComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -34,6 +37,7 @@ int main()
 	[[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 	[[maybe_unused]] cm::MeshHandle simpleCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/simpleCube2.gltf");
 	[[maybe_unused]] cm::MeshHandle crosshair_001_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/crosshair_001.gltf");
+	[[maybe_unused]] cm::MeshHandle inventory_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/inventory.gltf");
 
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
@@ -101,6 +105,22 @@ int main()
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
 
+	Entity crosshair = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::crosshair>(crosshair);
+	ComponentManager->GetComponent<cm::mesh>(crosshair)->handle = crosshair_001_Handle_GLTF;
+	cm::material* materialCorsshair = ComponentManager->GetComponent<cm::material>(crosshair);
+	*materialCorsshair = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+
+	Entity inventory = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::interface>(inventory);
+	ComponentManager->GetComponent<cm::mesh>(inventory)->handle = inventory_Handle_GLTF;
+	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
+	// cm::material* materialInventory = ComponentManager->GetComponent<cm::material>(inventory);
+	// *materialInventory = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+	// 	.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	
 	// Entity font = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::font>(font);
 	// *ComponentManager->GetComponent<cm::transform>(font) = { .tPosition = { 5.0f, 5.0f, 5.0f },

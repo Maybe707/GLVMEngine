@@ -24,6 +24,10 @@ namespace GLVM::core {
 		vec3 position;
 		float scale;
 	};
+
+	struct alignas(64) UI_UBO {
+		mat4 model;
+	};
 } // namespace GLVM::core
 
 #endif

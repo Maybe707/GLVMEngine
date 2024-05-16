@@ -8,9 +8,11 @@
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/InterfaceComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Components/CrosshairComponent.hpp"
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
@@ -447,6 +449,13 @@ namespace GLVM::core
 		hudScreenPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudScreenPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		hudScreenPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_SCREEN_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+
+		uiPipeline.vertShader = vertexShaderUI;
+		uiPipeline.fragShader = fragmentShaderUI;
+		uiPipeline.bindingDescription = Vertex::getBindingDescription();
+		uiPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -643,6 +652,7 @@ namespace GLVM::core
 		createFontRenderPass();
 		createHudRenderPass();
 		createHudScreenRenderPass();
+		createRenderPass_UI();
 		createDirectionalLightShadowMapRenderPass();
 		createSpotLightShadowMapRenderPass();
 		createPointLightShadowMapRenderPass();
@@ -653,12 +663,14 @@ namespace GLVM::core
 		createDescriptorSetLayout(hudPipeline.descriptors);
 		createDescriptorSetLayout(hudScreenPipeline.descriptors);
         createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
+		createDescriptorSetLayout(uiPipeline.descriptors);
         createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(fontPipeline, fontRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(hudPipeline, hudRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(hudScreenPipeline, hudScreenRenderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(uiPipeline, uiRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(mainRenderScenePipeline, renderPass, VK_POLYGON_MODE_FILL);
         createCommandPool(directionalLightCommandPool);
 		createCommandPool(spotLightCommandPool);
@@ -666,6 +678,7 @@ namespace GLVM::core
 		createCommandPool(fontCommandPool);
 		createCommandPool(hudCommandPool);
 		createCommandPool(hudScreenCommandPool);
+		createCommandPool(uiCommandPool);
 		createCommandPool(mainRenderCommandPool);
         createDepthResources();
 		createDirectionalLightShadowMapDepthResources();
@@ -686,6 +699,7 @@ namespace GLVM::core
 		createPointLightShadowMapDescriptorSets();
 		createHudDescriptorSets();
 		createHudScreenDescriptorSets();
+		createDescriptorSets_UI();
 		createFontRenderDescriptorSets();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
@@ -696,12 +710,16 @@ namespace GLVM::core
 		createCommandBuffers(fontCommandPool, fontCommandBuffers);
 		createCommandBuffers(hudCommandPool, hudCommandBuffers);
 		createCommandBuffers(hudScreenCommandPool, hudScreenCommandBuffers);
+		createCommandBuffers(uiCommandPool, uiCommandBuffers);
 		createSyncObjects(fontImageAvailableSemaphores,
 						  fontRenderFinishedSemaphores,
 						  fontInFlightFences);
 		createSyncObjects(hudImageAvailableSemaphores,
 						  hudRenderFinishedSemaphores,
 						  hudInFlightFences);
+		createSyncObjects(uiImageAvailableSemaphores,
+						  uiRenderFinishedSemaphores,
+						  uiInFlightFences);
 		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 						  directionalLightShadowMapRenderFinishedSemaphores,
 						  directionalLightShadowMapInFlightFences);
@@ -1219,7 +1237,7 @@ namespace GLVM::core
             throw std::runtime_error("failed to create render pass!");
         }
     }
-
+	
     void CVulkanRenderer::createHudScreenRenderPass() {
         VkAttachmentDescription colorAttachment{};
         colorAttachment.format = swapChainImageFormat;
@@ -1274,6 +1292,64 @@ namespace GLVM::core
         renderPassInfo.pDependencies = &dependency;
 
         if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &hudScreenRenderPass) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create render pass!");
+        }
+    }
+
+    void CVulkanRenderer::createRenderPass_UI() {
+        VkAttachmentDescription colorAttachment{};
+        colorAttachment.format = swapChainImageFormat;
+        colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD;
+        colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        colorAttachment.initialLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        
+        VkAttachmentDescription depthAttachment{};
+        depthAttachment.format = findDepthFormat();
+        depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference colorAttachmentRef{};
+        colorAttachmentRef.attachment = 0;
+        colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depthAttachmentRef{};
+        depthAttachmentRef.attachment = 1;
+        depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpass.colorAttachmentCount = 1;
+        subpass.pColorAttachments = &colorAttachmentRef;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = 0;
+        dependency.dstSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+//        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT ;
+        
+        std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments = attachments.data();
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 1;
+        renderPassInfo.pDependencies = &dependency;
+
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &uiRenderPass) != VK_SUCCESS) {
             throw std::runtime_error("failed to create render pass!");
         }
     }
@@ -2194,6 +2270,7 @@ namespace GLVM::core
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
 		VkDeviceSize fontUboSize = sizeof(FONT_UBO);
 		VkDeviceSize hudScreenUboSize = sizeof(HUD_SCREEN_UBO);
+		VkDeviceSize uiUboSize = sizeof(UI_UBO); 
 //		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
@@ -2266,6 +2343,22 @@ namespace GLVM::core
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 hudScreenUniformBuffers[i], hudScreenUniformBuffersMemory[i]);
+
+//				memory += modelMatrixBufferSize;
+		}
+		memory = 0;
+
+		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		uiUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+		uiUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * 64; i++) {
+			memory += uiUboSize;
+		}
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 uiUniformBuffers[i], uiUniformBuffersMemory[i]);
 
 //				memory += modelMatrixBufferSize;
 		}
@@ -2591,6 +2684,47 @@ namespace GLVM::core
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = hudScreenDescriptorSets[i];
 			descriptorWrites[0].dstBinding = hudScreenUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
+
+    void CVulkanRenderer::createDescriptorSets_UI() {
+		core::vector<u32> uiBindings = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_UBO);
+ 
+		int uiUboBinding = uiBindings[0];
+		
+		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
+		
+		std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+															spotLightPipeline.descriptors[uiUboBinding].setLayout);
+		VkDescriptorSetAllocateInfo uiUboAllocInfo{};
+		uiUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		uiUboAllocInfo.descriptorPool = descriptorPool;
+		uiUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+																	  actual_size);
+		uiUboAllocInfo.pSetLayouts = uiUboLayouts.data();
+			
+		uiDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		if (vkAllocateDescriptorSets(device, &uiUboAllocInfo, uiDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = uiUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
+			modelMatrixBufferInfo.range = sizeof(UI_UBO);
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = uiDescriptorSets[i];
+			descriptorWrites[0].dstBinding = uiUboBinding;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -3398,10 +3532,7 @@ namespace GLVM::core
         vkUnmapMemory(device, hudUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset,
-									   [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
-									   [[maybe_unused]] ecs::components::health* entityOwnHudHealth, [[maybe_unused]] bool isHudExists,
-									   [[maybe_unused]] float highestY) {
+	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset) {
 		HUD_SCREEN_UBO hudUBO{};
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
@@ -3419,6 +3550,22 @@ namespace GLVM::core
 					sizeof(HUD_SCREEN_UBO), 0, &hudMatrixData);
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_SCREEN_UBO));
         vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
+	}
+
+	void CVulkanRenderer::updateUBO_UI(uint32_t currentImage, uint32_t offset) {
+		UI_UBO hudUBO{};
+		mat4 model(1.0);
+		model[0][0] = 0.5f;
+		model[1][1] = 0.5f;
+		model[2][2] = 0.0f;
+		
+		hudUBO.model = model;
+		
+		void* hudMatrixData;
+        vkMapMemory(device, uiUniformBuffersMemory[currentImage], sizeof(UI_UBO) * offset,
+					sizeof(UI_UBO), 0, &hudMatrixData);
+        memcpy(hudMatrixData, &hudUBO, sizeof(UI_UBO));
+        vkUnmapMemory(device, uiUniformBuffersMemory[currentImage]);
 	}
 	
     void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -3524,6 +3671,107 @@ namespace GLVM::core
         // }
     }
 
+    void CVulkanRenderer::uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::interface>();
+		
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = uiRenderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+
+		// cm::transform* playerTransformComponent = nullptr;
+
+		// if ( viewPositionLinkedEntities.GetSize() > 0 )
+		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
+
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+//			std::cout << "i: " << i << std::endl;
+			unsigned int uiEntity = linkedEntities[i];
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+
+			unsigned int uboIndex = i;
+			updateUBO_UI(currentFrame, uboIndex);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
+									0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
+//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+				
+			// unsigned int uboIndex = i;
+			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+
+			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
+    }
+	
     void CVulkanRenderer::hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
@@ -3534,8 +3782,7 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::health>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::crosshair>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -3580,14 +3827,12 @@ namespace GLVM::core
 		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+//			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
-//			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
-			unsigned int uiVertexId = 10;
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 
 			unsigned int uboIndex = i;
-			updateHudScreenUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
+			updateHudScreenUBO(currentFrame, uboIndex);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudScreenPipeline.pipelineLayout,
 									0, 1, &hudScreenDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -4447,6 +4692,7 @@ namespace GLVM::core
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		fontRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		uiRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};

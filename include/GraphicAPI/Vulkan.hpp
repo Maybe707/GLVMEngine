@@ -183,6 +183,8 @@ namespace GLVM::core
 		FONT_UBO,
 		FONT_ATLAS_SAMPLER,
 		HUD_SCREEN_UBO,
+		UI_UBO,
+		UI_SAMPLER,
 		MODEL_MATRIX_UBO,
 
 		LIGHT_DATA,
@@ -521,6 +523,9 @@ namespace GLVM::core
 
 		const char* vertexShaderHudScreen = "../VKshaders/hud_screen_shaders/vert_hud_screen.spv";
 		const char* fragmentShaderHudScreen = "../VKshaders/hud_screen_shaders/frag_hud_screen.spv";
+
+		const char* vertexShaderUI = "../VKshaders/ui_shaders/vert_ui.spv";
+		const char* fragmentShaderUI = "../VKshaders/ui_shaders/frag_ui.spv";
 		
         unsigned int texturePool_;
 
@@ -611,6 +616,12 @@ namespace GLVM::core
 		std::vector<VkBuffer> hudScreenUniformBuffers;
 		std::vector<VkDeviceMemory> hudScreenUniformBuffersMemory;
 		std::vector<VkFramebuffer> hudScreenSwapChainFramebuffers;
+		Pipeline uiPipeline;
+		VkRenderPass uiRenderPass;
+		std::vector<VkDescriptorSet> uiDescriptorSets;
+		std::vector<VkBuffer> uiUniformBuffers;
+		std::vector<VkDeviceMemory> uiUniformBuffersMemory;
+		std::vector<VkFramebuffer> uiSwapChainFrameBuffers;
 		
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
@@ -621,6 +632,7 @@ namespace GLVM::core
 		VkCommandPool fontCommandPool;
 		VkCommandPool hudCommandPool;
 		VkCommandPool hudScreenCommandPool;
+		VkCommandPool uiCommandPool;
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
@@ -729,6 +741,7 @@ namespace GLVM::core
 		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
 		std::vector<VkCommandBuffer> hudScreenCommandBuffers;
+		std::vector<VkCommandBuffer> uiCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
 		/// Main render pipe line sync objects
@@ -741,6 +754,11 @@ namespace GLVM::core
         std::vector<VkSemaphore> hudRenderFinishedSemaphores;
         std::vector<VkFence> hudInFlightFences;
 
+		/// UI render pipe line sync objects
+		std::vector<VkSemaphore> uiImageAvailableSemaphores;
+		std::vector<VkSemaphore> uiRenderFinishedSemaphores;
+		std::vector<VkFence> uiInFlightFences;
+		
 		/// Font render pipe line sync objects
         std::vector<VkSemaphore> fontImageAvailableSemaphores;
         std::vector<VkSemaphore> fontRenderFinishedSemaphores;
@@ -793,6 +811,7 @@ namespace GLVM::core
 		void createFontRenderPass();
 		void createHudRenderPass();
 		void createHudScreenRenderPass();
+		void createRenderPass_UI();
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
@@ -827,6 +846,7 @@ namespace GLVM::core
 		void createPointLightShadowMapDescriptorSets();
 		void createHudDescriptorSets();
 		void createHudScreenDescriptorSets();
+		void createDescriptorSets_UI();
 		void createFontRenderDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
@@ -845,11 +865,10 @@ namespace GLVM::core
 		void updateHudUBO(uint32_t currentImage, uint32_t offset,
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
-		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset,
-												 [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
-												 ecs::components::health* entityOwnHudHealth, bool isHudExists,
-												 float highestY);
+		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset);
+		void updateUBO_UI(uint32_t currentImage, uint32_t offset);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
