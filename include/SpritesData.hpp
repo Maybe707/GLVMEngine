@@ -13,5 +13,6 @@
 #include "container2.h"
 #include "container2_specular.h"
 #include "fontAtlas.h"
+#include "inventory.h"
 
 #endif

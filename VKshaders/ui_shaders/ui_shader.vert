@@ -26,22 +26,22 @@ void main()
 		);
 
 	mat4 commonScale = mat4(
-		0.2, 0.0, 0.0, 0.0,
-		0.0, 0.2, 0.0, 0.0,
-		0.0, 0.0, 0.2, 0.0,
+		2.0, 0.0, 0.0, 0.0,
+		0.0, 2.0, 0.0, 0.0,
+		0.0, 0.0, 2.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
 	mat4 scaleMatrix = mat4(
 		0.1, 0.0, 0.0, 0.0,
-		0.0, 0.352, 0.0, 0.0,
+		0.0, 0.176, 0.0, 0.0,
 		0.0, 0.0, 0.11, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
 	mat4 projectionMatrix = mat4(
 		1.0, 0.0, 0.0, 0.0,
-		0.0, -1.0, 0.0, 0.0,
+		0.0, 1.0, 0.0, 0.0,
 		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
@@ -55,5 +55,5 @@ void main()
 	
 	outFragmentTextureCoordinate = inTextureCoordinate;
 //	vec4 p = translationMatrix * commonScale * scaleMatrix * vec4(inPosition, 1.0);
-	gl_Position = projectionMatrix * translationMatrix * scaleMatrix * vec4(inPosition, 1.0);
+	gl_Position = projectionMatrix * translationMatrix * scaleMatrix* commonScale * vec4(inPosition, 1.0);
 }
