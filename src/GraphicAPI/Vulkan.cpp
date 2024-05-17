@@ -2732,6 +2732,46 @@ namespace GLVM::core
 
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
+
+		core::vector<u32> uiSamplerBindigs = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_SAMPLER);
+ 
+		int uiSamplerBinding = uiSamplerBindigs[0];
+
+		if ( initializeTextureData_.size() > 0 ) {
+			u32 DS_specular_number = 64;
+			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
+																	 fontPipeline.descriptors[1].setLayout);
+			VkDescriptorSetAllocateInfo uiSamplerUboAllocInfo{};
+			uiSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+			uiSamplerUboAllocInfo.descriptorPool = descriptorPool;
+			uiSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
+			uiSamplerUboAllocInfo.pSetLayouts = fontSamplerUboLayouts.data();
+			
+			uiSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
+			if (vkAllocateDescriptorSets(device, &uiSamplerUboAllocInfo, uiSamplerDescriptorSets.data()) != VK_SUCCESS) {
+				throw std::runtime_error("failed to allocate descriptor sets!");
+			}
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//				unsigned int textureIndex = i / 2;
+				imageInfo.imageView = textureImages[1].views[0];
+				imageInfo.sampler = textureSampler;
+				
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = uiSamplerDescriptorSets[i];
+				descriptorWrites[0].dstBinding = uiSamplerBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
+		}
 	}
 	
 	void CVulkanRenderer::createFontRenderDescriptorSets() {
@@ -3734,6 +3774,9 @@ namespace GLVM::core
 			updateUBO_UI(currentFrame, uboIndex);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 									0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
+
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
+									1, 1, &uiSamplerDescriptorSets[currentFrame], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;

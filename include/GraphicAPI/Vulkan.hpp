@@ -619,6 +619,7 @@ namespace GLVM::core
 		Pipeline uiPipeline;
 		VkRenderPass uiRenderPass;
 		std::vector<VkDescriptorSet> uiDescriptorSets;
+		std::vector<VkDescriptorSet> uiSamplerDescriptorSets;
 		std::vector<VkBuffer> uiUniformBuffers;
 		std::vector<VkDeviceMemory> uiUniformBuffersMemory;
 		std::vector<VkFramebuffer> uiSwapChainFrameBuffers;
