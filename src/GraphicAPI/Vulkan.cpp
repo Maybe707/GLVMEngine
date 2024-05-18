@@ -4739,7 +4739,9 @@ namespace GLVM::core
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		fontRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
-		uiRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		if ( isInventoryOpened )
+			uiRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
