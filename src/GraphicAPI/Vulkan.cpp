@@ -560,6 +560,7 @@ namespace GLVM::core
 				SVertex texture;
 				texture[0] = aVertexesTemp_[m][n + 6];
 				texture[1] = aVertexesTemp_[m][n + 7];
+
 				vec4 joinIndices;
 				vec4 weights;
 				if ( animationFlags[m] ) {
@@ -2756,7 +2757,7 @@ namespace GLVM::core
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 //				unsigned int textureIndex = i / 2;
-				imageInfo.imageView = textureImages[1].views[0];
+				imageInfo.imageView = textureImages[7].views[0];
 				imageInfo.sampler = textureSampler;
 				
 				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -3595,9 +3596,12 @@ namespace GLVM::core
 	void CVulkanRenderer::updateUBO_UI(uint32_t currentImage, uint32_t offset) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
-		model[0][0] = 0.5f;
-		model[1][1] = 0.5f;
-		model[2][2] = 0.0f;
+		model[0][0] = 4.0f;
+		model[1][1] = 4.0f;
+		model[2][2] = 4.0f;
+		model[3][0] = 0.5f;
+		model[3][1] = -0.2f;
+		model[3][2] = 0.3f;
 		
 		hudUBO.model = model;
 		

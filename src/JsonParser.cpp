@@ -443,12 +443,9 @@ namespace GLVM::Core
 		int texture_byte_length = (*gltf)["bufferViews"][texture_buffer_view_index]["byteLength"].value.iNumber;
 		int texture_byte_offset = (*gltf)["bufferViews"][texture_buffer_view_index]["byteOffset"].value.iNumber;
 
-		std::cout << "next object" << std::endl;
 		core::vector<float> texture_coordinates;
-		for ( int i = texture_byte_offset; i < texture_byte_offset + texture_byte_length; i += 4 ) {
-			std::cout << "texture coordinate data: " << reinterpret_cast<float &>(buffer[i]) << std::endl;
+		for ( int i = texture_byte_offset; i < texture_byte_offset + texture_byte_length; i += 4 )
 			texture_coordinates.Push(reinterpret_cast<float &>(buffer[i]));
-		}
 
 		int normals_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["NORMAL"].value.iNumber;
 		int normals_buffer_view_index = (*gltf)["accessors"][normals_index]["bufferView"].value.iNumber;
