@@ -7,6 +7,7 @@
 #define COLLIDER_COMPONENT
 
 #include "Vector.hpp"
+#include <vector>
 
 namespace GLVM::ecs::components
 {

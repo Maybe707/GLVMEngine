@@ -18,6 +18,7 @@
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
 #include "Systems/GUISystem.hpp"
+#include "Systems/ItemSystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
@@ -76,6 +77,7 @@ namespace GLVM::core
 		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
 		damageSystem             = new ecs::DamageSystem();
 		enemySytem               = new ecs::EnemySystem();
+		itemSystem               = new ecs::ItemSystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -89,6 +91,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
+		pSystem_Manager->ActivateSystem(itemSystem);
 
 		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		sound_thread.detach();

@@ -9,6 +9,7 @@
 #include "Components/HealthComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
+#include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -115,8 +116,9 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 
 	Entity inventory = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::interface>(inventory);
+	ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::inventory>(inventory);
 	ComponentManager->GetComponent<cm::mesh>(inventory)->handle = inventory_Handle_GLTF;
+	ComponentManager->GetComponent<cm::inventory>(inventory)->entityOwner = uiPlayer;
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
 

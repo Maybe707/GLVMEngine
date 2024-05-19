@@ -7,6 +7,7 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -3725,7 +3726,7 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::interface>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::inventory>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
