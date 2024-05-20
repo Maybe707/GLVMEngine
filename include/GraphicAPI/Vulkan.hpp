@@ -185,6 +185,8 @@ namespace GLVM::core
 		HUD_SCREEN_UBO,
 		UI_UBO,
 		UI_SAMPLER,
+		UI_ICONS_UBO,
+		UI_ICONS_SAMPLER,
 		MODEL_MATRIX_UBO,
 
 		LIGHT_DATA,
@@ -526,6 +528,9 @@ namespace GLVM::core
 
 		const char* vertexShaderUI = "../VKshaders/ui_shaders/vert_ui.spv";
 		const char* fragmentShaderUI = "../VKshaders/ui_shaders/frag_ui.spv";
+
+		const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
+		const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
 		
         unsigned int texturePool_;
 
@@ -623,6 +628,13 @@ namespace GLVM::core
 		std::vector<VkBuffer> uiUniformBuffers;
 		std::vector<VkDeviceMemory> uiUniformBuffersMemory;
 		std::vector<VkFramebuffer> uiSwapChainFrameBuffers;
+		Pipeline uiIconsPipeline;
+		VkRenderPass uiIconsRenderPass;
+		std::vector<VkDescriptorSet> uiIconsDescriptorSets;
+		std::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
+		std::vector<VkBuffer> uiIconsUniformBuffers;
+		std::vector<VkDeviceMemory> uiIconsUniformBuffersMemory;
+		std::vector<VkFramebuffer> uiIconsSwapChainFrameBuffers;
 		
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;
@@ -634,6 +646,7 @@ namespace GLVM::core
 		VkCommandPool hudCommandPool;
 		VkCommandPool hudScreenCommandPool;
 		VkCommandPool uiCommandPool;
+		VkCommandPool uiIconsCommandPool;
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
@@ -813,6 +826,7 @@ namespace GLVM::core
 		void createHudRenderPass();
 		void createHudScreenRenderPass();
 		void createRenderPass_UI();
+		void createRenderPassIcons_UI();
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
@@ -848,6 +862,7 @@ namespace GLVM::core
 		void createHudDescriptorSets();
 		void createHudScreenDescriptorSets();
 		void createDescriptorSets_UI();
+		void createDescriptorSetsIcons_UI();
 		void createFontRenderDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
@@ -868,8 +883,10 @@ namespace GLVM::core
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset);
 		void updateUBO_UI(uint32_t currentImage, uint32_t offset);
+		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
