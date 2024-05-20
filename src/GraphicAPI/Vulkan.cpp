@@ -2621,7 +2621,7 @@ namespace GLVM::core
 		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
 		
 		std::vector<VkDescriptorSetLayout> hudUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
-															spotLightPipeline.descriptors[hudUboBinding].setLayout);
+															hudPipeline.descriptors[hudUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo hudUboAllocInfo{};
 		hudUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		hudUboAllocInfo.descriptorPool = descriptorPool;
@@ -2662,7 +2662,7 @@ namespace GLVM::core
 		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
 		
 		std::vector<VkDescriptorSetLayout> hudScreenUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
-															spotLightPipeline.descriptors[hudScreenUboBinding].setLayout);
+															hudScreenPipeline.descriptors[hudScreenUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo hudScreenUboAllocInfo{};
 		hudScreenUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		hudScreenUboAllocInfo.descriptorPool = descriptorPool;
@@ -2703,7 +2703,7 @@ namespace GLVM::core
 		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
 		
 		std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
-															spotLightPipeline.descriptors[uiUboBinding].setLayout);
+															uiPipeline.descriptors[uiUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo uiUboAllocInfo{};
 		uiUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		uiUboAllocInfo.descriptorPool = descriptorPool;
@@ -2742,7 +2742,7 @@ namespace GLVM::core
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_specular_number = 64;
 			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																	 fontPipeline.descriptors[1].setLayout);
+																	 uiPipeline.descriptors[1].setLayout);
 			VkDescriptorSetAllocateInfo uiSamplerUboAllocInfo{};
 			uiSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 			uiSamplerUboAllocInfo.descriptorPool = descriptorPool;
@@ -2784,7 +2784,7 @@ namespace GLVM::core
 		constexpr u32 font_ubo_ds = 64;
 		
 		std::vector<VkDescriptorSetLayout> fontUboLayouts(MAX_FRAMES_IN_FLIGHT * font_ubo_ds,
-															spotLightPipeline.descriptors[0].setLayout);
+															fontPipeline.descriptors[0].setLayout);
 		VkDescriptorSetAllocateInfo fontUboAllocInfo{};
 		fontUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		fontUboAllocInfo.descriptorPool = descriptorPool;
