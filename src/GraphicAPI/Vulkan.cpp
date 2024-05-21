@@ -3783,12 +3783,21 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset) {
 		UI_UBO hudUBO{};
+
+		unsigned int row_length = 8;
+		unsigned int x_offset = offset % row_length;
+		unsigned int y_offset = offset / row_length;
+		float x_base_offset = 0.152f;
+		float y_base_offset = -0.815;
+		float x_result_offset = x_base_offset + x_offset * 0.1f;
+		float y_result_offset = y_base_offset + y_offset * 0.1f;
+		
 		mat4 model(1.0);
-		model[0][0] = 4.0f;
-		model[1][1] = 4.0f;
-		model[2][2] = 4.0f;
-		model[3][0] = 0.5f;
-		model[3][1] = -0.2f;
+		model[0][0] = 0.43f;
+		model[1][1] = 0.43f;
+		model[2][2] = 0.43f;
+		model[3][0] = x_result_offset;
+		model[3][1] = y_result_offset;
 		model[3][2] = 0.3f;
 		
 		hudUBO.model = model;
@@ -4070,7 +4079,7 @@ namespace GLVM::core
 				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
 				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
 
-				unsigned int uboIndex = i;
+				unsigned int uboIndex = j;
 				updateUBO_IconsUI(currentFrame, uboIndex);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);

@@ -131,6 +131,16 @@ int main()
 	cm::material* materialTestItem  = ComponentManager->GetComponent<cm::material>(testItem);
 	*materialTestItem  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
+
+ 	Entity testItem2 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody>(testItem2);
+	*ComponentManager->GetComponent<cm::transform>(testItem2) = { .tPosition = { 3.0f, 15.0f, 13.0f },
+		.yaw = 0.0f, .pitch = 0.0f, .fScale = 2.0f, .gltf = false };
+	*ComponentManager->GetComponent<cm::rigidBody>(testItem2) = { .fMass_ = 2.0f };
+    ComponentManager->GetComponent<cm::mesh>(testItem2)->handle = icoSphereHandle_OBJ;
+	cm::material* materialTestItem2  = ComponentManager->GetComponent<cm::material>(testItem2);
+	*materialTestItem2  = { .diffuseTextureID_ = witchTexturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+		.shininess = 128.0f * 0.078125f };
 	
 	// cm::material* materialInventory = ComponentManager->GetComponent<cm::material>(inventory);
 	// *materialInventory = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
