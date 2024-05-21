@@ -3790,7 +3790,7 @@ namespace GLVM::core
 		float x_base_offset = 0.152f;
 		float y_base_offset = -0.815;
 		float x_result_offset = x_base_offset + x_offset * 0.1f;
-		float y_result_offset = y_base_offset + y_offset * 0.1f;
+		float y_result_offset = y_base_offset + y_offset * 0.18f;
 		
 		mat4 model(1.0);
 		model[0][0] = 0.43f;
