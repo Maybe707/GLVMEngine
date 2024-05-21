@@ -278,6 +278,7 @@ namespace GLVM::core
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
 			projectileSystem->soundEngine             = soundEngine;
+			projectileSystem->isInventoryOpened       = vulkanRenderer->isInventoryOpened;
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;

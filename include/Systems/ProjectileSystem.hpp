@@ -38,6 +38,7 @@ namespace GLVM::ecs
 		core::Sound::ISoundEngine* soundEngine;
         float                      projectileCooldown = 2.0f; 
 		float                      deltaFrameTime;
+		bool                       isInventoryOpened;
 
         CProjectileSystem(core::CStack& inputStack);
         void Update() override;
