@@ -4017,7 +4017,7 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::inventory>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -4063,46 +4063,50 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 //			std::cout << "i: " << i << std::endl;
-			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-			unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(uiEntity)->diffuseTextureID_.id;
+			unsigned int entityInventoryContaining = linkedEntities[i];
+			cm::inventory* inventory = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
+			for ( unsigned int j = 0; j < inventory->containedItems; ++j ) {
+				unsigned int entityItemContaining = inventory->items[j];
+				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
+				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
 
-			unsigned int uboIndex = i;
-			updateUBO_IconsUI(currentFrame, uboIndex);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-									0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
+				unsigned int uboIndex = i;
+				updateUBO_IconsUI(currentFrame, uboIndex);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-									1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+										1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+				// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+				// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
 //			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
-			// unsigned int uboIndex = i;
-			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+				// unsigned int uboIndex = i;
+				// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+				// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+				// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+				// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
 
-			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-			VkDeviceSize offsets[] = {0};
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+				VkDeviceSize offsets[] = {0};
+				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+				// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			}
 		}
 
         vkCmdEndRenderPass(commandBuffer);

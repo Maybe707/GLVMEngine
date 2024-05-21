@@ -5,7 +5,7 @@
 namespace GLVM::ecs::components
 {
 	struct inventory {
-		unsigned int array[64];
+		unsigned int items[64];
 		unsigned int containedItems = 0;
 		unsigned int entityOwner;
 	};

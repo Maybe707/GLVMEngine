@@ -7,7 +7,7 @@ namespace GLVM::ecs
         ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 
 		core::vector<Entity> inventoryLinkedEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		core::vector<Entity> linkedEntities  = componentManager->collectLinkedEntities<cm::item, cm::collider>();
+		core::vector<Entity> linkedEntities  = componentManager->collectLinkedEntities<cm::item, cm::collider, cm::transform, cm::rigidBody>();
 
 		for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
 			unsigned int inventoryEntity = inventoryLinkedEntities[m];
@@ -18,25 +18,27 @@ namespace GLVM::ecs
 				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
 
 				for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
-					std::cout << "size: " << itemColliderComponent->colliders.GetSize() << std::endl;
-					std::cout << "j: " << j << std::endl;
+					// std::cout << "size: " << itemColliderComponent->colliders.GetSize() << std::endl;
+					// std::cout << "j: " << j << std::endl;
 
-					// for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n )
-					// 	std::cout << "entity: " << itemColliderComponent->colliders[n] << std::endl;
+					// // for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n )
+					// // 	std::cout << "entity: " << itemColliderComponent->colliders[n] << std::endl;
 
-					if ( inventoryComponent == nullptr ) {
-						std::cout << "nullptr " << std::endl;
-						continue;
-					}
+					// if ( inventoryComponent == nullptr ) {
+					// 	std::cout << "nullptr " << std::endl;
+					// 	continue;
+					// }
 					
 					if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner ) {
 						unsigned int nextItemSlot = inventoryComponent->containedItems;
-						inventoryComponent->array[nextItemSlot] = itemEntity;
-						++nextItemSlot;
-						componentManager->RemoveComponent<cm::mesh>(itemEntity);
+						if ( nextItemSlot < 64 ) {
+							inventoryComponent->items[nextItemSlot] = itemEntity;
+							++inventoryComponent->containedItems;
+//						componentManager->RemoveComponent<cm::mesh>(itemEntity);
 //						componentManager->RemoveComponent<cm::collider>(itemEntity);
-						componentManager->RemoveComponent<cm::transform>(itemEntity);
-						componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
+							componentManager->RemoveComponent<cm::transform>(itemEntity);
+							componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
+						}
 					}
 				}
 			}
