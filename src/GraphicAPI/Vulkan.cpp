@@ -5322,7 +5322,8 @@ namespace GLVM::core
 
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::mesh>();
+																						   cm::mesh,
+																						   cm::actor>();
 
 		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
 			VkClearValue shadowMapClearValues[1];
@@ -5407,7 +5408,8 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::mesh>();
+																						   cm::mesh,
+																						   cm::actor>();
 
 		
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -5495,7 +5497,8 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::mesh>();
+																						   cm::mesh,
+																						   cm::actor>();
 		
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																						  cm::pointLight,

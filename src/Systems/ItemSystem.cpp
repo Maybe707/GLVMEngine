@@ -7,7 +7,8 @@ namespace GLVM::ecs
         ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 
 		core::vector<Entity> inventoryLinkedEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		core::vector<Entity> linkedEntities  = componentManager->collectLinkedEntities<cm::item, cm::collider, cm::transform, cm::rigidBody>();
+		core::vector<Entity> linkedEntities  = componentManager->collectLinkedEntities<cm::item, cm::collider, cm::transform,
+																					   cm::rigidBody, cm::actor>();
 
 		for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
 			unsigned int inventoryEntity = inventoryLinkedEntities[m];
