@@ -17,6 +17,7 @@ namespace GLVM::ecs::components
         bool bGround_Collision_ = false;
 		bool roofCollision = false;
         bool bWall_Collision_ = false;
+		bool itemDrag = false;
 		core::vector<unsigned int> colliders;
 	};
 }

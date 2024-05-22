@@ -282,6 +282,8 @@ namespace GLVM::core
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
+			itemSystem->inputStack                    = &Input_Stack_;
+			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->draw();

@@ -6,6 +6,7 @@
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/ActorComponent.hpp"
+#include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/InventoryComponent.hpp"
@@ -3788,7 +3789,8 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset,
-											ecs::components::transform* itemTransfromComponent) {
+											ecs::components::transform* itemTransfromComponent,
+											ecs::components::collider* itemColliderComponent) {
 		UI_UBO hudUBO{};
 
 		unsigned int row_length = 8;
@@ -3801,15 +3803,21 @@ namespace GLVM::core
 		float itemScale = 0.43f;
 
 		itemTransfromComponent->fScale = itemScale;
-		itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
+		if ( !itemColliderComponent->itemDrag ) {
+			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
+		} else {
+			itemScale = 0.53f;
+			itemColliderComponent->itemDrag = false;
+		}
 		
 		mat4 model(1.0);
 		model[0][0] = itemScale;
 		model[1][1] = itemScale;
 		model[2][2] = itemScale;
-		model[3][0] = x_result_offset;
-		model[3][1] = y_result_offset;
+		model[3][0] = itemTransfromComponent->tPosition[0];
+		model[3][1] = itemTransfromComponent->tPosition[1];
 		model[3][2] = 0.3f;
+
 		
 		hudUBO.model = model;
 		
@@ -4090,9 +4098,10 @@ namespace GLVM::core
 				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
 				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 
 				unsigned int uboIndex = j;
-				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent);
+				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent, itemColliderComponent);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 

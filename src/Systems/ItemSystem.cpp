@@ -1,4 +1,7 @@
 #include "Systems/ItemSystem.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/CrosshairComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace GLVM::ecs
 {
@@ -41,6 +44,31 @@ namespace GLVM::ecs
 							componentManager->RemoveComponent<cm::actor>(itemEntity);
 							componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
 						}
+					}
+				}
+			}
+		}
+
+		if(isInventoryOpened && inputStack->SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
+			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+
+			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
+			
+			for ( unsigned int i = 0; i < linkedInventoryEntities.GetSize(); ++i ) {
+				unsigned int entityInventoryContaining = linkedInventoryEntities[i];
+				cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
+
+				for ( unsigned int j = 0; j < inventoryComponent->containedItems; ++j ) {
+					unsigned int entityItemContaining = inventoryComponent->items[j];
+					cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
+					cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+					
+					if ( itemColliderComponent->bWall_Collision_ ) {
+						std::cout << "item drag collisiton detected" << std::endl;
+						itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
+						itemColliderComponent->itemDrag = true;
+						std::cout << "item position: " << itemTransformComponent->tPosition << std::endl;
 					}
 				}
 			}

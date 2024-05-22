@@ -883,7 +883,8 @@ namespace GLVM::core
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI(uint32_t currentImage, uint32_t offset);
-		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset, ecs::components::transform* itemTransfromComponent);
+		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset, ecs::components::transform* itemTransfromComponent,
+							   ecs::components::collider* itemColliderComponent);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

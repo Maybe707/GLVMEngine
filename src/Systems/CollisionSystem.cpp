@@ -190,10 +190,10 @@ namespace GLVM::ecs
 					itemScale /= 2;
 				}
 
-				std::cout << "crosshair pos: " << "x: " << crosshairPosition[0] << " y: " <<
-					crosshairPosition[1] << " z: " << crosshairPosition[2] << std::endl;
-				std::cout << "item pos: " << "x: " << itemPosition[0] << " y: " <<
-					itemPosition[1] << " z: " << itemPosition[2] << std::endl;
+				// std::cout << "crosshair pos: " << "x: " << crosshairPosition[0] << " y: " <<
+				// 	crosshairPosition[1] << " z: " << crosshairPosition[2] << std::endl;
+				// std::cout << "item pos: " << "x: " << itemPosition[0] << " y: " <<
+				// 	itemPosition[1] << " z: " << itemPosition[2] << std::endl;
 
 				// std::cout << "crosshair scale: " << crosshairScale << std::endl;
 				// std::cout << "item scale: " << itemScale << std::endl;
@@ -202,9 +202,12 @@ namespace GLVM::ecs
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
 													crosshairScale / 25.0f, itemScale / 7.0f);
 				if ( squareColliderFlag ) {
-					std::cout << "collision" << std::endl;
+//					std::cout << "collision" << std::endl;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityInventoryContaining);
+				} else {
+					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
+					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 				}
 			}
 		}

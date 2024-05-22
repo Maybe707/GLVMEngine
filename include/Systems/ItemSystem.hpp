@@ -3,6 +3,7 @@
 
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
+#include "EventsStack.hpp"
 #include "ISystem.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -19,6 +20,9 @@ namespace GLVM::ecs
 	{
 	public:
 		void Update();
+
+		core::CStack* inputStack;
+		bool          isInventoryOpened;
 	};
 } // namespace GLVM::ecs
 
