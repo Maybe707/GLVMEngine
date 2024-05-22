@@ -11,6 +11,7 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/ColliderComponent.hpp"
+#include "Components/ActorComponent.hpp"
 
 namespace GLVM::ecs
 {

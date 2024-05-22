@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/ActorComponent.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
@@ -115,7 +116,7 @@ namespace GLVM::ecs
         ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
 															  cm::transform, cm::material,
 															  cm::projectile, cm::pointLight,
-															  cm::damage>(uiEntity_Projectile);
+															  cm::damage, cm::actor>(uiEntity_Projectile);
 
         core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";

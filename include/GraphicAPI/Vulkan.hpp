@@ -881,9 +881,9 @@ namespace GLVM::core
 		void updateHudUBO(uint32_t currentImage, uint32_t offset,
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
-		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset);
+		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI(uint32_t currentImage, uint32_t offset);
-		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset);
+		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset, ecs::components::transform* itemTransfromComponent);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

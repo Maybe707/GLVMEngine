@@ -39,6 +39,8 @@ namespace GLVM::ecs
         bool Gravity(components::transform& _transform_Component);
 		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                 float backtrackingScale, float comparedScale);
+		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
+							float backtrackingScale, float comparedScale);
 		void Update() override;
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 							 float backtrackingScale, float comparedScale);

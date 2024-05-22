@@ -15,6 +15,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ItemComponent.hpp"
+#include "Components/ActorComponent.hpp"
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 #include "Texture.hpp"
@@ -59,7 +60,7 @@ int main()
 	
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
-		cm::transform, cm::rigidBody, cm::health>(uiPlayer);
+		cm::transform, cm::rigidBody, cm::health, cm::actor>(uiPlayer);
 	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .tPosition = { 5.7f, 130.0f, 15.0f }, .fScale = 1.1f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
@@ -72,7 +73,7 @@ int main()
 
 	
 	Entity plain0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider>(plain0);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider, cm::actor>(plain0);
 	*ComponentManager->GetComponent<cm::transform>(plain0) = { .tPosition = { 0.0f, -60.2f, 0.0f }, .yaw = 0.0f, .pitch = 0.0f, .fScale = 60.2f, .gltf = true };
     ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
 	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
@@ -81,7 +82,7 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state>(uiWitch);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 100.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
@@ -100,7 +101,7 @@ int main()
 	}
 
  	Entity cube0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform>(cube0);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::actor>(cube0);
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .tPosition = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
     ComponentManager->GetComponent<cm::mesh>(cube0)->handle = cubeHandle_OBJ;
@@ -109,7 +110,7 @@ int main()
 		.shininess = 128.0f * 0.078125f };
 
 	Entity crosshair = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::crosshair>(crosshair);
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::crosshair, cm::transform>(crosshair);
 	ComponentManager->GetComponent<cm::mesh>(crosshair)->handle = crosshair_001_Handle_GLTF;
 	cm::material* materialCorsshair = ComponentManager->GetComponent<cm::material>(crosshair);
 	*materialCorsshair = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
@@ -124,7 +125,7 @@ int main()
 
 	for ( unsigned int i = 0; i < 20; ++i ) {
 		Entity testItem = EntityManager->CreateEntity();
-		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody>(testItem);
+		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 2.0f },
 			.yaw = 0.0f, .pitch = 0.0f, .fScale = 2.0f, .gltf = false };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };

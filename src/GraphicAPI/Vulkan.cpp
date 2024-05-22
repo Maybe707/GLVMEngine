@@ -5,6 +5,7 @@
 
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
+#include "Components/ActorComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/InventoryComponent.hpp"
@@ -3742,10 +3743,15 @@ namespace GLVM::core
         vkUnmapMemory(device, hudUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset) {
+	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform) {
 		HUD_SCREEN_UBO hudUBO{};
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
+		cursorTransform->tPosition[0] = hud_screen_x;
+		cursorTransform->tPosition[1] = -hud_screen_y;
+
+//		std::cout << "x: " << cursorTransform->tPosition[0] << " y: " << cursorTransform->tPosition << std::endl;
+		
 		if ( !isInventoryOpened ) {
 			hudUBO.position = defaultPosition;
 		} else {
@@ -3781,7 +3787,8 @@ namespace GLVM::core
         vkUnmapMemory(device, uiUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset) {
+	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset,
+											ecs::components::transform* itemTransfromComponent) {
 		UI_UBO hudUBO{};
 
 		unsigned int row_length = 8;
@@ -3791,11 +3798,15 @@ namespace GLVM::core
 		float y_base_offset = -0.815;
 		float x_result_offset = x_base_offset + x_offset * 0.1f;
 		float y_result_offset = y_base_offset + y_offset * 0.18f;
+		float itemScale = 0.43f;
+
+		itemTransfromComponent->fScale = itemScale;
+		itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
 		
 		mat4 model(1.0);
-		model[0][0] = 0.43f;
-		model[1][1] = 0.43f;
-		model[2][2] = 0.43f;
+		model[0][0] = itemScale;
+		model[1][1] = itemScale;
+		model[2][2] = itemScale;
 		model[3][0] = x_result_offset;
 		model[3][1] = y_result_offset;
 		model[3][2] = 0.3f;
@@ -4078,9 +4089,10 @@ namespace GLVM::core
 				unsigned int entityItemContaining = inventory->items[j];
 				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
 				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
+				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
 				unsigned int uboIndex = j;
-				updateUBO_IconsUI(currentFrame, uboIndex);
+				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 
@@ -4135,7 +4147,7 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::crosshair>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -4182,10 +4194,11 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
+			cm::transform* cursorTransform = componentManager->GetComponent<ecs::components::transform>(uiEntity);
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 
 			unsigned int uboIndex = i;
-			updateHudScreenUBO(currentFrame, uboIndex);
+			updateHudScreenUBO(currentFrame, uboIndex, cursorTransform);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudScreenPipeline.pipelineLayout,
 									0, 1, &hudScreenDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -4446,7 +4459,8 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
-																						   cm::mesh>();
+																						   cm::mesh,
+																						   cm::actor>();
 		
 		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		

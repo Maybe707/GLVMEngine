@@ -36,7 +36,8 @@ namespace GLVM::ecs
 							++inventoryComponent->containedItems;
 //						componentManager->RemoveComponent<cm::mesh>(itemEntity);
 //						componentManager->RemoveComponent<cm::collider>(itemEntity);
-							componentManager->RemoveComponent<cm::transform>(itemEntity);
+//							componentManager->RemoveComponent<cm::transform>(itemEntity);
+							componentManager->RemoveComponent<cm::actor>(itemEntity);
 							componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
 						}
 					}
