@@ -28,6 +28,9 @@ namespace GLVM::ecs
         
 		float fDelta_Time_;
 		float gravity;
+		bool isInventoryOpened;
+		bool isItemDraged;
+		bool isLeftMouseButtonPressed;
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}

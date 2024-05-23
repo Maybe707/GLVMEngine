@@ -247,11 +247,18 @@ namespace GLVM::core
 			vulkanRenderer->Window.ClearDisplay();
              
 			vulkanRenderer->Window.HandleEvent(g_eEvent);
+//			std::cout << "left mouse released flag" << g_eEvent.isItemDraged << std::endl;			
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
 				bGame_Loop_Active = false;
 			}
-			
+
+			if((Input_Stack_.SearchElement(EEvents::eMOUSE_LEFT_BUTTON)) == EEvents::eMOUSE_LEFT_BUTTON) {
+				isLeftMouseButtonPressed = true;
+			} else {
+				isLeftMouseButtonPressed = false;
+			}
+
 			if((Input_Stack_.SearchElement(EEvents::eINVENTORY)) == EEvents::eINVENTORY) {
 				vulkanRenderer->isInventoryOpened = !vulkanRenderer->isInventoryOpened;
 				Input_Stack_.Remove(EEvents::eINVENTORY);
@@ -274,6 +281,9 @@ namespace GLVM::core
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
+			collisionSystem->isInventoryOpened        = vulkanRenderer->isInventoryOpened;
+			collisionSystem->isItemDraged             = g_eEvent.isItemDraged;
+			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
@@ -284,6 +294,7 @@ namespace GLVM::core
 			physicsSystem->gravity                    = gravity;
 			itemSystem->inputStack                    = &Input_Stack_;
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
+			itemSystem->isItemDraged                  = g_eEvent.isItemDraged;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->draw();

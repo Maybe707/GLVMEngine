@@ -501,6 +501,7 @@ namespace GLVM::core
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 		bool isInventoryOpened = false;
+		bool isItemDraged = false;
 		vec3 forward;
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;

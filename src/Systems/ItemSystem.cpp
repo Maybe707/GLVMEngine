@@ -49,7 +49,7 @@ namespace GLVM::ecs
 			}
 		}
 
-		if(isInventoryOpened && inputStack->SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
+		if(isInventoryOpened) {
 			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 
@@ -63,13 +63,17 @@ namespace GLVM::ecs
 					unsigned int entityItemContaining = inventoryComponent->items[j];
 					cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 					cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+
+					if ( itemColliderComponent->bWall_Collision_ && !isItemDraged ) {
+						itemColliderComponent->itemDrag = false;
+					}
 					
-					if ( itemColliderComponent->bWall_Collision_ ) {
-						std::cout << "item drag collisiton detected" << std::endl;
+					if ( itemColliderComponent->bWall_Collision_ && isItemDraged ) {
+//						std::cout << "item drag collisiton detected" << std::endl;
 						itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
 						itemColliderComponent->itemDrag = true;
-						std::cout << "item position: " << itemTransformComponent->tPosition << std::endl;
-					}
+//						std::cout << "item position: " << itemTransformComponent->tPosition << std::endl;
+					} 
 				}
 			}
 		}

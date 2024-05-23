@@ -156,7 +156,7 @@ namespace GLVM::core
 			}
 			case XCB_BUTTON_PRESS: {
 				xcb_button_press_event_t *expose_event = (xcb_button_press_event_t *)generic_event;
-				print_modifiers(expose_event->state);
+//				print_modifiers(expose_event->state);
 
 				switch (expose_event->detail) {
 				case 1:
@@ -183,11 +183,12 @@ namespace GLVM::core
 			}
 			case XCB_BUTTON_RELEASE: {
 				xcb_button_release_event_t *expose_event = (xcb_button_release_event_t *)generic_event;
-				print_modifiers(expose_event->state);
+//				print_modifiers(expose_event->state);
 
 				switch (expose_event->detail) {
 				case 1:
 					_Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
+					_Event.isItemDraged = !_Event.isItemDraged;
 					// printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
 					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
@@ -246,7 +247,7 @@ namespace GLVM::core
 //				xcb_keycode_t key_code = expose_event->detail;
 //				std::cout << "Detail: " << xcb_key_press_lookup_keysym(key_symbols, expose_event, 0) << std::endl;
 				xcb_keysym_t keysym = xcb_key_press_lookup_keysym(key_symbols, expose_event, 0);
-				std::cout << "keysym: " << keysym << std::endl;
+//				std::cout << "keysym: " << keysym << std::endl;
 				
 				switch(keysym)
 					{

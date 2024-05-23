@@ -78,6 +78,8 @@ namespace GLVM::core
 		void SetNextEvent(EEvents _eEvent);
 		EEvents GetNextEvent();
 		void SetLastEvent(CStack _Stack);
+
+		bool isItemDraged;
     };
 
 

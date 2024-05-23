@@ -23,6 +23,7 @@ namespace GLVM::ecs
 
 		core::CStack* inputStack;
 		bool          isInventoryOpened;
+		bool          isItemDraged;
 	};
 } // namespace GLVM::ecs
 

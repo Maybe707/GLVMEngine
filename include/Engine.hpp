@@ -53,6 +53,7 @@ namespace GLVM::core
 		float                deltaFrameTime;
 		float                gravity;
 		CStack               Input_Stack_;
+		bool                 isLeftMouseButtonPressed;
 		std::vector<ecs::Texture> textureVector;
 		core::vector<ecs::TextureHandle> textureHandlers;
 		std::vector<const char*> pathsArray_;
