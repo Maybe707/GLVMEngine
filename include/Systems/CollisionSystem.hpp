@@ -31,6 +31,7 @@ namespace GLVM::ecs
 		bool isInventoryOpened;
 		bool isItemDraged;
 		bool isLeftMouseButtonPressed;
+		bool* isLeftMouseButtonReleased;
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}

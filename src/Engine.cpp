@@ -284,6 +284,7 @@ namespace GLVM::core
 			collisionSystem->isInventoryOpened        = vulkanRenderer->isInventoryOpened;
 			collisionSystem->isItemDraged             = itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
+			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;

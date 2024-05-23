@@ -79,7 +79,7 @@ namespace GLVM::core
 		EEvents GetNextEvent();
 		void SetLastEvent(CStack _Stack);
 
-		bool isLeftMouseButtonReleased;
+		bool isLeftMouseButtonReleased = true;
     };
 
 

@@ -147,8 +147,9 @@ namespace GLVM::ecs
                 }
 			}
 		}
-
-		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed ) {
+		std::cout << "lmb: " << isLeftMouseButtonPressed << std::endl;
+		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+			*isLeftMouseButtonReleased = false;
 			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 			vec3 crosshairPosition;

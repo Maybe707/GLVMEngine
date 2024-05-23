@@ -64,7 +64,7 @@ namespace GLVM::ecs
 					cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 					cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
-					if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed ) {
+					if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed && itemColliderComponent->bWall_Collision_ ) {
 						isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
 						itemColliderComponent->itemDrag = false;
