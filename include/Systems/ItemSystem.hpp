@@ -24,6 +24,8 @@ namespace GLVM::ecs
 		core::CStack* inputStack;
 		bool          isInventoryOpened;
 		bool          isItemDraged;
+		bool*         isLeftMouseButtonReleased;
+		bool          isLeftMouseButtonPressed;
 	};
 } // namespace GLVM::ecs
 

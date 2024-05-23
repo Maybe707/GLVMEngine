@@ -64,14 +64,21 @@ namespace GLVM::ecs
 					cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 					cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
-					if ( itemColliderComponent->bWall_Collision_ && !isItemDraged ) {
+					if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed ) {
+						isItemDraged = false;
+						*isLeftMouseButtonReleased = false;
 						itemColliderComponent->itemDrag = false;
+						itemColliderComponent->bWall_Collision_ = false;
+						std::cout << "first" << std::endl;
+						return;
 					}
 					
-					if ( itemColliderComponent->bWall_Collision_ && isItemDraged ) {
+					if ( itemColliderComponent->bWall_Collision_ ) {
 //						std::cout << "item drag collisiton detected" << std::endl;
 						itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
 						itemColliderComponent->itemDrag = true;
+						isItemDraged = true;
+						std::cout << "second" << std::endl;
 //						std::cout << "item position: " << itemTransformComponent->tPosition << std::endl;
 					} 
 				}

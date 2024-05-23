@@ -282,7 +282,7 @@ namespace GLVM::core
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
 			collisionSystem->isInventoryOpened        = vulkanRenderer->isInventoryOpened;
-			collisionSystem->isItemDraged             = g_eEvent.isItemDraged;
+			collisionSystem->isItemDraged             = itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
@@ -294,7 +294,8 @@ namespace GLVM::core
 			physicsSystem->gravity                    = gravity;
 			itemSystem->inputStack                    = &Input_Stack_;
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
-			itemSystem->isItemDraged                  = g_eEvent.isItemDraged;
+			itemSystem->isLeftMouseButtonReleased     = &g_eEvent.isLeftMouseButtonReleased;
+			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->draw();

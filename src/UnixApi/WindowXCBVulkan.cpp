@@ -188,7 +188,7 @@ namespace GLVM::core
 				switch (expose_event->detail) {
 				case 1:
 					_Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
-					_Event.isItemDraged = !_Event.isItemDraged;
+					_Event.isLeftMouseButtonReleased = true;
 					// printf ("Button %d released in window %i, at coordinates (%d,%d)\n",
 					// 		expose_event->detail, expose_event->event, expose_event->event_x, expose_event->event_y);
 					break;
