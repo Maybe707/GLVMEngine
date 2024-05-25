@@ -5511,7 +5511,8 @@ namespace GLVM::core
 		
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																						  cm::pointLight,
-																						  cm::mesh>();
+																						  cm::mesh,
+																						  cm::actor>();
 
 		VkDebugUtilsLabelEXT label;
 		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;

@@ -88,7 +88,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
 		pSystem_Manager->ActivateSystem(enemySytem);
-//		pSystem_Manager->ActivateSystem(collisionSystem);
+		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
