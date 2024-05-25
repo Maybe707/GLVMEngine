@@ -106,23 +106,23 @@ namespace GLVM::ecs
 				// }
             }
         }
-		// FIXME: NO NEED TO HAVE SPECIAL FIELD FOR GRAVITY FRAME MOVEMENT
-        for(unsigned int n = 0; n < componentManager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
-//            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
-			int iEntity_refRigidBody = (*componentManager->GetEntityContainer<cm::rigidBody>())[n];
-//            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
-			cm::transform* rTransform_Component = componentManager->GetComponent<cm::transform>(iEntity_refRigidBody);
-			cm::rigidBody* rigidBodyComponennt = componentManager->GetComponent<cm::rigidBody>(iEntity_refRigidBody);
-			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
-			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
-			rTransform_Component->GravityAccumulator += deltaFrameTime;
-			float gravity = 9.8f * rTransform_Component->GravityAccumulator
-				* rigidBodyComponennt->fMass_ * 0.0005;
-			if ( gravity > 0.2f )
-				gravity = 0.2;
+// 		// FIXME: NO NEED TO HAVE SPECIAL FIELD FOR GRAVITY FRAME MOVEMENT
+//         for(unsigned int n = 0; n < componentManager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
+// //            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
+// 			int iEntity_refRigidBody = (*componentManager->GetEntityContainer<cm::rigidBody>())[n];
+// //            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
+// 			cm::transform* rTransform_Component = componentManager->GetComponent<cm::transform>(iEntity_refRigidBody);
+// 			cm::rigidBody* rigidBodyComponennt = componentManager->GetComponent<cm::rigidBody>(iEntity_refRigidBody);
+// 			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
+// 			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
+// 			rTransform_Component->GravityAccumulator += deltaFrameTime;
+// 			float gravity = 9.8f * rTransform_Component->GravityAccumulator
+// 				* rigidBodyComponennt->fMass_ * 0.0005;
+// 			if ( gravity > 0.2f )
+// 				gravity = 0.2;
 
-			moveComponent->gravity[1] -= gravity;
-        }
+// 			moveComponent->gravity[1] -= gravity;
+//         }
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {

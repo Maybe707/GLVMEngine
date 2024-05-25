@@ -542,6 +542,7 @@ namespace GLVM::core
 			if ( next_generic_event != NULL ) {
 
 				*generic_event = *next_generic_event;
+				free(next_generic_event);
 				next_generic_event = NULL;
 //				goto buffer_event;
 			} else {

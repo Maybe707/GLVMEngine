@@ -42,7 +42,7 @@ namespace GLVM::core
 		xcb_connection_t*  connection;
 		xcb_screen_t*      screen;
 		xcb_window_t       window;
-		xcb_generic_event_t* next_generic_event;
+		xcb_generic_event_t* next_generic_event = NULL;
 
 		Display* display;
 		int default_screen;

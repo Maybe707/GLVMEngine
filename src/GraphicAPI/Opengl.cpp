@@ -166,34 +166,34 @@ namespace GLVM::core
 		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
 		// unsigned int uiPlayerEntity = (*pEntityContainerRefView)[0];
 		// cm::transform* playerTransformComponent = pComponent_Manager->GetComponent<cm::transform>(uiPlayerEntity);
-		core::vector<unsigned int>* pEntityContainerRefPointLight =
-			pComponent_Manager->GetEntityContainer<cm::pointLight>();
-		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
+// 		core::vector<unsigned int>* pEntityContainerRefPointLight =
+// 			pComponent_Manager->GetEntityContainer<cm::pointLight>();
+// 		unsigned int pointLightComponentContainerSize = pEntityContainerRefPointLight->GetSize();
 
-		sampledPointLightEntityIDcontainer.clear();
-		unsigned int appropriatePointLightComponentIndex = 0;
-		for ( unsigned int i = 0; i < pointLightComponentContainerSize; ++i ) {
-			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
-			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(entityID);
-//			float distance = VectorLength(playerTransformComponent->tPosition, pointLightComponent->position);
+// 		sampledPointLightEntityIDcontainer.clear();
+// 		unsigned int appropriatePointLightComponentIndex = 0;
+// 		for ( unsigned int i = 0; i < pointLightComponentContainerSize; ++i ) {
+// 			unsigned int entityID = (*pEntityContainerRefPointLight)[i];
+// 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(entityID);
+// //			float distance = VectorLength(playerTransformComponent->tPosition, pointLightComponent->position);
 
-//			if ( distance < 4.5f ) {
-				glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				sampledPointLightEntityIDcontainer.push_back(i);
+// //			if ( distance < 4.5f ) {
+// 				glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+// 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+// 				sampledPointLightEntityIDcontainer.push_back(i);
 				
-				EvaluateCubeShadowMap(pointLightCubeShadowMapFBOcontainer[appropriatePointLightComponentIndex],
-									  *pointLightComponent);
+// 				EvaluateCubeShadowMap(pointLightCubeShadowMapFBOcontainer[appropriatePointLightComponentIndex],
+// 									  *pointLightComponent);
 				
-				coreShaderProgram->Use();
-				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("pointLightCubeShadowMapComponentIndices[",
-																	 appropriatePointLightComponentIndex, "]"), i);
-				++appropriatePointLightComponentIndex;
-//			}
-		}
+// 				coreShaderProgram->Use();
+// 				coreShaderProgram->SetInt(ConcatIntBetweenTwoStrings("pointLightCubeShadowMapComponentIndices[",
+// 																	 appropriatePointLightComponentIndex, "]"), i);
+// 				++appropriatePointLightComponentIndex;
+// //			}
+// 		}
 		
-		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize",
-								  sampledPointLightEntityIDcontainer.size());
+// 		coreShaderProgram->SetInt("sampledPointShadowOrdinalNumbersArraySize",
+// 								  sampledPointLightEntityIDcontainer.size());
 
 		
 		ComputeDirectionalLight();
@@ -617,13 +617,13 @@ namespace GLVM::core
 	void COpenglRenderer::Raycasting() {
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities      = componentManager->collectUniqueLinkedEntities<cm::projectile,
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::projectile,
 																								 cm::transform,
 																								 cm::material,
 																								 cm::mesh,
 																								 cm::collider>();
 		
-		core::vector<Entity> otherLinkedEntities = componentManager->collectUniqueLinkedEntities<cm::material,
+		core::vector<Entity> otherLinkedEntities = componentManager->collectLinkedEntities<cm::material,
 																								 cm::collider,
 																								 cm::mesh,
 																								 cm::transform>();
@@ -634,18 +634,27 @@ namespace GLVM::core
         for(unsigned int x = 0; x < linkedEntitiesVectorSize; ++x) {
           unsigned int uiEntity_refProjectile = linkedEntities[x];
           cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_refProjectile);
-		  float rayLength = 1.0f;
-		  vec3 ray        = rTransformProjectile->tForward * rayLength;
-
+//		  float rayLength = 0.1f;
+		  vec3 ray_direction        = Normalize(rTransformProjectile->tForward);
+		  std::cout << "ray position: " << rTransformProjectile->tPosition << std::endl;
+//		  std::cout << "ray direction: " << ray << std::endl;
 			for(unsigned int j = 0; j < otherLinkedEntitiesVectorSize; ++j) {
 				unsigned int entityOther = otherLinkedEntities[j];
 				cm::transform* transformOther = componentManager->GetComponent<cm::transform>(entityOther);
-				float otherHalfScale = transformOther->fScale * 0.5f;
+				float otherHalfScale = 0.0f;
+				if ( transformOther != nullptr )
+					otherHalfScale = transformOther->fScale * 0.5f;
+				else
+					continue;
+
+				if ( uiEntity_refProjectile == entityOther )
+					continue;
+				
 				float min = 0.0f;
-				float max = 1.0f;
+				float max = INFINITY;
 
 				for ( int dimension = 0; dimension < 3; ++dimension ) {
-					float axis_invariant = 1.0f / ray[dimension];
+					float axis_invariant = 1.0f / ray_direction[dimension];
 					float box_min = transformOther->tPosition[dimension] - otherHalfScale;
 					float box_max = transformOther->tPosition[dimension] + otherHalfScale;
 					
@@ -654,12 +663,17 @@ namespace GLVM::core
 
 					min = Max(min, Min(delta1, delta2));
 					max = Min(max, Max(delta1, delta2));
-					
-					if ( max < min )
-						break;
-				}
 
-				if ( max > min ) {
+					// min = Min(Max(delta1, min), Max(delta2, min));
+					// max = Max(Min(delta1, max), Min(delta2, max));
+					
+					// if ( max < min )
+					// 	break;
+				}
+				
+				if ( max >= min ) {
+					std::cout << "collided entity: " << entityOther << " iteration: " << j << std::endl;
+					std::cout << "ray casting collition" << std::endl;
 					ecs::EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
 					entityManager->RemoveEntity(uiEntity_refProjectile, componentManager);
 					/// TODO: There is a big quastion is this decrement have sence.
