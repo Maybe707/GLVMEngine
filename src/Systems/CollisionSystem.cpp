@@ -147,7 +147,7 @@ namespace GLVM::ecs
                 }
 			}
 		}
-		std::cout << "lmb: " << isLeftMouseButtonPressed << std::endl;
+
 		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 			*isLeftMouseButtonReleased = false;
 			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
@@ -204,7 +204,7 @@ namespace GLVM::ecs
 					squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
 														crosshairScale / 25.0f, itemScale / 7.0f);
 					if ( squareColliderFlag ) {
-					std::cout << "collision" << std::endl;
+
 						componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
 						componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityInventoryContaining);
 					} else {
