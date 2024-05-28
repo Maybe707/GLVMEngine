@@ -148,72 +148,64 @@ namespace GLVM::ecs
 			}
 		}
 
-		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-			*isLeftMouseButtonReleased = false;
-			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			vec3 crosshairPosition;
-			float crosshairScale = 0;
-			float crosshairGltfFlag = 0;
-			if ( linkedCrosshairEntities.GetSize() > 0 ) {
-				crosshairPosition = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->tPosition;                ///< Thants ok to give array '0' element in this case because we have only one crosshair
-				crosshairScale = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->fScale;
-				crosshairGltfFlag = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->gltf;
-			}
+		// if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+		// 	*isLeftMouseButtonReleased = false;
+		// 	core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+		// 	core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		// 	vec3 crosshairPosition;
+		// 	float crosshairScale = 0;
+		// 	float crosshairGltfFlag = 0;
+		// 	if ( linkedCrosshairEntities.GetSize() > 0 ) {
+		// 		crosshairPosition = componentManager->
+		// 			GetComponent<cm::transform>(linkedCrosshairEntities[0])->tPosition;                ///< Thants ok to give array '0' element in this case because we have only one crosshair
+		// 		crosshairScale = componentManager->
+		// 			GetComponent<cm::transform>(linkedCrosshairEntities[0])->fScale;
+		// 		crosshairGltfFlag = componentManager->
+		// 			GetComponent<cm::transform>(linkedCrosshairEntities[0])->gltf;
+		// 	}
 
-			for ( unsigned int i = 0; i < linkedInventoryEntities.GetSize(); ++i ) {
-				unsigned int entityInventoryContaining = linkedInventoryEntities[i];
-				cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
+		// 	for ( unsigned int i = 0; i < linkedInventoryEntities.GetSize(); ++i ) {
+		// 		unsigned int entityInventoryContaining = linkedInventoryEntities[i];
+		// 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
 
-				for ( unsigned int j = 0; j < inventoryComponent->containedItems; ++j ) {
-					unsigned int entityItemContaining = inventoryComponent->items[j];
+		// 		for ( unsigned int j = 0; j < inventoryComponent->containedItems; ++j ) {
+		// 			unsigned int entityItemContaining = inventoryComponent->items[j];
 
-					cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					vec3  itemPosition;
-					float itemScale = 0;
-					float itemGltfFlag = 0;
-					if ( itemTransformComponent != nullptr ) {
-						itemPosition = componentManager->
-							GetComponent<cm::transform>(entityItemContaining)->tPosition;
-						itemScale     = componentManager->
-							GetComponent<cm::transform>(entityItemContaining)->fScale;
-						itemGltfFlag = componentManager->
-							GetComponent<cm::transform>(entityItemContaining)->gltf;
-					}
+		// 			cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+		// 			vec3  itemPosition;
+		// 			float itemScale = 0;
+		// 			float itemGltfFlag = 0;
+		// 			if ( itemTransformComponent != nullptr ) {
+		// 				itemPosition = componentManager->
+		// 					GetComponent<cm::transform>(entityItemContaining)->tPosition;
+		// 				itemScale     = componentManager->
+		// 					GetComponent<cm::transform>(entityItemContaining)->fScale;
+		// 				itemGltfFlag = componentManager->
+		// 					GetComponent<cm::transform>(entityItemContaining)->gltf;
+		// 			}
 
-					if ( !crosshairGltfFlag ) {
-						crosshairScale /= 2;
-					}
+		// 			if ( !crosshairGltfFlag ) {
+		// 				crosshairScale /= 2;
+		// 			}
 
-					if ( !itemGltfFlag ) {
-						itemScale /= 2;
-					}
+		// 			if ( !itemGltfFlag ) {
+		// 				itemScale /= 2;
+		// 			}
 
-					// std::cout << "crosshair pos: " << "x: " << crosshairPosition[0] << " y: " <<
-					// 	crosshairPosition[1] << " z: " << crosshairPosition[2] << std::endl;
-					// std::cout << "item pos: " << "x: " << itemPosition[0] << " y: " <<
-					// 	itemPosition[1] << " z: " << itemPosition[2] << std::endl;
+		// 			bool squareColliderFlag = false;
+		// 			squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
+		// 												crosshairScale / 25.0f, itemScale / 7.0f);
+		// 			if ( squareColliderFlag ) {
 
-					// std::cout << "crosshair scale: " << crosshairScale << std::endl;
-					// std::cout << "item scale: " << itemScale << std::endl;
-				
-					bool squareColliderFlag = false;
-					squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-														crosshairScale / 25.0f, itemScale / 7.0f);
-					if ( squareColliderFlag ) {
-
-						componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
-						componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityInventoryContaining);
-					} else {
-						componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
-						componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
-					}
-				}
-			}
-		}
+		// 				componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
+		// 				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityInventoryContaining);
+		// 			} else {
+		// 				componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
+		// 				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 }

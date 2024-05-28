@@ -10,6 +10,7 @@
 #include "Components/InterfaceComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
 #include "Components/InventoryComponent.hpp"
+#include "Components/InventorySlotComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -49,7 +50,7 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromAddress(500, 500, container2_specular_dat_len, container2_specular_dat);
 	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromAddress(32, 32, Crosshair_dat_len, Crosshair_dat);
 	[[maybe_unused]] ecs::TextureHandle fontAtlasTexturehandle = GLVM->LoadTextureFromAddress(84, 132, fontAtlas_dat_len, fontAtlas_dat);
-	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(256, 256, inventory_dat_len, inventory_dat);
+	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(64, 64, inventorySlot_dat_len, inventorySlot_dat);
 
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
@@ -117,9 +118,15 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 
 	Entity inventory = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::inventory>(inventory);
-	ComponentManager->GetComponent<cm::mesh>(inventory)->handle = inventory_Handle_GLTF;
-	ComponentManager->GetComponent<cm::inventory>(inventory)->entityOwner = uiPlayer;
+	ComponentManager->CreateComponent<cm::transform, cm::inventory>(inventory);
+	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
+	inventoryComponent->entityOwner = uiPlayer;
+	for ( unsigned int i = 0; i < 8; ++i )
+		for ( unsigned int j = 0; j < 8; ++j ) {
+			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
+			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot>(inventoryComponent->slots[i][j]);
+			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
+		}
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
 

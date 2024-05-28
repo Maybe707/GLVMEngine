@@ -184,7 +184,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		
 		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform>();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform, cm::mesh>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			Entity currentEntity                = linkedEntities[i];
@@ -2789,7 +2789,8 @@ namespace GLVM::core
  
 		int uiUboBinding = uiBindings[0];
 		
-		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
+//		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
+		unsigned int actual_size = 64;
 		
 		std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
 															uiPipeline.descriptors[uiUboBinding].setLayout);
@@ -3769,14 +3770,14 @@ namespace GLVM::core
         vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateUBO_UI(uint32_t currentImage, uint32_t offset) {
+	void CVulkanRenderer::updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
-		model[0][0] = 4.0f;
-		model[1][1] = 4.0f;
-		model[2][2] = 4.0f;
-		model[3][0] = 0.5f;
-		model[3][1] = -0.2f;
+		model[0][0] = 0.5f;
+		model[1][1] = 0.5f;
+		model[2][2] = 0.5f;
+		model[3][0] = x_slot_offset * 0.1f + 0.2f;
+		model[3][1] = y_slot_offset * -0.17f + 0.3f;
 		model[3][2] = 0.3f;
 		
 		hudUBO.model = model;
@@ -3988,44 +3989,51 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
+			for ( unsigned int j = 0; j < 8; ++j ) {
+				for ( unsigned int m = 0; m < 8; ++m ) {
+					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
+					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
+					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
 
-			unsigned int uboIndex = i;
-			updateUBO_UI(currentFrame, uboIndex);
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
-									0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
+					unsigned int uboIndex = j * 8 + m;
+					updateUBO_UI(j, m, currentFrame, uboIndex);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
+											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
-									1, 1, &uiSamplerDescriptorSets[currentFrame], 0, nullptr);
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
+											1, 1, &uiSamplerDescriptorSets[currentFrame], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+					// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+					// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
 //			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
-			// unsigned int uboIndex = i;
-			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+					// unsigned int uboIndex = i;
+					// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+					// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+					// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+					// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
 
-			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-			VkDeviceSize offsets[] = {0};
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+					VkDeviceSize offsets[] = {0};
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+					vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+					unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+					// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+					// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				}
+			}
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -4089,55 +4097,55 @@ namespace GLVM::core
 		// if ( viewPositionLinkedEntities.GetSize() > 0 )
 		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-//			std::cout << "i: " << i << std::endl;
-			unsigned int entityInventoryContaining = linkedEntities[i];
-			cm::inventory* inventory = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
-			for ( unsigned int j = 0; j < inventory->containedItems; ++j ) {
-				unsigned int entityItemContaining = inventory->items[j];
-				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
-				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
-				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
-				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
+// 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+// //			std::cout << "i: " << i << std::endl;
+// 			unsigned int entityInventoryContaining = linkedEntities[i];
+// 			cm::inventory* inventory = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
+// 			for ( unsigned int j = 0; j < inventory->containedItems; ++j ) {
+// 				unsigned int entityItemContaining = inventory->items[j];
+// 				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
+// 				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
+// 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+// 				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 
-				unsigned int uboIndex = j;
-				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent, itemColliderComponent);
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
+// 				unsigned int uboIndex = j;
+// 				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent, itemColliderComponent);
+// 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+// 										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-										1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
-//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-				// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-				// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+// 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+// 										1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
+// //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+// 				// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+// 				// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+// //			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
-				// unsigned int uboIndex = i;
-				// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-				// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+// 				// unsigned int uboIndex = i;
+// 				// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+// 				// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-				// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-				// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+// 				// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+// 				// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
 
-				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-				VkDeviceSize offsets[] = {0};
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+// 				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+// 				VkDeviceSize offsets[] = {0};
+// 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+// 				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+// 				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-				// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+// //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+// 				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+// 				// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			
-				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-			}
-		}
+// 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+// 			}
+// 		}
 
         vkCmdEndRenderPass(commandBuffer);
 

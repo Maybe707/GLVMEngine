@@ -69,7 +69,7 @@ ECS даёт возможность легко добавлять новые и 
   1. Преобразуйте её к .dat формату:
 
 #+begin_src
-	 convert robot.png robot.dat
+	 convert robot.png rgba:robot.dat
 #+end_src
 
   2. Преобразуйте получившийся файл robot.dat к c-header файлу со статическим массивом внутри:
