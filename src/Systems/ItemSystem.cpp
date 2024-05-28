@@ -1,10 +1,54 @@
 #include "Systems/ItemSystem.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/CrosshairComponent.hpp"
-#include "Components/TransformComponent.hpp"
 
 namespace GLVM::ecs
 {
+	/*
+	  ===========================================
+	  This method is trying to search for suitable
+	  slots for the given 2x2 type item. It returns
+	  true if it finds them and false otherwise.
+	  ==========================================
+	*/
+	
+	bool ItemSystem::putItem2x2(components::inventory* inventoryComponent, unsigned int itemEntity) {
+		namespace cm = GLVM::ecs::components;
+        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+		
+		bool isSlotFound = false;
+		unsigned int row = inventoryComponent->row;
+		unsigned int col = inventoryComponent->col;
+		cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
+		
+		for ( unsigned int i = 0; i < row; ++i )
+			for ( unsigned int j = 0; j < col; ++j ) {
+				if ( i < row - 1 && j < col - 1 ) {
+					cm::inventorySlot* localItemSlot_00 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]);
+					cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
+					cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
+					cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
+				
+					if ( localItemSlot_00->itemEntity == UINT_MAX &&
+						 localItemSlot_01->itemEntity == UINT_MAX &&
+						 localItemSlot_10->itemEntity == UINT_MAX &&
+						 localItemSlot_11->itemEntity == UINT_MAX) {
+						localItemSlot_00->itemEntity = itemEntity;
+						localItemSlot_01->itemEntity = itemEntity;
+						localItemSlot_10->itemEntity = itemEntity;
+						localItemSlot_11->itemEntity = itemEntity;
+						itemComponent->occupiedSlots.Push({ .row = i, .col = j});
+						itemComponent->occupiedSlots.Push({ .row = i, .col = j + 1});
+						itemComponent->occupiedSlots.Push({ .row = i + 1, .col = j});
+						itemComponent->occupiedSlots.Push({ .row = i + 1, .col = j + 1});
+						
+						isSlotFound = true;
+						return isSlotFound;
+					}
+				}
+			}
+
+		return isSlotFound;
+	}
+	
 	void ItemSystem::Update() {
 		namespace cm = GLVM::ecs::components;
         ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
@@ -13,27 +57,32 @@ namespace GLVM::ecs
 		core::vector<Entity> linkedEntities  = componentManager->collectLinkedEntities<cm::item, cm::collider, cm::transform,
 																					   cm::rigidBody, cm::actor>();
 
-		// for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
-		// 	unsigned int inventoryEntity = inventoryLinkedEntities[m];
-		//     cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity);
+		for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
+			unsigned int inventoryEntity = inventoryLinkedEntities[m];
+		    cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity);
 
-		// 	for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-		// 		unsigned int itemEntity = linkedEntities[i];
-		// 		cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
+			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+				unsigned int itemEntity = linkedEntities[i];
+				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
 
-		// 		for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
-		// 			if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner ) {
-		// 				unsigned int nextItemSlot = inventoryComponent->containedItems;
-		// 				if ( nextItemSlot < 64 ) {
-		// 					inventoryComponent->items[nextItemSlot] = itemEntity;
-		// 					++inventoryComponent->containedItems;
-		// 					componentManager->RemoveComponent<cm::actor>(itemEntity);
-		// 					componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// }
+				for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
+					if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner ) {
+						if ( putItem2x2(inventoryComponent, itemEntity) ) {
+							cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
+							for ( unsigned int m = 0; m < itemComponent->occupiedSlots.GetSize(); ++m ) {
+								std::cout << "row: " << itemComponent->occupiedSlots[m].row <<
+									" col: " << itemComponent->occupiedSlots[m].col << std::endl;
+							}
+							
+							componentManager->RemoveComponent<cm::actor>(itemEntity);
+							componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
+						} else {
+							std::cout << "No suitable slots for that item in inventory" << std::endl;
+						}
+					}
+				}
+			}
+		}
 
 		// if(isInventoryOpened) {
 		// 	core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();

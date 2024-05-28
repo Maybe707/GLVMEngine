@@ -8,11 +8,12 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/InventoryComponent.hpp"
-#include "Components/ColliderComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ActorComponent.hpp"
+#include "Components/CrosshairComponent.hpp"
+#include <climits>
 
 namespace GLVM::ecs
 {
@@ -20,6 +21,7 @@ namespace GLVM::ecs
 	{
 	public:
 		void Update();
+		bool putItem2x2(components::inventory* inventoryComponent, unsigned int itemEntity);
 
 		core::CStack* inputStack;
 		bool          isInventoryOpened;
