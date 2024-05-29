@@ -10,6 +10,7 @@
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/InventoryComponent.hpp"
+#include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -3770,15 +3771,26 @@ namespace GLVM::core
         vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset) {
+	void CVulkanRenderer::updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset,
+									   ecs::components::transform* inventorySlotTransform) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
+		float x = x_slot_offset * 0.1f + 0.2f;
+		[[maybe_unused]] float y = y_slot_offset * 0.17f - 0.8f;
 		model[0][0] = 0.5f;
 		model[1][1] = 0.5f;
 		model[2][2] = 0.5f;
-		model[3][0] = x_slot_offset * 0.1f + 0.2f;
-		model[3][1] = y_slot_offset * -0.17f + 0.3f;
+		model[3][0] = x;
+		model[3][1] = y;
 		model[3][2] = 0.3f;
+
+		std::cout << "x: " << model[3][0] << std::endl;
+		std::cout << "y: " << model[3][1] << std::endl;
+		
+		inventorySlotTransform->fScale = 0.5f;
+		inventorySlotTransform->tPosition[0] = x;
+		inventorySlotTransform->tPosition[1] = y;
+		inventorySlotTransform->tPosition[2] = 0.3f;
 		
 		hudUBO.model = model;
 		
@@ -3791,23 +3803,41 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset,
 											ecs::components::transform* itemTransfromComponent,
-											ecs::components::collider* itemColliderComponent) {
+											ecs::components::collider* itemColliderComponent,
+											ecs::components::item* itemComponent) {
 		UI_UBO hudUBO{};
+		unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
+		unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots[3];
+		// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
+		// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
+		
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
+		cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
+		cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
 
-		unsigned int row_length = 8;
-		unsigned int x_offset = offset % row_length;
-		unsigned int y_offset = offset / row_length;
-		float x_base_offset = 0.152f;
-		float y_base_offset = -0.815;
-		float x_result_offset = x_base_offset + x_offset * 0.1f;
-		float y_result_offset = y_base_offset + y_offset * 0.18f;
-		float itemScale = 0.43f;
+		// Compute absolute centre of all slots
+		float x_result_offset = (slotTransform_0->tPosition[0] + slotTransform_3->tPosition[0]) / 2.0f;
+		[[maybe_unused]] float y_result_offset = (slotTransform_0->tPosition[1] + slotTransform_3->tPosition[1]) / 2.0f;
+		float itemScale = 0.9f;
+
+		// std::cout << "x: " << x_result_offset << std::endl;
+		// std::cout << "y: " << y_result_offset << std::endl;
+		
+		// unsigned int row_length = 8;
+		// unsigned int x_offset = offset % row_length;
+		// unsigned int y_offset = offset / row_length;
+		// float x_base_offset = 0.152f;
+		// float y_base_offset = -0.815;
+		// float x_result_offset = x_base_offset + x_offset * 0.1f;
+		// float y_result_offset = y_base_offset + y_offset * 0.18f;
+		// float itemScale = 0.43f;
 
 		itemTransfromComponent->fScale = itemScale;
 		if ( !itemColliderComponent->itemDrag ) {
 			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
 		} else {
-			itemScale = 0.53f;
+			itemScale = 1.0f;
 			itemColliderComponent->itemDrag = false;
 		}
 		
@@ -3819,7 +3849,6 @@ namespace GLVM::core
 		model[3][1] = itemTransfromComponent->tPosition[1];
 		model[3][2] = 0.3f;
 
-		
 		hudUBO.model = model;
 		
 		void* hudMatrixData;
@@ -3995,9 +4024,10 @@ namespace GLVM::core
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
-
+					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+					std::cout << "entity: " << inventorySlotEntity << std::endl;
 					unsigned int uboIndex = j * 8 + m;
-					updateUBO_UI(j, m, currentFrame, uboIndex);
+					updateUBO_UI(m, j, currentFrame, uboIndex, inventorySlotTransformComponent);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
@@ -4053,7 +4083,7 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::inventory>();
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -4097,55 +4127,55 @@ namespace GLVM::core
 		// if ( viewPositionLinkedEntities.GetSize() > 0 )
 		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-// 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-// //			std::cout << "i: " << i << std::endl;
-// 			unsigned int entityInventoryContaining = linkedEntities[i];
-// 			cm::inventory* inventory = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
-// 			for ( unsigned int j = 0; j < inventory->containedItems; ++j ) {
-// 				unsigned int entityItemContaining = inventory->items[j];
-// 				unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(entityItemContaining)->handle.id;
-// 				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(entityItemContaining)->diffuseTextureID_.id;
-// 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
-// 				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
-
-// 				unsigned int uboIndex = j;
-// 				updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent, itemColliderComponent);
-// 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-// 										0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
-
-// 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
-// 										1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
-// //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-// 				// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-// 				// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-// //			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-				
-// 				// unsigned int uboIndex = i;
-// 				// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-// 				// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
-
-// 				// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-// 				// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
-
-// 				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-// 				VkDeviceSize offsets[] = {0};
-// 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-// 				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
-
-// 				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
-
-// //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-// 				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
-// 				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-// 				// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+//			std::cout << "i: " << i << std::endl;
+			unsigned int itemEntity = linkedEntities[i];
+			cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
+			if ( itemComponent->occupiedSlots.GetSize() == 0 )
+				continue;
 			
-// 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-// 			}
-// 		}
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
+			unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
+			cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(itemEntity);
+			cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
+
+			unsigned int uboIndex = i;
+			updateUBO_IconsUI(currentFrame, uboIndex, itemTransformComponent, itemColliderComponent, itemComponent);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+									0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
+
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
+									1, 1, &uiIconsSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
+//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
+//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+				
+			// unsigned int uboIndex = i;
+			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
+
+			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
+			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
+
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
+			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+			// 						&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
+			
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		}
 
         vkCmdEndRenderPass(commandBuffer);
 

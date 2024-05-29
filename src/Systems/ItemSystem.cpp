@@ -35,10 +35,10 @@ namespace GLVM::ecs
 						localItemSlot_01->itemEntity = itemEntity;
 						localItemSlot_10->itemEntity = itemEntity;
 						localItemSlot_11->itemEntity = itemEntity;
-						itemComponent->occupiedSlots.Push({ .row = i, .col = j});
-						itemComponent->occupiedSlots.Push({ .row = i, .col = j + 1});
-						itemComponent->occupiedSlots.Push({ .row = i + 1, .col = j});
-						itemComponent->occupiedSlots.Push({ .row = i + 1, .col = j + 1});
+						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j]);
+						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j + 1]);
+						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i + 1][j]);
+						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i + 1][j + 1]);
 						
 						isSlotFound = true;
 						return isSlotFound;
@@ -70,8 +70,7 @@ namespace GLVM::ecs
 						if ( putItem2x2(inventoryComponent, itemEntity) ) {
 							cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
 							for ( unsigned int m = 0; m < itemComponent->occupiedSlots.GetSize(); ++m ) {
-								std::cout << "row: " << itemComponent->occupiedSlots[m].row <<
-									" col: " << itemComponent->occupiedSlots[m].col << std::endl;
+								std::cout << "entity: " << itemComponent->occupiedSlots[m] << std::endl;
 							}
 							
 							componentManager->RemoveComponent<cm::actor>(itemEntity);

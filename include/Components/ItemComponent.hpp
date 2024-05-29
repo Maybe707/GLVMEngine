@@ -5,13 +5,8 @@
 
 namespace GLVM::ecs::components
 {
-	struct ItemSlots {
-		unsigned int row;
-		unsigned int col;
-	};
-	
 	struct item {
-		core::vector<ItemSlots> occupiedSlots;
+		core::vector<unsigned int> occupiedSlots; ///< Array that contain entities with inventorySlotComponent
 		unsigned int itemSlotType;
 	};
 } // namespace GLVM::ecs::components

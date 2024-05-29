@@ -21,6 +21,7 @@
 #include <set>
 #include <cmath>
 
+#include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/TextureComponent.hpp"
@@ -883,9 +884,10 @@ namespace GLVM::core
 						  ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform);
-		void updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset);
+		void updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset,
+						  ecs::components::transform* inventorySlotTransform);
 		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset, ecs::components::transform* itemTransfromComponent,
-							   ecs::components::collider* itemColliderComponent);
+							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

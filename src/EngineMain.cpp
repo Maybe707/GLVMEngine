@@ -124,7 +124,8 @@ int main()
 	for ( unsigned int i = 0; i < 8; ++i )
 		for ( unsigned int j = 0; j < 8; ++j ) {
 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
-			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot>(inventoryComponent->slots[i][j]);
+			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
+			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform>(inventoryComponent->slots[i][j]);
 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
 		}
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
