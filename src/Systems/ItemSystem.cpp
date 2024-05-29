@@ -83,37 +83,36 @@ namespace GLVM::ecs
 			}
 		}
 
-		// if(isInventoryOpened) {
-		// 	core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		// 	core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		if(isInventoryOpened) {
+			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 
-		// 	cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
+			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
 			
-		// 	for ( unsigned int i = 0; i < linkedInventoryEntities.GetSize(); ++i ) {
-		// 		unsigned int entityInventoryContaining = linkedInventoryEntities[i];
-		// 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(entityInventoryContaining);
+			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+				unsigned int entityItemContaining = linkedItemEntities[i];
+				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+				if ( itemComponent->occupiedSlots.GetSize() == 0 )
+					continue;
 
-		// 		for ( unsigned int j = 0; j < inventoryComponent->containedItems; ++j ) {
-		// 			unsigned int entityItemContaining = inventoryComponent->items[j];
-		// 			cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
-		// 			cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
+				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
-		// 			if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed && itemColliderComponent->bWall_Collision_ ) {
-		// 				isItemDraged = false;
-		// 				*isLeftMouseButtonReleased = false;
-		// 				itemColliderComponent->itemDrag = false;
-		// 				itemColliderComponent->bWall_Collision_ = false;
+				if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed && itemColliderComponent->bWall_Collision_ ) {
+					isItemDraged = false;
+					*isLeftMouseButtonReleased = false;
+					itemColliderComponent->itemDrag = false;
+					itemColliderComponent->bWall_Collision_ = false;
 
-		// 				return;
-		// 			}
+					return;
+				}
 					
-		// 			if ( itemColliderComponent->bWall_Collision_ ) {
-		// 				itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
-		// 				itemColliderComponent->itemDrag = true;
-		// 				isItemDraged = true;
-		// 			} 
-		// 		}
-		// 	}
-		// }
+				if ( itemColliderComponent->bWall_Collision_ ) {
+					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
+					itemColliderComponent->itemDrag = true;
+					isItemDraged = true;
+				} 
+			}
+		}
 	}
 } // namespace GLVM::ecs
