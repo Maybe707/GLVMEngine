@@ -112,6 +112,7 @@ int main()
 
 	Entity crosshair = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::crosshair, cm::transform>(crosshair);
+	*ComponentManager->GetComponent<cm::transform>(crosshair) = { .fScale = 0.01f };
 	ComponentManager->GetComponent<cm::mesh>(crosshair)->handle = crosshair_001_Handle_GLTF;
 	cm::material* materialCorsshair = ComponentManager->GetComponent<cm::material>(crosshair);
 	*materialCorsshair = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
@@ -126,6 +127,7 @@ int main()
 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
 			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
 			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform>(inventoryComponent->slots[i][j]);
+			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .fScale = 0.05f };
 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
 		}
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
@@ -136,7 +138,7 @@ int main()
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = 4;
 		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 10.0f },
-			.yaw = 0.0f, .pitch = 0.0f, .fScale = 2.0f, .gltf = false };
+			.yaw = 0.0f, .pitch = 0.0f, .fScale = 0.1f, .gltf = true };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };
 		ComponentManager->GetComponent<cm::mesh>(testItem)->handle = icoSphereHandle_OBJ;
 		cm::material* materialTestItem  = ComponentManager->GetComponent<cm::material>(testItem);

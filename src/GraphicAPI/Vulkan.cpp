@@ -3752,16 +3752,29 @@ namespace GLVM::core
 
 		cursorTransform->tPosition[0] = hud_screen_x;
 		cursorTransform->tPosition[1] = -hud_screen_y;
+//		std::cout << "cursor scale: " << cursorTransform->fScale << std::endl;
 
 //		std::cout << "x: " << cursorTransform->tPosition[0] << " y: " << cursorTransform->tPosition << std::endl;
 		
 		if ( !isInventoryOpened ) {
-			hudUBO.position = defaultPosition;
+			hudUBO.model[3][0] = defaultPosition[0];
+			hudUBO.model[3][1] = defaultPosition[1];
+			hudUBO.model[3][2] = defaultPosition[2];
+			hudUBO.model[0][0] = cursorTransform->fScale;
+			hudUBO.model[1][1] = cursorTransform->fScale;
+			hudUBO.model[2][2] = cursorTransform->fScale;
+			hudUBO.model[3][3] = 1.0f;
 		} else {
 			defaultPosition[0] = hud_screen_x;
 			defaultPosition[1] = -hud_screen_y;
 			
-			hudUBO.position = defaultPosition;
+			hudUBO.model[3][0] = defaultPosition[0];
+			hudUBO.model[3][1] = defaultPosition[1];
+			hudUBO.model[3][2] = defaultPosition[2];
+			hudUBO.model[0][0] = cursorTransform->fScale;
+			hudUBO.model[1][1] = cursorTransform->fScale;
+			hudUBO.model[2][2] = cursorTransform->fScale;
+			hudUBO.model[3][3] = 1.0f;
 		}
 
 		void* hudMatrixData;
@@ -3777,20 +3790,21 @@ namespace GLVM::core
 		mat4 model(1.0);
 		float x = x_slot_offset * 0.1f + 0.2f;
 		[[maybe_unused]] float y = y_slot_offset * 0.17f - 0.8f;
-		model[0][0] = 0.5f;
-		model[1][1] = 0.5f;
-		model[2][2] = 0.5f;
+		float inventorySlotScale = inventorySlotTransform->fScale;
+//		std::cout << "inventory slot scale: " << inventorySlotScale << std::endl;
+		model[0][0] = inventorySlotScale;
+		model[1][1] = inventorySlotScale;
+		model[2][2] = inventorySlotScale;
 		model[3][0] = x;
 		model[3][1] = y;
-		model[3][2] = 0.3f;
+		model[3][2] = 0.1f;
 
-		std::cout << "x: " << model[3][0] << std::endl;
-		std::cout << "y: " << model[3][1] << std::endl;
+		// std::cout << "x: " << model[3][0] << std::endl;
+		// std::cout << "y: " << model[3][1] << std::endl;
 		
-		inventorySlotTransform->fScale = 0.5f;
 		inventorySlotTransform->tPosition[0] = x;
 		inventorySlotTransform->tPosition[1] = y;
-		inventorySlotTransform->tPosition[2] = 0.3f;
+		inventorySlotTransform->tPosition[2] = 0.1f;
 		
 		hudUBO.model = model;
 		
@@ -3819,8 +3833,8 @@ namespace GLVM::core
 		// Compute absolute centre of all slots
 		float x_result_offset = (slotTransform_0->tPosition[0] + slotTransform_3->tPosition[0]) / 2.0f;
 		[[maybe_unused]] float y_result_offset = (slotTransform_0->tPosition[1] + slotTransform_3->tPosition[1]) / 2.0f;
-		float itemScale = 0.9f;
-
+		float itemScale = itemTransfromComponent->fScale;
+//		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
 		// std::cout << "x: " << x_result_offset << std::endl;
 		// std::cout << "y: " << y_result_offset << std::endl;
 		
@@ -3833,11 +3847,11 @@ namespace GLVM::core
 		// float y_result_offset = y_base_offset + y_offset * 0.18f;
 		// float itemScale = 0.43f;
 
-		itemTransfromComponent->fScale = itemScale;
+//		itemTransfromComponent->fScale = itemScale;
 		if ( !itemColliderComponent->itemDrag ) {
 			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
 		} else {
-			itemScale = 1.0f;
+			itemScale *= 1.1f;
 			itemColliderComponent->itemDrag = false;
 		}
 		
@@ -4025,7 +4039,7 @@ namespace GLVM::core
 					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
 					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-					std::cout << "entity: " << inventorySlotEntity << std::endl;
+
 					unsigned int uboIndex = j * 8 + m;
 					updateUBO_UI(m, j, currentFrame, uboIndex, inventorySlotTransformComponent);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,

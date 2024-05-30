@@ -42,10 +42,11 @@ namespace GLVM::ecs
 	bool CCollisionSystem::SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                               float backtrackingScale, float comparedScale)
 	{
-        if(backtrackingPosition[0] + backtrackingScale / 2.3f  > comparedPosition[0] - comparedScale &&
-           backtrackingPosition[0] - backtrackingScale / 2.3f  < comparedPosition[0] + comparedScale &&
-           backtrackingPosition[1] + backtrackingScale  > comparedPosition[1] - comparedScale &&
-           backtrackingPosition[1] - backtrackingScale  < comparedPosition[1] + comparedScale) {
+		[[maybe_unused]] float aspectRatio = 1920.0f / 1080.0f;
+        if(backtrackingPosition[0] + backtrackingScale > comparedPosition[0] - comparedScale &&
+           backtrackingPosition[0] - backtrackingScale < comparedPosition[0] + comparedScale &&
+           backtrackingPosition[1] + backtrackingScale * aspectRatio  > comparedPosition[1] - comparedScale * aspectRatio &&
+           backtrackingPosition[1] - backtrackingScale * aspectRatio  < comparedPosition[1] + comparedScale * aspectRatio) {
 				return true;
 		}
         
@@ -192,9 +193,12 @@ namespace GLVM::ecs
 					itemScale /= 2;
 				}
 
+				std::cout << "crosshair scale: " << crosshairScale << std::endl;
+				std::cout << "item scale: " << itemScale << std::endl;
+				
 				bool squareColliderFlag = false;
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-													crosshairScale / 25.0f, itemScale / 3.5f);
+													crosshairScale, itemScale);
 				if ( squareColliderFlag ) {
 
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;

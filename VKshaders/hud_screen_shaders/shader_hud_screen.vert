@@ -9,33 +9,15 @@ layout(location = 4) in vec4 inWeights;
 layout(location = 0) out vec2 outFragmentTextureCoordinate;
 
 layout(set = 0, binding = 0) uniform FONT_UBO {
-	vec3 position;
+	mat4 model;
 } font_ubo;
 
 void main()
 {
-	mat4 translationMatrix = mat4(
-		1.0, 0.0, 0.0, 0.0,
-		0.0, 1.0, 0.0, 0.0,
-		0.0, 0.0, 1.0, 0.0,
-		font_ubo.position.x,
-		font_ubo.position.y,
-		0.0,
-//		font_ubo.position.z,
-		1.0
-		);
-
-	mat4 commonScale = mat4(
-		0.2, 0.0, 0.0, 0.0,
-		0.0, 0.2, 0.0, 0.0,
-		0.0, 0.0, 0.2, 0.0,
-		0.0, 0.0, 0.0, 1.0
-		);
-
 	mat4 scaleMatrix = mat4(
-		0.01, 0.0, 0.0, 0.0,
-		0.0, 0.0176, 0.0, 0.0,
-		0.0, 0.0, 0.011, 0.0,
+		1.0, 0.0, 0.0, 0.0,
+		0.0, 1.76, 0.0, 0.0,
+		0.0, 0.0, 1.0, 0.0,
 		0.0, 0.0, 0.0, 1.0
 		);
 
@@ -48,5 +30,5 @@ void main()
 	
 	outFragmentTextureCoordinate = inTextureCoordinate;
 //	vec4 p = translationMatrix * commonScale * scaleMatrix * vec4(inPosition, 1.0);
-	gl_Position = translationMatrix * scaleMatrix * vec4(inPosition, 1.0);
+	gl_Position = font_ubo.model * scaleMatrix * vec4(inPosition, 1.0);
 }
