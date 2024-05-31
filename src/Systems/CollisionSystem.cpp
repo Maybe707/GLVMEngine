@@ -9,6 +9,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
+#include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -21,6 +22,7 @@
 #include "EventsStack.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
+#include <climits>
 
 namespace GLVM::ecs
 {
@@ -150,6 +152,11 @@ namespace GLVM::ecs
 			}
 		}
 
+		// std::cout << "inventory opened: " << isInventoryOpened << std::endl;
+		// std::cout << "item draged: " << isItemDraged << std::endl;
+		// std::cout << "left mouse button pressed: " << isLeftMouseButtonPressed << std::endl;
+		// std::cout << "left mouse button released: " << *isLeftMouseButtonReleased << std::endl;
+		
 		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 			*isLeftMouseButtonReleased = false;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
@@ -193,14 +200,13 @@ namespace GLVM::ecs
 					itemScale /= 2;
 				}
 
-				std::cout << "crosshair scale: " << crosshairScale << std::endl;
-				std::cout << "item scale: " << itemScale << std::endl;
+				// std::cout << "crosshair scale: " << crosshairScale << std::endl;
+				// std::cout << "item scale: " << itemScale << std::endl;
 				
 				bool squareColliderFlag = false;
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
 													crosshairScale, itemScale);
 				if ( squareColliderFlag ) {
-
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
 				} else {
@@ -209,6 +215,137 @@ namespace GLVM::ecs
 				}
 			}
 		}
+
+		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && isItemDraged ) {
+			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+
+			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+				unsigned int entityItemContaining = linkedItemEntities[i];
+				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
+				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
+//				componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
+
+				if ( itemCollider->bWall_Collision_ ) {
+//					itemCollider->bWall_Collision_ = false;
+					std::cout << "TEST" << std::endl;
+					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
+					vec3 itemPosition = itemTransform->tPosition;
+					float itemScale   = itemTransform->fScale;
+					bool  isItem_GLTF = itemTransform->gltf;
+
+					if ( !isItem_GLTF ) {
+						itemScale /= 2;
+					}
+					
+					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
+																											   cm::transform,
+																											   cm::inventorySlot>();
+
+					core::vector<unsigned int> collidedInventorySlotEntities;
+					core::vector<vec3> collidedInventorySlotTransforms;
+					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
+						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
+						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
+						float inventorySlotScale    = inventorySlotTransform->fScale;
+						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
+
+						if ( !isInventorySlot_GLTF ) {
+							inventorySlotScale /= 2;
+						}
+
+						bool squareColliderFlag = false;
+						squareColliderFlag = SquareCollider(itemPosition, inventorySlotPosition,
+															itemScale, inventorySlotScale);
+						if ( squareColliderFlag ) {
+							collidedInventorySlotEntities.Push(inventorySlotEntity);
+							collidedInventorySlotTransforms.Push(inventorySlotPosition);
+//							componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
+							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
+						} else {
+							continue;
+						}		
+					}
+
+					core::vector<float> distanceVectorsFromItemToInventorySlot;
+					for ( unsigned int m = 0; m < collidedInventorySlotTransforms.GetSize(); ++m ) {
+						distanceVectorsFromItemToInventorySlot.Push(VecLength(itemPosition - collidedInventorySlotTransforms[m]));
+					}
+
+					// Search 4 minimum distance from item to inventorySlot
+					core::vector<unsigned int> newColliderEntities;
+					unsigned int firstMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					if ( firstMinimumIndex != UINT_MAX ) {
+						newColliderEntities.Push(collidedInventorySlotEntities[firstMinimumIndex]);
+						collidedInventorySlotEntities.Remove(firstMinimumIndex);
+						distanceVectorsFromItemToInventorySlot.Remove(firstMinimumIndex);
+					}
+
+					unsigned int secondMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					if ( secondMinimumIndex != UINT_MAX ) {
+						newColliderEntities.Push(collidedInventorySlotEntities[secondMinimumIndex]);
+						collidedInventorySlotEntities.Remove(secondMinimumIndex);
+						distanceVectorsFromItemToInventorySlot.Remove(secondMinimumIndex);
+					}
+
+					unsigned int thirdMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					if ( thirdMinimumIndex != UINT_MAX ) {
+						newColliderEntities.Push(collidedInventorySlotEntities[thirdMinimumIndex]);
+						collidedInventorySlotEntities.Remove(thirdMinimumIndex);
+						distanceVectorsFromItemToInventorySlot.Remove(thirdMinimumIndex);
+					}
+
+					unsigned int fourthMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					if ( fourthMinimumIndex != UINT_MAX ) {
+						newColliderEntities.Push(collidedInventorySlotEntities[fourthMinimumIndex]);
+						collidedInventorySlotEntities.Remove(fourthMinimumIndex);
+						distanceVectorsFromItemToInventorySlot.Remove(fourthMinimumIndex);
+					}
+
+					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+					itemComponent->occupiedSlots.clear();
+					bubleSortVector(newColliderEntities);
+					for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
+						std::cout << "new colliders entity: " << newColliderEntities[x] << std::endl;
+						itemComponent->occupiedSlots.Push(newColliderEntities[x]);
+					}
+
+					return;
+				}
+			}
+		}
 	}
 
+	unsigned int CCollisionSystem::searchMinimumValueIndex(core::vector<float> vector_) {
+		unsigned int indexAccumulator = 0;
+		float valueAccumulator = 0;
+		if ( vector_.GetSize() > 0 )
+			valueAccumulator = vector_[0];
+		else
+			return UINT_MAX;
+		
+		for ( unsigned int i = 1; i < vector_.GetSize(); ++i ) {
+			if ( vector_[i] < valueAccumulator ) {
+				valueAccumulator = vector_[i];
+				indexAccumulator = i;
+			}
+		}
+
+		return indexAccumulator;
+	}
+
+	void CCollisionSystem::bubleSortVector(core::vector<unsigned int>& vector_) {
+		if ( vector_.GetSize() == 0 )
+			return;
+
+		for ( unsigned int j = 0; j < vector_.GetSize(); ++j ) {
+			for ( unsigned int i = 0; i < vector_.GetSize(); ++i ) {
+				if ( vector_[i] > vector_[i + 1] ) {
+					unsigned int temp = vector_[i];
+					vector_[i] = vector_[i + 1];
+					vector_[i + 1] = temp;
+				}
+			}
+		}
+	}
 }

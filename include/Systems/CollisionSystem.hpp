@@ -46,6 +46,8 @@ namespace GLVM::ecs
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 							float backtrackingScale, float comparedScale);
 		void Update() override;
+		unsigned int searchMinimumValueIndex(core::vector<float> vector);
+		void bubleSortVector(core::vector<unsigned int>& vector_);
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 							 float backtrackingScale, float comparedScale);
 		bool RayCast(vec3 rayCasterPosition, vec3 receiverPosition,

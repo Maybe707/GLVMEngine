@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/EnemyComponent.hpp"
 #include "Components/FontComponent.hpp"
@@ -125,8 +126,8 @@ int main()
 	for ( unsigned int i = 0; i < 8; ++i )
 		for ( unsigned int j = 0; j < 8; ++j ) {
 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
-			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
-			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform>(inventoryComponent->slots[i][j]);
+//			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
+			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);
 			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .fScale = 0.05f };
 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
 		}

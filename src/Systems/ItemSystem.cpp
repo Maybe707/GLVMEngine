@@ -1,4 +1,6 @@
 #include "Systems/ItemSystem.hpp"
+#include "Components/InventorySlotComponent.hpp"
+#include "Components/ItemComponent.hpp"
 
 namespace GLVM::ecs
 {
@@ -84,6 +86,22 @@ namespace GLVM::ecs
 		}
 
 		if(isInventoryOpened) {
+			// namespace cm = GLVM::ecs::components;
+			// ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+
+			// core::vector<Entity> inventoryLinkedEntities = componentManager->collectLinkedEntities<cm::inventory>();
+			// for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
+			// 	unsigned int inventoryEntity = inventoryLinkedEntities[m];
+			// 	cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity);
+			// 	for ( unsigned int n = 0; n < 8; ++n )
+			// 		for ( unsigned int j = 0; j < 8; ++j ) {
+			// 			unsigned int inventorySlotEntity = inventoryComponent->slots[n][j];
+			// 			cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+
+			// 			std::cout << "item entity in inventory slot component: " << inventorySlotComponent->itemEntity << " for entity: " << inventorySlotEntity << std::endl;
+			// 		}
+			// }
+			
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 
@@ -111,6 +129,14 @@ namespace GLVM::ecs
 					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
 					itemColliderComponent->itemDrag = true;
 					isItemDraged = true;
+
+					for ( unsigned int j = 0; j < itemComponent->occupiedSlots.GetSize(); ++j ) {
+						unsigned int inventorySlotEntity = itemComponent->occupiedSlots[j];
+						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+						inventorySlotComponent->itemEntity = UINT_MAX;
+					}
+
+//					itemComponent->occupiedSlots.clear();
 				} 
 			}
 		}
