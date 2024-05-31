@@ -28,7 +28,14 @@ namespace GLVM::ecs
 					cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
 					cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
 					cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
-				
+
+					std::cout << "TEST" << std::endl;
+					for ( unsigned int m = 0; m < 2; ++m )
+						for ( unsigned int n = 0; n < 8; ++n ) {
+							cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
+							std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
+						}
+					
 					if ( localItemSlot_00->itemEntity == UINT_MAX &&
 						 localItemSlot_01->itemEntity == UINT_MAX &&
 						 localItemSlot_10->itemEntity == UINT_MAX &&
@@ -37,6 +44,15 @@ namespace GLVM::ecs
 						localItemSlot_01->itemEntity = itemEntity;
 						localItemSlot_10->itemEntity = itemEntity;
 						localItemSlot_11->itemEntity = itemEntity;
+
+						std::cout << "AFTER TEST" << std::endl;
+						for ( unsigned int m = 0; m < 2; ++m )
+							for ( unsigned int n = 0; n < 8; ++n ) {
+								cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
+								std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
+							}
+
+						
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j]);
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j + 1]);
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i + 1][j]);

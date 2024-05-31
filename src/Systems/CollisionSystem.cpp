@@ -227,7 +227,7 @@ namespace GLVM::ecs
 
 				if ( itemCollider->bWall_Collision_ ) {
 //					itemCollider->bWall_Collision_ = false;
-					std::cout << "TEST" << std::endl;
+//					std::cout << "TEST" << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->tPosition;
 					float itemScale   = itemTransform->fScale;
@@ -306,7 +306,7 @@ namespace GLVM::ecs
 					itemComponent->occupiedSlots.clear();
 					bubleSortVector(newColliderEntities);
 					for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-						std::cout << "new colliders entity: " << newColliderEntities[x] << std::endl;
+//						std::cout << "new colliders entity: " << newColliderEntities[x] << std::endl;
 						itemComponent->occupiedSlots.Push(newColliderEntities[x]);
 					}
 
