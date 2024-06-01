@@ -138,7 +138,7 @@ int main()
 		Entity testItem = EntityManager->CreateEntity();
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = 4;
-		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 10.0f },
+		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 2.0f },
 			.yaw = 0.0f, .pitch = 0.0f, .fScale = 0.1f, .gltf = true };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };
 		ComponentManager->GetComponent<cm::mesh>(testItem)->handle = icoSphereHandle_OBJ;

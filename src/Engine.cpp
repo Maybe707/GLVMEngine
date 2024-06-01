@@ -274,15 +274,19 @@ namespace GLVM::core
 			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,
-								  &g_eEvent.mousePointerPosition.offset_Y);
+											  &g_eEvent.mousePointerPosition.offset_Y);
 
+			// std::cout << "lmb released " << g_eEvent.isLeftMouseButtonReleased << std::endl;
+			// std::cout << "lmb pressed " << isLeftMouseButtonPressed << std::endl;
+			// std::cout << "item draged " << itemSystem->isItemDraged << std::endl;
+			
 			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
 			collisionSystem->isInventoryOpened        = vulkanRenderer->isInventoryOpened;
-			collisionSystem->isItemDraged             = itemSystem->isItemDraged;
+			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
 			enemySytem->deltaFrameTime                = deltaFrameTime;

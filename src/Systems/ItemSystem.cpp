@@ -1,6 +1,7 @@
 #include "Systems/ItemSystem.hpp"
 #include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
+#include <unistd.h>
 
 namespace GLVM::ecs
 {
@@ -30,7 +31,7 @@ namespace GLVM::ecs
 					cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
 
 					std::cout << "TEST" << std::endl;
-					for ( unsigned int m = 0; m < 2; ++m )
+					for ( unsigned int m = 0; m < 4; ++m )
 						for ( unsigned int n = 0; n < 8; ++n ) {
 							cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
 							std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
@@ -45,12 +46,12 @@ namespace GLVM::ecs
 						localItemSlot_10->itemEntity = itemEntity;
 						localItemSlot_11->itemEntity = itemEntity;
 
-						std::cout << "AFTER TEST" << std::endl;
-						for ( unsigned int m = 0; m < 2; ++m )
-							for ( unsigned int n = 0; n < 8; ++n ) {
-								cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
-								std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
-							}
+						// std::cout << "AFTER TEST" << std::endl;
+						// for ( unsigned int m = 0; m < 4; ++m )
+						// 	for ( unsigned int n = 0; n < 8; ++n ) {
+						// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
+						// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
+						// 	}
 
 						
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j]);
@@ -88,7 +89,7 @@ namespace GLVM::ecs
 						if ( putItem2x2(inventoryComponent, itemEntity) ) {
 							cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
 							for ( unsigned int m = 0; m < itemComponent->occupiedSlots.GetSize(); ++m ) {
-								std::cout << "entity: " << itemComponent->occupiedSlots[m] << std::endl;
+//								std::cout << "entity: " << itemComponent->occupiedSlots[m] << std::endl;
 							}
 							
 							componentManager->RemoveComponent<cm::actor>(itemEntity);
@@ -126,22 +127,24 @@ namespace GLVM::ecs
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-				if ( itemComponent->occupiedSlots.GetSize() == 0 )
-					continue;
+				// if ( itemComponent->occupiedSlots.GetSize() == 0 )
+				// 	continue;
 
 				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
-				if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed && itemColliderComponent->bWall_Collision_ ) {
-					isItemDraged = false;
-					*isLeftMouseButtonReleased = false;
-					itemColliderComponent->itemDrag = false;
-					itemColliderComponent->bWall_Collision_ = false;
+				// if ( *isLeftMouseButtonReleased && isItemDraged && isLeftMouseButtonPressed && itemColliderComponent->bWall_Collision_ ) {
+				// 	std::cout << "DROP" << std::endl;
+				// 	isItemDraged = false;
+				// 	*isLeftMouseButtonReleased = false;
+				// 	itemColliderComponent->itemDrag = false;
+				// 	itemColliderComponent->bWall_Collision_ = false;
 
-					return;
-				}
-					
+				// 	return;
+				// }
+//				std::cout << "wall collision " << itemColliderComponent->bWall_Collision_ << std::endl;
 				if ( itemColliderComponent->bWall_Collision_ ) {
+//					std::cout << "DRAG TO CROSSHAIR" << std::endl;
 					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
 					itemColliderComponent->itemDrag = true;
 					isItemDraged = true;

@@ -29,7 +29,7 @@ namespace GLVM::ecs
 		float fDelta_Time_;
 		float gravity;
 		bool isInventoryOpened;
-		bool isItemDraged;
+		bool* isItemDraged;
 		bool isLeftMouseButtonPressed;
 		bool* isLeftMouseButtonReleased;
         core::CStack& Input_Stack_;
@@ -46,8 +46,9 @@ namespace GLVM::ecs
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 							float backtrackingScale, float comparedScale);
 		void Update() override;
+		int areSlotsAvailable(const core::vector<unsigned int>& slots_);
 		unsigned int searchMinimumValueIndex(core::vector<float> vector);
-		void bubleSortVector(core::vector<unsigned int>& vector_);
+		void bubbleSortVector(core::vector<unsigned int>& vector_);
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
 							 float backtrackingScale, float comparedScale);
 		bool RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
