@@ -273,47 +273,80 @@ namespace GLVM::ecs
 					}
 					std::cout << "item position " << "x: " << itemPosition[0] << " y: " <<
 								itemPosition[1] << " z: " << itemPosition[2] << std::endl;
-					core::vector<float> distanceVectorsFromItemToInventorySlot;
-					for ( unsigned int m = 0; m < collidedInventorySlotTransforms.GetSize(); ++m ) {
-						vec3 collidedPosition = collidedInventorySlotTransforms[m];
-						float aspectRatio = 1920.0f / 1080.0f;
-						collidedPosition[0] = collidedPosition[0] * aspectRatio;
-						vec3 localItemPosition = itemPosition;
-						localItemPosition[0] = localItemPosition[0] * aspectRatio;
-						distanceVectorsFromItemToInventorySlot.Push(VecLength(localItemPosition - collidedPosition));
-						std::cout << "range " << distanceVectorsFromItemToInventorySlot[m] << std::endl;
-						std::cout << "entity " << collidedInventorySlotEntities[m] << std::endl;
+//					core::vector<float> distanceVectorsFromItemToInventorySlot;
+					float aspectRatio = 1920.0f / 1080.0f;
+					vec3 localItemPosition = itemPosition;
+					localItemPosition[0] = localItemPosition[0] * aspectRatio;
+
+					core::vector<unsigned int> newColliderEntities;
+					newColliderEntities.Push(0);
+					newColliderEntities.Push(0);
+					newColliderEntities.Push(0);
+					newColliderEntities.Push(0);
+					float distanceAccumulator = 999.999f;
+					unsigned int ignoreIterationFlag = 0;
+					for ( unsigned int m = 0; m < 5; ++m ) {
+						if ( ignoreIterationFlag == 2 ) {
+							ignoreIterationFlag = 0;
+							continue;
+						}
+						
+						std::cout << "m: " << m << std::endl;
+						vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+						vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
+
+						float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+						float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+						vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+						normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+						// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
+						// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
+
+						float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+						if ( currentDistance < distanceAccumulator ) {
+							newColliderEntities[0] = collidedInventorySlotEntities[m];
+							newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+							newColliderEntities[2] = collidedInventorySlotEntities[m + 3];
+							newColliderEntities[3] = collidedInventorySlotEntities[m + 4];
+							
+							distanceAccumulator = currentDistance;
+						}
+								
+						std::cout << "range " << distanceAccumulator << std::endl;
+						++ignoreIterationFlag;
+//						std::cout << "entity " << collidedInventorySlotEntities[m] << std::endl;
 					}
 
 					// Search 4 minimum distance from item to inventorySlot
-					core::vector<unsigned int> newColliderEntities;
-					unsigned int firstMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					if ( firstMinimumIndex != UINT_MAX ) {
-						newColliderEntities.Push(collidedInventorySlotEntities[firstMinimumIndex]);
-						collidedInventorySlotEntities.Remove(firstMinimumIndex);
-						distanceVectorsFromItemToInventorySlot.Remove(firstMinimumIndex);
-					}
 
-					unsigned int secondMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					if ( secondMinimumIndex != UINT_MAX ) {
-						newColliderEntities.Push(collidedInventorySlotEntities[secondMinimumIndex]);
-						collidedInventorySlotEntities.Remove(secondMinimumIndex);
-						distanceVectorsFromItemToInventorySlot.Remove(secondMinimumIndex);
-					}
+					// unsigned int firstMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					// if ( firstMinimumIndex != UINT_MAX ) {
+					// 	newColliderEntities.Push(collidedInventorySlotEntities[firstMinimumIndex]);
+					// 	collidedInventorySlotEntities.Remove(firstMinimumIndex);
+					// 	distanceVectorsFromItemToInventorySlot.Remove(firstMinimumIndex);
+					// }
 
-					unsigned int thirdMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					if ( thirdMinimumIndex != UINT_MAX ) {
-						newColliderEntities.Push(collidedInventorySlotEntities[thirdMinimumIndex]);
-						collidedInventorySlotEntities.Remove(thirdMinimumIndex);
-						distanceVectorsFromItemToInventorySlot.Remove(thirdMinimumIndex);
-					}
+					// unsigned int secondMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					// if ( secondMinimumIndex != UINT_MAX ) {
+					// 	newColliderEntities.Push(collidedInventorySlotEntities[secondMinimumIndex]);
+					// 	collidedInventorySlotEntities.Remove(secondMinimumIndex);
+					// 	distanceVectorsFromItemToInventorySlot.Remove(secondMinimumIndex);
+					// }
 
-					unsigned int fourthMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					if ( fourthMinimumIndex != UINT_MAX ) {
-						newColliderEntities.Push(collidedInventorySlotEntities[fourthMinimumIndex]);
-						collidedInventorySlotEntities.Remove(fourthMinimumIndex);
-						distanceVectorsFromItemToInventorySlot.Remove(fourthMinimumIndex);
-					}
+					// unsigned int thirdMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					// if ( thirdMinimumIndex != UINT_MAX ) {
+					// 	newColliderEntities.Push(collidedInventorySlotEntities[thirdMinimumIndex]);
+					// 	collidedInventorySlotEntities.Remove(thirdMinimumIndex);
+					// 	distanceVectorsFromItemToInventorySlot.Remove(thirdMinimumIndex);
+					// }
+
+					// unsigned int fourthMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
+					// if ( fourthMinimumIndex != UINT_MAX ) {
+					// 	newColliderEntities.Push(collidedInventorySlotEntities[fourthMinimumIndex]);
+					// 	collidedInventorySlotEntities.Remove(fourthMinimumIndex);
+					// 	distanceVectorsFromItemToInventorySlot.Remove(fourthMinimumIndex);
+					// }
 
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					bubbleSortVector(newColliderEntities);
