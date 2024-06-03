@@ -92,10 +92,11 @@ int main()
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
 	// cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
-	// fontComponentWitch->font_string.Push('G');
-	// fontComponentWitch->font_string.Push('L');
-	// fontComponentWitch->font_string.Push('V');
-	// fontComponentWitch->font_string.Push('M');
+	// fontComponentWitch->font_string.Push('F');
+	// fontComponentWitch->font_string.Push('R');
+	// fontComponentWitch->font_string.Push('E');
+	// fontComponentWitch->font_string.Push('N');
+	// fontComponentWitch->font_string.Push('K');
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
@@ -141,7 +142,11 @@ int main()
 		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 2.0f },
 			.yaw = 0.0f, .pitch = 0.0f, .fScale = 0.1f, .gltf = true };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };
-		ComponentManager->GetComponent<cm::mesh>(testItem)->handle = icoSphereHandle_OBJ;
+		if ( i % 2 == 0 ) 
+			ComponentManager->GetComponent<cm::mesh>(testItem)->handle = icoSphereHandle_OBJ;
+		else
+			ComponentManager->GetComponent<cm::mesh>(testItem)->handle = coneHandle_OBJ;
+		
 		cm::material* materialTestItem  = ComponentManager->GetComponent<cm::material>(testItem);
 		*materialTestItem  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 			.shininess = 128.0f * 0.078125f };

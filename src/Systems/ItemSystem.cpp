@@ -126,7 +126,7 @@ namespace GLVM::ecs
 			
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+//				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 				// if ( itemComponent->occupiedSlots.GetSize() == 0 )
 				// 	continue;
 
@@ -145,15 +145,16 @@ namespace GLVM::ecs
 //				std::cout << "wall collision " << itemColliderComponent->bWall_Collision_ << std::endl;
 				if ( itemColliderComponent->bWall_Collision_ ) {
 //					std::cout << "DRAG TO CROSSHAIR" << std::endl;
+//					std::cout << "draged entity " << entityItemContaining << std::endl;
 					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
 					itemColliderComponent->itemDrag = true;
 					isItemDraged = true;
 
-					for ( unsigned int j = 0; j < itemComponent->occupiedSlots.GetSize(); ++j ) {
-						unsigned int inventorySlotEntity = itemComponent->occupiedSlots[j];
-						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-						inventorySlotComponent->itemEntity = UINT_MAX;
-					}
+					// for ( unsigned int j = 0; j < itemComponent->occupiedSlots.GetSize(); ++j ) {
+					// 	unsigned int inventorySlotEntity = itemComponent->occupiedSlots[j];
+					// 	cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+					// 	inventorySlotComponent->itemEntity = UINT_MAX;
+					// }
 
 //					itemComponent->occupiedSlots.clear();
 				} 
