@@ -3820,19 +3820,25 @@ namespace GLVM::core
 											ecs::components::collider* itemColliderComponent,
 											ecs::components::item* itemComponent) {
 		UI_UBO hudUBO{};
-		unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
-		unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots[3];
-		// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
-		// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
+		float x_result_offset = 0.0f;
+		float y_result_offset = 0.0f;
+		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
+			
+		} else {
+			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
+			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots[3];
+			// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
+			// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
 		
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
-		cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
-		cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
+			ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+			namespace cm = GLVM::ecs::components;
+			cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
+			cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
 
-		// Compute absolute centre of all slots
-		float x_result_offset = (slotTransform_0->tPosition[0] + slotTransform_3->tPosition[0]) / 2.0f;
-		[[maybe_unused]] float y_result_offset = (slotTransform_0->tPosition[1] + slotTransform_3->tPosition[1]) / 2.0f;
+			// Compute absolute centre of all slots
+			x_result_offset = (slotTransform_0->tPosition[0] + slotTransform_3->tPosition[0]) / 2.0f;
+			y_result_offset = (slotTransform_0->tPosition[1] + slotTransform_3->tPosition[1]) / 2.0f;
+		}
 		float itemScale = itemTransfromComponent->fScale;
 //		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
 		// std::cout << "x: " << x_result_offset << std::endl;
@@ -4145,8 +4151,11 @@ namespace GLVM::core
 //			std::cout << "i: " << i << std::endl;
 			unsigned int itemEntity = linkedEntities[i];
 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
-			if ( itemComponent->occupiedSlots.GetSize() == 0 )
+			cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
+			if ( actorComponent != nullptr )
 				continue;
+			// if ( itemComponent->occupiedSlots.GetSize() == 0 )
+			// 	continue;
 			
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
 			unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
