@@ -227,16 +227,12 @@ namespace GLVM::ecs
 
 		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-			std::cout << "next iter" << std::endl;
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
 				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
-//				componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
 
 				if ( itemCollider->bWall_Collision_ ) {
-//					itemCollider->bWall_Collision_ = false;
-//					std::cout << "TEST" << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->tPosition;
 					float itemScale   = itemTransform->fScale;
@@ -249,15 +245,11 @@ namespace GLVM::ecs
 					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
 																											   cm::transform,
 																											   cm::inventorySlot>();
-					std::cout << "NEXT ITER" << std::endl;
 					core::vector<unsigned int> collidedInventorySlotEntities;
 					core::vector<vec3> collidedInventorySlotTransforms;
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-//						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-//						std::cout << "INVENTORY ENTITY " << inventorySlotEntity << std::endl;
-//						std::cout << "INVENTORY SLOT " << inventorySlotComponent->itemEntity << std::endl;
 						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
 						float inventorySlotScale    = inventorySlotTransform->fScale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
@@ -271,22 +263,13 @@ namespace GLVM::ecs
 						squareColliderFlag = SquareCollider(itemPosition, inventorySlotPosition,
 															itemScale, inventorySlotScale);
 						if ( squareColliderFlag ) {
-							// std::cout << "collided entities " << inventorySlotEntity << std::endl;
-							// std::cout << "colliede entity position " << "x: " << inventorySlotPosition[0] << " y: " <<
-							// 	inventorySlotPosition[1] << " z: " << inventorySlotPosition[2] << std::endl;
-//							std::cout << "COLLIDED ENTITY " << inventorySlotEntity << std::endl;
 							collidedInventorySlotEntities.Push(inventorySlotEntity);
 							collidedInventorySlotTransforms.Push(inventorySlotPosition);
-//							componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
 							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
 						} else {
 							continue;
 						}		
 					}
-					std::cout << "NUMBER OF COLLIDERS BEFOUR: " << collidedInventorySlotEntities.GetSize() << std::endl;
-					// std::cout << "item position " << "x: " << itemPosition[0] << " y: " <<
-					// 			itemPosition[1] << " z: " << itemPosition[2] << std::endl;
-//					core::vector<float> distanceVectorsFromItemToInventorySlot;
 					float aspectRatio = 1920.0f / 1080.0f;
 					vec3 localItemPosition = itemPosition;
 					localItemPosition[0] = localItemPosition[0] * aspectRatio;
@@ -305,7 +288,6 @@ namespace GLVM::ecs
 								continue;
 							}
 						
-//						std::cout << "m: " << m << std::endl;
 							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
 							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
 
@@ -314,9 +296,6 @@ namespace GLVM::ecs
 							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
 							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
 						
-							// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
-							// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
-
 							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
 							if ( currentDistance < distanceAccumulator ) {
 								newColliderEntities[0] = collidedInventorySlotEntities[m];
@@ -327,16 +306,13 @@ namespace GLVM::ecs
 								distanceAccumulator = currentDistance;
 							}
 								
-//						std::cout << "range " << distanceAccumulator << std::endl;
 							++ignoreIterationFlag;
-//						std::cout << "entity " << collidedInventorySlotEntities[m] << std::endl;
 						}
 					} else if ( collidedInventorySlotEntities.GetSize() == 4 ) {
 						for ( unsigned int i = 0; i < 4; ++i )
 							newColliderEntities[i] = collidedInventorySlotEntities[i];
 					} else if ( collidedInventorySlotEntities.GetSize() == 6 ) {
 						for ( unsigned int m = 0; m < 4; m += 2 ) {
-							std::cout << "ITERETION #: " << m << std::endl;
 							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
 							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 3];
 
@@ -345,9 +321,6 @@ namespace GLVM::ecs
 							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
 							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
 						
-							// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
-							// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
-
 							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
 							if ( currentDistance < distanceAccumulator ) {
 								newColliderEntities[0] = collidedInventorySlotEntities[m];
@@ -359,72 +332,17 @@ namespace GLVM::ecs
 							}
 						}
 					}
-					// Search 4 minimum distance from item to inventorySlot
-
-					// unsigned int firstMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					// if ( firstMinimumIndex != UINT_MAX ) {
-					// 	newColliderEntities.Push(collidedInventorySlotEntities[firstMinimumIndex]);
-					// 	collidedInventorySlotEntities.Remove(firstMinimumIndex);
-					// 	distanceVectorsFromItemToInventorySlot.Remove(firstMinimumIndex);
-					// }
-
-					// unsigned int secondMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					// if ( secondMinimumIndex != UINT_MAX ) {
-					// 	newColliderEntities.Push(collidedInventorySlotEntities[secondMinimumIndex]);
-					// 	collidedInventorySlotEntities.Remove(secondMinimumIndex);
-					// 	distanceVectorsFromItemToInventorySlot.Remove(secondMinimumIndex);
-					// }
-
-					// unsigned int thirdMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					// if ( thirdMinimumIndex != UINT_MAX ) {
-					// 	newColliderEntities.Push(collidedInventorySlotEntities[thirdMinimumIndex]);
-					// 	collidedInventorySlotEntities.Remove(thirdMinimumIndex);
-					// 	distanceVectorsFromItemToInventorySlot.Remove(thirdMinimumIndex);
-					// }
-
-					// unsigned int fourthMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
-					// if ( fourthMinimumIndex != UINT_MAX ) {
-					// 	newColliderEntities.Push(collidedInventorySlotEntities[fourthMinimumIndex]);
-					// 	collidedInventorySlotEntities.Remove(fourthMinimumIndex);
-					// 	distanceVectorsFromItemToInventorySlot.Remove(fourthMinimumIndex);
-					// }
-
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					bubbleSortVector(newColliderEntities);
-					std::cout << "NUMBER OF COLLIDERS: " << newColliderEntities.GetSize() << std::endl;
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
-					std::cout << "state: " << stateSlotsAvailability << std::endl;
 					if ( stateSlotsAvailability == INT_MAX ) {
 						itemComponent->occupiedSlots.clear();
 						
 						for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-//						std::cout << "new colliders entity: " << newColliderEntities[x] << std::endl;
 							cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
 							invetorySlot->itemEntity = entityItemContaining;
-//							std::cout << "new slot " << newColliderEntities[x] << std::endl;
 							itemComponent->occupiedSlots.Push(newColliderEntities[x]);
 						}
-
-						// std::cout << "first vector " << VecLength(vec3(0.272436f - 0.2f, -0.670455 - (-0.8f), 0.0f)) << std::endl;
-						// std::cout << "second vector " << VecLength(vec3(0.272436f - 0.4f, -0.670455 - (-0.63f), 0.0f)) << std::endl;
-						
-						// namespace cm = GLVM::ecs::components;
-						// ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-
-						// core::vector<Entity> inventoryLinkedEntities = componentManager->collectLinkedEntities<cm::inventory>();
-						// for ( unsigned int m = 0; m < inventoryLinkedEntities.GetSize(); ++m ) {
-						// unsigned int inventoryEntity = inventoryLinkedEntities[m];
-						// cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity);
-
-						// std::cout << "TEST" << std::endl;
-						// for ( unsigned int m = 0; m < 4; ++m )
-						// 	for ( unsigned int n = 0; n < 8; ++n ) {
-						// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
-						// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
-						// 	}
-						// }
-						
-//						std::cout << "ITEM DROPED" << std::endl;
 						*isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
 						itemCollider->itemDrag = false;
@@ -432,19 +350,14 @@ namespace GLVM::ecs
 
 						return;
 					} else if ( stateSlotsAvailability == -1 ) {
-						// std::cout << "wall collision " << itemCollider->bWall_Collision_ << std::endl;
-						// std::cout << "STILL HOLDING" << std::endl;
 						return;
 					} else if ( stateSlotsAvailability >= 0 ) {
-						// std::cout << "TEST" << std::endl;
-						std::cout << "COLLIDED ENTITY: " << stateSlotsAvailability << std::endl;
 						cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(stateSlotsAvailability);
 						for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
 							unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
 							cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
 							inventorySlotComponent->itemEntity = UINT_MAX;
 						}
-//						collidedItemComponent->occupiedSlots.clear();
 						cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
 						collidedItemColliderComponent->bWall_Collision_ = true;
 						collidedItemColliderComponent->colliders.clear();
@@ -453,10 +366,8 @@ namespace GLVM::ecs
 						itemComponent->occupiedSlots.clear();
 						
 						for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-//						std::cout << "new colliders entity: " << newColliderEntities[x] << std::endl;
 							cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
 							invetorySlot->itemEntity = entityItemContaining;
-							std::cout << "new slot " << newColliderEntities[x] << std::endl;
 							itemComponent->occupiedSlots.Push(newColliderEntities[x]);
 						}
 
@@ -484,27 +395,18 @@ namespace GLVM::ecs
 		if ( alreadyContainItemsAccumulator == UINT_MAX )
 			++allFreeStateAccumulator;
 			
-		// std::cout << "accumulator: " << alreadyContainItemsAccumulator << std::endl;
-		// std::cout << "next iteration" << std::endl;
-
-		// std::cout << "number of colliders " << slots_.GetSize() << std::endl;
 		for ( unsigned int i = 1; i < slots_.GetSize(); ++i ) {
 			cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(slots_[i]);
 
-//			std::cout << "ITEM ENTITY NEXT: " << invetorySlot->itemEntity << std::endl;
 			if ( alreadyContainItemsAccumulator == UINT_MAX && invetorySlot->itemEntity != UINT_MAX ) {
 				alreadyContainItemsAccumulator = invetorySlot->itemEntity;
 			} else if ( invetorySlot->itemEntity == UINT_MAX ) {
-//				std::cout << "ITEM ENTITY 0: " << invetorySlot->itemEntity << std::endl;
 				++allFreeStateAccumulator;
 			} else if ( invetorySlot->itemEntity == alreadyContainItemsAccumulator ) {
-//				std::cout << "ITEM ENTITY 1: " << invetorySlot->itemEntity << std::endl;
 				alreadyContainItemsAccumulator = invetorySlot->itemEntity;
 			} else if ( invetorySlot->itemEntity != UINT_MAX &&
 						invetorySlot->itemEntity > 0 &&
 						invetorySlot->itemEntity != alreadyContainItemsAccumulator ) {
-				// std::cout << "ITEM ENTITY 2: " << invetorySlot->itemEntity << std::endl;
-				// std::cout << "TI DURAK??? " << invetorySlot->itemEntity << std::endl;
 				return resultState;
 			}
 		}
@@ -512,8 +414,6 @@ namespace GLVM::ecs
 		if ( allFreeStateAccumulator == 4 )
 			return INT_MAX;
 		else {
-			std::cout << "TI DURAK??? " << std::endl;
-			std::cout << "U TEB9 V ACCUME -1??? " << alreadyContainItemsAccumulator << std::endl;
 			return alreadyContainItemsAccumulator;
 		}
 	}
