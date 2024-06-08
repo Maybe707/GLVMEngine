@@ -255,9 +255,9 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+//						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
 //						std::cout << "INVENTORY ENTITY " << inventorySlotEntity << std::endl;
-						std::cout << "INVENTORY SLOT " << inventorySlotComponent->itemEntity << std::endl;
+//						std::cout << "INVENTORY SLOT " << inventorySlotComponent->itemEntity << std::endl;
 						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
 						float inventorySlotScale    = inventorySlotTransform->fScale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
@@ -283,6 +283,7 @@ namespace GLVM::ecs
 							continue;
 						}		
 					}
+					std::cout << "NUMBER OF COLLIDERS BEFOUR: " << collidedInventorySlotEntities.GetSize() << std::endl;
 					// std::cout << "item position " << "x: " << itemPosition[0] << " y: " <<
 					// 			itemPosition[1] << " z: " << itemPosition[2] << std::endl;
 //					core::vector<float> distanceVectorsFromItemToInventorySlot;
@@ -297,39 +298,67 @@ namespace GLVM::ecs
 					newColliderEntities.Push(0);
 					float distanceAccumulator = 999.999f;
 					unsigned int ignoreIterationFlag = 0;
-					for ( unsigned int m = 0; m < 5; ++m ) {
-						if ( ignoreIterationFlag == 2 ) {
-							ignoreIterationFlag = 0;
-							continue;
-						}
+					if ( collidedInventorySlotEntities.GetSize() >= 9 ) {
+						for ( unsigned int m = 0; m < 5; ++m ) {
+							if ( ignoreIterationFlag == 2 ) {
+								ignoreIterationFlag = 0;
+								continue;
+							}
 						
 //						std::cout << "m: " << m << std::endl;
-						vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
-						vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
+							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
 
-						float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
-						float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
-						vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
-						normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
 						
-						// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
-						// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
+							// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
+							// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
 
-						float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
-						if ( currentDistance < distanceAccumulator ) {
-							newColliderEntities[0] = collidedInventorySlotEntities[m];
-							newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
-							newColliderEntities[2] = collidedInventorySlotEntities[m + 3];
-							newColliderEntities[3] = collidedInventorySlotEntities[m + 4];
+							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+							if ( currentDistance < distanceAccumulator ) {
+								newColliderEntities[0] = collidedInventorySlotEntities[m];
+								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+								newColliderEntities[2] = collidedInventorySlotEntities[m + 3];
+								newColliderEntities[3] = collidedInventorySlotEntities[m + 4];
 							
-							distanceAccumulator = currentDistance;
-						}
+								distanceAccumulator = currentDistance;
+							}
 								
 //						std::cout << "range " << distanceAccumulator << std::endl;
-						++ignoreIterationFlag;
+							++ignoreIterationFlag;
 //						std::cout << "entity " << collidedInventorySlotEntities[m] << std::endl;
-					}
+						}
+					} else if ( collidedInventorySlotEntities.GetSize() == 4 ) {
+						for ( unsigned int i = 0; i < 4; ++i )
+							newColliderEntities[i] = collidedInventorySlotEntities[i];
+					} else if ( collidedInventorySlotEntities.GetSize() == 6 ) {
+						for ( unsigned int m = 0; m < 4; m += 2 ) {
+							std::cout << "ITERETION #: " << m << std::endl;
+							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 3];
 
+							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+							// collidedPositionPivot[0] = collidedPositionPivot[0] * aspectRatio;
+							// collidedPositionNext[0] = collidedPositionNext[0] * aspectRatio;
+
+							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+							if ( currentDistance < distanceAccumulator ) {
+								newColliderEntities[0] = collidedInventorySlotEntities[m];
+								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+								newColliderEntities[2] = collidedInventorySlotEntities[m + 2];
+								newColliderEntities[3] = collidedInventorySlotEntities[m + 3];
+							
+								distanceAccumulator = currentDistance;
+							}
+						}
+					}
 					// Search 4 minimum distance from item to inventorySlot
 
 					// unsigned int firstMinimumIndex = searchMinimumValueIndex(distanceVectorsFromItemToInventorySlot);
@@ -362,6 +391,7 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					bubbleSortVector(newColliderEntities);
+					std::cout << "NUMBER OF COLLIDERS: " << newColliderEntities.GetSize() << std::endl;
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
 					std::cout << "state: " << stateSlotsAvailability << std::endl;
 					if ( stateSlotsAvailability == INT_MAX ) {
