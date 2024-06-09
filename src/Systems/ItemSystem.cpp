@@ -30,12 +30,12 @@ namespace GLVM::ecs
 					cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
 					cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
 
-					std::cout << "TEST" << std::endl;
-					for ( unsigned int m = 0; m < 4; ++m )
-						for ( unsigned int n = 0; n < 8; ++n ) {
-							cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
-							std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
-						}
+					// std::cout << "TEST" << std::endl;
+					// for ( unsigned int m = 0; m < 4; ++m )
+					// 	for ( unsigned int n = 0; n < 8; ++n ) {
+					// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
+					// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
+					// 	}
 					
 					if ( localItemSlot_00->itemEntity == UINT_MAX &&
 						 localItemSlot_01->itemEntity == UINT_MAX &&

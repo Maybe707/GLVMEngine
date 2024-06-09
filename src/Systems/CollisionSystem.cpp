@@ -312,7 +312,47 @@ namespace GLVM::ecs
 						for ( unsigned int i = 0; i < 4; ++i )
 							newColliderEntities[i] = collidedInventorySlotEntities[i];
 					} else if ( collidedInventorySlotEntities.GetSize() == 6 ) {
-						for ( unsigned int m = 0; m < 4; m += 2 ) {
+						unsigned int firstEntity = collidedInventorySlotEntities[0];
+						unsigned int secondEntity = collidedInventorySlotEntities[1];
+						unsigned int thirdEntity = collidedInventorySlotEntities[2];
+						unsigned int maxIteration = 0;
+						unsigned int step = 0;
+						unsigned int offset = 0;
+						unsigned int secondCubeLineOffset = 0;
+						
+						if ( firstEntity + 1 == secondEntity && firstEntity + 2 == thirdEntity ) {
+							maxIteration = 2;
+							step = 1;
+							offset = 4;
+							secondCubeLineOffset = 3;
+						} else {
+							maxIteration = 4;
+							step = 2;
+							offset = 3;
+							secondCubeLineOffset = 2;
+						}
+						
+						for ( unsigned int m = 0; m < maxIteration; m += step ) {
+							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + offset];
+
+							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+							if ( currentDistance < distanceAccumulator ) {
+								newColliderEntities[0] = collidedInventorySlotEntities[m];
+								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+								newColliderEntities[2] = collidedInventorySlotEntities[m + secondCubeLineOffset];
+								newColliderEntities[3] = collidedInventorySlotEntities[m + secondCubeLineOffset + 1];
+							
+								distanceAccumulator = currentDistance;
+							}
+						}
+					} else if (collidedInventorySlotEntities.GetSize() == 8 ) {
+						for ( unsigned int m = 0; m < 6; m += 2 ) {
 							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
 							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 3];
 
@@ -332,6 +372,7 @@ namespace GLVM::ecs
 							}
 						}
 					}
+					
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
