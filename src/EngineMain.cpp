@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Components/AnimationMoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/EnemyComponent.hpp"
@@ -84,7 +85,7 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
+	ComponentManager->CreateComponent<cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .tPosition = { (float)i * 2, 100.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
@@ -124,8 +125,8 @@ int main()
 	ComponentManager->CreateComponent<cm::transform, cm::inventory>(inventory);
 	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
 	inventoryComponent->entityOwner = uiPlayer;
-	for ( unsigned int i = 0; i < 8; ++i )
-		for ( unsigned int j = 0; j < 8; ++j ) {
+	for ( unsigned int i = 0; i < 100; ++i )
+		for ( unsigned int j = 0; j < 100; ++j ) {
 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
 //			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
 			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);

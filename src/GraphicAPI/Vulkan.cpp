@@ -6,6 +6,7 @@
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/ActorComponent.hpp"
+#include "Components/AnimationMoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
@@ -185,7 +186,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		
 		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform, cm::mesh>();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::animation, cm::transform, cm::mesh>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			Entity currentEntity                = linkedEntities[i];
@@ -4039,8 +4040,8 @@ namespace GLVM::core
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
-			for ( unsigned int j = 0; j < 8; ++j ) {
-				for ( unsigned int m = 0; m < 8; ++m ) {
+			for ( unsigned int j = 0; j < 100; ++j ) {
+				for ( unsigned int m = 0; m < 100; ++m ) {
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
