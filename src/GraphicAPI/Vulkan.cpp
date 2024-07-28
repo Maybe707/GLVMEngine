@@ -3703,7 +3703,8 @@ namespace GLVM::core
         vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
 
         for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++) {
-            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties && memProperties.memoryTypes[i].heapIndex == 0) {
+//            if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties && memProperties.memoryTypes[i].heapIndex == 0) {
+			if ((typeFilter & (1 << i)) && (memProperties.memoryTypes[i].propertyFlags & properties) == properties) {
                 return i;
             }
         }
@@ -4040,8 +4041,8 @@ namespace GLVM::core
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
-			for ( unsigned int j = 0; j < 100; ++j ) {
-				for ( unsigned int m = 0; m < 100; ++m ) {
+			for ( unsigned int j = 0; j < 8; ++j ) {
+				for ( unsigned int m = 0; m < 8; ++m ) {
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
@@ -5178,7 +5179,8 @@ namespace GLVM::core
             throw std::runtime_error("failed to present swap chain image!");
         }
 
-        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+//        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+		currentFrame = 0;
     }
 
     void CVulkanRenderer::directionalLightShadowMapDrawFrame() {

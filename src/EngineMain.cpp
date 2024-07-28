@@ -125,8 +125,8 @@ int main()
 	ComponentManager->CreateComponent<cm::transform, cm::inventory>(inventory);
 	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
 	inventoryComponent->entityOwner = uiPlayer;
-	for ( unsigned int i = 0; i < 100; ++i )
-		for ( unsigned int j = 0; j < 100; ++j ) {
+	for ( unsigned int i = 0; i < 8; ++i )
+		for ( unsigned int j = 0; j < 8; ++j ) {
 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
 //			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
 			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);

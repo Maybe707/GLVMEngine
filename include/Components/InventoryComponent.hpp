@@ -17,8 +17,8 @@ namespace GLVM::ecs::components
 					slots[i][j] = -1;
 		}
 
-		unsigned int row = 100;
-		unsigned int col = 100;
+		unsigned int row = 8;
+		unsigned int col = 8;
 		// int slots[row][col] = {
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
