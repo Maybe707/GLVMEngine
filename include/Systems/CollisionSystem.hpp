@@ -46,6 +46,8 @@ namespace GLVM::ecs
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 							float backtrackingScale, float comparedScale);
 		void Update() override;
+		static core::vector<unsigned int> searthEntities_2x2(vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
+													  const core::vector<vec3>& collidedInventorySlotTransforms);
 		int areSlotsAvailable(const core::vector<unsigned int>& slots_);
 		unsigned int searchMinimumValueIndex(core::vector<float> vector);
 		void bubbleSortVector(core::vector<unsigned int>& vector_);

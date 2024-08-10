@@ -196,24 +196,24 @@ namespace GLVM::core
 	};
 
 	struct VK_Image {
-		VkImage image;
-		VkDeviceMemory deviceMemory;
-		std::vector<VkImageView> views;
-		VkImageViewType viewType;
-		VkImageCreateFlags createFlags;
-		VkMemoryPropertyFlags memoryPropertyFlags;
-		VkImageUsageFlags usageFlags;
-		VkImageAspectFlags aspectFlags;
-		VkFormat format;
-		VkImageTiling tiling;
-		VkSampler sampler;
-		VkComponentSwizzle red;
-		VkComponentSwizzle green;
-		VkComponentSwizzle blue;
-		VkComponentSwizzle alpha;
-		uint32_t arrayLayers;
-		uint32_t width;
-		uint32_t height;
+		VkImage image = {};
+		VkDeviceMemory deviceMemory = {};
+		std::vector<VkImageView> views = {};
+		VkImageViewType viewType = {};
+		VkImageCreateFlags createFlags = {};
+		VkMemoryPropertyFlags memoryPropertyFlags = {};
+		VkImageUsageFlags usageFlags = {};
+		VkImageAspectFlags aspectFlags = {};
+		VkFormat format = {};
+		VkImageTiling tiling = {};
+		VkSampler sampler = {};
+		VkComponentSwizzle red = {};
+		VkComponentSwizzle green = {};
+		VkComponentSwizzle blue = {};
+		VkComponentSwizzle alpha = {};
+		uint32_t arrayLayers = 0;
+		uint32_t width = 0;
+		uint32_t height = 0;
 	};
 	
 	struct Descriptor {

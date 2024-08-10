@@ -270,108 +270,8 @@ namespace GLVM::ecs
 							continue;
 						}		
 					}
-					float aspectRatio = 1920.0f / 1080.0f;
-					vec3 localItemPosition = itemPosition;
-					localItemPosition[0] = localItemPosition[0] * aspectRatio;
 
-					core::vector<unsigned int> newColliderEntities;
-					newColliderEntities.Push(0);
-					newColliderEntities.Push(0);
-					newColliderEntities.Push(0);
-					newColliderEntities.Push(0);
-					float distanceAccumulator = 999.999f;
-					unsigned int ignoreIterationFlag = 0;
-					if ( collidedInventorySlotEntities.GetSize() >= 9 ) {
-						for ( unsigned int m = 0; m < 5; ++m ) {
-							if ( ignoreIterationFlag == 2 ) {
-								ignoreIterationFlag = 0;
-								continue;
-							}
-						
-							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
-							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
-
-							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
-							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
-							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
-							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
-						
-							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
-							if ( currentDistance < distanceAccumulator ) {
-								newColliderEntities[0] = collidedInventorySlotEntities[m];
-								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
-								newColliderEntities[2] = collidedInventorySlotEntities[m + 3];
-								newColliderEntities[3] = collidedInventorySlotEntities[m + 4];
-							
-								distanceAccumulator = currentDistance;
-							}
-								
-							++ignoreIterationFlag;
-						}
-					} else if ( collidedInventorySlotEntities.GetSize() == 4 ) {
-						for ( unsigned int i = 0; i < 4; ++i )
-							newColliderEntities[i] = collidedInventorySlotEntities[i];
-					} else if ( collidedInventorySlotEntities.GetSize() == 6 ) {
-						unsigned int firstEntity = collidedInventorySlotEntities[0];
-						unsigned int secondEntity = collidedInventorySlotEntities[1];
-						unsigned int thirdEntity = collidedInventorySlotEntities[2];
-						unsigned int maxIteration = 0;
-						unsigned int step = 0;
-						unsigned int offset = 0;
-						unsigned int secondCubeLineOffset = 0;
-						
-						if ( firstEntity + 1 == secondEntity && firstEntity + 2 == thirdEntity ) {
-							maxIteration = 2;
-							step = 1;
-							offset = 4;
-							secondCubeLineOffset = 3;
-						} else {
-							maxIteration = 4;
-							step = 2;
-							offset = 3;
-							secondCubeLineOffset = 2;
-						}
-						
-						for ( unsigned int m = 0; m < maxIteration; m += step ) {
-							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
-							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + offset];
-
-							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
-							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
-							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
-							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
-						
-							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
-							if ( currentDistance < distanceAccumulator ) {
-								newColliderEntities[0] = collidedInventorySlotEntities[m];
-								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
-								newColliderEntities[2] = collidedInventorySlotEntities[m + secondCubeLineOffset];
-								newColliderEntities[3] = collidedInventorySlotEntities[m + secondCubeLineOffset + 1];
-							
-								distanceAccumulator = currentDistance;
-							}
-						}
-					} else if (collidedInventorySlotEntities.GetSize() == 8 ) {
-						for ( unsigned int m = 0; m < 6; m += 2 ) {
-							vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
-							vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 3];
-
-							float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
-							float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
-							vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
-							normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
-						
-							float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
-							if ( currentDistance < distanceAccumulator ) {
-								newColliderEntities[0] = collidedInventorySlotEntities[m];
-								newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
-								newColliderEntities[2] = collidedInventorySlotEntities[m + 2];
-								newColliderEntities[3] = collidedInventorySlotEntities[m + 3];
-							
-								distanceAccumulator = currentDistance;
-							}
-						}
-					}
+					core::vector<unsigned int> newColliderEntities = searthEntities_2x2(itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 					
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					bubbleSortVector(newColliderEntities);
@@ -422,6 +322,114 @@ namespace GLVM::ecs
 		}
 	}
 
+	core::vector<unsigned int> CCollisionSystem::searthEntities_2x2(vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
+																	const core::vector<vec3>& collidedInventorySlotTransforms) {
+		float aspectRatio = 1920.0f / 1080.0f;
+		vec3 localItemPosition = itemPosition;
+		localItemPosition[0] = localItemPosition[0] * aspectRatio;
+
+		core::vector<unsigned int> newColliderEntities;
+		newColliderEntities.Push(0);
+		newColliderEntities.Push(0);
+		newColliderEntities.Push(0);
+		newColliderEntities.Push(0);
+		float distanceAccumulator = 999.999f;
+		unsigned int ignoreIterationFlag = 0;
+		if ( collidedInventorySlotEntities.GetSize() >= 9 ) {
+			for ( unsigned int m = 0; m < 4; ++m ) {
+				if ( ignoreIterationFlag == 2 ) {
+					ignoreIterationFlag = 0;
+					continue;
+				}
+						
+				vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+				vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 4];
+
+				float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+				float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+				vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+				normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+				float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+				if ( currentDistance < distanceAccumulator ) {
+					newColliderEntities[0] = collidedInventorySlotEntities[m];
+					newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+					newColliderEntities[2] = collidedInventorySlotEntities[m + 3];
+					newColliderEntities[3] = collidedInventorySlotEntities[m + 4];
+							
+					distanceAccumulator = currentDistance;
+				}
+								
+				++ignoreIterationFlag;
+			}
+		} else if ( collidedInventorySlotEntities.GetSize() == 4 ) {
+			for ( unsigned int i = 0; i < 4; ++i )
+				newColliderEntities[i] = collidedInventorySlotEntities[i];
+		} else if ( collidedInventorySlotEntities.GetSize() == 6 ) {
+			unsigned int firstEntity = collidedInventorySlotEntities[0];
+			unsigned int secondEntity = collidedInventorySlotEntities[1];
+			unsigned int thirdEntity = collidedInventorySlotEntities[2];
+			unsigned int maxIteration = 0;
+			unsigned int step = 0;
+			unsigned int offset = 0;
+			unsigned int secondCubeLineOffset = 0;
+						
+			if ( firstEntity + 1 == secondEntity && firstEntity + 2 == thirdEntity ) {
+				maxIteration = 2;
+				step = 1;
+				offset = 4;
+				secondCubeLineOffset = 3;
+			} else {
+				maxIteration = 4;
+				step = 2;
+				offset = 3;
+				secondCubeLineOffset = 2;
+			}
+						
+			for ( unsigned int m = 0; m < maxIteration; m += step ) {
+				vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+				vec3 collidedPositionNext = collidedInventorySlotTransforms[m + offset];
+
+				float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+				float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+				vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+				normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+				float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+				if ( currentDistance < distanceAccumulator ) {
+					newColliderEntities[0] = collidedInventorySlotEntities[m];
+					newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+					newColliderEntities[2] = collidedInventorySlotEntities[m + secondCubeLineOffset];
+					newColliderEntities[3] = collidedInventorySlotEntities[m + secondCubeLineOffset + 1];
+							
+					distanceAccumulator = currentDistance;
+				}
+			}
+		} else if (collidedInventorySlotEntities.GetSize() == 8 ) {
+			for ( unsigned int m = 0; m < 6; m += 2 ) {
+				vec3 collidedPositionPivot = collidedInventorySlotTransforms[m];
+				vec3 collidedPositionNext = collidedInventorySlotTransforms[m + 3];
+
+				float nonNormalized_x = (collidedPositionPivot[0] + collidedPositionNext[0]) / 2.0f;
+				float nonNormalized_y = (collidedPositionPivot[1] + collidedPositionNext[1]) / 2.0f;
+				vec3 normalizedCollidedPosition = vec3(nonNormalized_x, nonNormalized_y, 0.0f);
+				normalizedCollidedPosition[0] = normalizedCollidedPosition[0] * aspectRatio;
+						
+				float currentDistance = VecLength(localItemPosition - normalizedCollidedPosition);
+				if ( currentDistance < distanceAccumulator ) {
+					newColliderEntities[0] = collidedInventorySlotEntities[m];
+					newColliderEntities[1] = collidedInventorySlotEntities[m + 1];
+					newColliderEntities[2] = collidedInventorySlotEntities[m + 2];
+					newColliderEntities[3] = collidedInventorySlotEntities[m + 3];
+							
+					distanceAccumulator = currentDistance;
+				}
+			}
+		}
+
+		return newColliderEntities;
+	}
+	
 	int CCollisionSystem::areSlotsAvailable(const core::vector<unsigned int>& slots_) {
 		namespace cm = GLVM::ecs::components;
         ComponentManager* componentManager = ComponentManager::GetInstance();

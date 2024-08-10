@@ -13,9 +13,9 @@ namespace GLVM::ecs::components
 	class rigidBody
 	{
     public:
-		float gravityTime;
-        float fMass_;
-        bool bGravity_;
+		float gravityTime = 0.0f;
+        float fMass_ = 0.0f;
+        bool bGravity_ = 0.0f;
 		vec3 jump{ 0.0f, 0.0f, 0.0f };
 		float jumpAccumulator = 0.0f;
 	};
