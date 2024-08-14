@@ -155,7 +155,7 @@ namespace GLVM::core
     
 	template<class T>
 	void vector<T>::Push(T item) {
-		if(size == capacity || size == 0) {
+		if(size == capacity) {
 				unsigned char* aTemp_Vector_Container = new unsigned char[(capacity + expander) * sizeof(T)];
 				for(unsigned int i = 0; i < size; ++i) {
 					T& element = *(T*)&rowInnerData[i * sizeof(T)];
@@ -169,6 +169,11 @@ namespace GLVM::core
 				capacity += expander;
 			}
 
+		if( rowInnerData == nullptr ) {
+			capacity = expander;
+			rowInnerData = new unsigned char[capacity * sizeof(T)];
+		}
+		
 		new (&rowInnerData[size * sizeof(T)]) T(item);
 		++size;
 	}
