@@ -45,6 +45,7 @@ namespace GLVM::ecs
 		                 float backtrackingScale, float comparedScale);
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 							float backtrackingScale, float comparedScale);
+		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale);
 		void Update() override;
 		static core::vector<unsigned int> searthEntities_2x2(vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
 													  const core::vector<vec3>& collidedInventorySlotTransforms);
