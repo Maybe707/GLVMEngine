@@ -284,9 +284,9 @@ namespace GLVM::ecs
 						}		
 					}
 
-					core::vector<unsigned int> newColliderEntities = searthEntities_2x2(itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
-					
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
+					
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
 					if ( stateSlotsAvailability == INT_MAX ) {
@@ -335,17 +335,17 @@ namespace GLVM::ecs
 		}
 	}
 
-	core::vector<unsigned int> CCollisionSystem::searthEntities_2x2(vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
+	core::vector<unsigned int> CCollisionSystem::searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
 																	[[maybe_unused]] const core::vector<vec3>& collidedInventorySlotTransforms) {
 		float aspectRatio = 1920.0f / 1080.0f;
 		vec3 localItemPosition = itemPosition;
 		localItemPosition[0] = localItemPosition[0] * aspectRatio;
 
 		core::vector<unsigned int> newColliderEntities;
-		newColliderEntities.Push(0);
-		newColliderEntities.Push(0);
-		newColliderEntities.Push(0);
-		newColliderEntities.Push(0);
+		// newColliderEntities.Push(0);
+		// newColliderEntities.Push(0);
+		// newColliderEntities.Push(0);
+		// newColliderEntities.Push(0);
 		// float distanceAccumulator = 999.999f;
 		// unsigned int ignoreIterationFlag = 0;
 		namespace cm = GLVM::ecs::components;
@@ -357,8 +357,8 @@ namespace GLVM::ecs
 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity[0]);
 		unsigned int pivot_slot_row = -1;
 		unsigned int pivot_slot_col = -1;
-		for ( int i = 0; i < 8; ++i )
-			for ( int j = 0; j < 8; ++j ) {
+		for ( unsigned int i = 0; i < inventoryComponent->row; ++i )
+			for ( unsigned int j = 0; j < inventoryComponent->col; ++j ) {
 				if ( pivotEntity == inventoryComponent->slots[i][j] ) {
 					pivot_slot_row = i;
 					pivot_slot_col = j;
@@ -375,36 +375,60 @@ namespace GLVM::ecs
 		std::cout << "item pos: " << itemPosition[1] << std::endl;
 		std::cout << "candidate pos: " << candidatePosition[1] << std::endl;
 		if ( itemPosition[0] >= candidatePosition[0] ) {
-			if ( pivot_slot_col < 7 )
-				col_offset = 1;
-			else
-				col_offset = -1;
+			if ( pivot_slot_col < inventoryComponent->col - 1 ) {
+				col_offset = itemSlotType.width / 2;
+				std::cout << "TSET" << col_offset << std::endl;
+			} else
+				col_offset = -(itemSlotType.width / 2);
 		} else {
 			if ( pivot_slot_col > 0 )
-				col_offset = -1;
+				col_offset = -(itemSlotType.width / 2);
 			else
-				col_offset = 1;
+				col_offset = itemSlotType.width / 2;
 		}
 
 		if ( itemPosition[1] >= candidatePosition[1] ) {
-			if ( pivot_slot_row < 7 )
-				row_offset = 1;
+			if ( pivot_slot_row < inventoryComponent->row - 1 )
+				row_offset = itemSlotType.height / 2;
 			else
-				row_offset = -1;
+				row_offset = -(itemSlotType.height / 2);
 		} else {
 			if ( pivot_slot_row > 0 )
-				row_offset = -1;
+				row_offset = -(itemSlotType.height / 2);
 			else
-				row_offset = 1;
+				row_offset = itemSlotType.height / 2;
 		}
 		
 		std::cout << "row offset " << row_offset << std::endl;
 		std::cout << "col offset " << col_offset << std::endl;
+
+		for ( unsigned int i = 0; i < itemSlotType.height; ++i )
+			for ( unsigned int j = 0; j < itemSlotType.width; ++j ) {
+				int result_row_offset = 0;
+				int result_col_offset = 0;
+				if ( row_offset < 0 )
+					result_row_offset = row_offset + i;
+				else if (row_offset > 0 )
+					result_row_offset = row_offset - i;
+
+				if ( col_offset < 0 )
+					result_col_offset = col_offset + j;
+				else if (col_offset > 0 )
+					result_col_offset = col_offset - j;
+
+				std::cout << "i: " << i << std::endl;
+				std::cout << "j: " << j << std::endl;
+				
+				std::cout << "result row offset " << result_row_offset << std::endl;
+				std::cout << "result col offset " << result_col_offset << std::endl;
+				
+				newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
+			}
 		
-		newColliderEntities[0] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col];
-		newColliderEntities[1] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col + col_offset];
-		newColliderEntities[2] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col + col_offset];
-		newColliderEntities[3] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col];
+		// newColliderEntities[0] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col];
+		// newColliderEntities[1] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col + col_offset];
+		// newColliderEntities[2] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col + col_offset];
+		// newColliderEntities[3] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col];
 		
 		return newColliderEntities;
 	}
@@ -439,7 +463,7 @@ namespace GLVM::ecs
 			}
 		}
 		
-		if ( allFreeStateAccumulator == 4 )
+		if ( allFreeStateAccumulator == slots_.GetSize() )
 			return INT_MAX;
 		else {
 			return alreadyContainItemsAccumulator;

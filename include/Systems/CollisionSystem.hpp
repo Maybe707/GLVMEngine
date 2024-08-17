@@ -6,6 +6,7 @@
 #ifndef COLLISION_SYSTEM
 #define COLLISION_SYSTEM
 
+#include "Components/ItemComponent.hpp"
 #include "Vector.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -47,7 +48,7 @@ namespace GLVM::ecs
 							float backtrackingScale, float comparedScale);
 		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale);
 		void Update() override;
-		static core::vector<unsigned int> searthEntities_2x2(vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
+		static core::vector<unsigned int> searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
 													  const core::vector<vec3>& collidedInventorySlotTransforms);
 		int areSlotsAvailable(const core::vector<unsigned int>& slots_);
 		unsigned int searchMinimumValueIndex(core::vector<float> vector);
