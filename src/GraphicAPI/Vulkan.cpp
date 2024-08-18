@@ -3828,7 +3828,7 @@ namespace GLVM::core
 			
 		} else {
 			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
-			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots[3];
+			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
 			// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
 			// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
 		
@@ -3864,8 +3864,8 @@ namespace GLVM::core
 		}
 		
 		mat4 model(1.0);
-		model[0][0] = itemScale;
-		model[1][1] = itemScale;
+		model[0][0] = itemScale * itemComponent->itemSlotType.width / 2;
+		model[1][1] = itemScale * itemComponent->itemSlotType.height / 2;
 		model[2][2] = itemScale;
 		model[3][0] = itemTransfromComponent->tPosition[0];
 		model[3][1] = itemTransfromComponent->tPosition[1];

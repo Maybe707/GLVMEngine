@@ -6,8 +6,8 @@
 namespace GLVM::ecs::components
 {
 	struct ItemSlotType {
-		unsigned int width;
 		unsigned int height;
+		unsigned int width;
 	};
 	
 	struct item {
