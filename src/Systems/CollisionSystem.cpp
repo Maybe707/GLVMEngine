@@ -342,12 +342,6 @@ namespace GLVM::ecs
 		localItemPosition[0] = localItemPosition[0] * aspectRatio;
 
 		core::vector<unsigned int> newColliderEntities;
-		// newColliderEntities.Push(0);
-		// newColliderEntities.Push(0);
-		// newColliderEntities.Push(0);
-		// newColliderEntities.Push(0);
-		// float distanceAccumulator = 999.999f;
-		// unsigned int ignoreIterationFlag = 0;
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* componentManager = ComponentManager::GetInstance();
@@ -365,18 +359,10 @@ namespace GLVM::ecs
 				}
 			}
 		vec3 candidatePosition = candidateTransform->tPosition;
-		// std::cout << "item position y: " << itemPosition[1] << std::endl;
-		// std::cout << "candidate position y" << candidatePosition[1] << std::endl;
 
 		int row_offset = 0;
 		int col_offset = 0;
-		// std::cout << "row " << pivot_slot_row << std::endl;
-		// std::cout << "col " << pivot_slot_col << std::endl;
-		// std::cout << "item pos: " << itemPosition[1] << std::endl;
-		// std::cout << "candidate pos: " << candidatePosition[1] << std::endl;
 		const unsigned int half_width = static_cast<int>(std::floor(itemSlotType.width / 2.0f));
-//		std::cout << "half width: " << half_width << std::endl;
-//		const unsigned int halfWidth = itemSlotType.width / 2;
 		unsigned int even_odd_width_flag = 1;
 		if ( half_width == itemSlotType.width / 2.0f )
 			even_odd_width_flag = 0;
@@ -384,30 +370,23 @@ namespace GLVM::ecs
 		if ( itemPosition[0] >= candidatePosition[0] ) {
 			if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
 				col_offset = half_width;
-				std::cout << "case 0 with col_offset: " << col_offset << std::endl;
 			} else if ( pivot_slot_col < half_width ) {
 				col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
-				std::cout << "case 1 with col_offset: " << col_offset << std::endl;
 			} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
 				col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
-				std::cout << "case 2 with col_offset: " << col_offset << std::endl;
 			}
 
 		} else {
 			if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
 				col_offset = -half_width;
-				std::cout << "case 0 with col_offset: " << col_offset << std::endl;
 			} else if ( pivot_slot_col < half_width ) {
 				col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
-				std::cout << "case 1 with col_offset: " << col_offset << std::endl;
 			} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
 				col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
-				std::cout << "case 2 with col_offset: " << col_offset << std::endl;
 			}
 		}
 
 		const unsigned int half_height = static_cast<int>(std::floor(itemSlotType.height / 2.0f));
-//		const unsigned int halfHeight = itemSlotType.height / 2;
 		unsigned int even_odd_height_flag = 1;
 		if ( half_height == itemSlotType.height / 2.0f )
 			even_odd_height_flag = 0;
@@ -415,29 +394,20 @@ namespace GLVM::ecs
 		if ( itemPosition[1] >= candidatePosition[1] ) {
 			if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
 				row_offset = half_height;
-				std::cout << "case 0 with row_offset: " << row_offset << std::endl;
 			} else if ( pivot_slot_row < half_height ) {
 				row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
-				std::cout << "case 1 with row_offset: " << row_offset << std::endl;
 			} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
 				row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
-				std::cout << "case 2 with row_offset: " << row_offset << std::endl;
 			}
 		} else {
 			if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
 				row_offset = -(half_height);
-				std::cout << "case 0 with row_offset: " << row_offset << std::endl;
 			} else if ( pivot_slot_row < half_height ) {
 				row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
-				std::cout << "case 1 with row_offset: " << row_offset << std::endl;
 			} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
 				row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
-				std::cout << "case 2 with row_offset: " << row_offset << std::endl;
 			}
 		}
-		
-		// std::cout << "row offset " << row_offset << std::endl;
-		// std::cout << "col offset " << col_offset << std::endl;
 
 		for ( unsigned int i = 0; i < itemSlotType.height; ++i )
 			for ( unsigned int j = 0; j < itemSlotType.width; ++j ) {
@@ -453,22 +423,8 @@ namespace GLVM::ecs
 				else if (col_offset > 0 )
 					result_col_offset = col_offset - j;
 
-				std::cout << "i: " << i << std::endl;
-				std::cout << "j: " << j << std::endl;
-				
-				std::cout << "result row offset " << result_row_offset << std::endl;
-				std::cout << "result col offset " << result_col_offset << std::endl;
-
-				// std::cout << "pivot row: " << pivot_slot_row << std::endl;
-				// std::cout << "pivot col: " << pivot_slot_col << std::endl;
-				
 				newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
 			}
-		
-		// newColliderEntities[0] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col];
-		// newColliderEntities[1] = inventoryComponent->slots[pivot_slot_row][pivot_slot_col + col_offset];
-		// newColliderEntities[2] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col + col_offset];
-		// newColliderEntities[3] = inventoryComponent->slots[pivot_slot_row + row_offset][pivot_slot_col];
 		
 		return newColliderEntities;
 	}
