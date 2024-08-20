@@ -286,6 +286,9 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
+					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
+					if ( newColliderEntities.GetSize() != slotsNumberForItem )
+						return;
 					
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
@@ -349,8 +352,8 @@ namespace GLVM::ecs
 		cm::transform* candidateTransform = componentManager->GetComponent<cm::transform>(pivotEntity);
 		core::vector<unsigned int> inventoryEntity = componentManager->collectLinkedEntities<cm::inventory>();
 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity[0]);
-		unsigned int pivot_slot_row = -1;
-		unsigned int pivot_slot_col = -1;
+		int pivot_slot_row = -1;
+		int pivot_slot_col = -1;
 		for ( unsigned int i = 0; i < inventoryComponent->row; ++i )
 			for ( unsigned int j = 0; j < inventoryComponent->col; ++j ) {
 				if ( pivotEntity == inventoryComponent->slots[i][j] ) {
@@ -364,26 +367,62 @@ namespace GLVM::ecs
 		int col_offset = 0;
 		const unsigned int half_width = static_cast<int>(std::floor(itemSlotType.width / 2.0f));
 		unsigned int even_odd_width_flag = 1;
+		// if ( half_width == itemSlotType.width / 2.0f )
+		// 	even_odd_width_flag = 0;
+			
+		// if ( itemPosition[0] >= candidatePosition[0] ) {
+		// 	if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
+		// 		col_offset = half_width;
+		// 	} else if ( pivot_slot_col < half_width ) {
+		// 		col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
+		// 	} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
+		// 		col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
+		// 	}
+
+		// } else {
+		// 	if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
+		// 		col_offset = -half_width;
+		// 	} else if ( pivot_slot_col < half_width ) {
+		// 		col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
+		// 	} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
+		// 		col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
+		// 	}
+		// }
+
+		// const unsigned int half_height = static_cast<int>(std::floor(itemSlotType.height / 2.0f));
+		// unsigned int even_odd_height_flag = 1;
+		// if ( half_height == itemSlotType.height / 2.0f )
+		// 	even_odd_height_flag = 0;
+
+		// if ( itemPosition[1] >= candidatePosition[1] ) {
+		// 	if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
+		// 		row_offset = half_height;
+		// 	} else if ( pivot_slot_row < half_height ) {
+		// 		row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
+		// 	} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
+		// 		row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
+		// 	}
+		// } else {
+		// 	if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
+		// 		row_offset = -(half_height);
+		// 	} else if ( pivot_slot_row < half_height ) {
+		// 		row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
+		// 	} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
+		// 		row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
+		// 	}
+		// }
+
 		if ( half_width == itemSlotType.width / 2.0f )
 			even_odd_width_flag = 0;
-			
-		if ( itemPosition[0] >= candidatePosition[0] ) {
-			if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
-				col_offset = half_width;
-			} else if ( pivot_slot_col < half_width ) {
-				col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
-			} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
-				col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
-			}
 
-		} else {
-			if ( pivot_slot_col < inventoryComponent->col - half_width && pivot_slot_col >= half_width ) {
+		if ( !even_odd_width_flag ) {
+			if ( itemPosition[0] >= candidatePosition[0] ) {
+				col_offset = half_width;
+			} else {
 				col_offset = -half_width;
-			} else if ( pivot_slot_col < half_width ) {
-				col_offset = half_width + (half_width - pivot_slot_col -1 + even_odd_width_flag);
-			} else if ( pivot_slot_col >= inventoryComponent->col - half_width ) {
-				col_offset = -half_width - (half_width - (inventoryComponent->col - pivot_slot_col)) - even_odd_width_flag;
 			}
+		} else {
+			col_offset = half_width;
 		}
 
 		const unsigned int half_height = static_cast<int>(std::floor(itemSlotType.height / 2.0f));
@@ -391,24 +430,16 @@ namespace GLVM::ecs
 		if ( half_height == itemSlotType.height / 2.0f )
 			even_odd_height_flag = 0;
 
-		if ( itemPosition[1] >= candidatePosition[1] ) {
-			if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
+		if ( !even_odd_height_flag ) {
+			if ( itemPosition[1] >= candidatePosition[1] ) {
 				row_offset = half_height;
-			} else if ( pivot_slot_row < half_height ) {
-				row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
-			} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
-				row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
+			}  else {
+				row_offset = -half_height;
 			}
 		} else {
-			if ( pivot_slot_row < inventoryComponent->row - half_height && pivot_slot_row >= half_height ) {
-				row_offset = -(half_height);
-			} else if ( pivot_slot_row < half_height ) {
-				row_offset = half_height + (half_height - pivot_slot_row -1 + even_odd_height_flag);
-			} else if ( pivot_slot_row >= inventoryComponent->row - half_height ) {
-				row_offset = -(half_height) - (half_height - (inventoryComponent->row - pivot_slot_row)) - even_odd_height_flag;
-			}
+			row_offset = half_height;
 		}
-
+		
 		for ( unsigned int i = 0; i < itemSlotType.height; ++i )
 			for ( unsigned int j = 0; j < itemSlotType.width; ++j ) {
 				int result_row_offset = 0;
@@ -423,8 +454,22 @@ namespace GLVM::ecs
 				else if (col_offset > 0 )
 					result_col_offset = col_offset - j;
 
-				newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
+				std::cout << "x offset: " << pivot_slot_col + result_col_offset << std::endl;
+				std::cout << "y offset: " << pivot_slot_row + result_row_offset << std::endl;
+
+				// bool existSlot = false;
+				// for ( unsigned int n = 0; n < newColliderEntities.GetSize(); ++n ) {
+				// 	if ( newColliderEntities[n] == inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset] ) {
+				// 		existSlot = true;
+				// 		break;
+				// 	}
+				// }
+
+				if ( (pivot_slot_row + result_row_offset) >= 0 && (pivot_slot_col + result_col_offset) >= 0 ) 
+					newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
 			}
+
+		std::cout << "number of available slots: " << newColliderEntities.GetSize() << std::endl;
 		
 		return newColliderEntities;
 	}
