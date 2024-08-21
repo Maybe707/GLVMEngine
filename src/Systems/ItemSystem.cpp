@@ -1,4 +1,5 @@
 #include "Systems/ItemSystem.hpp"
+#include "Components/InventoryComponent.hpp"
 #include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
 #include <unistd.h>
@@ -21,14 +22,22 @@ namespace GLVM::ecs
 		unsigned int row = inventoryComponent->row;
 		unsigned int col = inventoryComponent->col;
 		cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
-		
+
+		unsigned int item_width = itemComponent->itemSlotType.width;
+		unsigned int item_height = itemComponent->itemSlotType.height;
 		for ( unsigned int i = 0; i < row; ++i )
 			for ( unsigned int j = 0; j < col; ++j ) {
 				if ( i < row - 1 && j < col - 1 ) {
-					cm::inventorySlot* localItemSlot_00 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]);
-					cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
-					cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
-					cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
+					core::vector<cm::inventorySlot*> maybeAvailabeSlots;
+					for ( unsigned int m = 0; m < item_height - 1; ++m )
+						for ( unsigned int n = 0; n < item_width - 1; ++n ) {
+							maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]));
+						}
+					
+					// cm::inventorySlot* localItemSlot_00 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]);
+					// cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
+					// cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
+					// cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
 
 					// std::cout << "TEST" << std::endl;
 					// for ( unsigned int m = 0; m < 4; ++m )
@@ -36,15 +45,19 @@ namespace GLVM::ecs
 					// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
 					// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
 					// 	}
-					
-					if ( localItemSlot_00->itemEntity == UINT_MAX &&
-						 localItemSlot_01->itemEntity == UINT_MAX &&
-						 localItemSlot_10->itemEntity == UINT_MAX &&
-						 localItemSlot_11->itemEntity == UINT_MAX) {
-						localItemSlot_00->itemEntity = itemEntity;
-						localItemSlot_01->itemEntity = itemEntity;
-						localItemSlot_10->itemEntity = itemEntity;
-						localItemSlot_11->itemEntity = itemEntity;
+
+					bool isAllSlotsAvailable = false;
+					for ( unsigned int v = 0; v < maybeAvailabeSlots.GetSize(); ++v ) {
+						if ( maybeAvailabeSlots[v]->itemEntity == UINT_MAX ) {
+							isAllSlotsAvailable = true;
+						} else {
+							isAllSlotsAvailable = false;
+							break;
+						}
+					}
+					if ( isAllSlotsAvailable ) {
+						for ( unsigned int w = 0; w < maybeAvailabeSlots.GetSize(); ++w )
+							maybeAvailabeSlots[w]->itemEntity = itemEntity;
 
 						// std::cout << "AFTER TEST" << std::endl;
 						// for ( unsigned int m = 0; m < 4; ++m )
@@ -53,11 +66,11 @@ namespace GLVM::ecs
 						// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
 						// 	}
 
-						
-						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j]);
-						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i][j + 1]);
-						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i + 1][j]);
-						itemComponent->occupiedSlots.Push(inventoryComponent->slots[i + 1][j + 1]);
+						for ( unsigned int m = 0; m < item_height - 1; ++m )
+							for ( unsigned int n = 0; n < item_width - 1; ++n ) {
+								itemComponent->occupiedSlots.Push(inventoryComponent->slots[m][n]);
+								std::cout << "slot entity: " << inventoryComponent->slots[m][n] << std::endl;
+							}
 						
 						isSlotFound = true;
 						return isSlotFound;
