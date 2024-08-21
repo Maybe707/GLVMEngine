@@ -425,7 +425,12 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		
         ComponentManager* componentManager = ComponentManager::GetInstance();
-		unsigned int pivotEntity = collidedInventorySlotEntities[0];
+		unsigned int pivotEntity = 0;
+		if ( collidedInventorySlotEntities.GetSize() > 0 )
+			pivotEntity = collidedInventorySlotEntities[0];
+		else
+			return newColliderEntities;
+		
 		cm::transform* candidateTransform = componentManager->GetComponent<cm::transform>(pivotEntity);
 		core::vector<unsigned int> inventoryEntity = componentManager->collectLinkedEntities<cm::inventory>();
 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntity[0]);
@@ -557,7 +562,12 @@ namespace GLVM::ecs
         ComponentManager* componentManager = ComponentManager::GetInstance();
 		
 		int resultState = -1;
-		cm::inventorySlot* inventorySlot = componentManager->GetComponent<cm::inventorySlot>(slots_[0]);
+		cm::inventorySlot* inventorySlot = nullptr;
+		if ( slots_.GetSize() > 0 )
+			inventorySlot = componentManager->GetComponent<cm::inventorySlot>(slots_[0]);
+		else
+			resultState = -1;
+
 		unsigned int alreadyContainItemsAccumulator = 0;
 		if ( inventorySlot != nullptr )
 			alreadyContainItemsAccumulator = inventorySlot->itemEntity;
@@ -608,11 +618,14 @@ namespace GLVM::ecs
 	}
 
 	void CCollisionSystem::bubbleSortVector(core::vector<unsigned int>& vector_) {
-		if ( vector_.GetSize() == 0 )
+		unsigned int max = 0;
+		if ( vector_.GetSize() > 0 )
+			max = vector_.GetSize() - 1;
+		else
 			return;
-
-		for ( unsigned int j = 0; j < vector_.GetSize(); ++j ) {
-			for ( unsigned int i = 0; i < vector_.GetSize(); ++i ) {
+		
+		for ( unsigned int j = 0; j < max; ++j ) {
+			for ( unsigned int i = 0; i < max; ++i ) {
 				if ( vector_[i] > vector_[i + 1] ) {
 					unsigned int temp = vector_[i];
 					vector_[i] = vector_[i + 1];
