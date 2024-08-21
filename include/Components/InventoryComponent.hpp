@@ -3,6 +3,7 @@
 
 #include "Components/InventorySlotComponent.hpp"
 #include <climits>
+#include "Vector.hpp"
 
 namespace GLVM::ecs::components
 {
@@ -17,8 +18,8 @@ namespace GLVM::ecs::components
 					slots[i][j] = -1;
 		}
 
-		unsigned int row = 8;
-		unsigned int col = 8;
+		static constexpr unsigned int row = 8;
+		static constexpr unsigned int col = 8;
 		// int slots[row][col] = {
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -32,6 +33,8 @@ namespace GLVM::ecs::components
 
 		unsigned int** slots = new unsigned int*[row];   ///< Array with entities contained inventorySlotComponents
 		unsigned int entityOwner = UINT_MAX;
+		core::vector<unsigned int> highlightedSlots;
+		bool isAvailableHighlightedSlots = false;
 	};
 }; // namespace GLVM::ecs::components
 

@@ -238,6 +238,80 @@ namespace GLVM::ecs
 			}
 		}
 
+
+		if ( isInventoryOpened && *isItemDraged ) {
+			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+				unsigned int entityItemContaining = linkedItemEntities[i];
+				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
+				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
+
+				if ( itemCollider->bWall_Collision_ ) {
+					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
+					vec3 itemPosition = itemTransform->tPosition;
+					// float itemScale   = itemTransform->fScale;
+					// bool  isItem_GLTF = itemTransform->gltf;
+
+					// if ( !isItem_GLTF ) {
+					// 	itemScale /= 2;
+					// }
+					
+					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
+																											   cm::transform,
+																											   cm::inventorySlot>();
+					core::vector<unsigned int> collidedInventorySlotEntities;
+					core::vector<vec3> collidedInventorySlotTransforms;
+					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
+						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
+						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
+						float inventorySlotScale    = inventorySlotTransform->fScale;
+						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
+
+						if ( !isInventorySlot_GLTF ) {
+							inventorySlotScale /= 2;
+						}
+
+						bool squareColliderFlag = false;
+						inventorySlotPosition[2] = 0.0f;
+						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
+														 inventorySlotScale);
+						if ( squareColliderFlag ) {
+							collidedInventorySlotEntities.Push(inventorySlotEntity);
+							collidedInventorySlotTransforms.Push(inventorySlotPosition);
+							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
+						} else {
+							continue;
+						}		
+					}
+
+					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
+					core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+					cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+
+					bubbleSortVector(newColliderEntities);
+					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
+
+					inventoryComponent->highlightedSlots.clear();
+					if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
+						 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) )
+						inventoryComponent->isAvailableHighlightedSlots = true;
+					else
+						inventoryComponent->isAvailableHighlightedSlots = false;
+						
+					for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
+						inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
+				}
+			}
+		} else {
+			core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+
+			inventoryComponent->highlightedSlots.clear();
+		}
+		
+		
 		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
@@ -287,8 +361,11 @@ namespace GLVM::ecs
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
-					if ( newColliderEntities.GetSize() != slotsNumberForItem )
+
+					if ( newColliderEntities.GetSize() != slotsNumberForItem ) {
+						
 						return;
+					}
 					
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
@@ -454,8 +531,8 @@ namespace GLVM::ecs
 				else if (col_offset > 0 )
 					result_col_offset = col_offset - j;
 
-				std::cout << "x offset: " << pivot_slot_col + result_col_offset << std::endl;
-				std::cout << "y offset: " << pivot_slot_row + result_row_offset << std::endl;
+				// std::cout << "x offset: " << pivot_slot_col + result_col_offset << std::endl;
+				// std::cout << "y offset: " << pivot_slot_row + result_row_offset << std::endl;
 
 				// bool existSlot = false;
 				// for ( unsigned int n = 0; n < newColliderEntities.GetSize(); ++n ) {
@@ -465,11 +542,12 @@ namespace GLVM::ecs
 				// 	}
 				// }
 
-				if ( (pivot_slot_row + result_row_offset) >= 0 && (pivot_slot_col + result_col_offset) >= 0 ) 
+				if ( (pivot_slot_row + result_row_offset) >= 0 && (pivot_slot_col + result_col_offset) >= 0 &&
+					 (pivot_slot_row + result_row_offset) < 8 && (pivot_slot_col + result_col_offset) < 8 ) 
 					newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
 			}
 
-		std::cout << "number of available slots: " << newColliderEntities.GetSize() << std::endl;
+//		std::cout << "number of available slots: " << newColliderEntities.GetSize() << std::endl;
 		
 		return newColliderEntities;
 	}

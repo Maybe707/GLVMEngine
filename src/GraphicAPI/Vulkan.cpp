@@ -11,6 +11,7 @@
 #include "Components/ControllerComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/InventoryComponent.hpp"
+#include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
@@ -3787,7 +3788,7 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset,
-									   ecs::components::transform* inventorySlotTransform) {
+									   ecs::components::transform* inventorySlotTransform, unsigned int inventorySlotEntity) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
 		float x = x_slot_offset * 0.1f + 0.2f;
@@ -3809,6 +3810,33 @@ namespace GLVM::core
 		inventorySlotTransform->tPosition[2] = 0.1f;
 		
 		hudUBO.model = model;
+
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
+		core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+
+//		std::cout << "number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
+		bool highLightedSlot = false;
+		for ( unsigned int i = 0; i < inventoryComponent->highlightedSlots.GetSize(); ++i ) {
+			if ( inventoryComponent->highlightedSlots[i] == inventorySlotEntity) {
+				highLightedSlot = true;
+				break;
+			} else
+				continue;
+		}
+		
+		if ( inventoryComponent->highlightedSlots.GetSize() > 0 ) {
+			std::cout << "TEST" << std::endl;
+			if ( highLightedSlot ) {
+				if ( inventoryComponent->isAvailableHighlightedSlots )
+					hudUBO.color = { 0.0, 0.3, 0.0 };
+				else
+					hudUBO.color = { 0.3, 0.0, 0.0 };
+			}
+		} else {
+			hudUBO.color = { 0.0, 0.0, 0.0 };
+		}
 		
 		void* hudMatrixData;
         vkMapMemory(device, uiUniformBuffersMemory[currentImage], sizeof(UI_UBO) * offset,
@@ -3824,8 +3852,9 @@ namespace GLVM::core
 		UI_UBO hudUBO{};
 		float x_result_offset = 0.0f;
 		float y_result_offset = 0.0f;
+//		if ( itemComponent->occupiedSlots.GetSize() < itemComponent->itemSlotType.height * itemComponent->itemSlotType.width ) {
 		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
-			
+			std::cout << "number of occupied slots: " << itemComponent->occupiedSlots.GetSize() << std::endl;
 		} else {
 			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
 			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
@@ -4049,7 +4078,7 @@ namespace GLVM::core
 					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
 					unsigned int uboIndex = j * 8 + m;
-					updateUBO_UI(m, j, currentFrame, uboIndex, inventorySlotTransformComponent);
+					updateUBO_UI(m, j, currentFrame, uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 

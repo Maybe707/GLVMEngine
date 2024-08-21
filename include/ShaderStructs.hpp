@@ -27,6 +27,7 @@ namespace GLVM::core {
 
 	struct alignas(64) UI_UBO {
 		mat4 model;
+		vec3 color;
 	};
 } // namespace GLVM::core
 
