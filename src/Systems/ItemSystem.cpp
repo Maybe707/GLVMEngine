@@ -25,56 +25,72 @@ namespace GLVM::ecs
 
 		unsigned int item_width = itemComponent->itemSlotType.width;
 		unsigned int item_height = itemComponent->itemSlotType.height;
-		for ( unsigned int i = 0; i < row; ++i )
-			for ( unsigned int j = 0; j < col; ++j ) {
-				if ( i < row - 1 && j < col - 1 ) {
-					core::vector<cm::inventorySlot*> maybeAvailabeSlots;
-					for ( unsigned int m = 0; m < item_height - 1; ++m )
-						for ( unsigned int n = 0; n < item_width - 1; ++n ) {
-							maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]));
-						}
+		for ( unsigned int i = 0; i < row - item_height; ++i )
+			for ( unsigned int j = 0; j < col - item_width; ++j ) {
+				core::vector<cm::inventorySlot*> maybeAvailabeSlots;
+				core::vector<unsigned int> indicesOfMaybeAvailableSlots;
+				for ( unsigned int m = i; m < i + item_height; ++m )
+					for ( unsigned int n = j; n < j + item_width; ++n ) {
+						maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]));
+//						std::cout << "pointer: " << componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]) << std::endl;
+//						std::cout << "slot entity first entiry: " << inventoryComponent->slots[m][n] << std::endl;
+						indicesOfMaybeAvailableSlots.Push(m);
+						indicesOfMaybeAvailableSlots.Push(n);
+					}
 					
-					// cm::inventorySlot* localItemSlot_00 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]);
-					// cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
-					// cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
-					// cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
+				// cm::inventorySlot* localItemSlot_00 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j]);
+				// cm::inventorySlot* localItemSlot_01 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i][j + 1]);
+				// cm::inventorySlot* localItemSlot_10 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j]);
+				// cm::inventorySlot* localItemSlot_11 = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[i + 1][j + 1]); 
 
-					// std::cout << "TEST" << std::endl;
+				// std::cout << "TEST" << std::endl;
+				// for ( unsigned int m = 0; m < 4; ++m )
+				// 	for ( unsigned int n = 0; n < 8; ++n ) {
+				// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
+				// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
+				// 	}
+
+				unsigned int isAllSlotsAvailable = 0;
+				for ( unsigned int v = 0; v < maybeAvailabeSlots.GetSize(); ++v ) {
+					if ( maybeAvailabeSlots[v]->itemEntity == UINT_MAX ) {
+						// std::cout << "ptr: " << maybeAvailabeSlots[v] << std::endl;
+						// std::cout << "TEST 2" << std::endl;
+						++isAllSlotsAvailable;
+					} else {
+						--isAllSlotsAvailable;
+					}
+				}
+				if ( maybeAvailabeSlots.GetSize() == isAllSlotsAvailable ) {
+//					std::cout << "size of array: " << maybeAvailabeSlots.GetSize() << std::endl;
+					for ( unsigned int w = 0; w < maybeAvailabeSlots.GetSize(); ++w ) {
+//						std::cout << "TEST" << std::endl;
+						maybeAvailabeSlots[w]->itemEntity = itemEntity;
+					}
+//					std::cout << "TEST" << std::endl;
+					// std::cout << "AFTER TEST" << std::endl;
 					// for ( unsigned int m = 0; m < 4; ++m )
 					// 	for ( unsigned int n = 0; n < 8; ++n ) {
 					// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
 					// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
 					// 	}
 
-					bool isAllSlotsAvailable = false;
-					for ( unsigned int v = 0; v < maybeAvailabeSlots.GetSize(); ++v ) {
-						if ( maybeAvailabeSlots[v]->itemEntity == UINT_MAX ) {
-							isAllSlotsAvailable = true;
-						} else {
-							isAllSlotsAvailable = false;
-							break;
-						}
+					// for ( unsigned int m = 0; m < item_height; ++m )
+					// 	for ( unsigned int n = 0; n < item_width; ++n ) {
+					// 		itemComponent->occupiedSlots.Push(inventoryComponent->slots[m][n]);
+					// 		std::cout << "slot entity: " << inventoryComponent->slots[m][n] << std::endl;
+					// 	}
+					std::cout << "size: " << indicesOfMaybeAvailableSlots.GetSize() << std::endl;
+					for ( unsigned int e = 0; e < indicesOfMaybeAvailableSlots.GetSize(); e += 2 ) {
+						unsigned int row = indicesOfMaybeAvailableSlots[e];
+						unsigned int col = indicesOfMaybeAvailableSlots[e + 1];
+						std::cout << "row: " << row << std::endl;
+						std::cout << "col: " << col << std::endl;
+						std::cout << "slot entity second entiry: " << inventoryComponent->slots[row][col] << std::endl;
+						itemComponent->occupiedSlots.Push(inventoryComponent->slots[row][col]);
 					}
-					if ( isAllSlotsAvailable ) {
-						for ( unsigned int w = 0; w < maybeAvailabeSlots.GetSize(); ++w )
-							maybeAvailabeSlots[w]->itemEntity = itemEntity;
-
-						// std::cout << "AFTER TEST" << std::endl;
-						// for ( unsigned int m = 0; m < 4; ++m )
-						// 	for ( unsigned int n = 0; n < 8; ++n ) {
-						// 		cm::inventorySlot* localItemSlot = componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]);
-						// 		std::cout << "slot value: " << localItemSlot->itemEntity << std::endl;
-						// 	}
-
-						for ( unsigned int m = 0; m < item_height - 1; ++m )
-							for ( unsigned int n = 0; n < item_width - 1; ++n ) {
-								itemComponent->occupiedSlots.Push(inventoryComponent->slots[m][n]);
-								std::cout << "slot entity: " << inventoryComponent->slots[m][n] << std::endl;
-							}
-						
-						isSlotFound = true;
-						return isSlotFound;
-					}
+					
+					isSlotFound = true;
+					return isSlotFound;
 				}
 			}
 
