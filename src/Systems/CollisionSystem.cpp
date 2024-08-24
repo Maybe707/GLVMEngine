@@ -240,6 +240,7 @@ namespace GLVM::ecs
 
 
 		if ( isInventoryOpened && *isItemDraged ) {
+			std::cout << "TEST" << std::endl;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];

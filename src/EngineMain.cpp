@@ -139,7 +139,8 @@ int main()
 	for ( unsigned int i = 0; i < 5; ++i ) {
 		Entity testItem = EntityManager->CreateEntity();
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
-		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { 2, 3 };
+		unsigned int row = 1 + i;
+		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { row, 5 };
 		*ComponentManager->GetComponent<cm::transform>(testItem) = { .tPosition = { 3.0f, 15.0f, 10.0f + i * 2.0f },
 			.yaw = 0.0f, .pitch = 0.0f, .fScale = 0.1f, .gltf = true };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };

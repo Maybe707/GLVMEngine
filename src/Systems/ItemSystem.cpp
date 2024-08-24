@@ -1,4 +1,6 @@
 #include "Systems/ItemSystem.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
@@ -25,8 +27,8 @@ namespace GLVM::ecs
 
 		unsigned int item_width = itemComponent->itemSlotType.width;
 		unsigned int item_height = itemComponent->itemSlotType.height;
-		for ( unsigned int i = 0; i < row - item_height; ++i )
-			for ( unsigned int j = 0; j < col - item_width; ++j ) {
+		for ( unsigned int i = 0; i < row - item_height + 1; ++i )
+			for ( unsigned int j = 0; j < col - item_width + 1; ++j ) {
 				core::vector<cm::inventorySlot*> maybeAvailabeSlots;
 				core::vector<unsigned int> indicesOfMaybeAvailableSlots;
 				for ( unsigned int m = i; m < i + item_height; ++m )
@@ -79,13 +81,13 @@ namespace GLVM::ecs
 					// 		itemComponent->occupiedSlots.Push(inventoryComponent->slots[m][n]);
 					// 		std::cout << "slot entity: " << inventoryComponent->slots[m][n] << std::endl;
 					// 	}
-					std::cout << "size: " << indicesOfMaybeAvailableSlots.GetSize() << std::endl;
+//					std::cout << "size: " << indicesOfMaybeAvailableSlots.GetSize() << std::endl;
 					for ( unsigned int e = 0; e < indicesOfMaybeAvailableSlots.GetSize(); e += 2 ) {
 						unsigned int row = indicesOfMaybeAvailableSlots[e];
 						unsigned int col = indicesOfMaybeAvailableSlots[e + 1];
-						std::cout << "row: " << row << std::endl;
-						std::cout << "col: " << col << std::endl;
-						std::cout << "slot entity second entiry: " << inventoryComponent->slots[row][col] << std::endl;
+						// std::cout << "row: " << row << std::endl;
+						// std::cout << "col: " << col << std::endl;
+						// std::cout << "slot entity second entiry: " << inventoryComponent->slots[row][col] << std::endl;
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[row][col]);
 					}
 					
@@ -172,7 +174,7 @@ namespace GLVM::ecs
 				// 	return;
 				// }
 //				std::cout << "wall collision " << itemColliderComponent->bWall_Collision_ << std::endl;
-				if ( itemColliderComponent->bWall_Collision_ ) {
+				if ( itemColliderComponent->bWall_Collision_ && itemColliderComponent->colliders[0] == linkedItemEntities[0] ) {
 //					std::cout << "DRAG TO CROSSHAIR" << std::endl;
 //					std::cout << "draged entity " << entityItemContaining << std::endl;
 					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
