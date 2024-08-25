@@ -3825,9 +3825,10 @@ namespace GLVM::core
 			} else
 				continue;
 		}
-		
+
+//		std::cout << "second intrence number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
 		if ( inventoryComponent->highlightedSlots.GetSize() > 0 ) {
-			std::cout << "TEST" << std::endl;
+//			std::cout << "TEST" << std::endl;
 			if ( highLightedSlot ) {
 				if ( inventoryComponent->isAvailableHighlightedSlots )
 					hudUBO.color = { 0.0, 0.3, 0.0 };
@@ -3854,7 +3855,7 @@ namespace GLVM::core
 		float y_result_offset = 0.0f;
 //		if ( itemComponent->occupiedSlots.GetSize() < itemComponent->itemSlotType.height * itemComponent->itemSlotType.width ) {
 		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
-			std::cout << "number of occupied slots: " << itemComponent->occupiedSlots.GetSize() << std::endl;
+//			std::cout << "number of occupied slots: " << itemComponent->occupiedSlots.GetSize() << std::endl;
 		} else {
 			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
 			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();

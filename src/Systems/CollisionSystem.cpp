@@ -222,7 +222,7 @@ namespace GLVM::ecs
 													crosshairScale, itemScale);
 				if ( squareColliderFlag ) {
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
+					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(linkedCrosshairEntities[0]);
 
 					cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
@@ -231,21 +231,23 @@ namespace GLVM::ecs
 						inventorySlotComponent->itemEntity = UINT_MAX;
 					}
 					collidedItemComponent->occupiedSlots.clear();
-				} else {
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = false;
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 				}
 			}
 		}
 
 
 		if ( isInventoryOpened && *isItemDraged ) {
-			std::cout << "TEST" << std::endl;
+//			std::cout << "TEST" << std::endl;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+			core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+			inventoryComponent->highlightedSlots.clear();
+			inventoryComponent->isAvailableHighlightedSlots = false;
+
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
+//				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 
 				if ( itemCollider->bWall_Collision_ ) {
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
@@ -262,6 +264,7 @@ namespace GLVM::ecs
 																											   cm::inventorySlot>();
 					core::vector<unsigned int> collidedInventorySlotEntities;
 					core::vector<vec3> collidedInventorySlotTransforms;
+					
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
@@ -288,21 +291,21 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
-					core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-					cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
 
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
 
-					inventoryComponent->highlightedSlots.clear();
+
 					if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
-						 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) )
+						 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ) {
+						//				std::cout << "TEST" << std::endl;
 						inventoryComponent->isAvailableHighlightedSlots = true;
-					else
-						inventoryComponent->isAvailableHighlightedSlots = false;
-						
+					}
+
 					for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
 						inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
+
+//					std::cout << "first intrance number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
 				}
 			}
 		} else {
@@ -318,9 +321,18 @@ namespace GLVM::ecs
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
-
-				if ( itemCollider->bWall_Collision_ ) {
+//				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
+				core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+				bool isCrosshairCollided = false;
+				for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
+					if ( itemCollider->colliders[n] == linkedCrosshairEntities[0] ) {
+						isCrosshairCollided = true;
+						break;
+					}
+				}
+				
+				if ( itemCollider->bWall_Collision_ && isCrosshairCollided ) {
+					std::cout << "item: " << entityItemContaining << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->tPosition;
 					// float itemScale   = itemTransform->fScale;
@@ -353,7 +365,7 @@ namespace GLVM::ecs
 						if ( squareColliderFlag ) {
 							collidedInventorySlotEntities.Push(inventorySlotEntity);
 							collidedInventorySlotTransforms.Push(inventorySlotPosition);
-							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
+//							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
 						} else {
 							continue;
 						}		
@@ -364,12 +376,14 @@ namespace GLVM::ecs
 					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
 
 					if ( newColliderEntities.GetSize() != slotsNumberForItem ) {
-						
+						// std::cout << "array size: " << newColliderEntities.GetSize() << std::endl;
+						// std::cout << "TEST" << std::endl;						
 						return;
 					}
 					
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
+//					std::cout << "state: " << stateSlotsAvailability << std::endl;
 					if ( stateSlotsAvailability == INT_MAX ) {
 						itemComponent->occupiedSlots.clear();
 						
@@ -394,9 +408,10 @@ namespace GLVM::ecs
 							inventorySlotComponent->itemEntity = UINT_MAX;
 						}
 						cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
+						core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 						collidedItemColliderComponent->bWall_Collision_ = true;
-						collidedItemColliderComponent->colliders.clear();
-						collidedItemColliderComponent->colliders.Push(entityItemContaining);
+//						collidedItemColliderComponent->colliders.clear();
+						collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
 
 						itemComponent->occupiedSlots.clear();
 						
