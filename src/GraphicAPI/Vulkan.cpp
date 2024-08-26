@@ -3887,19 +3887,20 @@ namespace GLVM::core
 
 //		itemTransfromComponent->fScale = itemScale;
 		if ( !itemColliderComponent->itemDrag ) {
-			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.3f);
+			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
 			itemScale *= 1.1f;
 			itemColliderComponent->itemDrag = false;
+			itemTransfromComponent->tPosition[2] = 0.0f;
 		}
 		
 		mat4 model(1.0);
 		model[0][0] = itemScale * itemComponent->itemSlotType.width;
 		model[1][1] = itemScale * itemComponent->itemSlotType.height;
-		model[2][2] = itemScale;
+		model[2][2] = 0.0f;
 		model[3][0] = itemTransfromComponent->tPosition[0];
 		model[3][1] = itemTransfromComponent->tPosition[1];
-		model[3][2] = 0.3f;
+		model[3][2] = itemTransfromComponent->tPosition[2];
 
 		hudUBO.model = model;
 		

@@ -198,7 +198,7 @@ namespace GLVM::ecs
 				float itemScale_X  = 0;
 				float itemScale_Y  = 0;
 				float itemGltfFlag = 0;
-				float collitionCorrectnessMultiplayer = 0.91;
+				float collitionCorrectnessMultiplayer = 0.8;
 				if ( itemTransformComponent != nullptr ) {
 					itemPosition = componentManager->
 						GetComponent<cm::transform>(entityItemContaining)->tPosition;
