@@ -7,6 +7,7 @@
 #include "ComponentManager.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Components/ColliderComponent.hpp"
+#include "Components/ControllerComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/InventorySlotComponent.hpp"
@@ -377,6 +378,20 @@ namespace GLVM::ecs
 						}		
 					}
 
+					if ( collidedInventorySlotEntities.GetSize() == 0 ) {
+						componentManager->CreateComponent<cm::actor>(entityItemContaining);
+						componentManager->CreateComponent<cm::rigidBody>(entityItemContaining);
+						*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
+						core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
+						cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
+						itemTransform->tPosition = playerTransform->tPosition + Normalize(playerTransform->tForward) * 2.5f;
+						itemTransform->fScale = 0.05f;
+						*isItemDraged = false;
+						*isLeftMouseButtonReleased = false;
+						itemCollider->itemDrag = false;
+						itemCollider->bWall_Collision_ = false;
+					}
+					
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;

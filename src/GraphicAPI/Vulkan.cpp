@@ -269,6 +269,7 @@ namespace GLVM::core
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
 								cameraComponent.up);
+		_Player.tForward = _Player.tPosition + cameraComponent.forward;
 
 		if ( !isInventoryOpened )
 			viewMatrix = viewMatrix_;
