@@ -42,13 +42,13 @@ namespace GLVM::ecs
 	}
 
 	bool CCollisionSystem::SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-		                               float backtrackingScale, float comparedScale)
+										  float backtrackingScale, float comparedScale_X, float comparedScale_Y)
 	{
 		[[maybe_unused]] float aspectRatio = 1920.0f / 1080.0f;
-        if(backtrackingPosition[0] + backtrackingScale > comparedPosition[0] - comparedScale &&
-           backtrackingPosition[0] - backtrackingScale < comparedPosition[0] + comparedScale &&
-           backtrackingPosition[1] + backtrackingScale * aspectRatio  > comparedPosition[1] - comparedScale * aspectRatio &&
-           backtrackingPosition[1] - backtrackingScale * aspectRatio  < comparedPosition[1] + comparedScale * aspectRatio) {
+        if(backtrackingPosition[0] + backtrackingScale > comparedPosition[0] - comparedScale_X &&
+           backtrackingPosition[0] - backtrackingScale < comparedPosition[0] + comparedScale_X &&
+           backtrackingPosition[1] + backtrackingScale * aspectRatio  > comparedPosition[1] - comparedScale_Y * aspectRatio &&
+           backtrackingPosition[1] - backtrackingScale * aspectRatio  < comparedPosition[1] + comparedScale_Y * aspectRatio) {
 				return true;
 		}
         
@@ -195,13 +195,19 @@ namespace GLVM::ecs
 
 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 				vec3  itemPosition;
-				float itemScale = 0;
+				float itemScale_X  = 0;
+				float itemScale_Y  = 0;
 				float itemGltfFlag = 0;
+				float collitionCorrectnessMultiplayer = 0.91;
 				if ( itemTransformComponent != nullptr ) {
 					itemPosition = componentManager->
 						GetComponent<cm::transform>(entityItemContaining)->tPosition;
-					itemScale     = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->fScale;
+					itemScale_X     = componentManager->
+						GetComponent<cm::transform>(entityItemContaining)->fScale * itemComponent->itemSlotType.width *
+						collitionCorrectnessMultiplayer;
+					itemScale_Y     = componentManager->
+						GetComponent<cm::transform>(entityItemContaining)->fScale * itemComponent->itemSlotType.height *
+						collitionCorrectnessMultiplayer;
 					itemGltfFlag = componentManager->
 						GetComponent<cm::transform>(entityItemContaining)->gltf;
 				}
@@ -211,7 +217,7 @@ namespace GLVM::ecs
 				}
 
 				if ( !itemGltfFlag ) {
-					itemScale /= 2;
+					itemScale_X /= 2;
 				}
 
 				// std::cout << "crosshair scale: " << crosshairScale << std::endl;
@@ -219,7 +225,7 @@ namespace GLVM::ecs
 				
 				bool squareColliderFlag = false;
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-													crosshairScale, itemScale);
+													crosshairScale, itemScale_X, itemScale_Y);
 				if ( squareColliderFlag ) {
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(linkedCrosshairEntities[0]);

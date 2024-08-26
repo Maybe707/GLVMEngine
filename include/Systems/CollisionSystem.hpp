@@ -45,7 +45,7 @@ namespace GLVM::ecs
 		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
 		                 float backtrackingScale, float comparedScale);
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-							float backtrackingScale, float comparedScale);
+							float backtrackingScale, float comparedScale_X, float comparedScale_Y);
 		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale);
 		void Update() override;
 		static core::vector<unsigned int> searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,

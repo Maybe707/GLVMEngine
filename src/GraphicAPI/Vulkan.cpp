@@ -3894,8 +3894,8 @@ namespace GLVM::core
 		}
 		
 		mat4 model(1.0);
-		model[0][0] = itemScale * itemComponent->itemSlotType.width / 2;
-		model[1][1] = itemScale * itemComponent->itemSlotType.height / 2;
+		model[0][0] = itemScale * itemComponent->itemSlotType.width;
+		model[1][1] = itemScale * itemComponent->itemSlotType.height;
 		model[2][2] = itemScale;
 		model[3][0] = itemTransfromComponent->tPosition[0];
 		model[3][1] = itemTransfromComponent->tPosition[1];
