@@ -8,7 +8,7 @@ INC = -I./include
 TEX = -I./textures
 BUILD = build
 SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
-	  ./src/ShaderProgram.cpp ./src/Event.cpp ./src/UnixApi/ChronoX.cpp ./src/TimerCreator.cpp \
+	  ./src/Event.cpp ./src/UnixApi/ChronoX.cpp ./src/TimerCreator.cpp \
 	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp \
 	  ./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
 	  ./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp \
