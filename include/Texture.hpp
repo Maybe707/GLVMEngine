@@ -8,7 +8,6 @@
 
 #include <cstdint>
 #include <vector>
-#include <GL/gl.h>
 
 typedef unsigned int Entity;
 
@@ -23,7 +22,6 @@ namespace GLVM::ecs
         unsigned int vkAvailableInnerId_ = 0; ///< This field using to choose specific instance of texture image in Vulkan.
         unsigned int vkInnerIdLimit_ = 10;
         
-        GLuint iTexture_ = 0;
 		const char* path_to_image = "";
         std::vector<Entity> entitiesOwnsThisTypeOfTexture_ = {};
         unsigned int id_ = 0;

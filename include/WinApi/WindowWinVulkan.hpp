@@ -11,9 +11,6 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
-#include <GL/gl.h>
-#include "glext.h"
-#include "GLPointer.h"
 
 //#define VULKAN_API
 #define OPENGL_API

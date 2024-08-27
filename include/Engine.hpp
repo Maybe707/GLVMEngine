@@ -12,11 +12,9 @@
 #include "Systems/EnemySystem.hpp"
 #include "Systems/ItemSystem.hpp"
 #include "SystemsFullSet.hpp"
-#include "GLPointer.h"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
 #include "ISoundEngine.hpp"
-#include "ShaderProgram.hpp"
 #include "EventsStack.hpp"
 #include "Event.hpp"
 #include "Texture.hpp"
@@ -26,8 +24,6 @@
 #include "ComponentManager.hpp"
 #include "SystemManager.hpp"
 #include "IContainer.hpp"
-#include <GL/gl.h>
-#include <GL/glext.h>
 #include "Constants.hpp"
 #include <mutex>
 #include "TextureManager.hpp"

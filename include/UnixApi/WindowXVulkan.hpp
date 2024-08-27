@@ -7,10 +7,15 @@
 #define WINDOW_X_VULKAN
 
 #include <X11/Xlib.h>
-#include <GL/gl.h>
-#include <GL/glx.h>
 #include "IWindow.hpp"
 #include "EventsStack.hpp"
+
+#define XKEY_ESCAPE 0xff1b
+#define XKEY_A      0x61
+#define XKEY_D      0x64
+#define XKEY_S      0x73
+#define XKEY_W      0x77
+#define XKEY_SPACE  0x20
 
 namespace GLVM::core
 {    

@@ -5,8 +5,6 @@
 
 #include "UnixApi/WindowXVulkan.hpp"
 
-#include "GLPointer.h"
-#include <GL/glx.h>
 #include <X11/Xlib.h>
 #include <bits/types/time_t.h>
 #include <bits/types/wint_t.h>
@@ -150,22 +148,22 @@ namespace GLVM::core
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
 				switch(ulKey)
 				{
-				case XK_Escape:
+				case XKEY_ESCAPE:
 					_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
 					break;
-				case XK_a:
+				case XKEY_A:
 					_Event.SetEvent(EEvents::eMOVE_LEFT);
 					break;
-				case XK_d:
+				case XKEY_D:
 					_Event.SetEvent(EEvents::eMOVE_RIGHT);
 					break;
-				case XK_s:
+				case XKEY_S:
 					_Event.SetEvent(EEvents::eMOVE_BACKWARD);
 					break;
-				case XK_w:
+				case XKEY_W:
 					_Event.SetEvent(EEvents::eMOVE_FORWARD);
 					break;
-                case XK_space:
+                case XKEY_SPACE:
                     _Event.SetEvent(EEvents::eJUMP);
                     break;
 				}
@@ -188,19 +186,19 @@ namespace GLVM::core
 		    	ulKey = XLookupKeysym(&uXEvent.xkey, 0);
                 switch(ulKey)
                 {
-                case XK_a:
+                case XKEY_A:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;
-                case XK_d:
+                case XKEY_D:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_D);
                     break;
-                case XK_s:
+                case XKEY_S:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_S);
                     break;
-                case XK_w:
+                case XKEY_W:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_W);
                     break;
-                case XK_space:
+                case XKEY_SPACE:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_JUMP);
                     break;
                 }

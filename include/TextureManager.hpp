@@ -10,7 +10,6 @@
 #include "Texture.hpp"
 #include <mutex>
 #include "Components/MaterialComponent.hpp"
-#include "GLPointer.h"
 #include "Constants.hpp"
 
 typedef unsigned int Entity_ID;
