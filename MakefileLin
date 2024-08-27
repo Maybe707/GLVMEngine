@@ -7,16 +7,16 @@ CFLAGS = -c -g -Wall -Wextra -Werror -Wpedantic
 INC = -I./include
 TEX = -I./textures
 BUILD = build
-SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp GLPointer.c \
+SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./src/ShaderProgram.cpp ./src/Event.cpp ./src/UnixApi/ChronoX.cpp ./src/TimerCreator.cpp \
-	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp ./src/Systems/GUISystem.cpp \
+	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp \
 	  ./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
-	  ./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp ./src/Systems/CameraSystem.cpp \
+	  ./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp \
 	  ./src/UnixApi/SoundEngineAlsa.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Vulkan.cpp \
 	  ./src/TextureManager.cpp ./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
-	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXOpengl.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
+	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
 	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
-	  ./textures/container2.cpp ./textures/container2_specular.cpp ./src/UnixApi/WindowXCBOpengl.cpp \
+	  ./textures/container2.cpp ./textures/container2_specular.cpp \
 	  ./src/Systems/DamageSystem.cpp ./src/Systems/EnemySystem.cpp ./textures/fontAtlas.cpp ./textures/inventorySlot.cpp \
 	  ./src/Systems/ItemSystem.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
