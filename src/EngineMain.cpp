@@ -133,7 +133,7 @@ int main()
 			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .fScale = 0.05f };
 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
 		}
-	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { 0.5f, 0.5f, 0.0f },
+	*ComponentManager->GetComponent<cm::transform>(inventory) = { .tPosition = { -1.5f, 1.5f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .fScale = 4.0f, .gltf = true };
 
 	for ( unsigned int i = 0; i < 5; ++i ) {

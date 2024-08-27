@@ -3788,7 +3788,7 @@ namespace GLVM::core
         vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateUBO_UI(uint32_t x_slot_offset, uint32_t y_slot_offset, uint32_t currentImage, uint32_t offset,
+	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t currentImage, uint32_t offset,
 									   ecs::components::transform* inventorySlotTransform, unsigned int inventorySlotEntity) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
@@ -4078,10 +4078,12 @@ namespace GLVM::core
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
+					cm::transform* inventoryTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
 					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
 					unsigned int uboIndex = j * 8 + m;
-					updateUBO_UI(m, j, currentFrame, uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
+					updateUBO_UI(inventoryTransformComponent->tPosition[0] + m, inventoryTransformComponent->tPosition[1] + j,
+								 currentFrame, uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
