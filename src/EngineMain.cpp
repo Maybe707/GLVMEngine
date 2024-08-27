@@ -285,7 +285,7 @@ int main()
 	
     ///< Game rendering loop
 //	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
-	GLVM->GameLoop(GLVM::core::VULKAN_RENDERER);
+	GLVM->GameLoop();
 
 	GLVM->GameKill();
 

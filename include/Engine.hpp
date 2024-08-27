@@ -7,7 +7,6 @@
 #define ENGINE
 
 #include "ComponentsFullSet.hpp"
-#include "GraphicAPI/Opengl.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
@@ -61,7 +60,6 @@ namespace GLVM::core
 		uint32_t meshID = 0;
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		CVulkanRenderer*     vulkanRenderer;
-		COpenglRenderer*     openglRenderer;
         
         ecs::CCollisionSystem  * collisionSystem;
 		ecs::CMovementSystem   * movementSystem;
@@ -86,9 +84,8 @@ namespace GLVM::core
         void operator=(const Engine& _engine) = delete;      ///< Dont need assignment operator because of singleton property.
         static Engine* GetInstance();                        ///< It possibly to get only one instance of this class whith this method
         
-		void GameLoop(RendererType renderer);
+		void GameLoop();
 		void EventQueueFlush();
-		void RenderOpengl();
 		void RenderVulkan();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);
 		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
