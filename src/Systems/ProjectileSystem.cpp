@@ -168,16 +168,16 @@ namespace GLVM::ecs
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
         
-        if(fPitch > 89.0f)
-            fPitch = 89.0f;
-        if(fPitch < -89.0f)
-            fPitch = -89.0f;
+        // if(fPitch > 89.0f)
+        //     fPitch = 89.0f;
+        // if(fPitch < -89.0f)
+        //     fPitch = -89.0f;
 
 		vec3 forward;
-		float sinPitch = std::sin(Radians(fPitch / 2));
-		float cosPitch = std::cos(Radians(fPitch / 2));
-		float sinYaw = std::sin(Radians(-fYaw / 2));
-		float cosYaw = std::cos(Radians(-fYaw / 2));
+		float sinPitch = std::sin(Radians(-fPitch / 2));
+		float cosPitch = std::cos(Radians(-fPitch / 2));
+		float sinYaw = std::sin(Radians(fYaw / 2));
+		float cosYaw = std::cos(Radians(fYaw / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;

@@ -362,10 +362,10 @@ namespace GLVM::core
         *_x_offset += iOffset_X;
         *_y_offset -= iOffset_Y;
 
-        if(*_y_offset > 890)
-            *_y_offset = 890;
-        else if(*_y_offset < -890)
-            *_y_offset = -890;
+        // if(*_y_offset > 890)
+        //     *_y_offset = 890;
+        // else if(*_y_offset < -890)
+        //     *_y_offset = -890;
 
 		xcb_warp_pointer(connection, XCB_NONE, window, 0, 0, 0, 0, 960, 540);
 		xcb_flush(connection);

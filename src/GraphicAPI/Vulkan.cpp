@@ -233,10 +233,10 @@ namespace GLVM::core
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
 
-        if(fPitch > 89.0f)
-            fPitch = 89.0f;
-        if(fPitch < -89.0f)
-            fPitch = -89.0f;
+        // if(fPitch > 89.0f)
+        //     fPitch = 89.0f;
+        // if(fPitch < -89.0f)
+        //     fPitch = -89.0f;
 
 		float sinPitch = std::sin(-Radians(fPitch / 2));
 		float cosPitch = std::cos(-Radians(fPitch / 2));
@@ -254,6 +254,11 @@ namespace GLVM::core
 		yawQuat.x = 0.0f;
 		yawQuat.y = sinYaw;
 		yawQuat.z = 0.0f;
+
+		// std::cout << "pitch cos: " << cosPitch << std::endl;
+		// std::cout << "pitch sin: " << sinPitch << std::endl;
+		// std::cout << "yaw cos: " << cosYaw << std::endl;
+		// std::cout << "yaw sin: " << sinYaw << std::endl;
 		
 		Quaternion result;
 		result = multiplyQuaternion(yawQuat, pitchQuat);
@@ -265,6 +270,8 @@ namespace GLVM::core
 		forward[1] = result.y;
 		forward[2] = result.z;
 
+//		std::cout << forward << std::endl;
+		
         cameraComponent.forward = Normalize(forward);
         viewMatrix_ = LookAtMain(_Player.tPosition,
 								_Player.tPosition + cameraComponent.forward,
@@ -5981,9 +5988,9 @@ namespace GLVM::core
 		Quaternion pitchQuat;
 		Quaternion yawQuat;
 		pitchQuat.w = cosPitch;
-		pitchQuat.x = 0.0f;
+		pitchQuat.x = sinPitch;
 		pitchQuat.y = 0.0f;
-		pitchQuat.z = sinPitch;
+		pitchQuat.z = 0.0f;
 
 		yawQuat.w = cosYaw;
 		yawQuat.x = 0.0f;
