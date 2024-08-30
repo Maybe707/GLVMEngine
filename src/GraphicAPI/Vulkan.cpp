@@ -238,10 +238,10 @@ namespace GLVM::core
         if(fPitch < -89.0f)
             fPitch = -89.0f;
 
-		float sinPitch = std::sin(Radians(fPitch / 2));
-		float cosPitch = std::cos(Radians(fPitch / 2));
-		float sinYaw = std::sin(Radians(-fYaw / 2));
-		float cosYaw = std::cos(Radians(-fYaw / 2));
+		float sinPitch = std::sin(-Radians(fPitch / 2));
+		float cosPitch = std::cos(-Radians(fPitch / 2));
+		float sinYaw = std::sin(Radians(fYaw / 2));
+		float cosYaw = std::cos(Radians(fYaw / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;
@@ -259,7 +259,7 @@ namespace GLVM::core
 		result = multiplyQuaternion(yawQuat, pitchQuat);
 
 		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = -1.0f }), inverseQuaternion(result));
+					.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
 
 		forward[0] = result.x;
 		forward[1] = result.y;
@@ -279,7 +279,7 @@ namespace GLVM::core
 	{
 		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
 		projectionMatrix = tProjection_Matrix;
-		projectionMatrix[1][1] *= -1.0f;
+		projectionMatrix[1][1] *= 1.0f;
 	}
 	
     void CVulkanRenderer::createTextureImage() {
@@ -5975,8 +5975,8 @@ namespace GLVM::core
 
 		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
 		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians(-(_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians(-(_transformComponent->yaw)  / 2));
+		float sinYaw = std::sin(Radians((_transformComponent->yaw)  / 2));
+		float cosYaw = std::cos(Radians((_transformComponent->yaw)  / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;

@@ -137,8 +137,8 @@ namespace GLVM::ecs
         // forward[0] = std::cos(Radians(event.mousePointerPosition.yaw * 2));
         // forward[2] = std::sin(Radians(event.mousePointerPosition.yaw * 2));
 
-		float sinYaw = std::sin(Radians(-event.mousePointerPosition.yaw / 2));
-		float cosYaw = std::cos(Radians(-event.mousePointerPosition.yaw / 2));
+		float sinYaw = std::sin(Radians(event.mousePointerPosition.yaw / 2));
+		float cosYaw = std::cos(Radians(event.mousePointerPosition.yaw / 2));
 		
 		Quaternion yawQuat;
 		yawQuat.w = cosYaw;
@@ -148,7 +148,7 @@ namespace GLVM::ecs
 
 		Quaternion result;
 		result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = -1.0f }), inverseQuaternion(yawQuat));
+					.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
 
 		forward[0] = result.x;
 		forward[1] = result.y;
