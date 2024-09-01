@@ -30,6 +30,10 @@ namespace GLVM::ecs
 		float                      deltaFrameTime;
 		float                      gravity;
         core::CStack&              inputStack;
+		float prev_delta_x = 0.0f;
+		float prev_X = 0.0f;
+		float current_X = 0.0f;
+		vec3  prev_forward;
         
         CMovementSystem( core::CStack& inputStack );
 

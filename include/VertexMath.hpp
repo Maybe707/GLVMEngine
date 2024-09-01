@@ -1149,6 +1149,7 @@ inline std::ostream& operator<<(std::ostream& ostream, const Quaternion& quatern
 }
 
 inline Quaternion linkedQuaternionValue(Quaternion quaternion) {
+	quaternion.w = quaternion.w;
 	quaternion.x = -quaternion.x;
 	quaternion.y = -quaternion.y;
 	quaternion.z = -quaternion.z;

@@ -24,13 +24,23 @@
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
+#include <cmath>
 #include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
+#include <glm/exponential.hpp>
+#include <glm/ext/quaternion_common.hpp>
+#include <glm/ext/quaternion_geometric.hpp>
+#include <glm/fwd.hpp>
+#include <glm/matrix.hpp>
+#include <glm/trigonometric.hpp>
 #include <thread>
 #include <vulkan/vulkan_core.h>
-
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 namespace GLVM::core
 {    
@@ -233,53 +243,134 @@ namespace GLVM::core
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
 
+		current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+		float delta = current_Y - prev_Y;
+		delta *= -1.0f;
+
+		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
+		float delta_x = current_X - prev_X;
+		
         // if(fPitch > 89.0f)
         //     fPitch = 89.0f;
         // if(fPitch < -89.0f)
         //     fPitch = -89.0f;
 
-		float sinPitch = std::sin(-Radians(fPitch / 2));
-		float cosPitch = std::cos(-Radians(fPitch / 2));
-		float sinYaw = std::sin(Radians(fYaw / 2));
-		float cosYaw = std::cos(Radians(fYaw / 2));
+		// float sinPitch = std::sin(-Radians(fPitch / 2));
+		// float cosPitch = std::cos(-Radians(fPitch / 2));
+		// float sinYaw = std::sin(Radians(fYaw / 2));
+		// float cosYaw = std::cos(Radians(fYaw / 2));
+
+		// std::cout << "mod y: " << g_eEvent.mousePointerPosition.offset_Y % 180 << std::endl;
+		// std::cout << "mod x: " << g_eEvent.mousePointerPosition.offset_X % 360 << std::endl;
+		// std::cout << "y: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
+		// std::cout << "x: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
+
+		// glm::vec3 forw          = { cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2] };
+		// glm::vec3 forwardResult = glm::normalize(glm::vec3(-g_eEvent.mousePointerPosition.offset_Y, g_eEvent.mousePointerPosition.offset_X, 0));
 		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = sinPitch;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = 0.0f;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		// std::cout << "pitch cos: " << cosPitch << std::endl;
-		// std::cout << "pitch sin: " << sinPitch << std::endl;
-		// std::cout << "yaw cos: " << cosYaw << std::endl;
-		// std::cout << "yaw sin: " << sinYaw << std::endl;
+		// glm::quat result = glm::quat(cos(glm::radians(fPitch/2)), sin(glm::radians(fPitch/2)) * forwardResult.x, sin(glm::radians(fPitch/2)) * forwardResult.y,
+		// 							 sin(glm::radians(fPitch/2)) * forwardResult.z);
+//		glm::quat result = rotation * glm::quat( cos(, 0.0, 0.0, 1.0 );
 		
-		Quaternion result;
-		result = multiplyQuaternion(yawQuat, pitchQuat);
+		// Quaternion pitchQuat;
+		// Quaternion yawQuat;
+		// pitchQuat.w = cosPitch;
+		// pitchQuat.x = sinPitch;
+		// pitchQuat.y = 0.0f;
+		// pitchQuat.z = 0.0f;
 
-		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
+		// yawQuat.w = cosYaw;
+		// yawQuat.x = 0.0f;
+		// yawQuat.y = sinYaw;
+		// yawQuat.z = 0.0f;
 
-		forward[0] = result.x;
-		forward[1] = result.y;
-		forward[2] = result.z;
-
-//		std::cout << forward << std::endl;
+		// // std::cout << "pitch cos: " << cosPitch << std::endl;
+		// // std::cout << "pitch sin: " << sinPitch << std::endl;
+		// // std::cout << "yaw cos: " << cosYaw << std::endl;
+		// // std::cout << "yaw sin: " << sinYaw << std::endl;
 		
-        cameraComponent.forward = Normalize(forward);
-        viewMatrix_ = LookAtMain(_Player.tPosition,
-								_Player.tPosition + cameraComponent.forward,
-								cameraComponent.up);
-		_Player.tForward = _Player.tPosition + cameraComponent.forward;
+		// Quaternion result;
+		// result = multiplyQuaternion(yawQuat, pitchQuat);
 
+		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
+		// 			.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
+		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)), sin(glm::radians(fPitch/2)), 0.0, 0.0 );
+
+		// std::cout << "cos pitch: " << cos(glm::radians(fPitch/2)) << std::endl;
+		// std::cout << "sin pitch: " << sin(glm::radians(fPitch/2)) << std::endl;
+		// float f = 1.0f;
+		// if ( cos(glm::radians(fPitch/2)) <= 0.0f ) {
+		// 	f = -1.0f;
+		// }
+		
+		// glm::quat result = rotation * glm::quat(0.0, 0.0, 0.0, -1.0);
+
+		/**********************************************************************************************************
+		glm::vec3 forwardVec(cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2]);
+		glm::vec3 upVec(cameraComponent.up[0], cameraComponent.up[1], cameraComponent.up[2]);
+		glm::vec3 rightVec = glm::cross(forwardVec, upVec);
+		upVec = glm::cross(rightVec, forwardVec);
+		glm::vec3 rotateAxis = glm::normalize(glm::cross(forwardVec, glm::vec3(rightVec * delta_x + upVec * delta)));
+
+		if ( glm::length(rotateAxis) >= 0.001f ) {
+			float angle = glm::sqrt(delta * delta + delta_x * delta_x);
+			angle = glm::radians(angle * 0.1);
+			float sinAngle = sin(angle * 0.5f);
+			glm::quat rotation = glm::quat(cos(angle * 0.5f), sinAngle * rotateAxis.x, sinAngle * rotateAxis.y,
+										   sinAngle * rotateAxis.z);
+
+			glm::quat result = rotation * glm::quat(0.0, forwardVec.x, forwardVec.y, forwardVec.z) * glm::conjugate(rotation);
+			
+			forward[0] = result.x;
+			forward[1] = result.y;
+			forward[2] = result.z;
+		}
+		cameraComponent.forward = Normalize(forward);
+		glm::vec3 position = { _Player.tPosition[0], _Player.tPosition[1], _Player.tPosition[2] };
+		glm::vec3 cameraForward = { cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2] };
+		glm::vec3 up = { cameraComponent.up[0], cameraComponent.up[1], cameraComponent.up[2] };
+		glm::mat4 view = glm::lookAt( position, position + cameraForward, up );
+		for ( unsigned int i = 0; i < 4; ++i )
+			for ( unsigned int j = 0; j < 4; ++j )
+				 viewMatrix_[i][j] = view[i][j];
+		
 		if ( !isInventoryOpened )
 			viewMatrix = viewMatrix_;
+
+		prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
+		************************************************************************************************************/
+
+		vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
+		vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
+		vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta));
+
+		if ( VecLength(rotateAxis) >= 0.001f ) {
+			float rotationAngle = sqrt(delta * delta + delta_x * delta_x);
+			rotationAngle = Radians(rotationAngle * 0.1f);
+			float angleScale = 0.5f;                                                                                     /// Quaternions need devision by 2
+			float sinRotationAngle = sin(rotationAngle * angleScale);
+			Quaternion rotationQuat = Quaternion(cos(rotationAngle * angleScale), sinRotationAngle * rotateAxis[0],
+												 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+			Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+																											cameraComponent.forward[1], cameraComponent.forward[2])),
+																linkedQuaternionValue(rotationQuat));
+
+			forward[0] = appliedRotationQuat.x;
+			forward[1] = appliedRotationQuat.y;
+			forward[2] = appliedRotationQuat.z;
+		}
+		cameraComponent.forward = Normalize(forward);
+		mat4 view = LookAtMain(_Player.tPosition, _Player.tPosition + cameraComponent.forward, cameraComponent.up);
+		for ( unsigned int i = 0; i < 4; ++i )
+			for ( unsigned int j = 0; j < 4; ++j )
+				 viewMatrix_[i][j] = view[i][j];
+		
+		if ( !isInventoryOpened )
+			viewMatrix = viewMatrix_;
+
+		prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
     }
 
     void CVulkanRenderer::SetProjectionMatrix()
@@ -962,7 +1053,12 @@ namespace GLVM::core
         vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
         for (const VkPhysicalDevice& device : devices) {
+			VkPhysicalDeviceProperties prop;
+			vkGetPhysicalDeviceProperties(device, &prop);
+			
             if (isDeviceSuitable(device)) {
+				std::cout << prop.deviceType << std::endl;
+				std::cout << prop.deviceName << std::endl;
                 physicalDevice = device;
                 break;
             }
@@ -5997,11 +6093,19 @@ namespace GLVM::core
 		yawQuat.y = sinYaw;
 		yawQuat.z = 0.0f;
 
-		Quaternion result;
-		result = multiplyQuaternion(pitchQuat, yawQuat);
-		rotationMatrix = rotateQuaternion<float, 4>(result);
+//		Quaternion result;
+		// result = multiplyQuaternion(pitchQuat, yawQuat);
+
+
+		glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
+		glm::mat4 rotationMat = glm::mat4_cast(rotation);
+		// result = { rotation.w, rotation.x, rotation.y, rotation.z };
+		// rotationMatrix = rotateQuaternion<float, 4>(result);
+		for ( unsigned int i = 0; i < 4; ++i )
+			for ( unsigned int j = 0; j < 4; ++j )
+				rotationMatrix[i][j] = rotationMat[i][j];
 		
-        return scalingMatrix * rotationMatrix * translationMatrix;
+        return scalingMatrix * translationMatrix;
 	}
 	
 	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {

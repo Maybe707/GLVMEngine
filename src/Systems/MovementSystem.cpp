@@ -24,6 +24,10 @@
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include <cstdio>
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/glm.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 namespace GLVM::ecs
 {
@@ -132,31 +136,68 @@ namespace GLVM::ecs
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& beholder,
-                                                        core::CEvent& event) {
+                                                        [[maybe_unused]] core::CEvent& event) {
         Vector<float, 3> forward(0.0f);
         // forward[0] = std::cos(Radians(event.mousePointerPosition.yaw * 2));
         // forward[2] = std::sin(Radians(event.mousePointerPosition.yaw * 2));
 
-		float sinYaw = std::sin(Radians(event.mousePointerPosition.yaw / 2));
-		float cosYaw = std::cos(Radians(event.mousePointerPosition.yaw / 2));
+		// float sinYaw = std::sin(Radians(event.mousePointerPosition.yaw / 2));
+		// float cosYaw = std::cos(Radians(event.mousePointerPosition.yaw / 2));
 		
-		Quaternion yawQuat;
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
+		// Quaternion yawQuat;
+		// yawQuat.w = cosYaw;
+		// yawQuat.x = 0.0f;
+		// yawQuat.y = sinYaw;
+		// yawQuat.z = 0.0f;
 
-		Quaternion result;
-		result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
+		// Quaternion result;
+		// result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
+		// 			.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
 
-		forward[0] = result.x;
-		forward[1] = result.y;
-		forward[2] = result.z;
+		// forward[0] = result.x;
+		// forward[1] = result.y;
+		// forward[2] = result.z;
+
+		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
+		float delta_x = current_X - prev_X;
+		if ( delta_x < 0.0001 )
+			delta_x = prev_delta_x;
+
+		/**************************************************************************************************************
+		glm::vec3 forwardVec(beholder.forward[0], beholder.forward[1], beholder.forward[2]);
+		glm::vec3 rotateAxis = { 0.0, 1.0, 0.0 };
+
+		float angle = glm::sqrt(delta_x * delta_x);
+		angle = glm::radians(angle * 0.1);
+		float sinAngle = sin(angle * 0.5f);
+		glm::quat rotation = glm::quat(cos(angle * 0.5f), sinAngle * rotateAxis.x, sinAngle * rotateAxis.y,
+									   sinAngle * rotateAxis.z);
+
+		glm::quat result = rotation * glm::quat(0.0, forwardVec.x, forwardVec.y, forwardVec.z) * glm::conjugate(rotation);
+		*****************************************************************************************************************/
+
+		vec3 rotateAxis = { 0.0, 1.0, 0.0 };
+		float rotationAngle = delta_x;
+		rotationAngle = Radians(rotationAngle * 0.1f);
+		float angleScale = 0.5f;
+		float sinRotationAngle = sin(rotationAngle * 0.5f);
+		Quaternion rotationQuat = Quaternion(cos(rotationAngle * angleScale), sinRotationAngle * rotateAxis[0],
+											 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+		Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
+																										beholder.forward[1], beholder.forward[2])),
+															linkedQuaternionValue(rotationQuat));
+
 		
-        beholder.forward = Normalize(forward);
-//		std::cout << beholder.forward << std::endl;
-        return beholder.forward;
+		forward[0] = appliedRotationQuat.x;
+		forward[1] = 0.0f;
+		forward[2] = appliedRotationQuat.z;
+
+		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
+		if ( delta_x > 0.0f )
+			prev_delta_x = delta_x;
+		
+        forward = Normalize(forward);
+        return forward;
     }
 }
 

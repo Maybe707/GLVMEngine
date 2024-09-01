@@ -70,7 +70,7 @@
 #include "WinApi/WindowWinVulkan.hpp"
 #endif
 
-#define SHADOW_MAP_SIZE 640
+#define SHADOW_MAP_SIZE 120
 
 #define VK_DEBUG_IMAGE_SET_RED "\x1b[31mVULKAN DEBUG IMAGE\x1b[0m"
 #define VK_DEBUG_DESCRIPTOR_SET_RED "\x1b[31mVULKAN DEBUG DESCRIPTOR SET\x1b[0m"
@@ -80,7 +80,7 @@
 
 #define DIRECTIONAL_LIGHTS_NUMBER                          4
 #define POINT_LIGHTS_NUMBER                                32
-#define SPOT_LIGHTS_NUMBER                                 8
+#define SPOT_LIGHTS_NUMBER 8
 
 namespace GLVM::core
 {
@@ -509,6 +509,10 @@ namespace GLVM::core
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
+		float prev_Y = 0.0f;
+		float current_Y = 0.0f;
+		float prev_X = 0.0f;
+		float current_X = 0.0f;
 
         const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
