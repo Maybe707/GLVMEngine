@@ -1098,7 +1098,7 @@ Matrix<T, 4> ortho(T left, T right, T bottom, T top, T near_plane, T far_plane) 
 
 template <class T, int var>
 Matrix<T, var> perspectiveRH_ZO(T fov, T aspect, T near_plane, T far_plane) {
-	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
+	const float tanHalfFov = std::tan((fov * 0.5) * (PI / 360));
 	
 	Matrix<float, var> tempMatrix(static_cast<T>(0));
 	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
@@ -1112,7 +1112,7 @@ Matrix<T, var> perspectiveRH_ZO(T fov, T aspect, T near_plane, T far_plane) {
 
 template <class T, int var>
 Matrix<T, var> perspectiveLH_NO(T fov, T aspect, T near_plane, T far_plane) {
-	float tanHalfFov = std::tan((fov / 2) * (PI / 360));
+	const float tanHalfFov = std::tan((fov * 0.5) * (PI / 360));
 	
 	Matrix<float, var> tempMatrix(static_cast<T>(0));
 	tempMatrix[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
@@ -1125,7 +1125,7 @@ Matrix<T, var> perspectiveLH_NO(T fov, T aspect, T near_plane, T far_plane) {
 }
 
 template <class T, int var>
-Matrix<T, var> Perspective(T fov, T aspect, T near_plane, T far_plane) {
+Matrix<T, var> Perspective(const T fov, const T aspect, const T near_plane, const T far_plane) {
 #ifdef GLVM_OPENGL_RENDER_BIT
 	return perspectiveLH_NO(fov, aspect, near, far);
 #else
@@ -1185,11 +1185,12 @@ inline float normQuaternion(const Quaternion& quaternion) {
 
 inline Quaternion normalizeQuaternion(Quaternion quaternion) {
 	float norm = normQuaternion(quaternion);
+	float inverseNorm = 1.0f / norm;
 	
-	quaternion.w /= norm;
-	quaternion.x /= norm;
-	quaternion.y /= norm;
-	quaternion.z /= norm;
+	quaternion.w *= inverseNorm;
+	quaternion.x *= inverseNorm;
+	quaternion.y *= inverseNorm;
+	quaternion.z *= inverseNorm;
 
 	return quaternion;
 }
@@ -1197,22 +1198,23 @@ inline Quaternion normalizeQuaternion(Quaternion quaternion) {
 inline Quaternion inverseQuaternion(Quaternion quaternion) {
 	Quaternion linkedValue = conjugate(quaternion);
 	float norm = normQuaternion(quaternion);
+	float inverseNorm = 1.0f / norm;
 
-	quaternion.w = linkedValue.w / norm;
-	quaternion.x = linkedValue.x / norm;
-	quaternion.y = linkedValue.y / norm;
-	quaternion.z = linkedValue.z / norm;
+	quaternion.w = linkedValue.w * inverseNorm;
+	quaternion.x = linkedValue.x * inverseNorm;
+	quaternion.y = linkedValue.y * inverseNorm;
+	quaternion.z = linkedValue.z * inverseNorm;
 	
 	return quaternion;
 }
 
 inline Quaternion eulerToQuaternion(const float roll, const float pitch, const float yaw) {
-	float cr = cos(roll * 0.5);
-    float sr = sin(roll * 0.5);
-    float cp = cos(pitch * 0.5);
-    float sp = sin(pitch * 0.5);
-    float cy = cos(yaw * 0.5);
-    float sy = sin(yaw * 0.5);
+	const float cr = cos(roll * 0.5);
+    const float sr = sin(roll * 0.5);
+    const float cp = cos(pitch * 0.5);
+    const float sp = sin(pitch * 0.5);
+    const float cy = cos(yaw * 0.5);
+    const float sy = sin(yaw * 0.5);
 
     Quaternion q;
     q.w = cr * cp * cy + sr * sp * sy;
