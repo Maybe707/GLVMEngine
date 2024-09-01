@@ -341,20 +341,21 @@ namespace GLVM::core
 		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
 		************************************************************************************************************/
 
-		vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
-		vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
-		vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta));
+		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
+		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
+		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta));
 
 		if ( VecLength(rotateAxis) >= 0.001f ) {
 			float rotationAngle = sqrt(delta * delta + delta_x * delta_x);
-			rotationAngle = Radians(rotationAngle * 0.1f);
-			float angleScale = 0.5f;                                                                                     /// Quaternions need devision by 2
-			float sinRotationAngle = sin(rotationAngle * angleScale);
-			Quaternion rotationQuat = Quaternion(cos(rotationAngle * angleScale), sinRotationAngle * rotateAxis[0],
+			constexpr float angleScale = 0.1f;                                                                                     
+			rotationAngle = Radians(rotationAngle * angleScale);
+			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
+			const float sinRotationAngle = sin(rotationAngle * quatAngleCorrection);
+			const Quaternion rotationQuat = Quaternion(cos(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
 												 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-			Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+			const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
 																											cameraComponent.forward[1], cameraComponent.forward[2])),
-																linkedQuaternionValue(rotationQuat));
+																conjugate(rotationQuat));
 
 			forward[0] = appliedRotationQuat.x;
 			forward[1] = appliedRotationQuat.y;

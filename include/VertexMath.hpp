@@ -81,13 +81,13 @@ public:
             }
     }
 
-	Matrix<T, var> operator+(Matrix matrix);
-	Matrix<T, var> operator*(T scalar);
-	Matrix<T, var> operator*(Matrix& matrix);
+	Matrix<T, var> operator+(const Matrix& matrix);
+	Matrix<T, var> operator*(const T scalar);
+	Matrix<T, var> operator*(const Matrix& matrix);
 	T* operator[](const int index);
 	const T* operator[](const int index) const;
 	template<class T2, int var2>
-	Vector<T2, var2> operator*(Vector<T2, var2>& vector);
+	Vector<T2, var2> operator*(const Vector<T2, var2>& vector);
 };
 
 typedef Vector<float, 1> vec1;
@@ -101,7 +101,7 @@ typedef Matrix<float, 3> mat3;
 typedef Matrix<float, 4> mat4;
 
 template <class T, int var>
-Matrix<T, var> Matrix<T, var>::operator+(Matrix matrix) {
+Matrix<T, var> Matrix<T, var>::operator+(const Matrix& matrix) {
 	Matrix<T, var> tempMatrix;
 	for(int i = 0; i < var; ++i)
 		for(int j = 0; j < var; ++j)
@@ -111,7 +111,7 @@ Matrix<T, var> Matrix<T, var>::operator+(Matrix matrix) {
 }
 	
 template <class T, int var>
-Matrix<T, var> Matrix<T, var>::operator*(T scalar) {
+Matrix<T, var> Matrix<T, var>::operator*(const T scalar) {
 	Matrix<T, var> tempMatrix;
 	for(int i = 0; i < var; ++i)
 		for(int j = 0; j < var; ++j)
@@ -121,7 +121,7 @@ Matrix<T, var> Matrix<T, var>::operator*(T scalar) {
 }
 
 template<class T, int var>
-Matrix<T, var> Matrix<T, var>::operator*(Matrix& matrix)
+Matrix<T, var> Matrix<T, var>::operator*(const Matrix& matrix)
 {
 	Matrix<T, var> tempMatrix;
 	for(int i = 0; i < var; ++i)
@@ -158,7 +158,7 @@ std::ostream& operator<<(std::ostream& ostream, const Matrix<float, var2>& matri
 
 template <class T, int var>
 template <class T2, int var2>
-Vector<T2, var2> Matrix<T, var>::operator*(Vector<T2, var2>& vector)
+Vector<T2, var2> Matrix<T, var>::operator*(const Vector<T2, var2>& vector)
 {
 	static_assert(var == var2, "Size error");
 	Vector<T2, var2> tempVector;
@@ -170,15 +170,15 @@ Vector<T2, var2> Matrix<T, var>::operator*(Vector<T2, var2>& vector)
 	return tempVector;
 }
 
-template <class T2, int var2>
+template <class T2, int dim>
 class Vector
 {
-	public: T2 m_vector[var2] {};
+	public: T2 m_vector[dim] {};
 public:
-	Vector(T2 arg1 = 0, T2 arg2 = 0, T2 arg3 = 0, T2 arg4 = 0)
+	Vector(T2 x = 0, T2 y = 0, T2 z = 0, T2 w = 0)
 	{
-		T2 array[4] = {arg1, arg2, arg3, arg4};
-		for(int i = 0; i < var2; ++i)
+		T2 array[4] = {x, y, z, w};
+		for(int i = 0; i < dim; ++i)
 		{
 			m_vector[i] = array[i];
 		}
@@ -186,16 +186,16 @@ public:
 
     T2& operator[](const int index);
 	const T2& operator[](const int index) const;
-	template<class T, int var>
-	Vector<T2, var2> operator*(const Matrix<T, var>& matrix);
-    Vector<T2, var2> operator*(Vector<T2, var2> _vector);
-    Vector<T2, var2> operator*=(Vector<T2, var2> _vector);
-    Vector<T2, var2> operator-(Vector<T2, var2> _vector);
-    Vector<T2, var2> operator+(Vector<T2, var2> _vector);
-    void operator-=(Vector<T2, var2> _vector);
-    void operator+=(Vector<T2, var2> _vector);
-    Vector<T2, var2> operator*(T2 _scalar);
-	Vector<T2, var2> operator-();
+	template<class T, int dim2>
+	Vector<T2, dim> operator*(const Matrix<T, dim2>& matrix);
+    Vector<T2, dim> operator*(const Vector<T2, dim>& _vector);
+    Vector<T2, dim> operator*=(const Vector<T2, dim>& _vector);
+    Vector<T2, dim> operator-(const Vector<T2, dim>& _vector);
+    Vector<T2, dim> operator+(const Vector<T2, dim>& _vector);
+    void operator-=(const Vector<T2, dim>& _vector);
+    void operator+=(const Vector<T2, dim>& _vector);
+    Vector<T2, dim> operator*(const T2& _scalar);
+	Vector<T2, dim> operator-();
 	T2 Length() const;
 };
 
@@ -246,7 +246,7 @@ Vector<T2, var2> Vector<T2, var2>::operator*(const Matrix<T, var>& matrix)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator*(Vector<T2, var2> _vector)
+Vector<T2, var2> Vector<T2, var2>::operator*(const Vector<T2, var2>& _vector)
 {
     Vector<T2, var2> tempVector;
     for(int i = 0; i < 3; ++i)
@@ -256,7 +256,7 @@ Vector<T2, var2> Vector<T2, var2>::operator*(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator*=(Vector<T2, var2> _vector)
+Vector<T2, var2> Vector<T2, var2>::operator*=(const Vector<T2, var2>& _vector)
 {
     Vector<T2, var2> tempVector;
     for(int i = 0; i < 3; ++i)
@@ -266,7 +266,7 @@ Vector<T2, var2> Vector<T2, var2>::operator*=(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator-(Vector<T2, var2> _vector)
+Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
 {
     Vector<T2, var2> temp_Vector(1);
 
@@ -278,7 +278,7 @@ Vector<T2, var2> Vector<T2, var2>::operator-(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator+(Vector<T2, var2> _vector)
+Vector<T2, var2> Vector<T2, var2>::operator+(const Vector<T2, var2>& _vector)
 {
         Vector<T2, var2> temp_Vector(1);
 
@@ -290,7 +290,7 @@ Vector<T2, var2> Vector<T2, var2>::operator+(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-void Vector<T2, var2>::operator-=(Vector<T2, var2> _vector)
+void Vector<T2, var2>::operator-=(const Vector<T2, var2>& _vector)
 {
     m_vector[0] = m_vector[0] - _vector[0];
     m_vector[1] = m_vector[1] - _vector[1];
@@ -298,7 +298,7 @@ void Vector<T2, var2>::operator-=(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-void Vector<T2, var2>::operator+=(Vector<T2, var2> _vector)
+void Vector<T2, var2>::operator+=(const Vector<T2, var2>& _vector)
 {
     m_vector[0] = m_vector[0] + _vector[0];
     m_vector[1] = m_vector[1] + _vector[1];
@@ -306,7 +306,7 @@ void Vector<T2, var2>::operator+=(Vector<T2, var2> _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator*(T2 _scalar)
+Vector<T2, var2> Vector<T2, var2>::operator*(const T2& _scalar)
 {
     Vector<T2, var2> temp_vec(1.0f);
     
@@ -315,6 +315,17 @@ Vector<T2, var2> Vector<T2, var2>::operator*(T2 _scalar)
 
     return temp_vec;
 }
+
+template <typename T2, int var2>
+Vector<T2, var2> operator*(const Vector<T2, var2>& vector, const T2 _scalar)
+{
+	Vector<T2, var2> temp;
+    for(int i = 0; i < var2; ++i)
+        temp[i] = vector[i] * _scalar;
+
+    return temp;
+}
+
 
 // template <typename T, int size, int row, int col>
 // Matrix<T, size - 1> matrix_minor( Matrix<T, size> matrix ) {
@@ -749,7 +760,7 @@ Matrix<T, var> RotateZ(Matrix<T, var> matrix, float angle)
 // }
 
 template <typename T>
-Vector<T, 3> Cross(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
+Vector<T, 3> Cross(const Vector<T, 3>& _vector1, const Vector<T, 3>& _vector2)
 {
     return Vector<T, 3>(_vector1[1] * _vector2[2] - _vector1[2] * _vector2[1],
                            _vector1[2] * _vector2[0] - _vector1[0] * _vector2[2],
@@ -757,13 +768,13 @@ Vector<T, 3> Cross(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 }
 
 template <typename T>
-T Dot(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
+T Dot(const Vector<T, 3>& _vector1, const Vector<T, 3>& _vector2)
 {
     return (_vector1[0] * _vector2[0] + _vector1[1] * _vector2[1] + _vector1[2] * _vector2[2]);
 }
 
 template <typename T>
-T VectorLength(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
+T VectorLength(const Vector<T, 3>& _vector1, const Vector<T, 3>& _vector2)
 {
     T _x_axis = _vector2[0] - _vector1[0];
     T _y_axis = _vector2[1] - _vector1[1];
@@ -772,7 +783,7 @@ T VectorLength(Vector<T, 3> _vector1, Vector<T, 3> _vector2)
 }
 
 template <typename T>
-T VecLength(Vector<T, 3> vector)
+T VecLength(const Vector<T, 3>& vector)
 {
     return std::sqrt(vector[0] * vector[0] + vector[1] * vector[1] + vector[2] * vector[2]);
 }
@@ -1148,7 +1159,7 @@ inline std::ostream& operator<<(std::ostream& ostream, const Quaternion& quatern
 	return ostream;
 }
 
-inline Quaternion linkedQuaternionValue(Quaternion quaternion) {
+inline Quaternion conjugate(Quaternion quaternion) {
 	quaternion.w = quaternion.w;
 	quaternion.x = -quaternion.x;
 	quaternion.y = -quaternion.y;
@@ -1157,7 +1168,7 @@ inline Quaternion linkedQuaternionValue(Quaternion quaternion) {
 	return quaternion;
 }
 
-inline Quaternion multiplyQuaternion(Quaternion a, Quaternion b) {
+inline Quaternion multiplyQuaternion(const Quaternion& a, const Quaternion& b) {
 	Quaternion result;
 	result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
 	result.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
@@ -1167,7 +1178,7 @@ inline Quaternion multiplyQuaternion(Quaternion a, Quaternion b) {
 	return result;
 }
 
-inline float normQuaternion(Quaternion quaternion) {
+inline float normQuaternion(const Quaternion& quaternion) {
 	return sqrt(quaternion.w * quaternion.w + quaternion.x * quaternion.x +
 				quaternion.y * quaternion.y + quaternion.z * quaternion.z);
 }
@@ -1184,7 +1195,7 @@ inline Quaternion normalizeQuaternion(Quaternion quaternion) {
 }
 
 inline Quaternion inverseQuaternion(Quaternion quaternion) {
-	Quaternion linkedValue = linkedQuaternionValue(quaternion);
+	Quaternion linkedValue = conjugate(quaternion);
 	float norm = normQuaternion(quaternion);
 
 	quaternion.w = linkedValue.w / norm;
@@ -1195,7 +1206,7 @@ inline Quaternion inverseQuaternion(Quaternion quaternion) {
 	return quaternion;
 }
 
-inline Quaternion eulerToQuaternion(float roll, float pitch, float yaw) {
+inline Quaternion eulerToQuaternion(const float roll, const float pitch, const float yaw) {
 	float cr = cos(roll * 0.5);
     float sr = sin(roll * 0.5);
     float cp = cos(pitch * 0.5);

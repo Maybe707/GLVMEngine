@@ -176,16 +176,17 @@ namespace GLVM::ecs
 		glm::quat result = rotation * glm::quat(0.0, forwardVec.x, forwardVec.y, forwardVec.z) * glm::conjugate(rotation);
 		*****************************************************************************************************************/
 
-		vec3 rotateAxis = { 0.0, 1.0, 0.0 };
+		const vec3 rotateAxis = { 0.0, 1.0, 0.0 };
 		float rotationAngle = delta_x;
-		rotationAngle = Radians(rotationAngle * 0.1f);
-		float angleScale = 0.5f;
-		float sinRotationAngle = sin(rotationAngle * 0.5f);
-		Quaternion rotationQuat = Quaternion(cos(rotationAngle * angleScale), sinRotationAngle * rotateAxis[0],
+		constexpr float angleScale = 0.1f;
+		rotationAngle = Radians(rotationAngle * angleScale);
+		constexpr float quatAngleCorrection = 0.5f;                                                                                     /// Quaternions need devision by 2
+		const float sinRotationAngle = sin(rotationAngle * quatAngleCorrection);
+		Quaternion rotationQuat = Quaternion(cos(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
 											 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
 		Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
 																										beholder.forward[1], beholder.forward[2])),
-															linkedQuaternionValue(rotationQuat));
+															conjugate(rotationQuat));
 
 		
 		forward[0] = appliedRotationQuat.x;
