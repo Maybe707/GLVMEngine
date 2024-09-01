@@ -45,8 +45,6 @@ namespace GLVM::ecs
         void CalculateProjectile(ecs::ComponentManager* componentManager,
                                  unsigned int entityRefMove,
                                  components::beholder& beholder);
-
-        Vector<float, 3> GetDirectionVector(components::beholder& beholder);
     };
 }
 

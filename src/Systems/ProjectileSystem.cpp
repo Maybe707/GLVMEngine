@@ -15,6 +15,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Texture.hpp"
+#include "VertexMath.hpp"
 #include <Systems/ProjectileSystem.hpp>
 
 namespace GLVM::ecs
@@ -142,7 +143,7 @@ namespace GLVM::ecs
 		if ( transform != nullptr )
 			rTransformProjectile->tPosition = transform->tPosition;
 
-        rTransformProjectile->tForward   = GetDirectionVector(beholder);
+        rTransformProjectile->tForward   = beholder.forward;
 		rTransformProjectile->yaw        = fYaw;
 		rTransformProjectile->pitch      = fPitch;
 		rTransformProjectile->tPosition  += rTransformProjectile->tForward * 2.0f;
@@ -154,58 +155,5 @@ namespace GLVM::ecs
 		cm::damage* damageComponent = componentManager->GetComponent<cm::damage>(uiEntity_Projectile);
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;
-    }
-
-    Vector<float, 3> CProjectileSystem::GetDirectionVector(components::beholder& beholder)
-    {
-        const float kSensitivity = 0.1f;
-
-        fYaw = g_eEvent.mousePointerPosition.offset_X;
-        fPitch = g_eEvent.mousePointerPosition.offset_Y;
-        fYaw *= kSensitivity;
-        fPitch *= kSensitivity;
-
-        g_eEvent.mousePointerPosition.pitch = fPitch;
-        g_eEvent.mousePointerPosition.yaw = fYaw;
-        
-        // if(fPitch > 89.0f)
-        //     fPitch = 89.0f;
-        // if(fPitch < -89.0f)
-        //     fPitch = -89.0f;
-
-		vec3 forward;
-		float sinPitch = std::sin(Radians(-fPitch / 2));
-		float cosPitch = std::cos(Radians(-fPitch / 2));
-		float sinYaw = std::sin(Radians(fYaw / 2));
-		float cosYaw = std::cos(Radians(fYaw / 2));
-		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = sinPitch;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = 0.0f;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-		Quaternion result;
-		result = multiplyQuaternion(yawQuat, pitchQuat);
-
-		result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
-					.y = 0.0f, .z = -1.0f }), inverseQuaternion(result));
-
-		forward[0] = result.x;
-		forward[1] = result.y;
-		forward[2] = result.z;
-		
-        // front[0] = std::cos(Radians(fYaw)) * std::cos(Radians(fPitch));
-        // front[1] = std::sin(Radians(fPitch));
-        // front[2] = std::sin(Radians(fYaw)) * std::cos(Radians(fPitch));
-        beholder.forward = Normalize(forward);
-
-        return beholder.forward;
     }
 }

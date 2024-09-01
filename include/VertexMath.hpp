@@ -1151,6 +1151,9 @@ constexpr float Min(float var1, float var2) {
 struct Quaternion
 {
 	float w, x, y, z;
+	Quaternion() = default;
+	Quaternion(float _w, float _x, float _y, float _z) : w(_w), x(_x), y(_y), z(_z) {}
+	Quaternion(float real, vec3 imaginary) : w(real), x(imaginary[0]), y(imaginary[1]), z(imaginary[2]) {}
 };
 
 inline std::ostream& operator<<(std::ostream& ostream, const Quaternion& quaternion) {
@@ -1169,6 +1172,16 @@ inline Quaternion conjugate(Quaternion quaternion) {
 }
 
 inline Quaternion multiplyQuaternion(const Quaternion& a, const Quaternion& b) {
+	Quaternion result;
+	result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
+	result.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
+	result.y = a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x;
+	result.z = a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w;
+
+	return result;
+}
+
+inline Quaternion operator*(const Quaternion& a, const Quaternion& b) {
 	Quaternion result;
 	result.w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
 	result.x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;

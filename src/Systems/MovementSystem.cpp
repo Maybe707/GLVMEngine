@@ -24,10 +24,6 @@
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include <cstdio>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 namespace GLVM::ecs
 {
@@ -163,31 +159,20 @@ namespace GLVM::ecs
 		if ( delta_x < 0.0001 )
 			delta_x = prev_delta_x;
 
-		/**************************************************************************************************************
-		glm::vec3 forwardVec(beholder.forward[0], beholder.forward[1], beholder.forward[2]);
-		glm::vec3 rotateAxis = { 0.0, 1.0, 0.0 };
-
-		float angle = glm::sqrt(delta_x * delta_x);
-		angle = glm::radians(angle * 0.1);
-		float sinAngle = sin(angle * 0.5f);
-		glm::quat rotation = glm::quat(cos(angle * 0.5f), sinAngle * rotateAxis.x, sinAngle * rotateAxis.y,
-									   sinAngle * rotateAxis.z);
-
-		glm::quat result = rotation * glm::quat(0.0, forwardVec.x, forwardVec.y, forwardVec.z) * glm::conjugate(rotation);
-		*****************************************************************************************************************/
-
 		const vec3 rotateAxis = { 0.0, 1.0, 0.0 };
 		float rotationAngle = delta_x;
 		constexpr float angleScale = 0.1f;
 		rotationAngle = Radians(rotationAngle * angleScale);
 		constexpr float quatAngleCorrection = 0.5f;                                                                                     /// Quaternions need devision by 2
-		const float sinRotationAngle = sin(rotationAngle * quatAngleCorrection);
-		Quaternion rotationQuat = Quaternion(cos(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+		const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+		Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
 											 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-		Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
-																										beholder.forward[1], beholder.forward[2])),
-															conjugate(rotationQuat));
-
+		// Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
+		// 																								beholder.forward[1], beholder.forward[2])),
+		// 													conjugate(rotationQuat));
+		const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, beholder.forward[0], beholder.forward[1],
+																		  beholder.forward[2])) * conjugate(rotationQuat);
+		
 		
 		forward[0] = appliedRotationQuat.x;
 		forward[1] = 0.0f;

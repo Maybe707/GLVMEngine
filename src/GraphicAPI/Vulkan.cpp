@@ -37,10 +37,6 @@
 #include <glm/trigonometric.hpp>
 #include <thread>
 #include <vulkan/vulkan_core.h>
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/string_cast.hpp>
 
 namespace GLVM::core
 {    
@@ -305,42 +301,6 @@ namespace GLVM::core
 		
 		// glm::quat result = rotation * glm::quat(0.0, 0.0, 0.0, -1.0);
 
-		/**********************************************************************************************************
-		glm::vec3 forwardVec(cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2]);
-		glm::vec3 upVec(cameraComponent.up[0], cameraComponent.up[1], cameraComponent.up[2]);
-		glm::vec3 rightVec = glm::cross(forwardVec, upVec);
-		upVec = glm::cross(rightVec, forwardVec);
-		glm::vec3 rotateAxis = glm::normalize(glm::cross(forwardVec, glm::vec3(rightVec * delta_x + upVec * delta)));
-
-		if ( glm::length(rotateAxis) >= 0.001f ) {
-			float angle = glm::sqrt(delta * delta + delta_x * delta_x);
-			angle = glm::radians(angle * 0.1);
-			float sinAngle = sin(angle * 0.5f);
-			glm::quat rotation = glm::quat(cos(angle * 0.5f), sinAngle * rotateAxis.x, sinAngle * rotateAxis.y,
-										   sinAngle * rotateAxis.z);
-
-			glm::quat result = rotation * glm::quat(0.0, forwardVec.x, forwardVec.y, forwardVec.z) * glm::conjugate(rotation);
-			
-			forward[0] = result.x;
-			forward[1] = result.y;
-			forward[2] = result.z;
-		}
-		cameraComponent.forward = Normalize(forward);
-		glm::vec3 position = { _Player.tPosition[0], _Player.tPosition[1], _Player.tPosition[2] };
-		glm::vec3 cameraForward = { cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2] };
-		glm::vec3 up = { cameraComponent.up[0], cameraComponent.up[1], cameraComponent.up[2] };
-		glm::mat4 view = glm::lookAt( position, position + cameraForward, up );
-		for ( unsigned int i = 0; i < 4; ++i )
-			for ( unsigned int j = 0; j < 4; ++j )
-				 viewMatrix_[i][j] = view[i][j];
-		
-		if ( !isInventoryOpened )
-			viewMatrix = viewMatrix_;
-
-		prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		************************************************************************************************************/
-
 		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
 		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
 		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta));
@@ -350,13 +310,17 @@ namespace GLVM::core
 			constexpr float angleScale = 0.1f;                                                                                     
 			rotationAngle = Radians(rotationAngle * angleScale);
 			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-			const float sinRotationAngle = sin(rotationAngle * quatAngleCorrection);
-			const Quaternion rotationQuat = Quaternion(cos(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+			const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+			const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
 												 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-			const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-																											cameraComponent.forward[1], cameraComponent.forward[2])),
-																conjugate(rotationQuat));
+			// const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+			// 																								cameraComponent.forward[1], cameraComponent.forward[2])),
+			// 													conjugate(rotationQuat));
 
+			const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
+																			  cameraComponent.forward[2])) * conjugate(rotationQuat);
+
+			
 			forward[0] = appliedRotationQuat.x;
 			forward[1] = appliedRotationQuat.y;
 			forward[2] = appliedRotationQuat.z;
@@ -6098,13 +6062,13 @@ namespace GLVM::core
 		// result = multiplyQuaternion(pitchQuat, yawQuat);
 
 
-		glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
-		glm::mat4 rotationMat = glm::mat4_cast(rotation);
-		// result = { rotation.w, rotation.x, rotation.y, rotation.z };
-		// rotationMatrix = rotateQuaternion<float, 4>(result);
-		for ( unsigned int i = 0; i < 4; ++i )
-			for ( unsigned int j = 0; j < 4; ++j )
-				rotationMatrix[i][j] = rotationMat[i][j];
+		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
+		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
+		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
+		// // rotationMatrix = rotateQuaternion<float, 4>(result);
+		// for ( unsigned int i = 0; i < 4; ++i )
+		// 	for ( unsigned int j = 0; j < 4; ++j )
+		// 		rotationMatrix[i][j] = rotationMat[i][j];
 		
         return scalingMatrix * translationMatrix;
 	}
