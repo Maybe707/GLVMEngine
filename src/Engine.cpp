@@ -221,6 +221,7 @@ namespace GLVM::core
 		}
 
 		vulkanRenderer->Window.Close();
+		delete vulkanRenderer;
 	}
 
 	ecs::TextureHandle Engine::LoadTextureFromFile(const char* path_to_texture) {

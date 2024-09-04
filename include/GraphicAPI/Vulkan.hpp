@@ -224,8 +224,8 @@ namespace GLVM::core
 		VkDescriptorSetLayout  setLayout;
 		core::vector<u32>               descriptorsNumber;
 
-		std::vector<VkBuffer> uniformBuffers;
-		std::vector<VkDeviceMemory> uniformBuffersMemory;
+		// std::vector<VkBuffer> uniformBuffers;
+		// std::vector<VkDeviceMemory> uniformBuffersMemory;
 		
 		std::vector<VK_Image> textureImages;
 	};
@@ -245,10 +245,10 @@ namespace GLVM::core
 		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag,
 						   core::vector<u32> descriptorsNumbers, core::vector<uint32_t> bindings) {
 			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
+				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
 				++uboDescriptorsNumber;
 			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
-				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}, {}, {}});
+				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
 				++combinedImageSamplersNumber;
 			} else {
 				assert(!"unreachable");
@@ -656,6 +656,8 @@ namespace GLVM::core
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
+		VkImage     mainPipelineImage;
+		VkDeviceMemory mainPipelineImageMemory;
         VkImageView depthImageView;
 
 		/// Depth varialbes for shadow map.
@@ -713,6 +715,7 @@ namespace GLVM::core
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
 		uint32_t wavefrontObjCounter = 0;
 
+		std::vector<unsigned int> fontIndicesContainer;
         std::vector<VkBuffer> fontVertexBufferContainer;
         std::vector<VkDeviceMemory> fontVertexBufferMemoryContainer;
         std::vector<VkBuffer> fontIndexBufferContainer;
@@ -857,7 +860,7 @@ namespace GLVM::core
         void createImage(VK_Image& image);
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 		void transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
-        void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+        void copyBufferToImage(VkBuffer& buffer, VkImage image, uint32_t width, uint32_t height);
         void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices);
         void createMainRenderUniformBuffers();
@@ -881,7 +884,7 @@ namespace GLVM::core
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);
         void endSingleTimeCommands(VkCommandPool& commandPool, VkCommandBuffer& commandBuffer);
-        void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+        void copyBuffer(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
 		void updateHudUBO(uint32_t currentImage, uint32_t offset,

@@ -458,7 +458,7 @@ namespace GLVM::core
 																									  cm::mesh>();
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		directionalLightShadowMapTextureSamplers.resize(directionalLightNumber);
+//		directionalLightShadowMapTextureSamplers.resize(directionalLightNumber);
 
 		core::vector<u32> DS_0_binding;
 		core::vector<u32> DS_0_count;
@@ -477,7 +477,7 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-		spotLightShadowMapTextureSamplers.resize(spotLightNumber);
+//		spotLightShadowMapTextureSamplers.resize(spotLightNumber);
 		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 										DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		
@@ -490,7 +490,7 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-		pointLightShadowMapTextureSamplers.resize(pointLightNumber);
+//		pointLightShadowMapTextureSamplers.resize(pointLightNumber);
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
@@ -707,13 +707,26 @@ namespace GLVM::core
 					{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
 				};
 				unsigned int currentBufferIndex = i * glyph_column + j;
-				
+
+				std::cout << "TEST" << std::endl;
 //				glyphs_map[(int)glyphs[currentBufferIndex]] = symbol_g_vertices;
 
+				bool exitFlag = false;
 				const unsigned int nextBufferIndex = static_cast<const unsigned int>(glyphs[currentBufferIndex]);
+				for ( unsigned int n = 0; n < fontIndicesContainer.size(); ++n ) {
+					if ( nextBufferIndex == fontIndicesContainer[n] )
+						exitFlag = true;
+				}
+
+				if ( exitFlag )
+					continue;
+				
+				std::cout << "index: " << nextBufferIndex << std::endl;
+				fontIndicesContainer.push_back(nextBufferIndex);
 				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
 
 				createIndexBuffer(fontIndexBufferContainer[nextBufferIndex], fontIndexBufferMemoryContaner[nextBufferIndex], symbol_g_indices);
+
 			}
 	}
 
@@ -816,26 +829,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::cleanupSwapChain() {
-        vkDestroyImageView(device, depthImageView, nullptr);
-
-		directionalLightPipeline.descriptors[0].textureImages.clear();
-		spotLightPipeline.descriptors[0].textureImages.clear();
-		pointLightPipeline.descriptors[0].textureImages.clear();
-		
-        for (VkFramebuffer& framebuffer : directionalLightShadowMapFrameBuffers) {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
-		for (VkFramebuffer& framebuffer : spotLightShadowMapFrameBuffers) {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
-		for (std::vector<VkFramebuffer>& inner_vector : pointLightShadowMapFrameBuffers) {
-			for (VkFramebuffer& framebuffer : inner_vector) {
-				vkDestroyFramebuffer(device, framebuffer, nullptr);
-			} 
-        }
-		
+		vkDeviceWaitIdle(device);
         for (VkFramebuffer& framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
@@ -850,19 +844,370 @@ namespace GLVM::core
     void CVulkanRenderer::cleanup() {
         cleanupSwapChain();
 
+		for ( size_t j = 0; j < hudUniformBuffers.size(); ++j ) {   ///<
+			vkDestroyBuffer(device, hudUniformBuffers[j], nullptr);
+			vkFreeMemory(device, hudUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < fontUniformBuffers.size(); ++j ) {   ///<
+			vkDestroyBuffer(device, fontUniformBuffers[j], nullptr);
+			vkFreeMemory(device, fontUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < hudScreenUniformBuffers.size(); ++j ) {   ///<
+			vkDestroyBuffer(device, hudScreenUniformBuffers[j], nullptr);
+			vkFreeMemory(device, hudScreenUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < uiUniformBuffers.size(); ++j ) {        ///<
+			vkDestroyBuffer(device, uiUniformBuffers[j], nullptr);
+			vkFreeMemory(device, uiUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < uiIconsUniformBuffers.size(); ++j ) {     ///<
+			vkDestroyBuffer(device, uiIconsUniformBuffers[j], nullptr);
+			vkFreeMemory(device, uiIconsUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < shadowMapDirectionalLightModelMatrixUniformBuffers.size(); ++j ) {          ///<
+			vkDestroyBuffer(device, shadowMapDirectionalLightModelMatrixUniformBuffers[j], nullptr);
+			vkFreeMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < lightSpaceMatrixBuffer.size(); ++j ) {     ///<
+			vkDestroyBuffer(device, lightSpaceMatrixBuffer[j], nullptr);
+			vkFreeMemory(device, lightSpaceMatrixMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < shadowMapPointLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
+			vkDestroyBuffer(device, shadowMapPointLightModelMatrixUniformBuffers[j], nullptr);
+			vkFreeMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < shadowMapPointLightDataUniformBuffers.size(); ++j ) {         ///<
+			vkDestroyBuffer(device, shadowMapPointLightDataUniformBuffers[j], nullptr);
+			vkFreeMemory(device, shadowMapPointLightDataUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < shadowMapSpotLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
+			vkDestroyBuffer(device, shadowMapSpotLightModelMatrixUniformBuffers[j], nullptr);
+			vkFreeMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < vertexBufferContainer.size(); ++j ) {
+			vkDestroyBuffer(device, vertexBufferContainer[j], nullptr);
+			vkFreeMemory(device, vertexBufferMemoryContainer[j], nullptr);
+		}
+		for ( size_t j = 0; j < indexBufferContainer.size(); ++j ) {
+			vkDestroyBuffer(device, indexBufferContainer[j], nullptr);
+			vkFreeMemory(device, indexBufferMemoryContaner[j], nullptr);
+		}
+		for ( size_t j = 0; j < fontIndicesContainer.size(); ++j ) {
+//			std::cout << "font vertex buffer container size: " << fontVertexBufferContainer.size() << std::endl;
+			vkDestroyBuffer(device, fontVertexBufferContainer[fontIndicesContainer[j]], nullptr);
+			vkFreeMemory(device, fontVertexBufferMemoryContainer[fontIndicesContainer[j]], nullptr);
+		}
+		for ( size_t j = 0; j < fontIndicesContainer.size(); ++j ) {
+//			std::cout << "font index buffer container size: " << fontIndexBufferContainer.size() << std::endl;
+			vkDestroyBuffer(device, fontIndexBufferContainer[fontIndicesContainer[j]], nullptr);
+			vkFreeMemory(device, fontIndexBufferMemoryContaner[fontIndicesContainer[j]], nullptr);
+		}
+		for ( size_t j = 0; j < modelMatrixUniformBuffers.size(); ++j ) {    ///<
+			vkDestroyBuffer(device, modelMatrixUniformBuffers[j], nullptr);
+			vkFreeMemory(device, modelMatrixUniformBuffersMemory[j], nullptr);
+		}
+		for ( size_t j = 0; j < lightDataUniformBuffers.size(); ++j ) {      ///<
+			vkDestroyBuffer(device, lightDataUniformBuffers[j], nullptr);
+			vkFreeMemory(device, lightDataUniformBuffersMemory[j], nullptr);
+		}
+		// for ( size_t j = 0; j < materialUniformBuffers.size(); ++j ) {
+		// 	vkDestroyBuffer(device, materialUniformBuffers[j], nullptr);
+		// 	vkFreeMemory(device, materialUniformBuffersMemory[j], nullptr);
+		// }
+		// for ( size_t j = 0; j < directionalLightsUniformBuffers.size(); ++j ) {
+		// 	vkDestroyBuffer(device, directionalLightsUniformBuffers[j], nullptr);
+		// 	vkFreeMemory(device, directionalLightsUniformBuffersMemory[j], nullptr);
+		// }
+		// for ( size_t j = 0; j < spotLightsUniformBuffers.size(); ++j ) {
+		// 	vkDestroyBuffer(device, spotLightsUniformBuffers[j], nullptr);
+		// 	vkFreeMemory(device, spotLightsUniformBuffersMemory[j], nullptr);
+		// }
+		// for ( size_t j = 0; j < pointLightsUniformBuffers.size(); ++j ) {
+		// 	vkDestroyBuffer(device, pointLightsUniformBuffers[j], nullptr);
+		// 	vkFreeMemory(device, pointLightsUniformBuffersMemory[j], nullptr);
+		// }
+		vkDeviceWaitIdle(device);
+
+		
+		std::cout << "DESTRUCTOR CALL" << std::endl;
         vkDestroyPipeline(device, graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-        vkDestroyRenderPass(device, renderPass, nullptr);
+        vkDestroyRenderPass(device, renderPass, nullptr);		
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            vkDestroyBuffer(device, modelMatrixUniformBuffers[i], nullptr);
-            vkFreeMemory(device, modelMatrixUniformBuffersMemory[i], nullptr);
-			vkDestroyBuffer(device, spotLightsUniformBuffers[i], nullptr);
-            vkFreeMemory(device, spotLightsUniformBuffersMemory[i], nullptr);
+		vkDestroyRenderPass(device, hudRenderPass, nullptr);
+		vkDestroyRenderPass(device, fontRenderPass, nullptr);
+		vkDestroyRenderPass(device, hudScreenRenderPass, nullptr);
+		vkDestroyRenderPass(device, uiRenderPass, nullptr);
+		vkDestroyRenderPass(device, uiIconsRenderPass, nullptr);
+		vkDestroyRenderPass(device, directionalLightShadowMapRenderPass, nullptr);
+		vkDestroyRenderPass(device, pointLightShadowMapRenderPass, nullptr);
+		vkDestroyRenderPass(device, spotLightShadowMapRenderPass, nullptr);
+
+		vkDestroyPipeline(device, directionalLightPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, directionalLightPipeline.pipelineLayout, nullptr);
+		for ( unsigned int i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
+			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptors[i].setLayout, nullptr);
+		}
+
+		vkDestroyPipeline(device, spotLightPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, spotLightPipeline.pipelineLayout, nullptr);
+		for ( unsigned int i = 0; i < spotLightPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptors[i].setLayout, nullptr);
+
+		vkDestroyPipeline(device, pointLightPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, pointLightPipeline.pipelineLayout, nullptr);
+		for ( unsigned int i = 0; i < pointLightPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptors[i].setLayout, nullptr);
+
+		vkDestroyPipeline(device, fontPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, fontPipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, hudPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, hudPipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, hudScreenPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, hudScreenPipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, uiPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, uiPipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, uiIconsPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, uiIconsPipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, mainRenderScenePipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, mainRenderScenePipeline.pipelineLayout, nullptr);
+		
+		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < hudPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, hudPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < fontPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, fontPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < hudScreenPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, hudScreenPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < uiPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, uiPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < uiIconsPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptors[i].setLayout, nullptr);
+		
+		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
+			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
+			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
+				{
+//					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
+					vkDestroySampler(device, mainRenderScenePipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, mainRenderScenePipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, mainRenderScenePipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for(unsigned int m = 0; m < hudPipeline.descriptors.GetSize(); ++m) {
+			for(unsigned int i = 0; i < hudPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, hudPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < hudPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, hudPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, hudPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, hudPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < hudPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, hudPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, hudPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+
+		for ( unsigned int m = 0; m < directionalLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < directionalLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, directionalLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, directionalLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, directionalLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, directionalLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, directionalLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, directionalLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < spotLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < spotLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, spotLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, spotLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, spotLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, spotLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, spotLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, spotLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < pointLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < pointLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, pointLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, pointLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, pointLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, pointLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, pointLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, pointLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < fontPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < fontPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, fontPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < fontPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, fontPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, fontPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, fontPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < fontPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, fontPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, fontPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < hudScreenPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < hudScreenPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, hudScreenPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, hudScreenPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, hudScreenPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, hudScreenPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, hudScreenPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, hudScreenPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < uiPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, uiPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < uiPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, uiPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, uiPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, uiPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < uiPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, uiPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, uiPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < uiIconsPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, uiIconsPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, uiIconsPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, uiIconsPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, uiIconsPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+
+		// for ( unsigned int i = 0; i < hudSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, hudSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < hudScreenSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, hudScreenSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < pointLightShadowMapFrameBuffers.size(); ++i )
+		// 	for ( unsigned int j = 0; j < pointLightShadowMapFrameBuffers[i].size(); ++j )
+		// 		vkDestroyFramebuffer(device, pointLightShadowMapFrameBuffers[i][j], nullptr);
+
+		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
+		
+        vkDestroyImageView(device, depthImageView, nullptr);
+		vkDestroyImage(device, mainPipelineImage, nullptr);
+		vkFreeMemory(device, mainPipelineImageMemory, nullptr);
+		
+        for (VkFramebuffer& framebuffer : directionalLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
+
+		for (VkFramebuffer& framebuffer : spotLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+		for (std::vector<VkFramebuffer>& inner_vector : pointLightShadowMapFrameBuffers) {
+			for (VkFramebuffer& framebuffer : inner_vector) {
+				vkDestroyFramebuffer(device, framebuffer, nullptr);
+			} 
+        }
+
+		for ( VkFramebuffer& framebuffer : hudSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : fontSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : hudScreenSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : uiSwapChainFrameBuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : uiIconsSwapChainFrameBuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+		
 
         vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
+		vkDestroySampler(device, textureSampler, nullptr);
         for(unsigned int i = 0; i < textureImages.size(); ++i)
         {
             vkDestroySampler(device, textureImages[i].sampler, nullptr);
@@ -873,25 +1218,54 @@ namespace GLVM::core
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         }
 
-		for ( unsigned int i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptors[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < spotLightPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptors[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < pointLightPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptors[i].setLayout, nullptr);
-		
-		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptors[i].setLayout, nullptr);
-		
-        for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
-            vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
-            vkFreeMemory(device, indexBufferMemoryContaner[i], nullptr);
-
-            vkDestroyBuffer(device, vertexBufferContainer[i], nullptr);
-            vkFreeMemory(device, vertexBufferMemoryContainer[i], nullptr);
+        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, directionalLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < directionalLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, directionalLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, directionalLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, directionalLightShadowMapImages[i].deviceMemory, nullptr);
         }
+
+        for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, spotLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < spotLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, spotLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, spotLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, spotLightShadowMapImages[i].deviceMemory, nullptr);
+        }
+		
+        for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < pointLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, pointLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, pointLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, pointLightShadowMapImages[i].deviceMemory, nullptr);
+        }
+
+        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
+        {
+            vkDestroySampler(device, pointLightImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < pointLightImages[i].views.size(); ++j )
+				vkDestroyImageView(device, pointLightImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, pointLightImages[i].image, nullptr);
+            vkFreeMemory(device, pointLightImages[i].deviceMemory, nullptr);
+        }
+		
+		
+        // for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
+        //     vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
+        //     vkFreeMemory(device, indexBufferMemoryContaner[i], nullptr);
+
+        //     vkDestroyBuffer(device, vertexBufferContainer[i], nullptr);
+        //     vkFreeMemory(device, vertexBufferMemoryContainer[i], nullptr);
+        // }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
             vkDestroySemaphore(device, directionalLightShadowMapImageAvailableSemaphores[i], nullptr);
@@ -909,13 +1283,31 @@ namespace GLVM::core
             vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, hudImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, hudInFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, uiImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, uiRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, uiInFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, fontImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, fontInFlightFences[i], nullptr);
         }
 
         vkDestroyCommandPool(device, directionalLightCommandPool, nullptr);
 		vkDestroyCommandPool(device, spotLightCommandPool, nullptr);
 		vkDestroyCommandPool(device, pointLightCommandPool, nullptr);
 		vkDestroyCommandPool(device, mainRenderCommandPool, nullptr);
+		vkDestroyCommandPool(device, fontCommandPool, nullptr);
+		vkDestroyCommandPool(device, hudCommandPool, nullptr);
+		vkDestroyCommandPool(device, hudScreenCommandPool, nullptr);
+		vkDestroyCommandPool(device, uiCommandPool, nullptr);
+		vkDestroyCommandPool(device, uiIconsCommandPool, nullptr);
 
+		vkDeviceWaitIdle(device);
         vkDestroyDevice(device, nullptr);
 
         if (enableValidationLayers) {
@@ -1937,6 +2329,8 @@ namespace GLVM::core
 		};
 
 		createImage(depthImage);
+		mainPipelineImage = depthImage.image;
+		mainPipelineImageMemory = depthImage.deviceMemory;
         depthImageView = createImageView(depthImage, 0, 1);
     }
 
@@ -2345,7 +2739,7 @@ namespace GLVM::core
         endSingleTimeCommands(directionalLightCommandPool, commandBuffer);
     }
 	
-    void CVulkanRenderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+    void CVulkanRenderer::copyBufferToImage(VkBuffer& buffer, VkImage image, uint32_t width, uint32_t height) {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
         VkBufferImageCopy region{};
@@ -3758,7 +4152,7 @@ namespace GLVM::core
         vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
     }
 
-    void CVulkanRenderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+    void CVulkanRenderer::copyBuffer(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size) {
         VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
         VkBufferCopy copyRegion{};
@@ -6157,6 +6551,215 @@ namespace GLVM::core
 		pointLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &pointLightPipelineLayoutObjectInfo);
 
+		for ( unsigned long i = 0; i < hudUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Hud uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)hudUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < fontUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Font uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)fontUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < uiUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " UI uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)uiUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < uiIconsUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " UI icons uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)uiIconsUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < shadowMapDirectionalLightModelMatrixUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map directional light model matrix uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightModelMatrixUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < lightSpaceMatrixBuffer.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Light space matrix uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)lightSpaceMatrixBuffer[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < shadowMapPointLightModelMatrixUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map point light model matrix uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapPointLightModelMatrixUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < shadowMapPointLightDataUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map point light data uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapPointLightDataUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < shadowMapSpotLightModelMatrixUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map spot light model matrix uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapSpotLightModelMatrixUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < vertexBufferContainer.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Vertex uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)vertexBufferContainer[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < indexBufferContainer.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Index uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)indexBufferContainer[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < fontIndicesContainer.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Font vertex uniform buffer # ", fontIndicesContainer[i]);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)fontVertexBufferContainer[fontIndicesContainer[i]];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < fontIndicesContainer.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Font index uniform buffer # ", fontIndicesContainer[i]);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)fontIndexBufferContainer[fontIndicesContainer[i]];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < modelMatrixUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Model matrix uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)modelMatrixUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < lightDataUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Light data uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)lightDataUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < materialUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Material uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)materialUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < directionalLightsUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional lights uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)directionalLightsUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < pointLightsUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point lights uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)pointLightsUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+
+		for ( unsigned long i = 0; i < spotLightsUniformBuffers.size(); ++i ) {
+			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot lights uniform buffer # ", i);
+			const char* strImageName = imageName.c_str();
+			uniformBufferObjectInfo.pObjectName = strImageName;
+			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+			uniformBufferObjectInfo.objectHandle = (uint64_t)spotLightsUniformBuffers[i];
+			SetDebugObjectName(device, &uniformBufferObjectInfo);
+		}
+		
 		// for ( unsigned long i = 0; i < pointLightShadowMapImages.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT pointLightImageObjectInfo{};
 		// 	pointLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
