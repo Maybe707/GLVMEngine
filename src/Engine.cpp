@@ -89,8 +89,8 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
 
-		std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
-		sound_thread.detach();
+		// std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
+		// sound_thread.detach();
     }
 	
     Engine::~Engine() {}

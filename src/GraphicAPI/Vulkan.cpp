@@ -929,7 +929,7 @@ namespace GLVM::core
 		vkDeviceWaitIdle(device);
 
 		
-		std::cout << "DESTRUCTOR CALL" << std::endl;
+//		std::cout << "DESTRUCTOR CALL" << std::endl;
         vkDestroyPipeline(device, graphicsPipeline, nullptr);
         vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         vkDestroyRenderPass(device, renderPass, nullptr);		
@@ -991,7 +991,7 @@ namespace GLVM::core
 			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptors[i].setLayout, nullptr);
 		
 		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
-			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
+//			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
 			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
 				{
 //					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
@@ -1414,8 +1414,8 @@ namespace GLVM::core
 			vkGetPhysicalDeviceProperties(device, &prop);
 			
             if (isDeviceSuitable(device)) {
-				std::cout << prop.deviceType << std::endl;
-				std::cout << prop.deviceName << std::endl;
+				// std::cout << prop.deviceType << std::endl;
+				// std::cout << prop.deviceName << std::endl;
                 physicalDevice = device;
                 break;
             }
@@ -4112,7 +4112,7 @@ namespace GLVM::core
 
 		i32 result = vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory);
         if (result != VK_SUCCESS) {
-			std::cout << "result" << result << std::endl;
+//			std::cout << "result" << result << std::endl;
             throw std::runtime_error("failed to allocate buffer memory!");
         }
 
