@@ -171,11 +171,11 @@ namespace GLVM::core
 					weights[2] = 1.0f;
 					weights[2] = 1.0f;
 					
-                    aVertices_[m].push_back({{vertex[0], vertex[1], vertex[2]},
-											 {normal[0], normal[1], normal[2]},
-											 {texture[0], texture[1]},
-											 {jointIndices[0], jointIndices[1], jointIndices[2]},
-											 {weights[0], weights[1], weights[2]}});
+                    aVertices_[m].Push({{vertex[0], vertex[1], vertex[2]},
+										{normal[0], normal[1], normal[2]},
+										{texture[0], texture[1]},
+										{jointIndices[0], jointIndices[1], jointIndices[2]},
+										{weights[0], weights[1], weights[2]}});
                 }
 			
             vertexBufferContainer.emplace_back();
@@ -664,7 +664,7 @@ namespace GLVM::core
 				}
 
 				uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-				aVertices_[nextIndexGLTF].push_back({{vertex[0], vertex[1], vertex[2]},
+				aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
 										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
@@ -700,12 +700,11 @@ namespace GLVM::core
 		
 		for ( unsigned int i = 0; i < glyph_row; ++i )
 			for ( unsigned int j = 0; j < glyph_column; ++j ) {
-				const std::vector<Vertex> symbol_g_vertices = {
-					{{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * j, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-					{{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-					{{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * j, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-					{{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-				};
+				core::vector<Vertex> symbol_g_vertices;
+					symbol_g_vertices.Push({{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * j, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * j, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
 				unsigned int currentBufferIndex = i * glyph_column + j;
 
 				std::cout << "TEST" << std::endl;
@@ -1306,6 +1305,7 @@ namespace GLVM::core
 		vkDestroyCommandPool(device, hudScreenCommandPool, nullptr);
 		vkDestroyCommandPool(device, uiCommandPool, nullptr);
 		vkDestroyCommandPool(device, uiIconsCommandPool, nullptr);
+		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
 		vkDeviceWaitIdle(device);
         vkDestroyDevice(device, nullptr);
@@ -2762,8 +2762,8 @@ namespace GLVM::core
         endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
     }
 
-    void CVulkanRenderer::createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices) {
-        VkDeviceSize bufferSize = sizeof(_vertices[0]) * _vertices.size();
+    void CVulkanRenderer::createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, core::vector<Vertex>& _vertices) {
+        VkDeviceSize bufferSize = sizeof(_vertices[0]) * _vertices.GetSize();
 
         VkBuffer stagingBuffer;
         VkDeviceMemory stagingBufferMemory;
@@ -2771,7 +2771,7 @@ namespace GLVM::core
 
         void* data;
         vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-        memcpy(data, _vertices.data(), (size_t) bufferSize);
+        memcpy(data, _vertices.GetVectorContainer(), (size_t) bufferSize);
         vkUnmapMemory(device, stagingBufferMemory);
 
         createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexBufferMemory);

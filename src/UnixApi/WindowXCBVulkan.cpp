@@ -353,7 +353,7 @@ namespace GLVM::core
 		return false;
 	};
 	
-	void WindowXCBVulkan::Close() {};
+	void WindowXCBVulkan::Close() { xcb_key_symbols_free(key_symbols); };
 	void WindowXCBVulkan::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
 		int iOffset_X = 0, iOffset_Y = 0;
         iOffset_X = _x_position - 960;

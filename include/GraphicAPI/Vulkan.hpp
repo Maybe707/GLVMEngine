@@ -88,7 +88,7 @@ namespace GLVM::core
     const uint32_t HEIGHT = 600;
 
     const int MAX_FRAMES_IN_FLIGHT = 2;
-//#define NDEBUG
+#define NDEBUG
     const std::vector<const char*> validationLayers = {
         "VK_LAYER_KHRONOS_validation"
     };
@@ -491,7 +491,7 @@ namespace GLVM::core
         std::vector<ecs::components::transform> transform_data_;
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
-        std::vector<std::vector<core::Vertex>> aVertices_;
+        std::vector<core::vector<core::Vertex>> aVertices_;
 		std::vector<std::vector<core::Vertex>> aVertices_Font;
 //		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
         std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
@@ -861,7 +861,7 @@ namespace GLVM::core
         void transitionImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
 		void transitionShadowMapImageLayout(VkImage image, VkImageLayout oldLayout, VkImageLayout newLayout);
         void copyBufferToImage(VkBuffer& buffer, VkImage image, uint32_t width, uint32_t height);
-        void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, const std::vector<Vertex>& _vertices);
+        void createVertexBuffer(VkBuffer& _vertexBuffer, VkDeviceMemory& _vertexBufferMemory, core::vector<Vertex>& _vertices);
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices);
         void createMainRenderUniformBuffers();
         void createMainRenderDescriptorPool();
