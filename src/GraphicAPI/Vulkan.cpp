@@ -1204,7 +1204,7 @@ namespace GLVM::core
 		}
 		
 
-        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+//        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
 		vkDestroySampler(device, textureSampler, nullptr);
         for(unsigned int i = 0; i < textureImages.size(); ++i)
