@@ -56,7 +56,9 @@ namespace GLVM::core
 		uint32_t meshID = 0;
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		CVulkanRenderer*     vulkanRenderer;
-        
+
+		ecs::CSystemManager* pSystem_Manager;
+		
         ecs::CCollisionSystem  * collisionSystem;
 		ecs::CMovementSystem   * movementSystem;
         ecs::CPhysicsSystem    * physicsSystem;

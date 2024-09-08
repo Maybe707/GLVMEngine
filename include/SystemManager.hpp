@@ -23,9 +23,8 @@ namespace GLVM::ecs
 		core::vector<DeactivatedSystems> deactivatedSystems;
 
         CSystemManager();
-        ~CSystemManager();
-        
 	public:
+		~CSystemManager();
         CSystemManager(CSystemManager& _system_Manager)       = delete;    ///< Dont need to make cope because of singleton property.
         void operator=(const CSystemManager& _system_Manager) = delete;    ///< Dont need assignment operator because of singleton property.
         static CSystemManager* GetInstance();                     ///< It possibly to get only one instance of this class whith this method.

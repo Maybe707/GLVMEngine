@@ -18,6 +18,13 @@ namespace GLVM::ecs::components
 					slots[i][j] = -1;
 		}
 
+		// ~inventory() {
+		// 	for ( unsigned int i = 0; i < row; ++i )
+		// 		delete [] slots[i];
+
+		// 	delete [] slots;
+		// }
+		
 		static constexpr unsigned int row = 8;
 		static constexpr unsigned int col = 8;
 		// int slots[row][col] = {

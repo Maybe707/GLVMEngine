@@ -78,7 +78,7 @@ namespace GLVM::core
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
 
-		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
+		pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
 		pSystem_Manager->ActivateSystem(movementSystem);
@@ -289,5 +289,13 @@ namespace GLVM::core
 		physicsSystem = nullptr;
 		delete projectileSystem;
 		projectileSystem = nullptr;
+		delete damageSystem;
+		damageSystem = nullptr;
+		delete enemySytem;
+		enemySytem = nullptr;
+		delete itemSystem;
+		itemSystem = nullptr;
+		// delete pSystem_Manager;
+		// pSystem_Manager = nullptr;
     }
 } // namespace GLVM::core

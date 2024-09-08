@@ -291,6 +291,7 @@ int main()
 
 	delete EntityManager;
 	delete ComponentManager;
+	delete GLVM;
 	
     return 0;
 }

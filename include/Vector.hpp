@@ -133,6 +133,7 @@ namespace GLVM::core
     vector<T>::vector(const vector<T>& _vector) {
 		size     = _vector.size;
 	    capacity = _vector.size;
+		delete [] this->rowInnerData;
 		this->rowInnerData = new unsigned char[capacity * sizeof(T)];
 		
         for(unsigned int i = 0; i < _vector.size; ++i) {
