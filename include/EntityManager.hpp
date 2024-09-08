@@ -23,9 +23,8 @@ namespace GLVM::ecs
 		core::vector<Entity_ID> tActive_Entity_Registry_;
 		
         EntityManager();
-        ~EntityManager();
-        
     public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
+		~EntityManager();
         EntityManager(EntityManager& _entity_Manager) = delete;           ///< Dont need to make cope because of singleton property.
         void operator=(const EntityManager& _entity_Manager) = delete;     ///< Dont need assignment operator because of singleton property.
         static EntityManager* GetInstance();                      ///< It possibly to get only one instance of this class whith this method.

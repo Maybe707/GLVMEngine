@@ -21,6 +21,10 @@ namespace GLVM::ecs
             delete worldSparseEntitiesMapToComponents[j];
             worldSparseEntitiesMapToComponents[j] = nullptr;
         }
+		for(int j = 0, iSize_Ordered = worldDenseComponentsMapToEntities.GetSize(); j < iSize_Ordered; ++j) {
+            delete worldDenseComponentsMapToEntities[j];
+            worldDenseComponentsMapToEntities[j] = nullptr;
+        }
     }
 
 	bool ComponentManager::checkAvailability( core::vector<Entity>& sparse,

@@ -4,6 +4,7 @@ a.out
 doxy/
 exec
 build/
+sandBox/
 .ccls-cache/
 .cache/
 valgrind-out.txt

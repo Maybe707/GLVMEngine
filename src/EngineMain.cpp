@@ -289,5 +289,8 @@ int main()
 
 	GLVM->GameKill();
 
+	delete EntityManager;
+	delete ComponentManager;
+	
     return 0;
 }

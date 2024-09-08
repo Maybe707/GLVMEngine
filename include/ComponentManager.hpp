@@ -42,7 +42,7 @@ namespace GLVM::ecs
 		unsigned int numberOfBaseComponents;
 		
         ComponentManager();
-        ~ComponentManager();
+
 
 		template <typename componentType>
 		unsigned int CreateComponentContainer() {
@@ -79,6 +79,7 @@ namespace GLVM::ecs
 
 		core::vector<const char*> componentsTypes;
 		
+        ~ComponentManager();		
         ComponentManager(ComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
         void operator=(const ComponentManager& componentManager) = delete;      ///< Dont need assignment operator because of singleton property.
        static ComponentManager* GetInstance();                          ///< It possibly to get only one instance of this class whith this method.
