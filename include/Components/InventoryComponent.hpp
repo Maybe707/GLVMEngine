@@ -18,12 +18,25 @@ namespace GLVM::ecs::components
 					slots[i][j] = -1;
 		}
 
-		// ~inventory() {
-		// 	for ( unsigned int i = 0; i < row; ++i )
-		// 		delete [] slots[i];
+		inventory(const inventory& inv) {
+			for ( unsigned int i = 0; i < row; ++i )
+				this->slots[i] = new unsigned int[col];
+			
+			for ( unsigned int i = 0; i < row; ++i )
+				for ( unsigned int j = 0; j < col; ++j )
+					this->slots[i][j] = inv.slots[i][j];
 
-		// 	delete [] slots;
-		// }
+			this->entityOwner = inv.entityOwner;
+			this->highlightedSlots = inv.highlightedSlots;
+			this->isAvailableHighlightedSlots = inv.isAvailableHighlightedSlots;
+		}
+		
+		~inventory() {
+			for ( unsigned int i = 0; i < row; ++i )
+				delete [] slots[i];
+
+			delete [] slots;
+		}
 		
 		static constexpr unsigned int row = 8;
 		static constexpr unsigned int col = 8;

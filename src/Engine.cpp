@@ -78,7 +78,7 @@ namespace GLVM::core
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
 
-		pSystem_Manager = ecs::CSystemManager::GetInstance();
+		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
 		pSystem_Manager->ActivateSystem(movementSystem);
