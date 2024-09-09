@@ -41,14 +41,14 @@ namespace GLVM::ecs
 				cm::collider* collider = componentManager->GetComponent<cm::collider>(entityRefMove);
                 if(collider->bGround_Collision_) {
 					move->gravity = 0;
-					transformComponent->GravityAccumulator = 0.0f;
+					transformComponent->gravityAccumulator = 0.0f;
                 }
                 if(collider->bWall_Collision_) {
 					move->frameMovement = 0;
                     collider->bWall_Collision_ = false;
                 }
-				transformComponent->tPosition += move->frameMovement;
-				transformComponent->tPosition += move->gravity;
+				transformComponent->position += move->frameMovement;
+				transformComponent->position += move->gravity;
 				move->gravity       = 0.0f;
 				move->frameMovement = 0.0f;
 				componentManager->RemoveComponent<cm::move>(entityRefMove);
@@ -57,7 +57,7 @@ namespace GLVM::ecs
 				if ( rigidBody->jumpAccumulator > 0.0f ) {
 					rigidBody->jumpAccumulator -= deltaTime;
 					rigidBody->jump = vec3{ 0.0f, 5.0f, 0.0f } * deltaTime;
-					transformComponent->tPosition += rigidBody->jump;
+					transformComponent->position += rigidBody->jump;
 				}
         }
     }

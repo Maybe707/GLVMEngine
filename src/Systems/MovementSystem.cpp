@@ -115,8 +115,8 @@ namespace GLVM::ecs
 			cm::rigidBody* rigidBodyComponennt = componentManager->GetComponent<cm::rigidBody>(iEntity_refRigidBody);
 			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
 			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
-			rTransform_Component->GravityAccumulator += deltaFrameTime;
-			float gravity = 9.8f * rTransform_Component->GravityAccumulator
+			rTransform_Component->gravityAccumulator += deltaFrameTime;
+			float gravity = 9.8f * rTransform_Component->gravityAccumulator
 				* rigidBodyComponennt->fMass_ * 0.0005;
 			if ( gravity > 0.2f )
 				gravity = 0.2;

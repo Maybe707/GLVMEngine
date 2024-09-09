@@ -187,7 +187,7 @@ namespace GLVM::ecs
 				if ( itemColliderComponent->bWall_Collision_ && isCrosshairCollided ) {
 //					std::cout << "DRAG TO CROSSHAIR" << std::endl;
 //					std::cout << "draged entity " << entityItemContaining << std::endl;
-					itemTransformComponent->tPosition = crosshairTransformComponent->tPosition;
+					itemTransformComponent->position = crosshairTransformComponent->position;
 					itemColliderComponent->itemDrag = true;
 					isItemDraged = true;
 

@@ -326,7 +326,7 @@ namespace GLVM::core
 			forward[2] = appliedRotationQuat.z;
 		}
 		cameraComponent.forward = Normalize(forward);
-		mat4 view = LookAtMain(_Player.tPosition, _Player.tPosition + cameraComponent.forward, cameraComponent.up);
+		mat4 view = LookAtMain(_Player.position, _Player.position + cameraComponent.forward, cameraComponent.up);
 		for ( unsigned int i = 0; i < 4; ++i )
 			for ( unsigned int j = 0; j < 4; ++j )
 				 viewMatrix_[i][j] = view[i][j];
@@ -4203,7 +4203,7 @@ namespace GLVM::core
 		hudUBO.isHudExists = isHudExists;
 		hudUBO.currentHP   = entityOwnHudHealth->currentHealth;
 		hudUBO.maxHP       = entityOwnHudHealth->maxHealth;
-		hudUBO.entityPosition = entityOwnHudTransform->tPosition;
+		hudUBO.entityPosition = entityOwnHudTransform->position;
 		hudUBO.highestY    = highestY;
 
 		void* hudMatrixData;
@@ -4217,8 +4217,8 @@ namespace GLVM::core
 		HUD_SCREEN_UBO hudUBO{};
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
-		cursorTransform->tPosition[0] = hud_screen_x;
-		cursorTransform->tPosition[1] = -hud_screen_y;
+		cursorTransform->position[0] = hud_screen_x;
+		cursorTransform->position[1] = -hud_screen_y;
 //		std::cout << "cursor scale: " << cursorTransform->fScale << std::endl;
 
 //		std::cout << "x: " << cursorTransform->tPosition[0] << " y: " << cursorTransform->tPosition << std::endl;
@@ -4227,9 +4227,9 @@ namespace GLVM::core
 			hudUBO.model[3][0] = defaultPosition[0];
 			hudUBO.model[3][1] = defaultPosition[1];
 			hudUBO.model[3][2] = defaultPosition[2];
-			hudUBO.model[0][0] = cursorTransform->fScale;
-			hudUBO.model[1][1] = cursorTransform->fScale;
-			hudUBO.model[2][2] = cursorTransform->fScale;
+			hudUBO.model[0][0] = cursorTransform->scale;
+			hudUBO.model[1][1] = cursorTransform->scale;
+			hudUBO.model[2][2] = cursorTransform->scale;
 			hudUBO.model[3][3] = 1.0f;
 		} else {
 			defaultPosition[0] = hud_screen_x;
@@ -4238,9 +4238,9 @@ namespace GLVM::core
 			hudUBO.model[3][0] = defaultPosition[0];
 			hudUBO.model[3][1] = defaultPosition[1];
 			hudUBO.model[3][2] = defaultPosition[2];
-			hudUBO.model[0][0] = cursorTransform->fScale;
-			hudUBO.model[1][1] = cursorTransform->fScale;
-			hudUBO.model[2][2] = cursorTransform->fScale;
+			hudUBO.model[0][0] = cursorTransform->scale;
+			hudUBO.model[1][1] = cursorTransform->scale;
+			hudUBO.model[2][2] = cursorTransform->scale;
 			hudUBO.model[3][3] = 1.0f;
 		}
 
@@ -4257,7 +4257,7 @@ namespace GLVM::core
 		mat4 model(1.0);
 		float x = x_slot_offset * 0.1f + 0.2f;
 		[[maybe_unused]] float y = y_slot_offset * 0.17f - 0.8f;
-		float inventorySlotScale = inventorySlotTransform->fScale;
+		float inventorySlotScale = inventorySlotTransform->scale;
 //		std::cout << "inventory slot scale: " << inventorySlotScale << std::endl;
 		model[0][0] = inventorySlotScale;
 		model[1][1] = inventorySlotScale;
@@ -4269,9 +4269,9 @@ namespace GLVM::core
 		// std::cout << "x: " << model[3][0] << std::endl;
 		// std::cout << "y: " << model[3][1] << std::endl;
 		
-		inventorySlotTransform->tPosition[0] = x;
-		inventorySlotTransform->tPosition[1] = y;
-		inventorySlotTransform->tPosition[2] = 0.1f;
+		inventorySlotTransform->position[0] = x;
+		inventorySlotTransform->position[1] = y;
+		inventorySlotTransform->position[2] = 0.1f;
 		
 		hudUBO.model = model;
 
@@ -4332,10 +4332,10 @@ namespace GLVM::core
 			cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
 
 			// Compute absolute centre of all slots
-			x_result_offset = (slotTransform_0->tPosition[0] + slotTransform_3->tPosition[0]) / 2.0f;
-			y_result_offset = (slotTransform_0->tPosition[1] + slotTransform_3->tPosition[1]) / 2.0f;
+			x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
+			y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
 		}
-		float itemScale = itemTransfromComponent->fScale;
+		float itemScale = itemTransfromComponent->scale;
 //		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
 		// std::cout << "x: " << x_result_offset << std::endl;
 		// std::cout << "y: " << y_result_offset << std::endl;
@@ -4351,20 +4351,20 @@ namespace GLVM::core
 
 //		itemTransfromComponent->fScale = itemScale;
 		if ( !itemColliderComponent->itemDrag ) {
-			itemTransfromComponent->tPosition = vec3(x_result_offset, y_result_offset, 0.1f);
+			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
 			itemScale *= 1.1f;
 			itemColliderComponent->itemDrag = false;
-			itemTransfromComponent->tPosition[2] = 0.0f;
+			itemTransfromComponent->position[2] = 0.0f;
 		}
 		
 		mat4 model(1.0);
 		model[0][0] = itemScale * itemComponent->itemSlotType.width;
 		model[1][1] = itemScale * itemComponent->itemSlotType.height;
 		model[2][2] = 0.0f;
-		model[3][0] = itemTransfromComponent->tPosition[0];
-		model[3][1] = itemTransfromComponent->tPosition[1];
-		model[3][2] = itemTransfromComponent->tPosition[2];
+		model[3][0] = itemTransfromComponent->position[0];
+		model[3][1] = itemTransfromComponent->position[1];
+		model[3][2] = itemTransfromComponent->position[2];
 
 		hudUBO.model = model;
 		
@@ -4545,7 +4545,7 @@ namespace GLVM::core
 					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
 					unsigned int uboIndex = j * 8 + m;
-					updateUBO_UI(inventoryTransformComponent->tPosition[0] + m, inventoryTransformComponent->tPosition[1] + j,
+					updateUBO_UI(inventoryTransformComponent->position[0] + m, inventoryTransformComponent->position[1] + j,
 								 currentFrame, uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
@@ -4931,9 +4931,9 @@ namespace GLVM::core
 				// mat4 tempProjection = projectionMatrix;
 				// tempView.SelfTensorTranspose();
 				// tempProjection.SelfTensorTranspose();
-				vec4 pos = vec4(transformComponent->tPosition[0],
-								transformComponent->tPosition[1],
-								transformComponent->tPosition[2], 1.0f);
+				vec4 pos = vec4(transformComponent->position[0],
+								transformComponent->position[1],
+								transformComponent->position[2], 1.0f);
 
 				// std::cout << "pos: " << pos << std::endl;
 				// std::cout << "view matrix: " << viewMatrix << std::endl;
@@ -4955,7 +4955,7 @@ namespace GLVM::core
 				fontUBO.view = viewMatrix;
 				fontUBO.proj = projectionMatrix;
 
-				vec3 fontPosition = transformComponent->tPosition;
+				vec3 fontPosition = transformComponent->position;
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;
 //				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
@@ -5348,7 +5348,7 @@ namespace GLVM::core
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GLVM::ecs::components::controller>();
 		if ( pointLightEntities.GetSize() > 0 )
 
-			lightDataUBO.viewPosition = transformComponent->tPosition;
+			lightDataUBO.viewPosition = transformComponent->position;
 
 		DirectionalLight directionalLight{};
 
@@ -6427,13 +6427,13 @@ namespace GLVM::core
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
 		
-		scalingMatrix[0][0] = _transformComponent->fScale;
-		scalingMatrix[1][1] = _transformComponent->fScale;
-		scalingMatrix[2][2] = _transformComponent->fScale;
+		scalingMatrix[0][0] = _transformComponent->scale;
+		scalingMatrix[1][1] = _transformComponent->scale;
+		scalingMatrix[2][2] = _transformComponent->scale;
 
-		translationMatrix[3][0] = _transformComponent->tPosition[0];
-		translationMatrix[3][1] = _transformComponent->tPosition[1];
-		translationMatrix[3][2] = _transformComponent->tPosition[2];
+		translationMatrix[3][0] = _transformComponent->position[0];
+		translationMatrix[3][1] = _transformComponent->position[1];
+		translationMatrix[3][2] = _transformComponent->position[2];
 		translationMatrix[3][3] = 1.0f;
 
 		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));

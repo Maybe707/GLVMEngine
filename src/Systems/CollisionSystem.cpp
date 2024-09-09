@@ -101,19 +101,19 @@ namespace GLVM::ecs
                 unsigned int comparedEntityRefCollider     = linkedEntities[j];
 				
 				vec3 backtrackingTransform = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->position;
 				vec3 backtrackingTransformUpper = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->tPosition;
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->position;
 				float backtrackingScale = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->fScale;
+					GetComponent<cm::transform>(backtrackingEntityRefCollider)->scale;
 				float backtrackingGltfFlag = componentManager->
 					GetComponent<cm::transform>(backtrackingEntityRefCollider)->gltf;
 			    vec3  comparedTransform     = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
+					GetComponent<cm::transform>(comparedEntityRefCollider)->position;
 				vec3 comparedTransformUpper = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->tPosition;
+					GetComponent<cm::transform>(comparedEntityRefCollider)->position;
 				float comparedScale     = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->fScale;
+					GetComponent<cm::transform>(comparedEntityRefCollider)->scale;
 				float comparedGltfFlag = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider)->gltf;
 
@@ -177,9 +177,9 @@ namespace GLVM::ecs
 			float crosshairGltfFlag = 0;
 			if ( linkedCrosshairEntities.GetSize() > 0 ) {
 				crosshairPosition = componentManager->
-					GetComponent<cm::transform>(crosshairEntity)->tPosition;                
+					GetComponent<cm::transform>(crosshairEntity)->position;                
 				crosshairScale = componentManager->
-					GetComponent<cm::transform>(crosshairEntity)->fScale;
+					GetComponent<cm::transform>(crosshairEntity)->scale;
 				crosshairGltfFlag = componentManager->
 					GetComponent<cm::transform>(crosshairEntity)->gltf;
 			}
@@ -198,12 +198,12 @@ namespace GLVM::ecs
 				constexpr float collitionCorrectnessMultiplayer = 0.8;
 				if ( itemTransformComponent != nullptr ) {
 					itemPosition = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->tPosition;
+						GetComponent<cm::transform>(entityItemContaining)->position;
 					itemScale_X     = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->fScale * itemComponent->itemSlotType.width *
+						GetComponent<cm::transform>(entityItemContaining)->scale * itemComponent->itemSlotType.width *
 						collitionCorrectnessMultiplayer;
 					itemScale_Y     = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->fScale * itemComponent->itemSlotType.height *
+						GetComponent<cm::transform>(entityItemContaining)->scale * itemComponent->itemSlotType.height *
 						collitionCorrectnessMultiplayer;
 					itemGltfFlag = componentManager->
 						GetComponent<cm::transform>(entityItemContaining)->gltf;
@@ -251,7 +251,7 @@ namespace GLVM::ecs
 
 				if ( itemCollider->bWall_Collision_ ) {
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					vec3 itemPosition = itemTransform->tPosition;
+					vec3 itemPosition = itemTransform->position;
 					// float itemScale   = itemTransform->fScale;
 					// bool  isItem_GLTF = itemTransform->gltf;
 
@@ -268,8 +268,8 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
-						float inventorySlotScale    = inventorySlotTransform->fScale;
+						vec3  inventorySlotPosition = inventorySlotTransform->position;
+						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
 
 						if ( !isInventorySlot_GLTF ) {
@@ -334,7 +334,7 @@ namespace GLVM::ecs
 				if ( itemCollider->bWall_Collision_ && isCrosshairCollided ) {
 					std::cout << "item: " << entityItemContaining << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					vec3 itemPosition = itemTransform->tPosition;
+					vec3 itemPosition = itemTransform->position;
 					// float itemScale   = itemTransform->fScale;
 					// bool  isItem_GLTF = itemTransform->gltf;
 
@@ -350,8 +350,8 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-						vec3  inventorySlotPosition = inventorySlotTransform->tPosition;
-						float inventorySlotScale    = inventorySlotTransform->fScale;
+						vec3  inventorySlotPosition = inventorySlotTransform->position;
+						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
 
 						if ( !isInventorySlot_GLTF ) {
@@ -377,8 +377,8 @@ namespace GLVM::ecs
 						*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
 						core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
 						cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-						itemTransform->tPosition = playerTransform->tPosition + Normalize(playerTransform->tForward) * 2.5f;
-						itemTransform->fScale = 0.05f;
+						itemTransform->position = playerTransform->position + Normalize(playerTransform->forward) * 2.5f;
+						itemTransform->scale = 0.05f;
 						*isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
 						itemCollider->itemDrag = false;
@@ -473,7 +473,7 @@ namespace GLVM::ecs
 					pivot_slot_col = j;
 				}
 			}
-		vec3 candidatePosition = candidateTransform->tPosition;
+		vec3 candidatePosition = candidateTransform->position;
 
 		int row_offset = 0;
 		int col_offset = 0;

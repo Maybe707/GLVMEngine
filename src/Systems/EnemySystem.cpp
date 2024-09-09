@@ -26,7 +26,7 @@ namespace GLVM::ecs
             cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enemyEntity);
 			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enemyEntity);
 
-			vec3 distance = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
+			vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
 			float cameraSpeed = 5.5f * deltaFrameTime;            
 
 
@@ -42,7 +42,7 @@ namespace GLVM::ecs
 				float deltaLenth = distance.Length() - enemyComponent->detectRadius;
 				vec3 enemyMove = distance * (deltaLenth / distance.Length());
 
-				enemyTransformComponent->tPosition += enemyMove;
+				enemyTransformComponent->position += enemyMove;
 			}
 			
 			if ( distance.Length() <= enemyComponent->detectRadius ) {
@@ -83,16 +83,16 @@ namespace GLVM::ecs
 		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 			.shininess = 128.0f * 0.078125f };
 		cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
-		rTransformProjectile->fScale = 0.1f;
+		rTransformProjectile->scale = 0.1f;
 
 		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
 		cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
 		
-		rTransformProjectile->tPosition = enemyTransformComponent->tPosition;
-		rTransformProjectile->tForward   = playerTransformComponent->tPosition - enemyTransformComponent->tPosition;
-		rTransformProjectile->tPosition += rTransformProjectile->tForward * 0.3;
+		rTransformProjectile->position = enemyTransformComponent->position;
+		rTransformProjectile->forward   = playerTransformComponent->position - enemyTransformComponent->position;
+		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
 		
-		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
+		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 

@@ -79,10 +79,10 @@ namespace GLVM::ecs
         for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
             unsigned int uiEntity_refProjectile = linkedEntities[x];
             cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->tPosition += Normalize(rTransformProjectile->tForward) * cameraSpeed * 0.5;
+			rTransformProjectile->position += Normalize(rTransformProjectile->forward) * cameraSpeed * 0.5;
 //			rTransformProjectile->tForward += rTransformProjectile->tPosition + rTransformProjectile->tForward;
 			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiEntity_refProjectile);
-			pointLightComponent->position += Normalize(rTransformProjectile->tForward) * cameraSpeed * 0.5;
+			pointLightComponent->position += Normalize(rTransformProjectile->forward) * cameraSpeed * 0.5;
 		}
 
         for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
@@ -137,18 +137,18 @@ namespace GLVM::ecs
 		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
         cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile->fScale = 0.1f;
+        rTransformProjectile->scale = 0.1f;
 		
 		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
 		if ( transform != nullptr )
-			rTransformProjectile->tPosition = transform->tPosition;
+			rTransformProjectile->position = transform->position;
 
-        rTransformProjectile->tForward   = beholder.forward;
+        rTransformProjectile->forward   = beholder.forward;
 		rTransformProjectile->yaw        = fYaw;
 		rTransformProjectile->pitch      = fPitch;
-		rTransformProjectile->tPosition  += rTransformProjectile->tForward * 2.0f;
+		rTransformProjectile->position  += rTransformProjectile->forward * 2.0f;
 		
-		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->tPosition,
+		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
 			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
 			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 

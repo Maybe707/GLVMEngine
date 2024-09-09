@@ -12,15 +12,15 @@ namespace GLVM::ecs::components
 {    
 	struct transform
 	{
-        vec3 tPosition{ 0.0f, 0.0f, 0.0f };
-        vec3 tForward{ 0.0f, 0.0f, 0.0f };
-        vec3 tRight{ 0.0f, 0.0f, 0.0f };
-        vec3 tUp{ 0.0f, 0.0f, 0.0 };
+        vec3 position{ 0.0f, 0.0f, 0.0f };
+        vec3 forward{ 0.0f, 0.0f, 0.0f };
+        vec3 right{ 0.0f, 0.0f, 0.0f };
+        vec3 up{ 0.0f, 0.0f, 0.0 };
         float yaw = 0.0f;
 		float pitch = 0.0f;
-        float fScale = 1.0f;
+        float scale = 1.0f;
         bool hud = false;
-		float GravityAccumulator = 0.0f;
+		float gravityAccumulator = 0.0f;
 		unsigned int currentAnimationFrame = 0;
 		float frameAccumulator = 0.0f;
 		bool gltf = true;
