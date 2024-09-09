@@ -166,32 +166,28 @@ namespace GLVM::ecs
 			}
 		}
 
-		// std::cout << "inventory opened: " << isInventoryOpened << std::endl;
-		// std::cout << "item draged: " << isItemDraged << std::endl;
-		// std::cout << "left mouse button pressed: " << isLeftMouseButtonPressed << std::endl;
-		// std::cout << "left mouse button released: " << *isLeftMouseButtonReleased << std::endl;
-		
+		/// This operator work when inventory is open, player press left mouse button and he is dont holding an item
 		if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-//			std::cout << "COLLISION" << std::endl;
 			*isLeftMouseButtonReleased = false;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thants ok to give array '0' element in this case because we have only one crosshair
 			vec3 crosshairPosition;
 			float crosshairScale = 0;
 			float crosshairGltfFlag = 0;
 			if ( linkedCrosshairEntities.GetSize() > 0 ) {
 				crosshairPosition = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->tPosition;                ///< Thants ok to give array '0' element in this case because we have only one crosshair
+					GetComponent<cm::transform>(crosshairEntity)->tPosition;                
 				crosshairScale = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->fScale;
+					GetComponent<cm::transform>(crosshairEntity)->fScale;
 				crosshairGltfFlag = componentManager->
-					GetComponent<cm::transform>(linkedCrosshairEntities[0])->gltf;
+					GetComponent<cm::transform>(crosshairEntity)->gltf;
 			}
 
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-				if ( itemComponent->occupiedSlots.GetSize() == 0 )
+				if ( itemComponent->occupiedSlots.GetSize() == 0 )                        ///< If occupiedSlots is 0 then this item not in inventory
 					continue;
 
 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
@@ -199,7 +195,7 @@ namespace GLVM::ecs
 				float itemScale_X  = 0;
 				float itemScale_Y  = 0;
 				float itemGltfFlag = 0;
-				float collitionCorrectnessMultiplayer = 0.8;
+				constexpr float collitionCorrectnessMultiplayer = 0.8;
 				if ( itemTransformComponent != nullptr ) {
 					itemPosition = componentManager->
 						GetComponent<cm::transform>(entityItemContaining)->tPosition;
@@ -221,15 +217,12 @@ namespace GLVM::ecs
 					itemScale_X /= 2;
 				}
 
-				// std::cout << "crosshair scale: " << crosshairScale << std::endl;
-				// std::cout << "item scale: " << itemScale << std::endl;
-				
 				bool squareColliderFlag = false;
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
 													crosshairScale, itemScale_X, itemScale_Y);
 				if ( squareColliderFlag ) {
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(linkedCrosshairEntities[0]);
+					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
 
 					cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 					for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {

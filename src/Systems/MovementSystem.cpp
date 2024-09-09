@@ -156,8 +156,8 @@ namespace GLVM::ecs
 
 		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
 		float delta_x = current_X - prev_X;
-		if ( delta_x < 0.0001 )
-			delta_x = prev_delta_x;
+		// if ( delta_x < 0.0001 )
+		// 	delta_x = prev_delta_x;
 
 		const vec3 rotateAxis = { 0.0, 1.0, 0.0 };
 		float rotationAngle = delta_x;
@@ -179,8 +179,8 @@ namespace GLVM::ecs
 		forward[2] = appliedRotationQuat.z;
 
 		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		if ( delta_x > 0.0f )
-			prev_delta_x = delta_x;
+		// if ( delta_x > 0.0f )
+		// 	prev_delta_x = delta_x;
 		
         forward = Normalize(forward);
         return forward;
