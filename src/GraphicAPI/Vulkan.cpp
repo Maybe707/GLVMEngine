@@ -829,10 +829,48 @@ namespace GLVM::core
 
     void CVulkanRenderer::cleanupSwapChain() {
 		vkDeviceWaitIdle(device);
+        vkDestroyImageView(device, depthImageView, nullptr);
+		vkDestroyImage(device, mainPipelineImage, nullptr);
+		vkFreeMemory(device, mainPipelineImageMemory, nullptr);
+		
         for (VkFramebuffer& framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
         }
 
+        for (VkFramebuffer& framebuffer : directionalLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+		for (VkFramebuffer& framebuffer : spotLightShadowMapFrameBuffers) {
+            vkDestroyFramebuffer(device, framebuffer, nullptr);
+        }
+
+		for (std::vector<VkFramebuffer>& inner_vector : pointLightShadowMapFrameBuffers) {
+			for (VkFramebuffer& framebuffer : inner_vector) {
+				vkDestroyFramebuffer(device, framebuffer, nullptr);
+			} 
+        }
+
+		for ( VkFramebuffer& framebuffer : hudSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : fontSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : hudScreenSwapChainFramebuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : uiSwapChainFrameBuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+
+		for ( VkFramebuffer& framebuffer : uiIconsSwapChainFrameBuffers ) {
+			vkDestroyFramebuffer(device, framebuffer, nullptr);
+		}
+		
         for (VkImageView& imageView : swapChainImageViews) {
             vkDestroyImageView(device, imageView, nullptr);
         }
@@ -1165,43 +1203,6 @@ namespace GLVM::core
 		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
 		
-        vkDestroyImageView(device, depthImageView, nullptr);
-		vkDestroyImage(device, mainPipelineImage, nullptr);
-		vkFreeMemory(device, mainPipelineImageMemory, nullptr);
-		
-        for (VkFramebuffer& framebuffer : directionalLightShadowMapFrameBuffers) {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
-		for (VkFramebuffer& framebuffer : spotLightShadowMapFrameBuffers) {
-            vkDestroyFramebuffer(device, framebuffer, nullptr);
-        }
-
-		for (std::vector<VkFramebuffer>& inner_vector : pointLightShadowMapFrameBuffers) {
-			for (VkFramebuffer& framebuffer : inner_vector) {
-				vkDestroyFramebuffer(device, framebuffer, nullptr);
-			} 
-        }
-
-		for ( VkFramebuffer& framebuffer : hudSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : fontSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : hudScreenSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : uiSwapChainFrameBuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : uiIconsSwapChainFrameBuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
 		
 
 //        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -2258,7 +2259,7 @@ namespace GLVM::core
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
 			directionalLightsRenderAttachments.push_back(directionalLightPipeline.descriptors[0].textureImages[i].views[0]);
-			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
@@ -2267,7 +2268,7 @@ namespace GLVM::core
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightPipeline.descriptors[0].textureImages[i].views[0]);
 			
-			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
+			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization

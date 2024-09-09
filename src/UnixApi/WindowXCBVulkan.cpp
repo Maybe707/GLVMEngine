@@ -66,8 +66,8 @@ namespace GLVM::core
 		const uint32_t values[] = {
 			320,    /* x */
 			180,    /* y */
-			1920, /* width */
-			1080   /* height */
+			windowWidth,
+			windowHeight
 		};
 
 		xcb_configure_window(connection, window, mask, values);
@@ -152,6 +152,12 @@ namespace GLVM::core
 
 				printf ("Window %i exposed. Region to be redrawn at location (%d,%d), with dimension (%d,%d)\n",
 						expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
+
+				if ( !isWindowResizeRead ) {
+					windowWidth = expose_event->width;
+					windowHeight = expose_event->height;
+					isWindowResizeRead = true;
+				}
 				break;
 			}
 			case XCB_BUTTON_PRESS: {
@@ -349,6 +355,7 @@ namespace GLVM::core
 			Input_Stack_->ControlInput(_Event);
 			/* Free the Generic Event */
 		}
+		isWindowResizeRead = false;
 
 		return false;
 	};
