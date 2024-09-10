@@ -92,7 +92,7 @@ namespace GLVM::ecs
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
 			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
-			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = false;
+			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = false;
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
 			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
 				if ( i == j )
@@ -153,13 +153,13 @@ namespace GLVM::ecs
 				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
-                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bGround_Collision_ = true;
+                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = true;
 					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
                     continue;
                 }
                     
                 if(boxColliderFlag) {
-                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->bWall_Collision_ = true;
+                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->wallCollision = true;
 					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
                     continue;
                 }
@@ -221,7 +221,7 @@ namespace GLVM::ecs
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
 													crosshairScale, itemScale_X, itemScale_Y);
 				if ( squareColliderFlag ) {
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->bWall_Collision_ = true;
+					componentManager->GetComponent<cm::collider>(entityItemContaining)->wallCollision = true;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
 
 					cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
@@ -249,7 +249,7 @@ namespace GLVM::ecs
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
 //				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 
-				if ( itemCollider->bWall_Collision_ ) {
+				if ( itemCollider->wallCollision ) {
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->position;
 					// float itemScale   = itemTransform->fScale;
@@ -331,7 +331,7 @@ namespace GLVM::ecs
 					}
 				}
 				
-				if ( itemCollider->bWall_Collision_ && isCrosshairCollided ) {
+				if ( itemCollider->wallCollision && isCrosshairCollided ) {
 					std::cout << "item: " << entityItemContaining << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->position;
@@ -382,7 +382,7 @@ namespace GLVM::ecs
 						*isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
 						itemCollider->itemDrag = false;
-						itemCollider->bWall_Collision_ = false;
+						itemCollider->wallCollision = false;
 					}
 					
 					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
@@ -409,7 +409,7 @@ namespace GLVM::ecs
 						*isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
 						itemCollider->itemDrag = false;
-						itemCollider->bWall_Collision_ = false;
+						itemCollider->wallCollision = false;
 
 						return;
 					} else if ( stateSlotsAvailability == -1 ) {
@@ -423,7 +423,7 @@ namespace GLVM::ecs
 						}
 						cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
 						core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-						collidedItemColliderComponent->bWall_Collision_ = true;
+						collidedItemColliderComponent->wallCollision = true;
 //						collidedItemColliderComponent->colliders.clear();
 						collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
 
@@ -437,7 +437,7 @@ namespace GLVM::ecs
 
 						*isLeftMouseButtonReleased = false;
 						itemCollider->itemDrag = false;
-						itemCollider->bWall_Collision_ = false;
+						itemCollider->wallCollision = false;
 						return;
 					}
 				}

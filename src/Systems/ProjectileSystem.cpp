@@ -88,8 +88,8 @@ namespace GLVM::ecs
         for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
 			
             unsigned int uiEntity_refProjectile = linkedEntities[i];
-            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bWall_Collision_ ||
-               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->bGround_Collision_) {
+            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->wallCollision ||
+               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->groundCollision) {
 				cm::damage* projectileDamageComponent = pComponent_Manager->GetComponent<cm::damage>(uiEntity_refProjectile);
 				for ( unsigned int j = 0; j < pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders.GetSize(); ++j ) {
 					unsigned int collidedEntity = pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders[j];

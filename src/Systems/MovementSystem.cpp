@@ -85,7 +85,7 @@ namespace GLVM::ecs
                 case core::EEvents::eJUMP:
 				{
 					cm::collider* collider = componentManager->GetComponent<cm::collider>(currentEntity);
-					if ( collider->bGround_Collision_ ) {
+					if ( collider->groundCollision ) {
 						cm::rigidBody* rigidBody = componentManager->GetComponent<cm::rigidBody>(currentEntity);
 						rigidBody->jumpAccumulator = 1.5f;
 					}
