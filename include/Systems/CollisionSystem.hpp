@@ -50,7 +50,7 @@ namespace GLVM::ecs
 		void Update() override;
 		static core::vector<unsigned int> searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
 													  const core::vector<vec3>& collidedInventorySlotTransforms);
-		int areSlotsAvailable(const core::vector<unsigned int>& slots_);
+		int slotsAvailabilityState(const core::vector<unsigned int>& slots_);
 		unsigned int searchMinimumValueIndex(core::vector<float> vector);
 		void bubbleSortVector(core::vector<unsigned int>& vector_);
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,

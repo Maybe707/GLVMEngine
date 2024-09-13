@@ -284,7 +284,7 @@ namespace GLVM::ecs
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 
 					bubbleSortVector(newColliderEntities);
-					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
+					int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
 
 					/// If this condition equal true then this means that we got inventory slots highlighted with green color what meancs thar player can drop item into inventory
 					if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
@@ -372,7 +372,7 @@ namespace GLVM::ecs
 						return;
 					
 					bubbleSortVector(newColliderEntities);
-					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
+					int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
 					if ( stateSlotsAvailability == INT_MAX ) {                                                         ///< Just drop an item into inventory because all slots are available
 						itemComponent->occupiedSlots.clear();
 						
@@ -540,66 +540,40 @@ namespace GLVM::ecs
 				else if (col_offset > 0 )
 					result_col_offset = col_offset - j;
 
-				// std::cout << "x offset: " << pivot_slot_col + result_col_offset << std::endl;
-				// std::cout << "y offset: " << pivot_slot_row + result_row_offset << std::endl;
-
-				// bool existSlot = false;
-				// for ( unsigned int n = 0; n < newColliderEntities.GetSize(); ++n ) {
-				// 	if ( newColliderEntities[n] == inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset] ) {
-				// 		existSlot = true;
-				// 		break;
-				// 	}
-				// }
-
 				if ( (pivot_slot_row + result_row_offset) >= 0 && (pivot_slot_col + result_col_offset) >= 0 &&
 					 (pivot_slot_row + result_row_offset) < 8 && (pivot_slot_col + result_col_offset) < 8 ) 
 					newColliderEntities.Push(inventoryComponent->slots[pivot_slot_row + result_row_offset][pivot_slot_col + result_col_offset]);
 			}
-
-//		std::cout << "number of available slots: " << newColliderEntities.GetSize() << std::endl;
 		
 		return newColliderEntities;
 	}
 	
-	int CCollisionSystem::areSlotsAvailable(const core::vector<unsigned int>& slots_) {
+	int CCollisionSystem::slotsAvailabilityState(const core::vector<unsigned int>& slots_) {
 		namespace cm = GLVM::ecs::components;
         ComponentManager* componentManager = ComponentManager::GetInstance();
-		
-		int resultState = -1;
-		cm::inventorySlot* inventorySlot = nullptr;
-		if ( slots_.GetSize() > 0 )
-			inventorySlot = componentManager->GetComponent<cm::inventorySlot>(slots_[0]);
-		else
-			resultState = -1;
-
-		unsigned int alreadyContainItemsAccumulator = 0;
-		if ( inventorySlot != nullptr )
-			alreadyContainItemsAccumulator = inventorySlot->itemEntity;
-
-		unsigned int allFreeStateAccumulator = 0;
-		if ( alreadyContainItemsAccumulator == UINT_MAX )
-			++allFreeStateAccumulator;
+		unsigned int resultAccumulator = 0;
+		int fieldState = -2;                                   ///< -2 is a default status value
 			
-		for ( unsigned int i = 1; i < slots_.GetSize(); ++i ) {
+		for ( unsigned int i = 0; i < slots_.GetSize(); ++i ) {
 			cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(slots_[i]);
-
-			if ( alreadyContainItemsAccumulator == UINT_MAX && invetorySlot->itemEntity != UINT_MAX ) {
-				alreadyContainItemsAccumulator = invetorySlot->itemEntity;
-			} else if ( invetorySlot->itemEntity == UINT_MAX ) {
-				++allFreeStateAccumulator;
-			} else if ( invetorySlot->itemEntity == alreadyContainItemsAccumulator ) {
-				alreadyContainItemsAccumulator = invetorySlot->itemEntity;
-			} else if ( invetorySlot->itemEntity != UINT_MAX &&
-						invetorySlot->itemEntity > 0 &&
-						invetorySlot->itemEntity != alreadyContainItemsAccumulator ) {
-				return resultState;
+			if ( invetorySlot == nullptr )
+				continue;
+			
+			if ( invetorySlot->itemEntity == UINT_MAX ) {
+				++resultAccumulator;
+			} else {
+				if ( fieldState < 0 ) {
+					fieldState = invetorySlot->itemEntity;     ///< Write entity on first appearence
+				} else if ( fieldState != static_cast<int>(invetorySlot->itemEntity) ) {
+					return -1;                                 ///< If found another entity that means some of slots holds by two items
+				}
 			}
 		}
 		
-		if ( allFreeStateAccumulator == slots_.GetSize() )
+		if ( resultAccumulator == slots_.GetSize() )
 			return INT_MAX;
 		else {
-			return alreadyContainItemsAccumulator;
+			return fieldState;
 		}
 	}
 	
