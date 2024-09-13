@@ -166,12 +166,12 @@ namespace GLVM::ecs
 			}
 		}
 
-		/// This operator work when inventory is open, player press left mouse button and he is dont holding an item
+		/// This code implements when inventory is open, player press left mouse button and he is not holding an item
 		if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 			*isLeftMouseButtonReleased = false;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thants ok to give array '0' element in this case because we have only one crosshair
+			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
 			vec3 crosshairPosition;
 			float crosshairScale = 0;
 			float crosshairGltfFlag = 0;
@@ -235,29 +235,21 @@ namespace GLVM::ecs
 			}
 		}
 
-
+		/// This code implements highlightning on inventory slots and show player is it possible to drop item in inventory
 		if ( isInventoryOpened && *isItemDraged ) {
-//			std::cout << "TEST" << std::endl;
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
 			inventoryComponent->highlightedSlots.clear();
-			inventoryComponent->isAvailableHighlightedSlots = false;
+			inventoryComponent->isAvailableHighlightedSlots = false;                         ///< Turn off highlightning flag before set it to the right value
 
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-//				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 
 				if ( itemCollider->wallCollision ) {
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->position;
-					// float itemScale   = itemTransform->fScale;
-					// bool  isItem_GLTF = itemTransform->gltf;
-
-					// if ( !isItem_GLTF ) {
-					// 	itemScale /= 2;
-					// }
 					
 					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
 																											   cm::transform,
@@ -272,12 +264,11 @@ namespace GLVM::ecs
 						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
 
-						if ( !isInventorySlot_GLTF ) {
+						if ( !isInventorySlot_GLTF )
 							inventorySlotScale /= 2;
-						}
 
 						bool squareColliderFlag = false;
-						inventorySlotPosition[2] = 0.0f;
+						inventorySlotPosition[2] = 0.0f;                                        ///< We dont need z-axis here because we test collision for x-y plane with item pivot
 						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
 														 inventorySlotScale);
 						if ( squareColliderFlag ) {
@@ -295,17 +286,14 @@ namespace GLVM::ecs
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
 
-
+					/// If this condition equal true then this means that we got inventory slots highlighted with green color what meancs thar player can drop item into inventory
 					if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
 						 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ) {
-						//				std::cout << "TEST" << std::endl;
 						inventoryComponent->isAvailableHighlightedSlots = true;
 					}
 
 					for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
 						inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
-
-//					std::cout << "first intrance number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
 				}
 			}
 		} else {
@@ -315,13 +303,12 @@ namespace GLVM::ecs
 			inventoryComponent->highlightedSlots.clear();
 		}
 		
-		
+		/// This code implements state when inventory is opened, player hold item and press left mouse button
 		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-//				componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.clear();
 				core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 				bool isCrosshairCollided = false;
 				for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
@@ -332,15 +319,8 @@ namespace GLVM::ecs
 				}
 				
 				if ( itemCollider->wallCollision && isCrosshairCollided ) {
-					std::cout << "item: " << entityItemContaining << std::endl;
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
 					vec3 itemPosition = itemTransform->position;
-					// float itemScale   = itemTransform->fScale;
-					// bool  isItem_GLTF = itemTransform->gltf;
-
-					// if ( !isItem_GLTF ) {
-					// 	itemScale /= 2;
-					// }
 					
 					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
 																											   cm::transform,
@@ -365,7 +345,6 @@ namespace GLVM::ecs
 						if ( squareColliderFlag ) {
 							collidedInventorySlotEntities.Push(inventorySlotEntity);
 							collidedInventorySlotTransforms.Push(inventorySlotPosition);
-//							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
 						} else {
 							continue;
 						}		
@@ -389,16 +368,12 @@ namespace GLVM::ecs
 					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
 
-					if ( newColliderEntities.GetSize() != slotsNumberForItem ) {
-						// std::cout << "array size: " << newColliderEntities.GetSize() << std::endl;
-						// std::cout << "TEST" << std::endl;						
+					if ( newColliderEntities.GetSize() != slotsNumberForItem )
 						return;
-					}
 					
 					bubbleSortVector(newColliderEntities);
 					int stateSlotsAvailability = areSlotsAvailable(newColliderEntities);
-//					std::cout << "state: " << stateSlotsAvailability << std::endl;
-					if ( stateSlotsAvailability == INT_MAX ) {
+					if ( stateSlotsAvailability == INT_MAX ) {                                                         ///< Just drop an item into inventory because all slots are available
 						itemComponent->occupiedSlots.clear();
 						
 						for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
@@ -412,9 +387,9 @@ namespace GLVM::ecs
 						itemCollider->wallCollision = false;
 
 						return;
-					} else if ( stateSlotsAvailability == -1 ) {
+					} else if ( stateSlotsAvailability == -1 ) {                                                       ///< We cant drop item into inventory
 						return;
-					} else if ( stateSlotsAvailability >= 0 ) {
+					} else if ( stateSlotsAvailability >= 0 ) {                                                        ///< We can switch holding item with another one
 						cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(stateSlotsAvailability);
 						for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
 							unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
@@ -424,7 +399,6 @@ namespace GLVM::ecs
 						cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
 						core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 						collidedItemColliderComponent->wallCollision = true;
-//						collidedItemColliderComponent->colliders.clear();
 						collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
 
 						itemComponent->occupiedSlots.clear();
