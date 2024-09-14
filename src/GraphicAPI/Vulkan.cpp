@@ -436,10 +436,6 @@ namespace GLVM::core
 		updateHudDescriptorSets();
 		updateFontRenderDescriptorSets();
     }
-    
-    void CVulkanRenderer::SetTextureData(std::vector<ecs::Texture>& _texture_data) {
-        texture_load_data_ = _texture_data;
-    }
 
     void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) {
         for (unsigned int i = 0; i < _pathsArray.size(); ++i)

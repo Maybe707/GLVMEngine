@@ -26,7 +26,6 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/TextureComponent.hpp"
 #include "Components/HealthComponent.hpp"
-#include "IRenderer.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
@@ -471,7 +470,7 @@ namespace GLVM::core
         4, 5, 6, 6, 5, 7
     };
     
-    class CVulkanRenderer : public IRenderer {
+    class CVulkanRenderer {
     public:
 	    float previousTime = 0;
 		float accumulator = 0;
@@ -553,20 +552,19 @@ namespace GLVM::core
 #endif
         
         CVulkanRenderer();
-        ~CVulkanRenderer() override;
+        ~CVulkanRenderer();
 
         void createTextureImage();
         void recreateSwapChain();
-        void draw() override;
-        void loadWavefrontObj() override;
-		void EnlargeFrameAccumulator(float value) override;
-        void SetTextureData(std::vector<ecs::Texture>& _texture_data) override;
-        void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) override;
-        void SetViewMatrix(mat4 _viewMatrix) override;
-        void SetProjectionMatrix(mat4 _projectionMatrix) override;
+        void draw();
+        void loadWavefrontObj();
+		void EnlargeFrameAccumulator(float value);
+        void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
+        void SetViewMatrix(mat4 _viewMatrix);
+        void SetProjectionMatrix(mat4 _projectionMatrix);
 		void SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent);
 		void SetProjectionMatrix();
-        void run() override;
+        void run();
     
     private:
         VkInstance instance;
