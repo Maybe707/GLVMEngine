@@ -406,75 +406,8 @@ namespace GLVM::core
         4, 0, 1
     };
 
-    // const std::vector<Vertex> symbol_g_vertices = {
-    //     {{0.0f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.0f, 0.06f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.01f, 0.01f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.01f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-
-    //     {{0.01f, 0.07f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.04f, 0.07f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.04f, 0.06f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-		
-    //     {{0.05f, 0.06f, 0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-	// 	{{0.05f, 0.01f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.04f, 0.01f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-		
-    //     {{0.04f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.01f, 0.0f,  0.0f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-
-	// 	{{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{-0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{-0.5f, 0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}, {0.0f, 1.0f},{0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    // };
-    
-    // const std::vector<uint32_t> symbol_g_indices = {
-	// 	0, 1, 2,
-	// 	2, 1, 3,
-	// 	3, 4, 5,
-	// 	5, 3, 6,
-	// 	6, 7, 8,
-	// 	8, 6, 9,
-	// 	9, 10, 2,
-	// 	2, 10, 11
-    // };
-
-	constexpr float fontStep = 1.0 / 12;
-	constexpr unsigned int glyph_row = 1;
-	constexpr unsigned int glyph_column = 2;
-	
-    const std::vector<Vertex> symbol_g_vertices = {
-        {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {1.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    };
-
-//	unsigned int glyphs_ascii_codes[128] = { static_cast<unsigned int>('A'), 
-	
-    // const std::vector<Vertex> symbol_g_vertices = {
-    //     {{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * glyph_column, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    //     {{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * glyph_column + fontStep, fontStep * glyph_row}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}},
-    // };
-	
-    const std::vector<uint32_t> symbol_g_indices = {
-		0, 1, 2,
-		2, 1, 3
-    };
-	
-    const std::vector<uint16_t> hudIndices = {
-        0, 1, 2, 2, 1, 3,
-        4, 5, 6, 6, 5, 7
-    };
-    
     class CVulkanRenderer {
     public:
-	    float previousTime = 0;
-		float accumulator = 0;
-		bool animationFlag = false;
 		unsigned int actorsNumber = 0;
 
 		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
@@ -484,24 +417,21 @@ namespace GLVM::core
 			'4', '5', '6', '7', '8', '9', '.', ',', '"', '"', '\'', '\'', '"', '"', '\'', '\'',
 			'?', '!', '_', '$', '(', ')', '+', '-', '/', ':', ';', '<', '>', '=', '[', ']', '\\'};
 		std::vector<Vertex> glyphs_map[128];
+		const std::vector<uint32_t> symbol_g_indices = {
+			0, 1, 2,
+			2, 1, 3
+		};
+
         std::vector<ecs::Texture> initializeTextureData_;
-        std::vector<ecs::Texture> texture_load_data_;
-        std::vector<ecs::Texture> hudTexture_load_data_;
-        std::vector<ecs::components::transform> transform_data_;
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
         std::vector<core::vector<core::Vertex>> aVertices_;
-		std::vector<std::vector<core::Vertex>> aVertices_Font;
-//		std::vector<std::vector<core::Vertex>> aVertices_GLTF;
         std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
-		std::vector<std::vector<uint32_t>> aIndices_Font;                 ///< wavefront.obj indices
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
 		std::vector<float> highest_gltf_Y;                                 /// highest gltf y
-		std::vector<std::vector<uint32_t>> aIndicesTemp_;             ///< Temp
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 		bool isInventoryOpened = false;
-		bool isItemDraged = false;
 		vec3 forward;
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;
@@ -537,8 +467,6 @@ namespace GLVM::core
 		const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
 		const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
 		
-        unsigned int texturePool_;
-
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		GLVM::core::WindowXCBVulkan Window;
 #endif

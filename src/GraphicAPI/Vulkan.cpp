@@ -692,11 +692,6 @@ namespace GLVM::core
 		fontIndexBufferContainer.resize(128);
 		fontIndexBufferMemoryContaner.resize(128);
 		
-		const std::vector<uint32_t> symbol_g_indices = {
-			0, 1, 2,
-			2, 1, 3
-		};
-		
 		for ( unsigned int i = 0; i < glyph_row; ++i )
 			for ( unsigned int j = 0; j < glyph_column; ++j ) {
 				core::vector<Vertex> symbol_g_vertices;
