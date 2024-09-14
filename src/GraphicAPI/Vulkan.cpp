@@ -425,6 +425,9 @@ namespace GLVM::core
 		createSpotLightShadowMapDepthResources();
 		createPointLightShadowMapDepthResources();
 		createFramebuffers();
+		// createTextureImage();
+        // createTextureImageView();
+        // createTextureSampler();
 
 		updateDirectionalLightShadowMapDescriptorSets();
 		updateSpotLightShadowMapDescriptorSets();
@@ -875,6 +878,246 @@ namespace GLVM::core
             vkDestroyImageView(device, imageView, nullptr);
         }
 
+		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
+//			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
+			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
+				{
+//					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
+					vkDestroySampler(device, mainRenderScenePipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, mainRenderScenePipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, mainRenderScenePipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for(unsigned int m = 0; m < hudPipeline.descriptors.GetSize(); ++m) {
+			for(unsigned int i = 0; i < hudPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, hudPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < hudPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, hudPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, hudPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, hudPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < hudPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, hudPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, hudPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+
+		for ( unsigned int m = 0; m < directionalLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < directionalLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, directionalLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, directionalLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+
+					directionalLightPipeline.descriptors[m].textureImages[i].views.clear();
+					
+					vkDestroyImage(device, directionalLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, directionalLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, directionalLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, directionalLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+			directionalLightPipeline.descriptors[m].textureImages.clear();
+		}
+
+		for ( unsigned int m = 0; m < spotLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < spotLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, spotLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, spotLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+
+					spotLightPipeline.descriptors[m].textureImages[i].views.clear();
+					
+					vkDestroyImage(device, spotLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, spotLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, spotLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, spotLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+			spotLightPipeline.descriptors[m].textureImages.clear();
+		}
+
+		for ( unsigned int m = 0; m < pointLightPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < pointLightPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, pointLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, pointLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+
+					pointLightPipeline.descriptors[m].textureImages[i].views.clear();
+					
+					vkDestroyImage(device, pointLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, pointLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, pointLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, pointLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+			pointLightPipeline.descriptors[m].textureImages.clear();
+		}
+
+		for ( unsigned int m = 0; m < fontPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < fontPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, fontPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < fontPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, fontPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, fontPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, fontPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < fontPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, fontPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, fontPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < hudScreenPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < hudScreenPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, hudScreenPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, hudScreenPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, hudScreenPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, hudScreenPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, hudScreenPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, hudScreenPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < uiPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, uiPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < uiPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, uiPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, uiPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, uiPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < uiPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, uiPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, uiPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < uiIconsPipeline.descriptors[m].textureImages.size(); ++i)
+				{
+					vkDestroySampler(device, uiIconsPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, uiIconsPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+			
+					vkDestroyImage(device, uiIconsPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, uiIconsPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
+					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+					// }
+				}
+		}
+
+
+		// for ( unsigned int i = 0; i < hudSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, hudSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < hudScreenSwapChainFramebuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, hudScreenSwapChainFramebuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
+
+		// for ( unsigned int i = 0; i < pointLightShadowMapFrameBuffers.size(); ++i )
+		// 	for ( unsigned int j = 0; j < pointLightShadowMapFrameBuffers[i].size(); ++j )
+		// 		vkDestroyFramebuffer(device, pointLightShadowMapFrameBuffers[i][j], nullptr);
+
+		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
+		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
+		
+		
+
+//        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
+
+		// vkDestroySampler(device, textureSampler, nullptr);
+        // for(unsigned int i = 0; i < textureImages.size(); ++i)
+        // {
+        //     vkDestroySampler(device, textureImages[i].sampler, nullptr);
+		// 	for ( unsigned int j = 0; j < textureImages[i].views.size(); ++j )
+		// 		vkDestroyImageView(device, textureImages[i].views[j], nullptr);
+			
+		// 	vkDestroyImage(device, textureImages[i].image, nullptr);
+        //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
+        // }
+
+        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, directionalLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < directionalLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, directionalLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, directionalLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, directionalLightShadowMapImages[i].deviceMemory, nullptr);
+        }
+
+        for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, spotLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < spotLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, spotLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, spotLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, spotLightShadowMapImages[i].deviceMemory, nullptr);
+        }
+		
+        for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
+        {
+            vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < pointLightShadowMapImages[i].views.size(); ++j )
+				vkDestroyImageView(device, pointLightShadowMapImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, pointLightShadowMapImages[i].image, nullptr);
+            vkFreeMemory(device, pointLightShadowMapImages[i].deviceMemory, nullptr);
+        }
+
+        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
+        {
+            vkDestroySampler(device, pointLightImages[i].sampler, nullptr);
+			for ( unsigned int j = 0; j < pointLightImages[i].views.size(); ++j )
+				vkDestroyImageView(device, pointLightImages[i].views[j], nullptr);
+			
+			vkDestroyImage(device, pointLightImages[i].image, nullptr);
+            vkFreeMemory(device, pointLightImages[i].deviceMemory, nullptr);
+        }
+		
         vkDestroySwapchainKHR(device, swapChain, nullptr);
     }
 
@@ -2276,9 +2519,11 @@ namespace GLVM::core
 		for ( size_t j = 0; j < POINT_LIGHTS_NUMBER; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
-				pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
-				pointLightShadowMapFrameBuffers[j].push_back({});
-				createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+				if ( pointLightPipeline.descriptors.GetSize() > 0 && pointLightPipeline.descriptors[0].textureImages.size() > 0 ) {
+					pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
+					pointLightShadowMapFrameBuffers[j].push_back({});
+					createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+				}
 			}
 		}
     }
@@ -2522,6 +2767,7 @@ namespace GLVM::core
 			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
 			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
+			std::cout << "POINT LIGHT IMAGE VIEW CREATED" << std::endl;
 			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
 		}
 	}
