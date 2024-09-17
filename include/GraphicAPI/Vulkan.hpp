@@ -439,9 +439,6 @@ namespace GLVM::core
 		*/
 		mat4 dirLightSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
 		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
-		std::vector<VkBuffer> lightSpaceMatrixBuffer;
-		std::vector<VkDeviceMemory> lightSpaceMatrixMemory;
-		std::vector<VkDescriptorSet> lightSpaceMatrixDescriptorSet;
 		
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<VK_Image> spotLightShadowMapImages;
@@ -676,7 +673,6 @@ namespace GLVM::core
         void updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
-		void updateDirSpaceMatrix(uint32_t currentImage);
 		void hudDrawFrame();
 		void fontDrawFrame();
         void mainRenderDrawFrame();

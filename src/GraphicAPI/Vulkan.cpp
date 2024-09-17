@@ -1086,10 +1086,6 @@ namespace GLVM::core
 			vkDestroyBuffer(device, shadowMapDirectionalLightModelMatrixUniformBuffers[j], nullptr);
 			vkFreeMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[j], nullptr);
 		}
-		for ( size_t j = 0; j < lightSpaceMatrixBuffer.size(); ++j ) {     ///<
-			vkDestroyBuffer(device, lightSpaceMatrixBuffer[j], nullptr);
-			vkFreeMemory(device, lightSpaceMatrixMemory[j], nullptr);
-		}
 		for ( size_t j = 0; j < shadowMapPointLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
 			vkDestroyBuffer(device, shadowMapPointLightModelMatrixUniformBuffers[j], nullptr);
 			vkFreeMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[j], nullptr);
@@ -2939,7 +2935,6 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderUniformBuffers() {
         VkDeviceSize modelMatrixBufferSize = sizeof(ModelMatrixUBO);
 		VkDeviceSize lightDataBufferSize = sizeof(LightData);
-		VkDeviceSize lightSpaceMatrixSize = sizeof(LightSpaceMatrixUBO);
 		VkDeviceSize modelShadowMapMatrixBufferSize = sizeof(ShadowMapMatrixUBO);
 		VkDeviceSize modelCubeShadowMapMatrixBufferSize = sizeof(PointLightShadowMapMatrixUBO);
 		VkDeviceSize fontUboSize = sizeof(FONT_UBO);
@@ -3055,17 +3050,6 @@ namespace GLVM::core
 		}
 		memory = 0;
 		
-		lightSpaceMatrixBuffer.resize(MAX_FRAMES_IN_FLIGHT);
-        lightSpaceMatrixMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-            createBuffer(lightSpaceMatrixSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 lightSpaceMatrixBuffer[i], lightSpaceMatrixMemory[i]);
-
-			memory += lightDataBufferSize;
-		}
-		memory = 0;
-
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
 																								cm::mesh>();
@@ -5582,24 +5566,6 @@ namespace GLVM::core
         vkUnmapMemory(device, lightDataUniformBuffersMemory[currentImage]);
 	}
 
-	void CVulkanRenderer::updateDirSpaceMatrix(uint32_t currentImage) {
-		LightSpaceMatrixUBO lightUBO{};
-		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
-			lightUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
-
-		for ( uint32_t i = 0; i < spotLightNumber; ++i )
-			lightUBO.spotSpaceMatrix[i] = spotLightSpaceMatrix[i];
-		
-		lightUBO.directionalLightsNumber = directionalLightNumber;
-		lightUBO.spotLightsNumber        = spotLightNumber;
-		
-        void* data;
-        vkMapMemory(device, lightSpaceMatrixMemory[currentImage], 0,
-					sizeof(LightSpaceMatrixUBO), 0, &data);
-        memcpy(data, &lightUBO, sizeof(LightSpaceMatrixUBO));
-        vkUnmapMemory(device, lightSpaceMatrixMemory[currentImage]);
-	}
-
     void CVulkanRenderer::hudDrawFrame() {
 		namespace cm = GLVM::ecs::components;
 		// mutex0.lock();
@@ -6737,17 +6703,6 @@ namespace GLVM::core
 			uniformBufferObjectInfo.pObjectName = strImageName;
 			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
 			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-
-		for ( unsigned long i = 0; i < lightSpaceMatrixBuffer.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Light space matrix uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)lightSpaceMatrixBuffer[i];
 			SetDebugObjectName(device, &uniformBufferObjectInfo);
 		}
 
