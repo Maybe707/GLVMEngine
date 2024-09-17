@@ -263,6 +263,7 @@ namespace GLVM::core
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'y', 'x', 'y', 'z', '0', '1', '2', '3',
 			'4', '5', '6', '7', '8', '9', '.', ',', '"', '"', '\'', '\'', '"', '"', '\'', '\'',
 			'?', '!', '_', '$', '(', ')', '+', '-', '/', ':', ';', '<', '>', '=', '[', ']', '\\'};
+		const std::vector<Vertex> padding[128];                                     ///< FIXME: Some gabage here that needs maybe for aligh
 		const std::vector<uint32_t> symbol_g_indices = {
 			0, 1, 2,
 			2, 1, 3
