@@ -263,7 +263,6 @@ namespace GLVM::core
 			'p', 'q', 'r', 's', 't', 'u', 'v', 'y', 'x', 'y', 'z', '0', '1', '2', '3',
 			'4', '5', '6', '7', '8', '9', '.', ',', '"', '"', '\'', '\'', '"', '"', '\'', '\'',
 			'?', '!', '_', '$', '(', ')', '+', '-', '/', ':', ';', '<', '>', '=', '[', ']', '\\'};
-		std::vector<Vertex> glyphs_map[128];
 		const std::vector<uint32_t> symbol_g_indices = {
 			0, 1, 2,
 			2, 1, 3
@@ -345,7 +344,6 @@ namespace GLVM::core
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
 		mat4 viewMatrix;
-		mat4 viewMatrixForWorldHUD;
 		mat4 projectionMatrix;
 
 #ifdef VK_USE_PLATFORM_XLIB_KHR

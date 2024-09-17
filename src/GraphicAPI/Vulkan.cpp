@@ -701,9 +701,6 @@ namespace GLVM::core
 					symbol_g_vertices.Push({{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
 				unsigned int currentBufferIndex = i * glyph_column + j;
 
-				std::cout << "TEST" << std::endl;
-//				glyphs_map[(int)glyphs[currentBufferIndex]] = symbol_g_vertices;
-
 				bool exitFlag = false;
 				const unsigned int nextBufferIndex = static_cast<const unsigned int>(glyphs[currentBufferIndex]);
 				for ( unsigned int n = 0; n < fontIndicesContainer.size(); ++n ) {
@@ -714,7 +711,6 @@ namespace GLVM::core
 				if ( exitFlag )
 					continue;
 				
-				std::cout << "index: " << nextBufferIndex << std::endl;
 				fontIndicesContainer.push_back(nextBufferIndex);
 				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
 
@@ -844,10 +840,6 @@ namespace GLVM::core
 				vkDestroyFramebuffer(device, framebuffer, nullptr);
 			} 
         }
-
-		for ( VkFramebuffer& framebuffer : hudSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
 
 		for ( VkFramebuffer& framebuffer : fontSwapChainFramebuffers ) {
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -1025,9 +1017,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < hudSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, hudSwapChainFramebuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
@@ -1408,9 +1397,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < hudSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, hudSwapChainFramebuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
@@ -2468,16 +2454,6 @@ namespace GLVM::core
 										 swapChainExtent.width, swapChainExtent.height);
 		}
 
-		hudSwapChainFramebuffers.resize(swapChainImageViews.size());
-        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
-			std::vector<VkImageView> hudRenderAttachments;
-			hudRenderAttachments.push_back(swapChainImageViews[i]);
-			hudRenderAttachments.push_back(depthImageView);
-
-			createRenderPassFramebuffers(hudRenderAttachments, hudRenderPass, hudSwapChainFramebuffers[i],
-										 swapChainExtent.width, swapChainExtent.height);
-		}
-
 		fontSwapChainFramebuffers.resize(swapChainImageViews.size());
         for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
 			std::vector<VkImageView> fontRenderAttachments;
@@ -2758,7 +2734,6 @@ namespace GLVM::core
 			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
 			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
-			std::cout << "POINT LIGHT IMAGE VIEW CREATED" << std::endl;
 			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
 		}
 	}
