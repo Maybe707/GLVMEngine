@@ -391,27 +391,23 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> fontDescriptorUboSets;
 		std::vector<VkBuffer> fontUniformBuffers;
 		std::vector<VkDeviceMemory> fontUniformBuffersMemory;
-		std::vector<VkFramebuffer> fontSwapChainFramebuffers;
 		Pipeline hudScreenPipeline;
 		VkRenderPass hudScreenRenderPass;
 		std::vector<VkDescriptorSet> hudScreenDescriptorSets;
 		std::vector<VkBuffer> hudScreenUniformBuffers;
 		std::vector<VkDeviceMemory> hudScreenUniformBuffersMemory;
-		std::vector<VkFramebuffer> hudScreenSwapChainFramebuffers;
 		Pipeline uiPipeline;
 		VkRenderPass uiRenderPass;
 		std::vector<VkDescriptorSet> uiDescriptorSets;
 		std::vector<VkDescriptorSet> uiSamplerDescriptorSets;
 		std::vector<VkBuffer> uiUniformBuffers;
 		std::vector<VkDeviceMemory> uiUniformBuffersMemory;
-		std::vector<VkFramebuffer> uiSwapChainFrameBuffers;
 		Pipeline uiIconsPipeline;
 		VkRenderPass uiIconsRenderPass;
 		std::vector<VkDescriptorSet> uiIconsDescriptorSets;
 		std::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
 		std::vector<VkBuffer> uiIconsUniformBuffers;
 		std::vector<VkDeviceMemory> uiIconsUniformBuffersMemory;
-		std::vector<VkFramebuffer> uiIconsSwapChainFrameBuffers;
 		
         VkPipelineLayout pipelineLayout;
         VkPipeline graphicsPipeline;

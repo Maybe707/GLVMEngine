@@ -841,14 +841,6 @@ namespace GLVM::core
 			} 
         }
 
-		for ( VkFramebuffer& framebuffer : uiSwapChainFrameBuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : uiIconsSwapChainFrameBuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-		
         for (VkImageView& imageView : swapChainImageViews) {
             vkDestroyImageView(device, imageView, nullptr);
         }
@@ -1009,15 +1001,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
@@ -1383,15 +1366,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < uiIconsSwapChainFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, uiIconsSwapChainFrameBuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
