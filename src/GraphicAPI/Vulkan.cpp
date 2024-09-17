@@ -457,7 +457,6 @@ namespace GLVM::core
 																									  cm::mesh>();
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-//		directionalLightShadowMapTextureSamplers.resize(directionalLightNumber);
 
 		core::vector<u32> DS_0_binding;
 		core::vector<u32> DS_0_count;
@@ -819,9 +818,9 @@ namespace GLVM::core
 
     void CVulkanRenderer::cleanupSwapChain() {
 		vkDeviceWaitIdle(device);
-        vkDestroyImageView(device, depthImageView, nullptr);
-		vkDestroyImage(device, mainPipelineImage, nullptr);
-		vkFreeMemory(device, mainPipelineImageMemory, nullptr);
+        vkDestroyImageView(device, mainDepthImageView, nullptr);
+		vkDestroyImage(device, mainDepthPipelineImage, nullptr);
+		vkFreeMemory(device, mainDepthPipelineImageMemory, nullptr);
 		
         for (VkFramebuffer& framebuffer : swapChainFramebuffers) {
             vkDestroyFramebuffer(device, framebuffer, nullptr);
@@ -1026,16 +1025,6 @@ namespace GLVM::core
 		// 	vkDestroyImage(device, textureImages[i].image, nullptr);
         //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         // }
-
-        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, directionalLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < directionalLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, directionalLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, directionalLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, directionalLightShadowMapImages[i].deviceMemory, nullptr);
-        }
 
         for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
         {
@@ -1388,16 +1377,6 @@ namespace GLVM::core
 			
 			vkDestroyImage(device, textureImages[i].image, nullptr);
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
-        }
-
-        for(unsigned int i = 0; i < directionalLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, directionalLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < directionalLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, directionalLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, directionalLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, directionalLightShadowMapImages[i].deviceMemory, nullptr);
         }
 
         for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
@@ -2400,7 +2379,7 @@ namespace GLVM::core
         for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
 			std::vector<VkImageView> mainRenderAttachments;
 			mainRenderAttachments.push_back(swapChainImageViews[i]);
-			mainRenderAttachments.push_back(depthImageView);
+			mainRenderAttachments.push_back(mainDepthImageView);
 
 			createRenderPassFramebuffers(mainRenderAttachments, renderPass, swapChainFramebuffers[i],
 										 swapChainExtent.width, swapChainExtent.height);
@@ -2484,9 +2463,9 @@ namespace GLVM::core
 		};
 
 		createImage(depthImage);
-		mainPipelineImage = depthImage.image;
-		mainPipelineImageMemory = depthImage.deviceMemory;
-        depthImageView = createImageView(depthImage, 0, 1);
+		mainDepthPipelineImage = depthImage.image;
+		mainDepthPipelineImageMemory = depthImage.deviceMemory;
+        mainDepthImageView = createImageView(depthImage, 0, 1);
     }
 
 	void CVulkanRenderer::createDirectionalLightShadowMapDepthResources() {

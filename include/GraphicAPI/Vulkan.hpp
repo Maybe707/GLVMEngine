@@ -420,16 +420,14 @@ namespace GLVM::core
 		VkCommandPool mainRenderCommandPool;
 
 		/// Main pipeline depth.
-		VkImage     mainPipelineImage;
-		VkDeviceMemory mainPipelineImageMemory;
-        VkImageView depthImageView;
+		VkImage     mainDepthPipelineImage;
+		VkDeviceMemory mainDepthPipelineImageMemory;
+        VkImageView mainDepthImageView;
 
 		/// Depth varialbes for shadow map.
 		unsigned int	directionalLightNumber = 0;
-		std::vector<VK_Image> directionalLightShadowMapImages;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
-		std::vector<VkSampler> directionalLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		std::vector<VkBuffer> shadowMapDirectionalLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
