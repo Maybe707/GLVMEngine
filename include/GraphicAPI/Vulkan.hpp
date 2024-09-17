@@ -382,7 +382,6 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> hudDescriptorSets;
 		std::vector<VkBuffer> hudUniformBuffers;
 		std::vector<VkDeviceMemory> hudUniformBuffersMemory;
-		std::vector<VkFramebuffer> hudSwapChainFramebuffers;
 		Pipeline directionalLightPipeline;
 		Pipeline spotLightPipeline;
 		Pipeline pointLightPipeline;

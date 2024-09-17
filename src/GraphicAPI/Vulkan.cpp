@@ -841,14 +841,6 @@ namespace GLVM::core
 			} 
         }
 
-		for ( VkFramebuffer& framebuffer : fontSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
-		for ( VkFramebuffer& framebuffer : hudScreenSwapChainFramebuffers ) {
-			vkDestroyFramebuffer(device, framebuffer, nullptr);
-		}
-
 		for ( VkFramebuffer& framebuffer : uiSwapChainFrameBuffers ) {
 			vkDestroyFramebuffer(device, framebuffer, nullptr);
 		}
@@ -1017,12 +1009,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < hudScreenSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, hudScreenSwapChainFramebuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
@@ -1397,12 +1383,6 @@ namespace GLVM::core
 				}
 		}
 
-
-		// for ( unsigned int i = 0; i < fontSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, fontSwapChainFramebuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < hudScreenSwapChainFramebuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, hudScreenSwapChainFramebuffers[i], nullptr);
 
 		// for ( unsigned int i = 0; i < uiSwapChainFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, uiSwapChainFrameBuffers[i], nullptr);
@@ -2454,16 +2434,6 @@ namespace GLVM::core
 										 swapChainExtent.width, swapChainExtent.height);
 		}
 
-		fontSwapChainFramebuffers.resize(swapChainImageViews.size());
-        for (size_t i = 0; i < swapChainImageViews.size(); ++i) {
-			std::vector<VkImageView> fontRenderAttachments;
-			fontRenderAttachments.push_back(swapChainImageViews[i]);
-			fontRenderAttachments.push_back(depthImageView);
-
-			createRenderPassFramebuffers(fontRenderAttachments, hudRenderPass, fontSwapChainFramebuffers[i],
-										 swapChainExtent.width, swapChainExtent.height);
-		}
-		
 		/// Directional lights shadow map renderer frame buffers initialization
 		directionalLightShadowMapFrameBuffers.resize(DIRECTIONAL_LIGHTS_NUMBER);
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
