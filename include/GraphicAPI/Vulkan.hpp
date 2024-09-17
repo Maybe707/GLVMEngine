@@ -409,9 +409,6 @@ namespace GLVM::core
 		std::vector<VkBuffer> uiIconsUniformBuffers;
 		std::vector<VkDeviceMemory> uiIconsUniformBuffersMemory;
 		
-        VkPipelineLayout pipelineLayout;
-        VkPipeline graphicsPipeline;
-
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
 		VkCommandPool pointLightCommandPool;

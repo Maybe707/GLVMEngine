@@ -1159,8 +1159,6 @@ namespace GLVM::core
 
 		
 //		std::cout << "DESTRUCTOR CALL" << std::endl;
-        vkDestroyPipeline(device, graphicsPipeline, nullptr);
-        vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
         vkDestroyRenderPass(device, renderPass, nullptr);		
 
 		vkDestroyRenderPass(device, hudRenderPass, nullptr);
