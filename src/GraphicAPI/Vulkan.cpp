@@ -1004,10 +1004,6 @@ namespace GLVM::core
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
 
-		// for ( unsigned int i = 0; i < pointLightShadowMapFrameBuffers.size(); ++i )
-		// 	for ( unsigned int j = 0; j < pointLightShadowMapFrameBuffers[i].size(); ++j )
-		// 		vkDestroyFramebuffer(device, pointLightShadowMapFrameBuffers[i][j], nullptr);
-
 		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
 		
@@ -1026,16 +1022,6 @@ namespace GLVM::core
         //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         // }
 
-        for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, spotLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < spotLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, spotLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, spotLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, spotLightShadowMapImages[i].deviceMemory, nullptr);
-        }
-		
         for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
         {
             vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
@@ -1353,10 +1339,6 @@ namespace GLVM::core
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
 
-		// for ( unsigned int i = 0; i < pointLightShadowMapFrameBuffers.size(); ++i )
-		// 	for ( unsigned int j = 0; j < pointLightShadowMapFrameBuffers[i].size(); ++j )
-		// 		vkDestroyFramebuffer(device, pointLightShadowMapFrameBuffers[i][j], nullptr);
-
 		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
 		
@@ -1375,16 +1357,6 @@ namespace GLVM::core
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         }
 
-        for(unsigned int i = 0; i < spotLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, spotLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < spotLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, spotLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, spotLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, spotLightShadowMapImages[i].deviceMemory, nullptr);
-        }
-		
         for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
         {
             vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
@@ -5297,7 +5269,7 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 1.0f;
+		float nearPlaneFlatShadowMap = 9.0f;
 		float farPlaneFlatShadowMap = 100.0f;
 		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
 														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
@@ -5308,7 +5280,7 @@ namespace GLVM::core
 										  directionVectorLight,
 										  { 0.0f, 1.0f, 0.0f });
 
-		spotProjectionMatrixLight[1][1] *= -1;
+//		spotProjectionMatrixLight[1][1] *= -1;
 		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
 	}
 	
@@ -6006,16 +5978,16 @@ namespace GLVM::core
 			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
 			shadowMapRenderPassInfo.renderArea.offset.x = 0;
 			shadowMapRenderPassInfo.renderArea.offset.y = 0;
-			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			shadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+			shadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
 			shadowMapRenderPassInfo.clearValueCount = 1;
 			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
 
 			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport shadowMapViewPort;
-			shadowMapViewPort.height = swapChainExtent.height;
-			shadowMapViewPort.width = swapChainExtent.width;
+			shadowMapViewPort.height = SHADOW_MAP_SIZE;
+			shadowMapViewPort.width = SHADOW_MAP_SIZE;
 			shadowMapViewPort.minDepth = 0.0f;
 			shadowMapViewPort.maxDepth = 1.0f;
 			shadowMapViewPort.x = 0;
@@ -6023,8 +5995,8 @@ namespace GLVM::core
 			vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
 
 			VkRect2D shadowMapScissor;
-			shadowMapScissor.extent.width = swapChainExtent.width;
-			shadowMapScissor.extent.height = swapChainExtent.height;
+			shadowMapScissor.extent.width = SHADOW_MAP_SIZE;
+			shadowMapScissor.extent.height = SHADOW_MAP_SIZE;
 			shadowMapScissor.offset.x = 0;
 			shadowMapScissor.offset.y = 0;
 			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
@@ -6083,7 +6055,8 @@ namespace GLVM::core
 		
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::spotLight,
-																							  cm::mesh>();
+																							  cm::mesh,
+																							  cm::actor>();
 			
 		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
 			VkClearValue spotLightShadowMapClearValues[1];
@@ -6097,16 +6070,16 @@ namespace GLVM::core
 			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
 			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
 			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
 			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
 
 			vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport spotLightShadowMapViewPort;
-			spotLightShadowMapViewPort.height = swapChainExtent.height;
-			spotLightShadowMapViewPort.width = swapChainExtent.width;
+			spotLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
+			spotLightShadowMapViewPort.width = SHADOW_MAP_SIZE;
 			spotLightShadowMapViewPort.minDepth = 0.0f;
 			spotLightShadowMapViewPort.maxDepth = 1.0f;
 			spotLightShadowMapViewPort.x = 0;
@@ -6114,8 +6087,8 @@ namespace GLVM::core
 			vkCmdSetViewport(commandBuffer, 0, 1, &spotLightShadowMapViewPort);
 
 			VkRect2D spotLightShadowMapScissor;
-			spotLightShadowMapScissor.extent.width = swapChainExtent.width;
-			spotLightShadowMapScissor.extent.height = swapChainExtent.height;
+			spotLightShadowMapScissor.extent.width = SHADOW_MAP_SIZE;
+			spotLightShadowMapScissor.extent.height = SHADOW_MAP_SIZE;
 			spotLightShadowMapScissor.offset.x = 0;
 			spotLightShadowMapScissor.offset.y = 0;
 			vkCmdSetScissor(commandBuffer, 0, 1, &spotLightShadowMapScissor);
@@ -6858,17 +6831,6 @@ namespace GLVM::core
 		// 	pointLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
 		// 	pointLightImageObjectInfo.objectHandle = (uint64_t)pointLightShadowMapImages[i].image;
 		// 	SetDebugObjectName(device, &pointLightImageObjectInfo);
-		// }
-
-		// for ( unsigned long i = 0; i < spotLightShadowMapImages.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT spotLightImageObjectInfo{};
-		// 	spotLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot light shadow map image # ", i);
-		// 	const char* strImageName = imageName.c_str();
-		// 	spotLightImageObjectInfo.pObjectName = strImageName;
-		// 	spotLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-		// 	spotLightImageObjectInfo.objectHandle = (uint64_t)spotLightShadowMapImages[i].image;
-		// 	SetDebugObjectName(device, &spotLightImageObjectInfo);			
 		// }
 
 		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {

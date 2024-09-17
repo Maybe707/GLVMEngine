@@ -441,7 +441,6 @@ namespace GLVM::core
 		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		
 		unsigned int	pointLightNumber	   = 0;
-		std::vector<VK_Image> spotLightShadowMapImages;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
