@@ -4480,9 +4480,6 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -4585,9 +4582,6 @@ namespace GLVM::core
 
 					unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-					// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 				}
 			}
@@ -4694,9 +4688,6 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -4789,9 +4780,6 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-			// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
@@ -4903,9 +4891,7 @@ namespace GLVM::core
 
 
 		
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-				// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-				// 						&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+
 //				const unsigned int currentIndex = 32 * currentFrame + j;
 				FONT_UBO fontUBO{};
 				// transformComponent->tPosition[0] += (float)j / 10;
@@ -6730,17 +6716,6 @@ namespace GLVM::core
 		// 	descriptorSetObjectInfo.pObjectName = strName;
 		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
 		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)viewPositionUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
-
- 		// for ( unsigned long i = 0; i < specularSamplerDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render specular sampler descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)specularSamplerDescriptorSets[i];
 		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
 		// }
 
