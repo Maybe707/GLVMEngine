@@ -454,9 +454,6 @@ namespace GLVM::core
 		std::vector<VkBuffer> shadowMapSpotLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapSpotLightModelMatrixUniformBuffersMemory;
 
-		core::vector<mat4> shadowMapBasisMatrices;
-		std::vector<VkDescriptorSet> shadowMapMatrixUboDescriptorSets;
-
 		std::vector<VK_Image> textureImages;
 		VkSampler textureSampler;
 

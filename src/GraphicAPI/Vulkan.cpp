@@ -700,7 +700,7 @@ namespace GLVM::core
 
 				bool exitFlag = false;
 				const unsigned int nextBufferIndex = static_cast<const unsigned int>(glyphs[currentBufferIndex]);
-				for ( unsigned int n = 0; n < fontIndicesContainer.size(); ++n ) {
+				for ( unsigned int n = 0; n < fontIndicesContainer.size(); ++n ) {                 ///< TODO: Fix gabage algo
 					if ( nextBufferIndex == fontIndicesContainer[n] )
 						exitFlag = true;
 				}
