@@ -448,7 +448,6 @@ namespace GLVM::core
 		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
 
 		unsigned int	spotLightNumber		   = 0;
-		std::vector<VK_Image> pointLightShadowMapImages;
 		std::vector<VK_Image> pointLightImages;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;

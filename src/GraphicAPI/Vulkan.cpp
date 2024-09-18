@@ -1021,16 +1021,6 @@ namespace GLVM::core
         //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         // }
 
-        for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < pointLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, pointLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, pointLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, pointLightShadowMapImages[i].deviceMemory, nullptr);
-        }
-
         for(unsigned int i = 0; i < pointLightImages.size(); ++i)
         {
             vkDestroySampler(device, pointLightImages[i].sampler, nullptr);
@@ -1350,16 +1340,6 @@ namespace GLVM::core
 			
 			vkDestroyImage(device, textureImages[i].image, nullptr);
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
-        }
-
-        for(unsigned int i = 0; i < pointLightShadowMapImages.size(); ++i)
-        {
-            vkDestroySampler(device, pointLightShadowMapImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < pointLightShadowMapImages[i].views.size(); ++j )
-				vkDestroyImageView(device, pointLightShadowMapImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, pointLightShadowMapImages[i].image, nullptr);
-            vkFreeMemory(device, pointLightShadowMapImages[i].deviceMemory, nullptr);
         }
 
         for(unsigned int i = 0; i < pointLightImages.size(); ++i)
@@ -6794,17 +6774,6 @@ namespace GLVM::core
 			SetDebugObjectName(device, &uniformBufferObjectInfo);
 		}
 		
-		// for ( unsigned long i = 0; i < pointLightShadowMapImages.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT pointLightImageObjectInfo{};
-		// 	pointLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point light shadow map image # ", i);
-		// 	const char* strImageName = imageName.c_str();
-		// 	pointLightImageObjectInfo.pObjectName = strImageName;
-		// 	pointLightImageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
-		// 	pointLightImageObjectInfo.objectHandle = (uint64_t)pointLightShadowMapImages[i].image;
-		// 	SetDebugObjectName(device, &pointLightImageObjectInfo);
-		// }
-
 		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
 		// 	directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
