@@ -488,7 +488,6 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-//		pointLightShadowMapTextureSamplers.resize(pointLightNumber);
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
@@ -1075,10 +1074,6 @@ namespace GLVM::core
 		for ( size_t j = 0; j < shadowMapPointLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
 			vkDestroyBuffer(device, shadowMapPointLightModelMatrixUniformBuffers[j], nullptr);
 			vkFreeMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[j], nullptr);
-		}
-		for ( size_t j = 0; j < shadowMapPointLightDataUniformBuffers.size(); ++j ) {         ///<
-			vkDestroyBuffer(device, shadowMapPointLightDataUniformBuffers[j], nullptr);
-			vkFreeMemory(device, shadowMapPointLightDataUniformBuffersMemory[j], nullptr);
 		}
 		for ( size_t j = 0; j < shadowMapSpotLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
 			vkDestroyBuffer(device, shadowMapSpotLightModelMatrixUniformBuffers[j], nullptr);
@@ -5378,19 +5373,6 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane) {
-		UniformBufferObjectLightUBO dataMatrixUBO{};
-
-		dataMatrixUBO.lightPosition = pointLightComponent->position;
-		dataMatrixUBO.farPlane = farPlane;
-		
-        void* dataMatrixData;
-        vkMapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage], 0,
-					sizeof(dataMatrixUBO), 0, &dataMatrixData);
-        memcpy(dataMatrixData, &dataMatrixUBO, sizeof(dataMatrixUBO));
-        vkUnmapMemory(device, shadowMapPointLightDataUniformBuffersMemory[currentImage]);
-	}
-	
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
 													unsigned int meshID, ecs::components::material* materialComponent) {
         ModelMatrixUBO modelMatrixUBO{};
@@ -6688,17 +6670,6 @@ namespace GLVM::core
 			uniformBufferObjectInfo.pObjectName = strImageName;
 			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
 			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapPointLightModelMatrixUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-
-		for ( unsigned long i = 0; i < shadowMapPointLightDataUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map point light data uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapPointLightDataUniformBuffers[i];
 			SetDebugObjectName(device, &uniformBufferObjectInfo);
 		}
 

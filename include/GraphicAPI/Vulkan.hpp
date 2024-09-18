@@ -443,13 +443,9 @@ namespace GLVM::core
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
-		std::vector<VkSampler> pointLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
-		std::vector<VkDescriptorSet> shadowMapPointLightDataDescriptorSets;
 		std::vector<VkBuffer> shadowMapPointLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
-		std::vector<VkBuffer> shadowMapPointLightDataUniformBuffers;
-		std::vector<VkDeviceMemory> shadowMapPointLightDataUniformBuffersMemory;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VK_Image> pointLightShadowMapImages;
@@ -668,7 +664,6 @@ namespace GLVM::core
 																		 uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
-		void updatePointLightShadowMapDataUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, float farPlane);
         void updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
