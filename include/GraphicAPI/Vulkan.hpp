@@ -508,11 +508,6 @@ namespace GLVM::core
         std::vector<VkSemaphore> hudRenderFinishedSemaphores;
         std::vector<VkFence> hudInFlightFences;
 
-		/// UI render pipe line sync objects
-		std::vector<VkSemaphore> uiImageAvailableSemaphores;
-		std::vector<VkSemaphore> uiRenderFinishedSemaphores;
-		std::vector<VkFence> uiInFlightFences;
-		
 		/// Font render pipe line sync objects
         std::vector<VkSemaphore> fontImageAvailableSemaphores;
         std::vector<VkSemaphore> fontRenderFinishedSemaphores;

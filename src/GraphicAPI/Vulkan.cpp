@@ -797,9 +797,6 @@ namespace GLVM::core
 		createSyncObjects(hudImageAvailableSemaphores,
 						  hudRenderFinishedSemaphores,
 						  hudInFlightFences);
-		createSyncObjects(uiImageAvailableSemaphores,
-						  uiRenderFinishedSemaphores,
-						  uiInFlightFences);
 		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 						  directionalLightShadowMapRenderFinishedSemaphores,
 						  directionalLightShadowMapInFlightFences);
@@ -1342,10 +1339,6 @@ namespace GLVM::core
 			vkDestroySemaphore(device, hudImageAvailableSemaphores[i], nullptr);
             vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, hudInFlightFences[i], nullptr);
-
-			vkDestroySemaphore(device, uiImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, uiRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, uiInFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, fontImageAvailableSemaphores[i], nullptr);
             vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
