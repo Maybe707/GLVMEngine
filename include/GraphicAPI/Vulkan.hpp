@@ -490,9 +490,6 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> lightDataUboDescriptorSets;
 		std::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
-		std::vector<VkDescriptorSet> directionalLightSamperDescriptorSets;
-		std::vector<VkDescriptorSet> pointLightSamplerDescriptorSets;
-		std::vector<VkDescriptorSet> spotLightSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
