@@ -4472,10 +4472,6 @@ namespace GLVM::core
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
-
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -4583,10 +4579,6 @@ namespace GLVM::core
 					// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
 					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 					// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
-
-					// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-					// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
 
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 					VkDeviceSize offsets[] = {0};
@@ -4700,10 +4692,6 @@ namespace GLVM::core
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
-
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -4802,10 +4790,6 @@ namespace GLVM::core
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
-
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -4903,10 +4887,6 @@ namespace GLVM::core
 			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
 			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
-
-			// updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						1, 1, &lightDataUboDescriptorSets[currentFrame], 0, nullptr);
 
 			// VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			// VkDeviceSize offsets[] = {0};
@@ -6753,17 +6733,6 @@ namespace GLVM::core
 			descriptorSetObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightDescriptorSets[i];
 			SetDebugObjectName(device, &descriptorSetObjectInfo);
 		}
-
- 		// for ( unsigned long i = 0; i < matrixUboDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render model matrix descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)matrixUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
 
 		// for ( unsigned long i = 0; i < viewPositionUboDescriptorSets.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
