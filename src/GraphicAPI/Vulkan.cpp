@@ -6745,50 +6745,6 @@ namespace GLVM::core
 		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
 		// }
 
-		// for ( unsigned long i = 0; i < materialUboDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render material descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)materialUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
-
-		// for ( unsigned long i = 0; i < directionalLightUboDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render directional light descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)directionalLightUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
-
-		// for ( unsigned long i = 0; i < pointLightUboDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render point light descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)pointLightUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
-
-		// for ( unsigned long i = 0; i < spotLightUboDescriptorSets.size(); ++i ) {
-		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
-		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		// 	std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Main render spot light descriptor set # ", i);
-		// 	const char* strName = name.c_str();
-		// 	descriptorSetObjectInfo.pObjectName = strName;
-		// 	descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
-		// 	descriptorSetObjectInfo.objectHandle = (uint64_t)spotLightUboDescriptorSets[i];
-		// 	SetDebugObjectName(device, &descriptorSetObjectInfo);
-		// }
-
 		// for ( unsigned long i = 0; i < diffuseSamplerDescriptorSets.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
 		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;

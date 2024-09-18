@@ -488,10 +488,6 @@ namespace GLVM::core
 		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number
         std::vector<VkDescriptorSet> matrixUboDescriptorSets;
 		std::vector<VkDescriptorSet> lightDataUboDescriptorSets;
-		std::vector<VkDescriptorSet> materialUboDescriptorSets;
-		std::vector<VkDescriptorSet> directionalLightUboDescriptorSets;
-		std::vector<VkDescriptorSet> pointLightUboDescriptorSets;
-		std::vector<VkDescriptorSet> spotLightUboDescriptorSets;
 		std::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 		std::vector<VkDescriptorSet> directionalLightSamperDescriptorSets;
