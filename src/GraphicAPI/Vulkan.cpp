@@ -475,7 +475,6 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-//		spotLightShadowMapTextureSamplers.resize(spotLightNumber);
 		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
 										DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
 		
@@ -1021,16 +1020,6 @@ namespace GLVM::core
         //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         // }
 
-        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
-        {
-            vkDestroySampler(device, pointLightImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < pointLightImages[i].views.size(); ++j )
-				vkDestroyImageView(device, pointLightImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, pointLightImages[i].image, nullptr);
-            vkFreeMemory(device, pointLightImages[i].deviceMemory, nullptr);
-        }
-		
         vkDestroySwapchainKHR(device, swapChain, nullptr);
     }
 
@@ -1342,17 +1331,6 @@ namespace GLVM::core
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         }
 
-        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
-        {
-            vkDestroySampler(device, pointLightImages[i].sampler, nullptr);
-			for ( unsigned int j = 0; j < pointLightImages[i].views.size(); ++j )
-				vkDestroyImageView(device, pointLightImages[i].views[j], nullptr);
-			
-			vkDestroyImage(device, pointLightImages[i].image, nullptr);
-            vkFreeMemory(device, pointLightImages[i].deviceMemory, nullptr);
-        }
-		
-		
         // for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
         //     vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
         //     vkFreeMemory(device, indexBufferMemoryContaner[i], nullptr);
@@ -2634,11 +2612,6 @@ namespace GLVM::core
             textureImages[i].views.push_back(createImageView(textureImages[i], 0, 1));
     }
 
-    void CVulkanRenderer::createShadowMapTextureImageView() {
-        for(unsigned int i = 0; i < pointLightImages.size(); ++i)
-            pointLightImages[i].views.push_back(createImageView(pointLightImages[i], 0, 1));
-    }
-	
     void CVulkanRenderer::createTextureSampler() {
 		VkPhysicalDeviceProperties properties{};
 		vkGetPhysicalDeviceProperties(physicalDevice, &properties);

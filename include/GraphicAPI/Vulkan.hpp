@@ -448,10 +448,8 @@ namespace GLVM::core
 		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
 
 		unsigned int	spotLightNumber		   = 0;
-		std::vector<VK_Image> pointLightImages;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;
-		std::vector<VkSampler> spotLightShadowMapTextureSamplers;
 		std::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
 		std::vector<VkBuffer> shadowMapSpotLightModelMatrixUniformBuffers;
 		std::vector<VkDeviceMemory> shadowMapSpotLightModelMatrixUniformBuffersMemory;
@@ -607,7 +605,6 @@ namespace GLVM::core
         VkFormat findDepthFormat();
         bool hasStencilComponent(VkFormat format);
         void createTextureImageView();
-		void createShadowMapTextureImageView();
         void createTextureSampler();
         VkImageView createImageView(VK_Image image, uint32_t baseArrayLayers, uint32_t layerCount);
         void createImage(VK_Image& image);
