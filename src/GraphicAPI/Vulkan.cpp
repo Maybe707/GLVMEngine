@@ -791,8 +791,6 @@ namespace GLVM::core
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
 		createCommandBuffers(fontCommandPool, fontCommandBuffers);
 		createCommandBuffers(hudCommandPool, hudCommandBuffers);
-		createCommandBuffers(hudScreenCommandPool, hudScreenCommandBuffers);
-		createCommandBuffers(uiCommandPool, uiCommandBuffers);
 		createSyncObjects(fontImageAvailableSemaphores,
 						  fontRenderFinishedSemaphores,
 						  fontInFlightFences);

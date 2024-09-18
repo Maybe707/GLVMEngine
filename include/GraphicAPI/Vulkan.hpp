@@ -496,8 +496,6 @@ namespace GLVM::core
 		std::vector<VkCommandBuffer> pointLightCommandBuffers;
 		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
-		std::vector<VkCommandBuffer> hudScreenCommandBuffers;
-		std::vector<VkCommandBuffer> uiCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
 
 		/// Main render pipe line sync objects
