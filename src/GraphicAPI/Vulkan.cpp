@@ -2358,7 +2358,7 @@ namespace GLVM::core
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
 			directionalLightsRenderAttachments.push_back(directionalLightPipeline.descriptors[0].textureImages[i].views[0]);
-			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
@@ -2367,7 +2367,7 @@ namespace GLVM::core
 			std::vector<VkImageView> spotLightsRenderAttachments;
 			spotLightsRenderAttachments.push_back(spotLightPipeline.descriptors[0].textureImages[i].views[0]);
 			
-			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
+			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
@@ -5228,8 +5228,8 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent,
 																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 1.5f;
-		float farPlaneFlatShadowMap = 100.0f;
+		float nearPlaneFlatShadowMap = 0.5f;
+		float farPlaneFlatShadowMap = 500.0f;
 		mat4 directionalProjectionMatrixLight = ortho(-15.0f, 15.0f, -15.0f, 15.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
@@ -5978,16 +5978,16 @@ namespace GLVM::core
 			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
 			shadowMapRenderPassInfo.renderArea.offset.x = 0;
 			shadowMapRenderPassInfo.renderArea.offset.y = 0;
-			shadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
-			shadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
+			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
 			shadowMapRenderPassInfo.clearValueCount = 1;
 			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
 
 			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport shadowMapViewPort;
-			shadowMapViewPort.height = SHADOW_MAP_SIZE;
-			shadowMapViewPort.width = SHADOW_MAP_SIZE;
+			shadowMapViewPort.height = swapChainExtent.height;
+			shadowMapViewPort.width = swapChainExtent.width;
 			shadowMapViewPort.minDepth = 0.0f;
 			shadowMapViewPort.maxDepth = 1.0f;
 			shadowMapViewPort.x = 0;
@@ -5995,8 +5995,8 @@ namespace GLVM::core
 			vkCmdSetViewport(commandBuffer, 0, 1, &shadowMapViewPort);
 
 			VkRect2D shadowMapScissor;
-			shadowMapScissor.extent.width = SHADOW_MAP_SIZE;
-			shadowMapScissor.extent.height = SHADOW_MAP_SIZE;
+			shadowMapScissor.extent.width = swapChainExtent.width;
+			shadowMapScissor.extent.height = swapChainExtent.height;
 			shadowMapScissor.offset.x = 0;
 			shadowMapScissor.offset.y = 0;
 			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
@@ -6070,16 +6070,16 @@ namespace GLVM::core
 			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
 			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
 			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
 			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
 			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
 
 			vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport spotLightShadowMapViewPort;
-			spotLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
-			spotLightShadowMapViewPort.width = SHADOW_MAP_SIZE;
+			spotLightShadowMapViewPort.height = swapChainExtent.height;
+			spotLightShadowMapViewPort.width = swapChainExtent.width;
 			spotLightShadowMapViewPort.minDepth = 0.0f;
 			spotLightShadowMapViewPort.maxDepth = 1.0f;
 			spotLightShadowMapViewPort.x = 0;
@@ -6087,8 +6087,8 @@ namespace GLVM::core
 			vkCmdSetViewport(commandBuffer, 0, 1, &spotLightShadowMapViewPort);
 
 			VkRect2D spotLightShadowMapScissor;
-			spotLightShadowMapScissor.extent.width = SHADOW_MAP_SIZE;
-			spotLightShadowMapScissor.extent.height = SHADOW_MAP_SIZE;
+			spotLightShadowMapScissor.extent.width = swapChainExtent.width;
+			spotLightShadowMapScissor.extent.height = swapChainExtent.height;
 			spotLightShadowMapScissor.offset.x = 0;
 			spotLightShadowMapScissor.offset.y = 0;
 			vkCmdSetScissor(commandBuffer, 0, 1, &spotLightShadowMapScissor);

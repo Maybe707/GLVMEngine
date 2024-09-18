@@ -174,17 +174,17 @@ int main()
 	// 	.fScale = 1.0f, .gltf = true };
 	// ComponentManager->GetComponent<cm::mesh>(font)->handle = cubeHandle_OBJ;
 	
-	// Entity directionalLight0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
-	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 0.0f, 15.0f, 5.0f },
-	// 	.direction = { -5.0f, 3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-	// 	.specular = {1.0f, 1.0f, 1.0f}};
- 	// *ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .position = { 0.0f, 15.0f, 5.0f },
-	// 	.scale = 0.1f };
-	// ComponentManager->GetComponent<cm::mesh>(directionalLight0)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
-	// *materialDirectionalLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
+	Entity directionalLight0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
+	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 0.0f, 15.0f, 5.0f },
+		.direction = { -5.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
+		.specular = {1.0f, 1.0f, 1.0f}};
+ 	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .position = { 0.0f, 15.0f, 5.0f },
+		.scale = 0.1f };
+	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->handle = hyperCubeHandle_GLTF;
+	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
+	*materialDirectionalLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
 
 	// Entity directionalLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
@@ -260,16 +260,16 @@ int main()
 	// cm::material* materialPointLight4 = ComponentManager->GetComponent<cm::material>(pointLight4);
 	// *materialPointLight4 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
 	
-	Entity spotLight1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 10.0f, 15.0f, 15.0f },
-		.direction = { 0.0f, -3.0f, 1.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-		.diffuse = { 1.8f, 1.8f, 1.8f }, .specular = { 2.0f, 2.0f, 2.0f }, .constant = 1.0f, .linear = 0.09f,
-		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .position = { 10.0f, 15.0f, 15.0f }, .scale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = simpleCubeHandle_GLTF;
-	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
-	*materialSpotLight1 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
+	// Entity spotLight1 = EntityManager->CreateEntity();
+	// ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
+	// *ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { 10.0f, 15.0f, 15.0f },
+	// 	.direction = { 0.0f, -3.0f, 1.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
+	// 	.diffuse = { 1.8f, 1.8f, 1.8f }, .specular = { 2.0f, 2.0f, 2.0f }, .constant = 1.0f, .linear = 0.09f,
+	// 	.quadratic = 0.032f };
+	// *ComponentManager->GetComponent<cm::transform>(spotLight1) = { .position = { 10.0f, 15.0f, 15.0f }, .scale = 0.2f };
+	// ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = simpleCubeHandle_GLTF;
+	// cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
+	// *materialSpotLight1 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
 
 	// Entity spotLight2 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight2);
