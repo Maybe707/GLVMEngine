@@ -5228,9 +5228,9 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent,
 																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 0.5f;
-		float farPlaneFlatShadowMap = 500.0f;
-		mat4 directionalProjectionMatrixLight = ortho(-15.0f, 15.0f, -15.0f, 15.0f,
+		float nearPlaneFlatShadowMap = 5.5f;
+		float farPlaneFlatShadowMap = 100.0f;
+		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
 		vec3 positionVectorLight = directionalLightComponent->position;
@@ -5238,9 +5238,9 @@ namespace GLVM::core
 
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
-										  { 0.0f, 1.0f, 0.0f });
+										  { 0.0f, -1.0f, 0.0f });
 
-		directionalProjectionMatrixLight[1][1] *= -1;
+//		directionalProjectionMatrixLight[1][1] *= -1;
 		dirLightSpaceMatrix[currentLight] = viewMatrixLight * directionalProjectionMatrixLight;
 	}
 	
@@ -5269,7 +5269,7 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 9.0f;
+		float nearPlaneFlatShadowMap = 5.5f;
 		float farPlaneFlatShadowMap = 100.0f;
 		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
 														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
@@ -5278,7 +5278,7 @@ namespace GLVM::core
 		vec3 directionVectorLight = spotLightComponent->direction;
 		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
 										  directionVectorLight,
-										  { 0.0f, 1.0f, 0.0f });
+										  { 0.0f, -1.0f, 0.0f });
 
 //		spotProjectionMatrixLight[1][1] *= -1;
 		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
@@ -5959,7 +5959,8 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																									 cm::directionalLight,
-																									 cm::mesh>();
+																									 cm::mesh,
+																									 cm::actor>();
 
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
