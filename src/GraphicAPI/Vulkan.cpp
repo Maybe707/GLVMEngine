@@ -1084,22 +1084,7 @@ namespace GLVM::core
 			vkDestroyBuffer(device, lightDataUniformBuffers[j], nullptr);
 			vkFreeMemory(device, lightDataUniformBuffersMemory[j], nullptr);
 		}
-		// for ( size_t j = 0; j < materialUniformBuffers.size(); ++j ) {
-		// 	vkDestroyBuffer(device, materialUniformBuffers[j], nullptr);
-		// 	vkFreeMemory(device, materialUniformBuffersMemory[j], nullptr);
-		// }
-		// for ( size_t j = 0; j < directionalLightsUniformBuffers.size(); ++j ) {
-		// 	vkDestroyBuffer(device, directionalLightsUniformBuffers[j], nullptr);
-		// 	vkFreeMemory(device, directionalLightsUniformBuffersMemory[j], nullptr);
-		// }
-		// for ( size_t j = 0; j < spotLightsUniformBuffers.size(); ++j ) {
-		// 	vkDestroyBuffer(device, spotLightsUniformBuffers[j], nullptr);
-		// 	vkFreeMemory(device, spotLightsUniformBuffersMemory[j], nullptr);
-		// }
-		// for ( size_t j = 0; j < pointLightsUniformBuffers.size(); ++j ) {
-		// 	vkDestroyBuffer(device, pointLightsUniformBuffers[j], nullptr);
-		// 	vkFreeMemory(device, pointLightsUniformBuffersMemory[j], nullptr);
-		// }
+
 		vkDeviceWaitIdle(device);
 
 		
@@ -6703,50 +6688,6 @@ namespace GLVM::core
 			SetDebugObjectName(device, &uniformBufferObjectInfo);
 		}
 
-		for ( unsigned long i = 0; i < materialUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Material uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)materialUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-
-		for ( unsigned long i = 0; i < directionalLightsUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Directional lights uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)directionalLightsUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-
-		for ( unsigned long i = 0; i < pointLightsUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Point lights uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)pointLightsUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-
-		for ( unsigned long i = 0; i < spotLightsUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Spot lights uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)spotLightsUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
-		
 		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};
 		// 	directionalLightImageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
