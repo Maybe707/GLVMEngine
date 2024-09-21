@@ -40,7 +40,7 @@ namespace GLVM::ecs
         static ComponentManager* pInstance_;
         static std::mutex  Mutex_;
 		unsigned int numberOfBaseComponents;
-		
+
         ComponentManager();
 
 
@@ -78,6 +78,7 @@ namespace GLVM::ecs
 		core::vector<core::vector<Entity>*> worldDenseComponentsMapToEntities;
 
 		core::vector<const char*> componentsTypes;
+		bool isComponentsCollectionChanged = true;
 		
         ~ComponentManager();		
         ComponentManager(ComponentManager& componentManager) = delete;         ///< Dont need to make cope because of singleton property.
@@ -111,6 +112,7 @@ namespace GLVM::ecs
 			sparse[entity] = dense.GetSize();
 			dense.Push(entity);
 			components.Push(Component);
+			isComponentsCollectionChanged = true;
 		}
 
 		bool checkAvailability( core::vector<Entity>& sparse,
@@ -252,6 +254,7 @@ namespace GLVM::ecs
 				components[indexInDenseOfRemovableEntity] = componentFromLastIndex;
 				components.Pop();
 				sparse[indexInSparseOfSwapableEntity] = indexInDenseOfRemovableEntity;
+				isComponentsCollectionChanged = true;
 			}
 		}
 		

@@ -256,6 +256,8 @@ namespace GLVM::core
     class CVulkanRenderer {
     public:
 		unsigned int actorsNumber = 0;
+		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
+		core::vector<unsigned int> entitiesCollectionLinked__Trn_PoL_Mes_Act;
 
 		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',

@@ -21,7 +21,7 @@ namespace GLVM::ecs
 		inline static Entity_ID u_iID = 0;		
  		core::vector<Entity_ID> tRemoved_Entity_Registry_;
 		core::vector<Entity_ID> tActive_Entity_Registry_;
-		
+
         EntityManager();
     public:                                                                   ///< !!!!!DELETE!!!!!!!!!!!!!!!11
 		~EntityManager();
@@ -32,6 +32,8 @@ namespace GLVM::ecs
 		[[nodiscard]] Entity_ID CreateEntity();
 
         void RemoveEntity(Entity_ID& _Entity_ID, ComponentManager* _ComponentManager);
+
+		bool isEntitiesCollectionChanged = true;
 	};
 }
 

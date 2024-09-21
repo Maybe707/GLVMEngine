@@ -19,6 +19,7 @@
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
+#include "EntityManager.hpp"
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "Vector.hpp"
@@ -5999,6 +6000,7 @@ namespace GLVM::core
 
 	void CVulkanRenderer::pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		ecs::EntityManager*    entityManager     = ecs::EntityManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -6007,15 +6009,26 @@ namespace GLVM::core
         }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::actor>();
-		
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																						  cm::pointLight,
-																						  cm::mesh,
-																						  cm::actor>();
+		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
+			core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							   cm::material,
+																							   cm::mesh,
+																							   cm::actor>();
+			entitiesCollectionLinked__Trn_Mat_Mes_Act.clear();
+			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i )
+				entitiesCollectionLinked__Trn_Mat_Mes_Act.Push(linkedEntities[i]);
+				
+			core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::pointLight,
+																							  cm::mesh,
+																							  cm::actor>();
+			entitiesCollectionLinked__Trn_PoL_Mes_Act.clear();
+			for ( unsigned int i = 0; i < pointLightEntities.GetSize(); ++i )
+				entitiesCollectionLinked__Trn_PoL_Mes_Act.Push(pointLightEntities[i]);
+
+			entityManager->isEntitiesCollectionChanged = false;
+			componentManager->isComponentsCollectionChanged = false;
+		}
 
 		VkDebugUtilsLabelEXT label;
 		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
@@ -6027,7 +6040,7 @@ namespace GLVM::core
 		label.pNext = NULL;
 		
 		CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
 				VkClearValue pointLightShadowMapClearValues[2];
@@ -6067,13 +6080,13 @@ namespace GLVM::core
 
 				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pointLightPipeline.pipeline);
 
-				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
+				unsigned int pointLightEntity = entitiesCollectionLinked__Trn_PoL_Mes_Act[pointLightCounter];
 				
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 				
-				uint32_t actorsNumber = linkedEntities.GetSize();
+				uint32_t actorsNumber = entitiesCollectionLinked__Trn_Mat_Mes_Act.GetSize();
 				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
-					unsigned int meshOwnerEntity = linkedEntities[actorCounter];
+					unsigned int meshOwnerEntity = entitiesCollectionLinked__Trn_Mat_Mes_Act[actorCounter];
 					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
 					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
 						

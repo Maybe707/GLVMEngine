@@ -42,6 +42,7 @@ namespace GLVM::ecs
             ++u_iID;
 
         }
+		isEntitiesCollectionChanged = true;
 		return _Entity_ID;
     }
 
@@ -68,6 +69,7 @@ namespace GLVM::ecs
 		_ComponentManager->RemoveAllComponents(_Entity_ID);
 		tActive_Entity_Registry_[_Entity_ID] = k_iUint_Max;  
 		tRemoved_Entity_Registry_.Push(_Entity_ID);
+		isEntitiesCollectionChanged = true;
     }
 }
 
