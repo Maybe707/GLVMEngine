@@ -85,19 +85,21 @@ int main()
 
 	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 2, 100.0f, 0.0f },
+	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 2, 5.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
-	// cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
-	// fontComponentWitch->font_string.Push('F');
-	// fontComponentWitch->font_string.Push('R');
-	// fontComponentWitch->font_string.Push('E');
-	// fontComponentWitch->font_string.Push('N');
-	// fontComponentWitch->font_string.Push('K');
+	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
+	fontComponentWitch->font_string.Push('1');
+	fontComponentWitch->font_string.Push('0');
+	fontComponentWitch->font_string.Push('E');
+	fontComponentWitch->font_string.Push('N');
+	fontComponentWitch->font_string.Push('K');
+	fontComponentWitch->lifeTime = 0.0f;
+	fontComponentWitch->removeble = false;
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
 	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
 	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
@@ -105,10 +107,17 @@ int main()
 	}
 
  	Entity cube0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::actor>(cube0);
+	ComponentManager->CreateComponent<cm::font, cm::material, cm::mesh, cm::collider, cm::transform, cm::actor>(cube0);
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .position = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 4.0f, .gltf = true };
     ComponentManager->GetComponent<cm::mesh>(cube0)->handle = cubeHandle_OBJ;
+	// cm::font* fontComponentCube0 = ComponentManager->GetComponent<cm::font>(cube0);
+	// fontComponentCube0->font_string.Push('1');
+	// fontComponentCube0->font_string.Push('2');
+	// fontComponentCube0->font_string.Push('3');
+	// fontComponentCube0->font_string.Push('4');
+	// fontComponentCube0->font_string.Push('5');
+	// fontComponentCube0->lifeTime = -10.0f;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
 	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };

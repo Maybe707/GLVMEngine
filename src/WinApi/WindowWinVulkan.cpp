@@ -5,7 +5,6 @@
 
 #include "WinApi/WindowWinVulkan.hpp"
 #include "Event.hpp"
-#include "GLPointer.h"
 #include <iostream>
 #include <iterator>
 
@@ -130,7 +129,7 @@ namespace GLVM::core
         //     return 0; 
  
         case WM_SIZE:
-            glViewport( 0, 0, LOWORD(_pLParam), HIWORD(_pLParam));
+//            glViewport( 0, 0, LOWORD(_pLParam), HIWORD(_pLParam));
             ///< Set the size and position of the window. 
             return 0;
 

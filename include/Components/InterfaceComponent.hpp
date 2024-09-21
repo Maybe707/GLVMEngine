@@ -3,7 +3,7 @@
 
 namespace GLVM::ecs::components
 {
-	struct interface {
+	struct interface_ui {
 		
 	};
 }; // namespace GLVM::ecs::components

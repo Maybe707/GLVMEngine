@@ -4864,10 +4864,13 @@ namespace GLVM::core
 			// unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::font>();
+//		std::cout << "size of font containing entities: " << linkedEntities.GetSize() << std::endl;
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int entity = linkedEntities[i];
+//			std::cout << "Font containing entity: " << entity << std::endl;
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
+//			std::cout << "size of font string: " << fontComponent->font_string.GetSize() << std::endl;
 			for ( unsigned int j = 0; j < fontComponent->font_string.GetSize(); ++j ) {
 				unsigned int ascii_code = static_cast<unsigned int>(fontComponent->font_string[j]);
 				// std::cout << "ascii code: " << ascii_code << std::endl;
@@ -4898,6 +4901,7 @@ namespace GLVM::core
 				// mat4 tempProjection = projectionMatrix;
 				// tempView.SelfTensorTranspose();
 				// tempProjection.SelfTensorTranspose();
+				std::cout << "position: " << transformComponent->position << std::endl;
 				vec4 pos = vec4(transformComponent->position[0],
 								transformComponent->position[1],
 								transformComponent->position[2], 1.0f);
