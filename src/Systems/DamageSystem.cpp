@@ -34,7 +34,6 @@ namespace GLVM::ecs
 			fontComponent->font_string.clear();
 			fontComponent->font_string.Push('4');
 			fontComponent->font_string.Push('0');
-			fontComponent->font_string.Push('0');
 			fontComponent->lifeTime = 0;
 			fontComponent->removeble = true;
 		}

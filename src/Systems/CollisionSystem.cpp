@@ -346,6 +346,7 @@ namespace GLVM::ecs
 					}
 
 					if ( collidedInventorySlotEntities.GetSize() == 0 ) {
+						componentManager->GetComponent<cm::item>(entityItemContaining)->occupiedSlots.clear();
 						componentManager->CreateComponent<cm::actor>(entityItemContaining);
 						componentManager->CreateComponent<cm::rigidBody>(entityItemContaining);
 						*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
