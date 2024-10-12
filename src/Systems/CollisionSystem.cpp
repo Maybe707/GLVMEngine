@@ -94,28 +94,23 @@ namespace GLVM::ecs
 			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = false;
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
+
+			cm::transform* backtrackingTransformComponent = componentManager->
+				GetComponent<cm::transform>(backtrackingEntityRefCollider);
+			vec3 backtrackingTransform = backtrackingTransformComponent->position;
+			float backtrackingScale = backtrackingTransformComponent->scale;
+			float backtrackingGltfFlag = backtrackingTransformComponent->gltf;
 			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
 				if ( i == j )
 					continue;
 				
                 unsigned int comparedEntityRefCollider     = linkedEntities[j];
-				
-				vec3 backtrackingTransform = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->position;
-				vec3 backtrackingTransformUpper = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->position;
-				float backtrackingScale = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->scale;
-				float backtrackingGltfFlag = componentManager->
-					GetComponent<cm::transform>(backtrackingEntityRefCollider)->gltf;
-			    vec3  comparedTransform     = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->position;
-				vec3 comparedTransformUpper = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->position;
-				float comparedScale     = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->scale;
-				float comparedGltfFlag = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider)->gltf;
+
+				cm::transform* comparedTransformComponent = componentManager->
+					GetComponent<cm::transform>(comparedEntityRefCollider);
+			    vec3  comparedTransform = comparedTransformComponent->position;
+				float comparedScale     = comparedTransformComponent->scale;
+				float comparedGltfFlag  = comparedTransformComponent->gltf;
 
 				if ( componentManager->isComponentExists<cm::move>(backtrackingEntityRefCollider) ) {
 					cm::move* backtrackingMove = componentManager->
@@ -146,8 +141,8 @@ namespace GLVM::ecs
 											  backtrackingScale,
 											  comparedScale);
 				if ( boxColliderFlag ) {
-					upperActorCheckFlag = UpperActorCheck(backtrackingTransformUpper,
-														  comparedTransformUpper,
+					upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
+														  comparedTransform,
 														  backtrackingScale,
 														  comparedScale);
 				}
