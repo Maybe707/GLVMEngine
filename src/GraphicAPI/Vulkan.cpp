@@ -15,6 +15,7 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/InterfaceComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
@@ -2998,11 +2999,12 @@ namespace GLVM::core
 
 		core::vector<Entity> pointLightsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								 cm::material,
-																								 cm::mesh>();
+																								 cm::mesh,
+																								 cm::pointLight>();
 
 		
 		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * pointLightsLinkedEntities.GetSize();
-		pointLightUboDescriptorsNumber = 200;
+//		pointLightUboDescriptorsNumber = 200;
 
 		if ( pointLightUboDescriptorsNumber > 0 ) {
 			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
@@ -4902,7 +4904,7 @@ namespace GLVM::core
 				// mat4 tempProjection = projectionMatrix;
 				// tempView.SelfTensorTranspose();
 				// tempProjection.SelfTensorTranspose();
-				std::cout << "position: " << transformComponent->position << std::endl;
+//				std::cout << "position: " << transformComponent->position << std::endl;
 				vec4 pos = vec4(transformComponent->position[0],
 								transformComponent->position[1],
 								transformComponent->position[2], 1.0f);
