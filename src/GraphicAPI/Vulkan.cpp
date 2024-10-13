@@ -4875,17 +4875,18 @@ namespace GLVM::core
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::font>();
 //		std::cout << "size of font containing entities: " << linkedEntities.GetSize() << std::endl;
+		unsigned int currentActorMemoryOffset = 0;
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int entity = linkedEntities[i];
 //			std::cout << "Font containing entity: " << entity << std::endl;
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
 			vec3 playerTragetDirection = transformComponent->position - playerTransformComponent->position;
-			std::cout << "target pos: " << transformComponent->position << std::endl;
-			std::cout << "player pos: " << playerTransformComponent->position << std::endl;
-			std::cout << "forward: " << playerTransformComponent->forward << std::endl;
+			// std::cout << "target pos: " << transformComponent->position << std::endl;
+			// std::cout << "player pos: " << playerTransformComponent->position << std::endl;
+			// std::cout << "forward: " << playerTransformComponent->forward << std::endl;
 			float dotProduct = Dot(playerTragetDirection, playerTransformComponent->forward);
-			std::cout << "dot: " << dotProduct << std::endl;
+//			std::cout << "dot: " << dotProduct << std::endl;
 			if ( dotProduct <= 0 )
 				continue;
 //			std::cout << "size of font string: " << fontComponent->font_string.GetSize() << std::endl;
@@ -4935,7 +4936,7 @@ namespace GLVM::core
 										clipSpacePosition[2] / clipSpacePosition[3]);
 
 				vec4 ndc = vec4(ndcPosition[0], ndcPosition[1], ndcPosition[2], 1.0);
-				std::cout << "position: " << ndc << std::endl;
+//				std::cout << "position: " << ndc << std::endl;
 //				std::cout << "dnc: " << ndc << std::endl;
 				
 				// ndcPosition[0] = (ndcPosition[0] + 1.0f) * 0.5f * 1920.0f;
@@ -4985,18 +4986,19 @@ namespace GLVM::core
 //				std::cout << "inverse of matrix: " << inverse_matrix_4x4<float>(testMatrix) << std::endl;
 				
 				void* modelMatrixData;
-				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * (i + j),
+				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * (currentActorMemoryOffset + j),
 							sizeof(fontUBO), 0, &modelMatrixData);
 				memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
 				vkUnmapMemory(device, fontUniformBuffersMemory[currentFrame]);
 
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
-										&fontDescriptorUboSets[i + j], 0, nullptr);
+										&fontDescriptorUboSets[currentActorMemoryOffset + j], 0, nullptr);
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 1, 1,
 										&fontDescriptorSets[0], 0, nullptr);
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
+			currentActorMemoryOffset += fontComponent->font_string.GetSize();
 		}
 
         vkCmdEndRenderPass(commandBuffer);

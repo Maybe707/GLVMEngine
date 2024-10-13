@@ -86,16 +86,23 @@ int main()
 	for ( u32 i = 0; i < 10; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 4, 5.0f, 0.0f },
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 5, 5.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
 	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
 	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
-	fontComponentWitch->font_string.Push('1');
-	fontComponentWitch->font_string.Push('0');
-	// fontComponentWitch->font_string.Push('E');
+	if ( i < 3 ) {
+		fontComponentWitch->font_string.Push('1');
+	} else if ( i < 6 ) {
+		fontComponentWitch->font_string.Push('1');
+		fontComponentWitch->font_string.Push('0');
+	} else if ( i < 10 ) {
+		fontComponentWitch->font_string.Push('1');
+		fontComponentWitch->font_string.Push('0');
+		fontComponentWitch->font_string.Push('E');
+	}
 	// fontComponentWitch->font_string.Push('N');
 	// fontComponentWitch->font_string.Push('K');
 	fontComponentWitch->lifeTime = 0.0f;
