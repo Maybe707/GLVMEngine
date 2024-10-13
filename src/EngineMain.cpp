@@ -86,7 +86,7 @@ int main()
 	for ( u32 i = 0; i < 10; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 2, 5.0f, 0.0f },
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 4, 5.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
@@ -95,9 +95,9 @@ int main()
 	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
 	fontComponentWitch->font_string.Push('1');
 	fontComponentWitch->font_string.Push('0');
-	fontComponentWitch->font_string.Push('E');
-	fontComponentWitch->font_string.Push('N');
-	fontComponentWitch->font_string.Push('K');
+	// fontComponentWitch->font_string.Push('E');
+	// fontComponentWitch->font_string.Push('N');
+	// fontComponentWitch->font_string.Push('K');
 	fontComponentWitch->lifeTime = 0.0f;
 	fontComponentWitch->removeble = false;
 	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
