@@ -11,7 +11,7 @@ namespace GLVM::ecs
 	/*
 	  ===========================================
 	  This method is trying to search for suitable
-	  slots for the given 2x2 type item. It returns
+	  slots for the given specific type item. It returns
 	  true if it finds them and false otherwise.
 	  ==========================================
 	*/
@@ -34,8 +34,8 @@ namespace GLVM::ecs
 				for ( unsigned int m = i; m < i + item_height; ++m )
 					for ( unsigned int n = j; n < j + item_width; ++n ) {
 						maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]));
-						indicesOfMaybeAvailableSlots.Push(m);
-						indicesOfMaybeAvailableSlots.Push(n);
+						indicesOfMaybeAvailableSlots.Push(m);                              ///< Save row index
+						indicesOfMaybeAvailableSlots.Push(n);                              ///< Save col index
 					}
 
 				unsigned int isAllSlotsAvailable = 0;
@@ -52,8 +52,8 @@ namespace GLVM::ecs
 					}
 
 					for ( unsigned int e = 0; e < indicesOfMaybeAvailableSlots.GetSize(); e += 2 ) {
-						unsigned int row = indicesOfMaybeAvailableSlots[e];
-						unsigned int col = indicesOfMaybeAvailableSlots[e + 1];
+						unsigned int row = indicesOfMaybeAvailableSlots[e];                ///< First one is row
+						unsigned int col = indicesOfMaybeAvailableSlots[e + 1];            ///< Second one is col
 
 						itemComponent->occupiedSlots.Push(inventoryComponent->slots[row][col]);
 					}
@@ -100,7 +100,6 @@ namespace GLVM::ecs
 		if(isInventoryOpened) {
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-
 			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
 			
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
@@ -110,14 +109,14 @@ namespace GLVM::ecs
 
 				bool isCrosshairCollided = false;
 				for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n ) {
-					if ( itemColliderComponent->colliders[n] == linkedCrosshairEntities[0] ) {
+					if ( itemColliderComponent->colliders[n] == linkedCrosshairEntities[0] ) {                ///< Is there a crosshair among the colliders
 						isCrosshairCollided = true;
 						break;
 					}
 				}
 				
 				if ( itemColliderComponent->wallCollision && isCrosshairCollided ) {
-					itemTransformComponent->position = crosshairTransformComponent->position;
+					itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged item
 					itemColliderComponent->itemDrag = true;
 					isItemDraged = true;
 				} 
