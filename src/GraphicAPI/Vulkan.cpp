@@ -4869,37 +4869,14 @@ namespace GLVM::core
 										clipSpacePosition[1] / clipSpacePosition[3],
 										clipSpacePosition[2] / clipSpacePosition[3]);
 
-				vec4 ndc = vec4(ndcPosition[0], ndcPosition[1], ndcPosition[2], 1.0);
-				
 				fontUBO.view = viewMatrix;
 				fontUBO.proj = projectionMatrix;
 
-				vec3 fontPosition = transformComponent->position;
-				fontPosition[1] -= (float)j * 1.5f;
-				fontPosition[1] += 0.8f;
 				fontUBO.scale    = 0.3f;
 				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
 				ndcPosition[1] -= fontComponent->lifeTime / 5.0f;
 				fontUBO.position = ndcPosition;
 
-				mat4 testMatrix (1.0f);
-				testMatrix[0][0] = 2.0f;
-				testMatrix[0][1] = 3.0f;
-				testMatrix[0][2] = 3.0f;
-				testMatrix[0][3] = 15.0f;
-				testMatrix[1][0] = 5.0f;
-				testMatrix[1][1] = 7.0f;
-				testMatrix[1][2] = 12.0f;
-				testMatrix[1][3] = 13.0f;
-				testMatrix[2][0] = 23.0f;
-				testMatrix[2][1] = 10.0f;
-				testMatrix[2][2] = 50.0f;
-				testMatrix[2][3] = 52.0f;
-				testMatrix[3][0] = 23.0f;
-				testMatrix[3][1] = 10.0f;
-				testMatrix[3][2] = 55.0f;
-				testMatrix[3][3] = 25.0f;
-				
 				void* modelMatrixData;
 				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * (currentActorMemoryOffset + j),
 							sizeof(fontUBO), 0, &modelMatrixData);
