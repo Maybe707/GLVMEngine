@@ -352,7 +352,10 @@ namespace GLVM::ecs
 						*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
 						core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
 						cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-						itemTransform->position = playerTransform->position + Normalize(playerTransform->forward) * 2.5f;
+						itemTransform->position = playerTransform->position;
+						vec3 normalizedForward = Normalize(playerTransform->forward);
+						itemTransform->position[0] += normalizedForward[0] * 2.5f;
+						itemTransform->position[2] += normalizedForward[2] * 2.5f;
 						itemTransform->scale = 0.05f;
 						*isItemDraged = false;
 						*isLeftMouseButtonReleased = false;
