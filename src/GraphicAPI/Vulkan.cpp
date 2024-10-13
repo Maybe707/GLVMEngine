@@ -4831,41 +4831,6 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-
-		// cm::transform* playerTransformComponent = nullptr;
-
-		// if ( viewPositionLinkedEntities.GetSize() > 0 )
-		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
-
-		// for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-		// 	unsigned int uiEntity = linkedEntities[i];
-		// 	unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-		// 	[[maybe_unused]] cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-		// 	[[maybe_unused]] cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
-
-		// 	unsigned int uboIndex = i;
-		// 	updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
-		// 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-		// 							0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
-			
-//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-				
-			// unsigned int uboIndex = i;
-			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
-
-			// VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-			// VkDeviceSize offsets[] = {0};
-			// vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-			// vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
-
-			// unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 
 		cm::transform* playerTransformComponent = nullptr;
@@ -4874,73 +4839,37 @@ namespace GLVM::core
 
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::font>();
-//		std::cout << "size of font containing entities: " << linkedEntities.GetSize() << std::endl;
 		unsigned int currentActorMemoryOffset = 0;
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int entity = linkedEntities[i];
-//			std::cout << "Font containing entity: " << entity << std::endl;
 			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
 			vec3 playerTragetDirection = transformComponent->position - playerTransformComponent->position;
-			// std::cout << "target pos: " << transformComponent->position << std::endl;
-			// std::cout << "player pos: " << playerTransformComponent->position << std::endl;
-			// std::cout << "forward: " << playerTransformComponent->forward << std::endl;
 			float dotProduct = Dot(playerTragetDirection, playerTransformComponent->forward);
-//			std::cout << "dot: " << dotProduct << std::endl;
 			if ( dotProduct <= 0 )
 				continue;
-//			std::cout << "size of font string: " << fontComponent->font_string.GetSize() << std::endl;
+
 			for ( unsigned int j = 0; j < fontComponent->font_string.GetSize(); ++j ) {
 				unsigned int ascii_code = static_cast<unsigned int>(fontComponent->font_string[j]);
-				// std::cout << "ascii code: " << ascii_code << std::endl;
-				// sleep(10);
 				VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
 				VkDeviceSize offsets[] = {0};
+				
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
 				vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[ascii_code], 0, VK_INDEX_TYPE_UINT32);
 
 				unsigned int indicesContainerSize = symbol_g_indices.size();
-
-
-		
-
-//				const unsigned int currentIndex = 32 * currentFrame + j;
 				FONT_UBO fontUBO{};
-				// transformComponent->tPosition[0] += (float)j / 10;
-				// transformComponent->tPosition[1] += (float)j / 10;
-
 				vec3 result;
-				// float vx = transformComponent->tPosition[0];
-				// float vy = transformComponent->tPosition[1];
-				// float vz = transformComponent->tPosition[2];
-//				std::cout << "position: " << transformComponent->tPosition << std::endl;
-
-				// mat4 tempView = viewMatrix;
-				// mat4 tempProjection = projectionMatrix;
-				// tempView.SelfTensorTranspose();
-				// tempProjection.SelfTensorTranspose();
-//				std::cout << "position: " << transformComponent->position << std::endl;
 				vec4 pos = vec4(transformComponent->position[0],
 								transformComponent->position[1],
 								transformComponent->position[2], 1.0f);
 
-				// std::cout << "pos: " << pos << std::endl;
-				// std::cout << "view matrix: " << viewMatrix << std::endl;
-				// std::cout << "projection matrix: " << projectionMatrix << std::endl;
-
 				vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
-//				std::cout << "w: " << clipSpacePosition[3] << std::endl;
 				vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
 										clipSpacePosition[1] / clipSpacePosition[3],
 										clipSpacePosition[2] / clipSpacePosition[3]);
 
 				vec4 ndc = vec4(ndcPosition[0], ndcPosition[1], ndcPosition[2], 1.0);
-//				std::cout << "position: " << ndc << std::endl;
-//				std::cout << "dnc: " << ndc << std::endl;
-				
-				// ndcPosition[0] = (ndcPosition[0] + 1.0f) * 0.5f * 1920.0f;
-				// ndcPosition[1] = (ndcPosition[1] + 1.0f) * 0.5f * 1080.0f;
 				
 				fontUBO.view = viewMatrix;
 				fontUBO.proj = projectionMatrix;
@@ -4948,22 +4877,10 @@ namespace GLVM::core
 				vec3 fontPosition = transformComponent->position;
 				fontPosition[1] -= (float)j * 1.5f;
 				fontPosition[1] += 0.8f;
-//				std::cout << "x: " << result[0] << " y: " << result[1] << " z: " << result[2] << std::endl;
 				fontUBO.scale    = 0.3f;
 				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
-//				ndcPosition[0] += 0.01f;
 				ndcPosition[1] -= fontComponent->lifeTime / 5.0f;
-//				ndcPosition[1] = fontPosition[1];
 				fontUBO.position = ndcPosition;
-
-
-				// mat2 testMatrix (1.0f);
-				// testMatrix[0][0] = 2.0f;
-				// testMatrix[0][1] = 3.0f;
-				// testMatrix[1][0] = 5.0f;
-				// testMatrix[1][1] = 7.0f;
-
-				// std::cout << "determinantus: " << determinant_2x2<float>(testMatrix) << std::endl;
 
 				mat4 testMatrix (1.0f);
 				testMatrix[0][0] = 2.0f;
@@ -4982,8 +4899,6 @@ namespace GLVM::core
 				testMatrix[3][1] = 10.0f;
 				testMatrix[3][2] = 55.0f;
 				testMatrix[3][3] = 25.0f;
-				
-//				std::cout << "inverse of matrix: " << inverse_matrix_4x4<float>(testMatrix) << std::endl;
 				
 				void* modelMatrixData;
 				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * (currentActorMemoryOffset + j),
