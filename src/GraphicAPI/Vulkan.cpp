@@ -3044,7 +3044,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 50000;
+		uint32_t descriptorCount = 10000;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;

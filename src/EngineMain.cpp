@@ -40,6 +40,7 @@ int main()
 	[[maybe_unused]] cm::MeshHandle torusHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/torus.obj");
 	[[maybe_unused]] cm::MeshHandle pipeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/pipe.obj");
 	[[maybe_unused]] cm::MeshHandle hyperCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube.gltf");
+	[[maybe_unused]] cm::MeshHandle hyperCubeHandle2_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube2.gltf");
 	[[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");
 	[[maybe_unused]] cm::MeshHandle simpleCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/simpleCube2.gltf");
 	[[maybe_unused]] cm::MeshHandle crosshair_001_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/crosshair_001.gltf");
@@ -83,7 +84,7 @@ int main()
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 
-	for ( u32 i = 0; i < 10; ++i ) {
+	for ( u32 i = 0; i < 1; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 5, 5.0f, 0.0f },
@@ -117,7 +118,7 @@ int main()
 	ComponentManager->CreateComponent<cm::font, cm::material, cm::mesh, cm::collider, cm::transform, cm::actor>(cube0);
 	*ComponentManager->GetComponent<cm::transform>(cube0) = { .position = { 7.0f, 3.0f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 4.0f, .gltf = true };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = cubeHandle_OBJ;
+    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = hyperCubeHandle2_GLTF;
 	// cm::font* fontComponentCube0 = ComponentManager->GetComponent<cm::font>(cube0);
 	// fontComponentCube0->font_string.Push('1');
 	// fontComponentCube0->font_string.Push('2');
@@ -228,13 +229,14 @@ int main()
 	
 	Entity pointLight0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 0.0f, 15.0f, 5.0f },
+	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 3.0f, 10.0f, 15.0f },
 		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .position = { 0.0f, 15.0f, 5.0f }, .scale = 0.2f };
+	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .position = { 3.0f, 10.0f, 15.0f }, .scale = 0.2f };
 	ComponentManager->GetComponent<cm::mesh>(pointLight0)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	*materialPointLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
+	*materialPointLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
 
  	// Entity pointLight1 = EntityManager->CreateEntity();
 	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);
