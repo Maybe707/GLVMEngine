@@ -88,10 +88,10 @@ namespace GLVM::ecs
 																					  cm::transform,
 																					  cm::actor>();
 		
-        float cameraSpeed = 5.5f * fDelta_Time_;            
+        const float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
 		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			unsigned int backtrackingEntityRefCollider = linkedEntities[i];  
+			const unsigned int backtrackingEntityRefCollider = linkedEntities[i];
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = false;
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
 
@@ -100,24 +100,25 @@ namespace GLVM::ecs
 			vec3 backtrackingTransform = backtrackingTransformComponent->position;
 			float backtrackingScale = backtrackingTransformComponent->scale;
 			float backtrackingGltfFlag = backtrackingTransformComponent->gltf;
+
+			if ( componentManager->isComponentExists<cm::move>(backtrackingEntityRefCollider) ) {
+				cm::move* backtrackingMove = componentManager->
+					GetComponent<cm::move>(backtrackingEntityRefCollider);
+				backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+				backtrackingTransform += backtrackingMove->gravity;
+			}
+
 			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
 				if ( i == j )
 					continue;
 				
-                unsigned int comparedEntityRefCollider     = linkedEntities[j];
+                const unsigned int comparedEntityRefCollider     = linkedEntities[j];
 
 				cm::transform* comparedTransformComponent = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider);
 			    vec3  comparedTransform = comparedTransformComponent->position;
 				float comparedScale     = comparedTransformComponent->scale;
 				float comparedGltfFlag  = comparedTransformComponent->gltf;
-
-				if ( componentManager->isComponentExists<cm::move>(backtrackingEntityRefCollider) ) {
-					cm::move* backtrackingMove = componentManager->
-						GetComponent<cm::move>(backtrackingEntityRefCollider);
-					backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
-					backtrackingTransform += backtrackingMove->gravity;
-				}
 
 				if ( componentManager->isComponentExists<cm::move>(comparedEntityRefCollider) ) {
 					cm::move* comparedMove = componentManager->
@@ -167,42 +168,34 @@ namespace GLVM::ecs
 			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
+			const cm::transform* crosshairTransform = componentManager->GetComponent<cm::transform>(crosshairEntity);
 			vec3 crosshairPosition;
 			float crosshairScale = 0;
 			float crosshairGltfFlag = 0;
 			if ( linkedCrosshairEntities.GetSize() > 0 ) {
-				crosshairPosition = componentManager->
-					GetComponent<cm::transform>(crosshairEntity)->position;                
-				crosshairScale = componentManager->
-					GetComponent<cm::transform>(crosshairEntity)->scale;
-				crosshairGltfFlag = componentManager->
-					GetComponent<cm::transform>(crosshairEntity)->gltf;
+				crosshairPosition = crosshairTransform->position;                
+				crosshairScale = crosshairTransform->scale;
+				crosshairGltfFlag = crosshairTransform->gltf;
 			}
 
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
 				unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+				const cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
 				if ( itemComponent->occupiedSlots.GetSize() == 0 )                        ///< If occupiedSlots is 0 then this item not in inventory
 					continue;
 
-				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+				const cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 				vec3  itemPosition;
 				float itemScale_X  = 0;
 				float itemScale_Y  = 0;
 				float itemGltfFlag = 0;
 				constexpr float collitionCorrectnessMultiplayer = 0.8;
-				if ( itemTransformComponent != nullptr ) {
-					itemPosition = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->position;
-					itemScale_X     = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->scale * itemComponent->itemSlotType.width *
-						collitionCorrectnessMultiplayer;
-					itemScale_Y     = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->scale * itemComponent->itemSlotType.height *
-						collitionCorrectnessMultiplayer;
-					itemGltfFlag = componentManager->
-						GetComponent<cm::transform>(entityItemContaining)->gltf;
-				}
+				itemPosition = itemTransformComponent->position;
+				itemScale_X  = itemTransformComponent->scale * itemComponent->itemSlotType.width *
+					collitionCorrectnessMultiplayer;
+				itemScale_Y  = itemTransformComponent->scale * itemComponent->itemSlotType.height *
+					collitionCorrectnessMultiplayer;
+				itemGltfFlag = itemTransformComponent->gltf;
 
 				if ( !crosshairGltfFlag ) {
 					crosshairScale /= 2;
@@ -300,11 +293,11 @@ namespace GLVM::ecs
 		
 		/// This code implements state when inventory is opened, player hold item and press left mouse button
 		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
-			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+			const core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				unsigned int entityItemContaining = linkedItemEntities[i];
+				const unsigned int entityItemContaining = linkedItemEntities[i];
 				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-				core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+				const core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 				bool isCrosshairCollided = false;
 				for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
 					if ( itemCollider->colliders[n] == linkedCrosshairEntities[0] ) {
@@ -315,16 +308,16 @@ namespace GLVM::ecs
 				
 				if ( itemCollider->wallCollision && isCrosshairCollided ) {
 					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					vec3 itemPosition = itemTransform->position;
+					const vec3 itemPosition = itemTransform->position;
 					
-					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
+					const core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
 																											   cm::transform,
 																											   cm::inventorySlot>();
 					core::vector<unsigned int> collidedInventorySlotEntities;
 					core::vector<vec3> collidedInventorySlotTransforms;
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
-						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
-						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+						const unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
+						const cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 						vec3  inventorySlotPosition = inventorySlotTransform->position;
 						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
