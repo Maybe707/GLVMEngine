@@ -2831,6 +2831,11 @@ namespace GLVM::core
         vkFreeMemory(device, stagingBufferMemory, nullptr);
     }
 
+	// void CVulkanRenderer::createMemoryArenaBuffers(VkBuffer buffer, VkDeviceMemory deviceMemory, VkDeviceSize,
+	// 	) {
+		
+	// }
+	
     void CVulkanRenderer::createMainRenderUniformBuffers() {
         VkDeviceSize modelMatrixBufferSize = sizeof(ModelMatrixUBO);
 		VkDeviceSize lightDataBufferSize = sizeof(LightData);
@@ -2954,7 +2959,7 @@ namespace GLVM::core
 																								cm::mesh>();
 		
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = UBO_multiplier * directionalLightLinkedEntities.GetSize();
+		directionalLightUboDescriptorsNumber = UBO_multiplier * 4;
 
 		if ( directionalLightUboDescriptorsNumber > 0 ) {
 			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
@@ -2966,18 +2971,11 @@ namespace GLVM::core
 
 			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 shadowMapDirectionalLightModelMatrixUniformBuffers[0], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
-		} else {
-			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
-			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(1);
-
-			createBuffer(2 * modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapDirectionalLightModelMatrixUniformBuffers[0], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
-
 		}
 		memory = 0;
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
-		spotLightUboDescriptorsNumber = UBO_multiplier * spotLightLinkedEntities.GetSize();
+		spotLightUboDescriptorsNumber = UBO_multiplier * 8;
 
 		if ( spotLightUboDescriptorsNumber > 0 ) {
 			shadowMapSpotLightModelMatrixUniformBuffers.resize(1);
@@ -2988,12 +2986,6 @@ namespace GLVM::core
 			}
 
 			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapSpotLightModelMatrixUniformBuffers[0], shadowMapSpotLightModelMatrixUniformBuffersMemory[0]);
-		} else {
-			shadowMapSpotLightModelMatrixUniformBuffers.resize(1);
-			shadowMapSpotLightModelMatrixUniformBuffersMemory.resize(1);
-
-			createBuffer(2 * modelShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 shadowMapSpotLightModelMatrixUniformBuffers[0], shadowMapSpotLightModelMatrixUniformBuffersMemory[0]);
 		}
 		memory = 0;
@@ -3036,7 +3028,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 10000;
+		uint32_t descriptorCount = 20000;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -3562,7 +3554,7 @@ namespace GLVM::core
 
 		int modelMatrixUboBinding = modelMatrixBindings[0];
 		
-		unsigned int model_matrix_ubo_actual_size = matrixUboDescriptorsNumber ? matrixUboDescriptorsNumber : 1; 
+		unsigned int model_matrix_ubo_actual_size = matrixUboDescriptorsNumber; 
 		
 		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size,
 															mainRenderScenePipeline.descriptors[0].setLayout);
