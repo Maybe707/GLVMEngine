@@ -2849,8 +2849,8 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		u32 memory = 0;
-		constexpr u32 UBO_multiplier = 2;
-		matrixUboDescriptorsNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		constexpr u32 UBO_multiplier = 500;
+		matrixUboDescriptorsNumber = UBO_multiplier;
 		modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2869,7 +2869,7 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUboDescriptorNumber = UBO_multiplier;
 		hudUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		hudUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2885,7 +2885,7 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUboDescriptorNumber = UBO_multiplier;
 		fontUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		fontUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2901,7 +2901,7 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUboDescriptorNumber = UBO_multiplier;
 		hudScreenUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		hudScreenUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2917,7 +2917,7 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUboDescriptorNumber = UBO_multiplier;
 		uiUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2933,7 +2933,7 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = matrixLinkedEntities.GetSize() * UBO_multiplier;
+		hudUboDescriptorNumber = UBO_multiplier;
 		uiIconsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiIconsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2954,7 +2954,7 @@ namespace GLVM::core
 																								cm::mesh>();
 		
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * directionalLightLinkedEntities.GetSize();
+		directionalLightUboDescriptorsNumber = UBO_multiplier * directionalLightLinkedEntities.GetSize();
 
 		if ( directionalLightUboDescriptorsNumber > 0 ) {
 			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
@@ -2977,7 +2977,7 @@ namespace GLVM::core
 		memory = 0;
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
-		spotLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * spotLightLinkedEntities.GetSize();
+		spotLightUboDescriptorsNumber = UBO_multiplier * spotLightLinkedEntities.GetSize();
 
 		if ( spotLightUboDescriptorsNumber > 0 ) {
 			shadowMapSpotLightModelMatrixUniformBuffers.resize(1);
@@ -3004,26 +3004,18 @@ namespace GLVM::core
 																								 cm::pointLight>();
 
 		
-		pointLightUboDescriptorsNumber = (actorsLinkedEntities.GetSize() * UBO_multiplier) * pointLightsLinkedEntities.GetSize();
+		pointLightUboDescriptorsNumber = actorsLinkedEntities.GetSize() * 32;
 //		pointLightUboDescriptorsNumber = 200;
 
-		if ( pointLightUboDescriptorsNumber > 0 ) {
-			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
-			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(1);
+		shadowMapPointLightModelMatrixUniformBuffers.resize(1);
+		shadowMapPointLightModelMatrixUniformBuffersMemory.resize(1);
 
-			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; i++) {
-				memory += modelCubeShadowMapMatrixBufferSize;
-			}
-
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-							 shadowMapPointLightModelMatrixUniformBuffers[0], shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
-		} else {
-			shadowMapPointLightModelMatrixUniformBuffers.resize(1);
-			shadowMapPointLightModelMatrixUniformBuffersMemory.resize(1);
-
-			createBuffer(6 * 2 * modelCubeShadowMapMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapPointLightModelMatrixUniformBuffers[0], shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
+		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; i++) {
+			memory += modelCubeShadowMapMatrixBufferSize;
 		}
+
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 shadowMapPointLightModelMatrixUniformBuffers[0], shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
 		memory += modelCubeShadowMapMatrixBufferSize;			
 		
 		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -3066,7 +3058,7 @@ namespace GLVM::core
 
 		int directionalLightShadowMapMatrixUboBinding = dirLightBindings[0];
 		
-		unsigned int actual_size = directionalLightUboDescriptorsNumber ? directionalLightUboDescriptorsNumber : 1;
+		unsigned int actual_size = directionalLightUboDescriptorsNumber;
 		
 		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
 															directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
@@ -3107,7 +3099,7 @@ namespace GLVM::core
  
 		int spotLightShadowMapMatrixUboBinding = spotLightsBindings[0];
 		
-		unsigned int actual_size = spotLightUboDescriptorsNumber ? spotLightUboDescriptorsNumber : 1;
+		unsigned int actual_size = spotLightUboDescriptorsNumber;
 		
 		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
 															spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
@@ -3148,41 +3140,39 @@ namespace GLVM::core
 
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
 		
-		unsigned int point_light_shadow_map_actual_size = pointLightUboDescriptorsNumber ? pointLightUboDescriptorsNumber : 1; 
+		unsigned int point_light_shadow_map_actual_size = pointLightUboDescriptorsNumber; 
 		
-		if ( pointLightShadowMapMatrixUboBinding != -1 ) {
-			std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size,
-																pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
-			VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-			matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			matrixUboAllocInfo.descriptorPool = descriptorPool;
-			matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
-																		  point_light_shadow_map_actual_size);
-			matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size,
+															pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
+		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		matrixUboAllocInfo.descriptorPool = descriptorPool;
+		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(6 * MAX_FRAMES_IN_FLIGHT *
+																	  point_light_shadow_map_actual_size);
+		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 
-			shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size);
-			if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
+		shadowMapPointLightDescriptorSets.resize(6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size);
+		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
 
-			for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size; ++i) {
-				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[0];
-				modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
-				modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
+		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * point_light_shadow_map_actual_size; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffers[0];
+			modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
+			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
-				descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
+			descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 	}
 
@@ -5840,7 +5830,7 @@ namespace GLVM::core
 																							  cm::spotLight,
 																							  cm::mesh,
 																							  cm::actor>();
-			
+
 		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
 			VkClearValue spotLightShadowMapClearValues[1];
 			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
@@ -5922,18 +5912,32 @@ namespace GLVM::core
 
 		namespace cm = GLVM::ecs::components;
 		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
-			core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+			core::vector<Entity> linkedEntitiesTemp      = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::material,
 																							   cm::mesh,
 																							   cm::actor>();
-			entitiesCollectionLinked__Trn_Mat_Mes_Act.clear();
-			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i )
-				entitiesCollectionLinked__Trn_Mat_Mes_Act.Push(linkedEntities[i]);
-				
+			
 			core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::pointLight,
 																							  cm::mesh,
 																							  cm::actor>();
+
+			core::vector<unsigned int> linkedEntities;
+			for ( unsigned int i = 0; i < linkedEntitiesTemp.GetSize(); ++i ) {
+				unsigned int entity = linkedEntitiesTemp[i];
+				for ( unsigned int j = 0; j < pointLightEntities.GetSize(); ++j ) {
+					if ( entity == pointLightEntities[j] ) {
+						break;
+					} else if ( entity != pointLightEntities[j] && j == pointLightEntities.GetSize() - 1 ) {
+						linkedEntities.Push(entity);
+					}
+				}
+			}
+//			std::cout << "number of actors: " << linkedEntities.GetSize() << std::endl;
+			entitiesCollectionLinked__Trn_Mat_Mes_Act.clear();
+			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i )
+				entitiesCollectionLinked__Trn_Mat_Mes_Act.Push(linkedEntities[i]);
+				
 			entitiesCollectionLinked__Trn_PoL_Mes_Act.clear();
 			for ( unsigned int i = 0; i < pointLightEntities.GetSize(); ++i )
 				entitiesCollectionLinked__Trn_PoL_Mes_Act.Push(pointLightEntities[i]);
