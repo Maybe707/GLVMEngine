@@ -1024,10 +1024,8 @@ namespace GLVM::core
     void CVulkanRenderer::cleanup() {
         cleanupSwapChain();
 
-		for ( size_t j = 0; j < hudUniformBuffers.size(); ++j ) {   ///<
-			vkDestroyBuffer(device, hudUniformBuffers[j], nullptr);
-			vkFreeMemory(device, hudUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, hudUniformBuffer, nullptr);
+		vkFreeMemory(device, hudUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < fontUniformBuffers.size(); ++j ) {   ///<
 			vkDestroyBuffer(device, fontUniformBuffers[j], nullptr);
 			vkFreeMemory(device, fontUniformBuffersMemory[j], nullptr);
@@ -2863,19 +2861,12 @@ namespace GLVM::core
 		memory = 0;
 
 		hudUboDescriptorNumber = UBO_multiplier;
-		hudUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		hudUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber; i++) {
 			memory += modelMatrixBufferSize;
 		}
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 hudUniformBuffers[i], hudUniformBuffersMemory[i]);
-
-//				memory += modelMatrixBufferSize;
-		}
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 hudUniformBuffer, hudUniformBuffersMemory);
 		memory = 0;
 
 		hudUboDescriptorNumber = UBO_multiplier;
@@ -3161,25 +3152,23 @@ namespace GLVM::core
  
 		int hudUboBinding = hudBindings[0];
 		
-		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
-		
-		std::vector<VkDescriptorSetLayout> hudUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+		std::vector<VkDescriptorSetLayout> hudUboLayouts(MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber,
 															hudPipeline.descriptors[hudUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo hudUboAllocInfo{};
 		hudUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		hudUboAllocInfo.descriptorPool = descriptorPool;
 		hudUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  actual_size);
+																	  hudUboDescriptorNumber);
 		hudUboAllocInfo.pSetLayouts = hudUboLayouts.data();
 			
-		hudDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		hudDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber);
 		if (vkAllocateDescriptorSets(device, &hudUboAllocInfo, hudDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = hudUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = hudUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
 			modelMatrixBufferInfo.range = sizeof(HUD_UBO);
 			
@@ -3908,7 +3897,7 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = hudUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = hudUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
 			modelMatrixBufferInfo.range = sizeof(HUD_UBO);
 			
@@ -4173,8 +4162,7 @@ namespace GLVM::core
         }
     }
 
-	void CVulkanRenderer::updateHudUBO(uint32_t currentImage, uint32_t offset,
-									   [[maybe_unused]] ecs::components::transform* entityOwnHudTransform,
+	void CVulkanRenderer::updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 									   ecs::components::health* entityOwnHudHealth, bool isHudExists,
 									   float highestY) {
 		HUD_UBO hudUBO{};
@@ -4189,10 +4177,10 @@ namespace GLVM::core
 		hudUBO.highestY    = highestY;
 
 		void* hudMatrixData;
-        vkMapMemory(device, hudUniformBuffersMemory[currentImage], sizeof(HUD_UBO) * offset,
+        vkMapMemory(device, hudUniformBuffersMemory, sizeof(HUD_UBO) * offset,
 					sizeof(HUD_UBO), 0, &hudMatrixData);
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_UBO));
-        vkUnmapMemory(device, hudUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, hudUniformBuffersMemory);
 	}
 
 	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform) {
@@ -4418,8 +4406,8 @@ namespace GLVM::core
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
 
-			unsigned int uboIndex = i;
-			updateHudUBO(currentFrame, uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
+			unsigned int uboIndex = currentFrame * hudUboDescriptorNumber + i;
+			updateHudUBO(uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
 									0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -6398,16 +6386,14 @@ namespace GLVM::core
 		pointLightPipelineLayoutObjectInfo.objectHandle = (uint64_t)pointLightPipeline.pipelineLayout;
 		SetDebugObjectName(device, &pointLightPipelineLayoutObjectInfo);
 
-		for ( unsigned long i = 0; i < hudUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Hud uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)hudUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT hudUniformBufferObjectInfo{};
+		hudUniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string hudImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Hud uniform buffer # ", 0);
+		const char* hudStrImageName = hudImageName.c_str();
+		hudUniformBufferObjectInfo.pObjectName = hudStrImageName;
+		hudUniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		hudUniformBufferObjectInfo.objectHandle = (uint64_t)hudUniformBuffer;
+		SetDebugObjectName(device, &hudUniformBufferObjectInfo);
 
 		for ( unsigned long i = 0; i < fontUniformBuffers.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};

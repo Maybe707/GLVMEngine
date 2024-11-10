@@ -382,8 +382,8 @@ namespace GLVM::core
 		Pipeline hudPipeline;
 		VkRenderPass hudRenderPass;
 		std::vector<VkDescriptorSet> hudDescriptorSets;
-		std::vector<VkBuffer> hudUniformBuffers;
-		std::vector<VkDeviceMemory> hudUniformBuffersMemory;
+		VkBuffer hudUniformBuffer;
+		VkDeviceMemory hudUniformBuffersMemory;
 		Pipeline directionalLightPipeline;
 		Pipeline spotLightPipeline;
 		Pipeline pointLightPipeline;
@@ -614,8 +614,7 @@ namespace GLVM::core
         void copyBuffer(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
-		void updateHudUBO(uint32_t currentImage, uint32_t offset,
-						  ecs::components::transform* entityOwnHudTransform,
+		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t currentImage, uint32_t offset,
