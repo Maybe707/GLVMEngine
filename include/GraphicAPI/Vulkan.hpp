@@ -402,8 +402,8 @@ namespace GLVM::core
 		VkRenderPass uiRenderPass;
 		std::vector<VkDescriptorSet> uiDescriptorSets;
 		std::vector<VkDescriptorSet> uiSamplerDescriptorSets;
-		std::vector<VkBuffer> uiUniformBuffers;
-		std::vector<VkDeviceMemory> uiUniformBuffersMemory;
+		VkBuffer uiUniformBuffer;
+		VkDeviceMemory uiUniformBuffersMemory;
 		Pipeline uiIconsPipeline;
 		VkRenderPass uiIconsRenderPass;
 		std::vector<VkDescriptorSet> uiIconsDescriptorSets;
@@ -485,6 +485,7 @@ namespace GLVM::core
 		const unsigned int hudUboDescriptorNumber = 500;
 		const unsigned int fontUboDescriptorNumber = 128;
 		const unsigned int hudScreenUboDescriptorNumber = 32;
+		const unsigned int uiUboDescriptorsNumber = 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
@@ -619,7 +620,7 @@ namespace GLVM::core
 		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
-		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t currentImage, uint32_t offset,
+		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
 						  ecs::components::transform* inventorySlotTransform, unsigned int inventorySlotEntity);
 		void updateUBO_IconsUI(uint32_t currentImage, uint32_t offset, ecs::components::transform* itemTransfromComponent,
 							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent);

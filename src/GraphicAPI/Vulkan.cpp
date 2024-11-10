@@ -1030,10 +1030,8 @@ namespace GLVM::core
 		vkFreeMemory(device, fontUniformBuffersMemory, nullptr);
 		vkDestroyBuffer(device, hudScreenUniformBuffer, nullptr);
 		vkFreeMemory(device, hudScreenUniformBuffersMemory, nullptr);
-		for ( size_t j = 0; j < uiUniformBuffers.size(); ++j ) {        ///<
-			vkDestroyBuffer(device, uiUniformBuffers[j], nullptr);
-			vkFreeMemory(device, uiUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, uiUniformBuffer, nullptr);
+		vkFreeMemory(device, uiUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < uiIconsUniformBuffers.size(); ++j ) {     ///<
 			vkDestroyBuffer(device, uiIconsUniformBuffers[j], nullptr);
 			vkFreeMemory(device, uiIconsUniformBuffersMemory[j], nullptr);
@@ -2860,24 +2858,13 @@ namespace GLVM::core
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 fontUniformBuffer, fontUniformBuffersMemory);
 
-		memory += hudScreenUboSize * MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber;
+		memory = hudScreenUboSize * MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 hudScreenUniformBuffer, hudScreenUniformBuffersMemory);
 
-		uiUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		uiUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * 64; i++) {
-			memory += uiUboSize;
-		}
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 uiUniformBuffers[i], uiUniformBuffersMemory[i]);
-
-//				memory += modelMatrixBufferSize;
-		}
-		memory = 0;
+		memory = uiUboSize * MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 uiUniformBuffer, uiUniformBuffersMemory);
 
 		uiIconsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiIconsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
@@ -3190,27 +3177,23 @@ namespace GLVM::core
 		core::vector<u32> uiBindings = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_UBO);
  
 		int uiUboBinding = uiBindings[0];
-		
-//		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
-		unsigned int actual_size = 64;
-		
-		std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+		std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber,
 															uiPipeline.descriptors[uiUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo uiUboAllocInfo{};
 		uiUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		uiUboAllocInfo.descriptorPool = descriptorPool;
 		uiUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  actual_size);
+																	  uiUboDescriptorsNumber);
 		uiUboAllocInfo.pSetLayouts = uiUboLayouts.data();
 			
-		uiDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		uiDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber);
 		if (vkAllocateDescriptorSets(device, &uiUboAllocInfo, uiDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = uiUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = uiUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
 			modelMatrixBufferInfo.range = sizeof(UI_UBO);
 			
@@ -4178,7 +4161,7 @@ namespace GLVM::core
         vkUnmapMemory(device, hudScreenUniformBuffersMemory);
 	}
 
-	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t currentImage, uint32_t offset,
+	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
 									   ecs::components::transform* inventorySlotTransform, unsigned int inventorySlotEntity) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
@@ -4231,10 +4214,10 @@ namespace GLVM::core
 		}
 		
 		void* hudMatrixData;
-        vkMapMemory(device, uiUniformBuffersMemory[currentImage], sizeof(UI_UBO) * offset,
+        vkMapMemory(device, uiUniformBuffersMemory, sizeof(UI_UBO) * offset,
 					sizeof(UI_UBO), 0, &hudMatrixData);
         memcpy(hudMatrixData, &hudUBO, sizeof(UI_UBO));
-        vkUnmapMemory(device, uiUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, uiUniformBuffersMemory);
 	}
 
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t currentImage, uint32_t offset,
@@ -4461,9 +4444,9 @@ namespace GLVM::core
 					cm::transform* inventoryTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
 					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
-					unsigned int uboIndex = j * 8 + m;
+					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * 8 + m;
 					updateUBO_UI(inventoryTransformComponent->position[0] + m, inventoryTransformComponent->position[1] + j,
-								 currentFrame, uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
+								 uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
@@ -6361,16 +6344,14 @@ namespace GLVM::core
 		fontUniformBufferObjectInfo.objectHandle = (uint64_t)fontUniformBuffer;
 		SetDebugObjectName(device, &fontUniformBufferObjectInfo);
 
-		for ( unsigned long i = 0; i < uiUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " UI uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)uiUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT uiUniformBufferObjectInfo{};
+		uiUniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string uiImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " UI uniform buffer # ", 0);
+		const char* uiStrImageName = uiImageName.c_str();
+		uiUniformBufferObjectInfo.pObjectName = uiStrImageName;
+		uiUniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		uiUniformBufferObjectInfo.objectHandle = (uint64_t)uiUniformBuffer;
+		SetDebugObjectName(device, &uiUniformBufferObjectInfo);
 
 		for ( unsigned long i = 0; i < uiIconsUniformBuffers.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
