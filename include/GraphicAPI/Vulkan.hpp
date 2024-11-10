@@ -446,8 +446,8 @@ namespace GLVM::core
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
 		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
-		std::vector<VkBuffer> shadowMapPointLightModelMatrixUniformBuffers;
-		std::vector<VkDeviceMemory> shadowMapPointLightModelMatrixUniformBuffersMemory;
+		VkBuffer shadowMapPointLightModelMatrixUniformBuffer;
+		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
@@ -489,8 +489,8 @@ namespace GLVM::core
 		const unsigned int uiIconsDescriptorsNumber = 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
-		unsigned int pointLightUboDescriptorsNumber = 0;
-		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of directional lights
+		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
+		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of spot lights
 		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number
         std::vector<VkDescriptorSet> matrixUboDescriptorSets;
 		std::vector<VkDescriptorSet> lightDataUboDescriptorSets;
