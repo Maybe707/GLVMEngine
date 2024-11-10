@@ -1060,10 +1060,8 @@ namespace GLVM::core
 		}
 		vkDestroyBuffer(device, modelMatrixUniformBuffer, nullptr);
 		vkFreeMemory(device, modelMatrixUniformBuffersMemory, nullptr);
-		for ( size_t j = 0; j < lightDataUniformBuffers.size(); ++j ) {      ///<
-			vkDestroyBuffer(device, lightDataUniformBuffers[j], nullptr);
-			vkFreeMemory(device, lightDataUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, lightDataUniformBuffer, nullptr);
+		vkFreeMemory(device, lightDataUniformBuffersMemory, nullptr);
 
 		vkDeviceWaitIdle(device);
 
@@ -2873,19 +2871,8 @@ namespace GLVM::core
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 shadowMapPointLightModelMatrixUniformBuffer, shadowMapPointLightModelMatrixUniformBuffersMemory);
 		
-		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								  cm::beholder,
-																								  cm::mesh>();
-		
-		lightDataUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		lightDataUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 lightDataUniformBuffers[i], lightDataUniformBuffersMemory[i]);
-
-			memory += lightDataBufferSize;
-		}
+		createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 lightDataUniformBuffer, lightDataUniformBuffersMemory);
     }
 
     void CVulkanRenderer::createMainRenderDescriptorPool() {
@@ -3449,7 +3436,7 @@ namespace GLVM::core
 
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = lightDataUniformBuffers[i];
+			modelMatrixBufferInfo.buffer = lightDataUniformBuffer;
 			modelMatrixBufferInfo.offset = 0;
 			modelMatrixBufferInfo.range = sizeof(LightData);
 			
@@ -3833,7 +3820,7 @@ namespace GLVM::core
 		if ( lightDataUboBinding != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * lightDataSize; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = lightDataUniformBuffers[i];
+				modelMatrixBufferInfo.buffer = lightDataUniformBuffer;
 				modelMatrixBufferInfo.offset = 0;
 				modelMatrixBufferInfo.range = sizeof(LightData);
 			
@@ -5131,10 +5118,10 @@ namespace GLVM::core
 		lightDataUBO.spotLightArraySize = spotLightNumber;
 
         void* data;
-        vkMapMemory(device, lightDataUniformBuffersMemory[currentImage], 0,
+        vkMapMemory(device, lightDataUniformBuffersMemory, sizeof(lightDataUBO) * currentImage,
 					sizeof(lightDataUBO), 0, &data);
         memcpy(data, &lightDataUBO, sizeof(lightDataUBO));
-        vkUnmapMemory(device, lightDataUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, lightDataUniformBuffersMemory);
 	}
 
     void CVulkanRenderer::hudDrawFrame() {
@@ -6366,16 +6353,14 @@ namespace GLVM::core
 		uniformBufferObjectInfo.objectHandle = (uint64_t)modelMatrixUniformBuffer;
 		SetDebugObjectName(device, &uniformBufferObjectInfo);
 
-		for ( unsigned long i = 0; i < lightDataUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Light data uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)lightDataUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT lightDataUniformBufferObjectInfo{};
+		lightDataUniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string lightDataImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Light data uniform buffer # ", 0);
+		const char* lightDataStrImageName = lightDataImageName.c_str();
+		lightDataUniformBufferObjectInfo.pObjectName = lightDataStrImageName;
+		lightDataUniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		lightDataUniformBufferObjectInfo.objectHandle = (uint64_t)lightDataUniformBuffer;
+		SetDebugObjectName(device, &lightDataUniformBufferObjectInfo);
 
 		// for ( unsigned long i = 0; i < directionalLightPipeline.descriptors[0].textureImages.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT directionalLightImageObjectInfo{};

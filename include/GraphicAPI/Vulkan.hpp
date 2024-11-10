@@ -473,8 +473,8 @@ namespace GLVM::core
 		
         VkBuffer modelMatrixUniformBuffer;
         VkDeviceMemory modelMatrixUniformBuffersMemory;
-        std::vector<VkBuffer> lightDataUniformBuffers;
-        std::vector<VkDeviceMemory> lightDataUniformBuffersMemory;
+        VkBuffer lightDataUniformBuffer;
+        VkDeviceMemory lightDataUniformBuffersMemory;
 
 		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
 		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
