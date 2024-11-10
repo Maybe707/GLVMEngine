@@ -1026,10 +1026,8 @@ namespace GLVM::core
 
 		vkDestroyBuffer(device, hudUniformBuffer, nullptr);
 		vkFreeMemory(device, hudUniformBuffersMemory, nullptr);
-		for ( size_t j = 0; j < fontUniformBuffers.size(); ++j ) {   ///<
-			vkDestroyBuffer(device, fontUniformBuffers[j], nullptr);
-			vkFreeMemory(device, fontUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, fontUniformBuffer, nullptr);
+		vkFreeMemory(device, fontUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < hudScreenUniformBuffers.size(); ++j ) {   ///<
 			vkDestroyBuffer(device, hudScreenUniformBuffers[j], nullptr);
 			vkFreeMemory(device, hudScreenUniformBuffersMemory[j], nullptr);
@@ -2841,7 +2839,7 @@ namespace GLVM::core
 		VkDeviceSize hudScreenUboSize = sizeof(HUD_SCREEN_UBO);
 		VkDeviceSize uiUboSize = sizeof(UI_UBO);
 		VkDeviceSize uiIconsUboSize = sizeof(UI_UBO);
-//		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
+		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -2851,41 +2849,19 @@ namespace GLVM::core
 
 		u32 memory = 0;
 		constexpr u32 UBO_multiplier = 500;
-		matrixUboDescriptorsNumber = UBO_multiplier;
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++)
-			memory += modelMatrixBufferSize;
-
+		memory = modelMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 modelMatrixUniformBuffer, modelMatrixUniformBuffersMemory);
-		memory = 0;
 
-		hudUboDescriptorNumber = UBO_multiplier;
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber; i++) {
-			memory += modelMatrixBufferSize;
-		}
-		
+		memory = hudBufferSize * MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 hudUniformBuffer, hudUniformBuffersMemory);
-		memory = 0;
 
-		hudUboDescriptorNumber = UBO_multiplier;
-		fontUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		fontUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * 64; i++) {
-			memory += fontUboSize;
-		}
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 fontUniformBuffers[i], fontUniformBuffersMemory[i]);
+		memory += fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 fontUniformBuffer, fontUniformBuffersMemory);
 
-//				memory += modelMatrixBufferSize;
-		}
-		memory = 0;
-
-		hudUboDescriptorNumber = UBO_multiplier;
 		hudScreenUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		hudScreenUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2901,7 +2877,6 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = UBO_multiplier;
 		uiUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -2917,7 +2892,6 @@ namespace GLVM::core
 		}
 		memory = 0;
 
-		hudUboDescriptorNumber = UBO_multiplier;
 		uiIconsUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiIconsUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
@@ -3007,7 +2981,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 20000;
+		uint32_t descriptorCount = 30000;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -3395,25 +3369,23 @@ namespace GLVM::core
  
 		int fontUboBinding = fontUboBindings[0];
 		
-		constexpr u32 font_ubo_ds = 64;
-		
-		std::vector<VkDescriptorSetLayout> fontUboLayouts(MAX_FRAMES_IN_FLIGHT * font_ubo_ds,
+		std::vector<VkDescriptorSetLayout> fontUboLayouts(MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber,
 															fontPipeline.descriptors[0].setLayout);
 		VkDescriptorSetAllocateInfo fontUboAllocInfo{};
 		fontUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		fontUboAllocInfo.descriptorPool = descriptorPool;
 		fontUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  font_ubo_ds);
+																	  fontUboDescriptorNumber);
 		fontUboAllocInfo.pSetLayouts = fontUboLayouts.data();
 			
-		fontDescriptorUboSets.resize(MAX_FRAMES_IN_FLIGHT * font_ubo_ds);
+		fontDescriptorUboSets.resize(MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber);
 		if (vkAllocateDescriptorSets(device, &fontUboAllocInfo, fontDescriptorUboSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = fontUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
 			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
 			
@@ -3480,7 +3452,7 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = fontUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
 			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
 			
@@ -4831,10 +4803,10 @@ namespace GLVM::core
 				fontUBO.position = ndcPosition;
 
 				void* modelMatrixData;
-				vkMapMemory(device, fontUniformBuffersMemory[currentFrame], sizeof(fontUBO) * (currentActorMemoryOffset + j),
+				vkMapMemory(device, fontUniformBuffersMemory, sizeof(fontUBO) * (currentActorMemoryOffset + j),
 							sizeof(fontUBO), 0, &modelMatrixData);
 				memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
-				vkUnmapMemory(device, fontUniformBuffersMemory[currentFrame]);
+				vkUnmapMemory(device, fontUniformBuffersMemory);
 
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, fontPipeline.pipelineLayout, 0, 1,
 										&fontDescriptorUboSets[currentActorMemoryOffset + j], 0, nullptr);
@@ -4843,7 +4815,7 @@ namespace GLVM::core
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
-			currentActorMemoryOffset += fontComponent->font_string.GetSize();
+			currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + fontComponent->font_string.GetSize();
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -6395,16 +6367,14 @@ namespace GLVM::core
 		hudUniformBufferObjectInfo.objectHandle = (uint64_t)hudUniformBuffer;
 		SetDebugObjectName(device, &hudUniformBufferObjectInfo);
 
-		for ( unsigned long i = 0; i < fontUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Font uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)fontUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT fontUniformBufferObjectInfo{};
+		fontUniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string fontImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Font uniform buffer # ", 0);
+		const char* fontStrImageName = fontImageName.c_str();
+		fontUniformBufferObjectInfo.pObjectName = fontStrImageName;
+		fontUniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		fontUniformBufferObjectInfo.objectHandle = (uint64_t)fontUniformBuffer;
+		SetDebugObjectName(device, &fontUniformBufferObjectInfo);
 
 		for ( unsigned long i = 0; i < uiUniformBuffers.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};

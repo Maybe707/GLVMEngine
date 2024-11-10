@@ -103,6 +103,9 @@ int main()
 		fontComponentWitch->font_string.Push('1');
 		fontComponentWitch->font_string.Push('0');
 		fontComponentWitch->font_string.Push('E');
+	} else {
+		fontComponentWitch->font_string.Push('J');
+		fontComponentWitch->font_string.Push('r');
 	}
 	// fontComponentWitch->font_string.Push('N');
 	// fontComponentWitch->font_string.Push('K');

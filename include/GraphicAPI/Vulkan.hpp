@@ -391,8 +391,8 @@ namespace GLVM::core
 		VkRenderPass fontRenderPass;
 		std::vector<VkDescriptorSet> fontDescriptorSets;
 		std::vector<VkDescriptorSet> fontDescriptorUboSets;
-		std::vector<VkBuffer> fontUniformBuffers;
-		std::vector<VkDeviceMemory> fontUniformBuffersMemory;
+		VkBuffer fontUniformBuffer;
+		VkDeviceMemory fontUniformBuffersMemory;
 		Pipeline hudScreenPipeline;
 		VkRenderPass hudScreenRenderPass;
 		std::vector<VkDescriptorSet> hudScreenDescriptorSets;
@@ -481,8 +481,9 @@ namespace GLVM::core
 		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		
         VkDescriptorPool descriptorPool;
-		unsigned int matrixUboDescriptorsNumber = 0;
-		unsigned int hudUboDescriptorNumber = 0;
+		const unsigned int matrixUboDescriptorsNumber = 500;
+		const unsigned int hudUboDescriptorNumber = 500;
+		const unsigned int fontUboDescriptorNumber = 128;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		unsigned int directionalLightUboDescriptorsNumber = 0;
 		unsigned int pointLightUboDescriptorsNumber = 0;
