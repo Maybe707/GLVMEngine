@@ -431,8 +431,8 @@ namespace GLVM::core
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
 		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
-		std::vector<VkBuffer> shadowMapDirectionalLightModelMatrixUniformBuffers;
-		std::vector<VkDeviceMemory> shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
+		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
+		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
 
 		/*
 		===================================
@@ -488,7 +488,7 @@ namespace GLVM::core
 		const unsigned int uiUboDescriptorsNumber = 64;
 		const unsigned int uiIconsDescriptorsNumber = 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
-		unsigned int directionalLightUboDescriptorsNumber = 0;
+		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
 		unsigned int pointLightUboDescriptorsNumber = 0;
 		unsigned int spotLightUboDescriptorsNumber = 0;
 		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number

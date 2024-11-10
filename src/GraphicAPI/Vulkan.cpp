@@ -1034,10 +1034,8 @@ namespace GLVM::core
 		vkFreeMemory(device, uiUniformBuffersMemory, nullptr);
 		vkDestroyBuffer(device, uiIconsUniformBuffer, nullptr);
 		vkFreeMemory(device, uiIconsUniformBuffersMemory, nullptr);
-		for ( size_t j = 0; j < shadowMapDirectionalLightModelMatrixUniformBuffers.size(); ++j ) {          ///<
-			vkDestroyBuffer(device, shadowMapDirectionalLightModelMatrixUniformBuffers[j], nullptr);
-			vkFreeMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, shadowMapDirectionalLightModelMatrixUniformBuffer, nullptr);
+		vkFreeMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < shadowMapPointLightModelMatrixUniformBuffers.size(); ++j ) {  ///<
 			vkDestroyBuffer(device, shadowMapPointLightModelMatrixUniformBuffers[j], nullptr);
 			vkFreeMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[j], nullptr);
@@ -2872,21 +2870,9 @@ namespace GLVM::core
 																								cm::material,
 																								cm::mesh>();
 		
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::directionalLight>();
-		directionalLightUboDescriptorsNumber = UBO_multiplier * 4;
-
-		if ( directionalLightUboDescriptorsNumber > 0 ) {
-			shadowMapDirectionalLightModelMatrixUniformBuffers.resize(1);
-			shadowMapDirectionalLightModelMatrixUniformBuffersMemory.resize(1);
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; i++) {
-				memory += modelShadowMapMatrixBufferSize;
-			}
-
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 shadowMapDirectionalLightModelMatrixUniformBuffers[0], shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
-		}
-		memory = 0;
+		memory = modelShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 shadowMapDirectionalLightModelMatrixUniformBuffer, shadowMapDirectionalLightModelMatrixUniformBuffersMemory);
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::spotLight>();
 		spotLightUboDescriptorsNumber = UBO_multiplier * 8;
@@ -2963,26 +2949,23 @@ namespace GLVM::core
 		core::vector<u32> dirLightBindings = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int directionalLightShadowMapMatrixUboBinding = dirLightBindings[0];
-		
-		unsigned int actual_size = directionalLightUboDescriptorsNumber;
-		
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
 															directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
 		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		matrixUboAllocInfo.descriptorPool = descriptorPool;
 		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  actual_size);
+																	  directionalLightUboDescriptorsNumber);
 		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
@@ -3747,7 +3730,7 @@ namespace GLVM::core
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffers[0];
+				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
 				modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 			
@@ -4933,10 +4916,10 @@ namespace GLVM::core
 		jointMatricesData = nullptr;
 		
         void* modelMatrixData = nullptr;
-        vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0], currentImage * sizeof(modelMatrixUBO),
+        vkMapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory, currentImage * sizeof(modelMatrixUBO),
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory[0]);
+        vkUnmapMemory(device, shadowMapDirectionalLightModelMatrixUniformBuffersMemory);
     }
 
 	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
@@ -6346,16 +6329,14 @@ namespace GLVM::core
 		uiIconsUniformBufferObjectInfo.objectHandle = (uint64_t)uiIconsUniformBuffer;
 		SetDebugObjectName(device, &uiIconsUniformBufferObjectInfo);
 
-		for ( unsigned long i = 0; i < shadowMapDirectionalLightModelMatrixUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map directional light model matrix uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightModelMatrixUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT directionalLightUniformBufferObjectInfo{};
+		directionalLightUniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string directionalLightImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Shadow map directional light model matrix uniform buffer # ", 0);
+		const char* directionalLightStrImageName = directionalLightImageName.c_str();
+		directionalLightUniformBufferObjectInfo.pObjectName = directionalLightStrImageName;
+		directionalLightUniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		directionalLightUniformBufferObjectInfo.objectHandle = (uint64_t)shadowMapDirectionalLightModelMatrixUniformBuffer;
+		SetDebugObjectName(device, &directionalLightUniformBufferObjectInfo);
 
 		for ( unsigned long i = 0; i < shadowMapPointLightModelMatrixUniformBuffers.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
