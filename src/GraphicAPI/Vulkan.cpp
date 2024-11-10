@@ -1074,10 +1074,8 @@ namespace GLVM::core
 			vkDestroyBuffer(device, fontIndexBufferContainer[fontIndicesContainer[j]], nullptr);
 			vkFreeMemory(device, fontIndexBufferMemoryContaner[fontIndicesContainer[j]], nullptr);
 		}
-		for ( size_t j = 0; j < modelMatrixUniformBuffers.size(); ++j ) {    ///<
-			vkDestroyBuffer(device, modelMatrixUniformBuffers[j], nullptr);
-			vkFreeMemory(device, modelMatrixUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, modelMatrixUniformBuffer, nullptr);
+		vkFreeMemory(device, modelMatrixUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < lightDataUniformBuffers.size(); ++j ) {      ///<
 			vkDestroyBuffer(device, lightDataUniformBuffers[j], nullptr);
 			vkFreeMemory(device, lightDataUniformBuffersMemory[j], nullptr);
@@ -2856,22 +2854,12 @@ namespace GLVM::core
 		u32 memory = 0;
 		constexpr u32 UBO_multiplier = 500;
 		matrixUboDescriptorsNumber = UBO_multiplier;
-		modelMatrixUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		modelMatrixUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++) {
-			// createBuffer(modelMatrixBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-			// 			 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
-
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; i++)
 			memory += modelMatrixBufferSize;
-		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 modelMatrixUniformBuffers[i], modelMatrixUniformBuffersMemory[i]);
-
-//				memory += modelMatrixBufferSize;
-		}
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+						 modelMatrixUniformBuffer, modelMatrixUniformBuffersMemory);
 		memory = 0;
 
 		hudUboDescriptorNumber = UBO_multiplier;
@@ -3554,27 +3542,25 @@ namespace GLVM::core
 
 		int modelMatrixUboBinding = modelMatrixBindings[0];
 		
-		unsigned int model_matrix_ubo_actual_size = matrixUboDescriptorsNumber; 
-		
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size,
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
 															mainRenderScenePipeline.descriptors[0].setLayout);
 		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
 		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size);
+		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
 		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		matrixUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size);
+		matrixUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
 		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, matrixUboDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			uint32_t uboIndex = 0;
-			if ( i > MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size / 2 )
-				uboIndex = 1;
-			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[uboIndex];
+			// uint32_t uboIndex = 0;
+			// if ( i > MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size / 2 )
+			// 	uboIndex = 1;
+			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
@@ -3947,10 +3933,7 @@ namespace GLVM::core
 		if ( modelMatrixUboBinding != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				uint32_t uboIndex = 0;
-				if ( i > MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber / 2 )
-					uboIndex = 1;
-				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffers[uboIndex];
+				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffer;
 				modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
 				modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
 			
@@ -4947,8 +4930,8 @@ namespace GLVM::core
 			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
-			unsigned int uboIndex = i;
-			updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
+			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
+			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout,
 									0, 1, &matrixUboDescriptorSets[uboIndex], 0, nullptr);
 
@@ -5155,7 +5138,7 @@ namespace GLVM::core
         vkUnmapMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory[0]);
     }
 
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
 													unsigned int meshID, ecs::components::material* materialComponent) {
         ModelMatrixUBO modelMatrixUBO{};
 		
@@ -5188,10 +5171,10 @@ namespace GLVM::core
 		modelMatrixUBO.spotLightsNumber        = spotLightNumber;
 		
         void* modelMatrixData;
-        vkMapMemory(device, modelMatrixUniformBuffersMemory[currentImage], sizeof(modelMatrixUBO) * offset,
+        vkMapMemory(device, modelMatrixUniformBuffersMemory, sizeof(modelMatrixUBO) * offset,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, modelMatrixUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, modelMatrixUniformBuffersMemory);
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
@@ -6536,16 +6519,14 @@ namespace GLVM::core
 			SetDebugObjectName(device, &uniformBufferObjectInfo);
 		}
 
-		for ( unsigned long i = 0; i < modelMatrixUniformBuffers.size(); ++i ) {
-			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
-			uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-			std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Model matrix uniform buffer # ", i);
-			const char* strImageName = imageName.c_str();
-			uniformBufferObjectInfo.pObjectName = strImageName;
-			uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-			uniformBufferObjectInfo.objectHandle = (uint64_t)modelMatrixUniformBuffers[i];
-			SetDebugObjectName(device, &uniformBufferObjectInfo);
-		}
+		VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};
+		uniformBufferObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string imageName = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " Model matrix uniform buffer # ", 0);
+		const char* strImageName = imageName.c_str();
+		uniformBufferObjectInfo.pObjectName = strImageName;
+		uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
+		uniformBufferObjectInfo.objectHandle = (uint64_t)modelMatrixUniformBuffer;
+		SetDebugObjectName(device, &uniformBufferObjectInfo);
 
 		for ( unsigned long i = 0; i < lightDataUniformBuffers.size(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT uniformBufferObjectInfo{};

@@ -471,8 +471,8 @@ namespace GLVM::core
         std::vector<VkBuffer> fontIndexBufferContainer;
         std::vector<VkDeviceMemory> fontIndexBufferMemoryContaner;
 		
-        std::vector<VkBuffer> modelMatrixUniformBuffers;
-        std::vector<VkDeviceMemory> modelMatrixUniformBuffersMemory;
+        VkBuffer modelMatrixUniformBuffer;
+        VkDeviceMemory modelMatrixUniformBuffersMemory;
         std::vector<VkBuffer> lightDataUniformBuffers;
         std::vector<VkDeviceMemory> lightDataUniformBuffersMemory;
 
@@ -637,7 +637,7 @@ namespace GLVM::core
 																		 uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
-        void updateMatrixUniformBuffer(uint32_t currentImage, uint32_t offset, ecs::components::transform* _transformComponent,
+        void updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
 		void hudDrawFrame();
