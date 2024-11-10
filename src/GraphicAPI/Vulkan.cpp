@@ -1028,10 +1028,8 @@ namespace GLVM::core
 		vkFreeMemory(device, hudUniformBuffersMemory, nullptr);
 		vkDestroyBuffer(device, fontUniformBuffer, nullptr);
 		vkFreeMemory(device, fontUniformBuffersMemory, nullptr);
-		for ( size_t j = 0; j < hudScreenUniformBuffers.size(); ++j ) {   ///<
-			vkDestroyBuffer(device, hudScreenUniformBuffers[j], nullptr);
-			vkFreeMemory(device, hudScreenUniformBuffersMemory[j], nullptr);
-		}
+		vkDestroyBuffer(device, hudScreenUniformBuffer, nullptr);
+		vkFreeMemory(device, hudScreenUniformBuffersMemory, nullptr);
 		for ( size_t j = 0; j < uiUniformBuffers.size(); ++j ) {        ///<
 			vkDestroyBuffer(device, uiUniformBuffers[j], nullptr);
 			vkFreeMemory(device, uiUniformBuffersMemory[j], nullptr);
@@ -2858,24 +2856,13 @@ namespace GLVM::core
 						 hudUniformBuffer, hudUniformBuffersMemory);
 
 
-		memory += fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber;
+		memory = fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 fontUniformBuffer, fontUniformBuffersMemory);
 
-		hudScreenUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-		hudScreenUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * 64; i++) {
-			memory += hudScreenUboSize;
-		}
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-			createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 hudScreenUniformBuffers[i], hudScreenUniformBuffersMemory[i]);
-
-//				memory += modelMatrixBufferSize;
-		}
-		memory = 0;
+		memory += hudScreenUboSize * MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 hudScreenUniformBuffer, hudScreenUniformBuffersMemory);
 
 		uiUniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 		uiUniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
@@ -3165,25 +3152,23 @@ namespace GLVM::core
  
 		int hudScreenUboBinding = hudScreenBindings[0];
 		
-		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
-		
-		std::vector<VkDescriptorSetLayout> hudScreenUboLayouts(MAX_FRAMES_IN_FLIGHT * actual_size,
+		std::vector<VkDescriptorSetLayout> hudScreenUboLayouts(MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber,
 															hudScreenPipeline.descriptors[hudScreenUboBinding].setLayout);
 		VkDescriptorSetAllocateInfo hudScreenUboAllocInfo{};
 		hudScreenUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		hudScreenUboAllocInfo.descriptorPool = descriptorPool;
 		hudScreenUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  actual_size);
+																	  hudScreenUboDescriptorNumber);
 		hudScreenUboAllocInfo.pSetLayouts = hudScreenUboLayouts.data();
 			
-		hudScreenDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * actual_size);
+		hudScreenDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber);
 		if (vkAllocateDescriptorSets(device, &hudScreenUboAllocInfo, hudScreenDescriptorSets.data()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * actual_size; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = hudScreenUniformBuffers[0];
+			modelMatrixBufferInfo.buffer = hudScreenUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(HUD_SCREEN_UBO);
 			modelMatrixBufferInfo.range = sizeof(HUD_SCREEN_UBO);
 			
@@ -4155,7 +4140,7 @@ namespace GLVM::core
         vkUnmapMemory(device, hudUniformBuffersMemory);
 	}
 
-	void CVulkanRenderer::updateHudScreenUBO(uint32_t currentImage, uint32_t offset, ecs::components::transform* cursorTransform) {
+	void CVulkanRenderer::updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform) {
 		HUD_SCREEN_UBO hudUBO{};
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
@@ -4187,10 +4172,10 @@ namespace GLVM::core
 		}
 
 		void* hudMatrixData;
-        vkMapMemory(device, hudScreenUniformBuffersMemory[currentImage], sizeof(HUD_SCREEN_UBO) * offset,
+        vkMapMemory(device, hudScreenUniformBuffersMemory, sizeof(HUD_SCREEN_UBO) * offset,
 					sizeof(HUD_SCREEN_UBO), 0, &hudMatrixData);
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_SCREEN_UBO));
-        vkUnmapMemory(device, hudScreenUniformBuffersMemory[currentImage]);
+        vkUnmapMemory(device, hudScreenUniformBuffersMemory);
 	}
 
 	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t currentImage, uint32_t offset,
@@ -4678,8 +4663,8 @@ namespace GLVM::core
 			cm::transform* cursorTransform = componentManager->GetComponent<ecs::components::transform>(uiEntity);
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 
-			unsigned int uboIndex = i;
-			updateHudScreenUBO(currentFrame, uboIndex, cursorTransform);
+			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
+			updateHudScreenUBO(uboIndex, cursorTransform);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudScreenPipeline.pipelineLayout,
 									0, 1, &hudScreenDescriptorSets[uboIndex], 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
