@@ -6,10 +6,13 @@
 #ifndef COMPONENT_MANAGER
 #define COMPONENT_MANAGER
 
+#include "Components/ActorComponent.hpp"
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
+#include "Components/EnemyComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/PointLightComponent.hpp"
@@ -19,6 +22,8 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Components/FontComponent.hpp"
+#include "Components/StateComponent.hpp"
 #include "Vector.hpp"
 #include <cassert>
 #include <compare>
@@ -325,6 +330,21 @@ namespace GLVM::ecs
 //					std::cout << "Delete controller" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::projectile).name() ) {
 					RemoveComponent<components::projectile>(entity);
+//				 	std::cout << "Delete projectile" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::enemy).name() ) {
+					RemoveComponent<components::enemy>(entity);
+//				 	std::cout << "Delete projectile" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::font).name() ) {
+					RemoveComponent<components::font>(entity);
+//				 	std::cout << "Delete projectile" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::health).name() ) {
+					RemoveComponent<components::health>(entity);
+//				 	std::cout << "Delete projectile" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::state).name() ) {
+					RemoveComponent<components::state>(entity);
+//				 	std::cout << "Delete projectile" << std::endl;
+				} else if ( componentsTypes[i] == typeid(components::actor).name() ) {
+					RemoveComponent<components::actor>(entity);
 //				 	std::cout << "Delete projectile" << std::endl;
 				} else {
 					continue;

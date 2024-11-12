@@ -84,7 +84,7 @@ int main()
 	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 		.shininess = 128.0f * 0.078125f };
 
-	for ( u32 i = 0; i < 15; ++i ) {
+	for ( u32 i = 0; i < 13; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
 	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 5, 5.0f, 0.0f },

@@ -16,17 +16,18 @@ namespace GLVM::ecs
 		core::vector<unsigned int>* entityContainerRefController =
 			componentManager->GetEntityContainer<cm::controller>();
 		unsigned int playerEntity = (*entityContainerRefController)[0];
-		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
 		
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::enemy, cm::transform, cm::state>();
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
 			unsigned int enemyEntity = linkedEntities[i];
 			cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
             cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enemyEntity);
 			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enemyEntity);
 
 			vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
+			
 			float cameraSpeed = 5.5f * deltaFrameTime;            
 
 
