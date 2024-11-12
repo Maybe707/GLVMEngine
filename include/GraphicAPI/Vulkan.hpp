@@ -242,7 +242,7 @@ namespace GLVM::core
 			}
 		}
 
-		core::vector<u32> getBindingOfDescriptor(DescriptorsTypes type) {
+		core::vector<u32> getBindingOfDescriptor(DescriptorsTypes type) const {
 			for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
 				if ( type == descriptors[i].type )
 					return descriptors[i].binding;
@@ -596,6 +596,9 @@ namespace GLVM::core
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices);
         void createMainRenderUniformBuffers();
         void createMainRenderDescriptorPool();
+		void allocateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline,
+									 unsigned int desriptorID, unsigned int descriptorSetsNumber);
+		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
 		void createPointLightShadowMapDescriptorSets();

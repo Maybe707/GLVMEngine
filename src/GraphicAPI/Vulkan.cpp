@@ -2895,24 +2895,48 @@ namespace GLVM::core
         }
     }
 
+	void CVulkanRenderer::allocateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline,
+												  unsigned int desriptorID, unsigned int descriptorSetsNumber ) {
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(descriptorSetsNumber,
+															pipeline.descriptors[desriptorID].setLayout);
+		VkDescriptorSetAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = descriptorPool;
+		allocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetsNumber);
+		allocInfo.pSetLayouts = matrixUboLayouts.data();
+			
+		descriptorSets.resize(descriptorSetsNumber);
+		if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+			throw std::runtime_error("failed to allocate descriptor sets!");
+		}
+	}
+
+	void CVulkanRenderer::updateDescriptorSets( [[maybe_unused]] std::vector<VkDescriptorSet>& descriptorSets, [[maybe_unused]] const Pipeline& pipeline,
+												[[maybe_unused]] DescriptorsTypes descriptorType) {
+	}
+	
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
 		core::vector<u32> dirLightBindings = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int directionalLightShadowMapMatrixUboBinding = dirLightBindings[0];
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-															directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  directionalLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+		// 													directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
+		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		// matrixUboAllocInfo.descriptorPool = descriptorPool;
+		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+		// 															  directionalLightUboDescriptorsNumber);
+		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+		// shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
+		// 	throw std::runtime_error("failed to allocate descriptor sets!");
+		// }
 
+		constexpr unsigned int descriptorID = 0; 
+		allocateDescriptorSets( shadowMapDirectionalLightDescriptorSets, directionalLightPipeline, descriptorID,
+								MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber );
+		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
@@ -2937,21 +2961,25 @@ namespace GLVM::core
 		core::vector<u32> spotLightsBindings = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
  
 		int spotLightShadowMapMatrixUboBinding = spotLightsBindings[0];
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-															spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  directionalLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
+		// 													spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
+		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		// matrixUboAllocInfo.descriptorPool = descriptorPool;
+		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+		// 															  directionalLightUboDescriptorsNumber);
+		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		shadowMapSpotLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+		// shadowMapSpotLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
+		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
+		// 	throw std::runtime_error("failed to allocate descriptor sets!");
+		// }
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
+		constexpr unsigned int descriptorID = 0; 
+		allocateDescriptorSets( shadowMapSpotLightDescriptorSets, spotLightPipeline, descriptorID,
+								MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber );
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
@@ -2975,20 +3003,24 @@ namespace GLVM::core
 		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
-															pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-																	  pointLightUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
+		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
+		// 													pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
+		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
+		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		// matrixUboAllocInfo.descriptorPool = descriptorPool;
+		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
+		// 															  pointLightUboDescriptorsNumber);
+		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
 
-		shadowMapPointLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
+		// shadowMapPointLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
+		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
+		// 	throw std::runtime_error("failed to allocate descriptor sets!");
+		// }
 
+		constexpr unsigned int descriptorID = 0; 
+		allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline, descriptorID,
+								MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber );
+		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
