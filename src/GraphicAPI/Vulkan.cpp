@@ -3245,23 +3245,14 @@ namespace GLVM::core
 
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_specular_number = 64;
-			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																		 fontPipeline.descriptors[1].setLayout);
-			VkDescriptorSetAllocateInfo fontSamplerUboAllocInfo{};
-			fontSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			fontSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			fontSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			fontSamplerUboAllocInfo.pSetLayouts = fontSamplerUboLayouts.data();
-			
-			fontDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			if (vkAllocateDescriptorSets(device, &fontSamplerUboAllocInfo, fontDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
 
+			constexpr unsigned int descriptorID = 1; 
+			allocateDescriptorSets( fontDescriptorSets, fontPipeline, descriptorID,
+									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-//				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[6].views[0];
 				imageInfo.sampler = textureSampler;
 				
