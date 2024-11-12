@@ -2919,19 +2919,6 @@ namespace GLVM::core
 		core::vector<u32> dirLightBindings = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int directionalLightShadowMapMatrixUboBinding = dirLightBindings[0];
-		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-		// 													directionalLightPipeline.descriptors[directionalLightShadowMapMatrixUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// matrixUboAllocInfo.descriptorPool = descriptorPool;
-		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  directionalLightUboDescriptorsNumber);
-		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-			
-		// shadowMapDirectionalLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapDirectionalLightDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( shadowMapDirectionalLightDescriptorSets, directionalLightPipeline, descriptorID,
@@ -2961,19 +2948,6 @@ namespace GLVM::core
 		core::vector<u32> spotLightsBindings = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
  
 		int spotLightShadowMapMatrixUboBinding = spotLightsBindings[0];
-		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber,
-		// 													spotLightPipeline.descriptors[spotLightShadowMapMatrixUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// matrixUboAllocInfo.descriptorPool = descriptorPool;
-		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  directionalLightUboDescriptorsNumber);
-		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-			
-		// shadowMapSpotLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber);
-		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapSpotLightDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( shadowMapSpotLightDescriptorSets, spotLightPipeline, descriptorID,
@@ -3003,19 +2977,6 @@ namespace GLVM::core
 		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-		// std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber,
-		// 													pointLightPipeline.descriptors[pointLightShadowMapMatrixUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		// matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// matrixUboAllocInfo.descriptorPool = descriptorPool;
-		// matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  pointLightUboDescriptorsNumber);
-		// matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-
-		// shadowMapPointLightDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber);
-		// if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, shadowMapPointLightDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline, descriptorID,
@@ -3045,20 +3006,6 @@ namespace GLVM::core
 		core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
  
 		int hudUboBinding = hudBindings[0];
-		
-		// std::vector<VkDescriptorSetLayout> hudUboLayouts(MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber,
-		// 													hudPipeline.descriptors[hudUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo hudUboAllocInfo{};
-		// hudUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// hudUboAllocInfo.descriptorPool = descriptorPool;
-		// hudUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  hudUboDescriptorNumber);
-		// hudUboAllocInfo.pSetLayouts = hudUboLayouts.data();
-			
-		// hudDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber);
-		// if (vkAllocateDescriptorSets(device, &hudUboAllocInfo, hudDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( hudDescriptorSets, hudPipeline, descriptorID,
@@ -3088,20 +3035,6 @@ namespace GLVM::core
 		core::vector<u32> hudScreenBindings = hudScreenPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_SCREEN_UBO);
  
 		int hudScreenUboBinding = hudScreenBindings[0];
-		
-		// std::vector<VkDescriptorSetLayout> hudScreenUboLayouts(MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber,
-		// 													hudScreenPipeline.descriptors[hudScreenUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo hudScreenUboAllocInfo{};
-		// hudScreenUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// hudScreenUboAllocInfo.descriptorPool = descriptorPool;
-		// hudScreenUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  hudScreenUboDescriptorNumber);
-		// hudScreenUboAllocInfo.pSetLayouts = hudScreenUboLayouts.data();
-			
-		// hudScreenDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber);
-		// if (vkAllocateDescriptorSets(device, &hudScreenUboAllocInfo, hudScreenDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( hudScreenDescriptorSets, hudScreenPipeline, descriptorID,
@@ -3131,19 +3064,6 @@ namespace GLVM::core
 		core::vector<u32> uiBindings = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_UBO);
  
 		int uiUboBinding = uiBindings[0];
-		// std::vector<VkDescriptorSetLayout> uiUboLayouts(MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber,
-		// 													uiPipeline.descriptors[uiUboBinding].setLayout);
-		// VkDescriptorSetAllocateInfo uiUboAllocInfo{};
-		// uiUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// uiUboAllocInfo.descriptorPool = descriptorPool;
-		// uiUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  uiUboDescriptorsNumber);
-		// uiUboAllocInfo.pSetLayouts = uiUboLayouts.data();
-			
-		// uiDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber);
-		// if (vkAllocateDescriptorSets(device, &uiUboAllocInfo, uiDescriptorSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( uiDescriptorSets, uiPipeline, descriptorID,
@@ -3295,20 +3215,6 @@ namespace GLVM::core
 		core::vector<u32> fontUboBindings = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_UBO);
  
 		int fontUboBinding = fontUboBindings[0];
-		
-		// std::vector<VkDescriptorSetLayout> fontUboLayouts(MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber,
-		// 													fontPipeline.descriptors[0].setLayout);
-		// VkDescriptorSetAllocateInfo fontUboAllocInfo{};
-		// fontUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		// fontUboAllocInfo.descriptorPool = descriptorPool;
-		// fontUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT *
-		// 															  fontUboDescriptorNumber);
-		// fontUboAllocInfo.pSetLayouts = fontUboLayouts.data();
-			
-		// fontDescriptorUboSets.resize(MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber);
-		// if (vkAllocateDescriptorSets(device, &fontUboAllocInfo, fontDescriptorUboSets.data()) != VK_SUCCESS) {
-		// 	throw std::runtime_error("failed to allocate descriptor sets!");
-		// }
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( fontDescriptorUboSets, fontPipeline, descriptorID,
@@ -3433,25 +3339,13 @@ namespace GLVM::core
 		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
 
 		int modelMatrixUboBinding = modelMatrixBindings[0];
-		
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
-															mainRenderScenePipeline.descriptors[0].setLayout);
-		VkDescriptorSetAllocateInfo matrixUboAllocInfo{};
-		matrixUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		matrixUboAllocInfo.descriptorPool = descriptorPool;
-		matrixUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
-		matrixUboAllocInfo.pSetLayouts = matrixUboLayouts.data();
-			
-		matrixUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber);
-		if (vkAllocateDescriptorSets(device, &matrixUboAllocInfo, matrixUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
 
+		constexpr unsigned int matrixUboDescriptorID = 0; 
+		allocateDescriptorSets( matrixUboDescriptorSets, mainRenderScenePipeline, matrixUboDescriptorID,
+								MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber );
+		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			// uint32_t uboIndex = 0;
-			// if ( i > MAX_FRAMES_IN_FLIGHT * model_matrix_ubo_actual_size / 2 )
-			// 	uboIndex = 1;
 			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
@@ -3472,20 +3366,11 @@ namespace GLVM::core
 		core::vector<u32> lightDataBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
 
 		int lightDataUboBinding = lightDataBindings[0];
-		
-		std::vector<VkDescriptorSetLayout> lightDataUboLayouts(MAX_FRAMES_IN_FLIGHT,
-																  mainRenderScenePipeline.descriptors[1].setLayout);
-		VkDescriptorSetAllocateInfo lightDataUboAllocInfo{};
-		lightDataUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		lightDataUboAllocInfo.descriptorPool = descriptorPool;
-		lightDataUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-		lightDataUboAllocInfo.pSetLayouts = lightDataUboLayouts.data();
-			
-		lightDataUboDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(device, &lightDataUboAllocInfo, lightDataUboDescriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("failed to allocate descriptor sets!");
-		}
 
+		constexpr unsigned int lightDataUboDescriptorID = 1; 
+		allocateDescriptorSets( lightDataUboDescriptorSets, mainRenderScenePipeline, lightDataUboDescriptorID,
+								MAX_FRAMES_IN_FLIGHT );
+		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = lightDataUniformBuffer;
@@ -3511,19 +3396,11 @@ namespace GLVM::core
 
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_specular_number = initializeTextureData_.size();
-			std::vector<VkDescriptorSetLayout> specularSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																		 mainRenderScenePipeline.descriptors[2].setLayout);
-			VkDescriptorSetAllocateInfo specularSamplerUboAllocInfo{};
-			specularSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			specularSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			specularSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			specularSamplerUboAllocInfo.pSetLayouts = specularSamplerUboLayouts.data();
-			
-			specularSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			if (vkAllocateDescriptorSets(device, &specularSamplerUboAllocInfo, specularSamplerDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
 
+			constexpr unsigned int specularSamplerUboDescriptorID = 2; 
+			allocateDescriptorSets( specularSamplerDescriptorSets, mainRenderScenePipeline, specularSamplerUboDescriptorID,
+									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -3575,19 +3452,11 @@ namespace GLVM::core
 
 		if ( initializeTextureData_.size() > 0 ) {
 			u32 DS_number = initializeTextureData_.size();
-			std::vector<VkDescriptorSetLayout> diffuseSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_number,
-																		mainRenderScenePipeline.descriptors[3].setLayout);
-			VkDescriptorSetAllocateInfo diffuseSamplerUboAllocInfo{};
-			diffuseSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			diffuseSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			diffuseSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_number);
-			diffuseSamplerUboAllocInfo.pSetLayouts = diffuseSamplerUboLayouts.data();
-		
-			diffuseSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_number);
-			if (vkAllocateDescriptorSets(device, &diffuseSamplerUboAllocInfo, diffuseSamplerDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
 
+			constexpr unsigned int diffuseSamplerUboDescriptorID = 3; 
+			allocateDescriptorSets( diffuseSamplerDescriptorSets, mainRenderScenePipeline, diffuseSamplerUboDescriptorID,
+									MAX_FRAMES_IN_FLIGHT * DS_number );
+			
 			constexpr u32 DS_writes_size = 4;
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_number; ++i) {
 				VkDescriptorImageInfo imageInfo{};
