@@ -461,13 +461,13 @@ namespace GLVM::core
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
 
-		core::vector<u32> DS_0_binding;
-		core::vector<u32> DS_0_count;
-		DS_0_binding.Push(0);
-		DS_0_count.Push(1);
+		core::vector<u32> descriptorCount1Set0;
+		descriptorCount1Set0.Push(1);
+		core::vector<u32> descriptorSet0Binding0;
+		descriptorSet0Binding0.Push(0);
 		
 		directionalLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-											   DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+											   DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
@@ -479,7 +479,7 @@ namespace GLVM::core
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
 		spotLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-										DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+										DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		
 		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
@@ -491,14 +491,14 @@ namespace GLVM::core
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
 		pointLightPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		hudPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+		hudPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		hudPipeline.vertShader = vertShaderHUD;
 		hudPipeline.fragShader = fragShaderHUD;
 
@@ -510,28 +510,28 @@ namespace GLVM::core
 
 		fontPipeline.bindingDescription = Vertex::getBindingDescription();
 		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::FONT_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
-		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
+		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::FONT_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		fontPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
 		hudScreenPipeline.vertShader = vertexShaderHudScreen;
 		hudScreenPipeline.fragShader = fragmentShaderHudScreen;
 		hudScreenPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudScreenPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		hudScreenPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_SCREEN_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
+		hudScreenPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_SCREEN_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
 		uiPipeline.vertShader = vertexShaderUI;
 		uiPipeline.fragShader = fragmentShaderUI;
 		uiPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
-		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
+		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		uiPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
 		uiIconsPipeline.vertShader = vertexShaderIconsUI;
 		uiIconsPipeline.fragShader = fragmentShaderIconsUI;
 		uiIconsPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiIconsPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
-		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_ICONS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
+		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_ICONS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -539,24 +539,23 @@ namespace GLVM::core
 
 		actorsNumber = actorsLinkedEntities.GetSize();
 
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, DS_0_count, DS_0_binding);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::LIGHT_DATA, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_count, DS_0_binding);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::LIGHT_DATA, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
-		core::vector<u32> DS_0_3_bindigs;
-		core::vector<u32> DS_0_3_count;
+		core::vector<u32> descriptorCountSet3;
+		descriptorCountSet3.Push(1);
+		descriptorCountSet3.Push(4);
+		descriptorCountSet3.Push(32);
+		descriptorCountSet3.Push(8);
 
-		DS_0_3_count.Push(1);
-		DS_0_3_count.Push(4);
-		DS_0_3_count.Push(32);
-		DS_0_3_count.Push(8);
-
-		DS_0_3_bindigs.Push(0);
-		DS_0_3_bindigs.Push(1);
-		DS_0_3_bindigs.Push(5);
-		DS_0_3_bindigs.Push(37);
+		core::vector<u32> descriptorSet3Bindings;
+		descriptorSet3Bindings.Push(0);
+		descriptorSet3Bindings.Push(1);
+		descriptorSet3Bindings.Push(5);
+		descriptorSet3Bindings.Push(37);
 			
-		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, DS_0_3_count, DS_0_3_bindigs);
+		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCountSet3, descriptorSet3Bindings);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
