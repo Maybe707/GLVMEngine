@@ -8,6 +8,7 @@
 
 #include "ComponentsFullSet.hpp"
 #include "GraphicAPI/Vulkan.hpp"
+#include "ProceduralLevelGeneratingSystem.hpp"
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
 #include "Systems/ItemSystem.hpp"
@@ -44,28 +45,27 @@ namespace GLVM::core
         
 		Time::IChrono       * chrono;
         Sound::ISoundEngine * soundEngine;
-
 		float                deltaFrameTime;
 		float                gravity;
 		CStack               Input_Stack_;
 		bool                 isLeftMouseButtonPressed;
 		std::vector<ecs::Texture> textureVector;
-		core::vector<ecs::TextureHandle> textureHandlers;
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
 		uint32_t meshID = 0;
-		core::vector<ecs::components::MeshHandle> meshHandlers;
+
 		CVulkanRenderer*     vulkanRenderer;
 
 //		ecs::CSystemManager* pSystem_Manager;
 		
-        ecs::CCollisionSystem  * collisionSystem;
-		ecs::CMovementSystem   * movementSystem;
-        ecs::CPhysicsSystem    * physicsSystem;
-        ecs::CProjectileSystem * projectileSystem;
-		ecs::DamageSystem      * damageSystem;
-		ecs::EnemySystem       * enemySytem;
-		ecs::ItemSystem        * itemSystem;
+        ecs::CCollisionSystem           * collisionSystem;
+		ecs::CMovementSystem            * movementSystem;
+        ecs::CPhysicsSystem             * physicsSystem;
+        ecs::CProjectileSystem          * projectileSystem;
+		ecs::DamageSystem               * damageSystem;
+		ecs::EnemySystem                * enemySytem;
+		ecs::ItemSystem                 * itemSystem;
+		ProceduralLevelGeneratingSystem * procuduralLevelGeneratingSystem;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
@@ -74,7 +74,8 @@ namespace GLVM::core
         Engine();
         
 	public:
-
+		core::vector<ecs::components::MeshHandle> meshHandlers;
+		core::vector<ecs::TextureHandle> textureHandlers;
         
         ~Engine();
         

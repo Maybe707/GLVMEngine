@@ -9,6 +9,7 @@
 #include "ISoundEngine.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "ISoundEngine.hpp"
+#include "ProceduralLevelGeneratingSystem.hpp"
 #include "SoundEngineFactory.hpp"
 #include "SystemManager.hpp"
 #include "Systems/CollisionSystem.hpp"
@@ -64,16 +65,17 @@ namespace GLVM::core
     }
 
     Engine::Engine() {
-		chrono                   = Time::CTimerCreator().Create();
-		soundEngine              = Sound::CSoundEngineFactory().CreateSoundEngine();
-
-		collisionSystem          = new ecs::CCollisionSystem(Input_Stack_);
-		movementSystem           = new ecs::CMovementSystem(Input_Stack_);
-		physicsSystem            = new ecs::CPhysicsSystem(gravity, Input_Stack_);
-		projectileSystem         = new ecs::CProjectileSystem(Input_Stack_);
-		damageSystem             = new ecs::DamageSystem();
-		enemySytem               = new ecs::EnemySystem();
-		itemSystem               = new ecs::ItemSystem();
+		chrono                          = Time::CTimerCreator().Create();
+		soundEngine                     = Sound::CSoundEngineFactory().CreateSoundEngine();
+								        
+		collisionSystem                 = new ecs::CCollisionSystem(Input_Stack_);
+		movementSystem                  = new ecs::CMovementSystem(Input_Stack_);
+		physicsSystem                   = new ecs::CPhysicsSystem(gravity, Input_Stack_);
+		projectileSystem                = new ecs::CProjectileSystem(Input_Stack_);
+		damageSystem                    = new ecs::DamageSystem();
+		enemySytem                      = new ecs::EnemySystem();
+		itemSystem                      = new ecs::ItemSystem();
+		procuduralLevelGeneratingSystem = new ProceduralLevelGeneratingSystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -88,6 +90,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
+		pSystem_Manager->ActivateSystem(procuduralLevelGeneratingSystem);
 
 		// std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		// sound_thread.detach();
@@ -119,6 +122,9 @@ namespace GLVM::core
 
 		enemySytem->textureHandlers       = textureHandlers;
 		enemySytem->meshHandlers          = meshHandlers;
+
+		procuduralLevelGeneratingSystem->meshHandlers    = meshHandlers;
+		procuduralLevelGeneratingSystem->textureHandlers = textureHandlers;
 		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;

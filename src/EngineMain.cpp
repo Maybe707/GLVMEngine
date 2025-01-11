@@ -23,6 +23,9 @@
 #include "SpritesData.hpp"
 #include "Texture.hpp"
 
+#include <map>
+#include <random>
+
 int main()
 {
 	using namespace GLVM;
@@ -76,18 +79,47 @@ int main()
 	// 	.shininess = 128.0f * 0.078125f };
 
 	
-	Entity plain0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider, cm::actor>(plain0);
-	*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0f, -60.2f, 0.0f }, .yaw = 0.0f, .pitch = 0.0f, .scale = 60.2f, .gltf = true };
-    ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
-	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
-	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
 
+	int* arrayPtr = new int[10];
+	for( int i = 0; i < 10; ++i ) {
+		arrayPtr[i] = i * 2;
+		std::cout << arrayPtr[i] << std::endl;
+	}
+
+	int array[3][2] = { { 1, 2 }, { 20, 30 }, { 450, 665 } };
+//	asm volatile ("" : : "r,m"(array) : "memory");
+//	int array[3][2];
+	array[0][1] = 1000;
+	array[2][1] = 2500;
+	for( int i = 0; i < 3; ++i )
+		for( int j = 0; j < 2; ++j )
+			std::cout << array[i][j] << std::endl;
+	
+    std::random_device rd;
+    std::map<int, int> hist;
+	std::mt19937 mersenne(rd());
+    std::uniform_int_distribution<int> dist(0, 3);
+	
 	for ( u32 i = 0; i < 13; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { (float)i * 5, 5.0f, 0.0f },
+	unsigned int random = dist(mersenne);
+	vec3 randomDirection = {};
+	switch( random ) {
+	case 0:
+		randomDirection = vec3( 3.0f, 0.0f, 0.0f, 0.0 );
+		break;
+	case 1:
+		randomDirection = vec3( -3.0f, 0.0f, 0.0f, 0.0 );
+		break;
+	case 2:
+		randomDirection = vec3( 0.0f, 0.0f, 3.0f, 0.0 );
+		break;
+	case 3:
+		randomDirection = vec3( 0.0f, 0.0f, -3.0f, 0.0 );
+		break;
+	}
+	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { vec3( (float)i * 5, 5.0f, 0.0f ) + randomDirection },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.2f };
 	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
@@ -305,7 +337,7 @@ int main()
 
 	
     ///< Game rendering loop
-//	GLVM->GameLoop(GLVM::core::OPENGL_RENDERER);
+//	Glvm->GameLoop(GLVM::core::OPENGL_RENDERER);
 	GLVM->GameLoop();
 
 	GLVM->GameKill();
