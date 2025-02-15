@@ -274,6 +274,9 @@ namespace GLVM::core
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
+        std::vector<core::vector<core::Vertex>> levelGeneratedVertices;
+        std::vector<std::vector<uint32_t>> levelGeneratedIndices;
+		
         std::vector<core::vector<core::Vertex>> aVertices_;
         std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
 		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
@@ -341,6 +344,7 @@ namespace GLVM::core
         void SetProjectionMatrix(mat4 _projectionMatrix);
 		void SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent);
 		void SetProjectionMatrix();
+		void initializeGameLevelVertices();
         void run();
     
     private:
@@ -552,7 +556,6 @@ namespace GLVM::core
         void initWindow();
 		void initializeFontData();
 		void initializeGLTF();
-		void initializeGameLevelVertices();
         void initVulkan();
         void cleanupSwapChain();
         void cleanup();

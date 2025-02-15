@@ -198,7 +198,7 @@ namespace GLVM::core
 			// std::cout << "lmb released " << g_eEvent.isLeftMouseButtonReleased << std::endl;
 			// std::cout << "lmb pressed " << isLeftMouseButtonPressed << std::endl;
 			// std::cout << "item draged " << itemSystem->isItemDraged << std::endl;
-			
+
 			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
@@ -222,6 +222,11 @@ namespace GLVM::core
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
+			vulkanRenderer->levelGeneratedVertices    = procuduralLevelGeneratingSystem->levelGeneratedVertices;
+			vulkanRenderer->levelGeneratedIndices     = procuduralLevelGeneratingSystem->levelGeneratedIndices;
+			procuduralLevelGeneratingSystem->levelGeneratedVertices.clear();
+			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
+			vulkanRenderer->initializeGameLevelVertices();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window.SwapBuffers();
 		}
