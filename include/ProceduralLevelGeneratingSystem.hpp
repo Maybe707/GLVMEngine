@@ -13,6 +13,7 @@ namespace GLVM::core
 	{
 	public:
 		unsigned int levelNubmer = 0;
+		bool bredoFlag = false;
 		
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::vector<ecs::TextureHandle> textureHandlers;

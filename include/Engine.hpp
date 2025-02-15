@@ -91,6 +91,7 @@ namespace GLVM::core
 								  unsigned int dat_length, unsigned char* u_iData);
 		ecs::components::MeshHandle LoadMeshFromFile_OBJ(const char* _pathToMesh);
 		ecs::components::MeshHandle LoadMeshFromFile_GLTF(const char* pathToMesh);
+		ecs::components::MeshHandle LoadMesh();
 		void FPScounter();
 		void GameKill();
 	};

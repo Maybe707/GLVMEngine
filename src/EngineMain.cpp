@@ -78,7 +78,14 @@ int main()
 	// *materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 	// 	.shininess = 128.0f * 0.078125f };
 
-	
+	Entity plain0 = EntityManager->CreateEntity();
+	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider, cm::actor>(plain0);
+	*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0, -40.0, 0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 40.2f, .gltf = true };
+	ComponentManager->GetComponent<cm::mesh>(plain0)->handle = cubeHandle_OBJ;
+	cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
+	*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
+
 
 	int* arrayPtr = new int[10];
 	for( int i = 0; i < 10; ++i ) {

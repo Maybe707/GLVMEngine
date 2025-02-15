@@ -270,6 +270,15 @@ namespace GLVM::core
 
 		return meshHandle;
 	}
+
+	ecs::components::MeshHandle Engine::LoadMesh() {
+		ecs::components::MeshHandle meshHandle;
+		meshHandle.id = meshID;
+		meshHandlers.Push(meshHandle);
+		++meshID;
+
+		return meshHandle;
+	}
 	
 	void Engine::FPScounter() {
 		++fpsCounter;

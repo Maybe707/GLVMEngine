@@ -464,6 +464,7 @@ namespace GLVM::core
         std::vector<VkBuffer> indexBufferContainer;
         std::vector<VkDeviceMemory> indexBufferMemoryContaner;
 		uint32_t wavefrontObjCounter = 0;
+		uint32_t gltfCounter         = 0;
 
 		std::vector<unsigned int> fontIndicesContainer;
         std::vector<VkBuffer> fontVertexBufferContainer;
@@ -551,6 +552,7 @@ namespace GLVM::core
         void initWindow();
 		void initializeFontData();
 		void initializeGLTF();
+		void initializeGameLevelVertices();
         void initVulkan();
         void cleanupSwapChain();
         void cleanup();

@@ -677,9 +677,120 @@ namespace GLVM::core
             indexBufferContainer.emplace_back();
             indexBufferMemoryContaner.emplace_back();
             createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
+			++gltfCounter;
 		}
 	}
 
+	void CVulkanRenderer::initializeGameLevelVertices() {
+		for ( unsigned int m = 0; m < 1; ++m ) {
+			aVertices_.emplace_back();
+			aIndices_.emplace_back();
+			jointMatricesPerMesh.Push({});
+			frames.Push({});
+			for( int i = 0; i < 30; ++i ) {
+				frames[frames.GetSize() - 1].Push(0.0f);
+			}
+			int maximumJoints     = 6;
+			core::vector<core::vector<mat4>> jointMatrices;
+			for ( int i = 0; i < maximumJoints; ++i) {
+				core::vector<mat4>  globalAllFrameNodeMatrix;
+				int numberOfFrames = 30;
+				for ( int j = 0; j < numberOfFrames; ++j ) {
+					mat4 unitMatrix(1.0f);
+					globalAllFrameNodeMatrix.Push(unitMatrix);
+				}
+
+				jointMatrices.Push(globalAllFrameNodeMatrix);
+			}
+			jointMatricesPerMesh[jointMatricesPerMesh.GetSize() - 1] = jointMatrices;
+			
+			uint32_t nextIndexGLTF = wavefrontObjCounter + gltfCounter + m;
+			int j = 0;
+			while ( j < 6 ) {
+				switch( j ) {
+				case 0:
+					aIndices_[nextIndexGLTF].push_back(0);
+					break;
+				case 1:
+					aIndices_[nextIndexGLTF].push_back(1);
+					break;
+				case 2:
+					aIndices_[nextIndexGLTF].push_back(2);
+					break;
+				case 3:
+					aIndices_[nextIndexGLTF].push_back(3);
+					break;
+				case 4:
+					aIndices_[nextIndexGLTF].push_back(2);
+					break;
+				case 5:
+					aIndices_[nextIndexGLTF].push_back(1);
+					break;
+				}
+				++j;
+			}
+			
+			for ( unsigned int i = 0; i < 4; ++i ) {
+				vec4 joinIndices;
+				vec4 weights;
+				joinIndices[0] = -1;
+				joinIndices[1] = -1;
+				joinIndices[2] = -1;
+				joinIndices[3] = -1;
+
+				weights[0] = 1;
+				weights[1] = 1;
+				weights[2] = 1;
+				weights[3] = 1;
+
+				SVertex vertex;
+				switch( i ) {
+				case 0:
+					vertex[0] = 0.1;
+					vertex[1] = 0.1;
+					break;
+				case 1:
+					vertex[0] = -0.1;
+					vertex[1] = 0.1;
+					break;			
+				case 2:
+					vertex[0] = -0.1;
+					vertex[1] = -0.1;
+					break;			
+				case 3:
+					vertex[0] = 0.1;
+					vertex[1] = -0.1;
+					break;			
+				}
+				vertex[2] = -0.1;
+				SVertex normal;
+				normal[0] = 0;
+				normal[1] = 1;
+				normal[2] = 0;
+				SVertex texture;
+				texture[0] = 0;
+				texture[1] = 1;
+			
+				uint32_t nextIndexGLTF = wavefrontObjCounter + gltfCounter + m;
+				aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
+									{normal[0], normal[1], normal[2]},
+									{texture[0], texture[1]},
+									{joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
+									{weights[0], weights[1], weights[2], weights[3]}});
+
+			}
+
+		
+			vertexBufferContainer.emplace_back();
+			vertexBufferMemoryContainer.emplace_back();
+			createVertexBuffer(vertexBufferContainer[nextIndexGLTF], vertexBufferMemoryContainer[nextIndexGLTF], aVertices_[nextIndexGLTF]);
+
+			indexBufferContainer.emplace_back();
+			indexBufferMemoryContaner.emplace_back();
+			createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
+		}
+	}
+	
 	void CVulkanRenderer::initializeFontData() {
 		constexpr float fontStep = 1.0 / 12;
 		constexpr unsigned int glyph_row = 7;
@@ -773,6 +884,7 @@ namespace GLVM::core
         createTextureSampler();
         loadWavefrontObj();
 		initializeGLTF();
+		initializeGameLevelVertices();
 		initializeFontData();
 		
         createMainRenderUniformBuffers();
