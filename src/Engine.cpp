@@ -83,6 +83,7 @@ namespace GLVM::core
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
+		pSystem_Manager->ActivateSystem(procuduralLevelGeneratingSystem);
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(enemySytem);
 		pSystem_Manager->ActivateSystem(projectileSystem);
@@ -90,7 +91,6 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
-		pSystem_Manager->ActivateSystem(procuduralLevelGeneratingSystem);
 
 		// std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
 		// sound_thread.detach();

@@ -22,6 +22,7 @@
 #include "Engine.hpp"
 #include "SpritesData.hpp"
 #include "Texture.hpp"
+#include "VertexMath.hpp"
 
 #include <map>
 #include <random>
@@ -67,16 +68,16 @@ int main()
 	
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
-		cm::transform, cm::rigidBody, cm::health, cm::actor>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .position = { 5.7f, 10.0f, 15.0f }, .scale = 1.2f };
+		cm::transform, cm::rigidBody, cm::health, cm::actor, cm::material>(uiPlayer);
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .position = { 5.7f, 10.0f, 15.0f }, .scale = 0.2f };
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
-		.up = { 0.0f, -1.0f, 0.0f } };
+		.up = { 0.0f, -1.0f, 0.0f }, .Position = {0.0f, 0.2f, 0.7f} };
     ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = simpleCubeHandle_GLTF;
-	// cm::material* materialPlainPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
-	// *materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
+	cm::material* materialPlainPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
+	*materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
+		.shininess = 128.0f * 0.078125f };
 
 	Entity plain0 = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider, cm::actor>(plain0);
