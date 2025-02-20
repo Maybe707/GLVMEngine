@@ -141,6 +141,7 @@ namespace GLVM::core
 
 			frames.Push({});
 			jointMatricesPerMesh.Push({});
+			allMeshMaxAbsoluteValues.Push({});
             
             unsigned int vertexIndex  = 0;
             unsigned int textureIndex = 0;
@@ -162,6 +163,24 @@ namespace GLVM::core
 
 					if ( vertex[1] > highest_gltf_Y[m] )
 						highest_gltf_Y[m] = vertex[1];
+
+					if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
+						meshAxisLimitingValues.lowest_x = vertex[0];
+					} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
+						meshAxisLimitingValues.highest_x = vertex[0];
+					}
+
+					if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
+						meshAxisLimitingValues.lowest_y = vertex[1];
+					} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
+						meshAxisLimitingValues.highest_y = vertex[1];
+					}
+
+					if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
+						meshAxisLimitingValues.lowest_z = vertex[2];
+					} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
+						meshAxisLimitingValues.highest_z = vertex[2];
+					}
 					
 					jointIndices[0] = -1;
 					jointIndices[1] = -1;
@@ -179,7 +198,12 @@ namespace GLVM::core
 										{jointIndices[0], jointIndices[1], jointIndices[2]},
 										{weights[0], weights[1], weights[2]}});
                 }
-			
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
+			std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
+			std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
+			std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
             createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
@@ -617,6 +641,7 @@ namespace GLVM::core
 //            aIndices_.emplace_back();
 //            aVertices_.emplace_back();
 			aVertices_.emplace_back();
+			allMeshMaxAbsoluteValues.Push({});
 
 			int stepOffset = 0;
 			if ( animationFlags[m] )
@@ -636,6 +661,24 @@ namespace GLVM::core
 				texture[0] = aVertexesTemp_[m][n + 6];
 				texture[1] = aVertexesTemp_[m][n + 7];
 
+				if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
+					meshAxisLimitingValues.lowest_x = vertex[0];
+				} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
+					meshAxisLimitingValues.highest_x = vertex[0];
+				}
+
+				if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
+					meshAxisLimitingValues.lowest_y = vertex[1];
+				} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
+					meshAxisLimitingValues.highest_y = vertex[1];
+				}
+
+				if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
+					meshAxisLimitingValues.lowest_z = vertex[2];
+				} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
+					meshAxisLimitingValues.highest_z = vertex[2];
+				}
+				
 				vec4 joinIndices;
 				vec4 weights;
 				if ( animationFlags[m] ) {
@@ -669,6 +712,9 @@ namespace GLVM::core
 										 {weights[0], weights[1], weights[2], weights[3]}});
 			}
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
 
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();

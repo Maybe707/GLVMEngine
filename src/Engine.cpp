@@ -208,6 +208,7 @@ namespace GLVM::core
 			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
+			collisionSystem->allMeshMaxAbsoluteValues = vulkanRenderer->allMeshMaxAbsoluteValues;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;

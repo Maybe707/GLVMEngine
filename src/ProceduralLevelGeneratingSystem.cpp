@@ -24,13 +24,13 @@ namespace GLVM::core
 				std::map<int, int> hist;
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> dist(1, 3);
-				// unsigned int half_x = dist(mersenne);
+				unsigned int half_x_rand = dist(mersenne);
 				// unsigned int half_y = dist(mersenne);
-				// unsigned int half_z = dist(mersenne);
+				unsigned int half_z_rand = dist(mersenne);
 
-				unsigned int half_x = 1;
-				unsigned int half_y = 2;
-				unsigned int half_z = 3;
+				// unsigned int half_x = 1;
+				unsigned int half_y_rand = 1;
+				// unsigned int half_z = 1;
 				
 				// vec3 randomDirection = {};
 				// switch( random ) {
@@ -90,11 +90,11 @@ namespace GLVM::core
 				indices.push_back(3);
 				indices.push_back(6);
 
-				std::cout << "x: " << half_x << std::endl;
-				std::cout << "y: " << half_y << std::endl;
-				std::cout << "z: " << half_z << std::endl;
+				std::cout << "x: " << half_x_rand << std::endl;
+				std::cout << "y: " << half_y_rand << std::endl;
+				std::cout << "z: " << half_z_rand << std::endl;
 
-				std::cout << "TEST " << -half_x << std::endl;
+				std::cout << "TEST " << -half_x_rand << std::endl;
 				
 				unsigned int cube_vertices = 8;
 				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
@@ -111,47 +111,57 @@ namespace GLVM::core
 					weights[3] = 1;
 
 					SVertex vertex;
-					float devider = 10.0f;
+					float half_x = 0;
+					float half_z = 0;
+					float half_y = (float)half_y_rand;
+					if ( half_x_rand > half_z_rand ) {
+						half_x = 0.5f;
+						half_z = 0.5f * (float)half_z_rand / (float)half_x_rand;
+					} else {
+						half_z = 0.5f;
+						half_x = 0.5f * (float)half_x_rand / (float)half_z_rand;
+					}
+					
 					switch( i ) {
 					case 0:
-						vertex[0] = half_x / devider;
-						vertex[1] = half_y / devider;
-						vertex[2] = half_z / devider;
+						vertex[0] = half_x;
+						vertex[1] = half_y;
+						vertex[2] = half_z;
 						break;
 					case 1:
-						vertex[0] = -(float)half_x / devider;
-						vertex[1] = half_y / devider;
-						vertex[2] = half_z / devider;
+						vertex[0] = -(float)half_x;
+						vertex[1] = half_y;
+						vertex[2] = half_z;
 						break;			
 					case 2:
-						vertex[0] = -(float)half_x / devider;
-						vertex[1] = -(float)half_y / devider;
-						vertex[2] = half_z / devider;
+						vertex[0] = -(float)half_x;
+						vertex[1] = -(float)half_y;
+						vertex[2] = half_z;
 						break;			
 					case 3:
-						vertex[0] = half_x / devider;
-						vertex[1] = -(float)half_y / devider;
-						vertex[2] = half_z / devider;
+						vertex[0] = half_x;
+						vertex[1] = -(float)half_y;
+						vertex[2] = half_z;
 						break;
 					case 4:
-						vertex[0] = half_x / devider;
-						vertex[1] = half_y / devider;
-						vertex[2] = -(float)half_z / devider;
+						vertex[0] = half_x;
+						vertex[1] = half_y;
+						vertex[2] = -(float)half_z;
 						break;
 					case 5:
-						vertex[0] = -(float)half_x / devider;
-						vertex[1] = half_y / devider;
-						vertex[2] = -(float)half_z / devider;
+						vertex[0] = -(float)half_x;
+						vertex[1] = half_y;
+						vertex[2] = -(float)half_z;
 						break;			
 					case 6:
-						vertex[0] = -(float)half_x / devider;
-						vertex[1] = -(float)half_y / devider;
-						vertex[2] = -(float)half_z / devider;
+						vertex[0] = -(float)half_x;
+						vertex[1] = -(float)half_y;
+						vertex[2] = -(float)half_z;
 						break;			
 					case 7:
-						vertex[0] = half_x / devider;
-						vertex[1] = -(float)half_y / devider;
-						vertex[2] = -(float)half_z / devider;
+						vertex[0] = half_x;
+						vertex[1] = -(float)half_y;
+						vertex[2] = -(float)half_z;
 						break;			
 					}
 
@@ -177,7 +187,7 @@ namespace GLVM::core
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				Entity plain0 = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(plain0);
-				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0, 5.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = false };
+				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0, 5.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 2.0f, .gltf = false };
 				ComponentManager->GetComponent<cm::mesh>(plain0)->handle = gameLevelMeshHandle;
 				cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 				ecs::TextureHandle grayTextureHandle = textureHandlers[3];

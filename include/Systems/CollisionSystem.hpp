@@ -20,6 +20,7 @@
 #include "Components/ViewComponent.hpp"
 #include <mutex>
 #include "Globals.hpp"
+#include "GraphicAPI/Vulkan.hpp"
 
 namespace GLVM::ecs
 {
@@ -33,6 +34,7 @@ namespace GLVM::ecs
 		bool* isItemDraged;
 		bool isLeftMouseButtonPressed;
 		bool* isLeftMouseButtonReleased;
+		core::vector<core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
@@ -43,10 +45,13 @@ namespace GLVM::ecs
 				   core::CEvent& _event);
         bool Gravity(components::transform& _transform_Component);
 		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-		                 float backtrackingScale, float comparedScale);
+		                 float backtrackingScale, float comparedScale,
+						 components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
 		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-							float backtrackingScale, float comparedScale_X, float comparedScale_Y);
-		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale);
+							float backtrackingScale, float comparedScale_X, float comparedScale_Y,
+							components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
+		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale,
+						 components::MeshHandle comparedMeshHandle);
 		void Update() override;
 		static core::vector<unsigned int> searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
 													  const core::vector<vec3>& collidedInventorySlotTransforms);
@@ -54,7 +59,8 @@ namespace GLVM::ecs
 		unsigned int searchMinimumValueIndex(core::vector<float> vector);
 		void bubbleSortVector(core::vector<unsigned int>& vector_);
         bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
-							 float backtrackingScale, float comparedScale);
+							 float backtrackingScale, float comparedScale,
+							 components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
 		bool RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
 					 float rayCasterScale, float receiverScale);
     };

@@ -161,6 +161,21 @@ namespace GLVM::core
             return attributeDescriptions;
         }
     };
+
+	struct MeshAxisMaxAbsoluteValues {
+		float absolute_x = 0.0f;
+		float absolute_y = 0.0f;
+		float absolute_z = 0.0f;
+	};
+
+	struct MeshAxisLimitingValues {
+		float lowest_x = MAXFLOAT;
+		float highest_x = -MAXFLOAT;
+		float lowest_y = MAXFLOAT;
+		float highest_y = -MAXFLOAT;
+		float lowest_z = MAXFLOAT;
+		float highest_z = -MAXFLOAT;
+	};
 	
 	enum class DescriptorsTypes {
 		/// UBO - uniform buffer object
@@ -278,9 +293,11 @@ namespace GLVM::core
         std::vector<std::vector<uint32_t>> levelGeneratedIndices;
 		
         std::vector<core::vector<core::Vertex>> aVertices_;
-        std::vector<std::vector<uint32_t>> aIndices_;                 ///< wavefront.obj indices
-		std::vector<std::vector<float>> aVertexesTemp_;                   ///< gltf indices
-		std::vector<float> highest_gltf_Y;                                 /// highest gltf y
+        std::vector<std::vector<uint32_t>> aIndices_;                          ///< wavefront.obj indices
+		std::vector<std::vector<float>> aVertexesTemp_;                        ///< gltf indices
+		std::vector<float> highest_gltf_Y;                                     /// highest gltf y
+		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
+		core::vector<MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 		bool isInventoryOpened = false;

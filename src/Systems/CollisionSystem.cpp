@@ -16,6 +16,7 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
 #include "EntityManager.hpp"
 #include "Event.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -28,14 +29,24 @@
 namespace GLVM::ecs
 {
 	bool CCollisionSystem::BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-		                               float backtrackingScale, float comparedScale)
+		                               float backtrackingScale, float comparedScale,
+									   components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle)
 	{
-        if(backtrackingPosition[0] + backtrackingScale  > comparedPosition[0] - comparedScale &&
-           backtrackingPosition[0] - backtrackingScale  < comparedPosition[0] + comparedScale &&
-           backtrackingPosition[1] + backtrackingScale  > comparedPosition[1] - comparedScale &&
-           backtrackingPosition[1] - backtrackingScale  < comparedPosition[1] + comparedScale &&
-           backtrackingPosition[2] + backtrackingScale  > comparedPosition[2] - comparedScale &&
-           backtrackingPosition[2] - backtrackingScale  < comparedPosition[2] + comparedScale) {
+		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
+		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
+		
+        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
+		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[0] - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
+		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
+		   comparedPosition[1] - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
+           backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
+		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
+           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
+		   comparedPosition[2] - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
+           backtrackingPosition[2] - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
+		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
 				return true;
 		}
         
@@ -43,26 +54,37 @@ namespace GLVM::ecs
 	}
 
 	bool CCollisionSystem::SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-										  float backtrackingScale, float comparedScale_X, float comparedScale_Y)
+										  float backtrackingScale, float comparedScale_X, float comparedScale_Y,
+										  components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle)
 	{
+		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
+		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
+
 		[[maybe_unused]] float aspectRatio = 1920.0f / 1080.0f;
-        if(backtrackingPosition[0] + backtrackingScale > comparedPosition[0] - comparedScale_X &&
-           backtrackingPosition[0] - backtrackingScale < comparedPosition[0] + comparedScale_X &&
-           backtrackingPosition[1] + backtrackingScale * aspectRatio  > comparedPosition[1] - comparedScale_Y * aspectRatio &&
-           backtrackingPosition[1] - backtrackingScale * aspectRatio  < comparedPosition[1] + comparedScale_Y * aspectRatio) {
+        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale >
+		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale_X &&
+           backtrackingPosition[0] - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale <
+		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale_X &&
+           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale * aspectRatio  >
+		   comparedPosition[1] - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale_Y * aspectRatio &&
+           backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale * aspectRatio  <
+		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale_Y * aspectRatio) {
 				return true;
 		}
         
 		return false;
 	}
 
-	bool CCollisionSystem::DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale)
+	bool CCollisionSystem::DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale,
+									   components::MeshHandle comparedMeshHandle)
 	{
+		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
+
 		[[maybe_unused]] float aspectRatio = 1920.0f / 1080.0f;
-        if(backtrackingPosition[0] > comparedPosition[0] - comparedScale &&
-           backtrackingPosition[0] < comparedPosition[0] + comparedScale &&
-           backtrackingPosition[1] > comparedPosition[1] - comparedScale * aspectRatio &&
-           backtrackingPosition[1] < comparedPosition[1] + comparedScale * aspectRatio) {
+        if(backtrackingPosition[0] > comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[0] < comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[1] > comparedPosition[1] - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale * aspectRatio &&
+           backtrackingPosition[1] < comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale * aspectRatio) {
 				return true;
 		}
         
@@ -70,9 +92,13 @@ namespace GLVM::ecs
 	}
 	
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
-										   float backtrackingScale, float comparedScale) {
-        if((backtrackingPosition[1] - backtrackingScale) + 1.7f >
-		   (comparedPosition[1] + (comparedScale))) {
+										   float backtrackingScale, float comparedScale,
+										   components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle) {
+		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
+		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
+
+        if((backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + 1.7f >
+		   (comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale))) {
             return true;
         }
 
@@ -86,7 +112,8 @@ namespace GLVM::ecs
         ComponentManager* componentManager = ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
 																					  cm::transform,
-																					  cm::actor>();
+																					  cm::actor,
+																					  cm::mesh>();
 		
         const float cameraSpeed = 5.5f * fDelta_Time_;            
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
@@ -94,6 +121,7 @@ namespace GLVM::ecs
 			const unsigned int backtrackingEntityRefCollider = linkedEntities[i];
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = false;
 			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
+			cm::MeshHandle backtrackingEntityMeshHandle = componentManager->GetComponent<cm::mesh>(backtrackingEntityRefCollider)->handle;
 
 			cm::transform* backtrackingTransformComponent = componentManager->
 				GetComponent<cm::transform>(backtrackingEntityRefCollider);
@@ -114,6 +142,7 @@ namespace GLVM::ecs
 				
                 const unsigned int comparedEntityRefCollider     = linkedEntities[j];
 
+				cm::MeshHandle comparedEntityMeshHandle = componentManager->GetComponent<cm::mesh>(comparedEntityRefCollider)->handle;
 				cm::transform* comparedTransformComponent = componentManager->
 					GetComponent<cm::transform>(comparedEntityRefCollider);
 			    vec3  comparedTransform = comparedTransformComponent->position;
@@ -140,12 +169,16 @@ namespace GLVM::ecs
                 boxColliderFlag = BoxCollider(backtrackingTransform,
 											  comparedTransform,
 											  backtrackingScale,
-											  comparedScale);
+											  comparedScale,
+											  backtrackingEntityMeshHandle,
+											  comparedEntityMeshHandle);
 				if ( boxColliderFlag ) {
 					upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
 														  comparedTransform,
 														  backtrackingScale,
-														  comparedScale);
+														  comparedScale,
+														  backtrackingEntityMeshHandle,
+														  comparedEntityMeshHandle);
 				}
 				
 				if(upperActorCheckFlag && boxColliderFlag) {
@@ -169,6 +202,7 @@ namespace GLVM::ecs
 			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
 			const cm::transform* crosshairTransform = componentManager->GetComponent<cm::transform>(crosshairEntity);
+			cm::MeshHandle crosshairMeshhandle = componentManager->GetComponent<cm::mesh>(crosshairEntity)->handle;
 			vec3 crosshairPosition;
 			float crosshairScale = 0;
 			float crosshairGltfFlag = 0;
@@ -185,6 +219,7 @@ namespace GLVM::ecs
 					continue;
 
 				const cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+				cm::MeshHandle itemMeshHandle = componentManager->GetComponent<cm::mesh>(entityItemContaining)->handle;
 				vec3  itemPosition;
 				float itemScale_X  = 0;
 				float itemScale_Y  = 0;
@@ -207,7 +242,8 @@ namespace GLVM::ecs
 
 				bool squareColliderFlag = false;
 				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-													crosshairScale, itemScale_X, itemScale_Y);
+													crosshairScale, itemScale_X, itemScale_Y,
+													crosshairMeshhandle, itemMeshHandle);
 				if ( squareColliderFlag ) {
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->wallCollision = true;
 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
@@ -248,6 +284,7 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+						cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
 						vec3  inventorySlotPosition = inventorySlotTransform->position;
 						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
@@ -258,7 +295,7 @@ namespace GLVM::ecs
 						bool squareColliderFlag = false;
 						inventorySlotPosition[2] = 0.0f;                                        ///< We dont need z-axis here because we test collision for x-y plane with item pivot
 						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-														 inventorySlotScale);
+														 inventorySlotScale, slotMeshHandle);
 						if ( squareColliderFlag ) {
 							collidedInventorySlotEntities.Push(inventorySlotEntity);
 							collidedInventorySlotTransforms.Push(inventorySlotPosition);
@@ -318,6 +355,7 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
 						const unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
 						const cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+						cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
 						vec3  inventorySlotPosition = inventorySlotTransform->position;
 						float inventorySlotScale    = inventorySlotTransform->scale;
 						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
@@ -329,7 +367,7 @@ namespace GLVM::ecs
 						bool squareColliderFlag = false;
 						inventorySlotPosition[2] = 0.0f;
 						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-														 inventorySlotScale);
+														 inventorySlotScale, slotMeshHandle);
 						if ( squareColliderFlag ) {
 							collidedInventorySlotEntities.Push(inventorySlotEntity);
 							collidedInventorySlotTransforms.Push(inventorySlotPosition);
