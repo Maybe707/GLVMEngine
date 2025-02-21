@@ -21,6 +21,7 @@ namespace GLVM::core
 
         std::vector<core::vector<core::Vertex>> levelGeneratedVertices;
         std::vector<std::vector<uint32_t>> levelGeneratedIndices;                 ///< wavefront.obj indices
+		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
 		
 		void Update();
 	};

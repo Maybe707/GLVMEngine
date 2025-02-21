@@ -15,11 +15,12 @@ namespace GLVM::core
 		ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 		ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
-		if ( bredoFlag == false ) {
+		while ( levelNubmer < 3 ) {
 			core::vector<core::Vertex> nextLevel;
 			std::vector<uint32_t> indices;
-
-			if ( levelNubmer < 1 ) {
+			allMeshMaxAbsoluteValues.Push({});
+			
+			if ( levelNubmer < 3 ) {
 				std::random_device rd;
 				std::map<int, int> hist;
 				std::mt19937 mersenne(rd());
@@ -166,6 +167,24 @@ namespace GLVM::core
 						break;			
 					}
 
+					if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
+						meshAxisLimitingValues.lowest_x = vertex[0];
+					} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
+						meshAxisLimitingValues.highest_x = vertex[0];
+					}
+
+					if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
+						meshAxisLimitingValues.lowest_y = vertex[1];
+					} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
+						meshAxisLimitingValues.highest_y = vertex[1];
+					}
+
+					if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
+						meshAxisLimitingValues.lowest_z = vertex[2];
+					} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
+						meshAxisLimitingValues.highest_z = vertex[2];
+					}
+					
 					std::cout << "vertex x: " << vertex[0] << std::endl;
 					std::cout << "vertex y: " << vertex[1] << std::endl;
 					std::cout << "vertex z: " << vertex[2] << std::endl;
@@ -184,17 +203,20 @@ namespace GLVM::core
 									{joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
 									{weights[0], weights[1], weights[2], weights[3]}});
 				}
-								
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
+				
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				Entity plain0 = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(plain0);
-				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0, 5.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 2.0f, .gltf = false };
+				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { (float)levelNubmer * 2, 1.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
 				ComponentManager->GetComponent<cm::mesh>(plain0)->handle = gameLevelMeshHandle;
 				cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 				ecs::TextureHandle grayTextureHandle = textureHandlers[3];
 				*materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 					.shininess = 128.0f * 0.078125f };
-			
+				std::cout << "TEST PROC" << std::endl;
 				++levelNubmer;
 			}
 			levelGeneratedVertices.push_back(nextLevel);

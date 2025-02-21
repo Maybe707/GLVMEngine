@@ -4,5 +4,8 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Event.hpp"
+#include "Vector.hpp"
+#include "VkStructs.hpp"
 
 extern GLVM::core::CEvent g_eEvent;
+extern GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values

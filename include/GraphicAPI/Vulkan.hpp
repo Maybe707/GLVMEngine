@@ -34,6 +34,7 @@
 #include "WavefrontObjParser.hpp"
 #include "MeshManager.hpp"
 #include "Globals.hpp"
+#include "VkStructs.hpp"
 #include "ToString.hpp"
 #include "JsonParser.hpp"
 #include "ShaderStructs.hpp"
@@ -162,41 +163,6 @@ namespace GLVM::core
         }
     };
 
-	struct MeshAxisMaxAbsoluteValues {
-		float absolute_x = 0.0f;
-		float absolute_y = 0.0f;
-		float absolute_z = 0.0f;
-	};
-
-	struct MeshAxisLimitingValues {
-		float lowest_x = MAXFLOAT;
-		float highest_x = -MAXFLOAT;
-		float lowest_y = MAXFLOAT;
-		float highest_y = -MAXFLOAT;
-		float lowest_z = MAXFLOAT;
-		float highest_z = -MAXFLOAT;
-	};
-	
-	enum class DescriptorsTypes {
-		/// UBO - uniform buffer object
-		DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		HUD_UBO,
-		FONT_UBO,
-		FONT_ATLAS_SAMPLER,
-		HUD_SCREEN_UBO,
-		UI_UBO,
-		UI_SAMPLER,
-		UI_ICONS_UBO,
-		UI_ICONS_SAMPLER,
-		MODEL_MATRIX_UBO,
-
-		LIGHT_DATA,
-		SPECULAR_SAMPLER,
-		LIGHT_SAMPLERS,
-	};
-
 	struct VK_Image {
 		VkImage image = {};
 		VkDeviceMemory deviceMemory = {};
@@ -297,7 +263,6 @@ namespace GLVM::core
 		std::vector<std::vector<float>> aVertexesTemp_;                        ///< gltf indices
 		std::vector<float> highest_gltf_Y;                                     /// highest gltf y
 		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
-		core::vector<MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
 		bool isInventoryOpened = false;

@@ -52,6 +52,7 @@
     exit(1)
 
 GLVM::core::CEvent g_eEvent;
+GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
 
 namespace GLVM::core
 {
@@ -208,7 +209,7 @@ namespace GLVM::core
 			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
-			collisionSystem->allMeshMaxAbsoluteValues = vulkanRenderer->allMeshMaxAbsoluteValues;
+			collisionSystem->allMeshMaxAbsoluteValues = allMeshMaxAbsoluteValues;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
