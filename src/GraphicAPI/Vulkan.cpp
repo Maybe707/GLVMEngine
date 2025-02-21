@@ -202,6 +202,7 @@ namespace GLVM::core
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
 
+			std::cout << "WAVEFRONT" << std::endl;
 			std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
 			std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
 			std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
@@ -724,6 +725,18 @@ namespace GLVM::core
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
 
+			std::cout << "GLTF" << std::endl;
+			std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
+			std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
+			std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
+			std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
+			std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
+			std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
+			
+			std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
+			std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
+			std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
+			
             vertexBufferContainer.emplace_back();
             vertexBufferMemoryContainer.emplace_back();
             createVertexBuffer(vertexBufferContainer[nextIndexGLTF], vertexBufferMemoryContainer[nextIndexGLTF], aVertices_[nextIndexGLTF]);

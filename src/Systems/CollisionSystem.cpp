@@ -34,7 +34,7 @@ namespace GLVM::ecs
 	{
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
-		
+		//std::cout << "absolute x: " << backtrackingMeshAxisMaxAbsoluteValues.absolute_x << std::endl;
         if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
 		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
            backtrackingPosition[0] - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <

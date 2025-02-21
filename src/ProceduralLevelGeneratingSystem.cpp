@@ -114,12 +114,13 @@ namespace GLVM::core
 					float half_x = 0;
 					float half_z = 0;
 					float half_y = (float)half_y_rand;
+					float max    = 0.5f;
 					if ( half_x_rand > half_z_rand ) {
-						half_x = 0.5f;
-						half_z = 0.5f * (float)half_z_rand / (float)half_x_rand;
+						half_x = max;
+						half_z = max * (float)half_z_rand / (float)half_x_rand;
 					} else {
-						half_z = 0.5f;
-						half_x = 0.5f * (float)half_x_rand / (float)half_z_rand;
+						half_z = max;
+						half_x = max * (float)half_x_rand / (float)half_z_rand;
 					}
 					
 					switch( i ) {
