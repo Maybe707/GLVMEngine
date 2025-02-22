@@ -26,11 +26,11 @@ namespace GLVM::core
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> dist(1, 3);
 				unsigned int half_x_rand = dist(mersenne);
-				// unsigned int half_y = dist(mersenne);
+				unsigned int half_y_rand = dist(mersenne);
 				unsigned int half_z_rand = dist(mersenne);
 
 				// unsigned int half_x = 1;
-				unsigned int half_y_rand = 1;
+				// unsigned int half_y_rand = 1;
 				// unsigned int half_z = 1;
 				
 				// vec3 randomDirection = {};
@@ -112,17 +112,17 @@ namespace GLVM::core
 					weights[3] = 1;
 
 					SVertex vertex;
-					float half_x = 0;
-					float half_z = 0;
-					float half_y = (float)half_y_rand;
-					float max    = 0.5f;
-					if ( half_x_rand > half_z_rand ) {
-						half_x = max;
-						half_z = max * (float)half_z_rand / (float)half_x_rand;
-					} else {
-						half_z = max;
-						half_x = max * (float)half_x_rand / (float)half_z_rand;
-					}
+					float half_x = half_x_rand;
+					float half_z = half_y_rand;
+					float half_y = half_z_rand;
+					// float max    = 0.5f;
+					// if ( half_x_rand > half_z_rand ) {
+					// 	half_x = max;
+					// 	half_z = max * (float)half_z_rand / (float)half_x_rand;
+					// } else {
+					// 	half_z = max;
+					// 	half_x = max * (float)half_x_rand / (float)half_z_rand;
+					// }
 					
 					switch( i ) {
 					case 0:
@@ -210,7 +210,7 @@ namespace GLVM::core
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				Entity plain0 = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(plain0);
-				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { (float)levelNubmer * 2, 1.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
+				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { (float)levelNubmer * 7, 1.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
 				ComponentManager->GetComponent<cm::mesh>(plain0)->handle = gameLevelMeshHandle;
 				cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
 				ecs::TextureHandle grayTextureHandle = textureHandlers[3];
