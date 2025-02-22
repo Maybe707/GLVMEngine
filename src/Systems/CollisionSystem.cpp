@@ -34,6 +34,17 @@ namespace GLVM::ecs
 	{
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
+		// if ( backtrackingMeshHandle.id == 6 || backtrackingMeshHandle.id == 7 ) {
+		// 	std::cout << "collition system" << std::endl;
+		// 	std::cout << "back mesh id: " << backtrackingMeshHandle.id << std::endl;
+		// 	std::cout << "compated mesh id: " << comparedMeshHandle.id << std::endl;
+		// 	std::cout << "size of all mesh container: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
+		// 	std::cout << "half width: " << allMeshMaxAbsoluteValues[backtrackingMeshHandle.id].absolute_x << std::endl;
+		// 	std::cout << "half height: " << allMeshMaxAbsoluteValues[backtrackingMeshHandle.id].absolute_y << std::endl;
+		// 	std::cout << "half deep: " << allMeshMaxAbsoluteValues[backtrackingMeshHandle.id].absolute_z << std::endl;
+		// 	sleep(1);
+		// }
+
 		//std::cout << "absolute x: " << backtrackingMeshAxisMaxAbsoluteValues.absolute_x << std::endl;
         if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
 		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
@@ -59,7 +70,7 @@ namespace GLVM::ecs
 	{
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
-
+		
 		[[maybe_unused]] float aspectRatio = 1920.0f / 1080.0f;
         if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale >
 		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale_X &&

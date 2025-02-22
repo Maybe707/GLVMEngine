@@ -1,4 +1,5 @@
 #include <ProceduralLevelGeneratingSystem.hpp>
+#include <cmath>
 #include <random>
 #include "Components/ColliderComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -18,8 +19,15 @@ namespace GLVM::core
 		while ( levelNubmer < 3 ) {
 			core::vector<core::Vertex> nextLevel;
 			std::vector<uint32_t> indices;
+			std::cout << "size of all mesh container in proc gen 0: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
 			allMeshMaxAbsoluteValues.Push({});
-			
+
+			meshAxisLimitingValues.highest_x = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_x  = MAXFLOAT;
+			meshAxisLimitingValues.highest_y = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_y  = MAXFLOAT;
+			meshAxisLimitingValues.highest_z = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_z  = MAXFLOAT;
 			if ( levelNubmer < 3 ) {
 				std::random_device rd;
 				std::map<int, int> hist;
@@ -29,9 +37,22 @@ namespace GLVM::core
 				unsigned int half_y_rand = dist(mersenne);
 				unsigned int half_z_rand = dist(mersenne);
 
-				// unsigned int half_x = 1;
-				// unsigned int half_y_rand = 1;
-				// unsigned int half_z = 1;
+				// unsigned int half_x_rand = 0;
+				// unsigned int half_y_rand = 0;
+				// unsigned int half_z_rand = 0;
+				// if ( levelNubmer == 0 ) {
+				// 	half_x_rand = 2;
+				// 	half_y_rand = 3;
+				// 	half_z_rand = 2;
+				// } else if ( levelNubmer == 1 ) {
+				// 	half_x_rand = 1;
+				// 	half_y_rand = 2;
+				// 	half_z_rand = 1;
+				// } else if ( levelNubmer == 2 ) {
+				// 	half_x_rand = 1;
+				// 	half_y_rand = 3;
+				// 	half_z_rand = 2;
+				// }
 				
 				// vec3 randomDirection = {};
 				// switch( random ) {
@@ -113,8 +134,8 @@ namespace GLVM::core
 
 					SVertex vertex;
 					float half_x = half_x_rand;
-					float half_z = half_y_rand;
-					float half_y = half_z_rand;
+					float half_y = half_y_rand;
+					float half_z = half_z_rand;
 					// float max    = 0.5f;
 					// if ( half_x_rand > half_z_rand ) {
 					// 	half_x = max;
@@ -206,8 +227,21 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
+				std::cout << "size of all mesh container in proc gen 1: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
+				std::cout << "pocedural gen" << std::endl;
+				std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
+				std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
+				std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
+				std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
+				std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
+				std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
+			
+				std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
+				std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
+				std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
 				
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
+				std::cout << "proc gen mesh id: " << gameLevelMeshHandle.id << std::endl;
 				Entity plain0 = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(plain0);
 				*ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { (float)levelNubmer * 7, 1.0, 15.0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };

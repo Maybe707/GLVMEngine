@@ -34,7 +34,6 @@ namespace GLVM::ecs
 		bool* isItemDraged;
 		bool isLeftMouseButtonPressed;
 		bool* isLeftMouseButtonReleased;
-		core::vector<core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
         core::CStack& Input_Stack_;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}

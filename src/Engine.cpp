@@ -209,7 +209,6 @@ namespace GLVM::core
 			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
-			collisionSystem->allMeshMaxAbsoluteValues = allMeshMaxAbsoluteValues;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
 			enemySytem->soundEngine                   = soundEngine;
 			projectileSystem->deltaFrameTime          = deltaFrameTime;
