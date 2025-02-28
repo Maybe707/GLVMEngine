@@ -13,8 +13,14 @@ namespace GLVM::core
 	class ProceduralLevelGeneratingSystem : public ecs::ISystem
 	{
 	public:
-		unsigned int levelNubmer = 0;
-		bool bredoFlag = false;
+		unsigned int levelNubmer          = 0;
+		bool bredoFlag                    = false;
+		unsigned int previous_half_x_rand = 0;
+		unsigned int previous_half_z_rand = 0;
+//		vec3 previousLevelPosition        = { 5.0f, 0.0f, 15.0f };
+		vec3 currentLevelPosition         = { 5.0f, 0.0f, 15.0f };
+		vec3 transitionBridgePosition     = { 0.0f, 0.0f, 0.0f };
+		unsigned int previousIterationTransitionBridgeDirection = 0;
 		
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::vector<ecs::TextureHandle> textureHandlers;

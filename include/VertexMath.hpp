@@ -183,7 +183,7 @@ public:
 			m_vector[i] = array[i];
 		}
 	}
-
+	
     T2& operator[](const int index);
 	const T2& operator[](const int index) const;
 	template<class T, int dim2>
