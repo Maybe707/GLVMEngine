@@ -16,18 +16,18 @@ namespace GLVM::core
 		ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 		ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
-		while ( levelNubmer < 1 ) {
+		while ( levelNubmer < 2 ) {
 			core::vector<core::Vertex> nextLevel;
 			std::vector<uint32_t> indices;
 			std::cout << "size of all mesh container in proc gen 0: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
 			core::vector<core::Vertex> transitionBridgeVertices;
 			std::vector<uint32_t> transitionBridgeIndices;
 
-			if ( levelNubmer < 1 ) {
+			if ( levelNubmer < 2 ) {
 				std::random_device rd;
 				std::map<int, int> hist;
 				std::mt19937 mersenne(rd());
-				std::uniform_int_distribution<int> distCurrentLevel_y(1, 2);
+				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int half_y_rand = distCurrentLevel_y(mersenne);
 				std::uniform_int_distribution<int> distCurrentLevel_x_z(4, 8);
 				unsigned int half_x_rand = distCurrentLevel_x_z(mersenne);
@@ -38,10 +38,15 @@ namespace GLVM::core
 				// unsigned int z_currentLevelOffset                  = 0;
 				constexpr float transitionBridgeHalfWidth  = 0.5f;              ///< Need to move on half
 				constexpr float transitionBridgeHalfHeight = 1.0f;
+//				previousIterationTransitionBridgeDirection = 4;
+				std::cout << "level number: " << levelNubmer << std::endl;
+				std::cout << "previous iter: " << previousIterationTransitionBridgeDirection << std::endl;
 				if ( levelNubmer != 0 ) {                                               ///< On first iteration we dont need to define where locate current level depends on previousTransitionBridge
 					switch( previousIterationTransitionBridgeDirection ) {
 					case 1:
 					{
+						std::cout << "SWITCH 1" << std::endl;
+						std::cout << "previous transition bridge position: " << transitionBridgePosition << std::endl;
 						std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
 						previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 						currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
@@ -51,15 +56,17 @@ namespace GLVM::core
 					break;
 					case 2:
 					{
+						std::cout << "SWITCH 2" << std::endl;
 						std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );
 						previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-						currentLevelPosition[2] = transitionBridgePosition[2] + half_z_rand - transitionBridgeHalfWidth
-							- previousTransitionBridgeAnchorPoint;
+						currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
+							+ previousTransitionBridgeAnchorPoint;
 						currentLevelPosition[0] = transitionBridgePosition[0] + half_x_rand + transitionBridgeHalfHeight;
 					}
 					break;
 					case 3:
 					{
+						std::cout << "SWITCH 3" << std::endl;
 						std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
 						previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 						currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
@@ -69,18 +76,24 @@ namespace GLVM::core
 					break;
 					case 4:
 					{
+						std::cout << "SWITCH 4" << std::endl;
 						std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
 						previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-						currentLevelPosition[2] = transitionBridgePosition[2] + half_z_rand - transitionBridgeHalfHeight
-							- previousTransitionBridgeAnchorPoint;
-						currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand - transitionBridgeHalfWidth;
+						currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
+							+ previousTransitionBridgeAnchorPoint;
+						currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand - transitionBridgeHalfHeight;
 					}
 					break;
 					}
 				}
+				currentLevelPosition[1] = 0.0f;
 				
 				std::uniform_int_distribution<int> distNextLevelTransitionDirection(1, 4);                       ///< 1 - north, 2 - east, 3 - south, 4 - west
 				unsigned int nextLevelTransitionDirection = distNextLevelTransitionDirection(mersenne);          ///< randomly chose direction in where next level will appeared
+//				nextLevelTransitionDirection = 4;
+				// if ( previousIterationTransitionBridgeDirection != 0 && nextLevelTransitionDirection == 4 % previousIterationTransitionBridgeDirection ) {
+				// 	nextLevelTransitionDirection = 4 % previousIterationTransitionBridgeDirection + 1;
+				// }
 				unsigned int transitionBridgeAnchorPoint  = 0;
 				[[maybe_unused]] unsigned int leftTransitionBridgeEdge     = 0;
 				[[maybe_unused]] unsigned int forwardTransitionBridgeEdge  = 0;
@@ -125,8 +138,8 @@ namespace GLVM::core
 				}
 				transitionBridgePosition[1]         = currentLevelPosition[1];
 				std::cout << "transition bridge position: " << transitionBridgePosition << std::endl;
-				previousTransitionBridgeAnchorPoint = nextLevelTransitionDirection;
-				
+				previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
+				std::cout << "current level position: " << currentLevelPosition << std::endl;
 				// if ( levelNubmer == 0 ) {
 				// 	currentLevelPosition = transitionBridgePosition;
 				// } else {
@@ -369,6 +382,7 @@ namespace GLVM::core
 //				std::cout << "proc gen mesh id: " << gameLevelMeshHandle.id << std::endl;
 				Entity gameLevelEntity = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(gameLevelEntity);
+				std::cout << "current level position before set in component: " << currentLevelPosition << std::endl;
 				*ComponentManager->GetComponent<cm::transform>(gameLevelEntity) = { .position = currentLevelPosition, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
 				ComponentManager->GetComponent<cm::mesh>(gameLevelEntity)->handle = gameLevelMeshHandle;
 				cm::material* gameLevelMaterial  = ComponentManager->GetComponent<cm::material>(gameLevelEntity);
