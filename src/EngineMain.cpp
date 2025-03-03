@@ -73,7 +73,7 @@ int main()
 	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
-		.up = { 0.0f, -1.0f, 0.0f }, .Position = {0.0f, 0.2f, 0.7f} };
+		.up = { 0.0f, -1.0f, 0.0f }, .Position = {0.0f, 0.0f, -1.0f} };
     ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = hyperCubeHandle_GLTF;
 	cm::material* materialPlainPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
 	*materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },

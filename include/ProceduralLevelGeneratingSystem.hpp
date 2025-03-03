@@ -4,6 +4,7 @@
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "ISystem.hpp"
+#include <cmath>
 #include <map>
 #include <random>
 #include "GraphicAPI/Vulkan.hpp"
@@ -21,15 +22,25 @@ namespace GLVM::core
 		vec3 currentLevelPosition         = { 5.0f, 0.0f, 15.0f };
 		vec3 transitionBridgePosition     = { 0.0f, 0.0f, 0.0f };
 		unsigned int previousIterationTransitionBridgeDirection = 0;
+		struct {
+			float positive_x = -MAXFLOAT;
+			float negative_x = MAXFLOAT;
+			float positive_y = -MAXFLOAT;
+			float negative_y = MAXFLOAT;
+			float positive_z = -MAXFLOAT;
+			float negative_z = MAXFLOAT;
+		} coordinateMaximumValuePerDirection;                                  ///< contain maximum coordinate value in every direction
 		
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::vector<ecs::TextureHandle> textureHandlers;
 
         std::vector<core::vector<core::Vertex>> levelGeneratedVertices;
-        std::vector<std::vector<uint32_t>> levelGeneratedIndices;                 ///< wavefront.obj indices
+        std::vector<std::vector<uint32_t>> levelGeneratedIndices;              ///< wavefront.obj indices
 		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
 		
 		void Update();
+		void setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z);
+		bool checkCollisionIntersectionWithMaximumCoordinates(vec3 position, float half_x, float half_y, float half_z);
 	};
 }
 
