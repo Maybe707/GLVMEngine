@@ -25,7 +25,6 @@ namespace GLVM::core
 
 			if ( levelNubmer < 5 ) {
 				std::random_device rd;
-				std::map<int, int> hist;
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int half_y_rand = distCurrentLevel_y(mersenne);
@@ -33,103 +32,14 @@ namespace GLVM::core
 				unsigned int half_x_rand = distCurrentLevel_x_z(mersenne);
 				unsigned int half_z_rand = distCurrentLevel_x_z(mersenne);
 
-
-				// unsigned int x_currentLevelOffset                  = 0;
-				// unsigned int z_currentLevelOffset                  = 0;
 				constexpr float transitionBridgeHalfWidth  = 0.5f;              ///< Need to move on half
 				constexpr float transitionBridgeHalfHeight = 1.0f;
-//				previousIterationTransitionBridgeDirection = 4;
-				// std::cout << "level number: " << levelNubmer << std::endl;
-				// std::cout << "previous iter: " << previousIterationTransitionBridgeDirection << std::endl;
 				if ( levelNubmer != 0 ) {                                               ///< On first iteration we dont need to define where locate current level depends on previousTransitionBridge
-					generateLevel(half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight, mersenne);
+					generateLevel( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
 				}
-				currentLevelPosition[1] = 0.0f;
 				
-				// std::cout << "current level position: " << currentLevelPosition << std::endl;
-				// std::cout << "half_x: " << half_x_rand << std::endl;
-				// std::cout << "half_z: " << half_z_rand << std::endl;
-
-				// std::cout << "maximum positive x: " << coordinateMaximumValuePerDirection.positive_x << std::endl;
-				// std::cout << "maximum negative x: " << coordinateMaximumValuePerDirection.negative_x << std::endl;
-				// std::cout << "maximum positive y: " << coordinateMaximumValuePerDirection.positive_y << std::endl;
-				// std::cout << "maximum negative y: " << coordinateMaximumValuePerDirection.negative_y << std::endl;
-				// std::cout << "maximum positive z: " << coordinateMaximumValuePerDirection.positive_z << std::endl;
-				// std::cout << "maximum negative z: " << coordinateMaximumValuePerDirection.negative_z << std::endl;
+				generateTransitionBridge( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
 				
-				std::uniform_int_distribution<int> distNextLevelTransitionDirection(1, 4);                       ///< 1 - north, 2 - east, 3 - south, 4 - west
-				unsigned int nextLevelTransitionDirection = distNextLevelTransitionDirection(mersenne);          ///< randomly chose direction in where next level will appeared
-//				nextLevelTransitionDirection = 4;
-				// if ( previousIterationTransitionBridgeDirection != 0 && nextLevelTransitionDirection == 4 % previousIterationTransitionBridgeDirection ) {
-				// 	nextLevelTransitionDirection = 4 % previousIterationTransitionBridgeDirection + 1;
-				// }
-				unsigned int transitionBridgeAnchorPoint  = 0;
-				[[maybe_unused]] unsigned int leftTransitionBridgeEdge     = 0;
-				[[maybe_unused]] unsigned int forwardTransitionBridgeEdge  = 0;
-				float transitionBridgeOffset_x  = 0.0f;
-				float transitionBridgeOffset_z  = 0.0f;
-//				std::cout << "direction: " << nextLevelTransitionDirection << std::endl;
-				bool validTransitionBridge = false;
-				while ( !validTransitionBridge ) {
-//					std::cout << "looooop" << std::endl;
-					if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
-						std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
-						transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
-						// std::cout << "half x rand: " << half_x_rand << std::endl;
-						// std::cout << "anchor point: " << transitionBridgeAnchorPoint << std::endl;
-//					leftTransitionBridgeEdge    = -half_x_rand + transitionBridgeAnchorPoint;
-						transitionBridgeOffset_x = -(float)half_x_rand + (float)transitionBridgeAnchorPoint;
-//					std::cout << "transition bridge offset x: " << transitionBridgeOffset_x << std::endl;
-						if ( nextLevelTransitionDirection == 1 ) {
-//						forwardTransitionBridgeEdge = half_z_rand;
-							transitionBridgeOffset_z = half_z_rand;
-							transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
-								currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfHeight };
-						} else {
-//						forwardTransitionBridgeEdge = -half_z_rand;
-							transitionBridgeOffset_z = -(float)half_z_rand;
-							transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
-								currentLevelPosition[2] + transitionBridgeOffset_z - transitionBridgeHalfHeight };
-						}
-					} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-						std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
-						transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
-//					leftTransitionBridgeEdge    = -half_z_rand + transitionBridgeAnchorPoint;
-						transitionBridgeOffset_z    = -(float)half_z_rand + (float)transitionBridgeAnchorPoint;
-						if ( nextLevelTransitionDirection == 2 ) {
-//						forwardTransitionBridgeEdge = half_x_rand;
-							transitionBridgeOffset_x = half_x_rand;
-							transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfHeight, (float)half_y_rand,
-								currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
-						} else {
-//						forwardTransitionBridgeEdge = -half_x_rand;
-							transitionBridgeOffset_x = -(float)half_x_rand;
-							transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x - transitionBridgeHalfHeight, (float)half_y_rand,
-								currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
-						}
-					}
-
-					float width = 0;
-					float height = 0;
-					if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
-						width = transitionBridgeHalfWidth;
-						height = transitionBridgeHalfHeight;
-					}
-					if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-						width = transitionBridgeHalfHeight;
-						height = transitionBridgeHalfWidth;
-					}
-					
-					if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, half_y_rand, height ) ) {
-						std::cout << "found intersection transition bridge" << std::endl;
-						nextLevelTransitionDirection = (4 + nextLevelTransitionDirection) % 4 + 1;
-					} else {
-						setCoordinateMaximumValuePerDirection(transitionBridgePosition, (float)width, (float)half_y_rand, (float)height);
-						validTransitionBridge = true;
-					}
-				}
-				transitionBridgePosition[1]         = currentLevelPosition[1];
-
 				// std::cout << "prev dir: " << previousIterationTransitionBridgeDirection << std::endl;
 				// std::cout << "next dir: " << nextLevelTransitionDirection << std::endl;
 				// std::cout << "transition bridge position: " << transitionBridgePosition << std::endl;
@@ -145,7 +55,7 @@ namespace GLVM::core
 				// std::cout << "maximum negative z: " << coordinateMaximumValuePerDirection.negative_z << std::endl;
 
 //				std::cout << "transition bridge position: " << transitionBridgePosition << std::endl;
-				previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
+
 //				std::cout << "current level position: " << currentLevelPosition << std::endl;
 				// if ( levelNubmer == 0 ) {
 				// 	currentLevelPosition = transitionBridgePosition;
@@ -602,15 +512,15 @@ namespace GLVM::core
 	}
 
 	void ProceduralLevelGeneratingSystem::generateLevel( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
-														 const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight, std::mt19937 mersenne) {
+														 const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight ) {
+		std::random_device rd;
+		std::mt19937 mersenne(rd());
 		unsigned int previousTransitionBridgeAnchorPoint   = 0;
 		bool validLevel = false;
 		while ( !validLevel ) {
 			switch( previousIterationTransitionBridgeDirection ) {
 			case 1:
 			{
-				// std::cout << "SWITCH 1" << std::endl;
-				// std::cout << "previous transition bridge position: " << transitionBridgePosition << std::endl;
 				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 				currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
@@ -620,7 +530,6 @@ namespace GLVM::core
 			break;
 			case 2:
 			{
-//						std::cout << "SWITCH 2" << std::endl;
 				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 				currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
@@ -630,7 +539,6 @@ namespace GLVM::core
 			break;
 			case 3:
 			{
-//						std::cout << "SWITCH 3" << std::endl;
 				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 				currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
@@ -640,7 +548,6 @@ namespace GLVM::core
 			break;
 			case 4:
 			{
-//						std::cout << "SWITCH 4" << std::endl;
 				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
 				currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
@@ -651,15 +558,76 @@ namespace GLVM::core
 			}
 
 			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
-				std::cout << "found intersection" << std::endl;
 				previousIterationTransitionBridgeDirection = (4 + previousIterationTransitionBridgeDirection) % 4 + 1;
 			} else {
 				setCoordinateMaximumValuePerDirection(currentLevelPosition, (float)half_x_rand, (float)half_y_rand, (float)half_z_rand);
 				validLevel = true;
 			}
 		}
+		currentLevelPosition[1] = 0.0f;
 	}
-		
+
+	void ProceduralLevelGeneratingSystem::generateTransitionBridge( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
+																	const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight ) {
+		std::random_device rd;
+		std::mt19937 mersenne(rd());
+		std::uniform_int_distribution<int> distNextLevelTransitionDirection(1, 4);                       ///< 1 - north, 2 - east, 3 - south, 4 - west
+		nextLevelTransitionDirection = distNextLevelTransitionDirection(mersenne);          ///< randomly chose direction in where next level will appeared
+		unsigned int transitionBridgeAnchorPoint  = 0;
+		float transitionBridgeOffset_x  = 0.0f;
+		float transitionBridgeOffset_z  = 0.0f;
+		bool validTransitionBridge = false;
+		while ( !validTransitionBridge ) {
+			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
+				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
+				transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
+				transitionBridgeOffset_x = -(float)half_x_rand + (float)transitionBridgeAnchorPoint;
+				if ( nextLevelTransitionDirection == 1 ) {
+					transitionBridgeOffset_z = half_z_rand;
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
+						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfHeight };
+				} else {
+					transitionBridgeOffset_z = -(float)half_z_rand;
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
+						currentLevelPosition[2] + transitionBridgeOffset_z - transitionBridgeHalfHeight };
+				}
+			} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
+				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
+				transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
+				transitionBridgeOffset_z    = -(float)half_z_rand + (float)transitionBridgeAnchorPoint;
+				if ( nextLevelTransitionDirection == 2 ) {
+					transitionBridgeOffset_x = half_x_rand;
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfHeight, (float)half_y_rand,
+						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
+				} else {
+					transitionBridgeOffset_x = -(float)half_x_rand;
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x - transitionBridgeHalfHeight, (float)half_y_rand,
+						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
+				}
+			}
+
+			float width = 0;
+			float height = 0;
+			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
+				width = transitionBridgeHalfWidth;
+				height = transitionBridgeHalfHeight;
+			}
+			if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
+				width = transitionBridgeHalfHeight;
+				height = transitionBridgeHalfWidth;
+			}
+					
+			if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, half_y_rand, height ) ) {
+				nextLevelTransitionDirection = (4 + nextLevelTransitionDirection) % 4 + 1;
+			} else {
+				setCoordinateMaximumValuePerDirection(transitionBridgePosition, (float)width, (float)half_y_rand, (float)height);
+				validTransitionBridge = true;
+			}
+		}
+		transitionBridgePosition[1]         = currentLevelPosition[1];
+		previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
+	}
+	
 	void ProceduralLevelGeneratingSystem::setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z) {
 		if ( position[0] + half_x > coordinateMaximumValuePerDirection.positive_x ) {
 			coordinateMaximumValuePerDirection.positive_x = position[0] + half_x;

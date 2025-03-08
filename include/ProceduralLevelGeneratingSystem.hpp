@@ -21,6 +21,7 @@ namespace GLVM::core
 //		vec3 previousLevelPosition        = { 5.0f, 0.0f, 15.0f };
 		vec3 currentLevelPosition         = { 5.0f, 0.0f, 15.0f };
 		vec3 transitionBridgePosition     = { 0.0f, 0.0f, 0.0f };
+		unsigned int nextLevelTransitionDirection = 0;
 		unsigned int previousIterationTransitionBridgeDirection = 0;
 		struct {
 			float positive_x = -MAXFLOAT;
@@ -40,7 +41,9 @@ namespace GLVM::core
 		
 		void Update();
 		void generateLevel( const unsigned int half_x_rand, const unsigned int half_z_rand, const unsigned int half_y_rand,
-							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight, std::mt19937 mersenne );
+							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
+		void generateTransitionBridge( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
+									   const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
 		void setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z);
 		bool checkCollisionIntersectionWithMaximumCoordinates(vec3 position, float half_x, float half_y, float half_z);
 	};
