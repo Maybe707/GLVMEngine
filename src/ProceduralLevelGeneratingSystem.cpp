@@ -45,27 +45,12 @@ namespace GLVM::core
 					indices.push_back(boxIndicesForIndexBuffer[i]);
 
 				allMeshMaxAbsoluteValues.Push({});
-
-				meshAxisLimitingValues.highest_x = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-				meshAxisLimitingValues.highest_y = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-				meshAxisLimitingValues.highest_z = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+				meshAxisLimitingValues.setToDefaultValues();
 				
 				unsigned int cube_vertices = 8;
 				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-					vec4 joinIndices;
-					vec4 weights;
-					joinIndices[0] = -1;
-					joinIndices[1] = -1;
-					joinIndices[2] = -1;
-					joinIndices[3] = -1;
-
-					weights[0] = 1;
-					weights[1] = 1;
-					weights[2] = 1;
-					weights[3] = 1;
+					vec4 joinIndices = { -1, -1, -1, -1 };
+					vec4 weights = { 1, 1, 1, 1 };
 
 					SVertex vertex;
 					float half_x = half_x_rand;
@@ -193,13 +178,7 @@ namespace GLVM::core
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
 
 				allMeshMaxAbsoluteValues.Push({});
-
-				meshAxisLimitingValues.highest_x = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-				meshAxisLimitingValues.highest_y = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-				meshAxisLimitingValues.highest_z = -MAXFLOAT;
-				meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+				meshAxisLimitingValues.setToDefaultValues();
 				
 				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
 					vec4 joinIndices;

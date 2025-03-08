@@ -18,6 +18,15 @@ namespace GLVM::core
 		float highest_y = -MAXFLOAT;
 		float lowest_z = MAXFLOAT;
 		float highest_z = -MAXFLOAT;
+
+		void setToDefaultValues() {
+			highest_x = -MAXFLOAT;
+			lowest_x  = MAXFLOAT;
+			highest_y = -MAXFLOAT;
+			lowest_y  = MAXFLOAT;
+			highest_z = -MAXFLOAT;
+			lowest_z  = MAXFLOAT;
+		}
 	};
 	
 	enum class DescriptorsTypes {
