@@ -148,6 +148,13 @@ namespace GLVM::core
 			unsigned int normalIndex  = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
 
+			meshAxisLimitingValues.highest_x = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_x  = MAXFLOAT;
+			meshAxisLimitingValues.highest_y = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_y  = MAXFLOAT;
+			meshAxisLimitingValues.highest_z = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+			
             for (unsigned int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
                     vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
@@ -652,6 +659,13 @@ namespace GLVM::core
 			aVertices_.emplace_back();
 			allMeshMaxAbsoluteValues.Push({});
 
+			meshAxisLimitingValues.highest_x = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_x  = MAXFLOAT;
+			meshAxisLimitingValues.highest_y = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_y  = MAXFLOAT;
+			meshAxisLimitingValues.highest_z = -MAXFLOAT;
+			meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+			
 			int stepOffset = 0;
 			if ( animationFlags[m] )
 				stepOffset = 8;

@@ -39,6 +39,8 @@ namespace GLVM::core
 		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
 		
 		void Update();
+		void generateLevel( const unsigned int half_x_rand, const unsigned int half_z_rand, const unsigned int half_y_rand,
+							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight, std::mt19937 mersenne );
 		void setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z);
 		bool checkCollisionIntersectionWithMaximumCoordinates(vec3 position, float half_x, float half_y, float half_z);
 	};
