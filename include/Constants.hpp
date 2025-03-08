@@ -32,6 +32,13 @@
 
 constexpr unsigned int k_iUint_Max = 4000000000;
 constexpr int k_iNull = 0;
+constexpr int boxIndicesForIndexBuffer[36] =
+{ 0, 1, 2, 3, 0, 2,
+  4, 0, 3, 7, 4, 3,
+  4, 5, 1, 0, 4, 1,
+  1, 5, 6, 2, 1, 6,
+  5, 4, 7, 6, 5, 7,
+  3, 2, 6, 7, 3, 6 };
 
 #endif
 

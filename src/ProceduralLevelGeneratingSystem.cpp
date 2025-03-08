@@ -3,6 +3,7 @@
 #include <random>
 #include "Components/ColliderComponent.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Constants.hpp"
 #include "Engine.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Vector.hpp"
@@ -39,129 +40,9 @@ namespace GLVM::core
 				}
 				
 				generateTransitionBridge( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
-				
-				// std::cout << "prev dir: " << previousIterationTransitionBridgeDirection << std::endl;
-				// std::cout << "next dir: " << nextLevelTransitionDirection << std::endl;
-				// std::cout << "transition bridge position: " << transitionBridgePosition << std::endl;
 
-				// std::cout << "width: " << width << std::endl;
-				// std::cout << "height: " << height << std::endl;
-//				setCoordinateMaximumValuePerDirection(transitionBridgePosition, (float)width, (float)half_y_rand, (float)height);
-				// std::cout << "maximum positive x: " << coordinateMaximumValuePerDirection.positive_x << std::endl;
-				// std::cout << "maximum negative x: " << coordinateMaximumValuePerDirection.negative_x << std::endl;
-				// std::cout << "maximum positive y: " << coordinateMaximumValuePerDirection.positive_y << std::endl;
-				// std::cout << "maximum negative y: " << coordinateMaximumValuePerDirection.negative_y << std::endl;
-				// std::cout << "maximum positive z: " << coordinateMaximumValuePerDirection.positive_z << std::endl;
-				// std::cout << "maximum negative z: " << coordinateMaximumValuePerDirection.negative_z << std::endl;
-
-//				std::cout << "transition bridge position: " << transitionBridgePosition << std::endl;
-
-//				std::cout << "current level position: " << currentLevelPosition << std::endl;
-				// if ( levelNubmer == 0 ) {
-				// 	currentLevelPosition = transitionBridgePosition;
-				// } else {
-				// 	currentLevelPosition = { currentLevelPosition[0] + 
-				// }
-				// unsigned int transitionBridgeAnchorPoint  
-				// switch( nextLevelTransitionDirection ) {
-				// case 1:
-					
-				// }
-				// std::uniform_int_distribution<int> distLevelPosition_x(previousLevelPosition[0] + previous_half_x_rand + half_x_rand + 2,
-				// 													   previousLevelPosition[0] + previous_half_x_rand + half_x_rand + 6);
-				// std::uniform_int_distribution<int> distLevelPosition_z(previousLevelPosition[2] + previous_half_z_rand + half_z_rand + 2,
-				// 													   previousLevelPosition[2] + previous_half_z_rand + half_z_rand + 6);
-				
-				// if ( levelNubmer == 0 ) {
-				// 	currentLevelPosition = previousLevelPosition;
-				// } else {
-				// 	currentLevelPosition = { (float)distLevelPosition_x(mersenne), 0.0f, (float)distLevelPosition_z(mersenne) };
-				// 	previousLevelPosition = currentLevelPosition;
-				// }
-				
-				// previous_half_x_rand     = half_x_rand;
-				// previous_half_z_rand     = half_z_rand;
-
-				// unsigned int half_x_rand = 0;
-				// unsigned int half_y_rand = 0;
-				// unsigned int half_z_rand = 0;
-				// if ( levelNubmer == 0 ) {
-				// 	half_x_rand = 2;
-				// 	half_y_rand = 3;
-				// 	half_z_rand = 2;
-				// } else if ( levelNubmer == 1 ) {
-				// 	half_x_rand = 1;
-				// 	half_y_rand = 2;
-				// 	half_z_rand = 1;
-				// } else if ( levelNubmer == 2 ) {
-				// 	half_x_rand = 1;
-				// 	half_y_rand = 3;
-				// 	half_z_rand = 2;
-				// }
-				
-				// vec3 randomDirection = {};
-				// switch( random ) {
-				// case 0:
-				// 	randomDirection = vec3( 50.0f, -60.0f, 0.0f, 0.0 );
-				// 	break;
-				// case 1:
-				// 	randomDirection = vec3( -50.0f, -60.0f, 0.0f, 0.0 );
-				// 	break;
-				// case 2:
-				// 	randomDirection = vec3( 0.0f, -60.0f, 50.0f, 0.0 );
-				// 	break;
-				// case 3:
-				// 	randomDirection = vec3( 0.0f, -60.0f, -50.0f, 0.0 );
-				// 	break;
-				// }
-
-				indices.push_back(0);
-				indices.push_back(1);
-				indices.push_back(2);
-				indices.push_back(3);
-				indices.push_back(0);
-				indices.push_back(2);
-
-				indices.push_back(4);
-				indices.push_back(0);
-				indices.push_back(3);
-				indices.push_back(7);
-				indices.push_back(4);
-				indices.push_back(3);
-
-				indices.push_back(4);
-				indices.push_back(5);
-				indices.push_back(1);
-				indices.push_back(0);
-				indices.push_back(4);
-				indices.push_back(1);
-
-				indices.push_back(1);
-				indices.push_back(5);
-				indices.push_back(6);
-				indices.push_back(2);
-				indices.push_back(1);
-				indices.push_back(6);
-
-				indices.push_back(5);
-				indices.push_back(4);
-				indices.push_back(7);
-				indices.push_back(6);
-				indices.push_back(5);
-				indices.push_back(7);
-
-				indices.push_back(3);
-				indices.push_back(2);
-				indices.push_back(6);
-				indices.push_back(7);
-				indices.push_back(3);
-				indices.push_back(6);
-
-				// std::cout << "x: " << half_x_rand << std::endl;
-				// std::cout << "y: " << half_y_rand << std::endl;
-				// std::cout << "z: " << half_z_rand << std::endl;
-
-				// std::cout << "TEST " << -half_x_rand << std::endl;
+				for ( unsigned int i = 0; i < 36; ++i )
+					indices.push_back(boxIndicesForIndexBuffer[i]);
 
 				allMeshMaxAbsoluteValues.Push({});
 
@@ -308,48 +189,9 @@ namespace GLVM::core
 					.shininess = 128.0f * 0.078125f };
 //				std::cout << "TEST PROC" << std::endl;
 
-				transitionBridgeIndices.push_back(0);
-				transitionBridgeIndices.push_back(1);
-				transitionBridgeIndices.push_back(2);
-				transitionBridgeIndices.push_back(3);
-				transitionBridgeIndices.push_back(0);
-				transitionBridgeIndices.push_back(2);
+				for ( unsigned int i = 0; i < 36; ++i )
+					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
 
-				transitionBridgeIndices.push_back(4);
-				transitionBridgeIndices.push_back(0);
-				transitionBridgeIndices.push_back(3);
-				transitionBridgeIndices.push_back(7);
-				transitionBridgeIndices.push_back(4);
-				transitionBridgeIndices.push_back(3);
-
-				transitionBridgeIndices.push_back(4);
-				transitionBridgeIndices.push_back(5);
-				transitionBridgeIndices.push_back(1);
-				transitionBridgeIndices.push_back(0);
-				transitionBridgeIndices.push_back(4);
-				transitionBridgeIndices.push_back(1);
-
-				transitionBridgeIndices.push_back(1);
-				transitionBridgeIndices.push_back(5);
-				transitionBridgeIndices.push_back(6);
-				transitionBridgeIndices.push_back(2);
-				transitionBridgeIndices.push_back(1);
-				transitionBridgeIndices.push_back(6);
-
-				transitionBridgeIndices.push_back(5);
-				transitionBridgeIndices.push_back(4);
-				transitionBridgeIndices.push_back(7);
-				transitionBridgeIndices.push_back(6);
-				transitionBridgeIndices.push_back(5);
-				transitionBridgeIndices.push_back(7);
-
-				transitionBridgeIndices.push_back(3);
-				transitionBridgeIndices.push_back(2);
-				transitionBridgeIndices.push_back(6);
-				transitionBridgeIndices.push_back(7);
-				transitionBridgeIndices.push_back(3);
-				transitionBridgeIndices.push_back(6);
-				
 				allMeshMaxAbsoluteValues.Push({});
 
 				meshAxisLimitingValues.highest_x = -MAXFLOAT;
