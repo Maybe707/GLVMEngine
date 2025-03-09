@@ -154,7 +154,7 @@ namespace GLVM::core
 			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
 				previousIterationTransitionBridgeDirection = (4 + previousIterationTransitionBridgeDirection) % 4 + 1;
 			} else {
-				setCoordinateMaximumValuePerDirection(currentLevelPosition, (float)half_x_rand, (float)half_y_rand, (float)half_z_rand);
+				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( currentLevelPosition, (float)half_x_rand, (float)half_y_rand, (float)half_z_rand );
 				validLevel = true;
 			}
 		}
@@ -214,7 +214,7 @@ namespace GLVM::core
 			if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, half_y_rand, height ) ) {
 				nextLevelTransitionDirection = (4 + nextLevelTransitionDirection) % 4 + 1;
 			} else {
-				setCoordinateMaximumValuePerDirection(transitionBridgePosition, (float)width, (float)half_y_rand, (float)height);
+				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( transitionBridgePosition, (float)width, (float)half_y_rand, (float)height );
 				validTransitionBridge = true;
 			}
 		}
@@ -226,13 +226,7 @@ namespace GLVM::core
 																  core::vector<core::Vertex>& destinationVerticesContainer ) {
 		unsigned int cube_vertices = 8;
 		for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-			// vec4 joinIndices = { -1, -1, -1, -1 };
-			// vec4 weights = { 1, 1, 1, 1 };
-
 			SVertex vertex;
-			// float half_x = half_x_rand;
-			// float half_y = half_y_rand;
-			// float half_z = half_z_rand;
 					
 			switch( i ) {
 			case 0:
@@ -295,34 +289,13 @@ namespace GLVM::core
 		}
 	}
 	
-	void ProceduralLevelGeneratingSystem::setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z) {
-		if ( position[0] + half_x > coordinateMaximumValuePerDirection.positive_x ) {
-			coordinateMaximumValuePerDirection.positive_x = position[0] + half_x;
-		}
-		if ( position[0] - half_x < coordinateMaximumValuePerDirection.negative_x ) {
-			coordinateMaximumValuePerDirection.negative_x = position[0] - half_x;
-		}
-		if ( position[1] + half_y > coordinateMaximumValuePerDirection.positive_y ) {
-			coordinateMaximumValuePerDirection.positive_y = position[1] + half_y;
-		}
-		if ( position[1] - half_y < coordinateMaximumValuePerDirection.negative_y ) {
-			coordinateMaximumValuePerDirection.negative_y = position[1] - half_y;
-		}
-		if ( position[2] + half_z > coordinateMaximumValuePerDirection.positive_z ) {
-			coordinateMaximumValuePerDirection.positive_z = position[2] + half_z;
-		}
-		if ( position[2] - half_z < coordinateMaximumValuePerDirection.negative_z ) {
-			coordinateMaximumValuePerDirection.negative_z = position[2] - half_z;
-		}
-	}
-
 	bool ProceduralLevelGeneratingSystem::checkCollisionIntersectionWithMaximumCoordinates(vec3 position, float half_x, float half_y, float half_z) {
-		if ( position[0] + half_x > coordinateMaximumValuePerDirection.negative_x &&
-			 position[0] - half_x < coordinateMaximumValuePerDirection.positive_x &&
-			 position[1] + half_y > coordinateMaximumValuePerDirection.negative_y &&
-			 position[1] - half_y < coordinateMaximumValuePerDirection.positive_y &&
-			 position[2] + half_z > coordinateMaximumValuePerDirection.negative_z &&
-			 position[2] - half_z < coordinateMaximumValuePerDirection.positive_z ) {
+		if ( position[0] + half_x > coordinateMaximumValuePerDirection.lowest_x &&
+			 position[0] - half_x < coordinateMaximumValuePerDirection.highest_x &&
+			 position[1] + half_y > coordinateMaximumValuePerDirection.lowest_y &&
+			 position[1] - half_y < coordinateMaximumValuePerDirection.highest_y &&
+			 position[2] + half_z > coordinateMaximumValuePerDirection.lowest_z &&
+			 position[2] - half_z < coordinateMaximumValuePerDirection.highest_z ) {
 			return true;
 		} else {
 			return false;

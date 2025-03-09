@@ -48,6 +48,27 @@ namespace GLVM::core
 				highest_z = vertex[2];
 			}
 		}
+
+		void comparePerDirectionAndSetToMaximumValueByModule( vec3 position, float half_x, float half_y, float half_z ) {
+			if ( position[0] + half_x > highest_x ) {
+				highest_x = position[0] + half_x;
+			}
+			if ( position[0] - half_x < lowest_x ) {
+				lowest_x = position[0] - half_x;
+			}
+			if ( position[1] + half_y > highest_y ) {
+				highest_y = position[1] + half_y;
+			}
+			if ( position[1] - half_y < lowest_y ) {
+				lowest_y = position[1] - half_y;
+			}
+			if ( position[2] + half_z > highest_z ) {
+				highest_z = position[2] + half_z;
+			}
+			if ( position[2] - half_z < lowest_z ) {
+				lowest_z = position[2] - half_z;
+			}
+		}
 	};
 	
 	enum class DescriptorsTypes {
