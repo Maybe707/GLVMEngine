@@ -108,27 +108,7 @@ namespace GLVM::core
 						break;			
 					}
 
-					if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
-						meshAxisLimitingValues.lowest_x = vertex[0];
-					} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
-						meshAxisLimitingValues.highest_x = vertex[0];
-					}
-
-					if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
-						meshAxisLimitingValues.lowest_y = vertex[1];
-					} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
-						meshAxisLimitingValues.highest_y = vertex[1];
-					}
-
-					if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
-						meshAxisLimitingValues.lowest_z = vertex[2];
-					} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
-						meshAxisLimitingValues.highest_z = vertex[2];
-					}
-					
-					// std::cout << "vertex x: " << vertex[0] << std::endl;
-					// std::cout << "vertex y: " << vertex[1] << std::endl;
-					// std::cout << "vertex z: " << vertex[2] << std::endl;
+					meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
 					
 					SVertex normal;
 					normal[0] = 0;
@@ -148,31 +128,16 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-				// std::cout << "size of all mesh container in proc gen 1: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
-				// std::cout << "pocedural gen" << std::endl;
-				// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-				// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-				// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-				// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-				// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-				// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-				// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-				// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-				// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
 				
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
-//				std::cout << "proc gen mesh id: " << gameLevelMeshHandle.id << std::endl;
 				Entity gameLevelEntity = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(gameLevelEntity);
-//				std::cout << "current level position before set in component: " << currentLevelPosition << std::endl;
 				*ComponentManager->GetComponent<cm::transform>(gameLevelEntity) = { .position = currentLevelPosition, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
 				ComponentManager->GetComponent<cm::mesh>(gameLevelEntity)->handle = gameLevelMeshHandle;
 				cm::material* gameLevelMaterial  = ComponentManager->GetComponent<cm::material>(gameLevelEntity);
 				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
 				*gameLevelMaterial = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f },
 					.shininess = 128.0f * 0.078125f };
-//				std::cout << "TEST PROC" << std::endl;
 
 				for ( unsigned int i = 0; i < 36; ++i )
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
@@ -204,14 +169,6 @@ namespace GLVM::core
 						half_x = transitionBridgeHalfHeight;
 						half_z = transitionBridgeHalfWidth;
 					}
-					// float max    = 0.5f;
-					// if ( half_x_rand > half_z_rand ) {
-					// 	half_x = max;
-					// 	half_z = max * (float)half_z_rand / (float)half_x_rand;
-					// } else {
-					// 	half_z = max;
-					// 	half_x = max * (float)half_x_rand / (float)half_z_rand;
-					// }
 					
 					switch( i ) {
 					case 0:
@@ -256,27 +213,7 @@ namespace GLVM::core
 						break;			
 					}
 
-					if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
-						meshAxisLimitingValues.lowest_x = vertex[0];
-					} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
-						meshAxisLimitingValues.highest_x = vertex[0];
-					}
-
-					if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
-						meshAxisLimitingValues.lowest_y = vertex[1];
-					} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
-						meshAxisLimitingValues.highest_y = vertex[1];
-					}
-
-					if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
-						meshAxisLimitingValues.lowest_z = vertex[2];
-					} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
-						meshAxisLimitingValues.highest_z = vertex[2];
-					}
-					
-					// std::cout << "vertex x: " << vertex[0] << std::endl;
-					// std::cout << "vertex y: " << vertex[1] << std::endl;
-					// std::cout << "vertex z: " << vertex[2] << std::endl;
+					meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
 					
 					SVertex normal;
 					normal[0] = 0;
@@ -296,21 +233,8 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-				// std::cout << "size of all mesh container in proc gen 1: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
-				// std::cout << "pocedural gen" << std::endl;
-				// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-				// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-				// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-				// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-				// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-				// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-				// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-				// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-				// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
 				
 				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = GLVM->LoadMesh();
-//				std::cout << "proc gen mesh id: " << gameLevelMeshHandle.id << std::endl;
 				Entity transitionBridgeEntity = EntityManager->CreateEntity();
 				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(transitionBridgeEntity);
 				*ComponentManager->GetComponent<cm::transform>(transitionBridgeEntity) = { .position = transitionBridgePosition, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
@@ -319,7 +243,6 @@ namespace GLVM::core
 				ecs::TextureHandle transitionBridgeTexture = textureHandlers[3];
 				*transitionBridgeMaterial = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f },
 					.shininess = 128.0f * 0.078125f };
-//				std::cout << "TEST PROC" << std::endl;
 				++levelNubmer;
 			}
 			levelGeneratedVertices.push_back(nextLevel);
@@ -448,6 +371,10 @@ namespace GLVM::core
 		transitionBridgePosition[1]         = currentLevelPosition[1];
 		previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
 	}
+
+	// void ProceduralLevelGeneratingSystem::makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
+	// 															  core::vector<core::Vertex>& transitionBridgeVertices ) {
+	// }
 	
 	void ProceduralLevelGeneratingSystem::setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z) {
 		if ( position[0] + half_x > coordinateMaximumValuePerDirection.positive_x ) {

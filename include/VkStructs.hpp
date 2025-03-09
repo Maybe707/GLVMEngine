@@ -2,9 +2,10 @@
 #define VK_STRUCTS
 
 #include <math.h>
+#include "WavefrontObjParser.hpp"
 
 namespace GLVM::core
-{    
+{
 	struct MeshAxisMaxAbsoluteValues {
 		float absolute_x = 0.0f;
 		float absolute_y = 0.0f;
@@ -26,6 +27,26 @@ namespace GLVM::core
 			lowest_y  = MAXFLOAT;
 			highest_z = -MAXFLOAT;
 			lowest_z  = MAXFLOAT;
+		}
+
+		void comparePerDirectionAndSetToMaximumValueByModule( SVertex& vertex ) {
+			if ( vertex[0] < lowest_x ) {
+				lowest_x = vertex[0];
+			} else if ( vertex[0] > highest_x ) {
+				highest_x = vertex[0];
+			}
+
+			if ( vertex[1] < lowest_y ) {
+				lowest_y = vertex[1];
+			} else if ( vertex[1] > highest_y ) {
+				highest_y = vertex[1];
+			}
+
+			if ( vertex[2] < lowest_z ) {
+				lowest_z = vertex[2];
+			} else if ( vertex[2] > highest_z ) {
+				highest_z = vertex[2];
+			}
 		}
 	};
 	
