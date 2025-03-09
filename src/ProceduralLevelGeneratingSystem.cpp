@@ -36,6 +36,14 @@ namespace GLVM::core
 				constexpr float transitionBridgeHalfHeight = 1.0f;
 				if ( levelNubmer != 0 ) {                                               ///< On first iteration we dont need to define where locate current level depends on previousTransitionBridge
 					generateLevel( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
+				} else {
+					// Set to first level maximum values
+					coordinateMaximumValuePerDirection.lowest_x  = currentLevelPosition[0] - half_x_rand;
+					coordinateMaximumValuePerDirection.highest_x = currentLevelPosition[0] + half_x_rand;
+					coordinateMaximumValuePerDirection.lowest_y  = currentLevelPosition[1] - half_y_rand;
+					coordinateMaximumValuePerDirection.highest_y = currentLevelPosition[1] + half_y_rand;
+					coordinateMaximumValuePerDirection.lowest_z  = currentLevelPosition[2] - half_z_rand;
+					coordinateMaximumValuePerDirection.highest_z = currentLevelPosition[2] + half_z_rand;
 				}
 				
 				generateTransitionBridge( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
@@ -151,7 +159,20 @@ namespace GLVM::core
 			break;
 			}
 
+			std::cout << "next level position: " << "x: " << currentLevelPosition[0] << " y: " << currentLevelPosition[1] << " z: " << currentLevelPosition[2] << std::endl;
+			std::cout << "half x: " << half_x_rand << std::endl;
+			std::cout << "half y: " << half_y_rand << std::endl;
+			std::cout << "half z: " << half_z_rand << std::endl;
+
+			std::cout << "lowest x: " << coordinateMaximumValuePerDirection.lowest_x << std::endl;
+			std::cout << "highest x: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			std::cout << "lowest y: " << coordinateMaximumValuePerDirection.lowest_y << std::endl;
+			std::cout << "highest y: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			std::cout << "lowest z: " << coordinateMaximumValuePerDirection.lowest_z << std::endl;
+			std::cout << "highest z: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			
 			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
+				std::cout << "LEVEL COLLITION DETECTED" << std::endl;
 				previousIterationTransitionBridgeDirection = (4 + previousIterationTransitionBridgeDirection) % 4 + 1;
 			} else {
 				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( currentLevelPosition, (float)half_x_rand, (float)half_y_rand, (float)half_z_rand );
