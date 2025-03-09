@@ -44,8 +44,8 @@ namespace GLVM::core
 							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
 		void generateTransitionBridge( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
 									   const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
-		// void makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
-		// 							 core::vector<core::Vertex>& transitionBridgeVertices );
+		void makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
+									 core::vector<core::Vertex>& destinationVerticesContainer );
 		void setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z);
 		bool checkCollisionIntersectionWithMaximumCoordinates(vec3 position, float half_x, float half_y, float half_z);
 	};

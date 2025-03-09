@@ -20,7 +20,6 @@ namespace GLVM::core
 		while ( levelNubmer < 5 ) {
 			core::vector<core::Vertex> nextLevel;
 			std::vector<uint32_t> indices;
-//			std::cout << "size of all mesh container in proc gen 0: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
 			core::vector<core::Vertex> transitionBridgeVertices;
 			std::vector<uint32_t> transitionBridgeIndices;
 
@@ -46,84 +45,8 @@ namespace GLVM::core
 
 				allMeshMaxAbsoluteValues.Push({});
 				meshAxisLimitingValues.setToDefaultValues();
-				
-				unsigned int cube_vertices = 8;
-				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-					vec4 joinIndices = { -1, -1, -1, -1 };
-					vec4 weights = { 1, 1, 1, 1 };
 
-					SVertex vertex;
-					float half_x = half_x_rand;
-					float half_y = half_y_rand;
-					float half_z = half_z_rand;
-					// float max    = 0.5f;
-					// if ( half_x_rand > half_z_rand ) {
-					// 	half_x = max;
-					// 	half_z = max * (float)half_z_rand / (float)half_x_rand;
-					// } else {
-					// 	half_z = max;
-					// 	half_x = max * (float)half_x_rand / (float)half_z_rand;
-					// }
-					
-					switch( i ) {
-					case 0:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;
-					case 1:
-						vertex[0] = -(float)half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;			
-					case 2:
-						vertex[0] = -(float)half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = half_z;
-						break;			
-					case 3:
-						vertex[0] = half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = half_z;
-						break;
-					case 4:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = -(float)half_z;
-						break;
-					case 5:
-						vertex[0] = -(float)half_x;
-						vertex[1] = half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					case 6:
-						vertex[0] = -(float)half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					case 7:
-						vertex[0] = half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					}
-
-					meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
-					
-					SVertex normal;
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					SVertex texture;
-					texture[0] = 0;
-					texture[1] = 1;
-
-					nextLevel.Push({{vertex[0], vertex[1], vertex[2]},
-									{normal[0], normal[1], normal[2]},
-									{texture[0], texture[1]},
-									{joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-									{weights[0], weights[1], weights[2], weights[3]}});
-				}
+				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x_rand, half_y_rand, half_z_rand, nextLevel );
 
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
@@ -144,91 +67,18 @@ namespace GLVM::core
 
 				allMeshMaxAbsoluteValues.Push({});
 				meshAxisLimitingValues.setToDefaultValues();
-				
-				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-					vec4 joinIndices;
-					vec4 weights;
-					joinIndices[0] = -1;
-					joinIndices[1] = -1;
-					joinIndices[2] = -1;
-					joinIndices[3] = -1;
 
-					weights[0] = 1;
-					weights[1] = 1;
-					weights[2] = 1;
-					weights[3] = 1;
-
-					SVertex vertex;
-					float half_x = 0.0f;
-					float half_y = half_y_rand;
-					float half_z = 0.0f;
-					if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
-						half_x = transitionBridgeHalfWidth;
-						half_z = transitionBridgeHalfHeight;
-					} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-						half_x = transitionBridgeHalfHeight;
-						half_z = transitionBridgeHalfWidth;
-					}
-					
-					switch( i ) {
-					case 0:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;
-					case 1:
-						vertex[0] = -(float)half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;			
-					case 2:
-						vertex[0] = -(float)half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = half_z;
-						break;			
-					case 3:
-						vertex[0] = half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = half_z;
-						break;
-					case 4:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = -(float)half_z;
-						break;
-					case 5:
-						vertex[0] = -(float)half_x;
-						vertex[1] = half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					case 6:
-						vertex[0] = -(float)half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					case 7:
-						vertex[0] = half_x;
-						vertex[1] = -(float)half_y;
-						vertex[2] = -(float)half_z;
-						break;			
-					}
-
-					meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
-					
-					SVertex normal;
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					SVertex texture;
-					texture[0] = 0;
-					texture[1] = 1;
-
-					transitionBridgeVertices.Push({{vertex[0], vertex[1], vertex[2]},
-									{normal[0], normal[1], normal[2]},
-									{texture[0], texture[1]},
-									{joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-									{weights[0], weights[1], weights[2], weights[3]}});
+				float half_x = 0.0f;
+				float half_y = half_y_rand;
+				float half_z = 0.0f;
+				if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
+					half_x = transitionBridgeHalfWidth;
+					half_z = transitionBridgeHalfHeight;
+				} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
+					half_x = transitionBridgeHalfHeight;
+					half_z = transitionBridgeHalfWidth;
 				}
+				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x, half_y, half_z, transitionBridgeVertices );
 
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
@@ -372,9 +222,78 @@ namespace GLVM::core
 		previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
 	}
 
-	// void ProceduralLevelGeneratingSystem::makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
-	// 															  core::vector<core::Vertex>& transitionBridgeVertices ) {
-	// }
+	void ProceduralLevelGeneratingSystem::makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
+																  core::vector<core::Vertex>& destinationVerticesContainer ) {
+		unsigned int cube_vertices = 8;
+		for ( unsigned int i = 0; i < cube_vertices; ++i ) {
+			// vec4 joinIndices = { -1, -1, -1, -1 };
+			// vec4 weights = { 1, 1, 1, 1 };
+
+			SVertex vertex;
+			// float half_x = half_x_rand;
+			// float half_y = half_y_rand;
+			// float half_z = half_z_rand;
+					
+			switch( i ) {
+			case 0:
+				vertex[0] = half_x;
+				vertex[1] = half_y;
+				vertex[2] = half_z;
+				break;
+			case 1:
+				vertex[0] = -(float)half_x;
+				vertex[1] = half_y;
+				vertex[2] = half_z;
+				break;			
+			case 2:
+				vertex[0] = -(float)half_x;
+				vertex[1] = -(float)half_y;
+				vertex[2] = half_z;
+				break;			
+			case 3:
+				vertex[0] = half_x;
+				vertex[1] = -(float)half_y;
+				vertex[2] = half_z;
+				break;
+			case 4:
+				vertex[0] = half_x;
+				vertex[1] = half_y;
+				vertex[2] = -(float)half_z;
+				break;
+			case 5:
+				vertex[0] = -(float)half_x;
+				vertex[1] = half_y;
+				vertex[2] = -(float)half_z;
+				break;			
+			case 6:
+				vertex[0] = -(float)half_x;
+				vertex[1] = -(float)half_y;
+				vertex[2] = -(float)half_z;
+				break;			
+			case 7:
+				vertex[0] = half_x;
+				vertex[1] = -(float)half_y;
+				vertex[2] = -(float)half_z;
+				break;			
+			}
+
+			meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
+					
+			SVertex normal;
+			normal[0] = 0;
+			normal[1] = 1;
+			normal[2] = 0;
+			SVertex texture;
+			texture[0] = 0;
+			texture[1] = 1;
+
+			destinationVerticesContainer.Push({{vertex[0], vertex[1], vertex[2]},
+											   {normal[0], normal[1], normal[2]},
+											   {texture[0], texture[1]},
+											   {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
+											   {weights[0], weights[1], weights[2], weights[3]}});
+		}
+	}
 	
 	void ProceduralLevelGeneratingSystem::setCoordinateMaximumValuePerDirection(vec3 position, float half_x, float half_y, float half_z) {
 		if ( position[0] + half_x > coordinateMaximumValuePerDirection.positive_x ) {
