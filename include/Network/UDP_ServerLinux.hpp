@@ -10,13 +10,13 @@
 namespace GLVM::core
 {
 	struct UDP_ServerLinux {
-		unsigned long port;
+		unsigned short port;
 		static const unsigned int  maxBufferSize = 1024;
-		int           socketFileDescriptor;
-		sockaddr_in   serverAddress;
-		sockaddr_in   clientAddress;
-		socklen_t     clientAddressLength = sizeof(clientAddress);
-		char          buffer[maxBufferSize];
+		int            socketFileDescriptor;
+		sockaddr_in    serverAddress;
+		sockaddr_in    clientAddress;
+		socklen_t      clientAddressLength = sizeof(clientAddress);
+		char           buffer[maxBufferSize];
 
 		UDP_ServerLinux( unsigned long port = 8080 );
 		char* receive();

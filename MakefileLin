@@ -18,7 +18,8 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
 	  ./textures/container2.cpp ./textures/container2_specular.cpp \
 	  ./src/Systems/DamageSystem.cpp ./src/Systems/EnemySystem.cpp ./textures/fontAtlas.cpp ./textures/inventorySlot.cpp \
-	  ./src/Systems/ItemSystem.cpp ./src/ProceduralLevelGeneratingSystem.cpp
+	  ./src/Systems/ItemSystem.cpp ./src/ProceduralLevelGeneratingSystem.cpp ./src/Network/UDP_ServerLinux.cpp \
+	  ./src/Network/UDP_ClientLinux.cpp
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = linGame
 

@@ -20,10 +20,12 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Engine.hpp"
+#include "Network/UDP_ServerLinux.hpp"
 #include "SpritesData.hpp"
 #include "Texture.hpp"
 #include "VertexMath.hpp"
 
+#include <cstdio>
 #include <map>
 #include <random>
 
@@ -66,6 +68,20 @@ int main()
 	// [[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromFile("../textures/data/gray.png");
 	// [[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromFile("../textures/data/container2.png");
 	// [[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromFile("../textures/data/container2_specular.png");
+
+	while(1) {
+		core::UDP_ServerLinux serverLinux;
+		char* buffer = serverLinux.receive();
+		printf("Message sent to server: %s\n", buffer);
+		// for ( int i = 0; i < 1024; ++i ) {
+		// 	if ( buffer[i] == '\n' )
+		// 		break;
+
+			
+		// }
+
+		serverLinux.response();
+	}
 	
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,

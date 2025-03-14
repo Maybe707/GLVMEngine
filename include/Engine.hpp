@@ -28,6 +28,7 @@
 #include "Constants.hpp"
 #include <mutex>
 #include "TextureManager.hpp"
+#include "Network/UDP_ServerLinux.hpp"
 
 using Entity = unsigned int;
 
