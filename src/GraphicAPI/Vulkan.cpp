@@ -3027,6 +3027,28 @@ namespace GLVM::core
 		}
 	}
 
+	void CVulkanRenderer::updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
+												   int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets ) {
+		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = ubo;
+			modelMatrixBufferInfo.offset = i * uboStructSize;
+			modelMatrixBufferInfo.range = uboStructSize;
+			
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = uboDescriptorSets[i];
+			descriptorWrites[0].dstBinding = uboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+	}
+	
 	void CVulkanRenderer::updateDescriptorSets( [[maybe_unused]] std::vector<VkDescriptorSet>& descriptorSets, [[maybe_unused]] const Pipeline& pipeline,
 												[[maybe_unused]] DescriptorsTypes descriptorType) {
 	}
@@ -3444,58 +3466,20 @@ namespace GLVM::core
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
 		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
-
 		int modelMatrixUboBinding = modelMatrixBindings[0];
-
 		constexpr unsigned int matrixUboDescriptorID = 0; 
 		allocateDescriptorSets( matrixUboDescriptorSets, mainRenderScenePipeline, matrixUboDescriptorID,
 								MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = modelMatrixUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(ModelMatrixUBO);
-			modelMatrixBufferInfo.range = sizeof(ModelMatrixUBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = matrixUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = modelMatrixUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
+		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
+								 modelMatrixUboBinding, matrixUboDescriptorSets );
 
 		core::vector<u32> lightDataBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
-
 		int lightDataUboBinding = lightDataBindings[0];
-
 		constexpr unsigned int lightDataUboDescriptorID = 1; 
 		allocateDescriptorSets( lightDataUboDescriptorSets, mainRenderScenePipeline, lightDataUboDescriptorID,
 								MAX_FRAMES_IN_FLIGHT );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = lightDataUniformBuffer;
-			modelMatrixBufferInfo.offset = 0;
-			modelMatrixBufferInfo.range = sizeof(LightData);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = lightDataUboDescriptorSets[i];
-			descriptorWrites[0].dstBinding = lightDataUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		}
+		updateDescriptorSetsUBO( lightDataUniformBuffer, sizeof(LightData), MAX_FRAMES_IN_FLIGHT,
+								 lightDataUboBinding,lightDataUboDescriptorSets );
 
 		core::vector<u32> specularSamplerBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_SAMPLER);
  

@@ -31,7 +31,6 @@ namespace GLVM::core
 	void UDP_ClientLinux::response() {
 		/// Sending message to server
 		sendto(socketFileDescriptor, (const char *)message, strlen(message), 0, (const struct sockaddr *)&serverAddress, sizeof(serverAddress));
-		printf("Message sent to server: %s\n", message);
 	}
 
 	UDP_ClientLinux::~UDP_ClientLinux() {

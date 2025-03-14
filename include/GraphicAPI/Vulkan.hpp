@@ -585,6 +585,8 @@ namespace GLVM::core
         void createMainRenderDescriptorPool();
 		void allocateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline,
 									 unsigned int desriptorID, unsigned int descriptorSetsNumber);
+		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
+									  int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets);
 		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
