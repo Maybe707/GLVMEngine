@@ -3049,6 +3049,34 @@ namespace GLVM::core
 		}
 	}
 
+	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, const unsigned int& descriptorSetsNumber,
+																	const core::vector<unsigned int> bindings, std::vector<VkDescriptorSet>& descriptorSets,
+																	const unsigned int descriptorCount ) {
+		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
+			VkDescriptorImageInfo imageInfo{};
+			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			unsigned int textureIndex = i / 2;
+			imageInfo.imageView = textureImages[textureIndex].views[0];
+			imageInfo.sampler = textureSampler;
+
+//			std::array<VkWriteDescriptorSet, writesNumber> descriptorWrites{};
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
+
+			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
+				descriptorWrites.Push({});
+				const unsigned int lastElement = descriptorWrites.GetSize() - 1;
+				descriptorWrites[lastElement].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[lastElement].dstSet = descriptorSets[i];
+				descriptorWrites[lastElement].dstBinding = bindings[j];
+				descriptorWrites[lastElement].dstArrayElement = 0;
+				descriptorWrites[lastElement].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[lastElement].descriptorCount = descriptorCount;
+				descriptorWrites[lastElement].pImageInfo = &imageInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+		}
+	}
+	
 	void CVulkanRenderer::createDescriptorImageInfo( const unsigned int descriptorNumber, VkImageLayout imageLayout,
 													 std::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
 													 VkDescriptorImageInfo descriptorImageInfos[] ) {
@@ -3502,26 +3530,29 @@ namespace GLVM::core
 			constexpr unsigned int specularSamplerUboDescriptorID = 2; 
 			allocateDescriptorSets( specularSamplerDescriptorSets, mainRenderScenePipeline, specularSamplerUboDescriptorID,
 									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
-			
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
-				VkDescriptorImageInfo imageInfo{};
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				unsigned int textureIndex = i / 2;
-				imageInfo.imageView = textureImages[textureIndex].views[0];
-				imageInfo.sampler = textureSampler;
 
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = specularSamplerDescriptorSets[i];
-				descriptorWrites[0].dstBinding = specularSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
+			core::vector<unsigned int> bindings;
+			bindings.Push(specularSamplerBinding);
+			updateDescriptorSetsCombinedImageSampler( textureImages, MAX_FRAMES_IN_FLIGHT * DS_specular_number, bindings, specularSamplerDescriptorSets, 1 );
+			// for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			// 	VkDescriptorImageInfo imageInfo{};
+			// 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			// 	unsigned int textureIndex = i / 2;
+			// 	imageInfo.imageView = textureImages[textureIndex].views[0];
+			// 	imageInfo.sampler = textureSampler;
 
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-			}
+			// 	std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			// 	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			// 	descriptorWrites[0].dstSet = specularSamplerDescriptorSets[i];
+			// 	descriptorWrites[0].dstBinding = specularSamplerBinding;
+			// 	descriptorWrites[0].dstArrayElement = 0;
+			// 	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+			// 	descriptorWrites[0].descriptorCount = 1;
+			// 	descriptorWrites[0].pImageInfo = &imageInfo;
+
+			// 	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			// }
 		}
 		
 		core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
