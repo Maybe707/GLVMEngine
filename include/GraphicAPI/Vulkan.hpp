@@ -587,6 +587,9 @@ namespace GLVM::core
 									 unsigned int desriptorID, unsigned int descriptorSetsNumber);
 		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
 									  int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets);
+		void createDescriptorImageInfo( const unsigned int descriptorNumber, VkImageLayout imageLayout,
+										std::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
+										VkDescriptorImageInfo descriptorImageInfos[]);
 		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
