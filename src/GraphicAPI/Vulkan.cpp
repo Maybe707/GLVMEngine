@@ -23,6 +23,7 @@
 #include "EntityManager.hpp"
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
+#include "UnixApi/WindowWaylandVulkan.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "WavefrontObjParser.hpp"
@@ -39,6 +40,7 @@
 #include <glm/trigonometric.hpp>
 #include <thread>
 #include <vulkan/vulkan_core.h>
+#include <vulkan/vulkan_wayland.h>
 
 namespace GLVM::core
 {    
@@ -458,6 +460,20 @@ namespace GLVM::core
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		Window.configureWindow();
 #endif
+
+// #ifdef VK_USE_PLATFORM_WAYLAND_KHR
+// 		Window.Close();
+// 		Window = GLVM::core::WindowWaylandVulkan();
+// 		// if ( buffer == NULL )
+// 		// 	std::cout << "BUFFER V GOVNE" << std::endl;
+			
+// 		createWaylandSurfaceInfo.display = display;
+// 		createWaylandSurfaceInfo.surface = wl_surface;
+
+// 		createWaylandSurfaceInfo.sType   = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+// 		createWaylandSurfaceInfo.pNext   = nullptr;
+// 		createWaylandSurfaceInfo.flags   = 0;
+// #endif
 		
         cleanupSwapChain();
 		
@@ -608,6 +624,25 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::initWindow() {
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+//		Window->Close();
+		Window = new GLVM::core::WindowWaylandVulkan();
+		// if ( buffer == NULL )
+		// 	std::cout << "BUFFER V GOVNE" << std::endl;
+			
+		createWaylandSurfaceInfo.display = display;
+		createWaylandSurfaceInfo.surface = wl_surface;
+
+		if ( createWaylandSurfaceInfo.display == NULL )
+			std::cout << "DISPLAY NULL" << std::endl;
+		else if ( createWaylandSurfaceInfo.surface == NULL )
+			std::cout << "SURFACE NULL" << std::endl;
+		
+		createWaylandSurfaceInfo.sType   = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
+		createWaylandSurfaceInfo.pNext   = nullptr;
+		createWaylandSurfaceInfo.flags   = 0;
+#endif
+		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
 		Window.Close();
 		Window = GLVM::core::WindowXVulkan();
@@ -1527,6 +1562,12 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createSurface() {
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+        if (vkCreateWaylandSurfaceKHR(instance, &createWaylandSurfaceInfo, nullptr, &surface) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create window surface!");
+        }
+#endif
+
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         if (vkCreateXlibSurfaceKHR(instance, &createXlibSurfaceInfo, nullptr, &surface) != VK_SUCCESS) {
             throw std::runtime_error("failed to create window surface!");
@@ -2986,8 +3027,9 @@ namespace GLVM::core
 		memory = modelCubeShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 shadowMapPointLightModelMatrixUniformBuffer, shadowMapPointLightModelMatrixUniformBuffersMemory);
-		
-		createBuffer(lightDataBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+
+		memory = lightDataBufferSize * MAX_FRAMES_IN_FLIGHT;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 lightDataUniformBuffer, lightDataUniformBuffersMemory);
     }
 
@@ -3034,6 +3076,10 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = ubo;
 			modelMatrixBufferInfo.offset = i * uboStructSize;
 			modelMatrixBufferInfo.range = uboStructSize;
+
+			std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
+			std::cout << "buffer size: " << uboStructSize << std::endl;
+			std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -3059,7 +3105,8 @@ namespace GLVM::core
 			imageInfo.imageView = textureImages[textureIndex].views[0];
 			imageInfo.sampler = textureSampler;
 
-//			std::array<VkWriteDescriptorSet, writesNumber> descriptorWrites{};
+			// constexpr int var = descriptorCount;
+			// std::array<VkWriteDescriptorSet, var> descriptorWrites{};
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
 			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
@@ -3106,7 +3153,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3135,7 +3182,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3164,7 +3211,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3222,7 +3269,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = hudScreenUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(HUD_SCREEN_UBO);
 			modelMatrixBufferInfo.range = sizeof(HUD_SCREEN_UBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3251,7 +3298,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = uiUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
 			modelMatrixBufferInfo.range = sizeof(UI_UBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3333,7 +3380,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = uiIconsUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
 			modelMatrixBufferInfo.range = sizeof(UI_UBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -3402,7 +3449,7 @@ namespace GLVM::core
 			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
 			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
-			
+
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -6040,6 +6087,12 @@ namespace GLVM::core
 		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         std::vector<const char*> pRequiredExtentions = {"VK_KHR_win32_surface",
+            "VK_KHR_surface"};
+#endif
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+        std::vector<const char*> pRequiredExtentions = {"VK_KHR_wayland_surface",
+			"VK_KHR_display", "VK_EXT_direct_mode_display",
             "VK_KHR_surface"};
 #endif
 

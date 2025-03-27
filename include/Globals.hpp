@@ -9,3 +9,20 @@
 
 extern GLVM::core::CEvent g_eEvent;
 extern GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
+extern struct wl_surface*    wl_surface;
+extern struct wl_compositor* compositor;
+extern struct xdg_toplevel*  xdg_topLevel;
+extern struct xdg_wm_base*   xdg_shell;
+extern struct wl_buffer*     buffer;
+extern struct wl_shm*        shared_memory;
+extern struct wl_seat*       seat;
+extern struct wl_keyboard*   keyboard;
+extern void* pixels;
+extern uint16_t width;
+extern uint16_t height;
+extern uint8_t  constant_byte;
+extern uint8_t  close_xdg_toplevel;
+extern struct wl_display*  display;
+extern struct wl_registry* registry;
+extern struct wl_callback* frame_callback;
+extern struct xdg_surface* xdg_surface;

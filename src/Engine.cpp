@@ -53,6 +53,23 @@
 
 GLVM::core::CEvent g_eEvent;
 GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
+struct wl_surface*    wl_surface;
+struct wl_compositor* compositor;
+struct xdg_toplevel*  xdg_topLevel;
+struct xdg_wm_base*   xdg_shell;
+struct wl_buffer*     buffer;
+struct wl_shm*        shared_memory;
+struct wl_seat*       seat;
+struct wl_keyboard*   keyboard;
+void* pixels;
+uint16_t width = 480;
+uint16_t height = 320;
+uint8_t  constant_byte = 0;
+uint8_t  close_xdg_toplevel;
+struct wl_display*  display;
+struct wl_registry* registry;
+struct wl_callback* frame_callback;
+struct xdg_surface* xdg_surface;
 
 namespace GLVM::core
 {
@@ -132,7 +149,7 @@ namespace GLVM::core
 		vulkanRenderer->pathsArray_            = pathsArray_;
 		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
 		vulkanRenderer->run();
-		vulkanRenderer->Window.Input_Stack_    = &Input_Stack_;		
+		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 
 #ifdef __linux__
 		// XEvent uXEvent;
@@ -164,9 +181,9 @@ namespace GLVM::core
 			chrono->Reset();
 		    gravity += deltaFrameTime;
 
-			vulkanRenderer->Window.ClearDisplay();
+			vulkanRenderer->Window->ClearDisplay();
              
-			vulkanRenderer->Window.HandleEvent(g_eEvent);
+			vulkanRenderer->Window->HandleEvent(g_eEvent);
 //			std::cout << "left mouse released flag" << g_eEvent.isItemDraged << std::endl;			
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
@@ -191,7 +208,7 @@ namespace GLVM::core
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
 
-			vulkanRenderer->Window.CursorLock(g_eEvent.mousePointerPosition.position_X,
+			vulkanRenderer->Window->CursorLock(g_eEvent.mousePointerPosition.position_X,
 								  g_eEvent.mousePointerPosition.position_Y,
 								  &g_eEvent.mousePointerPosition.offset_X,
 											  &g_eEvent.mousePointerPosition.offset_Y);
@@ -229,10 +246,10 @@ namespace GLVM::core
 			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
 			vulkanRenderer->initializeGameLevelVertices();
 			vulkanRenderer->draw();
-			vulkanRenderer->Window.SwapBuffers();
+			vulkanRenderer->Window->SwapBuffers();
 		}
 
-		vulkanRenderer->Window.Close();
+		vulkanRenderer->Window->Close();
 		delete vulkanRenderer;
 	}
 

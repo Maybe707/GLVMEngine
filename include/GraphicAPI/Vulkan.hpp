@@ -42,11 +42,18 @@
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
-#define VK_USE_PLATFORM_XCB_KHR
+//#define VK_USE_PLATFORM_XCB_KHR
+#define VK_USE_PLATFORM_WAYLAND_KHR
 #endif
 
 #ifdef _WIN32
 #define VK_USE_PLATFORM_WIN32_KHR
+#endif
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+#include "vulkan/vulkan.h"
+#include "vulkan/vulkan_wayland.h"
+#include "UnixApi/WindowWaylandVulkan.hpp"
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
@@ -300,6 +307,10 @@ namespace GLVM::core
 
 		const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
 		const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
+
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+		GLVM::core::WindowWaylandVulkan* Window;
+#endif
 		
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		GLVM::core::WindowXCBVulkan Window;
@@ -335,6 +346,10 @@ namespace GLVM::core
 		mat4 viewMatrix;
 		mat4 projectionMatrix;
 
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+		VkWaylandSurfaceCreateInfoKHR createWaylandSurfaceInfo;
+#endif
+		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;
 #endif

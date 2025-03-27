@@ -1,7 +1,7 @@
 C = clang
 CC = clang++
 SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
-LDFLAGS = -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb
+LDFLAGS = -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb -lwayland-client
 CXXFLAGS = -c -std=c++20 -static -Wall -Wextra -Wpedantic -Werror -g -march=x86-64-v3 -O2
 CFLAGS = -c -g -Wall -Wextra -Wpedantic -Werror -march=x86-64-v3 -O2
 INC = -I./include
@@ -19,14 +19,17 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./textures/container2.cpp ./textures/container2_specular.cpp \
 	  ./src/Systems/DamageSystem.cpp ./src/Systems/EnemySystem.cpp ./textures/fontAtlas.cpp ./textures/inventorySlot.cpp \
 	  ./src/Systems/ItemSystem.cpp ./src/ProceduralLevelGeneratingSystem.cpp ./src/Network/UDP_ServerLinux.cpp \
-	  ./src/Network/UDP_ClientLinux.cpp
+	  ./src/Network/UDP_ClientLinux.cpp ./src/UnixApi/WindowWaylandVulkan.cpp
+
+SOURCES_C = xdg-shell-protocol.c
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
+OBJECTS_C = $(SOURCES_C:%.c=$(BUILD)/%.o)
 EXECUTABLE = linGame
 
-all: $(SOURCES) $(EXECUTABLE)
+all: $(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(SANITIZE) $(OBJECTS) -o $(BUILD)/$@
+$(EXECUTABLE): $(OBJECTS) $(OBJECTS_C)
+	$(CC) $(LDFLAGS) $(SANITIZE) $(OBJECTS) $(OBJECTS_C) -o $(BUILD)/$@
 
 $(BUILD)/%.o : ./src/%.cpp
 	mkdir -p $(@D)
