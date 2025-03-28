@@ -289,7 +289,7 @@ namespace GLVM::core
 
 		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
 		float delta_x = current_X - prev_X;
-		
+//		std::cout << "delta x: " << delta_x << std::endl;
         // if(fPitch > 89.0f)
         //     fPitch = 89.0f;
         // if(fPitch < -89.0f)

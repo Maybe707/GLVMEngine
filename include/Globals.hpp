@@ -29,3 +29,6 @@ extern struct wl_display*  display;
 extern struct wl_registry* registry;
 extern struct wl_callback* frame_callback;
 extern struct xdg_surface* xdg_surface;
+
+extern int x_pointer;
+extern int y_pointer;

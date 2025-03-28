@@ -22,3 +22,6 @@ struct wl_display*  display;
 struct wl_registry* registry;
 struct wl_callback* frame_callback;
 struct xdg_surface* xdg_surface;
+
+int x_pointer;
+int y_pointer;

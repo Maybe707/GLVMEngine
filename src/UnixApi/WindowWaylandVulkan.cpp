@@ -3,6 +3,7 @@
 #include "UnixApi/xdg-shell-client-protocol.h"
 #include <cstddef>
 #include <wayland-client-core.h>
+#include <wayland-util.h>
 
 namespace GLVM::core {
 	WindowWaylandVulkan::WindowWaylandVulkan() {
@@ -67,6 +68,13 @@ namespace GLVM::core {
 		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
 		   buffers, and other resources.
 		*/
+		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
+		_Event.mousePointerPosition.position_X = x_pointer;
+		_Event.mousePointerPosition.position_Y = y_pointer;
+
+		// std::cout << "mouse x: " << _Event.mousePointerPosition.position_X << std::endl;
+		// std::cout << "mouse y: " << _Event.mousePointerPosition.position_Y << std::endl;
+		
 		wl_display_dispatch( display );
 // 		while (wl_display_dispatch( display )) {
 // //			printf("%s", "HREN GOVNA!");
@@ -101,6 +109,12 @@ namespace GLVM::core {
 	void WindowWaylandVulkan::ClearDisplay() {
 	};
 	void WindowWaylandVulkan::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
+		int iOffset_X = 0, iOffset_Y = 0;
+        iOffset_X = _x_position - 960;
+        iOffset_Y = _y_position - 540;
+        
+        *_x_offset += iOffset_X;
+        *_y_offset -= iOffset_Y;
 	};
 
 	void WindowWaylandVulkan::Close() {
@@ -326,8 +340,10 @@ namespace GLVM::core {
 	
 	void WindowWaylandVulkan::pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t time, wl_fixed_t sx, wl_fixed_t sy) {
-		printf("Pointer moved to %f, %f\n",
-			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+		// printf("Pointer moved to %f, %f\n",
+		// 	   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+		x_pointer = wl_fixed_to_int(sx);
+		y_pointer = wl_fixed_to_int(sy);
 	}
 
 	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
