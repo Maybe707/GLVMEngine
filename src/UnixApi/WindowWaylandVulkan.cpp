@@ -2,6 +2,7 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "UnixApi/xdg-shell-client-protocol.h"
 #include <cstddef>
+#include <wayland-client-core.h>
 
 namespace GLVM::core {
 	WindowWaylandVulkan::WindowWaylandVulkan() {
@@ -30,6 +31,7 @@ namespace GLVM::core {
 		   surface becomes the foundation for windows, popups, and anything visual in a Wayland client
 		*/
 		wl_surface = wl_compositor_create_surface( compositor );
+		pointer_surface = wl_compositor_create_surface(compositor);
 		/* set up a frame callback, which lets the client know when it's a good time to start rendering
 		   the next frame — usually tied to the compositor's refresh cycle (like vsync).
 		*/
@@ -57,83 +59,15 @@ namespace GLVM::core {
 		*/
 		wl_surface_commit( wl_surface );
 
-		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
-		   buffers, and other resources.
-		*/
 
-		// if ( buffer == NULL )
-		// 	std::cout << "BUFFER SOVSEM V GOVNE" << std::endl;
-		// else
-		// 	std::cout << "BUFFER V PORYADE" << std::endl;
-		
-		// while (wl_display_dispatch( display )) {
-		// 	if ( wl_surface == NULL )
-		// 		std::cout << "NULL SURFACE" << std::endl;
-		// 	else if ( compositor == NULL )
-		// 		std::cout << "NULL COMPOSITOR" << std::endl;
-		// 	else if ( xdg_topLevel == NULL )
-		// 		std::cout << "NULL XDG_TOPLEVEL" << std::endl;
-		// 	else if ( xdg_shell == NULL )
-		// 		std::cout << "NULL XDG_SHELL" << std::endl;
-		// 	else if ( buffer == NULL )
-		// 		std::cout << "NULL BUFFER" << std::endl;
-		// 	else if ( shared_memory == NULL )
-		// 		std::cout << "NULL SHARED_MEMORY" << std::endl;
-		// 	else if ( seat == NULL )
-		// 		std::cout << "NULL SEAT" << std::endl;
-		// 	else if ( keyboard == NULL )
-		// 		std::cout << "NULL KEYBOARD" << std::endl;
-		// 	else if ( display == NULL )
-		// 		std::cout << "NULL DISPLAY" << std::endl;
-		// 	else if ( registry == NULL )
-		// 		std::cout << "NULL REGISTRY" << std::endl;
-		// 	else if ( frame_callback == NULL )
-		// 		std::cout << "NULL FRAME_CALLBACK" << std::endl;
-		// 	else if ( xdg_surface == NULL )
-		// 		std::cout << "NULL XDG_SURFACE" << std::endl;
-		// 	else if ( pixels == NULL )
-		// 		std::cout << "NULL PIXELS" << std::endl;
-			
-		// 	if ( close_xdg_toplevel )
-		// 		break;
-		// }
-		// if ( buffer == NULL )
-		// 	std::cout << "BUFFER SOVSEM V GOVNE" << std::endl;
-		// else
-		// 	std::cout << "BUFFER V PORYADE" << std::endl;
 		std::cout << "CONSTRUCTOR WAYLAND" << std::endl;
 	}
 
 	bool WindowWaylandVulkan::HandleEvent([[maybe_unused]] CEvent& _Event) {
-		// if ( wl_surface == NULL )
-		// 	std::cout << "NULL SURFACE" << std::endl;
-		// else if ( compositor == NULL )
-		// 	std::cout << "NULL COMPOSITOR" << std::endl;
-		// else if ( xdg_topLevel == NULL )
-		// 	std::cout << "NULL XDG_TOPLEVEL" << std::endl;
-		// else if ( xdg_shell == NULL )
-		// 	std::cout << "NULL XDG_SHELL" << std::endl;
-		// else if ( buffer == NULL )
-		// 	std::cout << "NULL BUFFER" << std::endl;
-		// else if ( shared_memory == NULL )
-		// 	std::cout << "NULL SHARED_MEMORY" << std::endl;
-		// else if ( seat == NULL )
-		// 	std::cout << "NULL SEAT" << std::endl;
-		// else if ( keyboard == NULL )
-		// 	std::cout << "NULL KEYBOARD" << std::endl;
-		// else if ( display == NULL )
-		// 	std::cout << "NULL DISPLAY" << std::endl;
-		// else if ( registry == NULL )
-		// 	std::cout << "NULL REGISTRY" << std::endl;
-		// else if ( frame_callback == NULL )
-		// 	std::cout << "NULL FRAME_CALLBACK" << std::endl;
-		// else if ( xdg_surface == NULL )
-		// 	std::cout << "NULL XDG_SURFACE" << std::endl;
-		// else if ( pixels == NULL )
-		// 	std::cout << "NULL PIXELS" << std::endl;
-
+		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
+		   buffers, and other resources.
+		*/
 		wl_display_dispatch( display );
-		
 // 		while (wl_display_dispatch( display )) {
 // //			printf("%s", "HREN GOVNA!");
 // 			if ( close_xdg_toplevel )
@@ -142,6 +76,26 @@ namespace GLVM::core {
 		return false;
 	}
 
+// Create transparent cursor
+	struct wl_buffer* WindowWaylandVulkan::create_transparent_cursor([[maybe_unused]] struct wl_shm *shm) {
+		int size = 4 * 64 * 64; // 64x64 RGBA cursor (common size)
+		int32_t file_descriptor = alocate_shared_memory( size );
+		void* data = mmap(NULL, width * height * 4, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
+    
+		// Fill with transparent pixels
+		for ( int i = 0; i < 64 * 64; ++i )
+			((int*)data)[i] = 0x00000000;
+
+		struct wl_shm_pool *pool = wl_shm_create_pool(shm, file_descriptor, size);
+		struct wl_buffer *buffer = wl_shm_pool_create_buffer(pool, 0, 64, 64, 64*4, WL_SHM_FORMAT_ARGB8888);
+    
+		munmap(data, size);
+		close(file_descriptor);
+		wl_shm_pool_destroy(pool);
+    
+		return buffer;
+	}
+	
 	void WindowWaylandVulkan::SwapBuffers() {
 	};
 	void WindowWaylandVulkan::ClearDisplay() {
@@ -262,10 +216,6 @@ namespace GLVM::core {
 		draw();
 	}
 
-	// uint16_t WindowWaylandVulkan::width  = 320;
-	// uint16_t WindowWaylandVulkan::height = 240;
-	// uint8_t  WindowWaylandVulkan::constant_byte = 0;
-
 	struct wl_callback_listener WindowWaylandVulkan::callback_listener = {
 		/* Notify the client when the related request is done.
 		   param callback_data request-specific data for the callback
@@ -319,12 +269,35 @@ namespace GLVM::core {
 
 	void WindowWaylandVulkan::keyboard_key([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 										   [[maybe_unused]] uint32_t time, uint32_t key, [[maybe_unused]] uint32_t state) {
-		if ( key == 1 ) {
-			close_xdg_toplevel = 1;
-		} else if ( key == 30 ) {
-			printf("a\n");
-		} else if ( key == 32 ) {
-			printf("d\n");
+		// if ( key == 1 ) {
+		// 	close_xdg_toplevel = 1;
+		// } else if ( key == 30 ) {
+		// 	printf("a\n");
+		// } else if ( key == 32 ) {
+		// 	printf("d\n");
+		// }
+
+		if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
+			printf("Key pressed: %u\n", key);
+			if (key == 1) {  // Typically ESC key
+				printf("ESC pressed - exiting\n");
+				wl_display_disconnect(display);
+			}
+			if (key == 17) {  // Typically ESC key
+				printf("w\n");
+			}
+			if (key == 31) {  // Typically ESC key
+				printf("s\n");
+			}
+			if (key == 30) {  // Typically ESC key
+				printf("a\n");
+			}
+			if (key == 32) {  // Typically ESC key
+				printf("d\n");
+			}
+			if (key == 57) {  // Typically ESC key
+				printf("space\n");
+			}
 		}
 	}
 
@@ -338,8 +311,82 @@ namespace GLVM::core {
 	
 	}
 
+	// Pointer listener callbacks
+	void WindowWaylandVulkan::pointer_enter([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface,
+							  wl_fixed_t sx, wl_fixed_t sy) {
+		printf("Pointer entered surface at %f, %f\n",
+			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+	}
+
+	void WindowWaylandVulkan::pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface) {
+		printf("Pointer left surface\n");
+	}
+	
+	void WindowWaylandVulkan::pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							   [[maybe_unused]] uint32_t time, wl_fixed_t sx, wl_fixed_t sy) {
+		printf("Pointer moved to %f, %f\n",
+			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+	}
+
+	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							   [[maybe_unused]] uint32_t serial, [[maybe_unused]] uint32_t time, uint32_t button,
+							   uint32_t state) {
+		const char *button_name = "unknown";
+		std::cout << "button number: " << button << std::endl;
+		// switch (button) {
+        // case BTN_LEFT: button_name = "left"; break;
+        // case BTN_RIGHT: button_name = "right"; break;
+        // case BTN_MIDDLE: button_name = "middle"; break;
+		// }
+
+//        wl_pointer_set_cursor(pointer, serial, NULL, 0, 0);
+//		pointer = nullptr;
+
+		// Hide cursor on first opportunity
+		struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
+		wl_surface_attach(pointer_surface, transparent, 0, 0);
+		wl_surface_commit(pointer_surface);
+		wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
+
+		
+		printf("%s mouse button %s\n",
+			   state == WL_POINTER_BUTTON_STATE_PRESSED ? "Pressed" : "Released",
+			   button_name);
+	}
+
+	void WindowWaylandVulkan::pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							 [[maybe_unused]] uint32_t time, uint32_t axis, wl_fixed_t value) {
+		const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
+			"horizontal" : "vertical";
+		printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
+	}
+	
+	struct wl_pointer_listener WindowWaylandVulkan::pointer_listener = {
+		.enter = pointer_enter,
+		.leave = pointer_leave,
+		.motion = pointer_motion,
+		.button = pointer_button,
+		.axis = pointer_axis,
+		.frame = nullptr,
+		.axis_source = nullptr,
+		.axis_stop = nullptr,
+		.axis_discrete = nullptr,
+		.axis_value120 = nullptr,
+		.axis_relative_direction = nullptr
+	};
 
 	void WindowWaylandVulkan::seat_capabilities( [[maybe_unused]] void* data, struct wl_seat* seat, uint32_t capabilities ) {
+		// Handle pointer capabilities
+		if ((capabilities & WL_SEAT_CAPABILITY_POINTER) && !pointer) {
+			pointer = wl_seat_get_pointer(seat);
+			wl_pointer_add_listener(pointer, &pointer_listener, NULL);
+		} else if (!(capabilities & WL_SEAT_CAPABILITY_POINTER) && pointer) {
+			wl_pointer_destroy(pointer);
+			pointer = NULL;
+		}
+		
 		if ( capabilities & WL_SEAT_CAPABILITY_KEYBOARD && !keyboard ) {
 			keyboard = wl_seat_get_keyboard( seat );
 			wl_keyboard_add_listener( keyboard, &keyboard_listener, 0 );
@@ -355,6 +402,8 @@ namespace GLVM::core {
 			compositor = (wl_compositor*)wl_registry_bind( registry, name, &wl_compositor_interface, 4 );
 		} else if (!strcmp( interface, wl_shm_interface.name )) {
 			shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
+			pointer_shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
+		} else if (!strcmp( interface, wl_shm_interface.name )) {
 		} else if (!strcmp( interface, xdg_wm_base_interface.name )) {
 			xdg_shell = (xdg_wm_base*)wl_registry_bind( registry, name, &xdg_wm_base_interface, 1 );
 			xdg_wm_base_add_listener( xdg_shell, &shell_listener, 0 );
@@ -370,78 +419,3 @@ namespace GLVM::core {
 
 }; ///< namespace GLVM::core
 
-/* int main(int argc, char* argv[]) { */
-/* 	// connects your client application to the Wayland display server */
-/* 	struct wl_display*  display  = wl_display_connect(0);                */
-/* 	/\* get the global registry object from the Wayland display server (compositor). This registry allows */
-/* 	   the client to discover available global objects, such as wl_compositor, wl_shm, xdg_wm_base, etc., */
-/* 	   which are needed to create surfaces and interact with the window system. */
-/* 	*\/ */
-/* 	struct wl_registry* registry = wl_display_get_registry(display); */
-/* 	/\* used to attach a listener (callback functions) to the Wayland registry object (wl_registry) so */
-/* 	   that your client can respond to announcements about global objects provided by the compositor */
-/* 	*\/ */
-/* 	wl_registry_add_listener( registry, &registry_listener, 0 ); */
-/* 	/\* synchronize the client with the Wayland compositor */
-/* 	   1. global object announcements (e.g., from wl_registry) */
-/* 	   2. event responses to previously sent requests */
-/* 	*\/ */
-/* 	wl_display_roundtrip( display ); */
-
-/* 	/\* create a new surface — which is essentially a drawable area in the Wayland compositor. This */
-/* 	   surface becomes the foundation for windows, popups, and anything visual in a Wayland client */
-/* 	*\/ */
-/* 	surface = wl_compositor_create_surface( compositor ); */
-/* 	/\* set up a frame callback, which lets the client know when it's a good time to start rendering */
-/* 	   the next frame — usually tied to the compositor's refresh cycle (like vsync). */
-/* 	*\/ */
-/* 	struct wl_callback* frame_callback = wl_surface_frame( surface ); */
-/* 	// attach a listener (callback function) to a wl_callback object — typically created using wl_surface_frame */
-/* 	wl_callback_add_listener( frame_callback, &callback_listener, 0 ); */
-
-/* 	/\* create a top-level window or popup window from a given wl_surface. */
-/* 	   wraps a wl_surface with an XDG surface, which provides window management features */
-/* 	*\/ */
-/* 	struct xdg_surface* xdg_surface = xdg_wm_base_get_xdg_surface( xdg_shell, surface ); */
-/* 	/\* Attach event handlers (callbacks) to an xdg_surface so your application can respond to events */
-/* 	   from the compositor. When something happens to this surface (like resize, configure, etc.), */
-/* 	   please call these functions. */
-/* 	*\/ */
-/* 	xdg_surface_add_listener( xdg_surface, &xdg_surface_listener, 0 ); */
-/* 	/\* Turn a basic xdg_surface into a toplevel window — like a normal app window with borders, */
-/* 	   title bar, and so on. */
-/* 	 *\/ */
-/* 	xdg_topLevel = xdg_surface_get_toplevel( xdg_surface ); */
-/* 	xdg_toplevel_add_listener( xdg_topLevel, &xdg_toplevel_listener, 0 ); */
-/* 	xdg_toplevel_set_title( xdg_topLevel, "wayland glvm client" ); */
-/* 	/\* Commit the changes made to a Wayland surface, notifying the compositor to render those */
-/* 	   changes to the screen. */
-/* 	 *\/ */
-/* 	wl_surface_commit( surface ); */
-
-/* 	/\* Process events and dispatch them to the appropriate Wayland objects, such as surfaces, */
-/* 	   buffers, and other resources. */
-/* 	*\/ */
-/* 	while (wl_display_dispatch( display )) { */
-/* 		if ( close_xdg_toplevel ) */
-/* 			break; */
-/* 	} */
-
-/* 	if (keyboard) { */
-/* 		wl_keyboard_destroy(keyboard); */
-/* 	} */
-/* 	/\* Release a Wayland seat object, which is responsible for managing input devices like */
-/* 	   keyboards, mice, or touchscreens. */
-/* 	*\/ */
-/* 	wl_seat_release( seat ); */
-/* 	if (buffer) { */
-/* 		wl_buffer_destroy( buffer ); */
-/* 	} */
-/* 	xdg_toplevel_destroy( xdg_topLevel ); */
-/* 	xdg_surface_destroy( xdg_surface ); */
-/* 	wl_surface_destroy( surface ); */
-/* 	wl_display_disconnect( display ); */
-	
-/* 	return 0; */
-/* } */
-    
