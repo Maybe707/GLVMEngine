@@ -92,7 +92,7 @@ namespace GLVM::core
     
     void CVulkanRenderer::draw() {
 		namespace cm = GLVM::ecs::components;
-		
+
 		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
 		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
@@ -458,7 +458,7 @@ namespace GLVM::core
         vkDeviceWaitIdle(device);
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		Window.configureWindow();
+		Window->configureWindow();
 #endif
 
 // #ifdef VK_USE_PLATFORM_WAYLAND_KHR
@@ -655,10 +655,10 @@ namespace GLVM::core
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		Window.Disconnect();
-		Window = GLVM::core::WindowXCBVulkan();
-		createXcbSurfaceInfo.window = Window.GetWindow();
-		createXcbSurfaceInfo.connection = Window.GetConnection();
+//		Window->Disconnect();
+		Window = new GLVM::core::WindowXCBVulkan();
+		createXcbSurfaceInfo.window = Window->GetWindow();
+		createXcbSurfaceInfo.connection = Window->GetConnection();
 
 		createXcbSurfaceInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 		createXcbSurfaceInfo.pNext = nullptr;
@@ -3077,9 +3077,9 @@ namespace GLVM::core
 			modelMatrixBufferInfo.offset = i * uboStructSize;
 			modelMatrixBufferInfo.range = uboStructSize;
 
-			std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
-			std::cout << "buffer size: " << uboStructSize << std::endl;
-			std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
+			// std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
+			// std::cout << "buffer size: " << uboStructSize << std::endl;
+			// std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
@@ -3201,7 +3201,7 @@ namespace GLVM::core
 		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-
+		std::cout << "POINTER LIGHTS: " << pointLightUboDescriptorsNumber << std::endl;
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline, descriptorID,
 								MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber );
@@ -3807,14 +3807,14 @@ namespace GLVM::core
 		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
 		
-		for (size_t i = 0; i < 6 * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
 			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 			
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
+//			std::cout << "vector size: " << shadowMapPointLightDescriptorSets.size() << std::endl;
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
 			descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;

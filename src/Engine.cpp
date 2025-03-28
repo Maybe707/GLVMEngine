@@ -25,6 +25,7 @@
 #include <mutex>
 #include <sys/types.h>
 #include <thread>
+#include <wayland-client-core.h>
 
 
 /*******************************************************************
@@ -53,23 +54,23 @@
 
 GLVM::core::CEvent g_eEvent;
 GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
-struct wl_surface*    wl_surface;
-struct wl_compositor* compositor;
-struct xdg_toplevel*  xdg_topLevel;
-struct xdg_wm_base*   xdg_shell;
-struct wl_buffer*     buffer;
-struct wl_shm*        shared_memory;
-struct wl_seat*       seat;
-struct wl_keyboard*   keyboard;
-void* pixels;
-uint16_t width = 480;
-uint16_t height = 320;
-uint8_t  constant_byte = 0;
-uint8_t  close_xdg_toplevel;
-struct wl_display*  display;
-struct wl_registry* registry;
-struct wl_callback* frame_callback;
-struct xdg_surface* xdg_surface;
+// struct wl_surface*    wl_surface;
+// struct wl_compositor* compositor;
+// struct xdg_toplevel*  xdg_topLevel;
+// struct xdg_wm_base*   xdg_shell;
+// struct wl_buffer*     buffer;
+// struct wl_shm*        shared_memory;
+// struct wl_seat*       seat;
+// struct wl_keyboard*   keyboard;
+// void* pixels;
+// uint16_t width = 480;
+// uint16_t height = 320;
+// uint8_t  constant_byte = 0;
+// uint8_t  close_xdg_toplevel;
+// struct wl_display*  display;
+// struct wl_registry* registry;
+// struct wl_callback* frame_callback;
+// struct xdg_surface* xdg_surface;
 
 namespace GLVM::core
 {
@@ -183,7 +184,7 @@ namespace GLVM::core
 
 			vulkanRenderer->Window->ClearDisplay();
              
-			vulkanRenderer->Window->HandleEvent(g_eEvent);
+//			vulkanRenderer->Window->HandleEvent(g_eEvent);
 //			std::cout << "left mouse released flag" << g_eEvent.isItemDraged << std::endl;			
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
@@ -245,7 +246,11 @@ namespace GLVM::core
 			procuduralLevelGeneratingSystem->levelGeneratedVertices.clear();
 			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
 			vulkanRenderer->initializeGameLevelVertices();
-			vulkanRenderer->draw();
+			while ( 1 ) {
+				while (wl_display_dispatch(display)) {
+					vulkanRenderer->draw();
+				}
+			}
 			vulkanRenderer->Window->SwapBuffers();
 		}
 

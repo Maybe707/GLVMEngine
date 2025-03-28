@@ -313,7 +313,7 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		GLVM::core::WindowXCBVulkan Window;
+		GLVM::core::WindowXCBVulkan* Window;
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
