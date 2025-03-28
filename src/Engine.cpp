@@ -184,7 +184,7 @@ namespace GLVM::core
 
 			vulkanRenderer->Window->ClearDisplay();
              
-//			vulkanRenderer->Window->HandleEvent(g_eEvent);
+			vulkanRenderer->Window->HandleEvent(g_eEvent);
 //			std::cout << "left mouse released flag" << g_eEvent.isItemDraged << std::endl;			
 			// 	Input_Stack_.ControlInput(g_eEvent);
 			if((Input_Stack_.SearchElement(EEvents::eGAME_LOOP_KILL)) == EEvents::eGAME_LOOP_KILL) {
@@ -246,11 +246,7 @@ namespace GLVM::core
 			procuduralLevelGeneratingSystem->levelGeneratedVertices.clear();
 			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
 			vulkanRenderer->initializeGameLevelVertices();
-			while ( 1 ) {
-				while (wl_display_dispatch(display)) {
-					vulkanRenderer->draw();
-				}
-			}
+			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
 		}
 

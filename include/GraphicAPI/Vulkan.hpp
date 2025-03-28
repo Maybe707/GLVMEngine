@@ -272,7 +272,7 @@ namespace GLVM::core
 		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
 		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
 		core::vector<core::vector<float>> frames;
-		bool isInventoryOpened = false;
+		bool isInventoryOpened = true;
 		vec3 forward;
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;

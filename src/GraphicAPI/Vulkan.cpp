@@ -5975,7 +5975,10 @@ namespace GLVM::core
             return capabilities.currentExtent;
         } else {
 
-			VkExtent2D actualExtent{};
+			VkExtent2D actualExtent{
+				.width  = width,
+				.height = height
+			};
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
