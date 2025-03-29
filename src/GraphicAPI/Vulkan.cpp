@@ -260,7 +260,7 @@ namespace GLVM::core
     void CVulkanRenderer::SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent)
     {
 		Matrix<float, 4> viewMatrix_(1.0f);
-        const float kSensitivity = 2.3f;
+        const float kSensitivity = 1.0f;
 
 		hud_screen_y = g_eEvent.mousePointerPosition.offset_Y / 880.0f;
 		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;

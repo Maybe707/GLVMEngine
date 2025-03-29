@@ -1,8 +1,5 @@
 #include "UnixApi/WindowWaylandVulkan.hpp"
-#include "GraphicAPI/Vulkan.hpp"
-#include "UnixApi/xdg-shell-client-protocol.h"
-#include <cstddef>
-#include <wayland-client-core.h>
+#include "UnixApi/pointer-constraints-unstable-v1-client-protocol.h"
 #include <wayland-util.h>
 
 namespace GLVM::core {
@@ -60,6 +57,11 @@ namespace GLVM::core {
 		*/
 		wl_surface_commit( wl_surface );
 
+		// if (!seat || !pointer_constraints || !relative_pointer_manager || !pointer) {
+		// 	fprintf(stderr, "Missing required Wayland globals\n");
+		// 	exit(1);
+		// }
+		
 
 		std::cout << "CONSTRUCTOR WAYLAND" << std::endl;
 	}
@@ -72,8 +74,8 @@ namespace GLVM::core {
 		_Event.mousePointerPosition.position_X = x_pointer;
 		_Event.mousePointerPosition.position_Y = y_pointer;
 
-		std::cout << "x_pointer: " << x_pointer << std::endl;
-		std::cout << "y_pointer: " << y_pointer << std::endl;
+		// std::cout << "x_pointer: " << x_pointer << std::endl;
+		// std::cout << "y_pointer: " << y_pointer << std::endl;
 		
 		// std::cout << "mouse x: " << _Event.mousePointerPosition.position_X << std::endl;
 		// std::cout << "mouse y: " << _Event.mousePointerPosition.position_Y << std::endl;
@@ -119,6 +121,17 @@ namespace GLVM::core {
 
 		*_y_offset = _y_position - previous_Y;
 		previous_Y += *_y_offset;
+
+        // *_x_offset = _x_position + previous_X;
+		// previous_X = *_x_offset;
+
+		// *_y_offset = _y_position + previous_Y;
+		// previous_Y = *_y_offset;
+		
+		// *_x_offset = _x_position;
+		// *_y_offset = _y_position;
+		std::cout << "x offset: " << *_x_offset << std::endl;
+		std::cout << "y offset: " << *_y_offset << std::endl;
 	};
 
 	void WindowWaylandVulkan::Close() {
@@ -339,6 +352,11 @@ namespace GLVM::core {
 							  wl_fixed_t sx, wl_fixed_t sy) {
 		printf("Pointer entered surface at %f, %f\n",
 			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+
+		// // lock the pointer
+		// [[maybe_unused]] zwp_locked_pointer_v1 *locked_pointer = zwp_pointer_constraints_v1_lock_pointer(pointer_constraints, pointer_surface, pointer, NULL,
+		// 										ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+
 	}
 
 	void WindowWaylandVulkan::pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
@@ -347,13 +365,20 @@ namespace GLVM::core {
 	}
 	
 	void WindowWaylandVulkan::pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
-							   [[maybe_unused]] uint32_t time, wl_fixed_t sx, wl_fixed_t sy) {
+							   [[maybe_unused]] uint32_t time, [[maybe_unused]] wl_fixed_t sx, [[maybe_unused]] wl_fixed_t sy) {
 		// printf("Pointer moved to %f, %f\n",
 		// 	   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
-		x_pointer = wl_fixed_to_int(sx);
-		y_pointer = wl_fixed_to_int(sy);
+		// x_pointer = wl_fixed_to_int(sx);
+		// y_pointer = wl_fixed_to_int(sy);
 	}
 
+	void WindowWaylandVulkan::pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+							 [[maybe_unused]] uint32_t time, uint32_t axis, wl_fixed_t value) {
+		const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
+			"horizontal" : "vertical";
+		printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
+	}
+	
 	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t serial, [[maybe_unused]] uint32_t time, uint32_t button,
 							   uint32_t state) {
@@ -369,23 +394,48 @@ namespace GLVM::core {
 //		pointer = nullptr;
 
 		// Hide cursor on first opportunity
-		struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
-		wl_surface_attach(pointer_surface, transparent, 0, 0);
-		wl_surface_commit(pointer_surface);
-		wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
+		// struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
+		// wl_surface_attach(pointer_surface, transparent, 0, 0);
+		// wl_surface_commit(pointer_surface);
+		// wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
 
+		// Only lock on button press
+		if (state != WL_POINTER_BUTTON_STATE_PRESSED) return;
+
+		if (!pointer_constraints) {
+			printf("Pointer constraints not available!\n");
+			return;
+		}
+
+		// Lock pointer to main window surface, not pointer_surface
+		[[maybe_unused]] zwp_locked_pointer_v1* locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
+			pointer_constraints,
+			wl_surface,  // Use main window surface
+			pointer,
+			NULL,
+			ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+
+		// get relative motion
+		relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
+			relative_pointer_manager, pointer);
+		zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
 		
 		printf("%s mouse button %s\n",
 			   state == WL_POINTER_BUTTON_STATE_PRESSED ? "Pressed" : "Released",
 			   button_name);
 	}
 
-	void WindowWaylandVulkan::pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
-							 [[maybe_unused]] uint32_t time, uint32_t axis, wl_fixed_t value) {
-		const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
-			"horizontal" : "vertical";
-		printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
+	void WindowWaylandVulkan::handle_relative_motion([[maybe_unused]] void *data, [[maybe_unused]] struct zwp_relative_pointer_v1 *rel_pointer, [[maybe_unused]] uint32_t utime_hi, [[maybe_unused]] uint32_t utime_lo,
+													 wl_fixed_t dx, wl_fixed_t dy, [[maybe_unused]] wl_fixed_t dx_unaccel, [[maybe_unused]] wl_fixed_t dy_unaccel) {
+		printf("Relative motion: dx=%.2f dy=%.2f\n",
+			   wl_fixed_to_double(dx), wl_fixed_to_double(dy));
+		x_pointer = wl_fixed_to_int(dx);
+		y_pointer = wl_fixed_to_int(dy);
 	}
+
+	struct zwp_relative_pointer_v1_listener WindowWaylandVulkan::relative_pointer_listener = {
+		.relative_motion = handle_relative_motion
+	};
 	
 	struct wl_pointer_listener WindowWaylandVulkan::pointer_listener = {
 		.enter = pointer_enter,
@@ -427,7 +477,10 @@ namespace GLVM::core {
 		} else if (!strcmp( interface, wl_shm_interface.name )) {
 			shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
 			pointer_shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
-		} else if (!strcmp( interface, wl_shm_interface.name )) {
+		} else if (!strcmp( interface, zwp_pointer_constraints_v1_interface.name )) {
+			pointer_constraints = (zwp_pointer_constraints_v1*)wl_registry_bind(registry, name, &zwp_pointer_constraints_v1_interface, 1);
+		} else if (!strcmp( interface, zwp_relative_pointer_manager_v1_interface.name)) {
+			relative_pointer_manager = (zwp_relative_pointer_manager_v1*)wl_registry_bind(registry, name, &zwp_relative_pointer_manager_v1_interface, 1);
 		} else if (!strcmp( interface, xdg_wm_base_interface.name )) {
 			xdg_shell = (xdg_wm_base*)wl_registry_bind( registry, name, &xdg_wm_base_interface, 1 );
 			xdg_wm_base_add_listener( xdg_shell, &shell_listener, 0 );
