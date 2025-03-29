@@ -73,7 +73,9 @@ namespace GLVM::core {
 		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
 		_Event.mousePointerPosition.position_X = x_pointer;
 		_Event.mousePointerPosition.position_Y = y_pointer;
-
+		x_pointer = 0;
+		y_pointer = 0;
+		
 		// std::cout << "x_pointer: " << x_pointer << std::endl;
 		// std::cout << "y_pointer: " << y_pointer << std::endl;
 		
@@ -404,10 +406,10 @@ namespace GLVM::core {
 //		pointer = nullptr;
 
 		// Hide cursor on first opportunity
-		// struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
-		// wl_surface_attach(pointer_surface, transparent, 0, 0);
-		// wl_surface_commit(pointer_surface);
-		// wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
+		struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
+		wl_surface_attach(pointer_surface, transparent, 0, 0);
+		wl_surface_commit(pointer_surface);
+		wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
 
 		// Only lock on button press
 		if (state != WL_POINTER_BUTTON_STATE_PRESSED) return;
