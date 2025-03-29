@@ -19,9 +19,27 @@
 #include <fcntl.h>
 #include "IWindow.hpp"
 #include "Globals.hpp"
+#include "EventsStack.hpp"
 
 namespace GLVM::core {
 	struct WindowWaylandVulkan : IWindow {
+		static struct WL_EVENTS {
+			bool WL_KEY_PRESSED_W = false;
+			bool WL_KEY_PRESSED_S = false;
+			bool WL_KEY_PRESSED_A = false;
+			bool WL_KEY_PRESSED_D = false;
+			bool WL_KEY_PRESSED_SPACE = false;
+			bool WL_KEY_PRESSED_ESC = false;
+			bool WL_KEY_PRESSED_I  = false;
+			bool WL_KEY_RELEASED_W = false;
+			bool WL_KEY_RELEASED_S = false;
+			bool WL_KEY_RELEASED_A = false;
+			bool WL_KEY_RELEASED_D = false;
+			bool WL_KEY_RELEASED_SPACE = false;
+			bool WL_KEY_RELEASED_ESC = false;
+			bool WL_KEY_RELEASED_I  = false;
+		} wl_events;
+		
 		WindowWaylandVulkan();
 		void Close() override;
 		bool HandleEvent(CEvent& _Event) override;

@@ -1,5 +1,6 @@
 #include "UnixApi/WindowWaylandVulkan.hpp"
 #include "UnixApi/pointer-constraints-unstable-v1-client-protocol.h"
+#include <wayland-client-protocol.h>
 #include <wayland-util.h>
 
 namespace GLVM::core {
@@ -70,11 +71,61 @@ namespace GLVM::core {
 		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
 		   buffers, and other resources.
 		*/
-		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
+//		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
 		_Event.mousePointerPosition.position_X = x_pointer;
 		_Event.mousePointerPosition.position_Y = y_pointer;
 		x_pointer = 0;
 		y_pointer = 0;
+
+		if ( wl_events.WL_KEY_PRESSED_W ) {
+			wl_events.WL_KEY_PRESSED_W = false;
+			_Event.SetEvent(EEvents::eMOVE_FORWARD);
+			Input_Stack_->ControlInput(_Event);
+		} else if ( wl_events.WL_KEY_RELEASED_W ) {
+			wl_events.WL_KEY_RELEASED_W = false;
+			_Event.SetEvent(EEvents::eKEYRELEASE_W);
+			Input_Stack_->ControlInput(_Event);
+		} else if ( wl_events.WL_KEY_PRESSED_S ) {
+			wl_events.WL_KEY_PRESSED_S = false;
+			_Event.SetEvent(EEvents::eMOVE_BACKWARD);
+			Input_Stack_->ControlInput(_Event);
+		} else if ( wl_events.WL_KEY_RELEASED_S ) {
+			wl_events.WL_KEY_RELEASED_S = false;
+			_Event.SetEvent(EEvents::eKEYRELEASE_S);
+			Input_Stack_->ControlInput(_Event);
+		} else if ( wl_events.WL_KEY_PRESSED_A ) {
+			wl_events.WL_KEY_PRESSED_A = false;
+			_Event.SetEvent(EEvents::eMOVE_LEFT);
+			Input_Stack_->ControlInput(_Event);
+		} else if ( wl_events.WL_KEY_RELEASED_A ) {
+			wl_events.WL_KEY_RELEASED_A = false;
+			_Event.SetEvent(EEvents::eKEYRELEASE_A);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_PRESSED_D ) {
+			wl_events.WL_KEY_PRESSED_D = false;
+			_Event.SetEvent(EEvents::eMOVE_RIGHT);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_RELEASED_D ) {
+			wl_events.WL_KEY_RELEASED_D = false;
+			_Event.SetEvent(EEvents::eKEYRELEASE_D);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_PRESSED_SPACE ) {
+			wl_events.WL_KEY_PRESSED_SPACE = false;
+			_Event.SetEvent(EEvents::eJUMP);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_RELEASED_SPACE ) {
+			wl_events.WL_KEY_RELEASED_SPACE = false;
+			_Event.SetEvent(EEvents::eKEYRELEASE_JUMP);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_PRESSED_I ) {
+			wl_events.WL_KEY_PRESSED_I = false;
+			_Event.SetEvent(EEvents::eINVENTORY);
+			Input_Stack_->ControlInput(_Event);
+		} if ( wl_events.WL_KEY_RELEASED_I ) {
+			wl_events.WL_KEY_RELEASED_I = false;
+			_Event.SetEvent(EEvents::eINVENTORY_RELEASE);
+			Input_Stack_->ControlInput(_Event);
+		} 
 		
 		// std::cout << "x_pointer: " << x_pointer << std::endl;
 		// std::cout << "y_pointer: " << y_pointer << std::endl;
@@ -142,8 +193,8 @@ namespace GLVM::core {
 		
 		// *_x_offset = _x_position;
 		// *_y_offset = _y_position;
-		std::cout << "x offset: " << *_x_offset << std::endl;
-		std::cout << "y offset: " << *_y_offset << std::endl;
+		// std::cout << "x offset: " << *_x_offset << std::endl;
+		// std::cout << "y offset: " << *_y_offset << std::endl;
 	};
 
 	void WindowWaylandVulkan::Close() {
@@ -310,6 +361,20 @@ namespace GLVM::core {
 	
 	}
 
+	WindowWaylandVulkan::WL_EVENTS WindowWaylandVulkan::wl_events {
+		.WL_KEY_PRESSED_W = false,
+		.WL_KEY_PRESSED_S = false,
+		.WL_KEY_PRESSED_A = false,
+		.WL_KEY_PRESSED_D = false,
+		.WL_KEY_PRESSED_SPACE = false,
+		.WL_KEY_PRESSED_ESC = false,
+		.WL_KEY_RELEASED_W = false,
+		.WL_KEY_RELEASED_S = false,
+		.WL_KEY_RELEASED_A = false,
+		.WL_KEY_RELEASED_D = false,
+		.WL_KEY_RELEASED_SPACE = false,
+	};
+	
 	void WindowWaylandVulkan::keyboard_key([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 										   [[maybe_unused]] uint32_t time, uint32_t key, [[maybe_unused]] uint32_t state) {
 		// if ( key == 1 ) {
@@ -324,24 +389,65 @@ namespace GLVM::core {
 			printf("Key pressed: %u\n", key);
 			if (key == 1) {  // Typically ESC key
 				printf("ESC pressed - exiting\n");
+				wl_events.WL_KEY_PRESSED_ESC = true;
 				wl_display_disconnect(display);
 			}
 			if (key == 17) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_W = true;
 				printf("w\n");
 			}
 			if (key == 31) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_S = true;
 				printf("s\n");
 			}
 			if (key == 30) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_A = true;
 				printf("a\n");
 			}
 			if (key == 32) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_D = true;
 				printf("d\n");
 			}
 			if (key == 57) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_SPACE = true;
 				printf("space\n");
 			}
 			if (key == 23) {  // Typically ESC key
+				wl_events.WL_KEY_PRESSED_I = true;
+				keys_pressed[0] = 23;
+				printf("inventory\n");
+			}
+		}
+
+		if (state == WL_KEYBOARD_KEY_STATE_RELEASED) {
+			printf("Key pressed: %u\n", key);
+			if (key == 1) {  // Typically ESC key
+				printf("ESC pressed - exiting\n");
+				wl_events.WL_KEY_RELEASED_ESC = true;
+				wl_display_disconnect(display);
+			}
+			if (key == 17) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_W = true;
+				printf("w\n");
+			}
+			if (key == 31) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_S = true;
+				printf("s\n");
+			}
+			if (key == 30) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_A = true;
+				printf("a\n");
+			}
+			if (key == 32) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_D = true;
+				printf("d\n");
+			}
+			if (key == 57) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_SPACE = true;
+				printf("space\n");
+			}
+			if (key == 23) {  // Typically ESC key
+				wl_events.WL_KEY_RELEASED_I = true;
 				keys_pressed[0] = 23;
 				printf("inventory\n");
 			}
