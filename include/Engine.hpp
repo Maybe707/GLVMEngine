@@ -48,7 +48,7 @@ namespace GLVM::core
         Sound::ISoundEngine * soundEngine;
 		float                deltaFrameTime;
 		float                gravity;
-		CStack               Input_Stack_;
+//		CStack               Input_Stack_;
 		bool                 isLeftMouseButtonPressed;
 		std::vector<ecs::Texture> textureVector;
 		std::vector<const char*> pathsArray_;

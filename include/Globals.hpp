@@ -6,6 +6,7 @@
 #include "Event.hpp"
 #include "Vector.hpp"
 #include "VkStructs.hpp"
+#include "EventsStack.hpp"
 
 extern GLVM::core::CEvent g_eEvent;
 extern GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
@@ -32,6 +33,7 @@ extern struct wl_display*  display;
 extern struct wl_registry* registry;
 extern struct wl_callback* frame_callback;
 extern struct xdg_surface *xdg_surface;
+extern GLVM::core::CStack Input_Stack_;
 
 extern int x_pointer;
 extern int y_pointer;

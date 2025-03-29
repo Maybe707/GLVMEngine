@@ -150,7 +150,7 @@ namespace GLVM::core
 		vulkanRenderer->pathsArray_            = pathsArray_;
 		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
 		vulkanRenderer->run();
-		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
+//		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 
 #ifdef __linux__
 		// XEvent uXEvent;

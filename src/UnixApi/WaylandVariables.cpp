@@ -1,6 +1,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include "EventsStack.hpp"
 
 struct wl_surface*    wl_surface;
 struct wl_compositor* compositor;
@@ -25,6 +26,7 @@ struct wl_display*  display;
 struct wl_registry* registry;
 struct wl_callback* frame_callback;
 struct xdg_surface* xdg_surface;
+GLVM::core::CStack Input_Stack_{};
 
 int x_pointer;
 int y_pointer;

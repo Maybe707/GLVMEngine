@@ -23,23 +23,6 @@
 
 namespace GLVM::core {
 	struct WindowWaylandVulkan : IWindow {
-		static struct WL_EVENTS {
-			bool WL_KEY_PRESSED_W = false;
-			bool WL_KEY_PRESSED_S = false;
-			bool WL_KEY_PRESSED_A = false;
-			bool WL_KEY_PRESSED_D = false;
-			bool WL_KEY_PRESSED_SPACE = false;
-			bool WL_KEY_PRESSED_ESC = false;
-			bool WL_KEY_PRESSED_I  = false;
-			bool WL_KEY_RELEASED_W = false;
-			bool WL_KEY_RELEASED_S = false;
-			bool WL_KEY_RELEASED_A = false;
-			bool WL_KEY_RELEASED_D = false;
-			bool WL_KEY_RELEASED_SPACE = false;
-			bool WL_KEY_RELEASED_ESC = false;
-			bool WL_KEY_RELEASED_I  = false;
-		} wl_events;
-		
 		WindowWaylandVulkan();
 		void Close() override;
 		bool HandleEvent(CEvent& _Event) override;
@@ -74,7 +57,7 @@ namespace GLVM::core {
 		static void registry_global( void* data, struct wl_registry* registry, uint32_t name, const char* interface, uint32_t version );
 		static void registry_global_remove( void* data, struct wl_registry* registry, uint32_t name);
 
-		CStack           * Input_Stack_;
+//		CStack           * Input_Stack_;
 		int previous_X = 960;
 		int previous_Y = 540;
 		// int previous_X = 0;
