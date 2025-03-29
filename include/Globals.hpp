@@ -32,3 +32,4 @@ extern struct xdg_surface* xdg_surface;
 
 extern int x_pointer;
 extern int y_pointer;
+extern int keys_pressed[6];

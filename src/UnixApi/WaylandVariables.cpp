@@ -25,3 +25,4 @@ struct xdg_surface* xdg_surface;
 
 int x_pointer;
 int y_pointer;
+int keys_pressed[6];

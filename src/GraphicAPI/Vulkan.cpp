@@ -260,7 +260,7 @@ namespace GLVM::core
     void CVulkanRenderer::SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent)
     {
 		Matrix<float, 4> viewMatrix_(1.0f);
-        const float kSensitivity = 0.1f;
+        const float kSensitivity = 2.3f;
 
 		hud_screen_y = g_eEvent.mousePointerPosition.offset_Y / 880.0f;
 		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
@@ -283,74 +283,26 @@ namespace GLVM::core
         g_eEvent.mousePointerPosition.pitch = fPitch;
         g_eEvent.mousePointerPosition.yaw = fYaw;
 
-		current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-		float delta = current_Y - prev_Y;
-		delta *= -1.0f;
-
 		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		float delta_x = current_X - prev_X;
-//		std::cout << "delta x: " << delta_x << std::endl;
-        // if(fPitch > 89.0f)
-        //     fPitch = 89.0f;
-        // if(fPitch < -89.0f)
-        //     fPitch = -89.0f;
-
-		// float sinPitch = std::sin(-Radians(fPitch / 2));
-		// float cosPitch = std::cos(-Radians(fPitch / 2));
-		// float sinYaw = std::sin(Radians(fYaw / 2));
-		// float cosYaw = std::cos(Radians(fYaw / 2));
-
-		// std::cout << "mod y: " << g_eEvent.mousePointerPosition.offset_Y % 180 << std::endl;
-		// std::cout << "mod x: " << g_eEvent.mousePointerPosition.offset_X % 360 << std::endl;
-		// std::cout << "y: " << g_eEvent.mousePointerPosition.offset_Y << std::endl;
-		// std::cout << "x: " << g_eEvent.mousePointerPosition.offset_X << std::endl;
-
-		// glm::vec3 forw          = { cameraComponent.forward[0], cameraComponent.forward[1], cameraComponent.forward[2] };
-		// glm::vec3 forwardResult = glm::normalize(glm::vec3(-g_eEvent.mousePointerPosition.offset_Y, g_eEvent.mousePointerPosition.offset_X, 0));
+		current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+		float delta_x = 0.0f;
+		float delta_y = 0.0f;
+		#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+		delta_x = current_X;
+		delta_y = current_Y;
+		#else
+		delta_x = current_X - prev_X;
+		delta_y = current_Y - prev_Y;
+		#endif
+		delta_x *= kSensitivity;
+		delta_y *= kSensitivity;
 		
-		// glm::quat result = glm::quat(cos(glm::radians(fPitch/2)), sin(glm::radians(fPitch/2)) * forwardResult.x, sin(glm::radians(fPitch/2)) * forwardResult.y,
-		// 							 sin(glm::radians(fPitch/2)) * forwardResult.z);
-//		glm::quat result = rotation * glm::quat( cos(, 0.0, 0.0, 1.0 );
-		
-		// Quaternion pitchQuat;
-		// Quaternion yawQuat;
-		// pitchQuat.w = cosPitch;
-		// pitchQuat.x = sinPitch;
-		// pitchQuat.y = 0.0f;
-		// pitchQuat.z = 0.0f;
-
-		// yawQuat.w = cosYaw;
-		// yawQuat.x = 0.0f;
-		// yawQuat.y = sinYaw;
-		// yawQuat.z = 0.0f;
-
-		// // std::cout << "pitch cos: " << cosPitch << std::endl;
-		// // std::cout << "pitch sin: " << sinPitch << std::endl;
-		// // std::cout << "yaw cos: " << cosYaw << std::endl;
-		// // std::cout << "yaw sin: " << sinYaw << std::endl;
-		
-		// Quaternion result;
-		// result = multiplyQuaternion(yawQuat, pitchQuat);
-
-		// result = multiplyQuaternion(multiplyQuaternion(result, Quaternion{ .w = 0.0f, .x = 0.0f,
-		// 			.y = 0.0f, .z = 1.0f }), inverseQuaternion(result));
-		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)), sin(glm::radians(fPitch/2)), 0.0, 0.0 );
-
-		// std::cout << "cos pitch: " << cos(glm::radians(fPitch/2)) << std::endl;
-		// std::cout << "sin pitch: " << sin(glm::radians(fPitch/2)) << std::endl;
-		// float f = 1.0f;
-		// if ( cos(glm::radians(fPitch/2)) <= 0.0f ) {
-		// 	f = -1.0f;
-		// }
-		
-		// glm::quat result = rotation * glm::quat(0.0, 0.0, 0.0, -1.0);
-
 		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
 		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
-		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta));
+		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta_y));
 
 		if ( VecLength(rotateAxis) >= 0.001f ) {
-			float rotationAngle = sqrt(delta * delta + delta_x * delta_x);
+			float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
 			constexpr float angleScale = 0.1f;                                                                                     
 			rotationAngle = Radians(rotationAngle * angleScale);
 			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2

@@ -72,10 +72,15 @@ namespace GLVM::core {
 		_Event.mousePointerPosition.position_X = x_pointer;
 		_Event.mousePointerPosition.position_Y = y_pointer;
 
+		std::cout << "x_pointer: " << x_pointer << std::endl;
+		std::cout << "y_pointer: " << y_pointer << std::endl;
+		
 		// std::cout << "mouse x: " << _Event.mousePointerPosition.position_X << std::endl;
 		// std::cout << "mouse y: " << _Event.mousePointerPosition.position_Y << std::endl;
-		
+
 		wl_display_dispatch( display );
+		if ( keys_pressed[0] == 23 )
+			_Event.SetEvent(EEvents::eINVENTORY);			
 // 		while (wl_display_dispatch( display )) {
 // //			printf("%s", "HREN GOVNA!");
 // 			if ( close_xdg_toplevel )
@@ -109,12 +114,11 @@ namespace GLVM::core {
 	void WindowWaylandVulkan::ClearDisplay() {
 	};
 	void WindowWaylandVulkan::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
-		int iOffset_X = 0, iOffset_Y = 0;
-        iOffset_X = _x_position - 960;
-        iOffset_Y = _y_position - 540;
-        
-        *_x_offset += iOffset_X;
-        *_y_offset -= iOffset_Y;
+        *_x_offset = _x_position - previous_X;
+		previous_X += *_x_offset;
+
+		*_y_offset = _y_position - previous_Y;
+		previous_Y += *_y_offset;
 	};
 
 	void WindowWaylandVulkan::Close() {
@@ -311,6 +315,10 @@ namespace GLVM::core {
 			}
 			if (key == 57) {  // Typically ESC key
 				printf("space\n");
+			}
+			if (key == 23) {  // Typically ESC key
+				keys_pressed[0] = 23;
+				printf("inventory\n");
 			}
 		}
 	}

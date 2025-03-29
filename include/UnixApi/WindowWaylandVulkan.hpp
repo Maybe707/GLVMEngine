@@ -53,6 +53,8 @@ namespace GLVM::core {
 		static void registry_global_remove( void* data, struct wl_registry* registry, uint32_t name);
 
 		CStack           * Input_Stack_;
+		int previous_X = 960;
+		int previous_Y = 540;
 		struct xdg_toplevel_listener xdg_toplevel_listener = {
 			.configure = xdg_toplevel_configure,
 			.close     = xdg_toplevel_close,
