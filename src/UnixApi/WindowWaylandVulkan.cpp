@@ -481,6 +481,7 @@ namespace GLVM::core {
 			if ( button == 272 ) {
 				g_eEvent.SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
 				Input_Stack_.ControlInput(g_eEvent);
+				g_eEvent.isLeftMouseButtonReleased = true;
 			}
 		}
 		if ( state == WL_POINTER_BUTTON_STATE_RELEASED ) {

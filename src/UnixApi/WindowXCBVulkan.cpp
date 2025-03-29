@@ -352,7 +352,7 @@ namespace GLVM::core
 				free (generic_event);
 			}
 
-			Input_Stack_->ControlInput(_Event);
+			Input_Stack_.ControlInput(_Event);
 			/* Free the Generic Event */
 		}
 		isWindowResizeRead = false;

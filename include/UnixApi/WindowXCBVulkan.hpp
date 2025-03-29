@@ -18,6 +18,7 @@
 #include <cassert>
 #include <iostream>
 #include "EventsStack.hpp"
+#include "Globals.hpp"
 
 namespace GLVM::core
 {
@@ -33,7 +34,7 @@ namespace GLVM::core
 
 		static void print_modifiers (uint32_t mask);
 	public:
-		CStack           * Input_Stack_;
+//		CStack           * Input_Stack_;
 		uint32_t           windowWidth;
 		uint32_t           windowHeight;
 		bool               isWindowResizeRead = false;

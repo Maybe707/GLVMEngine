@@ -262,8 +262,8 @@ namespace GLVM::core
 		Matrix<float, 4> viewMatrix_(1.0f);
         const float kSensitivity = 1.0f;
 
-		hud_screen_y = g_eEvent.mousePointerPosition.offset_Y / 880.0f;
-		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 880.0f;
+		hud_screen_x -= (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
 //		std::cout << "x: " << hud_screen_x << std::endl;
 		if ( hud_screen_x > 1.0f )
 			hud_screen_x = 1.0f;
@@ -293,6 +293,7 @@ namespace GLVM::core
 		#else
 		delta_x = current_X - prev_X;
 		delta_y = current_Y - prev_Y;
+		delta_y *= -1.0f;
 		#endif
 		delta_x *= kSensitivity;
 		delta_y *= kSensitivity;
