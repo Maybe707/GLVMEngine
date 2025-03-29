@@ -116,12 +116,22 @@ namespace GLVM::core {
 	void WindowWaylandVulkan::ClearDisplay() {
 	};
 	void WindowWaylandVulkan::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
-        *_x_offset = _x_position - previous_X;
-		previous_X += *_x_offset;
+        // *_x_offset = _x_position - previous_X;
+		// previous_X += *_x_offset;
 
-		*_y_offset = _y_position - previous_Y;
-		previous_Y += *_y_offset;
+		// *_y_offset = _y_position - previous_Y;
+		// previous_Y += *_y_offset;
 
+		static int flag = 0;
+		if ( flag == 0 ) {
+			*_x_offset = -960;
+			*_y_offset = -540;
+			++flag;
+		} else {
+			*_x_offset = _x_position;
+			*_y_offset = _y_position;
+		}
+		
         // *_x_offset = _x_position + previous_X;
 		// previous_X = *_x_offset;
 
