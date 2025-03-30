@@ -372,6 +372,9 @@ namespace GLVM::core
         *_x_offset += iOffset_X;
         *_y_offset -= iOffset_Y;
 
+		std::cout << "x offset: " << *_x_offset << std::endl;
+		std::cout << "y offset: " << *_y_offset << std::endl;
+		
         // if(*_y_offset > 890)
         //     *_y_offset = 890;
         // else if(*_y_offset < -890)

@@ -260,10 +260,12 @@ namespace GLVM::core
     void CVulkanRenderer::SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent)
     {
 		Matrix<float, 4> viewMatrix_(1.0f);
-        const float kSensitivity = 1.0f;
+        const float kSensitivity = 0.1f;
 
-		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 880.0f;
-		hud_screen_x -= (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+		hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 880.0f;
+		// std::cout << "Y: " << (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 880.0f << std::endl;
+		// std::cout << "X: " << (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f << std::endl;
+		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
 //		std::cout << "x: " << hud_screen_x << std::endl;
 		if ( hud_screen_x > 1.0f )
 			hud_screen_x = 1.0f;
@@ -295,8 +297,8 @@ namespace GLVM::core
 		delta_y = current_Y - prev_Y;
 		delta_y *= -1.0f;
 		#endif
-		delta_x *= kSensitivity;
-		delta_y *= kSensitivity;
+		// delta_x *= kSensitivity;
+		// delta_y *= kSensitivity;
 		
 		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
 		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
