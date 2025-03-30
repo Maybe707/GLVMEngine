@@ -262,11 +262,14 @@ namespace GLVM::core
 		Matrix<float, 4> viewMatrix_(1.0f);
         const float kSensitivity = 0.1f;
 
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 880.0f;
+		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
+#else
 		hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 880.0f;
-		// std::cout << "Y: " << (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 880.0f << std::endl;
-		// std::cout << "X: " << (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f << std::endl;
 		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
-//		std::cout << "x: " << hud_screen_x << std::endl;
+#endif
+
 		if ( hud_screen_x > 1.0f )
 			hud_screen_x = 1.0f;
 		else if ( hud_screen_x < -1.0f )
