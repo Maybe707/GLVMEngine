@@ -1,6 +1,7 @@
 #include "UnixApi/WindowWaylandVulkan.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "UnixApi/pointer-constraints-unstable-v1-client-protocol.h"
+#include <vulkan/vulkan_core.h>
 #include <wayland-client-protocol.h>
 #include <wayland-util.h>
 
@@ -415,35 +416,6 @@ namespace GLVM::core {
 		printf("Pointer entered surface at %f, %f\n",
 			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
 
-		// Hide cursor on first opportunity
-		struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
-		wl_surface_attach(pointer_surface, transparent, 0, 0);
-		wl_surface_commit(pointer_surface);
-		wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
-
-		if (!pointer_constraints) {
-			printf("Pointer constraints not available!\n");
-			return;
-		}
-
-		// Lock pointer to main window surface, not pointer_surface
-		[[maybe_unused]] zwp_locked_pointer_v1* locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
-			pointer_constraints,
-			wl_surface,  // Use main window surface
-			pointer,
-			NULL,
-			ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
-
-		// get relative motion
-		relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
-			relative_pointer_manager, pointer);
-		zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
-
-		
-		// // lock the pointer
-		// [[maybe_unused]] zwp_locked_pointer_v1 *locked_pointer = zwp_pointer_constraints_v1_lock_pointer(pointer_constraints, pointer_surface, pointer, NULL,
-		// 										ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
-
 	}
 
 	void WindowWaylandVulkan::pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
@@ -465,6 +437,8 @@ namespace GLVM::core {
 			"horizontal" : "vertical";
 		printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
 	}
+
+	bool WindowWaylandVulkan::hideAndLockPointer = false;
 	
 	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t serial, [[maybe_unused]] uint32_t time, uint32_t button,
@@ -494,6 +468,38 @@ namespace GLVM::core {
 //        wl_pointer_set_cursor(pointer, serial, NULL, 0, 0);
 //		pointer = nullptr;
 
+		
+		// Hide cursor on first opportunity
+		if ( !hideAndLockPointer ) {
+			hideAndLockPointer = true;
+			struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
+			wl_surface_attach(pointer_surface, transparent, 0, 0);
+			wl_surface_commit(pointer_surface);
+			wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
+
+			if (!pointer_constraints) {
+				printf("Pointer constraints not available!\n");
+				return;
+			}
+
+			// Lock pointer to main window surface, not pointer_surface
+			[[maybe_unused]] zwp_locked_pointer_v1* locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
+				pointer_constraints,
+				wl_surface,  // Use main window surface
+				pointer,
+				NULL,
+				ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+
+			// get relative motion
+			relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
+				relative_pointer_manager, pointer);
+			zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
+
+		
+			// // lock the pointer
+			// [[maybe_unused]] zwp_locked_pointer_v1 *locked_pointer = zwp_pointer_constraints_v1_lock_pointer(pointer_constraints, pointer_surface, pointer, NULL,
+			// 										ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
+		}
 		
 		printf("%s mouse button %s\n",
 			   state == WL_POINTER_BUTTON_STATE_PRESSED ? "Pressed" : "Released",

@@ -60,6 +60,7 @@ namespace GLVM::core {
 //		CStack           * Input_Stack_;
 		int previous_X = 960;
 		int previous_Y = 540;
+		static bool hideAndLockPointer;
 		// int previous_X = 0;
 		// int previous_Y = 0;
 		struct xdg_toplevel_listener xdg_toplevel_listener = {
