@@ -34,6 +34,7 @@ int main()
 	using namespace GLVM;
 	namespace cm  = GLVM::ecs::components;
 
+	
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
