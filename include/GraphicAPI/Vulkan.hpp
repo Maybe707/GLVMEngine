@@ -309,6 +309,9 @@ namespace GLVM::core
 		const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
 		const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
 
+		const char* virtualTexturesVertexShader = "../VKshaders/virtualTextures/virtualTexturesVert.spv";
+		const char* virtualTexturesFragmentShader = "../VKshaders/virtualTextures/virtualTexturesFrag.spv";
+		
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 		GLVM::core::WindowWaylandVulkan* Window;
 #endif
@@ -414,9 +417,10 @@ namespace GLVM::core
 		VkDeviceMemory uiIconsUniformBuffersMemory;
 		Pipeline virtualTexturesPipeline;
 		VkRenderPass virtualTexturesRenderPass;
-		core::vector<VkDescriptorSet> virtualTexturesDesctiptorSets;
-		[[maybe_unused]] VkBuffer virtualTexturesUniformBuffer;
-		[[maybe_unused]] VkDeviceMemory virtualTexturesDeviceMemory;
+		std::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
+		std::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
+		VkBuffer virtualTexturesUniformBuffer;
+		VkDeviceMemory virtualTexturesUniformBufferMemory;
 		
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
@@ -496,6 +500,7 @@ namespace GLVM::core
 		const unsigned int hudScreenUboDescriptorNumber = 32;
 		const unsigned int uiUboDescriptorsNumber = 64;
 		const unsigned int uiIconsDescriptorsNumber = 64;
+		const unsigned int virtualTexturesDescriptorsNumber= 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
 		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
@@ -512,6 +517,7 @@ namespace GLVM::core
 		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
+		std::vector<VkCommandBuffer> virtualTexturesCommandBuffers;
 
 		/// Main render pipe line sync objects
         std::vector<VkSemaphore> imageAvailableSemaphores;
@@ -542,6 +548,11 @@ namespace GLVM::core
         std::vector<VkSemaphore> pointLightShadowMapImageAvailableSemaphores;
         std::vector<VkSemaphore> pointLightShadowMapRenderFinishedSemaphores;
         std::vector<VkFence> pointLightShadowMapInFlightFences;
+
+		/// Virtual textures pipeline sync objects
+        std::vector<VkSemaphore> virtualTexturesImageAvailableSemaphores;
+        std::vector<VkSemaphore> virtualTexturesRenderFinishedSemaphores;
+        std::vector<VkFence> virtualTexturesInFlightFences;
 		
         uint32_t currentFrame = 0;
 		uint32_t fontCurrentFrame = 0;
@@ -625,6 +636,7 @@ namespace GLVM::core
 		void createDescriptorSets_UI();
 		void createDescriptorSetsIcons_UI();
 		void createFontRenderDescriptorSets();
+		void createVirtualTexturesDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
 		void updateDirectionalLightShadowMapDescriptorSets();
@@ -632,6 +644,7 @@ namespace GLVM::core
 		void updatePointLightShadowMapDescriptorSets();
 		void updateHudDescriptorSets();
 		void updateFontRenderDescriptorSets();
+		void updateVirtualTexturesDescriptorSets();
 		void updateDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);

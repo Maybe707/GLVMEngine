@@ -540,6 +540,12 @@ namespace GLVM::core
 		uiIconsPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		uiIconsPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_ICONS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+
+		virtualTexturesPipeline.vertShader = virtualTexturesVertexShader;
+		virtualTexturesPipeline.fragShader = virtualTexturesFragmentShader;
+		virtualTexturesPipeline.bindingDescription = Vertex::getBindingDescription();
+		virtualTexturesPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
+		virtualTexturesPipeline.addDescriptor(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::material,
@@ -901,6 +907,7 @@ namespace GLVM::core
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
 		createCommandBuffers(fontCommandPool, fontCommandBuffers);
 		createCommandBuffers(hudCommandPool, hudCommandBuffers);
+		createCommandBuffers(virtualTexturesCommandPool, virtualTexturesCommandBuffers);
 		createSyncObjects(fontImageAvailableSemaphores,
 						  fontRenderFinishedSemaphores,
 						  fontInFlightFences);
@@ -917,6 +924,7 @@ namespace GLVM::core
 						  pointLightShadowMapRenderFinishedSemaphores,
 						  pointLightShadowMapInFlightFences);
         createSyncObjects(imageAvailableSemaphores, renderFinishedSemaphores, inFlightFences);
+		createSyncObjects(virtualTexturesImageAvailableSemaphores, virtualTexturesRenderFinishedSemaphores, virtualTexturesInFlightFences);
     }
 
     void CVulkanRenderer::cleanupSwapChain() {
@@ -2994,7 +3002,7 @@ namespace GLVM::core
 		VkDeviceSize uiUboSize = sizeof(UI_UBO);
 		VkDeviceSize uiIconsUboSize = sizeof(UI_UBO);
 		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
-//		VkDeviceSize virtualTexturesBufferSize = sizeof(HU
+		VkDeviceSize virtualTexturesBufferSize = sizeof(VIRTUAL_TEXTURES_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -3044,9 +3052,9 @@ namespace GLVM::core
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 lightDataUniformBuffer, lightDataUniformBuffersMemory);
 
-		memory = lightDataBufferSize * MAX_FRAMES_IN_FLIGHT;
+		memory = virtualTexturesBufferSize * MAX_FRAMES_IN_FLIGHT;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-					 lightDataUniformBuffer, lightDataUniformBuffersMemory);
+					 virtualTexturesUniformBuffer, virtualTexturesUniformBufferMemory);
     }
 
     void CVulkanRenderer::createMainRenderDescriptorPool() {
@@ -3556,6 +3564,120 @@ namespace GLVM::core
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[0].dstSet = fontDescriptorSets[i];
 				descriptorWrites[0].dstBinding = fontSamplerBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
+		}
+	}
+
+	void CVulkanRenderer::createVirtualTexturesDescriptorSets() {
+		core::vector<u32> virtualTexturesUboBindings = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURES_UBO);
+ 
+		int virtualTexturesUboBinding = virtualTexturesUboBindings[0];
+
+		constexpr unsigned int descriptorID = 0; 
+		allocateDescriptorSets( virtualTexturesUBODesctiptorSets, virtualTexturesPipeline, descriptorID,
+								MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber );
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = virtualTexturesUniformBuffer;
+			modelMatrixBufferInfo.offset = i * sizeof(VIRTUAL_TEXTURES_UBO);
+			modelMatrixBufferInfo.range = sizeof(VIRTUAL_TEXTURES_UBO);
+
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = virtualTexturesUBODesctiptorSets[i];
+			descriptorWrites[0].dstBinding = virtualTexturesUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+
+		core::vector<u32> virtualTexturesSamplerBindigs = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURE_TILESET);
+ 
+		int virtualTexturesSamplerBinding = virtualTexturesSamplerBindigs[0];
+
+		if ( initializeTextureData_.size() > 0 ) {
+			constexpr u32 DS_specular_number = 64;
+
+			constexpr unsigned int descriptorID = 1; 
+			allocateDescriptorSets( virtualTexturesSamplersDesctiptorSets, virtualTexturesPipeline, descriptorID,
+									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//				unsigned int textureIndex = i / 2;
+				imageInfo.imageView = textureImages[6].views[0];
+				imageInfo.sampler = textureSampler;
+
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = virtualTexturesSamplersDesctiptorSets[i];
+				descriptorWrites[0].dstBinding = virtualTexturesSamplerBinding;
+				descriptorWrites[0].dstArrayElement = 0;
+				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+				descriptorWrites[0].descriptorCount = 1;
+				descriptorWrites[0].pImageInfo = &imageInfo;
+
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			}
+		}
+	}
+
+	void CVulkanRenderer::updateVirtualTexturesDescriptorSets() {
+		core::vector<u32> virtualTexturesUboBindings = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURES_UBO);
+ 
+		int virtualTexturesUboBinding = virtualTexturesUboBindings[0];
+
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber; ++i) {
+			VkDescriptorBufferInfo modelMatrixBufferInfo{};
+			modelMatrixBufferInfo.buffer = virtualTexturesUniformBuffer;
+			modelMatrixBufferInfo.offset = i * sizeof(VIRTUAL_TEXTURES_UBO);
+			modelMatrixBufferInfo.range = sizeof(VIRTUAL_TEXTURES_UBO);
+
+			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			descriptorWrites[0].dstSet = virtualTexturesUBODesctiptorSets[i];
+			descriptorWrites[0].dstBinding = virtualTexturesUboBinding;
+			descriptorWrites[0].dstArrayElement = 0;
+			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+			descriptorWrites[0].descriptorCount = 1;
+			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		}
+
+		core::vector<u32> virtualTexturesSamplerBindigs = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURE_TILESET);
+ 
+		int virtualTexturesSamplerBinding = virtualTexturesSamplerBindigs[0];
+
+		if ( initializeTextureData_.size() > 0 ) {
+			constexpr u32 DS_specular_number = 64;
+
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+				VkDescriptorImageInfo imageInfo{};
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//				unsigned int textureIndex = i / 2;
+				imageInfo.imageView = textureImages[6].views[0];
+				imageInfo.sampler = textureSampler;
+
+				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			
+				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[0].dstSet = virtualTexturesSamplersDesctiptorSets[i];
+				descriptorWrites[0].dstBinding = virtualTexturesSamplerBinding;
 				descriptorWrites[0].dstArrayElement = 0;
 				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 				descriptorWrites[0].descriptorCount = 1;
