@@ -20,6 +20,7 @@
 #include <optional>
 #include <set>
 #include <cmath>
+#include <vulkan/vulkan_core.h>
 
 #include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
@@ -411,6 +412,10 @@ namespace GLVM::core
 		std::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
+		Pipeline virtualTexturesPipeline;
+		core::vector<VkDescriptorSet> virtualTexturesDesctiptorSets;
+		VkBuffer virtualTexturesUniformBuffer;
+		VkDeviceMemory virtualTexturesDeviceMemory;
 		
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
