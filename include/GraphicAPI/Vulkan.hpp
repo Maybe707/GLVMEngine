@@ -413,9 +413,10 @@ namespace GLVM::core
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
 		Pipeline virtualTexturesPipeline;
+		VkRenderPass virtualTexturesRenderPass;
 		core::vector<VkDescriptorSet> virtualTexturesDesctiptorSets;
-		VkBuffer virtualTexturesUniformBuffer;
-		VkDeviceMemory virtualTexturesDeviceMemory;
+		[[maybe_unused]] VkBuffer virtualTexturesUniformBuffer;
+		[[maybe_unused]] VkDeviceMemory virtualTexturesDeviceMemory;
 		
         VkCommandPool directionalLightCommandPool;
 		VkCommandPool spotLightCommandPool;
@@ -426,6 +427,7 @@ namespace GLVM::core
 		VkCommandPool uiCommandPool;
 		VkCommandPool uiIconsCommandPool;
 		VkCommandPool mainRenderCommandPool;
+		VkCommandPool virtualTexturesCommandPool;
 
 		/// Main pipeline depth.
 		VkImage     mainDepthPipelineImage;
@@ -578,6 +580,7 @@ namespace GLVM::core
 		void createDirectionalLightShadowMapRenderPass();
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
+		void createVirtualTextureRenderPass();
         void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,

@@ -12,6 +12,17 @@
 
 #define PI 3.14159265
 
+struct point2D {
+	float x;
+	float y;
+};
+
+struct point3D {
+	float x;
+	float y;
+	float z;
+};
+
 template <class T2, int var2>
 class Vector;
 

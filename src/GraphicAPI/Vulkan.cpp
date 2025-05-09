@@ -840,6 +840,7 @@ namespace GLVM::core
 		createDirectionalLightShadowMapRenderPass();
 		createSpotLightShadowMapRenderPass();
 		createPointLightShadowMapRenderPass();
+		createVirtualTextureRenderPass();
         createDescriptorSetLayout(directionalLightPipeline.descriptors);
 		createDescriptorSetLayout(spotLightPipeline.descriptors);
 		createDescriptorSetLayout(pointLightPipeline.descriptors);
@@ -849,6 +850,7 @@ namespace GLVM::core
         createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
 		createDescriptorSetLayout(uiPipeline.descriptors);
 		createDescriptorSetLayout(uiIconsPipeline.descriptors);
+		createDescriptorSetLayout(virtualTexturesPipeline.descriptors);
         createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
@@ -858,6 +860,7 @@ namespace GLVM::core
 		createGraphicsPipeline(uiPipeline, uiRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(uiIconsPipeline, uiIconsRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(mainRenderScenePipeline, renderPass, VK_POLYGON_MODE_FILL);
+		createGraphicsPipeline(virtualTexturesPipeline, virtualTexturesRenderPass, VK_POLYGON_MODE_FILL);
         createCommandPool(directionalLightCommandPool);
 		createCommandPool(spotLightCommandPool);
 		createCommandPool(pointLightCommandPool);
@@ -867,6 +870,7 @@ namespace GLVM::core
 		createCommandPool(uiCommandPool);
 		createCommandPool(uiIconsCommandPool);
 		createCommandPool(mainRenderCommandPool);
+		createCommandPool(virtualTexturesCommandPool);
         createDepthResources();
 		createDirectionalLightShadowMapDepthResources();
 		createSpotLightShadowMapDepthResources();
@@ -2195,6 +2199,61 @@ namespace GLVM::core
             throw std::runtime_error("failed to create render pass!");
         }
     }
+
+    void CVulkanRenderer::createVirtualTextureRenderPass() {
+        VkAttachmentDescription attachmentDescription{};
+        
+		attachmentDescription.format = findDepthFormat();
+        attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+        attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+        attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+		attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+
+		/// Attachment references form subpasses
+        VkAttachmentReference depthAttachmentRef{};
+        depthAttachmentRef.attachment = 0;
+        depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		/// Subpass 0: shadow map rendering
+        VkSubpassDescription subpass{};
+        subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+		subpass.colorAttachmentCount = 0;
+        subpass.pDepthStencilAttachment = &depthAttachmentRef;
+
+		VkSubpassDependency dependencies[2];
+		dependencies[0].srcSubpass		= VK_SUBPASS_EXTERNAL;
+		dependencies[0].dstSubpass		= 0;
+		dependencies[0].srcStageMask	= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[0].dstStageMask	= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependencies[0].srcAccessMask	= VK_ACCESS_SHADER_READ_BIT;
+		dependencies[0].dstAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		dependencies[1].srcSubpass		= 0;
+		dependencies[1].dstSubpass		= VK_SUBPASS_EXTERNAL;
+		dependencies[1].srcStageMask	= VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		dependencies[1].dstStageMask	= VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		dependencies[1].srcAccessMask	= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		dependencies[1].dstAccessMask	= VK_ACCESS_SHADER_READ_BIT;
+		dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
+
+		std::array<VkAttachmentDescription, 1> attachments = {attachmentDescription};
+        VkRenderPassCreateInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+        renderPassInfo.pAttachments = attachments.data();
+        renderPassInfo.subpassCount = 1;
+        renderPassInfo.pSubpasses = &subpass;
+        renderPassInfo.dependencyCount = 2;
+        renderPassInfo.pDependencies = dependencies;
+
+        if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &virtualTexturesRenderPass) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create render pass!");
+        }
+    }
 	
     void CVulkanRenderer::createDescriptorSetLayout(core::vector<Descriptor>& descriptors) {
 		for ( u32 i = 0; i < descriptors.GetSize(); ++i ) {
@@ -2935,6 +2994,7 @@ namespace GLVM::core
 		VkDeviceSize uiUboSize = sizeof(UI_UBO);
 		VkDeviceSize uiIconsUboSize = sizeof(UI_UBO);
 		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
+//		VkDeviceSize virtualTexturesBufferSize = sizeof(HU
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -2979,6 +3039,10 @@ namespace GLVM::core
 		memory = modelCubeShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 shadowMapPointLightModelMatrixUniformBuffer, shadowMapPointLightModelMatrixUniformBuffersMemory);
+
+		memory = lightDataBufferSize * MAX_FRAMES_IN_FLIGHT;
+		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+					 lightDataUniformBuffer, lightDataUniformBuffersMemory);
 
 		memory = lightDataBufferSize * MAX_FRAMES_IN_FLIGHT;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,

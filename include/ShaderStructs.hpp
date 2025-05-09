@@ -145,6 +145,10 @@ namespace GLVM::core {
 		mat4 model;
 		vec3 color;
 	};
+
+	struct alignas(64) VIRTUAL_TEXTURES_UBO {
+		
+	};
 } // namespace GLVM::core
 
 #endif
