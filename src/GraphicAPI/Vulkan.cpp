@@ -5500,6 +5500,9 @@ namespace GLVM::core
         vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 
         uint32_t imageIndex;
+		/* vkAcquireNextImageKHR give index of image that WILL BE SOON available for rendering and signal imageAvailablesemaphore when its so.
+		   GraphicsQueue waint for this semaphore bacause we pass it in submitInfo.
+		 */
         VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
         if (result == VK_ERROR_OUT_OF_DATE_KHR) {
@@ -5524,6 +5527,7 @@ namespace GLVM::core
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
+		/// GraphicsQueue wait for swapchain image when its become available.
         VkSemaphore waitSemaphores[] = {imageAvailableSemaphores[currentFrame]};
         VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
         submitInfo.waitSemaphoreCount = 1;

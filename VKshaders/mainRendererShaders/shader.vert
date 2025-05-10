@@ -89,10 +89,11 @@ void main() {
 	// 	0.0, 0.0, 0.0, 1.0
 	// 	);
 
-	
+
     gl_Position = ubo.proj * ubo.view * worldPosition;
 //	gl_Position = worldPosition * ubo.model * ubo.view * ubo.proj;
 	outFragmentPosition = worldPosition.xyz;
+//	outFragmentPosition = mat3(ubo.proj * ubo.view) * worldPosition.xyz;
     outFragmentNormal = inNormal;
     outFragmentTextureCoordinate = inTextureCoordinate;
 }
