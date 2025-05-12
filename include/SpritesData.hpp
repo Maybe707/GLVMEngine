@@ -14,5 +14,6 @@
 #include "container2_specular.h"
 #include "fontAtlas.h"
 #include "inventorySlot.h"
+#include "tileset.h"
 
 #endif

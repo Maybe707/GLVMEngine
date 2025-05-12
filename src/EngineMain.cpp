@@ -62,6 +62,7 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromAddress(32, 32, Crosshair_dat_len, Crosshair_dat);
 	[[maybe_unused]] ecs::TextureHandle fontAtlasTexturehandle = GLVM->LoadTextureFromAddress(84, 132, fontAtlas_dat_len, fontAtlas_dat);
 	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(64, 64, inventorySlot_dat_len, inventorySlot_dat);
+	[[maybe_unused]] ecs::TextureHandle tilesetTexturehandle = GLVM->LoadTextureFromAddress(512, 512, tileset_dat_len, tileset_dat);
 
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
@@ -188,7 +189,7 @@ int main()
 	// fontComponentCube0->font_string.Push('5');
 	// fontComponentCube0->lifeTime = -10.0f;
 	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
-	*materialCube0  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+	*materialCube0  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 		.shininess = 128.0f * 0.078125f };
 
 	Entity crosshair = EntityManager->CreateEntity();

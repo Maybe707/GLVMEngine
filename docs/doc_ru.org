@@ -70,6 +70,8 @@ ECS даёт возможность легко добавлять новые и 
 
 #+begin_src
 	 convert robot.png rgba:robot.dat
+         or
+         magick uv.jpg -depth 8 rgba:tileset.dat
 #+end_src
 
   2. Преобразуйте получившийся файл robot.dat к c-header файлу со статическим массивом внутри:

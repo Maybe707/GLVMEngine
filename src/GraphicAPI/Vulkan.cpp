@@ -1,4 +1,4 @@
-// This file is part of Game Loop Versatile Modules (GLVM)
+ // This file is part of Game Loop Versatile Modules (GLVM)
 // Copyright © 2024 Maksim Manokhin a.k.a. Yuriorkis_Scream. Contacts: <fellfrostqtw@gmail.com>
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
@@ -603,10 +603,10 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-		Window.Close();
-		Window = GLVM::core::WindowXVulkan();
-        createXlibSurfaceInfo.dpy = Window.GetDisplay();
-        createXlibSurfaceInfo.window = Window.GetWindow();
+//		Window->Close();
+		Window = new GLVM::core::WindowXVulkan();
+        createXlibSurfaceInfo.dpy = Window->GetDisplay();
+        createXlibSurfaceInfo.window = Window->GetWindow();
 
         createXlibSurfaceInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
         createXlibSurfaceInfo.pNext = nullptr;
@@ -614,7 +614,9 @@ namespace GLVM::core
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-//		Window->Disconnect();
+		// if( Window != nullptr )
+		// 	Window->Disconnect();
+		
 		Window = new GLVM::core::WindowXCBVulkan();
 		createXcbSurfaceInfo.window = Window->GetWindow();
 		createXcbSurfaceInfo.connection = Window->GetConnection();
@@ -5346,6 +5348,20 @@ namespace GLVM::core
 
 		lightDataUBO.spotLightArraySize = spotLightNumber;
 
+		std::random_device rd;
+		std::mt19937 mersenne(rd());
+		std::uniform_int_distribution<int> distributionTileIndex(0, INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT);
+
+		for( int i = 0; i < INDIRECT_TEXTURE_WIDTH; ++i )
+			for( int j = 0; j < INDIRECT_TEXTURE_HEIGHT; ++j ) {
+				int randomTileIndex = distributionTileIndex(mersenne);
+				lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_HEIGHT + j] = randomTileIndex;
+			}
+
+		lightDataUBO.tilesetTilesCount = vec2(INDIRECT_TEXTURE_WIDTH, INDIRECT_TEXTURE_HEIGHT);
+		lightDataUBO.tilesRaw = 1;
+		lightDataUBO.tilesColumn = 1;
+		
         void* data;
         vkMapMemory(device, lightDataUniformBuffersMemory, sizeof(lightDataUBO) * currentImage,
 					sizeof(lightDataUBO), 0, &data);

@@ -43,8 +43,8 @@
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
-//#define VK_USE_PLATFORM_XCB_KHR
-#define VK_USE_PLATFORM_WAYLAND_KHR
+#define VK_USE_PLATFORM_XCB_KHR
+//#define VK_USE_PLATFORM_WAYLAND_KHR
 #endif
 
 #ifdef _WIN32
@@ -317,11 +317,11 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		GLVM::core::WindowXCBVulkan* Window;
+		GLVM::core::WindowXCBVulkan* Window = nullptr;
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        GLVM::core::WindowXVulkan Window;
+        GLVM::core::WindowXVulkan* Window;
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR

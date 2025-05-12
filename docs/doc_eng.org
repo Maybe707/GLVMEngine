@@ -63,6 +63,8 @@ The GLVM engine is based on a simple entity-component system (ECS) that uses spa
  
 #+begin_src
 	 convert robot.png robot.dat
+         or
+         magick uv.jpg -depth 8 rgba:tileset.dat
 #+end_src  
  
   2. Convert robot.dat into a C header file containing a static array:
