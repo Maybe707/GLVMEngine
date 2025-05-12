@@ -19,6 +19,11 @@ namespace GLVM::core
 	WindowXCBVulkan::WindowXCBVulkan() {
 		/// Open the connection to the X server
 		connection = xcb_connect ( NULL, NULL );
+		int error = xcb_connection_has_error(connection);
+		if (error) {
+			fprintf(stderr, "XCB connection error: %d\n", error);
+			// Handle error or exit
+		}
 
 		/// Get the first screen
 		const xcb_setup_t*    setup    = xcb_get_setup ( connection );
@@ -52,6 +57,19 @@ namespace GLVM::core
 							screen->root_visual,             ///< Visual
 							event_mask, event_flags );                       ///< Masks, not used yet
 
+		// Verify the window was created (optional)
+		xcb_get_window_attributes_cookie_t attr_cookie =
+			xcb_get_window_attributes(connection, window);
+		xcb_get_window_attributes_reply_t *attr_reply =
+			xcb_get_window_attributes_reply(connection, attr_cookie, NULL);
+
+		if (!attr_reply) {
+			fprintf(stderr, "Failed to query window — maybe it wasn't created.\n");
+		} else {
+			printf("Window created successfully and is valid.\n");
+			free(attr_reply);
+		}
+		
 		/// Map the window on the screen
 		xcb_map_window ( connection, window );
 

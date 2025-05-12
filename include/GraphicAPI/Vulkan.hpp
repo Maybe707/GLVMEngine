@@ -366,7 +366,7 @@ namespace GLVM::core
         VkWin32SurfaceCreateInfoKHR createWin32SurfaceInfo;
 #endif
     
-        VkSurfaceKHR surface;
+        VkSurfaceKHR surface = VK_NULL_HANDLE;
 
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
         VkDevice device;
