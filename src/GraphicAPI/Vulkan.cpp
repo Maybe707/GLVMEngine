@@ -1098,15 +1098,15 @@ namespace GLVM::core
 				}
 		}
 
-		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < uiIconsPipeline.descriptors[m].textureImages.size(); ++i)
+		for ( unsigned int m = 0; m < virtualTexturesPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < virtualTexturesPipeline.descriptors[m].textureImages.size(); ++i)
 				{
-					vkDestroySampler(device, uiIconsPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, uiIconsPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+					vkDestroySampler(device, virtualTexturesPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < virtualTexturesPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, virtualTexturesPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, uiIconsPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, uiIconsPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					vkDestroyImage(device, virtualTexturesPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, virtualTexturesPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
 					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
 					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
 					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
@@ -1158,6 +1158,9 @@ namespace GLVM::core
 		vkFreeMemory(device, shadowMapPointLightModelMatrixUniformBuffersMemory, nullptr);
 		vkDestroyBuffer(device, shadowMapSpotLightModelMatrixUniformBuffer, nullptr);
 		vkFreeMemory(device, shadowMapSpotLightModelMatrixUniformBuffersMemory, nullptr);
+		vkDestroyBuffer(device, virtualTexturesUniformBuffer, nullptr);
+		vkFreeMemory(device, virtualTexturesUniformBufferMemory, nullptr);
+
 		for ( size_t j = 0; j < vertexBufferContainer.size(); ++j ) {
 			vkDestroyBuffer(device, vertexBufferContainer[j], nullptr);
 			vkFreeMemory(device, vertexBufferMemoryContainer[j], nullptr);
@@ -1195,6 +1198,7 @@ namespace GLVM::core
 		vkDestroyRenderPass(device, directionalLightShadowMapRenderPass, nullptr);
 		vkDestroyRenderPass(device, pointLightShadowMapRenderPass, nullptr);
 		vkDestroyRenderPass(device, spotLightShadowMapRenderPass, nullptr);
+		vkDestroyRenderPass(device, virtualTexturesRenderPass, nullptr);
 
 		vkDestroyPipeline(device, directionalLightPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, directionalLightPipeline.pipelineLayout, nullptr);
@@ -1224,6 +1228,8 @@ namespace GLVM::core
 		vkDestroyPipelineLayout(device, uiIconsPipeline.pipelineLayout, nullptr);
 		vkDestroyPipeline(device, mainRenderScenePipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, mainRenderScenePipeline.pipelineLayout, nullptr);
+		vkDestroyPipeline(device, virtualTexturesPipeline.pipeline, nullptr);
+		vkDestroyPipelineLayout(device, virtualTexturesPipeline.pipelineLayout, nullptr);
 		
 		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) 
 			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptors[i].setLayout, nullptr);
@@ -1242,6 +1248,9 @@ namespace GLVM::core
 
 		for ( unsigned int i = 0; i < uiIconsPipeline.descriptors.GetSize(); ++i ) 
 			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptors[i].setLayout, nullptr);
+
+		for ( unsigned int i = 0; i < virtualTexturesPipeline.descriptors.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, virtualTexturesPipeline.descriptors[i].setLayout, nullptr);
 		
 		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
 //			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
@@ -1374,15 +1383,15 @@ namespace GLVM::core
 				}
 		}
 
-		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < uiIconsPipeline.descriptors[m].textureImages.size(); ++i)
+		for ( unsigned int m = 0; m < virtualTexturesPipeline.descriptors.GetSize(); ++m ) {
+			for(unsigned int i = 0; i < virtualTexturesPipeline.descriptors[m].textureImages.size(); ++i)
 				{
-					vkDestroySampler(device, uiIconsPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, uiIconsPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+					vkDestroySampler(device, virtualTexturesPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+					for ( unsigned int j = 0; j < virtualTexturesPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+						vkDestroyImageView(device, virtualTexturesPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, uiIconsPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, uiIconsPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+					vkDestroyImage(device, virtualTexturesPipeline.descriptors[m].textureImages[i].image, nullptr);
+					vkFreeMemory(device, virtualTexturesPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
 					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
 					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
 					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
@@ -1444,6 +1453,10 @@ namespace GLVM::core
 			vkDestroySemaphore(device, fontImageAvailableSemaphores[i], nullptr);
             vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, fontInFlightFences[i], nullptr);
+
+			vkDestroySemaphore(device, virtualTexturesImageAvailableSemaphores[i], nullptr);
+            vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
+            vkDestroyFence(device, virtualTexturesInFlightFences[i], nullptr);
         }
 
         vkDestroyCommandPool(device, directionalLightCommandPool, nullptr);
@@ -1455,6 +1468,7 @@ namespace GLVM::core
 		vkDestroyCommandPool(device, hudScreenCommandPool, nullptr);
 		vkDestroyCommandPool(device, uiCommandPool, nullptr);
 		vkDestroyCommandPool(device, uiIconsCommandPool, nullptr);
+		vkDestroyCommandPool(device, virtualTexturesCommandPool, nullptr);
 		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
 		vkDeviceWaitIdle(device);
