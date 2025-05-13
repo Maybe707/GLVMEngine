@@ -323,7 +323,7 @@ namespace GLVM::core {
 				printf("ESC pressed - exiting\n");
 				g_eEvent.SetEvent(EEvents::eGAME_LOOP_KILL);
 				Input_Stack_.ControlInput(g_eEvent);
-				wl_display_disconnect(display);
+//				wl_display_disconnect(display);
 			}
 			if (key == 17) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eMOVE_FORWARD);

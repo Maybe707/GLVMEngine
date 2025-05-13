@@ -1356,7 +1356,7 @@ namespace GLVM::core
 
         vkDestroySurfaceKHR(instance, surface, nullptr);
         vkDestroyInstance(instance, nullptr);
-//        Window.Close();
+        Window->Close();
     }
 
     void CVulkanRenderer::createInstance() {

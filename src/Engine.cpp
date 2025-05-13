@@ -250,7 +250,7 @@ namespace GLVM::core
 			vulkanRenderer->Window->SwapBuffers();
 		}
 
-		vulkanRenderer->Window->Close();
+//		vulkanRenderer->Window->Close();
 		delete vulkanRenderer;
 	}
 
