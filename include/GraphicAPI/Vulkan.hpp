@@ -42,8 +42,8 @@
 #include "Components/FontComponent.hpp"
 
 #ifdef __linux__
-#define VK_USE_PLATFORM_XLIB_KHR
-//#define VK_USE_PLATFORM_XCB_KHR
+//#define VK_USE_PLATFORM_XLIB_KHR
+#define VK_USE_PLATFORM_XCB_KHR
 //#define VK_USE_PLATFORM_WAYLAND_KHR
 #endif
 
@@ -702,6 +702,7 @@ namespace GLVM::core
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void setImageDebugObjectName(VK_Image image);
 		void setDebugObjectNames();
+		void clearPipeline( Pipeline& pipeline );
     };
 
 };
