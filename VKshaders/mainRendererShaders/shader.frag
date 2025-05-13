@@ -96,8 +96,8 @@ layout(set = 1, binding = 0) uniform LightData {
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 
-#define INDIRECT_TEXTURE_WIDTH 16
-#define INDIRECT_TEXTURE_HEIGHT 16
+#define INDIRECT_TEXTURE_WIDTH 4
+#define INDIRECT_TEXTURE_HEIGHT 4
 	
 	int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT];
 } lightData;
@@ -212,63 +212,67 @@ void main()
 	float indirectTextureX = INDIRECT_TEXTURE_WIDTH * inFragmentTextureCoordinate.x;
 	float indirectTextureY = INDIRECT_TEXTURE_HEIGHT * inFragmentTextureCoordinate.y;
 
-	int indirectTextureTileRaw = int(floor(indirectTextureX));
-	int indirectTextureTileColumn = int(floor(indirectTextureY));
-	int tilesIndex = lightData.indirectTexture[indirectTextureTileRaw * INDIRECT_TEXTURE_WIDTH + indirectTextureTileColumn];
+	int indirectTextureTileColumn = int(floor(indirectTextureX));
+	int indirectTextureTileRaw = int(floor(indirectTextureY));
+	int tileIndex = lightData.indirectTexture[indirectTextureTileRaw * INDIRECT_TEXTURE_WIDTH + indirectTextureTileColumn];
 	
-	int tileIndexRaw = int(mod(tilesIndex, int(lightData.tilesetTilesCount.x)));
-	int tileIndexColumn = tilesIndex / int(lightData.tilesetTilesCount.y);
+	int tileIndexColumn = int(mod(tileIndex, int(lightData.tilesetTilesCount.x)));
+	int tileIndexRaw = tileIndex / int(lightData.tilesetTilesCount.y);
 
 	float tileSizeX = 1.0f / lightData.tilesetTilesCount.x;
 	float tileSizeY = 1.0f / lightData.tilesetTilesCount.y;
 
-	float offsetUV_X = tileSizeX * tileIndexRaw;
-	float offsetUV_Y = tileSizeY * tileIndexColumn;
+	float offsetUV_X = tileSizeX * tileIndexColumn;
+	float offsetUV_Y = tileSizeY * tileIndexRaw;
 
 	float localUV_X = indirectTextureX - floor(indirectTextureX);
 	float localUV_Y = indirectTextureY - floor(indirectTextureY);
 
-	tilesetFinalUV = vec2(offsetUV_X + localUV_X, localUV_Y + localUV_Y);
+	// tilesetFinalUV = vec2(offsetUV_X + (localUV_X * INDIRECT_TEXTURE_WIDTH / lightData.tilesetTilesCount.x), offsetUV_Y + (localUV_Y * INDIRECT_TEXTURE_HEIGHT / lightData.tilesetTilesCount.y));
+	tilesetFinalUV = vec2(offsetUV_X + (localUV_X / lightData.tilesetTilesCount.x), offsetUV_Y + (localUV_Y / lightData.tilesetTilesCount.y));
+
+	//tilesetFinalUV = vec2(tileSizeX + localUV_X / 8.0, tileSizeY + localUV_Y / 8.0);
 	/// End computing virtual texture logic.
 
-	outColor = vec4(lightData.tilesColumn, 0.0, 0.0, 1.0);
+	//	outColor = vec4(localUV_X - 0.9, 0.0, 0.0, 1.0);
+	//outColor = vec4(texture(diffuse, vec2(localUV_X, localUV_Y)));
 	
-	// vec3 fragmentNormal = normalize(fs_in.normal);
-	// vec3 viewDirection  = normalize(lightData.viewPosition - fs_in.fragmentPosition);
+	vec3 fragmentNormal = normalize(fs_in.normal);
+	vec3 viewDirection  = normalize(lightData.viewPosition - fs_in.fragmentPosition);
 
-	// vec3 result = vec3(0.0, 0.0, 0.0);
-	// for(int i = 0; i < lightData.directionalLightsArraySize; ++i ) {
-	// 	vec3 light = ComputeDirectionalLight(lightData.directionalLightsArray[i], fragmentNormal, viewDirection);
-	// 	float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+	vec3 result = vec3(0.0, 0.0, 0.0);
+	for(int i = 0; i < lightData.directionalLightsArraySize; ++i ) {
+		vec3 light = ComputeDirectionalLight(lightData.directionalLightsArray[i], fragmentNormal, viewDirection);
+		float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
-	// for(int i = 0; i < lightData.pointLightsArraySize; ++i) {
-	// 	debugPrintfEXT("Quadratic value: %f", lightData.pointLightsArray[3].quadratic);
+	for(int i = 0; i < lightData.pointLightsArraySize; ++i) {
+		debugPrintfEXT("Quadratic value: %f", lightData.pointLightsArray[3].quadratic);
 		
-	// 	vec3 light = ComputePointLight(lightData.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
-	// 	float shadow = ComputePointShadow(lightData.pointLightsArray[i],
-	// 									  inFragmentPosition, pointLightsCubeShadowMaps[i]);
-	// 	result += (1.0 - shadow) * light;
+		vec3 light = ComputePointLight(lightData.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
+		float shadow = ComputePointShadow(lightData.pointLightsArray[i],
+										  inFragmentPosition, pointLightsCubeShadowMaps[i]);
+		result += (1.0 - shadow) * light;
 
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
-	// for(int i = 0; i < lightData.spotLightArraySize; ++i) {
-	// 	vec3 light = ComputeSpotLight(lightData.spotLightsArray[i], fragmentNormal,
-	// 								  inFragmentPosition, viewDirection);
-	// 	float shadow = ComputeSpotShadow(lightData.spotLightsArray[i],
-	// 									 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
+	for(int i = 0; i < lightData.spotLightArraySize; ++i) {
+		vec3 light = ComputeSpotLight(lightData.spotLightsArray[i], fragmentNormal,
+									  inFragmentPosition, viewDirection);
+		float shadow = ComputeSpotShadow(lightData.spotLightsArray[i],
+										 fs_in.fragmentPositionSpotLightSpace[i], spotLightsShadowMaps[i]);
 
-	// 	result += (1.0 - shadow) * light;
-	// 	if(shadow > 0.0)
-	// 		shadow = 0.0;
-	// }
+		result += (1.0 - shadow) * light;
+		if(shadow > 0.0)
+			shadow = 0.0;
+	}
 
-	// outColor = vec4(result, 1.0);
+	outColor = vec4(result, 1.0);
 }
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection) {

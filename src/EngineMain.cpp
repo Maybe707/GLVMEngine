@@ -88,8 +88,8 @@ int main()
     Entity uiPlayer = EntityManager->CreateEntity();
     ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
 		cm::transform, cm::rigidBody, cm::health, cm::actor, cm::material>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .position = { 5.0f, 10.0f, 15.0f }, .scale = 1.0f, .gltf = true };
-	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 6.0f };
+	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f, .gltf = true };
+	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 0.0f };
 	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
     *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
 		.up = { 0.0f, -1.0f, 0.0f }, .Position = {0.0f, 0.0f, -3.0f} };

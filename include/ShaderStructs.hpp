@@ -19,8 +19,8 @@ namespace GLVM::core {
 
 #define MAX_JOINTS_NUMBER 18
 
-#define INDIRECT_TEXTURE_WIDTH 16
-#define INDIRECT_TEXTURE_HEIGHT 16
+#define INDIRECT_TEXTURE_WIDTH 8
+#define INDIRECT_TEXTURE_HEIGHT 8
 	
 	struct LightSpaceMatrixUBO {
 		alignas(16) mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];

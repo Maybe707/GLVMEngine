@@ -5245,12 +5245,13 @@ namespace GLVM::core
 		for( int i = 0; i < INDIRECT_TEXTURE_WIDTH; ++i )
 			for( int j = 0; j < INDIRECT_TEXTURE_HEIGHT; ++j ) {
 				int randomTileIndex = distributionTileIndex(mersenne);
+				randomTileIndex = 32;
 				lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_HEIGHT + j] = randomTileIndex;
 			}
 
 		lightDataUBO.tilesetTilesCount = vec2(INDIRECT_TEXTURE_WIDTH, INDIRECT_TEXTURE_HEIGHT);
-		lightDataUBO.tilesRaw = 1;
-		lightDataUBO.tilesColumn = 1;
+		lightDataUBO.tilesRaw = 8;
+		lightDataUBO.tilesColumn = 8;
 		
         void* data;
         vkMapMemory(device, lightDataUniformBuffersMemory, sizeof(lightDataUBO) * currentImage,
