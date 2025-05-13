@@ -9,6 +9,7 @@
 #include <X11/Xlib.h>
 #include "IWindow.hpp"
 #include "EventsStack.hpp"
+#include "Globals.hpp"
 
 #define XKEY_ESCAPE 0xff1b
 #define XKEY_A      0x61
@@ -30,8 +31,7 @@ namespace GLVM::core
     public:
         Display* pDisp_;
         Window Win_;
-		CStack* Input_Stack_;
-        
+
         WindowXVulkan();
         ~WindowXVulkan();
         

@@ -109,7 +109,7 @@ namespace GLVM::core {
 		float quadratic;
 	};
 	
-    struct LightData {
+    struct alignas(64) LightData {
 		vec2 tilesetTilesCount;
 		int tilesRaw;
 		int tilesColumn;

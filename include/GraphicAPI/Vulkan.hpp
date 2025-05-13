@@ -42,8 +42,8 @@
 #include "Components/FontComponent.hpp"
 
 #ifdef __linux__
-//#define VK_USE_PLATFORM_XLIB_KHR
-#define VK_USE_PLATFORM_XCB_KHR
+#define VK_USE_PLATFORM_XLIB_KHR
+//#define VK_USE_PLATFORM_XCB_KHR
 //#define VK_USE_PLATFORM_WAYLAND_KHR
 #endif
 

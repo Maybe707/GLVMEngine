@@ -205,7 +205,7 @@ namespace GLVM::core
 				break;
 			}
 
-			Input_Stack_->ControlInput(_Event);
+			Input_Stack_.ControlInput(_Event);
         }
 		return false;
     }
