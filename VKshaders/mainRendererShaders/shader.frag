@@ -96,8 +96,8 @@ layout(set = 1, binding = 0) uniform LightData {
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 
-#define INDIRECT_TEXTURE_WIDTH 4
-#define INDIRECT_TEXTURE_HEIGHT 4
+#define INDIRECT_TEXTURE_WIDTH 3
+#define INDIRECT_TEXTURE_HEIGHT 2
 	
 	int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT];
 } lightData;
@@ -209,8 +209,8 @@ float delinearize_depth(float depth, float near, float far) {
 void main()
 {
 	/// Start computing virtual texture logic.
-	float indirectTextureX = INDIRECT_TEXTURE_WIDTH * inFragmentTextureCoordinate.x;
-	float indirectTextureY = INDIRECT_TEXTURE_HEIGHT * inFragmentTextureCoordinate.y;
+    float indirectTextureX = float(INDIRECT_TEXTURE_WIDTH) * inFragmentTextureCoordinate.x;
+	float indirectTextureY = float(INDIRECT_TEXTURE_HEIGHT) * inFragmentTextureCoordinate.y;
 
 	int indirectTextureTileColumn = int(floor(indirectTextureX));
 	int indirectTextureTileRaw = int(floor(indirectTextureY));
@@ -228,8 +228,8 @@ void main()
 	float localUV_X = indirectTextureX - floor(indirectTextureX);
 	float localUV_Y = indirectTextureY - floor(indirectTextureY);
 
-	// tilesetFinalUV = vec2(offsetUV_X + (localUV_X * INDIRECT_TEXTURE_WIDTH / lightData.tilesetTilesCount.x), offsetUV_Y + (localUV_Y * INDIRECT_TEXTURE_HEIGHT / lightData.tilesetTilesCount.y));
 	tilesetFinalUV = vec2(offsetUV_X + (localUV_X / lightData.tilesetTilesCount.x), offsetUV_Y + (localUV_Y / lightData.tilesetTilesCount.y));
+	//	tilesetFinalUV = vec2(offsetUV_X + (localUV_X / lightData.tilesetTilesCount.x * INDIRECT_TEXTURE_WIDTH), offsetUV_Y + (localUV_Y / lightData.tilesetTilesCount.y * INDIRECT_TEXTURE_HEIGHT));
 
 	//tilesetFinalUV = vec2(tileSizeX + localUV_X / 8.0, tileSizeY + localUV_Y / 8.0);
 	/// End computing virtual texture logic.
