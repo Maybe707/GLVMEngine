@@ -96,10 +96,10 @@ layout(set = 1, binding = 0) uniform LightData {
 	SpotLight spotLightsArray[SPOT_LIGHTS_NUMBER];
 	int spotLightArraySize;
 
-#define INDIRECT_TEXTURE_WIDTH 3
-#define INDIRECT_TEXTURE_HEIGHT 2
+#define INDIRECT_TEXTURE_WIDTH 7
+#define INDIRECT_TEXTURE_HEIGHT 5
 	
-	int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT];
+	int indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH];
 } lightData;
 vec2 tilesetFinalUV;
 

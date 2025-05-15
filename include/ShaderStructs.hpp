@@ -19,8 +19,10 @@ namespace GLVM::core {
 
 #define MAX_JOINTS_NUMBER 18
 
-#define INDIRECT_TEXTURE_WIDTH 8
-#define INDIRECT_TEXTURE_HEIGHT 8
+#define INDIRECT_TEXTURE_WIDTH 7
+#define INDIRECT_TEXTURE_HEIGHT 5
+#define TILESET_ROW 8
+#define TILESET_COLUMN 8
 	
 	struct LightSpaceMatrixUBO {
 		alignas(16) mat4 spotSpaceMatrix[SPOT_LIGHTS_NUMBER];
@@ -126,7 +128,7 @@ namespace GLVM::core {
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
 
-		int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT];
+		int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT * 4];
     };
 	
 	struct alignas(64) HUD_UBO {

@@ -5240,16 +5240,18 @@ namespace GLVM::core
 
 		std::random_device rd;
 		std::mt19937 mersenne(rd());
-		std::uniform_int_distribution<int> distributionTileIndex(0, INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT);
+		std::uniform_int_distribution<int> distributionTileIndex(0, INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH);
 
-		for( int i = 0; i < INDIRECT_TEXTURE_WIDTH; ++i )
-			for( int j = 0; j < INDIRECT_TEXTURE_HEIGHT; ++j ) {
+		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT; ++i )
+			for( int j = 0; j < INDIRECT_TEXTURE_WIDTH; ++j ) {
 				int randomTileIndex = distributionTileIndex(mersenne);
 				randomTileIndex = 32;
-				lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_HEIGHT + j] = randomTileIndex;
+				std::cout << "index: " << i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3 << std::endl;
+				lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3] = randomTileIndex;
+//				std::cout << "element: " << i * INDIRECT_TEXTURE_WIDTH + j << " equal: " << lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH + j] << std::endl;
 			}
 
-		lightDataUBO.tilesetTilesCount = vec2(INDIRECT_TEXTURE_WIDTH, INDIRECT_TEXTURE_HEIGHT);
+		lightDataUBO.tilesetTilesCount = vec2(TILESET_ROW, TILESET_COLUMN);
 		lightDataUBO.tilesRaw = 8;
 		lightDataUBO.tilesColumn = 8;
 		
