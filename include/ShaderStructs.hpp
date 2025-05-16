@@ -121,14 +121,19 @@ namespace GLVM::core {
 		PointLight pointLights[POINT_LIGHTS_NUMBER];
 		int pointLightsArraySize;
 		float farPlane;
+		int padding0;
+		int padding1;
 
 		DirectionalLight directionalLights[DIRECTIONAL_LIGHTS_NUMBER];
-		int directionalLightsArraySize;
+		alignas(16) int directionalLightsArraySize;
 		
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
+		int padding2;
+		int padding3;
+		int padding4;
 
-		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4];
+		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4 + 1];
     };
 	
 	struct alignas(64) HUD_UBO {

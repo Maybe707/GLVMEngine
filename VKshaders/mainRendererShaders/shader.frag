@@ -99,7 +99,7 @@ layout(set = 1, binding = 0) uniform LightData {
 #define INDIRECT_TEXTURE_WIDTH 7
 #define INDIRECT_TEXTURE_HEIGHT 5
 	
-	int indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4];
+	ivec4 indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4 + 1];
 } lightData;
 vec2 tilesetFinalUV;
 
@@ -214,7 +214,7 @@ void main()
 
 	int indirectTextureTileColumn = int(floor(indirectTextureX));
 	int indirectTextureTileRaw = int(floor(indirectTextureY));
-	int tileIndex = lightData.indirectTexture[indirectTextureTileRaw * INDIRECT_TEXTURE_WIDTH + indirectTextureTileColumn];
+	int tileIndex = lightData.indirectTexture[(indirectTextureTileRaw * INDIRECT_TEXTURE_WIDTH + indirectTextureTileColumn) / 4][(indirectTextureTileRaw * INDIRECT_TEXTURE_WIDTH + indirectTextureTileColumn) % 4];
 	
 	int tileIndexColumn = int(mod(tileIndex, int(lightData.tilesetTilesCount.x)));
 	int tileIndexRaw = tileIndex / int(lightData.tilesetTilesCount.y);

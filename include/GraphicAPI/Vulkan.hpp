@@ -244,6 +244,7 @@ namespace GLVM::core
 
     class CVulkanRenderer {
     public:
+		bool print = true;
 		unsigned int actorsNumber = 0;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_PoL_Mes_Act;

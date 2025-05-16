@@ -5242,15 +5242,20 @@ namespace GLVM::core
 		std::mt19937 mersenne(rd());
 		std::uniform_int_distribution<int> distributionTileIndex(0, INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH);
 
-		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4; ++i )
+		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4 + 1; ++i )
 			for( int j = 0; j < 4; ++j ) {
 				int randomTileIndex = distributionTileIndex(mersenne);
 				randomTileIndex = 20;
 				lightDataUBO.indirectTexture[i][j] = randomTileIndex;
+				if( print )
+					std::cout << "element: " << i * 4 + j << " value: " << lightDataUBO.indirectTexture[i][j] << std::endl;
+				
 				// std::cout << "index: " << i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3 << std::endl;
 				// lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3] = randomTileIndex;
 //				std::cout << "element: " << i * INDIRECT_TEXTURE_WIDTH + j << " equal: " << lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH + j] << std::endl;
 			}
+		if( print == true )
+			print = false;
 
 		lightDataUBO.tilesetTilesCount = vec2(TILESET_ROW, TILESET_COLUMN);
 		lightDataUBO.tilesRaw = 8;
