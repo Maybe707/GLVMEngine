@@ -3121,7 +3121,7 @@ namespace GLVM::core
 		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
 
 		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-		std::cout << "POINTER LIGHTS: " << pointLightUboDescriptorsNumber << std::endl;
+//		std::cout << "POINTER LIGHTS: " << pointLightUboDescriptorsNumber << std::endl;
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline, descriptorID,
 								MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber );
@@ -5242,12 +5242,13 @@ namespace GLVM::core
 		std::mt19937 mersenne(rd());
 		std::uniform_int_distribution<int> distributionTileIndex(0, INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH);
 
-		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT; ++i )
-			for( int j = 0; j < INDIRECT_TEXTURE_WIDTH; ++j ) {
+		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4; ++i )
+			for( int j = 0; j < 4; ++j ) {
 				int randomTileIndex = distributionTileIndex(mersenne);
-				randomTileIndex = 32;
-				std::cout << "index: " << i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3 << std::endl;
-				lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3] = randomTileIndex;
+				randomTileIndex = 20;
+				lightDataUBO.indirectTexture[i][j] = randomTileIndex;
+				// std::cout << "index: " << i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3 << std::endl;
+				// lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3] = randomTileIndex;
 //				std::cout << "element: " << i * INDIRECT_TEXTURE_WIDTH + j << " equal: " << lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH + j] << std::endl;
 			}
 

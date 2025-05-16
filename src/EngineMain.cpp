@@ -110,7 +110,7 @@ int main()
 	int* arrayPtr = new int[10];
 	for( int i = 0; i < 10; ++i ) {
 		arrayPtr[i] = i * 2;
-		std::cout << arrayPtr[i] << std::endl;
+//		std::cout << arrayPtr[i] << std::endl;
 	}
 
 	int array[3][2] = { { 1, 2 }, { 20, 30 }, { 450, 665 } };
@@ -118,9 +118,9 @@ int main()
 //	int array[3][2];
 	array[0][1] = 1000;
 	array[2][1] = 2500;
-	for( int i = 0; i < 3; ++i )
-		for( int j = 0; j < 2; ++j )
-			std::cout << array[i][j] << std::endl;
+	// for( int i = 0; i < 3; ++i )
+	// 	for( int j = 0; j < 2; ++j )
+	// 		std::cout << array[i][j] << std::endl;
 	
     std::random_device rd;
     std::map<int, int> hist;

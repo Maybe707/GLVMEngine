@@ -99,7 +99,7 @@ layout(set = 1, binding = 0) uniform LightData {
 #define INDIRECT_TEXTURE_WIDTH 7
 #define INDIRECT_TEXTURE_HEIGHT 5
 	
-	int indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH];
+	int indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4];
 } lightData;
 vec2 tilesetFinalUV;
 

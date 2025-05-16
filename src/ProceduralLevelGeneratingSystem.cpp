@@ -159,17 +159,17 @@ namespace GLVM::core
 			break;
 			}
 
-			std::cout << "next level position: " << "x: " << currentLevelPosition[0] << " y: " << currentLevelPosition[1] << " z: " << currentLevelPosition[2] << std::endl;
-			std::cout << "half x: " << half_x_rand << std::endl;
-			std::cout << "half y: " << half_y_rand << std::endl;
-			std::cout << "half z: " << half_z_rand << std::endl;
+			// std::cout << "next level position: " << "x: " << currentLevelPosition[0] << " y: " << currentLevelPosition[1] << " z: " << currentLevelPosition[2] << std::endl;
+			// std::cout << "half x: " << half_x_rand << std::endl;
+			// std::cout << "half y: " << half_y_rand << std::endl;
+			// std::cout << "half z: " << half_z_rand << std::endl;
 
-			std::cout << "lowest x: " << coordinateMaximumValuePerDirection.lowest_x << std::endl;
-			std::cout << "highest x: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
-			std::cout << "lowest y: " << coordinateMaximumValuePerDirection.lowest_y << std::endl;
-			std::cout << "highest y: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
-			std::cout << "lowest z: " << coordinateMaximumValuePerDirection.lowest_z << std::endl;
-			std::cout << "highest z: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			// std::cout << "lowest x: " << coordinateMaximumValuePerDirection.lowest_x << std::endl;
+			// std::cout << "highest x: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			// std::cout << "lowest y: " << coordinateMaximumValuePerDirection.lowest_y << std::endl;
+			// std::cout << "highest y: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
+			// std::cout << "lowest z: " << coordinateMaximumValuePerDirection.lowest_z << std::endl;
+			// std::cout << "highest z: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
 			
 			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
 				std::cout << "LEVEL COLLITION DETECTED" << std::endl;

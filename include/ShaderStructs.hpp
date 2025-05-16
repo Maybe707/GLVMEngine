@@ -128,7 +128,7 @@ namespace GLVM::core {
 		SpotLight spotLights[SPOT_LIGHTS_NUMBER];
 		int spotLightArraySize;
 
-		int indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT * 4];
+		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4];
     };
 	
 	struct alignas(64) HUD_UBO {
