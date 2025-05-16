@@ -229,6 +229,7 @@ void main()
 	float localUV_Y = indirectTextureY - floor(indirectTextureY);
 
 	tilesetFinalUV = vec2(offsetUV_X + (localUV_X / lightData.tilesetTilesCount.x), offsetUV_Y + (localUV_Y / lightData.tilesetTilesCount.y));
+	//	tilesetFinalUV = inFragmentTextureCoordinate;
 	//	tilesetFinalUV = vec2(offsetUV_X + (localUV_X / lightData.tilesetTilesCount.x * INDIRECT_TEXTURE_WIDTH), offsetUV_Y + (localUV_Y / lightData.tilesetTilesCount.y * INDIRECT_TEXTURE_HEIGHT));
 
 	//tilesetFinalUV = vec2(tileSizeX + localUV_X / 8.0, tileSizeY + localUV_Y / 8.0);

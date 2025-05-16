@@ -245,6 +245,7 @@ namespace GLVM::core
     class CVulkanRenderer {
     public:
 		bool print = true;
+		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4 + 1];
 		unsigned int actorsNumber = 0;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_PoL_Mes_Act;
