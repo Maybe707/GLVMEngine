@@ -508,8 +508,8 @@ namespace GLVM::core {
 
 	void WindowWaylandVulkan::handle_relative_motion([[maybe_unused]] void *data, [[maybe_unused]] struct zwp_relative_pointer_v1 *rel_pointer, [[maybe_unused]] uint32_t utime_hi, [[maybe_unused]] uint32_t utime_lo,
 													 wl_fixed_t dx, wl_fixed_t dy, [[maybe_unused]] wl_fixed_t dx_unaccel, [[maybe_unused]] wl_fixed_t dy_unaccel) {
-		printf("Relative motion: dx=%.2f dy=%.2f\n",
-			   wl_fixed_to_double(dx), wl_fixed_to_double(dy));
+		// printf("Relative motion: dx=%.2f dy=%.2f\n",
+		// 	   wl_fixed_to_double(dx), wl_fixed_to_double(dy));
 		x_pointer = wl_fixed_to_int(dx);
 		y_pointer = wl_fixed_to_int(dy);
 	}

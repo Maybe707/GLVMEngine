@@ -97,30 +97,39 @@ namespace GLVM::ecs
 			}
 		}
 
-		if(isInventoryOpened) {
-			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
+		// if(isInventoryOpened) {
+		// 	core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+		// 	core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		// 	cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
 			
-			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
-				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+		// 		unsigned int entityItemContaining = linkedItemEntities[i];
+		// 		cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
+		// 		cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
-				bool isCrosshairCollided = false;
-				for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n ) {
-					if ( itemColliderComponent->colliders[n] == linkedCrosshairEntities[0] ) {                ///< Is there a crosshair among the colliders
-						isCrosshairCollided = true;
-						break;
-					}
-				}
+		// 		bool isCrosshairCollided = false;
+		// 		for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n ) {
+		// 			if ( itemColliderComponent->colliders[n] == linkedCrosshairEntities[0] ) {                ///< Is there a crosshair among the colliders
+		// 				isCrosshairCollided = true;
+		// 				break;
+		// 			}
+		// 		}
 				
-				if ( itemColliderComponent->wallCollision && isCrosshairCollided ) {
-					itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged item
-					itemColliderComponent->itemDrag = true;
-					isItemDraged = true;
-				} 
-			}
-		}
+		// 		if ( itemColliderComponent->wallCollision && isCrosshairCollided ) {
+		// 			itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged item
+		// 			itemColliderComponent->itemDrag = true;
+		// 			isItemDraged = true;
+		// 		} 
+		// 	}
+		// }
+
+		// if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+		// }
+
+		// if ( isInventoryOpened && *isItemDraged ) {
+		// }
+
+		// if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
+		// }
 	}
 } // namespace GLVM::ecs

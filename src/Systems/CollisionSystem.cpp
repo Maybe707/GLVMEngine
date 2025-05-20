@@ -206,258 +206,258 @@ namespace GLVM::ecs
 			}
 		}
 
-		/// This code implements when inventory is open, player press left mouse button and he is not holding an item
-		if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-			*isLeftMouseButtonReleased = false;
-			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
-			const cm::transform* crosshairTransform = componentManager->GetComponent<cm::transform>(crosshairEntity);
-			cm::MeshHandle crosshairMeshhandle = componentManager->GetComponent<cm::mesh>(crosshairEntity)->handle;
-			vec3 crosshairPosition;
-			float crosshairScale = 0;
-			float crosshairGltfFlag = 0;
-			if ( linkedCrosshairEntities.GetSize() > 0 ) {
-				crosshairPosition = crosshairTransform->position;                
-				crosshairScale = crosshairTransform->scale;
-				crosshairGltfFlag = crosshairTransform->gltf;
-			}
+		// /// This code implements when inventory is open, player press left mouse button and he is not holding an item
+		// if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+		// 	*isLeftMouseButtonReleased = false;
+		// 	core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+		// 	core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		// 	const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
+		// 	const cm::transform* crosshairTransform = componentManager->GetComponent<cm::transform>(crosshairEntity);
+		// 	cm::MeshHandle crosshairMeshhandle = componentManager->GetComponent<cm::mesh>(crosshairEntity)->handle;
+		// 	vec3 crosshairPosition;
+		// 	float crosshairScale = 0;
+		// 	float crosshairGltfFlag = 0;
+		// 	if ( linkedCrosshairEntities.GetSize() > 0 ) {
+		// 		crosshairPosition = crosshairTransform->position;                
+		// 		crosshairScale = crosshairTransform->scale;
+		// 		crosshairGltfFlag = crosshairTransform->gltf;
+		// 	}
 
-			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				unsigned int entityItemContaining = linkedItemEntities[i];
-				const cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-				if ( itemComponent->occupiedSlots.GetSize() == 0 )                        ///< If occupiedSlots is 0 then this item not in inventory
-					continue;
+		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+		// 		unsigned int entityItemContaining = linkedItemEntities[i];
+		// 		const cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+		// 		if ( itemComponent->occupiedSlots.GetSize() == 0 )                        ///< If occupiedSlots is 0 then this item not in inventory
+		// 			continue;
 
-				const cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
-				cm::MeshHandle itemMeshHandle = componentManager->GetComponent<cm::mesh>(entityItemContaining)->handle;
-				vec3  itemPosition;
-				float itemScale_X  = 0;
-				float itemScale_Y  = 0;
-				float itemGltfFlag = 0;
-				constexpr float collitionCorrectnessMultiplayer = 0.8;
-				itemPosition = itemTransformComponent->position;
-				itemScale_X  = itemTransformComponent->scale * itemComponent->itemSlotType.width *
-					collitionCorrectnessMultiplayer;
-				itemScale_Y  = itemTransformComponent->scale * itemComponent->itemSlotType.height *
-					collitionCorrectnessMultiplayer;
-				itemGltfFlag = itemTransformComponent->gltf;
+		// 		const cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
+		// 		cm::MeshHandle itemMeshHandle = componentManager->GetComponent<cm::mesh>(entityItemContaining)->handle;
+		// 		vec3  itemPosition;
+		// 		float itemScale_X  = 0;
+		// 		float itemScale_Y  = 0;
+		// 		float itemGltfFlag = 0;
+		// 		constexpr float collitionCorrectnessMultiplayer = 0.8;
+		// 		itemPosition = itemTransformComponent->position;
+		// 		itemScale_X  = itemTransformComponent->scale * itemComponent->itemSlotType.width *
+		// 			collitionCorrectnessMultiplayer;
+		// 		itemScale_Y  = itemTransformComponent->scale * itemComponent->itemSlotType.height *
+		// 			collitionCorrectnessMultiplayer;
+		// 		itemGltfFlag = itemTransformComponent->gltf;
 
-				if ( !crosshairGltfFlag ) {
-					crosshairScale /= 2;
-				}
+		// 		if ( !crosshairGltfFlag ) {
+		// 			crosshairScale /= 2;
+		// 		}
 
-				if ( !itemGltfFlag ) {
-					itemScale_X /= 2;
-				}
+		// 		if ( !itemGltfFlag ) {
+		// 			itemScale_X /= 2;
+		// 		}
 
-				bool squareColliderFlag = false;
-				squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-													crosshairScale, itemScale_X, itemScale_Y,
-													crosshairMeshhandle, itemMeshHandle);
-				if ( squareColliderFlag ) {
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->wallCollision = true;
-					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
+		// 		bool squareColliderFlag = false;
+		// 		squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
+		// 											crosshairScale, itemScale_X, itemScale_Y,
+		// 											crosshairMeshhandle, itemMeshHandle);
+		// 		if ( squareColliderFlag ) {
+		// 			componentManager->GetComponent<cm::collider>(entityItemContaining)->wallCollision = true;
+		// 			componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
 
-					cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-					for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
-						unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
-						cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-						inventorySlotComponent->itemEntity = UINT_MAX;
-					}
-					collidedItemComponent->occupiedSlots.clear();
-				}
-			}
-		}
+		// 			cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+		// 			for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
+		// 				unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
+		// 				cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+		// 				inventorySlotComponent->itemEntity = UINT_MAX;
+		// 			}
+		// 			collidedItemComponent->occupiedSlots.clear();
+		// 		}
+		// 	}
+		// }
 
-		/// This code implements highlightning on inventory slots and show player is it possible to drop item in inventory
-		if ( isInventoryOpened && *isItemDraged ) {
-			core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-			core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-			inventoryComponent->highlightedSlots.clear();
-			inventoryComponent->isAvailableHighlightedSlots = false;                         ///< Turn off highlightning flag before set it to the right value
+		// /// This code implements highlightning on inventory slots and show player is it possible to drop item in inventory
+		// if ( isInventoryOpened && *isItemDraged ) {
+		// 	core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+		// 	core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+		// 	cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+		// 	inventoryComponent->highlightedSlots.clear();
+		// 	inventoryComponent->isAvailableHighlightedSlots = false;                         ///< Turn off highlightning flag before set it to the right value
 
-			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
+		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+		// 		unsigned int entityItemContaining = linkedItemEntities[i];
+		// 		cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
 
-				if ( itemCollider->wallCollision ) {
-					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					vec3 itemPosition = itemTransform->position;
+		// 		if ( itemCollider->wallCollision ) {
+		// 			cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
+		// 			vec3 itemPosition = itemTransform->position;
 					
-					core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
-																											   cm::transform,
-																											   cm::inventorySlot>();
-					core::vector<unsigned int> collidedInventorySlotEntities;
-					core::vector<vec3> collidedInventorySlotTransforms;
+		// 			core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
+		// 																									   cm::transform,
+		// 																									   cm::inventorySlot>();
+		// 			core::vector<unsigned int> collidedInventorySlotEntities;
+		// 			core::vector<vec3> collidedInventorySlotTransforms;
 					
-					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
-						unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
-						cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-						cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
-						vec3  inventorySlotPosition = inventorySlotTransform->position;
-						float inventorySlotScale    = inventorySlotTransform->scale;
-						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
+		// 			for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
+		// 				unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
+		// 				cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+		// 				cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
+		// 				vec3  inventorySlotPosition = inventorySlotTransform->position;
+		// 				float inventorySlotScale    = inventorySlotTransform->scale;
+		// 				bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
 
-						if ( !isInventorySlot_GLTF )
-							inventorySlotScale /= 2;
+		// 				if ( !isInventorySlot_GLTF )
+		// 					inventorySlotScale /= 2;
 
-						bool squareColliderFlag = false;
-						inventorySlotPosition[2] = 0.0f;                                        ///< We dont need z-axis here because we test collision for x-y plane with item pivot
-						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-														 inventorySlotScale, slotMeshHandle);
-						if ( squareColliderFlag ) {
-							collidedInventorySlotEntities.Push(inventorySlotEntity);
-							collidedInventorySlotTransforms.Push(inventorySlotPosition);
-							componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
-						} else {
-							continue;
-						}		
-					}
+		// 				bool squareColliderFlag = false;
+		// 				inventorySlotPosition[2] = 0.0f;                                        ///< We dont need z-axis here because we test collision for x-y plane with item pivot
+		// 				squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
+		// 												 inventorySlotScale, slotMeshHandle);
+		// 				if ( squareColliderFlag ) {
+		// 					collidedInventorySlotEntities.Push(inventorySlotEntity);
+		// 					collidedInventorySlotTransforms.Push(inventorySlotPosition);
+		// 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
+		// 				} else {
+		// 					continue;
+		// 				}		
+		// 			}
 
-					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
+		// 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+		// 			core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
 
-					bubbleSortVector(newColliderEntities);
-					int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
+		// 			bubbleSortVector(newColliderEntities);
+		// 			int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
 
-					/// If this condition equal true then this means that we got inventory slots highlighted with green color what meancs thar player can drop item into inventory
-					if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
-						 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ) {
-						inventoryComponent->isAvailableHighlightedSlots = true;
-					}
+		// 			/// If this condition equal true then this means that we got inventory slots highlighted with green color what meancs thar player can drop item into inventory
+		// 			if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
+		// 				 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ) {
+		// 				inventoryComponent->isAvailableHighlightedSlots = true;
+		// 			}
 
-					for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
-						inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
-				}
-			}
-		} else {
-			core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+		// 			for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
+		// 				inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
+		// 		}
+		// 	}
+		// } else {
+		// 	core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+		// 	cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
 
-			inventoryComponent->highlightedSlots.clear();
-		}
+		// 	inventoryComponent->highlightedSlots.clear();
+		// }
 		
-		/// This code implements state when inventory is opened, player hold item and press left mouse button
-		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
-			const core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				const unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-				const core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-				bool isCrosshairCollided = false;
-				for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
-					if ( itemCollider->colliders[n] == linkedCrosshairEntities[0] ) {
-						isCrosshairCollided = true;
-						break;
-					}
-				}
+		// /// This code implements state when inventory is opened, player hold item and press left mouse button
+		// if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
+		// 	const core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
+		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
+		// 		const unsigned int entityItemContaining = linkedItemEntities[i];
+		// 		cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
+		// 		const core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		// 		bool isCrosshairCollided = false;
+		// 		for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
+		// 			if ( itemCollider->colliders[n] == linkedCrosshairEntities[0] ) {
+		// 				isCrosshairCollided = true;
+		// 				break;
+		// 			}
+		// 		}
 				
-				if ( itemCollider->wallCollision && isCrosshairCollided ) {
-					cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-					const vec3 itemPosition = itemTransform->position;
+		// 		if ( itemCollider->wallCollision && isCrosshairCollided ) {
+		// 			cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
+		// 			const vec3 itemPosition = itemTransform->position;
 					
-					const core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
-																											   cm::transform,
-																											   cm::inventorySlot>();
-					core::vector<unsigned int> collidedInventorySlotEntities;
-					core::vector<vec3> collidedInventorySlotTransforms;
-					for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
-						const unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
-						const cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-						cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
-						vec3  inventorySlotPosition = inventorySlotTransform->position;
-						float inventorySlotScale    = inventorySlotTransform->scale;
-						bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
+		// 			const core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
+		// 																									   cm::transform,
+		// 																									   cm::inventorySlot>();
+		// 			core::vector<unsigned int> collidedInventorySlotEntities;
+		// 			core::vector<vec3> collidedInventorySlotTransforms;
+		// 			for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
+		// 				const unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
+		// 				const cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+		// 				cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
+		// 				vec3  inventorySlotPosition = inventorySlotTransform->position;
+		// 				float inventorySlotScale    = inventorySlotTransform->scale;
+		// 				bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
 
-						if ( !isInventorySlot_GLTF ) {
-							inventorySlotScale /= 2;
-						}
+		// 				if ( !isInventorySlot_GLTF ) {
+		// 					inventorySlotScale /= 2;
+		// 				}
 
-						bool squareColliderFlag = false;
-						inventorySlotPosition[2] = 0.0f;
-						squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-														 inventorySlotScale, slotMeshHandle);
-						if ( squareColliderFlag ) {
-							collidedInventorySlotEntities.Push(inventorySlotEntity);
-							collidedInventorySlotTransforms.Push(inventorySlotPosition);
-						} else {
-							continue;
-						}		
-					}
+		// 				bool squareColliderFlag = false;
+		// 				inventorySlotPosition[2] = 0.0f;
+		// 				squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
+		// 												 inventorySlotScale, slotMeshHandle);
+		// 				if ( squareColliderFlag ) {
+		// 					collidedInventorySlotEntities.Push(inventorySlotEntity);
+		// 					collidedInventorySlotTransforms.Push(inventorySlotPosition);
+		// 				} else {
+		// 					continue;
+		// 				}		
+		// 			}
 
-					if ( collidedInventorySlotEntities.GetSize() == 0 ) {
-						componentManager->GetComponent<cm::item>(entityItemContaining)->occupiedSlots.clear();
-						componentManager->CreateComponent<cm::actor>(entityItemContaining);
-						componentManager->CreateComponent<cm::rigidBody>(entityItemContaining);
-						*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
-						core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
-						cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-						itemTransform->position = playerTransform->position;
-						vec3 normalizedForward = Normalize(playerTransform->forward);
-						itemTransform->position[0] += normalizedForward[0] * 2.5f;
-						itemTransform->position[2] += normalizedForward[2] * 2.5f;
-						itemTransform->scale = 0.05f;
-						*isItemDraged = false;
-						*isLeftMouseButtonReleased = false;
-						itemCollider->itemDrag = false;
-						itemCollider->wallCollision = false;
-					}
+		// 			if ( collidedInventorySlotEntities.GetSize() == 0 ) {
+		// 				componentManager->GetComponent<cm::item>(entityItemContaining)->occupiedSlots.clear();
+		// 				componentManager->CreateComponent<cm::actor>(entityItemContaining);
+		// 				componentManager->CreateComponent<cm::rigidBody>(entityItemContaining);
+		// 				*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
+		// 				core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
+		// 				cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
+		// 				itemTransform->position = playerTransform->position;
+		// 				vec3 normalizedForward = Normalize(playerTransform->forward);
+		// 				itemTransform->position[0] += normalizedForward[0] * 2.5f;
+		// 				itemTransform->position[2] += normalizedForward[2] * 2.5f;
+		// 				itemTransform->scale = 0.05f;
+		// 				*isItemDraged = false;
+		// 				*isLeftMouseButtonReleased = false;
+		// 				itemCollider->itemDrag = false;
+		// 				itemCollider->wallCollision = false;
+		// 			}
 					
-					cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-					core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
-					unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
+		// 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
+		// 			core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
+		// 			unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
 
-					if ( newColliderEntities.GetSize() != slotsNumberForItem )
-						return;
+		// 			if ( newColliderEntities.GetSize() != slotsNumberForItem )
+		// 				return;
 					
-					bubbleSortVector(newColliderEntities);
-					int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
-					if ( stateSlotsAvailability == INT_MAX ) {                                                         ///< Just drop an item into inventory because all slots are available
-						itemComponent->occupiedSlots.clear();
+		// 			bubbleSortVector(newColliderEntities);
+		// 			int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
+		// 			if ( stateSlotsAvailability == INT_MAX ) {                                                         ///< Just drop an item into inventory because all slots are available
+		// 				itemComponent->occupiedSlots.clear();
 						
-						for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-							cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
-							invetorySlot->itemEntity = entityItemContaining;
-							itemComponent->occupiedSlots.Push(newColliderEntities[x]);
-						}
-						*isItemDraged = false;
-						*isLeftMouseButtonReleased = false;
-						itemCollider->itemDrag = false;
-						itemCollider->wallCollision = false;
+		// 				for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
+		// 					cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
+		// 					invetorySlot->itemEntity = entityItemContaining;
+		// 					itemComponent->occupiedSlots.Push(newColliderEntities[x]);
+		// 				}
+		// 				*isItemDraged = false;
+		// 				*isLeftMouseButtonReleased = false;
+		// 				itemCollider->itemDrag = false;
+		// 				itemCollider->wallCollision = false;
 
-						return;
-					} else if ( stateSlotsAvailability == -1 ) {                                                       ///< We cant drop item into inventory
-						return;
-					} else if ( stateSlotsAvailability >= 0 ) {                                                        ///< We can switch holding item with another one
-						cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(stateSlotsAvailability);
-						for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
-							unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
-							cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-							inventorySlotComponent->itemEntity = UINT_MAX;
-						}
-						cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
-						core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-						collidedItemColliderComponent->wallCollision = true;
-						collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
+		// 				return;
+		// 			} else if ( stateSlotsAvailability == -1 ) {                                                       ///< We cant drop item into inventory
+		// 				return;
+		// 			} else if ( stateSlotsAvailability >= 0 ) {                                                        ///< We can switch holding item with another one
+		// 				cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(stateSlotsAvailability);
+		// 				for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
+		// 					unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
+		// 					cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
+		// 					inventorySlotComponent->itemEntity = UINT_MAX;
+		// 				}
+		// 				cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
+		// 				core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		// 				collidedItemColliderComponent->wallCollision = true;
+		// 				collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
 
-						itemComponent->occupiedSlots.clear();
+		// 				itemComponent->occupiedSlots.clear();
 						
-						for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-							cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
-							invetorySlot->itemEntity = entityItemContaining;
-							itemComponent->occupiedSlots.Push(newColliderEntities[x]);
-						}
+		// 				for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
+		// 					cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
+		// 					invetorySlot->itemEntity = entityItemContaining;
+		// 					itemComponent->occupiedSlots.Push(newColliderEntities[x]);
+		// 				}
 
-						*isLeftMouseButtonReleased = false;
-						itemCollider->itemDrag = false;
-						itemCollider->wallCollision = false;
-						return;
-					}
-				}
-			}
-		}
+		// 				*isLeftMouseButtonReleased = false;
+		// 				itemCollider->itemDrag = false;
+		// 				itemCollider->wallCollision = false;
+		// 				return;
+		// 			}
+		// 		}
+		// 	}
+		// }
 	}
 
 	core::vector<unsigned int> CCollisionSystem::searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
