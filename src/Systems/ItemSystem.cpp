@@ -123,13 +123,20 @@ namespace GLVM::ecs
 		// 	}
 		// }
 
-		// if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-		// }
+		if ( isInventoryOpened && !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+			std::cout << "Take an item" << std::endl;
+			*isLeftMouseButtonReleased = false;
+			isItemDraged = true;
+		}
 
-		// if ( isInventoryOpened && *isItemDraged ) {
-		// }
+		if ( isInventoryOpened && isItemDraged ) {
+//			std::cout << "highlight item slots" << std::endl;
+		}
 
-		// if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
-		// }
+		if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && isItemDraged ) {
+			std::cout << "item droped" << std::endl;
+			*isLeftMouseButtonReleased = false;
+			isItemDraged = false;
+		}
 	}
 } // namespace GLVM::ecs

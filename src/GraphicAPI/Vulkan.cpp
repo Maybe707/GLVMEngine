@@ -5248,8 +5248,8 @@ namespace GLVM::core
 				int randomTileIndex = distributionTileIndex(mersenne);
 //				randomTileIndex = 20;
 				indirectTexture[i][j] = randomTileIndex;
-				if( print )
-					std::cout << "element: " << i * 4 + j << " value: " << indirectTexture[i][j] << std::endl;
+				// if( print )
+				// 	std::cout << "element: " << i * 4 + j << " value: " << indirectTexture[i][j] << std::endl;
 				
 				// std::cout << "index: " << i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3 << std::endl;
 				// lightDataUBO.indirectTexture[i * INDIRECT_TEXTURE_WIDTH * 4 + j * 4 + 3] = randomTileIndex;

@@ -66,7 +66,7 @@ namespace GLVM::core {
 		// }
 		
 
-		std::cout << "CONSTRUCTOR WAYLAND" << std::endl;
+//		std::cout << "CONSTRUCTOR WAYLAND" << std::endl;
 	}
 
 	bool WindowWaylandVulkan::HandleEvent([[maybe_unused]] CEvent& _Event) {
@@ -318,9 +318,9 @@ namespace GLVM::core {
 		// }
 
 		if (state == WL_KEYBOARD_KEY_STATE_PRESSED) {
-			printf("Key pressed: %u\n", key);
+//			printf("Key pressed: %u\n", key);
 			if (key == 1) {  // Typically ESC key
-				printf("ESC pressed - exiting\n");
+//				printf("ESC pressed - exiting\n");
 				g_eEvent.SetEvent(EEvents::eGAME_LOOP_KILL);
 				Input_Stack_.ControlInput(g_eEvent);
 //				wl_display_disconnect(display);
@@ -328,73 +328,73 @@ namespace GLVM::core {
 			if (key == 17) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eMOVE_FORWARD);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("w\n");
+//				printf("w\n");
 			}
 			if (key == 31) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eMOVE_BACKWARD);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("s\n");
+//				printf("s\n");
 			}
 			if (key == 30) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eMOVE_LEFT);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("a\n");
+//				printf("a\n");
 			}
 			if (key == 32) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eMOVE_RIGHT);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("d\n");
+//				printf("d\n");
 			}
 			if (key == 57) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eJUMP);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("space\n");
+//				printf("space\n");
 			}
 			if (key == 23) {  // Typically ESC key
 				// wl_events.WL_KEY_PRESSED_I = true;
 				// keys_pressed[0] = 23;
 				g_eEvent.SetEvent(EEvents::eINVENTORY);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("inventory\n");
+//				printf("inventory\n");
 			}
 		}
 
 		if (state == WL_KEYBOARD_KEY_STATE_RELEASED) {
-			printf("Key pressed: %u\n", key);
+//			printf("Key pressed: %u\n", key);
 			if (key == 1) {  // Typically ESC key
-				printf("ESC pressed - exiting\n");
+//				printf("ESC pressed - exiting\n");
 				wl_display_disconnect(display);
 			}
 			if (key == 17) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_W);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("w\n");
+//				printf("w\n");
 			}
 			if (key == 31) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_S);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("s\n");
+//				printf("s\n");
 			}
 			if (key == 30) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_A);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("a\n");
+//				printf("a\n");
 			}
 			if (key == 32) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_D);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("d\n");
+//				printf("d\n");
 			}
 			if (key == 57) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_JUMP);
 				Input_Stack_.ControlInput(g_eEvent);
-				printf("space\n");
+//				printf("space\n");
 			}
 			if (key == 23) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eINVENTORY_RELEASE);
 				Input_Stack_.ControlInput(g_eEvent);
 //				keys_pressed[0] = 23;
-				printf("inventory\n");
+//				printf("inventory\n");
 			}
 		}
 	}
@@ -412,15 +412,15 @@ namespace GLVM::core {
 	// Pointer listener callbacks
 	void WindowWaylandVulkan::pointer_enter([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface,
-							  wl_fixed_t sx, wl_fixed_t sy) {
-		printf("Pointer entered surface at %f, %f\n",
-			   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
+							  [[maybe_unused]] wl_fixed_t sx, [[maybe_unused]] wl_fixed_t sy) {
+		// printf("Pointer entered surface at %f, %f\n",
+		// 	   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
 
 	}
 
 	void WindowWaylandVulkan::pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface) {
-		printf("Pointer left surface\n");
+//		printf("Pointer left surface\n");
 	}
 	
 	void WindowWaylandVulkan::pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
@@ -432,10 +432,10 @@ namespace GLVM::core {
 	}
 
 	void WindowWaylandVulkan::pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
-							 [[maybe_unused]] uint32_t time, uint32_t axis, wl_fixed_t value) {
-		const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
-			"horizontal" : "vertical";
-		printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
+							 [[maybe_unused]] uint32_t time, [[maybe_unused]] uint32_t axis, [[maybe_unused]] wl_fixed_t value) {
+		// const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
+		// 	"horizontal" : "vertical";
+		// printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
 	}
 
 	bool WindowWaylandVulkan::hideAndLockPointer = false;
@@ -443,8 +443,8 @@ namespace GLVM::core {
 	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t serial, [[maybe_unused]] uint32_t time, uint32_t button,
 							   uint32_t state) {
-		const char *button_name = "unknown";
-		std::cout << "button number: " << button << std::endl;
+//		const char *button_name = "unknown";
+//		std::cout << "button number: " << button << std::endl;
 		// switch (button) {
         // case BTN_LEFT: button_name = "left"; break;
         // case BTN_RIGHT: button_name = "right"; break;
@@ -478,7 +478,7 @@ namespace GLVM::core {
 			wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
 
 			if (!pointer_constraints) {
-				printf("Pointer constraints not available!\n");
+//				printf("Pointer constraints not available!\n");
 				return;
 			}
 
@@ -501,9 +501,9 @@ namespace GLVM::core {
 			// 										ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
 		}
 		
-		printf("%s mouse button %s\n",
-			   state == WL_POINTER_BUTTON_STATE_PRESSED ? "Pressed" : "Released",
-			   button_name);
+		// printf("%s mouse button %s\n",
+		// 	   state == WL_POINTER_BUTTON_STATE_PRESSED ? "Pressed" : "Released",
+		// 	   button_name);
 	}
 
 	void WindowWaylandVulkan::handle_relative_motion([[maybe_unused]] void *data, [[maybe_unused]] struct zwp_relative_pointer_v1 *rel_pointer, [[maybe_unused]] uint32_t utime_hi, [[maybe_unused]] uint32_t utime_lo,
