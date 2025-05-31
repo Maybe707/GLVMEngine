@@ -21,7 +21,21 @@ namespace GLVM::core {
 		/* used to attach a listener (callback functions) to the Wayland registry object (wl_registry) so
 		   that your client can respond to announcements about global objects provided by the compositor
 		*/
-		wl_registry_add_listener( registry, &registry_listener, 0 );
+		// RegistryListenerData registryListenerData;
+		// registryListenerData.pointer_shared_memory = windowWaylandVulkan.pointer_shared_memory;
+		// registryListenerData.pointer_surface       = windowWaylandVulkan.pointer_surface;
+		// registryListenerData.pointer_constraints   = windowWaylandVulkan.pointer_constraints;
+		// registryListenerData.wl_surface            = windowWaylandVulkan.wl_surface;
+		// registryListenerData.relative_pointer_manager = windowWaylandVulkan.relative_pointer_manager;
+		// registryListenerData.relative_pointer      = windowWaylandVulkan.relative_pointer;
+		// registryListenerData.pointer               = windowWaylandVulkan.pointer;
+		// registryListenerData.keyboard              = windowWaylandVulkan.keyboard;
+		// registryListenerData.display               = windowWaylandVulkan.display;
+		// registryListenerData.compositor            = windowWaylandVulkan.compositor;
+		// registryListenerData.shared_memory         = windowWaylandVulkan.shared_memory;
+		// registryListenerData.xdg_shell             = windowWaylandVulkan.xdg_shell;
+		// registryListenerData.seat                  = windowWaylandVulkan.seat;
+		wl_registry_add_listener( registry, &registry_listener, (void*)(&windowWaylandVulkan) );
 		/* synchronize the client with the Wayland compositor
 		   1. global object announcements (e.g., from wl_registry)
 		   2. event responses to previously sent requests
@@ -42,7 +56,15 @@ namespace GLVM::core {
 		*/
 		frame_callback = wl_surface_frame( wl_surface );
 		// attach a listener (callback function) to a wl_callback object — typically created using wl_surface_frame
-		wl_callback_add_listener( frame_callback, &callback_listener, 0 );
+		// XDG_surfaceConfigData xdg_surfaceConfigData;
+		// xdg_surfaceConfigData.width  = windowWaylandVulkan.width;
+		// xdg_surfaceConfigData.height = windowWaylandVulkan.height;
+		// xdg_surfaceConfigData.shared_memory = windowWaylandVulkan.shared_memory;
+		// xdg_surfaceConfigData.pixels = windowWaylandVulkan.pixels;
+		// xdg_surfaceConfigData.buffer = windowWaylandVulkan.buffer;
+		// xdg_surfaceConfigData.constant_byte = windowWaylandVulkan.constant_byte;
+		// xdg_surfaceConfigData.wl_surface    = windowWaylandVulkan.wl_surface;
+		wl_callback_add_listener( frame_callback, &callback_listener, (void*)(&windowWaylandVulkan) );
 
 		/* create a top-level window or popup window from a given wl_surface.
 		   wraps a wl_surface with an XDG surface, which provides window management features
@@ -52,12 +74,18 @@ namespace GLVM::core {
 		   from the compositor. When something happens to this surface (like resize, configure, etc.),
 		   please call these functions.
 		*/
-		xdg_surface_add_listener( xdg_surface, &xdg_surface_listener, 0 );
+		xdg_surface_add_listener( xdg_surface, &xdg_surface_listener, (void*)(&windowWaylandVulkan) );
 		/* Turn a basic xdg_surface into a toplevel window — like a normal app window with borders,
 		   title bar, and so on.
 		*/
 		xdg_topLevel = xdg_surface_get_toplevel( xdg_surface );
-		xdg_toplevel_add_listener( xdg_topLevel, &xdg_toplevel_listener, 0 );
+		// XDG_topLevelData xdg_topLevelData;
+		// xdg_topLevelData.width  = windowWaylandVulkan.width;
+		// xdg_topLevelData.height = windowWaylandVulkan.height;
+		// xdg_topLevelData.shared_memory = windowWaylandVulkan.shared_memory;
+		// xdg_topLevelData.pixels = windowWaylandVulkan.pixels;
+		// xdg_topLevelData.buffer = windowWaylandVulkan.buffer;
+		xdg_toplevel_add_listener( xdg_topLevel, &xdg_toplevel_listener, (void*)(&windowWaylandVulkan) );
 		xdg_toplevel_set_title( xdg_topLevel, "wayland glvm client" );
 		/* Commit the changes made to a Wayland surface, notifying the compositor to render those
 		   changes to the screen.
@@ -182,7 +210,7 @@ namespace GLVM::core {
 		return file_descriptor;
 	}
 
-	void resize() {
+	void resize( uint16_t width, uint16_t height, wl_shm* shared_memory, [[maybe_unused]] void* pixels, [[maybe_unused]] wl_buffer* buffer ) {
 		int32_t file_descriptor = alocate_shared_memory( width * height * 4 );
 
 		/*
@@ -213,7 +241,7 @@ namespace GLVM::core {
 		close( file_descriptor );
 	}
 
-	void draw() {
+	void draw( uint16_t width, uint16_t height, void* pixels, wl_buffer* buffer, uint8_t  constant_byte, wl_surface* wl_surface ) {
 		/// Fill a block of memory with a specific byte value.
 		memset( pixels, constant_byte, width * height * 4 );
 
@@ -235,16 +263,20 @@ namespace GLVM::core {
 			return;
 		}
 
-		if ( width != new_width || height != new_height ) {
-			munmap( pixels, width * new_height * 4 );
-			width = new_width;
-			height = new_height;
-			resize();
+		WindowWaylandVulkan* xdg_topLevelData = (WindowWaylandVulkan*)data;
+		
+		if ( xdg_topLevelData->width != new_width || xdg_topLevelData->height != new_height ) {
+			munmap( xdg_topLevelData->pixels, xdg_topLevelData->width * new_height * 4 );
+			xdg_topLevelData->width = new_width;
+			xdg_topLevelData->height = new_height;
+			resize( xdg_topLevelData->width, xdg_topLevelData->height, xdg_topLevelData->shared_memory, xdg_topLevelData->pixels, xdg_topLevelData->buffer );
 		}
 	}
 
 	void xdg_toplevel_close( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel ) {
-		close_xdg_toplevel = 1;
+		WindowWaylandVulkan* xdg_topLevelData = (WindowWaylandVulkan*)data;
+		
+		xdg_topLevelData->close_xdg_toplevel = 1;
 	}
 
 	void xdg_surface_configure( [[maybe_unused]] void* data, struct xdg_surface* xdg_surface, uint32_t serial ) {
@@ -254,21 +286,28 @@ namespace GLVM::core {
 		   that you received and accepted this change. If you don’t call it, your window won’t be
 		   shown or updated properly.
 		*/
+		WindowWaylandVulkan* xdg_surfaceConfigData = (WindowWaylandVulkan*)data;
+		
 		xdg_surface_ack_configure( xdg_surface, serial );
-		if ( !pixels ) {
-			resize();
+		if ( !xdg_surfaceConfigData->pixels ) {
+			resize( xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->shared_memory,
+					xdg_surfaceConfigData->pixels, xdg_surfaceConfigData->buffer );
 		}
 
-		draw();
+		draw(xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->pixels,
+			 xdg_surfaceConfigData->buffer, xdg_surfaceConfigData->constant_byte, xdg_surfaceConfigData->wl_surface);
 	}
 
 	void new_frame( [[maybe_unused]] void* data, struct wl_callback* frame_call_back, [[maybe_unused]] uint32_t callback_data ) {
+		WindowWaylandVulkan* xdg_surfaceConfigData = (WindowWaylandVulkan*)data;
+		
 		wl_callback_destroy( frame_call_back );
-		frame_call_back = wl_surface_frame( wl_surface );
+		frame_call_back = wl_surface_frame( xdg_surfaceConfigData->wl_surface );
 		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, 0 );
 
 //	++constant_byte;
-		draw();
+		draw(xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->pixels,
+			 xdg_surfaceConfigData->buffer, xdg_surfaceConfigData->constant_byte, xdg_surfaceConfigData->wl_surface);
 	}
 
 	void shell_ping( [[maybe_unused]] void* data, struct xdg_wm_base* shell, uint32_t serial ) {
@@ -347,7 +386,8 @@ namespace GLVM::core {
 //			printf("Key pressed: %u\n", key);
 			if (key == 1) {  // Typically ESC key
 //				printf("ESC pressed - exiting\n");
-				wl_display_disconnect(display);
+				WindowWaylandVulkan* registryListenerData = (WindowWaylandVulkan*)data;
+				wl_display_disconnect(registryListenerData->display);
 			}
 			if (key == 17) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_W);
@@ -453,29 +493,31 @@ namespace GLVM::core {
 		
 		// Hide cursor on first opportunity
 		if ( !windowWaylandVulkan.hideAndLockPointer ) {
+			WindowWaylandVulkan* registryListenerData = (WindowWaylandVulkan*)data;
+			
 			windowWaylandVulkan.hideAndLockPointer = true;
-			struct wl_buffer *transparent = windowWaylandVulkan.create_transparent_cursor(pointer_shared_memory);
-			wl_surface_attach(pointer_surface, transparent, 0, 0);
-			wl_surface_commit(pointer_surface);
-			wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
+			struct wl_buffer *transparent = windowWaylandVulkan.create_transparent_cursor(registryListenerData->pointer_shared_memory);
+			wl_surface_attach(registryListenerData->pointer_surface, transparent, 0, 0);
+			wl_surface_commit(registryListenerData->pointer_surface);
+			wl_pointer_set_cursor(pointer, serial, registryListenerData->pointer_surface, 0, 0);
 
-			if (!pointer_constraints) {
+			if (!registryListenerData->pointer_constraints) {
 //				printf("Pointer constraints not available!\n");
 				return;
 			}
 
 			// Lock pointer to main window surface, not pointer_surface
 			[[maybe_unused]] zwp_locked_pointer_v1* locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
-				pointer_constraints,
-				wl_surface,  // Use main window surface
+				registryListenerData->pointer_constraints,
+				registryListenerData->wl_surface,  // Use main window surface
 				pointer,
 				NULL,
 				ZWP_POINTER_CONSTRAINTS_V1_LIFETIME_PERSISTENT);
 
 			// get relative motion
-			relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
-				relative_pointer_manager, pointer);
-			zwp_relative_pointer_v1_add_listener(relative_pointer, &windowWaylandVulkan.relative_pointer_listener, NULL);
+			registryListenerData->relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
+				registryListenerData->relative_pointer_manager, pointer);
+			zwp_relative_pointer_v1_add_listener(registryListenerData->relative_pointer, &windowWaylandVulkan.relative_pointer_listener, NULL);
 
 		
 			// // lock the pointer
@@ -497,18 +539,20 @@ namespace GLVM::core {
 	}
 
 	void seat_capabilities( [[maybe_unused]] void* data, struct wl_seat* seat, uint32_t capabilities ) {
+		WindowWaylandVulkan* registryListenerData = (WindowWaylandVulkan*)data;
+		
 		// Handle pointer capabilities
-		if ((capabilities & WL_SEAT_CAPABILITY_POINTER) && !pointer) {
-			pointer = wl_seat_get_pointer(seat);
-			wl_pointer_add_listener(pointer, &windowWaylandVulkan.pointer_listener, NULL);
-		} else if (!(capabilities & WL_SEAT_CAPABILITY_POINTER) && pointer) {
-			wl_pointer_destroy(pointer);
-			pointer = NULL;
+		if ((capabilities & WL_SEAT_CAPABILITY_POINTER) && !registryListenerData->pointer) {
+			registryListenerData->pointer = wl_seat_get_pointer(seat);
+			wl_pointer_add_listener(registryListenerData->pointer, &windowWaylandVulkan.pointer_listener, data);
+		} else if (!(capabilities & WL_SEAT_CAPABILITY_POINTER) && registryListenerData->pointer) {
+			wl_pointer_destroy(registryListenerData->pointer);
+			registryListenerData->pointer = NULL;
 		}
 		
-		if ( capabilities & WL_SEAT_CAPABILITY_KEYBOARD && !keyboard ) {
-			keyboard = wl_seat_get_keyboard( seat );
-			wl_keyboard_add_listener( keyboard, &windowWaylandVulkan.keyboard_listener, 0 );
+		if ( capabilities & WL_SEAT_CAPABILITY_KEYBOARD && !registryListenerData->keyboard ) {
+			registryListenerData->keyboard = wl_seat_get_keyboard( seat );
+			wl_keyboard_add_listener( registryListenerData->keyboard, &windowWaylandVulkan.keyboard_listener, data );
 		}
 	}
 
@@ -517,21 +561,23 @@ namespace GLVM::core {
 
 
 	void registry_global( [[maybe_unused]] void* data, struct wl_registry* registry, uint32_t name, const char* interface, [[maybe_unused]] uint32_t version ) {
+		WindowWaylandVulkan* registryListenerData = (WindowWaylandVulkan*)data;
+		
 		if (!strcmp( interface, wl_compositor_interface.name )) {
-			compositor = (wl_compositor*)wl_registry_bind( registry, name, &wl_compositor_interface, 4 );
+			registryListenerData->compositor = (wl_compositor*)wl_registry_bind( registry, name, &wl_compositor_interface, 4 );
 		} else if (!strcmp( interface, wl_shm_interface.name )) {
-			shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
-			pointer_shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
+			registryListenerData->shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
+			registryListenerData->pointer_shared_memory = (wl_shm*)wl_registry_bind( registry, name, &wl_shm_interface, 1 );
 		} else if (!strcmp( interface, zwp_pointer_constraints_v1_interface.name )) {
-			pointer_constraints = (zwp_pointer_constraints_v1*)wl_registry_bind(registry, name, &zwp_pointer_constraints_v1_interface, 1);
+			registryListenerData->pointer_constraints = (zwp_pointer_constraints_v1*)wl_registry_bind(registry, name, &zwp_pointer_constraints_v1_interface, 1);
 		} else if (!strcmp( interface, zwp_relative_pointer_manager_v1_interface.name)) {
-			relative_pointer_manager = (zwp_relative_pointer_manager_v1*)wl_registry_bind(registry, name, &zwp_relative_pointer_manager_v1_interface, 1);
+			registryListenerData->relative_pointer_manager = (zwp_relative_pointer_manager_v1*)wl_registry_bind(registry, name, &zwp_relative_pointer_manager_v1_interface, 1);
 		} else if (!strcmp( interface, xdg_wm_base_interface.name )) {
-			xdg_shell = (xdg_wm_base*)wl_registry_bind( registry, name, &xdg_wm_base_interface, 1 );
-			xdg_wm_base_add_listener( xdg_shell, &windowWaylandVulkan.shell_listener, 0 );
+			registryListenerData->xdg_shell = (xdg_wm_base*)wl_registry_bind( registry, name, &xdg_wm_base_interface, 1 );
+			xdg_wm_base_add_listener( registryListenerData->xdg_shell, &windowWaylandVulkan.shell_listener, 0 );
 		} else if (!strcmp( interface, wl_seat_interface.name )) {
-			seat = (wl_seat*)wl_registry_bind( registry, name, &wl_seat_interface, 1 );
-			wl_seat_add_listener( seat, &windowWaylandVulkan.seat_lintener, 0 );
+			registryListenerData->seat = (wl_seat*)wl_registry_bind( registry, name, &wl_seat_interface, 1 );
+			wl_seat_add_listener( registryListenerData->seat, &windowWaylandVulkan.seat_lintener, data );
 		}
 	}
 

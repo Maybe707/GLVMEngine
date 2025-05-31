@@ -1,6 +1,7 @@
 #ifndef WINDOW_WAYLAND_VULKAN
 #define WINDOW_WAYLAND_VULKAN
 
+#include <cstdint>
 #include <wayland-client-core.h>
 #include <wayland-client-protocol.h>
 #include <wayland-client.h>
@@ -28,7 +29,7 @@ namespace GLVM::core {
 		void Close() override;
 		bool HandleEvent(CEvent& _Event) override;
 		static int create_anonymous_file(off_t size);
-		static struct wl_buffer *create_transparent_cursor(struct wl_shm *shm);
+		struct wl_buffer *create_transparent_cursor(struct wl_shm *shm);
 		void SwapBuffers() override;
         void ClearDisplay() override;
         void CursorLock(int _x_position, int _y_position, int* _x_offset, int* _y_offset) override;
@@ -48,13 +49,72 @@ namespace GLVM::core {
 		struct wl_pointer_listener pointer_listener;
 		struct wl_seat_listener seat_lintener;
 		struct wl_registry_listener registry_listener;
+
+		struct wl_surface*    wl_surface;
+		struct wl_compositor* compositor;
+		struct xdg_toplevel*  xdg_topLevel;
+		struct xdg_wm_base*   xdg_shell;
+		struct wl_buffer*     buffer;
+		struct wl_shm*        shared_memory;
+		struct wl_seat*       seat;
+		struct wl_keyboard*   keyboard;
+		struct wl_pointer*    pointer;
+		struct wl_shm*        pointer_shared_memory;
+		struct wl_surface*    pointer_surface;
+		struct zwp_pointer_constraints_v1 *pointer_constraints;
+		struct zwp_relative_pointer_manager_v1* relative_pointer_manager;
+		struct zwp_relative_pointer_v1* relative_pointer;
+		void* pixels;
+		uint16_t width = 1920;
+		uint16_t height = 1080;
+		uint8_t  constant_byte = 0;
+		uint8_t  close_xdg_toplevel;
+		struct wl_display*  display;
+		struct wl_registry* registry;
+		struct wl_callback* frame_callback;
+		struct xdg_surface *xdg_surface;
 	};
 
+	// struct XDG_topLevelData {
+	// 	uint16_t width;
+	// 	uint16_t height;
+	// 	wl_shm* shared_memory;
+	// 	void* pixels;
+	// 	wl_buffer* buffer;
+	// 	uint8_t  close_xdg_toplevel;
+	// };
+
+	// struct XDG_surfaceConfigData {
+	// 	uint16_t width;
+	// 	uint16_t height;
+	// 	wl_shm* shared_memory;
+	// 	void* pixels;
+	// 	wl_buffer* buffer;
+	// 	uint8_t  constant_byte;
+	// 	wl_surface* wl_surface;
+	// };
+
+	// struct RegistryListenerData {
+	// 	wl_shm*        pointer_shared_memory;
+	// 	wl_surface*    pointer_surface;
+	// 	zwp_pointer_constraints_v1 *pointer_constraints;
+	// 	wl_surface* wl_surface;
+	// 	zwp_relative_pointer_manager_v1* relative_pointer_manager;
+	// 	zwp_relative_pointer_v1* relative_pointer;
+	// 	wl_pointer*    pointer;
+	// 	wl_keyboard*   keyboard;
+	// 	wl_display*  display;
+	// 	wl_compositor* compositor;
+	// 	wl_shm*        shared_memory;
+	// 	xdg_wm_base*   xdg_shell;
+	// 	wl_seat*       seat;
+	// };
+	
 	void xdg_toplevel_configure( void* data, struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, struct wl_array* atate );
 	void xdg_toplevel_close( void* data, struct xdg_toplevel* xdg_toplevel );
 	int32_t alocate_shared_memory( uint64_t size );
-	void resize();
-	void draw();
+	void resize( uint16_t width, uint16_t height, wl_shm* shared_memory, [[maybe_unused]] void* pixels, [[maybe_unused]] wl_buffer* buffer);
+	void draw( uint16_t width, uint16_t height, void* pixels, wl_buffer* buffer, uint8_t  constant_byte, wl_surface* wl_surface );
 	void xdg_surface_configure( void* data, struct xdg_surface* xdg_surface, uint32_t serial );
 	void new_frame( void* data, struct wl_callback* frame_call_back, uint32_t callback_data );
 	void shell_ping( void* data, struct xdg_wm_base* shell, uint32_t serial );

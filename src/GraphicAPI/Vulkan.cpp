@@ -589,8 +589,8 @@ namespace GLVM::core
 		// if ( buffer == NULL )
 		// 	std::cout << "BUFFER V GOVNE" << std::endl;
 			
-		createWaylandSurfaceInfo.display = display;
-		createWaylandSurfaceInfo.surface = wl_surface;
+		createWaylandSurfaceInfo.display = Window->display;
+		createWaylandSurfaceInfo.surface = Window->wl_surface;
 
 		if ( createWaylandSurfaceInfo.display == NULL )
 			std::cout << "DISPLAY NULL" << std::endl;
@@ -6043,8 +6043,8 @@ namespace GLVM::core
         } else {
 
 			VkExtent2D actualExtent{
-				.width  = width,
-				.height = height
+				.width  = Window->width,
+				.height = Window->height
 			};
             actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
             actualExtent.height = std::clamp(actualExtent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
