@@ -210,8 +210,10 @@ namespace GLVM::core {
 		return file_descriptor;
 	}
 
-	void resize( uint16_t width, uint16_t height, wl_shm* shared_memory, [[maybe_unused]] void* pixels, [[maybe_unused]] wl_buffer* buffer ) {
-		int32_t file_descriptor = alocate_shared_memory( width * height * 4 );
+	void resize( void* data ) {
+		WindowWaylandVulkan* resizeData = (WindowWaylandVulkan*)data;
+		
+		int32_t file_descriptor = alocate_shared_memory( resizeData->width * resizeData->height * 4 );
 
 		/*
 		  1. addr: Preferred memory address where mapping should start.
@@ -224,14 +226,14 @@ namespace GLVM::core {
 		  When you pass 0 (or NULL) as the first argument, you’re telling the kernel:
 		  “I don’t care where you map the file in memory — just choose a suitable address for me.”
 		*/
-		pixels = mmap( 0, width * height * 4, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
+		resizeData->pixels = mmap( 0, resizeData->width * resizeData->height * 4, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
 
 		/// Create a shared memory pool that clients can use to allocate memory buffers for drawing.
-		struct wl_shm_pool* pool = wl_shm_create_pool( shared_memory, file_descriptor, width * height * 4 );
+		struct wl_shm_pool* pool = wl_shm_create_pool( resizeData->shared_memory, file_descriptor, resizeData->width * resizeData->height * 4 );
 		/* It tells Wayland: “Take this part of the memory pool and treat it as an image buffer that
 		   I’ll draw onto a window.”
 		*/
-		buffer = wl_shm_pool_create_buffer( pool, 0, width, height, width * 4, WL_SHM_FORMAT_ABGR8888 );
+		resizeData->buffer = wl_shm_pool_create_buffer( pool, 0, resizeData->width, resizeData->height, resizeData->width * 4, WL_SHM_FORMAT_ABGR8888 );
 		// if ( buffer != NULL )
 		// 	std::cout << "BUFFER NOT NULL" << std::endl;
 		// else 
@@ -241,21 +243,23 @@ namespace GLVM::core {
 		close( file_descriptor );
 	}
 
-	void draw( uint16_t width, uint16_t height, void* pixels, wl_buffer* buffer, uint8_t  constant_byte, wl_surface* wl_surface ) {
+	void draw( void* data ) {
+		WindowWaylandVulkan* drawData = (WindowWaylandVulkan*)data;
+		
 		/// Fill a block of memory with a specific byte value.
-		memset( pixels, constant_byte, width * height * 4 );
+		memset( drawData->pixels, drawData->constant_byte, drawData->width * drawData->height * 4 );
 
 		/// Set a buffer as the content of this surface.
-		wl_surface_attach( wl_surface, buffer, 0, 0 );
+		wl_surface_attach( drawData->wl_surface, drawData->buffer, 0, 0 );
 		/* Mark a specific area of a Wayland surface as "damaged", which means the
 		   compositor should re-render or update that area.
 		*/
-		wl_surface_damage_buffer( wl_surface, 0, 0, width, height );
+		wl_surface_damage_buffer( drawData->wl_surface, 0, 0, drawData->width, drawData->height );
 		/* Commit the changes you've made to a Wayland surface, sending them to the
 		   compositor so they can be applied (i.e., rendered to the screen).
 		*/
 
-		wl_surface_commit( wl_surface );
+		wl_surface_commit( drawData->wl_surface );
 	}
 
 	void xdg_toplevel_configure( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, [[maybe_unused]] struct wl_array* atate ) {
@@ -269,7 +273,7 @@ namespace GLVM::core {
 			munmap( xdg_topLevelData->pixels, xdg_topLevelData->width * new_height * 4 );
 			xdg_topLevelData->width = new_width;
 			xdg_topLevelData->height = new_height;
-			resize( xdg_topLevelData->width, xdg_topLevelData->height, xdg_topLevelData->shared_memory, xdg_topLevelData->pixels, xdg_topLevelData->buffer );
+			resize( data );
 		}
 	}
 
@@ -290,12 +294,10 @@ namespace GLVM::core {
 		
 		xdg_surface_ack_configure( xdg_surface, serial );
 		if ( !xdg_surfaceConfigData->pixels ) {
-			resize( xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->shared_memory,
-					xdg_surfaceConfigData->pixels, xdg_surfaceConfigData->buffer );
+			resize( data );
 		}
 
-		draw(xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->pixels,
-			 xdg_surfaceConfigData->buffer, xdg_surfaceConfigData->constant_byte, xdg_surfaceConfigData->wl_surface);
+		draw( data );
 	}
 
 	void new_frame( [[maybe_unused]] void* data, struct wl_callback* frame_call_back, [[maybe_unused]] uint32_t callback_data ) {
@@ -303,11 +305,10 @@ namespace GLVM::core {
 		
 		wl_callback_destroy( frame_call_back );
 		frame_call_back = wl_surface_frame( xdg_surfaceConfigData->wl_surface );
-		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, 0 );
+		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, data );
 
 //	++constant_byte;
-		draw(xdg_surfaceConfigData->width, xdg_surfaceConfigData->height, xdg_surfaceConfigData->pixels,
-			 xdg_surfaceConfigData->buffer, xdg_surfaceConfigData->constant_byte, xdg_surfaceConfigData->wl_surface);
+		draw( data );
 	}
 
 	void shell_ping( [[maybe_unused]] void* data, struct xdg_wm_base* shell, uint32_t serial ) {

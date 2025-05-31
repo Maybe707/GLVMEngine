@@ -113,8 +113,8 @@ namespace GLVM::core {
 	void xdg_toplevel_configure( void* data, struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, struct wl_array* atate );
 	void xdg_toplevel_close( void* data, struct xdg_toplevel* xdg_toplevel );
 	int32_t alocate_shared_memory( uint64_t size );
-	void resize( uint16_t width, uint16_t height, wl_shm* shared_memory, [[maybe_unused]] void* pixels, [[maybe_unused]] wl_buffer* buffer);
-	void draw( uint16_t width, uint16_t height, void* pixels, wl_buffer* buffer, uint8_t  constant_byte, wl_surface* wl_surface );
+	void resize( void* data );
+	void draw( void* data );
 	void xdg_surface_configure( void* data, struct xdg_surface* xdg_surface, uint32_t serial );
 	void new_frame( void* data, struct wl_callback* frame_call_back, uint32_t callback_data );
 	void shell_ping( void* data, struct xdg_wm_base* shell, uint32_t serial );
