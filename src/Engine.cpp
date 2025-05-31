@@ -239,12 +239,35 @@ namespace GLVM::core
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
 			itemSystem->isLeftMouseButtonReleased     = &g_eEvent.isLeftMouseButtonReleased;
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+			hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
+			hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
+#else
+			hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 1080.0f;
+			hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+#endif
+
+			if ( hud_screen_x > 1.0f )
+				hud_screen_x = 1.0f;
+			else if ( hud_screen_x < -1.0f )
+				hud_screen_x = -1.0f;
+		
+			if ( hud_screen_y > 1.0f )
+				hud_screen_y = 1.0f;
+			else if ( hud_screen_y < -1.0f )
+				hud_screen_y = -1.0f;
+
+			
+			itemSystem->mouseOffsetX                  = hud_screen_x;
+			itemSystem->mouseOffsetY                  = hud_screen_y;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->levelGeneratedVertices    = procuduralLevelGeneratingSystem->levelGeneratedVertices;
 			vulkanRenderer->levelGeneratedIndices     = procuduralLevelGeneratingSystem->levelGeneratedIndices;
 			procuduralLevelGeneratingSystem->levelGeneratedVertices.clear();
 			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
+			vulkanRenderer->hud_screen_x              = hud_screen_x;
+			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();

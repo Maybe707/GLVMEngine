@@ -130,7 +130,9 @@ namespace GLVM::core {
 			*_x_offset = _x_position;
 			*_y_offset = _y_position;
 		}
-		
+		// std::cout << "x: " << _x_position << std::endl;
+		// std::cout << "y: " << _y_position << std::endl;
+
         // *_x_offset = _x_position + previous_X;
 		// previous_X = *_x_offset;
 

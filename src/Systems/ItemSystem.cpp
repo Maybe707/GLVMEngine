@@ -123,9 +123,22 @@ namespace GLVM::ecs
 		// 	}
 		// }
 
+		// if ( mouseOffsetX > 1.0f )
+		// 	mouseOffsetX = 1.0f;
+		// else if ( mouseOffsetX < -1.0f )
+		// 	mouseOffsetX = -1.0f;
+		
+		// if ( mouseOffsetY > 1.0f )
+		// 	mouseOffsetY = 1.0f;
+		// else if ( mouseOffsetY < -1.0f )
+		// 	mouseOffsetY = -1.0f;
+
+		
 		if ( isInventoryOpened ) {
 			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 				std::cout << "Take an item" << std::endl;
+				std::cout << "x: " << mouseOffsetX << std::endl;
+				std::cout << "y: " << mouseOffsetY << std::endl;
 				*isLeftMouseButtonReleased = false;
 				isItemDraged = true;
 			}

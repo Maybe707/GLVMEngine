@@ -54,6 +54,8 @@ namespace GLVM::core
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
 		uint32_t meshID = 0;
+		float hud_screen_x = 0.0f;
+		float hud_screen_y;
 
 		CVulkanRenderer*     vulkanRenderer;
 

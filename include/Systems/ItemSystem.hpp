@@ -28,6 +28,8 @@ namespace GLVM::ecs
 		bool          isItemDraged;
 		bool*         isLeftMouseButtonReleased;
 		bool          isLeftMouseButtonPressed;
+		float           mouseOffsetX = 0;
+		float           mouseOffsetY = 0;
 	};
 } // namespace GLVM::ecs
 

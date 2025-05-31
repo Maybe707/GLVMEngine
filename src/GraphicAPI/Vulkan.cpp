@@ -256,23 +256,16 @@ namespace GLVM::core
 		Matrix<float, 4> viewMatrix_(1.0f);
         const float kSensitivity = 0.1f;
 
-#ifdef VK_USE_PLATFORM_WAYLAND_KHR
-		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 880.0f;
-		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
-#else
-		hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 880.0f;
-		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
-#endif
 
-		if ( hud_screen_x > 1.0f )
-			hud_screen_x = 1.0f;
-		else if ( hud_screen_x < -1.0f )
-			hud_screen_x = -1.0f;
+		// if ( hud_screen_x > 1.0f )
+		// 	hud_screen_x = 1.0f;
+		// else if ( hud_screen_x < -1.0f )
+		// 	hud_screen_x = -1.0f;
 		
-		if ( hud_screen_y > 1.0f )
-			hud_screen_y = 1.0f;
-		else if ( hud_screen_y < -1.0f )
-			hud_screen_y = -1.0f;
+		// if ( hud_screen_y > 1.0f )
+		// 	hud_screen_y = 1.0f;
+		// else if ( hud_screen_y < -1.0f )
+		// 	hud_screen_y = -1.0f;
 		
         fYaw = g_eEvent.mousePointerPosition.offset_X;
         fPitch = g_eEvent.mousePointerPosition.offset_Y;
@@ -299,9 +292,15 @@ namespace GLVM::core
 		
 		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
 		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
+		/*
+		 * 1. The mouse direction determines the "intended direction of rotation" for the object.
+		 * 2. The camera is "looking forward."
+		 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
+		 */
 		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta_y));
 
 		if ( VecLength(rotateAxis) >= 0.001f ) {
+			/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
 			float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
 			constexpr float angleScale = 0.1f;                                                                                     
 			rotationAngle = Radians(rotationAngle * angleScale);
