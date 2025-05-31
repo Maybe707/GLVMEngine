@@ -6,7 +6,11 @@
 #include <wayland-util.h>
 
 namespace GLVM::core {
-	WindowWaylandVulkan::WindowWaylandVulkan() {
+	static WindowWaylandVulkan windowWaylandVulkan;
+
+	WindowWaylandVulkan::WindowWaylandVulkan() {}
+	
+	void WindowWaylandVulkan::init() {
 		// connects your client application to the Wayland display server
 		display  = wl_display_connect(0);               
 		/* get the global registry object from the Wayland display server (compositor). This registry allows
@@ -162,7 +166,7 @@ namespace GLVM::core {
 		wl_display_disconnect( display );
 	}
 	
-	int32_t WindowWaylandVulkan::alocate_shared_memory( uint64_t size ) {
+	int32_t alocate_shared_memory( uint64_t size ) {
 		char name[8];
 		name[0] = '/';
 		name[7] = 0;
@@ -178,7 +182,7 @@ namespace GLVM::core {
 		return file_descriptor;
 	}
 
-	void WindowWaylandVulkan::resize() {
+	void resize() {
 		int32_t file_descriptor = alocate_shared_memory( width * height * 4 );
 
 		/*
@@ -209,7 +213,7 @@ namespace GLVM::core {
 		close( file_descriptor );
 	}
 
-	void WindowWaylandVulkan::draw() {
+	void draw() {
 		/// Fill a block of memory with a specific byte value.
 		memset( pixels, constant_byte, width * height * 4 );
 
@@ -226,7 +230,7 @@ namespace GLVM::core {
 		wl_surface_commit( wl_surface );
 	}
 
-	void WindowWaylandVulkan::xdg_toplevel_configure( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, [[maybe_unused]] struct wl_array* atate ) {
+	void xdg_toplevel_configure( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, [[maybe_unused]] struct wl_array* atate ) {
 		if ( !new_width && !new_height ) {
 			return;
 		}
@@ -239,11 +243,11 @@ namespace GLVM::core {
 		}
 	}
 
-	void WindowWaylandVulkan::xdg_toplevel_close( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel ) {
+	void xdg_toplevel_close( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel ) {
 		close_xdg_toplevel = 1;
 	}
 
-	void WindowWaylandVulkan::xdg_surface_configure( [[maybe_unused]] void* data, struct xdg_surface* xdg_surface, uint32_t serial ) {
+	void xdg_surface_configure( [[maybe_unused]] void* data, struct xdg_surface* xdg_surface, uint32_t serial ) {
 		/* Acknowledge a configure event sent by the Wayland compositor to your xdg_surface
 		   In Wayland, when the compositor wants to change your window (like resizing it), it sends
 		   a configure event to your surface. You must call xdg_surface_ack_configure() to confirm
@@ -258,58 +262,36 @@ namespace GLVM::core {
 		draw();
 	}
 
-	struct wl_callback_listener WindowWaylandVulkan::callback_listener = {
-		/* Notify the client when the related request is done.
-		   param callback_data request-specific data for the callback
-		*/
-		.done = new_frame
-	};
-	struct wl_keyboard_listener WindowWaylandVulkan::keyboard_listener = {
-		.keymap      = keyboard_keymap,
-		.enter       = keyboard_enter,
-		.leave       = keyboard_leave,
-		.key         = keyboard_key,
-		.modifiers   = keyboard_modifiers,
-		.repeat_info = keyboard_repeat_info
-	};
-	struct xdg_wm_base_listener WindowWaylandVulkan::shell_listener = {
-		.ping = shell_ping
-	};
-	struct wl_seat_listener WindowWaylandVulkan::seat_lintener = {
-		.capabilities = seat_capabilities,
-		.name         = seat_name
-	};
-	
-	void WindowWaylandVulkan::new_frame( [[maybe_unused]] void* data, struct wl_callback* frame_call_back, [[maybe_unused]] uint32_t callback_data ) {
+	void new_frame( [[maybe_unused]] void* data, struct wl_callback* frame_call_back, [[maybe_unused]] uint32_t callback_data ) {
 		wl_callback_destroy( frame_call_back );
 		frame_call_back = wl_surface_frame( wl_surface );
-		wl_callback_add_listener( frame_call_back, &callback_listener, 0 );
+		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, 0 );
 
 //	++constant_byte;
 		draw();
 	}
 
-	void WindowWaylandVulkan::shell_ping( [[maybe_unused]] void* data, struct xdg_wm_base* shell, uint32_t serial ) {
+	void shell_ping( [[maybe_unused]] void* data, struct xdg_wm_base* shell, uint32_t serial ) {
 		xdg_wm_base_pong( shell, serial );
 	}
 
 
-	void WindowWaylandVulkan::keyboard_keymap([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t format,
+	void keyboard_keymap([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t format,
 											  [[maybe_unused]] int32_t keymap_file_descriptor, [[maybe_unused]] uint32_t size) {
 	
 	}
 
-	void WindowWaylandVulkan::keyboard_enter([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
+	void keyboard_enter([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 											 [[maybe_unused]] struct wl_surface* surface, [[maybe_unused]] struct wl_array* keys) {
 	
 	}
 
-	void WindowWaylandVulkan::keyboard_leave([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
+	void keyboard_leave([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 											 [[maybe_unused]] struct wl_surface* surface) {
 	
 	}
 
-	void WindowWaylandVulkan::keyboard_key([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
+	void keyboard_key([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 										   [[maybe_unused]] uint32_t time, uint32_t key, [[maybe_unused]] uint32_t state) {
 		// if ( key == 1 ) {
 		// 	close_xdg_toplevel = 1;
@@ -401,18 +383,18 @@ namespace GLVM::core {
 		}
 	}
 
-	void WindowWaylandVulkan::keyboard_modifiers([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
+	void keyboard_modifiers([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
 												 [[maybe_unused]] uint32_t mods_depressed, [[maybe_unused]] uint32_t mods_latched, [[maybe_unused]] uint32_t mods_locked, [[maybe_unused]] uint32_t group) {
 	
 	}
 
-	void WindowWaylandVulkan::keyboard_repeat_info([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] int32_t rate,
+	void keyboard_repeat_info([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] int32_t rate,
 												   [[maybe_unused]] int32_t delay) {
 	
 	}
 
 	// Pointer listener callbacks
-	void WindowWaylandVulkan::pointer_enter([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+	void pointer_enter([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface,
 							  [[maybe_unused]] wl_fixed_t sx, [[maybe_unused]] wl_fixed_t sy) {
 		// printf("Pointer entered surface at %f, %f\n",
@@ -420,12 +402,12 @@ namespace GLVM::core {
 
 	}
 
-	void WindowWaylandVulkan::pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+	void pointer_leave([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							  [[maybe_unused]] uint32_t serial, [[maybe_unused]] struct wl_surface *surface) {
 //		printf("Pointer left surface\n");
 	}
 	
-	void WindowWaylandVulkan::pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+	void pointer_motion([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t time, [[maybe_unused]] wl_fixed_t sx, [[maybe_unused]] wl_fixed_t sy) {
 		// printf("Pointer moved to %f, %f\n",
 		// 	   wl_fixed_to_double(sx), wl_fixed_to_double(sy));
@@ -433,16 +415,14 @@ namespace GLVM::core {
 		// y_pointer = wl_fixed_to_int(sy);
 	}
 
-	void WindowWaylandVulkan::pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+	void pointer_axis([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							 [[maybe_unused]] uint32_t time, [[maybe_unused]] uint32_t axis, [[maybe_unused]] wl_fixed_t value) {
 		// const char *axis_name = axis == WL_POINTER_AXIS_HORIZONTAL_SCROLL ? 
 		// 	"horizontal" : "vertical";
 		// printf("Scroll %s by %f\n", axis_name, wl_fixed_to_double(value));
 	}
 
-	bool WindowWaylandVulkan::hideAndLockPointer = false;
-	
-	void WindowWaylandVulkan::pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
+	void pointer_button([[maybe_unused]] void *data, [[maybe_unused]] struct wl_pointer *pointer,
 							   [[maybe_unused]] uint32_t serial, [[maybe_unused]] uint32_t time, uint32_t button,
 							   uint32_t state) {
 //		const char *button_name = "unknown";
@@ -472,9 +452,9 @@ namespace GLVM::core {
 
 		
 		// Hide cursor on first opportunity
-		if ( !hideAndLockPointer ) {
-			hideAndLockPointer = true;
-			struct wl_buffer *transparent = create_transparent_cursor(pointer_shared_memory);
+		if ( !windowWaylandVulkan.hideAndLockPointer ) {
+			windowWaylandVulkan.hideAndLockPointer = true;
+			struct wl_buffer *transparent = windowWaylandVulkan.create_transparent_cursor(pointer_shared_memory);
 			wl_surface_attach(pointer_surface, transparent, 0, 0);
 			wl_surface_commit(pointer_surface);
 			wl_pointer_set_cursor(pointer, serial, pointer_surface, 0, 0);
@@ -495,7 +475,7 @@ namespace GLVM::core {
 			// get relative motion
 			relative_pointer = zwp_relative_pointer_manager_v1_get_relative_pointer(
 				relative_pointer_manager, pointer);
-			zwp_relative_pointer_v1_add_listener(relative_pointer, &relative_pointer_listener, NULL);
+			zwp_relative_pointer_v1_add_listener(relative_pointer, &windowWaylandVulkan.relative_pointer_listener, NULL);
 
 		
 			// // lock the pointer
@@ -508,7 +488,7 @@ namespace GLVM::core {
 		// 	   button_name);
 	}
 
-	void WindowWaylandVulkan::handle_relative_motion([[maybe_unused]] void *data, [[maybe_unused]] struct zwp_relative_pointer_v1 *rel_pointer, [[maybe_unused]] uint32_t utime_hi, [[maybe_unused]] uint32_t utime_lo,
+	void handle_relative_motion([[maybe_unused]] void *data, [[maybe_unused]] struct zwp_relative_pointer_v1 *rel_pointer, [[maybe_unused]] uint32_t utime_hi, [[maybe_unused]] uint32_t utime_lo,
 													 wl_fixed_t dx, wl_fixed_t dy, [[maybe_unused]] wl_fixed_t dx_unaccel, [[maybe_unused]] wl_fixed_t dy_unaccel) {
 		// printf("Relative motion: dx=%.2f dy=%.2f\n",
 		// 	   wl_fixed_to_double(dx), wl_fixed_to_double(dy));
@@ -516,29 +496,11 @@ namespace GLVM::core {
 		y_pointer = wl_fixed_to_int(dy);
 	}
 
-	struct zwp_relative_pointer_v1_listener WindowWaylandVulkan::relative_pointer_listener = {
-		.relative_motion = handle_relative_motion
-	};
-	
-	struct wl_pointer_listener WindowWaylandVulkan::pointer_listener = {
-		.enter = pointer_enter,
-		.leave = pointer_leave,
-		.motion = pointer_motion,
-		.button = pointer_button,
-		.axis = pointer_axis,
-		.frame = nullptr,
-		.axis_source = nullptr,
-		.axis_stop = nullptr,
-		.axis_discrete = nullptr,
-		.axis_value120 = nullptr,
-		.axis_relative_direction = nullptr
-	};
-
-	void WindowWaylandVulkan::seat_capabilities( [[maybe_unused]] void* data, struct wl_seat* seat, uint32_t capabilities ) {
+	void seat_capabilities( [[maybe_unused]] void* data, struct wl_seat* seat, uint32_t capabilities ) {
 		// Handle pointer capabilities
 		if ((capabilities & WL_SEAT_CAPABILITY_POINTER) && !pointer) {
 			pointer = wl_seat_get_pointer(seat);
-			wl_pointer_add_listener(pointer, &pointer_listener, NULL);
+			wl_pointer_add_listener(pointer, &windowWaylandVulkan.pointer_listener, NULL);
 		} else if (!(capabilities & WL_SEAT_CAPABILITY_POINTER) && pointer) {
 			wl_pointer_destroy(pointer);
 			pointer = NULL;
@@ -546,15 +508,15 @@ namespace GLVM::core {
 		
 		if ( capabilities & WL_SEAT_CAPABILITY_KEYBOARD && !keyboard ) {
 			keyboard = wl_seat_get_keyboard( seat );
-			wl_keyboard_add_listener( keyboard, &keyboard_listener, 0 );
+			wl_keyboard_add_listener( keyboard, &windowWaylandVulkan.keyboard_listener, 0 );
 		}
 	}
 
-	void WindowWaylandVulkan::seat_name( [[maybe_unused]] void* data, [[maybe_unused]] struct wl_seat* seat, [[maybe_unused]] const char* name ) {
+	void seat_name( [[maybe_unused]] void* data, [[maybe_unused]] struct wl_seat* seat, [[maybe_unused]] const char* name ) {
 	}
 
 
-	void WindowWaylandVulkan::registry_global( [[maybe_unused]] void* data, struct wl_registry* registry, uint32_t name, const char* interface, [[maybe_unused]] uint32_t version ) {
+	void registry_global( [[maybe_unused]] void* data, struct wl_registry* registry, uint32_t name, const char* interface, [[maybe_unused]] uint32_t version ) {
 		if (!strcmp( interface, wl_compositor_interface.name )) {
 			compositor = (wl_compositor*)wl_registry_bind( registry, name, &wl_compositor_interface, 4 );
 		} else if (!strcmp( interface, wl_shm_interface.name )) {
@@ -566,16 +528,73 @@ namespace GLVM::core {
 			relative_pointer_manager = (zwp_relative_pointer_manager_v1*)wl_registry_bind(registry, name, &zwp_relative_pointer_manager_v1_interface, 1);
 		} else if (!strcmp( interface, xdg_wm_base_interface.name )) {
 			xdg_shell = (xdg_wm_base*)wl_registry_bind( registry, name, &xdg_wm_base_interface, 1 );
-			xdg_wm_base_add_listener( xdg_shell, &shell_listener, 0 );
+			xdg_wm_base_add_listener( xdg_shell, &windowWaylandVulkan.shell_listener, 0 );
 		} else if (!strcmp( interface, wl_seat_interface.name )) {
 			seat = (wl_seat*)wl_registry_bind( registry, name, &wl_seat_interface, 1 );
-			wl_seat_add_listener( seat, &seat_lintener, 0 );
+			wl_seat_add_listener( seat, &windowWaylandVulkan.seat_lintener, 0 );
 		}
 	}
 
-	void WindowWaylandVulkan::registry_global_remove( [[maybe_unused]] void* data, [[maybe_unused]] struct wl_registry* registry, [[maybe_unused]] uint32_t name) {
+	void registry_global_remove( [[maybe_unused]] void* data, [[maybe_unused]] struct wl_registry* registry, [[maybe_unused]] uint32_t name) {
 	}
 
+	WindowWaylandVulkan*  initializeWaylandWindow() {
+		windowWaylandVulkan.previous_X = 960;
+		windowWaylandVulkan.previous_Y = 540;
+		windowWaylandVulkan.xdg_toplevel_listener = {
+			.configure = xdg_toplevel_configure,
+			.close     = xdg_toplevel_close,
+			.configure_bounds = nullptr,
+			.wm_capabilities   = nullptr
+		};
+		windowWaylandVulkan.xdg_surface_listener = {
+			.configure = xdg_surface_configure
+		};
+		windowWaylandVulkan.callback_listener = {
+			/* Notify the client when the related request is done.
+			   param callback_data request-specific data for the callback
+			*/
+			.done = new_frame
+		};
+		windowWaylandVulkan.shell_listener = {
+			.ping = shell_ping
+		};
+		windowWaylandVulkan.keyboard_listener = {
+			.keymap      = keyboard_keymap,
+			.enter       = keyboard_enter,
+			.leave       = keyboard_leave,
+			.key         = keyboard_key,
+			.modifiers   = keyboard_modifiers,
+			.repeat_info = keyboard_repeat_info
+		};
 
+		windowWaylandVulkan.relative_pointer_listener = {
+			.relative_motion = handle_relative_motion
+		};
+		windowWaylandVulkan.pointer_listener = {
+			.enter = pointer_enter,
+			.leave = pointer_leave,
+			.motion = pointer_motion,
+			.button = pointer_button,
+			.axis = pointer_axis,
+			.frame = nullptr,
+			.axis_source = nullptr,
+			.axis_stop = nullptr,
+			.axis_discrete = nullptr,
+			.axis_value120 = nullptr,
+			.axis_relative_direction = nullptr
+		};
+		windowWaylandVulkan.seat_lintener = {
+			.capabilities = seat_capabilities,
+			.name         = seat_name
+		};
+		windowWaylandVulkan.registry_listener = {
+			.global        = registry_global,
+			.global_remove = registry_global_remove
+		};
+
+		windowWaylandVulkan.init();
+		return &windowWaylandVulkan;
+	}
 }; ///< namespace GLVM::core
 

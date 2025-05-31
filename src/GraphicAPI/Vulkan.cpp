@@ -584,7 +584,8 @@ namespace GLVM::core
     void CVulkanRenderer::initWindow() {
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 //		Window->Close();
-		Window = new GLVM::core::WindowWaylandVulkan();
+//		Window = new GLVM::core::WindowWaylandVulkan();
+		Window = initializeWaylandWindow();
 		// if ( buffer == NULL )
 		// 	std::cout << "BUFFER V GOVNE" << std::endl;
 			
