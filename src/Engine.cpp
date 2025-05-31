@@ -214,6 +214,7 @@ namespace GLVM::core
 								  &g_eEvent.mousePointerPosition.offset_X,
 											  &g_eEvent.mousePointerPosition.offset_Y);
 
+			computeHudScreeenCoordinates();
 			// std::cout << "lmb released " << g_eEvent.isLeftMouseButtonReleased << std::endl;
 			// std::cout << "lmb pressed " << isLeftMouseButtonPressed << std::endl;
 			// std::cout << "item draged " << itemSystem->isItemDraged << std::endl;
@@ -239,25 +240,6 @@ namespace GLVM::core
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
 			itemSystem->isLeftMouseButtonReleased     = &g_eEvent.isLeftMouseButtonReleased;
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
-#ifdef VK_USE_PLATFORM_WAYLAND_KHR
-			hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
-			hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
-#else
-			hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 1080.0f;
-			hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
-#endif
-
-			if ( hud_screen_x > 1.0f )
-				hud_screen_x = 1.0f;
-			else if ( hud_screen_x < -1.0f )
-				hud_screen_x = -1.0f;
-		
-			if ( hud_screen_y > 1.0f )
-				hud_screen_y = 1.0f;
-			else if ( hud_screen_y < -1.0f )
-				hud_screen_y = -1.0f;
-
-			
 			itemSystem->mouseOffsetX                  = hud_screen_x;
 			itemSystem->mouseOffsetY                  = hud_screen_y;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
@@ -277,6 +259,26 @@ namespace GLVM::core
 		delete vulkanRenderer;
 	}
 
+	void Engine::computeHudScreeenCoordinates() {
+#ifdef VK_USE_PLATFORM_WAYLAND_KHR
+		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
+		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
+#else
+		hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 1080.0f;
+		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+#endif
+
+		if ( hud_screen_x > 1.0f )
+			hud_screen_x = 1.0f;
+		else if ( hud_screen_x < -1.0f )
+			hud_screen_x = -1.0f;
+		
+		if ( hud_screen_y > 1.0f )
+			hud_screen_y = 1.0f;
+		else if ( hud_screen_y < -1.0f )
+			hud_screen_y = -1.0f;
+	}
+	
 	ecs::TextureHandle Engine::LoadTextureFromFile(const char* path_to_texture) {
 		uint32_t textureID = textureVector.size();
 		ecs::TextureHandle textureHandle;

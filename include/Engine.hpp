@@ -89,6 +89,7 @@ namespace GLVM::core
 		void GameLoop();
 		void EventQueueFlush();
 		void RenderVulkan();
+		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);
 		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,
 								  unsigned int dat_length, unsigned char* u_iData);
