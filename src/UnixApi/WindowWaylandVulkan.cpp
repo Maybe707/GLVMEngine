@@ -112,8 +112,6 @@ namespace GLVM::core {
 		y_pointer = 0;
 
 		wl_display_dispatch( display );
-		if ( keys_pressed[0] == 23 )
-			_Event.SetEvent(EEvents::eINVENTORY);			
 // 		while (wl_display_dispatch( display )) {
 // //			printf("%s", "HREN GOVNA!");
 // 			if ( close_xdg_toplevel )
