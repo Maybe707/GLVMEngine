@@ -15,6 +15,7 @@
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
+#include "Systems/InventorySystem.hpp"
 #include "Systems/ItemSystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
@@ -95,6 +96,7 @@ namespace GLVM::core
 		enemySytem                      = new ecs::EnemySystem();
 		itemSystem                      = new ecs::ItemSystem();
 		procuduralLevelGeneratingSystem = new ProceduralLevelGeneratingSystem();
+		inventorySystem                 = new ecs::InventorySystem();
         
 		deltaFrameTime             = 0.0;
 		g_eEvent.SetEvent(eDEFAULT);
@@ -109,6 +111,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(collisionSystem);
 		pSystem_Manager->ActivateSystem(damageSystem);
 		pSystem_Manager->ActivateSystem(physicsSystem);
+		pSystem_Manager->ActivateSystem(inventorySystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
 
 		// std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
@@ -242,6 +245,11 @@ namespace GLVM::core
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
 			itemSystem->mouseOffsetX                  = hud_screen_x;
 			itemSystem->mouseOffsetY                  = hud_screen_y;
+			inventorySystem->isInventoryOpened         = vulkanRenderer->isInventoryOpened;
+			inventorySystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
+			inventorySystem->isLeftMouseButtonPressed  = isLeftMouseButtonPressed;
+			inventorySystem->mouseOffsetX              = hud_screen_x;
+			inventorySystem->mouseOffsetY              = hud_screen_y;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->levelGeneratedVertices    = procuduralLevelGeneratingSystem->levelGeneratedVertices;

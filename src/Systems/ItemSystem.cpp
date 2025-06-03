@@ -134,24 +134,24 @@ namespace GLVM::ecs
 		// 	mouseOffsetY = -1.0f;
 
 		
-		if ( isInventoryOpened ) {
-			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-				std::cout << "Take an item" << std::endl;
-				std::cout << "x: " << mouseOffsetX << std::endl;
-				std::cout << "y: " << mouseOffsetY << std::endl;
-				*isLeftMouseButtonReleased = false;
-				isItemDraged = true;
-			}
+// 		if ( isInventoryOpened ) {
+// 			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+// 				std::cout << "Take an item" << std::endl;
+// 				std::cout << "x: " << mouseOffsetX << std::endl;
+// 				std::cout << "y: " << mouseOffsetY << std::endl;
+// 				*isLeftMouseButtonReleased = false;
+// 				isItemDraged = true;
+// 			}
 
-			if ( isItemDraged ) {
-//			std::cout << "highlight item slots" << std::endl;
-			}
+// 			if ( isItemDraged ) {
+// //			std::cout << "highlight item slots" << std::endl;
+// 			}
 
-			if ( isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-				std::cout << "item droped" << std::endl;
-				*isLeftMouseButtonReleased = false;
-				isItemDraged = false;
-			}
-		}
+// 			if ( isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+// 				std::cout << "item droped" << std::endl;
+// 				*isLeftMouseButtonReleased = false;
+// 				isItemDraged = false;
+// 			}
+// 		}
 	}
 } // namespace GLVM::ecs

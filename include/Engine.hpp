@@ -11,6 +11,7 @@
 #include "ProceduralLevelGeneratingSystem.hpp"
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
+#include "Systems/InventorySystem.hpp"
 #include "Systems/ItemSystem.hpp"
 #include "SystemsFullSet.hpp"
 #include "IChrono.hpp"
@@ -69,6 +70,7 @@ namespace GLVM::core
 		ecs::EnemySystem                * enemySytem;
 		ecs::ItemSystem                 * itemSystem;
 		ProceduralLevelGeneratingSystem * procuduralLevelGeneratingSystem;
+		ecs::InventorySystem            * inventorySystem;
 
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
