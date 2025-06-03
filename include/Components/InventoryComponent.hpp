@@ -3,6 +3,7 @@
 
 #include "Components/InventorySlotComponent.hpp"
 #include <climits>
+#include "Components/VertexComponent.hpp"
 #include "Vector.hpp"
 
 namespace GLVM::ecs::components
@@ -38,8 +39,8 @@ namespace GLVM::ecs::components
 			delete [] slots;
 		}
 		
-		static constexpr unsigned int row = 8;
-		static constexpr unsigned int col = 8;
+		unsigned int row = 8;
+		unsigned int col = 8;
 		// int slots[row][col] = {
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
@@ -51,10 +52,12 @@ namespace GLVM::ecs::components
 		// 	{ -1, -1, -1, -1, -1, -1, -1, -1 },
 		// };
 
-		unsigned int** slots = new unsigned int*[row];   ///< Array with entities contained inventorySlotComponents
+		unsigned int** slots     = new unsigned int*[row];   ///< Array with entities contained inventorySlotComponents
 		unsigned int entityOwner = UINT_MAX;
 		core::vector<unsigned int> highlightedSlots;
 		bool isAvailableHighlightedSlots = false;
+		MeshHandle slotMeshID;
+		float slotScale;
 	};
 }; // namespace GLVM::ecs::components
 

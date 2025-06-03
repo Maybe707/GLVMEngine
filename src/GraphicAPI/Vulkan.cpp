@@ -4194,12 +4194,13 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
-									   ecs::components::transform* inventorySlotTransform, unsigned int inventorySlotEntity) {
+									   float slotScale, unsigned int inventorySlotEntity) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
 		float x = x_slot_offset * 0.1f + 0.2f;
 		[[maybe_unused]] float y = y_slot_offset * 0.17f - 0.8f;
-		float inventorySlotScale = inventorySlotTransform->scale;
+//		float inventorySlotScale = inventorySlotTransform->scale;
+		float inventorySlotScale = slotScale;
 //		std::cout << "inventory slot scale: " << inventorySlotScale << std::endl;
 		model[0][0] = inventorySlotScale;
 		model[1][1] = inventorySlotScale;
@@ -4211,9 +4212,9 @@ namespace GLVM::core
 		// std::cout << "x: " << model[3][0] << std::endl;
 		// std::cout << "y: " << model[3][1] << std::endl;
 		
-		inventorySlotTransform->position[0] = x;
-		inventorySlotTransform->position[1] = y;
-		inventorySlotTransform->position[2] = 0.1f;
+		// inventorySlotTransform->position[0] = x;
+		// inventorySlotTransform->position[1] = y;
+		// inventorySlotTransform->position[2] = 0.1f;
 		
 		hudUBO.model = model;
 
@@ -4274,8 +4275,10 @@ namespace GLVM::core
 			cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
 
 			// Compute absolute centre of all slots
-			x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
-			y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
+			if ( slotTransform_0 != nullptr && slotTransform_3 != nullptr ) {
+				x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
+				y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
+			}
 		}
 		float itemScale = itemTransfromComponent->scale;
 //		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
@@ -4468,17 +4471,18 @@ namespace GLVM::core
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
+			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
 			for ( unsigned int j = 0; j < 8; ++j ) {
 				for ( unsigned int m = 0; m < 8; ++m ) {
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
-					cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
-					unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
+					// cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
+					// unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
 					cm::transform* inventoryTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
-					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
+//					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
 					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * 8 + m;
 					updateUBO_UI(inventoryTransformComponent->position[0] + m, inventoryTransformComponent->position[1] + j,
-								 uboIndex, inventorySlotTransformComponent, inventorySlotEntity);
+								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
@@ -4571,6 +4575,7 @@ namespace GLVM::core
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 //			std::cout << "i: " << i << std::endl;
 			unsigned int itemEntity = linkedEntities[i];
+//			std::cout << "item entity id: " << itemEntity << std::endl;
 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
 			cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
 			if ( actorComponent != nullptr )
@@ -4584,6 +4589,9 @@ namespace GLVM::core
 			cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
 
 			unsigned int uboIndex = currentFrame * MAX_FRAMES_IN_FLIGHT + i;
+			if ( itemTransformComponent == nullptr )
+				std::cout << "NULL POINTER" << std::endl;
+			
 			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 									0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);

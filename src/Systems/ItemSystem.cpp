@@ -29,18 +29,20 @@ namespace GLVM::ecs
 		unsigned int item_height = itemComponent->itemSlotType.height;
 		for ( unsigned int i = 0; i < row - item_height + 1; ++i )
 			for ( unsigned int j = 0; j < col - item_width + 1; ++j ) {
-				core::vector<cm::inventorySlot*> maybeAvailabeSlots;
+//				core::vector<cm::inventorySlot*> maybeAvailabeSlots;
+				core::vector<unsigned int> maybeAvailabeSlots;
 				core::vector<unsigned int> indicesOfMaybeAvailableSlots;
 				for ( unsigned int m = i; m < i + item_height; ++m )
 					for ( unsigned int n = j; n < j + item_width; ++n ) {
-						maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]));
+//						maybeAvailabeSlots.Push(componentManager->GetComponent<cm::inventorySlot>(inventoryComponent->slots[m][n]));
+						maybeAvailabeSlots.Push(inventoryComponent->slots[m][n]);
 						indicesOfMaybeAvailableSlots.Push(m);                              ///< Save row index
 						indicesOfMaybeAvailableSlots.Push(n);                              ///< Save col index
 					}
 
 				unsigned int isAllSlotsAvailable = 0;
 				for ( unsigned int v = 0; v < maybeAvailabeSlots.GetSize(); ++v ) {
-					if ( maybeAvailabeSlots[v]->itemEntity == UINT_MAX ) {
+					if ( maybeAvailabeSlots[v] == UINT_MAX ) {
 						++isAllSlotsAvailable;
 					} else {
 						--isAllSlotsAvailable;
@@ -48,7 +50,7 @@ namespace GLVM::ecs
 				}
 				if ( maybeAvailabeSlots.GetSize() == isAllSlotsAvailable ) {
 					for ( unsigned int w = 0; w < maybeAvailabeSlots.GetSize(); ++w ) {
-						maybeAvailabeSlots[w]->itemEntity = itemEntity;
+						maybeAvailabeSlots[w] = itemEntity;
 					}
 
 					for ( unsigned int e = 0; e < indicesOfMaybeAvailableSlots.GetSize(); e += 2 ) {

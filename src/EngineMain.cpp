@@ -204,19 +204,22 @@ int main()
 	ComponentManager->CreateComponent<cm::transform, cm::inventory>(inventory);
 	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
 	inventoryComponent->entityOwner = uiPlayer;
-	for ( unsigned int i = 0; i < 8; ++i )
-		for ( unsigned int j = 0; j < 8; ++j ) {
-			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
-//			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
-			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);
-			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .scale = 0.05f };
-			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
-		}
+	inventoryComponent->slotMeshID  = inventory_Handle_GLTF;
+	inventoryComponent->slotScale   = 0.05;
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .position = { -1.5f, 1.5f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 4.0f, .gltf = true };
+// 	for ( unsigned int i = 0; i < 8; ++i )
+// 		for ( unsigned int j = 0; j < 8; ++j ) {
+// 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
+// //			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
+// 			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);
+// 			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .scale = 0.05f };
+// 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
+// 		}
 
 	for ( unsigned int i = 0; i < 5; ++i ) {
 		Entity testItem = EntityManager->CreateEntity();
+		std::cout << "item entity id: " << testItem << std::endl;
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		[[maybe_unused]] unsigned int row = i + 1;
 		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { row, 5 };
