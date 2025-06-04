@@ -4266,19 +4266,33 @@ namespace GLVM::core
 		} else {
 			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
 			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
+			std::cout << "slot entity 0 " << inventorySlotEntity_0 << std::endl;
+			std::cout << "slot entity 3 " << inventorySlotEntity_3 << std::endl;
+			constexpr unsigned int row = 8;
+			constexpr unsigned int col = 8;
+			unsigned int rowIndexFirstSlot = inventorySlotEntity_0 / row;
+			unsigned int colIndexFirstSlot = inventorySlotEntity_0 % col;
+			unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / row;
+			unsigned int colIndexSecondSlot = inventorySlotEntity_3 % col;
+
+			constexpr float itemScale = 0.2f;
+			x_result_offset = (rowIndexFirstSlot * itemScale + rowIndexSecondSlot * itemScale) / 2.0f;
+			y_result_offset = (colIndexFirstSlot * itemScale + colIndexSecondSlot * itemScale) / 2.0f;
+			std::cout << "x offset: " << x_result_offset << std::endl;
+			std::cout << "y offset: " << y_result_offset << std::endl;
 			// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
 			// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
 		
-			ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-			namespace cm = GLVM::ecs::components;
-			cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
-			cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
+			// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+			// namespace cm = GLVM::ecs::components;
+			// cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
+			// cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
 
-			// Compute absolute centre of all slots
-			if ( slotTransform_0 != nullptr && slotTransform_3 != nullptr ) {
-				x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
-				y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
-			}
+			// // Compute absolute centre of all slots
+			// if ( slotTransform_0 != nullptr && slotTransform_3 != nullptr ) {
+			// 	x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
+			// 	y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
+			// }
 		}
 		float itemScale = itemTransfromComponent->scale;
 //		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
@@ -4472,10 +4486,10 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
 			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
-			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
+//			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
 			for ( unsigned int j = 0; j < 8; ++j ) {
 				for ( unsigned int m = 0; m < 8; ++m ) {
-					std::cout << "slots index: " << (j / 8) + (j % 8) << " with entity: " << inventoryComponent->slots[j][m] << std::endl;
+//					std::cout << "slots index: " << (j / 8) + (j % 8) << " with entity: " << inventoryComponent->slots[j][m] << std::endl;
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					// cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					// unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
