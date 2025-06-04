@@ -4472,8 +4472,10 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
 			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
+			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
 			for ( unsigned int j = 0; j < 8; ++j ) {
 				for ( unsigned int m = 0; m < 8; ++m ) {
+					std::cout << "slots index: " << (j / 8) + (j % 8) << " with entity: " << inventoryComponent->slots[j][m] << std::endl;
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					// cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
 					// unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
