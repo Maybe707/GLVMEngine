@@ -4458,7 +4458,7 @@ namespace GLVM::core
 //					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
 					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * 8 + m;
-					updateUBO_UI(slotTransformComponent->position[0] + m, slotTransformComponent->position[1] + j,
+					updateUBO_UI(j, m,
 								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity, slotTransformComponent);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
