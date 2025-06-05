@@ -658,11 +658,11 @@ namespace GLVM::core
 		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
-		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
-						  float slotScale, unsigned int inventorySlotEntity, const bool isGLTF);
+		void updateUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, uint32_t offset,
+						  float slotScale, unsigned int inventorySlotEntity, ecs::components::transform* slotTransfromComponent);
 		void updateUBO_IconsUI(uint32_t offset, ecs::components::transform* itemTransfromComponent,
 							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent,
-							   const unsigned int rowInventory, const unsigned int columnInventory);
+							   const unsigned int rowInventory, const unsigned int columnInventory, ecs::components::transform* inventoryTransformComponent);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
