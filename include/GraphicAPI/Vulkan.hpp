@@ -661,7 +661,8 @@ namespace GLVM::core
 		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
 						  float slotScale, unsigned int inventorySlotEntity);
 		void updateUBO_IconsUI(uint32_t offset, ecs::components::transform* itemTransfromComponent,
-							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent);
+							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent,
+							   const unsigned int rowInventory, const unsigned int columnInventory);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

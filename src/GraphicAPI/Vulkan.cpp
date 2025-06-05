@@ -583,11 +583,7 @@ namespace GLVM::core
     
     void CVulkanRenderer::initWindow() {
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-//		Window->Close();
-//		Window = new GLVM::core::WindowWaylandVulkan();
 		Window = initializeWaylandWindow();
-		// if ( buffer == NULL )
-		// 	std::cout << "BUFFER V GOVNE" << std::endl;
 			
 		createWaylandSurfaceInfo.display = Window->display;
 		createWaylandSurfaceInfo.surface = Window->wl_surface;
@@ -604,7 +600,6 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-//		Window->Close();
 		Window = new GLVM::core::WindowXVulkan();
         createXlibSurfaceInfo.dpy = Window->GetDisplay();
         createXlibSurfaceInfo.window = Window->GetWindow();
@@ -615,9 +610,6 @@ namespace GLVM::core
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-		// if( Window != nullptr )
-		// 	Window->Disconnect();
-		
 		Window = new GLVM::core::WindowXCBVulkan();
 		createXcbSurfaceInfo.window = Window->GetWindow();
 		createXcbSurfaceInfo.connection = Window->GetConnection();
@@ -4259,61 +4251,29 @@ namespace GLVM::core
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t offset,
 											ecs::components::transform* itemTransfromComponent,
 											ecs::components::collider* itemColliderComponent,
-											ecs::components::item* itemComponent) {
+											ecs::components::item* itemComponent,
+											const unsigned int rowInventory,
+											const unsigned int columnInventory) {
 		UI_UBO hudUBO{};
 		float x_result_offset = 0.0f;
 		float y_result_offset = 0.0f;
-//		if ( itemComponent->occupiedSlots.GetSize() < itemComponent->itemSlotType.height * itemComponent->itemSlotType.width ) {
 		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
-//			std::cout << "number of occupied slots: " << itemComponent->occupiedSlots.GetSize() << std::endl;
 		} else {
-			unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
-			unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
-			std::cout << "slot entity 0 " << inventorySlotEntity_0 << std::endl;
-			std::cout << "slot entity 3 " << inventorySlotEntity_3 << std::endl;
-			constexpr unsigned int row = 8;
-			constexpr unsigned int col = 8;
-			unsigned int rowIndexFirstSlot = inventorySlotEntity_0 / row;
-			unsigned int colIndexFirstSlot = inventorySlotEntity_0 % col;
-			unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / row;
-			unsigned int colIndexSecondSlot = inventorySlotEntity_3 % col;
+			const unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
+			const unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
+			const unsigned int rowIndexFirstSlot = inventorySlotEntity_0 / rowInventory;
+			const unsigned int colIndexFirstSlot = inventorySlotEntity_0 % columnInventory;
+			const unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / rowInventory;
+			const unsigned int colIndexSecondSlot = inventorySlotEntity_3 % columnInventory;
 
-			constexpr float itemScale         = 0.05f;
+			const float itemScale             = itemTransfromComponent->scale;
 			const float fullSlotScale         = itemScale * 2.0f;
 			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
 			x_result_offset = (colIndexFirstSlot * fullSlotScale + colIndexSecondSlot * fullSlotScale) * centreMultiplayer;
 			y_result_offset = (rowIndexFirstSlot * fullSlotScale + rowIndexSecondSlot * fullSlotScale) * centreMultiplayer * aspectRate;
-			std::cout << "x offset: " << x_result_offset << std::endl;
-			std::cout << "y offset: " << y_result_offset << std::endl;
-			// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
-			// std::cout << "second entity: " << inventorySlotEntity_3 << std::endl;
-		
-			// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-			// namespace cm = GLVM::ecs::components;
-			// cm::transform* slotTransform_0 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_0);
-			// cm::transform* slotTransform_3 = componentManager->GetComponent<cm::transform>(inventorySlotEntity_3);
-
-			// // Compute absolute centre of all slots
-			// if ( slotTransform_0 != nullptr && slotTransform_3 != nullptr ) {
-			// 	x_result_offset = (slotTransform_0->position[0] + slotTransform_3->position[0]) / 2.0f;
-			// 	y_result_offset = (slotTransform_0->position[1] + slotTransform_3->position[1]) / 2.0f;
-			// }
 		}
 		float itemScale = itemTransfromComponent->scale;
-//		std::cout << "item scale: " << itemTransfromComponent->fScale << std::endl;
-		// std::cout << "x: " << x_result_offset << std::endl;
-		// std::cout << "y: " << y_result_offset << std::endl;
-		
-		// unsigned int row_length = 8;
-		// unsigned int x_offset = offset % row_length;
-		// unsigned int y_offset = offset / row_length;
-		// float x_base_offset = 0.152f;
-		// float y_base_offset = -0.815;
-		// float x_result_offset = x_base_offset + x_offset * 0.1f;
-		// float y_result_offset = y_base_offset + y_offset * 0.18f;
-		// float itemScale = 0.43f;
 
-//		itemTransfromComponent->fScale = itemScale;
 		if ( !itemColliderComponent->itemDrag ) {
 			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
@@ -4592,7 +4552,9 @@ namespace GLVM::core
 
 		// if ( viewPositionLinkedEntities.GetSize() > 0 )
 		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
-
+		core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
+		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 //			std::cout << "i: " << i << std::endl;
 			unsigned int itemEntity = linkedEntities[i];
@@ -4613,7 +4575,7 @@ namespace GLVM::core
 			if ( itemTransformComponent == nullptr )
 				std::cout << "NULL POINTER" << std::endl;
 			
-			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent);
+			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent, inventoryComponent->row, inventoryComponent->col);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 									0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 
