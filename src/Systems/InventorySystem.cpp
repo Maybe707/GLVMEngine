@@ -17,10 +17,11 @@ namespace GLVM::ecs
 
 			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 				const float inventorySlotScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
-				if( crosshairTransformComponent->position[0] > inventoryTransformComponent->position[0] &&
-					crosshairTransformComponent->position[0] < inventoryTransformComponent->position[0] + inventorySlotScale * inventoryComponent->col &&
-					crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] &&
-					crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] + inventorySlotScale * inventoryComponent->row * aspectRate ) {
+				const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
+				if( crosshairTransformComponent->position[0] > inventoryTransformComponent->position[0] - inventorySlotHalfScale &&
+					crosshairTransformComponent->position[0] < inventoryTransformComponent->position[0] - inventorySlotHalfScale + inventorySlotScale * inventoryComponent->col &&
+					crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate &&
+					crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate + inventorySlotScale * inventoryComponent->row * aspectRate ) {
 					std::cout << "TEST" << std::endl;
 				}
 				// std::cout << "Take an item" << std::endl;
