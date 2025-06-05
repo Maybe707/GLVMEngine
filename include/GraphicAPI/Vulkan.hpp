@@ -659,7 +659,7 @@ namespace GLVM::core
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
-						  float slotScale, unsigned int inventorySlotEntity);
+						  float slotScale, unsigned int inventorySlotEntity, const bool isGLTF);
 		void updateUBO_IconsUI(uint32_t offset, ecs::components::transform* itemTransfromComponent,
 							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent,
 							   const unsigned int rowInventory, const unsigned int columnInventory);

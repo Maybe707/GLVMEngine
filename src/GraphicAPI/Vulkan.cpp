@@ -4187,16 +4187,14 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateUBO_UI(float x_slot_offset, float y_slot_offset, uint32_t offset,
-									   float slotScale, unsigned int inventorySlotEntity) {
+									   float slotScale, unsigned int inventorySlotEntity, const bool isGLTF) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
-		const float fullSlotScale = slotScale * 2.0f;
+		const float fullSlotScale     = isGLTF ? slotScale * 2.0f : slotScale;
 		const float x = x_slot_offset * fullSlotScale;
 		const float y_scaleMultilayer = aspectRate * fullSlotScale;
 		const float y = y_slot_offset * y_scaleMultilayer;
-//		float inventorySlotScale = inventorySlotTransform->scale;
 		const float inventorySlotScale = slotScale;
-//		std::cout << "inventory slot scale: " << inventorySlotScale << std::endl;
 		model[0][0] = inventorySlotScale;
 		model[1][1] = inventorySlotScale;
 		model[2][2] = inventorySlotScale;
@@ -4204,9 +4202,6 @@ namespace GLVM::core
 		model[3][1] = y;
 		model[3][2] = 0.1f;
 
-		// std::cout << "x: " << model[3][0] << std::endl;
-		// std::cout << "y: " << model[3][1] << std::endl;
-		
 		// inventorySlotTransform->position[0] = x;
 		// inventorySlotTransform->position[1] = y;
 		// inventorySlotTransform->position[2] = 0.1f;
@@ -4230,7 +4225,6 @@ namespace GLVM::core
 
 //		std::cout << "second intrence number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
 		if ( inventoryComponent->highlightedSlots.GetSize() > 0 ) {
-//			std::cout << "TEST" << std::endl;
 			if ( highLightedSlot ) {
 				if ( inventoryComponent->isAvailableHighlightedSlots )
 					hudUBO.color = { 0.0, 0.3, 0.0 };
@@ -4267,7 +4261,7 @@ namespace GLVM::core
 			const unsigned int colIndexSecondSlot = inventorySlotEntity_3 % columnInventory;
 
 			const float itemScale             = itemTransfromComponent->scale;
-			const float fullSlotScale         = itemScale * 2.0f;
+			const float fullSlotScale         = itemTransfromComponent->gltf ? itemScale * 2.0f : itemScale;
 			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
 			x_result_offset = (colIndexFirstSlot * fullSlotScale + colIndexSecondSlot * fullSlotScale) * centreMultiplayer;
 			y_result_offset = (rowIndexFirstSlot * fullSlotScale + rowIndexSecondSlot * fullSlotScale) * centreMultiplayer * aspectRate;
@@ -4463,7 +4457,7 @@ namespace GLVM::core
 
 					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * 8 + m;
 					updateUBO_UI(inventoryTransformComponent->position[0] + m, inventoryTransformComponent->position[1] + j,
-								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity);
+								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity, inventoryTransformComponent->gltf);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
 											0, 1, &uiDescriptorSets[uboIndex], 0, nullptr);
 
