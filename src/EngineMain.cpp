@@ -207,7 +207,7 @@ int main()
 	inventoryComponent->slotMeshID  = inventory_Handle_GLTF;
 	inventoryComponent->slotScale   = 0.05;
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .position = { 0.0f, 0.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .scale = 4.0f, .gltf = true };
+		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
 // 	for ( unsigned int i = 0; i < 8; ++i )
 // 		for ( unsigned int j = 0; j < 8; ++j ) {
 // 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
