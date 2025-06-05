@@ -4197,8 +4197,8 @@ namespace GLVM::core
 									   float slotScale, unsigned int inventorySlotEntity) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
-		float x = x_slot_offset * 0.1f + 0.2f;
-		[[maybe_unused]] float y = y_slot_offset * 0.17f - 0.8f;
+		float x = x_slot_offset * 0.1f;
+		[[maybe_unused]] float y = y_slot_offset * 0.1777f;
 //		float inventorySlotScale = inventorySlotTransform->scale;
 		float inventorySlotScale = slotScale;
 //		std::cout << "inventory slot scale: " << inventorySlotScale << std::endl;
@@ -4275,9 +4275,10 @@ namespace GLVM::core
 			unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / row;
 			unsigned int colIndexSecondSlot = inventorySlotEntity_3 % col;
 
-			constexpr float itemScale = 0.2f;
-			x_result_offset = (rowIndexFirstSlot * itemScale + rowIndexSecondSlot * itemScale) / 2.0f;
-			y_result_offset = (colIndexFirstSlot * itemScale + colIndexSecondSlot * itemScale) / 2.0f;
+			constexpr float itemScale         = 0.1f;
+			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
+			x_result_offset = (colIndexFirstSlot * itemScale + colIndexSecondSlot * itemScale) * centreMultiplayer;
+			y_result_offset = (rowIndexFirstSlot * itemScale + rowIndexSecondSlot * itemScale) * centreMultiplayer;
 			std::cout << "x offset: " << x_result_offset << std::endl;
 			std::cout << "y offset: " << y_result_offset << std::endl;
 			// std::cout << "first entity: " << inventorySlotEntity_0 << std::endl;
