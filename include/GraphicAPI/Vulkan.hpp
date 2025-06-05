@@ -286,6 +286,7 @@ namespace GLVM::core
 		float current_Y = 0.0f;
 		float prev_X = 0.0f;
 		float current_X = 0.0f;
+		float aspectRate = 0.0f;                   ///< Multiplier of current aspect rate. For full hd this must be 1920 / 1080
 
         const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
