@@ -10,6 +10,7 @@ namespace GLVM::ecs
 	class InventorySystem : public ecs::ISystem {
 	public:
 		void Update() override;
+		bool checkCrosshairInventoryIntersection();
 
 		bool          isInventoryOpened;
 		bool          isItemDraged;
