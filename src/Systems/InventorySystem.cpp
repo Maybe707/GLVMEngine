@@ -27,7 +27,7 @@ namespace GLVM::ecs
 				// std::cout << "lkm pressed: " << isLeftMouseButtonPressed << std::endl;
 				// std::cout << "lkm released: " << *isLeftMouseButtonReleased << std::endl;
 				
-				std::cout << "item taken" << std::endl;
+//				std::cout << "item taken" << std::endl;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -81,15 +81,15 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
 					if( itemComponent != nullptr ) {
-						const unsigned int itemWidth  = itemComponent->itemSlotType.width;
-						const unsigned int itemHeight = itemComponent->itemSlotType.height;
+						const int itemWidth  = itemComponent->itemSlotType.width;
+						const int itemHeight = itemComponent->itemSlotType.height;
 
-						const unsigned int row    = intersectionSlot.y;
-						const unsigned int column = intersectionSlot.x;
+						const int row    = intersectionSlot.y;
+						const int column = intersectionSlot.x;
 
 						/// Find left-upper pivot slot inventory
-						unsigned int rowBasicOffset    = 0;
-						unsigned int columnBasicOffset = 0;
+						int rowBasicOffset    = 0;
+						int columnBasicOffset = 0;
 						
 						if( itemWidth % 2 == 0 ) {
 							const float slotCenterX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
@@ -119,11 +119,30 @@ namespace GLVM::ecs
 						// std::cout << "basic row offset: " << rowBasicOffset << std::endl;
 						// std::cout << "basic column offset: " << columnBasicOffset << std::endl;
 
+						int pivotRow    = row - rowBasicOffset;
+						int pivotColumn = column - columnBasicOffset;
+						std::cout << "pivot column: " << pivotColumn << std::endl;
+
+						if( pivotRow < 0 ) {
+							pivotRow = 0;
+						}
+						if( pivotRow > static_cast<int>(inventoryComponent->row) - itemHeight ) {
+							pivotRow = inventoryComponent->row - itemHeight;
+						}
+
+						if( pivotColumn < 0 ) {
+							std::cout << "CHE ZA" << std::endl;
+							pivotColumn = 0;
+						}
+						if( pivotColumn > static_cast<int>(inventoryComponent->col) - itemWidth ) {
+							pivotColumn = inventoryComponent->col - itemWidth;
+						}
+						
 						itemComponent->occupiedSlots.clear();
-						for( unsigned int i = 0; i < itemHeight; ++i ) {
-							for( unsigned int j = 0; j < itemWidth; ++j ) {
-								const unsigned int finalRow    = row - rowBasicOffset + i;
-								const unsigned int finalColumn = column - columnBasicOffset + j;
+						for( int i = 0; i < itemHeight; ++i ) {
+							for( int j = 0; j < itemWidth; ++j ) {
+								const unsigned int finalRow    = pivotRow + i;
+								const unsigned int finalColumn = pivotColumn + j;
 								inventoryComponent->slots[finalRow][finalColumn] = *isItemDraged;
 								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
 							}
@@ -135,7 +154,7 @@ namespace GLVM::ecs
 					}
 				}
 
-				std::cout << "item droped" << std::endl;
+//				std::cout << "item droped" << std::endl;
 				*isLeftMouseButtonReleased = false;
 //				isItemDraged = false;
 				*isItemDraged = -1;
