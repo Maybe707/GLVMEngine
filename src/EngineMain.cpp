@@ -222,7 +222,7 @@ int main()
 		std::cout << "item entity id: " << testItem << std::endl;
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		[[maybe_unused]] unsigned int row = i + 1;
-		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { 3, 3 };
+		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { 4, 4 };
 		*ComponentManager->GetComponent<cm::transform>(testItem) = { .position = { 3.0f, 15.0f, 10.0f + i * 2.0f },
 			.yaw = 0.0f, .pitch = 0.0f, .scale = 0.05f, .gltf = true };
 		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };
