@@ -12,10 +12,17 @@
 
 #define PI 3.14159265
 
+template< class T>
 struct point2D {
-	float x;
-	float y;
+	T x;
+	T y;
 };
+
+template< typename T> 
+std::ostream& operator<<(std::ostream& ostream, const point2D<T>& point) {
+	ostream << "x: " << point.x << " y: " << point.y;
+	return ostream;	
+}
 
 struct point3D {
 	float x;

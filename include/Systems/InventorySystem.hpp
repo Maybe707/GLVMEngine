@@ -4,13 +4,18 @@
 #include "ISystem.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
+#include "Components/InventoryComponent.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ecs
 {
 	class InventorySystem : public ecs::ISystem {
 	public:
 		void Update() override;
-		bool checkCrosshairInventoryIntersection();
+		bool checkCrosshairInventoryIntersection( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
+												  components::inventory* inventoryComponent, const float inventorySlotScale, const float inventorySlotHalfScale );
+		point2D<int> determineActualIntersectionSlot( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
+												 const float inventorySlotScale, const float inventorySlotHalfScale );
 
 		bool          isInventoryOpened;
 		bool          isItemDraged;
