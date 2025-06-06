@@ -98,8 +98,8 @@ namespace GLVM::ecs
 			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
 			
 			for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-				unsigned int entityItemContaining = linkedItemEntities[i];
-				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
+				int entityItemContaining = linkedItemEntities[i];
+//				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entityItemContaining);
 				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
 
 				// bool isCrosshairCollided = false;
@@ -115,8 +115,8 @@ namespace GLVM::ecs
 				// 	itemColliderComponent->itemDrag = true;
 				// 	isItemDraged = true;
 				// }
-
-				if ( itemColliderComponent->itemDrag ) {
+				std::cout << dragedItemEntity << std::endl;
+				if ( dragedItemEntity >= 0 ) {
 					itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged itemx
 				}
 			}

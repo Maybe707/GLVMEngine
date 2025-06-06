@@ -287,6 +287,7 @@ namespace GLVM::core
 		float prev_X = 0.0f;
 		float current_X = 0.0f;
 		float aspectRate = 0.0f;                   ///< Multiplier of current aspect rate. For full hd this must be 1920 / 1080
+		int   dragedItemEntity;
 
         const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
         const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
@@ -662,7 +663,8 @@ namespace GLVM::core
 						  float slotScale, unsigned int inventorySlotEntity, ecs::components::transform* slotTransfromComponent);
 		void updateUBO_IconsUI(uint32_t offset, ecs::components::transform* itemTransfromComponent,
 							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent,
-							   const unsigned int rowInventory, const unsigned int columnInventory, ecs::components::transform* inventoryTransformComponent);
+							   const unsigned int rowInventory, const unsigned int columnInventory,
+							   ecs::components::transform* inventoryTransformComponent, int itemEntity);
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

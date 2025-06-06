@@ -25,11 +25,11 @@ namespace GLVM::ecs
 
 		core::CStack* inputStack;
 		bool          isInventoryOpened;
-		bool          isItemDraged;
+		int           dragedItemEntity;
 		bool*         isLeftMouseButtonReleased;
 		bool          isLeftMouseButtonPressed;
-		float           mouseOffsetX = 0;
-		float           mouseOffsetY = 0;
+		float         mouseOffsetX = 0;
+		float         mouseOffsetY = 0;
 	};
 } // namespace GLVM::ecs
 

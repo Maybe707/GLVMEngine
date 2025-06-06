@@ -19,7 +19,7 @@ namespace GLVM::ecs
 												 const float inventorySlotScale, const float inventorySlotHalfScale );
 
 		bool          isInventoryOpened;
-		bool          isItemDraged;
+		int*          isItemDraged;
 		bool*         isLeftMouseButtonReleased;
 		bool          isLeftMouseButtonPressed;
 		float         mouseOffsetX = 0;

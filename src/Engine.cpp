@@ -147,6 +147,8 @@ namespace GLVM::core
 
 		procuduralLevelGeneratingSystem->meshHandlers    = meshHandlers;
 		procuduralLevelGeneratingSystem->textureHandlers = textureHandlers;
+
+		inventorySystem->isItemDraged     = &dragedItemEntity;
 		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
@@ -228,7 +230,7 @@ namespace GLVM::core
 			collisionSystem->fDelta_Time_             = deltaFrameTime;
 			collisionSystem->gravity                  = gravity;
 			collisionSystem->isInventoryOpened        = vulkanRenderer->isInventoryOpened;
-			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
+//			collisionSystem->isItemDraged             = &itemSystem->isItemDraged;
 			collisionSystem->isLeftMouseButtonPressed = isLeftMouseButtonPressed;
 			collisionSystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
 			enemySytem->deltaFrameTime                = deltaFrameTime;
@@ -239,23 +241,25 @@ namespace GLVM::core
 			physicsSystem->fDelta_Time_               = deltaFrameTime;
 			physicsSystem->fAcceleration_of_Gravity_ += (deltaFrameTime / 20);
 			physicsSystem->gravity                    = gravity;
+			inventorySystem->isInventoryOpened         = vulkanRenderer->isInventoryOpened;
+			inventorySystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
+			inventorySystem->isLeftMouseButtonPressed  = isLeftMouseButtonPressed;
+			inventorySystem->mouseOffsetX              = hud_screen_x;
+			inventorySystem->mouseOffsetY              = hud_screen_y;
+			itemSystem->dragedItemEntity              = dragedItemEntity;
 			itemSystem->inputStack                    = &Input_Stack_;
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
 			itemSystem->isLeftMouseButtonReleased     = &g_eEvent.isLeftMouseButtonReleased;
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
 			itemSystem->mouseOffsetX                  = hud_screen_x;
 			itemSystem->mouseOffsetY                  = hud_screen_y;
-			inventorySystem->isInventoryOpened         = vulkanRenderer->isInventoryOpened;
-			inventorySystem->isLeftMouseButtonReleased = &g_eEvent.isLeftMouseButtonReleased;
-			inventorySystem->isLeftMouseButtonPressed  = isLeftMouseButtonPressed;
-			inventorySystem->mouseOffsetX              = hud_screen_x;
-			inventorySystem->mouseOffsetY              = hud_screen_y;
 			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->levelGeneratedVertices    = procuduralLevelGeneratingSystem->levelGeneratedVertices;
 			vulkanRenderer->levelGeneratedIndices     = procuduralLevelGeneratingSystem->levelGeneratedIndices;
 			procuduralLevelGeneratingSystem->levelGeneratedVertices.clear();
 			procuduralLevelGeneratingSystem->levelGeneratedIndices.clear();
+			vulkanRenderer->dragedItemEntity          = dragedItemEntity;
 			vulkanRenderer->hud_screen_x              = hud_screen_x;
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();

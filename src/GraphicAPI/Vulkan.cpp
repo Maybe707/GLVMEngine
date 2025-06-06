@@ -4245,11 +4245,12 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateUBO_IconsUI(uint32_t offset,
 											ecs::components::transform* itemTransfromComponent,
-											ecs::components::collider* itemColliderComponent,
+											[[maybe_unused]] ecs::components::collider* itemColliderComponent,
 											ecs::components::item* itemComponent,
 											const unsigned int rowInventory,
 											const unsigned int columnInventory,
-											ecs::components::transform* inventoryTransformComponent) {
+											ecs::components::transform* inventoryTransformComponent,
+											int itemEntity) {
 		UI_UBO hudUBO{};
 		float x_result_offset = 0.0f;
 		float y_result_offset = 0.0f;
@@ -4270,9 +4271,10 @@ namespace GLVM::core
 		}
 		float itemScale = itemTransfromComponent->scale;
 
-		if ( !itemColliderComponent->itemDrag ) {
+		if ( dragedItemEntity != itemEntity ) {
 			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
+			std::cout << "item entity: " << itemEntity << std::endl;
 			itemScale *= 1.1f;
 //			itemColliderComponent->itemDrag = false;
 			itemTransfromComponent->position[2] = 0.0f;
@@ -4574,7 +4576,7 @@ namespace GLVM::core
 			if ( itemTransformComponent == nullptr )
 				std::cout << "NULL POINTER" << std::endl;
 			
-			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent, inventoryComponent->row, inventoryComponent->col, inventoryTransformComponent);
+			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent, inventoryComponent->row, inventoryComponent->col, inventoryTransformComponent, itemEntity);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiIconsPipeline.pipelineLayout,
 									0, 1, &uiIconsDescriptorSets[uboIndex], 0, nullptr);
 

@@ -17,8 +17,8 @@ namespace GLVM::ecs
 			const float inventorySlotScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
 			const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
 
-			
-			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+//			std::cout << "itme draged flag: " << isItemDraged << std::endl;
+			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -40,7 +40,8 @@ namespace GLVM::ecs
 						if( itemTransformComponent != nullptr && itemColliderComponent != nullptr ) {
 //							std::cout << "TEST" << std::endl;
 //							itemTransformComponent->position = crosshairTransformComponent->position;
-							itemColliderComponent->itemDrag  = true;
+//							itemColliderComponent->itemDrag  = true;
+							*isItemDraged = entity;
 						}
 					}
 					
@@ -57,18 +58,19 @@ namespace GLVM::ecs
 				// std::cout << "x: " << mouseOffsetX << std::endl;
 				// std::cout << "y: " << mouseOffsetY << std::endl;
 				*isLeftMouseButtonReleased = false;
-				isItemDraged = true;
+//				isItemDraged = true;
 				return;
 			}
 
-			if ( isItemDraged ) {
+			if ( *isItemDraged >= 0 ) {
 //			std::cout << "highlight item slots" << std::endl;
 			}
 
-			if ( isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 //				std::cout << "item droped" << std::endl;
 				*isLeftMouseButtonReleased = false;
-				isItemDraged = false;
+//				isItemDraged = false;
+				*isItemDraged = -1;
 			}
 		}
 	}

@@ -57,6 +57,7 @@ namespace GLVM::core
 		uint32_t meshID = 0;
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;
+		int                  dragedItemEntity = -1;             ///< If dont have any draged item then this variable have value of -1
 
 		CVulkanRenderer*     vulkanRenderer;
 
