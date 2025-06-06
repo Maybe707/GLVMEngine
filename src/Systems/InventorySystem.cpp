@@ -81,18 +81,32 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
 					if( itemComponent != nullptr ) {
-						// const unsigned int itemWidth  = itemComponent->itemSlotType.width;
-						// const unsigned int itemHeight = itemComponent->itemSlotType.height;
+						const unsigned int itemWidth  = itemComponent->itemSlotType.width;
+						const unsigned int itemHeight = itemComponent->itemSlotType.height;
 
 						const unsigned int row    = intersectionSlot.y;
 						const unsigned int column = intersectionSlot.x;
-						
-						const float slotX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
-						const float slotY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
+
+						if( itemWidth % 2 == 0 ) {
+							const float slotCenterX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
+							if( slotCenterX > crosshairTransformComponent->position[0] ) {
+								std::cout << "cursor in a left position" << std::endl;
+							} else {
+								std::cout << "cursor in a right position" << std::endl;
+							}
+						}
+						if( itemHeight % 2 == 0 ) {
+							const float slotCenterY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
+							if( slotCenterY > crosshairTransformComponent->position[1] ) {
+								std::cout << "cursor in an apper position" << std::endl;
+							} else {
+								std::cout << "cursor in an lower position" << std::endl;
+							}
+						}
 
 						std::cout << "cross: " << crosshairTransformComponent->position << std::endl;
-						std::cout << "slotX: " << slotX << std::endl;
-						std::cout << "slotY: " << slotY << std::endl;
+						// std::cout << "slotX: " << slotX << std::endl;
+						// std::cout << "slotY: " << slotY << std::endl;
 					}
 				}
 
