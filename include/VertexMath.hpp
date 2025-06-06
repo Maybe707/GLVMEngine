@@ -30,6 +30,15 @@ struct point3D {
 	float z;
 };
 
+template <typename T>
+void clamp( T lowerThreshold, T& targetValue, T upperThreshold ) {
+	if( targetValue < lowerThreshold ) {
+		targetValue = lowerThreshold;
+	} else if( targetValue > upperThreshold ) {
+		targetValue = upperThreshold;
+	}
+}
+
 template <class T2, int var2>
 class Vector;
 

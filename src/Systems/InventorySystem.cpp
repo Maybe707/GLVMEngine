@@ -1,4 +1,5 @@
 #include "Systems/InventorySystem.hpp"
+#include "VertexMath.hpp"
 
 namespace GLVM::ecs
 {
@@ -17,17 +18,7 @@ namespace GLVM::ecs
 			const float inventorySlotScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
 			const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
 
-//			std::cout << "itme draged flag: " << isItemDraged << std::endl;
-			// std::cout << "item draged: " << *isItemDraged << std::endl;
-			// std::cout << "lkm pressed: " << isLeftMouseButtonPressed << std::endl;
-			// std::cout << "lkm released: " << *isLeftMouseButtonReleased << std::endl;
-			
 			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-				// std::cout << "item draged: " << *isItemDraged << std::endl;
-				// std::cout << "lkm pressed: " << isLeftMouseButtonPressed << std::endl;
-				// std::cout << "lkm released: " << *isLeftMouseButtonReleased << std::endl;
-				
-//				std::cout << "item taken" << std::endl;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -47,9 +38,6 @@ namespace GLVM::ecs
 						cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entity);
 						cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entity);
 						if( itemTransformComponent != nullptr && itemColliderComponent != nullptr ) {
-//							std::cout << "TEST" << std::endl;
-//							itemTransformComponent->position = crosshairTransformComponent->position;
-//							itemColliderComponent->itemDrag  = true;
 							*isItemDraged = entity;
 						}
 					}
@@ -60,14 +48,8 @@ namespace GLVM::ecs
 					// 	}
 					// 	std::cout << std::endl;
 					// }
-					// point2D<float> point;
-					// std::cout << point << std::endl;
 				}
-				// std::cout << "Take an item" << std::endl;
-				// std::cout << "x: " << mouseOffsetX << std::endl;
-				// std::cout << "y: " << mouseOffsetY << std::endl;
 				*isLeftMouseButtonReleased = false;
-//				isItemDraged = true;
 			}
 
 			if ( *isItemDraged >= 0 ) {
@@ -95,10 +77,8 @@ namespace GLVM::ecs
 							const float slotCenterX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
 							if( slotCenterX > crosshairTransformComponent->position[0] ) {
 								columnBasicOffset = itemWidth / 2;
-//								std::cout << "cursor in a left position" << std::endl;
 							} else {
 								columnBasicOffset = itemWidth / 2 - 1;
-//								std::cout << "cursor in a right position" << std::endl;
 							}
 						} else {
 							columnBasicOffset = itemWidth / 2;
@@ -107,36 +87,19 @@ namespace GLVM::ecs
 							const float slotCenterY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
 							if( slotCenterY > crosshairTransformComponent->position[1] ) {
 								rowBasicOffset = itemHeight / 2;
-//								std::cout << "cursor in an apper position" << std::endl;
 							} else {
 								rowBasicOffset = itemHeight / 2 - 1;
-//								std::cout << "cursor in an lower position" << std::endl;
 							}
 						} else {
 							rowBasicOffset = itemHeight / 2;
 						}
 
-						// std::cout << "basic row offset: " << rowBasicOffset << std::endl;
-						// std::cout << "basic column offset: " << columnBasicOffset << std::endl;
-
 						int pivotRow    = row - rowBasicOffset;
 						int pivotColumn = column - columnBasicOffset;
 						std::cout << "pivot column: " << pivotColumn << std::endl;
 
-						if( pivotRow < 0 ) {
-							pivotRow = 0;
-						}
-						if( pivotRow > static_cast<int>(inventoryComponent->row) - itemHeight ) {
-							pivotRow = inventoryComponent->row - itemHeight;
-						}
-
-						if( pivotColumn < 0 ) {
-							std::cout << "CHE ZA" << std::endl;
-							pivotColumn = 0;
-						}
-						if( pivotColumn > static_cast<int>(inventoryComponent->col) - itemWidth ) {
-							pivotColumn = inventoryComponent->col - itemWidth;
-						}
+						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
+						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
 						
 						itemComponent->occupiedSlots.clear();
 						for( int i = 0; i < itemHeight; ++i ) {
@@ -147,16 +110,10 @@ namespace GLVM::ecs
 								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
 							}
 						}
-						
-//						std::cout << "cross: " << crosshairTransformComponent->position << std::endl;
-						// std::cout << "slotX: " << slotX << std::endl;
-						// std::cout << "slotY: " << slotY << std::endl;
 					}
 				}
 
-//				std::cout << "item droped" << std::endl;
 				*isLeftMouseButtonReleased = false;
-//				isItemDraged = false;
 				*isItemDraged = -1;
 			}
 		}
@@ -168,7 +125,6 @@ namespace GLVM::ecs
 			crosshairTransformComponent->position[0] < inventoryTransformComponent->position[0] - inventorySlotHalfScale + inventorySlotScale * inventoryComponent->col &&
 			crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate &&
 			crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate + inventorySlotScale * inventoryComponent->row * aspectRate ) {
-//			std::cout << "TEST" << std::endl;
 			return true;
 		} else {
 			return false;
@@ -177,18 +133,10 @@ namespace GLVM::ecs
 
 	point2D<int> InventorySystem::determineActualIntersectionSlot( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
 															  const float inventorySlotScale, const float inventorySlotHalfScale ) {
-		// std::cout << "cross x: " << crosshairTransformComponent->position[0] << std::endl;
-		// std::cout << "cross y: " << crosshairTransformComponent->position[1] << std::endl;
-		// std::cout << "slot x: " << inventoryTransformComponent->position[0] << std::endl;
 		float x_delta = crosshairTransformComponent->position[0] - inventoryTransformComponent->position[0] + inventorySlotHalfScale;
 		float y_delta = crosshairTransformComponent->position[1] - inventoryTransformComponent->position[1] + inventorySlotHalfScale * aspectRate;
-
-		// std::cout << "x delta: " << x_delta << std::endl;
-		// std::cout << "y delta: " << y_delta << std::endl;
 		
 		point2D<int> slotPosition{ (int)(x_delta / inventorySlotScale), (int)(y_delta / (inventorySlotScale * aspectRate)) };
-//		point2D<int> slotPosition{ (int)(y_delta / (inventorySlotScale * aspectRate)), (int)(x_delta / inventorySlotScale) };
-		
 		return slotPosition;
 	}
 } ///< namespace GLVM::ecs
