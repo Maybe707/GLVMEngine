@@ -6,6 +6,7 @@
 #include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "VertexMath.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace GLVM::ecs
 {

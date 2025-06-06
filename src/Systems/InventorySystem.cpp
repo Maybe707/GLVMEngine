@@ -1,5 +1,4 @@
 #include "Systems/InventorySystem.hpp"
-#include "VertexMath.hpp"
 
 namespace GLVM::ecs
 {
@@ -26,7 +25,7 @@ namespace GLVM::ecs
 					const unsigned int row    = intersectionSlot.y;
 					const unsigned int column = intersectionSlot.x;
 					const unsigned int entity = inventoryComponent->slots[row][column];
-					if( entity != UINT_MAX ) {
+					if( entity != UINT_MAX && entity >= 0 ) {
 						cm::item* itemComponent   = componentManager->GetComponent<cm::item>(entity);
 						if( itemComponent != nullptr ) {
 							for( unsigned int i = 0; i < itemComponent->occupiedSlots.GetSize(); ++i ) {
@@ -36,14 +35,21 @@ namespace GLVM::ecs
 								inventoryComponent->slots[row_index][col_index] = UINT_MAX;
 							}
 						}
+						cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entity);
+						cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entity);
+						if( itemTransformComponent != nullptr && itemColliderComponent != nullptr ) {
+//							std::cout << "TEST" << std::endl;
+//							itemTransformComponent->position = crosshairTransformComponent->position;
+							itemColliderComponent->itemDrag  = true;
+						}
 					}
 					
-					for( unsigned int i = 0; i < 8; ++i ) {
-						for( unsigned int j = 0; j < 8; ++j ) {
-							std::cout << inventoryComponent->slots[i][j] << " ";
-						}
-						std::cout << std::endl;
-					}
+					// for( unsigned int i = 0; i < 8; ++i ) {
+					// 	for( unsigned int j = 0; j < 8; ++j ) {
+					// 		std::cout << inventoryComponent->slots[i][j] << " ";
+					// 	}
+					// 	std::cout << std::endl;
+					// }
 					// point2D<float> point;
 					// std::cout << point << std::endl;
 				}
@@ -52,6 +58,7 @@ namespace GLVM::ecs
 				// std::cout << "y: " << mouseOffsetY << std::endl;
 				*isLeftMouseButtonReleased = false;
 				isItemDraged = true;
+				return;
 			}
 
 			if ( isItemDraged ) {
@@ -72,7 +79,7 @@ namespace GLVM::ecs
 			crosshairTransformComponent->position[0] < inventoryTransformComponent->position[0] - inventorySlotHalfScale + inventorySlotScale * inventoryComponent->col &&
 			crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate &&
 			crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate + inventorySlotScale * inventoryComponent->row * aspectRate ) {
-			std::cout << "TEST" << std::endl;
+//			std::cout << "TEST" << std::endl;
 			return true;
 		} else {
 			return false;

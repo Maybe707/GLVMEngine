@@ -4274,9 +4274,11 @@ namespace GLVM::core
 			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
 			itemScale *= 1.1f;
-			itemColliderComponent->itemDrag = false;
+//			itemColliderComponent->itemDrag = false;
 			itemTransfromComponent->position[2] = 0.0f;
 		}
+
+//		std::cout << itemTransfromComponent->position << std::endl;
 		
 		mat4 model(1.0);
 		model[0][0] = itemScale * itemComponent->itemSlotType.width;
