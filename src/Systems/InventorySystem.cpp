@@ -22,7 +22,28 @@ namespace GLVM::ecs
 			if ( !isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
-					std::cout << "slot: " << determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
+					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
+					const unsigned int row    = intersectionSlot.y;
+					const unsigned int column = intersectionSlot.x;
+					const unsigned int entity = inventoryComponent->slots[row][column];
+					if( entity != UINT_MAX ) {
+						cm::item* itemComponent   = componentManager->GetComponent<cm::item>(entity);
+						if( itemComponent != nullptr ) {
+							for( unsigned int i = 0; i < itemComponent->occupiedSlots.GetSize(); ++i ) {
+								unsigned int row_index = itemComponent->occupiedSlots[i] / inventoryComponent->row;
+								unsigned int col_index = itemComponent->occupiedSlots[i] % inventoryComponent->col;
+
+								inventoryComponent->slots[row_index][col_index] = UINT_MAX;
+							}
+						}
+					}
+					
+					for( unsigned int i = 0; i < 8; ++i ) {
+						for( unsigned int j = 0; j < 8; ++j ) {
+							std::cout << inventoryComponent->slots[i][j] << " ";
+						}
+						std::cout << std::endl;
+					}
 					// point2D<float> point;
 					// std::cout << point << std::endl;
 				}
@@ -70,6 +91,7 @@ namespace GLVM::ecs
 		// std::cout << "y delta: " << y_delta << std::endl;
 		
 		point2D<int> slotPosition{ (int)(x_delta / inventorySlotScale), (int)(y_delta / (inventorySlotScale * aspectRate)) };
+//		point2D<int> slotPosition{ (int)(y_delta / (inventorySlotScale * aspectRate)), (int)(x_delta / inventorySlotScale) };
 		
 		return slotPosition;
 	}
