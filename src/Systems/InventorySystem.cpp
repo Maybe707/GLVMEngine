@@ -54,12 +54,12 @@ namespace GLVM::ecs
 						}
 					}
 					
-					for( unsigned int i = 0; i < 8; ++i ) {
-						for( unsigned int j = 0; j < 8; ++j ) {
-							std::cout << inventoryComponent->slots[i][j] << " ";
-						}
-						std::cout << std::endl;
-					}
+					// for( unsigned int i = 0; i < 8; ++i ) {
+					// 	for( unsigned int j = 0; j < 8; ++j ) {
+					// 		std::cout << inventoryComponent->slots[i][j] << " ";
+					// 	}
+					// 	std::cout << std::endl;
+					// }
 					// point2D<float> point;
 					// std::cout << point << std::endl;
 				}
@@ -90,21 +90,38 @@ namespace GLVM::ecs
 						if( itemWidth % 2 == 0 ) {
 							const float slotCenterX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
 							if( slotCenterX > crosshairTransformComponent->position[0] ) {
-								std::cout << "cursor in a left position" << std::endl;
+//								std::cout << "cursor in a left position" << std::endl;
 							} else {
-								std::cout << "cursor in a right position" << std::endl;
+//								std::cout << "cursor in a right position" << std::endl;
 							}
 						}
 						if( itemHeight % 2 == 0 ) {
 							const float slotCenterY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
 							if( slotCenterY > crosshairTransformComponent->position[1] ) {
-								std::cout << "cursor in an apper position" << std::endl;
+//								std::cout << "cursor in an apper position" << std::endl;
 							} else {
-								std::cout << "cursor in an lower position" << std::endl;
+//								std::cout << "cursor in an lower position" << std::endl;
 							}
 						}
 
-						std::cout << "cross: " << crosshairTransformComponent->position << std::endl;
+						/// Find left-upper pivot slot inventory
+						const unsigned int rowBasicOffset    = itemHeight / 2;
+						const unsigned int columnBasicOffset = itemWidth / 2;
+
+						// std::cout << "basic row offset: " << rowBasicOffset << std::endl;
+						// std::cout << "basic column offset: " << columnBasicOffset << std::endl;
+
+						itemComponent->occupiedSlots.clear();
+						for( unsigned int i = 0; i < itemHeight; ++i ) {
+							for( unsigned int j = 0; j < itemWidth; ++j ) {
+								const unsigned int finalRow    = row - rowBasicOffset + i;
+								const unsigned int finalColumn = column - columnBasicOffset + j;
+								inventoryComponent->slots[finalRow][finalColumn] = *isItemDraged;
+								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
+							}
+						}
+						
+//						std::cout << "cross: " << crosshairTransformComponent->position << std::endl;
 						// std::cout << "slotX: " << slotX << std::endl;
 						// std::cout << "slotY: " << slotY << std::endl;
 					}
