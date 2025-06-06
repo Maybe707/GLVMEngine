@@ -4274,7 +4274,7 @@ namespace GLVM::core
 		if ( dragedItemEntity != itemEntity ) {
 			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
 		} else {
-			std::cout << "item entity: " << itemEntity << std::endl;
+//			std::cout << "item entity: " << itemEntity << std::endl;
 			itemScale *= 1.1f;
 //			itemColliderComponent->itemDrag = false;
 			itemTransfromComponent->position[2] = 0.0f;

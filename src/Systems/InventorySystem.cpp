@@ -18,7 +18,16 @@ namespace GLVM::ecs
 			const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
 
 //			std::cout << "itme draged flag: " << isItemDraged << std::endl;
+			// std::cout << "item draged: " << *isItemDraged << std::endl;
+			// std::cout << "lkm pressed: " << isLeftMouseButtonPressed << std::endl;
+			// std::cout << "lkm released: " << *isLeftMouseButtonReleased << std::endl;
+			
 			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+				// std::cout << "item draged: " << *isItemDraged << std::endl;
+				// std::cout << "lkm pressed: " << isLeftMouseButtonPressed << std::endl;
+				// std::cout << "lkm released: " << *isLeftMouseButtonReleased << std::endl;
+				
+				std::cout << "item taken" << std::endl;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -45,12 +54,12 @@ namespace GLVM::ecs
 						}
 					}
 					
-					// for( unsigned int i = 0; i < 8; ++i ) {
-					// 	for( unsigned int j = 0; j < 8; ++j ) {
-					// 		std::cout << inventoryComponent->slots[i][j] << " ";
-					// 	}
-					// 	std::cout << std::endl;
-					// }
+					for( unsigned int i = 0; i < 8; ++i ) {
+						for( unsigned int j = 0; j < 8; ++j ) {
+							std::cout << inventoryComponent->slots[i][j] << " ";
+						}
+						std::cout << std::endl;
+					}
 					// point2D<float> point;
 					// std::cout << point << std::endl;
 				}
@@ -59,7 +68,6 @@ namespace GLVM::ecs
 				// std::cout << "y: " << mouseOffsetY << std::endl;
 				*isLeftMouseButtonReleased = false;
 //				isItemDraged = true;
-				return;
 			}
 
 			if ( *isItemDraged >= 0 ) {
@@ -67,7 +75,7 @@ namespace GLVM::ecs
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-//				std::cout << "item droped" << std::endl;
+				std::cout << "item droped" << std::endl;
 				*isLeftMouseButtonReleased = false;
 //				isItemDraged = false;
 				*isItemDraged = -1;
