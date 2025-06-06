@@ -75,6 +75,27 @@ namespace GLVM::ecs
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
+														  inventorySlotScale, inventorySlotHalfScale) ) {
+					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
+
+					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
+					if( itemComponent != nullptr ) {
+						// const unsigned int itemWidth  = itemComponent->itemSlotType.width;
+						// const unsigned int itemHeight = itemComponent->itemSlotType.height;
+
+						const unsigned int row    = intersectionSlot.y;
+						const unsigned int column = intersectionSlot.x;
+						
+						const float slotX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
+						const float slotY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
+
+						std::cout << "cross: " << crosshairTransformComponent->position << std::endl;
+						std::cout << "slotX: " << slotX << std::endl;
+						std::cout << "slotY: " << slotY << std::endl;
+					}
+				}
+
 				std::cout << "item droped" << std::endl;
 				*isLeftMouseButtonReleased = false;
 //				isItemDraged = false;
