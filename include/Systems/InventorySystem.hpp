@@ -13,6 +13,9 @@ namespace GLVM::ecs
 	class InventorySystem : public ecs::ISystem {
 	public:
 		void Update() override;
+		int determineSwappableField( components::item* itemComponent, const int itemWidth, const int itemHeight,
+									 int pivotRow, int pivotColumn, components::inventory* inventoryComponent,
+									 core::vector<unsigned int>& potentialOccupiedSlots );
 		int calculateBasicOffset( const int itemAxisSize, const float axisValue,
 								  const float crosshairAxisPosition, const int axisSlotIndex,
 								  const float inventorySlotScale );

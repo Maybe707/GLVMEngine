@@ -1,6 +1,6 @@
 #include "Systems/InventorySystem.hpp"
 #include "VertexMath.hpp"
-
+                                
 namespace GLVM::ecs
 {
 	void InventorySystem::Update() {
@@ -80,31 +80,13 @@ namespace GLVM::ecs
 
 						int pivotRow    = row - rowBasicOffset;
 						int pivotColumn = column - columnBasicOffset;
-//						std::cout << "pivot column: " << pivotColumn << std::endl;
 
 						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
 						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
-						
-						itemComponent->occupiedSlots.clear();
-						int isSwapable = -1;                   ///< -1: default value. -2: found two entities in potential slots. Any other value: swapable.
+
 						core::vector<unsigned int> potentialOccupiedSlots;
-						for( int i = 0; i < itemHeight; ++i ) {
-							for( int j = 0; j < itemWidth; ++j ) {
-								const unsigned int finalRow    = pivotRow + i;
-								const unsigned int finalColumn = pivotColumn + j;
-								if( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] == UINT_MAX ) {
-//									inventoryComponent->slots[finalRow][finalColumn] = *isItemDraged;
-								} else if ( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX ) {
-									isSwapable = inventoryComponent->slots[finalRow][finalColumn];
-								} else if ( isSwapable > 0 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX && (int)inventoryComponent->slots[finalRow][finalColumn] != isSwapable ) {
-									isSwapable = -2;
-								}
-								
-//								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
-								potentialOccupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
-							}
-						}
-//						std::cout << "swapable: " << isSwapable << std::endl;
+						int isSwapable = determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
+						
 						if( isSwapable == -1 ) {
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
 							for( int i = 0; i < itemHeight; ++i ) {
@@ -116,15 +98,13 @@ namespace GLVM::ecs
 								}
 							}
 						} else if ( isSwapable > 0 ) {
-//							std::cout << "TEST" << std::endl;
 							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
 							for( unsigned int i = 0; i < swapedItemComponent->itemSlotType.height; ++i ) {
 								for( unsigned int j = 0; j < swapedItemComponent->itemSlotType.width; ++j ) {
 									const unsigned int slotsRow = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] / inventoryComponent->col;
 									const unsigned int slotsColumn = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] % inventoryComponent->col;
-									std::cout << "row: " << slotsRow << std::endl;
-									std::cout << "col: " << slotsColumn << std::endl;
+
 									inventoryComponent->slots[slotsRow][slotsColumn] = UINT_MAX;
 								}
 							}
@@ -150,6 +130,29 @@ namespace GLVM::ecs
 		}
 	}
 
+	int InventorySystem::determineSwappableField( components::item* itemComponent, const int itemWidth, const int itemHeight,
+												  int pivotRow, int pivotColumn, components::inventory* inventoryComponent,
+												  core::vector<unsigned int>& potentialOccupiedSlots) {
+		itemComponent->occupiedSlots.clear();
+		int isSwapable = -1;                   ///< -1: default value. -2: found two entities in potential slots. Any other value: swapable.
+		for( int i = 0; i < itemHeight; ++i ) {
+			for( int j = 0; j < itemWidth; ++j ) {
+				const unsigned int finalRow    = pivotRow + i;
+				const unsigned int finalColumn = pivotColumn + j;
+				if ( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX ) {
+					isSwapable = inventoryComponent->slots[finalRow][finalColumn];
+				} else if ( isSwapable > 0 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX
+							&& (int)inventoryComponent->slots[finalRow][finalColumn] != isSwapable ) {
+					isSwapable = -2;
+				}
+								
+				potentialOccupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
+			}
+		}
+		
+		return isSwapable;
+	}
+	
 	int InventorySystem::calculateBasicOffset( const int itemAxisSize, const float axisValue,
 											   const float crosshairAxisPosition, const int axisSlotIndex,
 											   const float inventorySlotScale) {
