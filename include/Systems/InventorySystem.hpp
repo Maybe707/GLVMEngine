@@ -13,6 +13,9 @@ namespace GLVM::ecs
 	class InventorySystem : public ecs::ISystem {
 	public:
 		void Update() override;
+		int calculateBasicOffset( const int itemAxisSize, const float axisValue,
+								  const float crosshairAxisPosition, const int axisSlotIndex,
+								  const float inventorySlotScale );
 		bool checkCrosshairInventoryIntersection( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
 												  components::inventory* inventoryComponent, const float inventorySlotScale, const float inventorySlotHalfScale );
 		point2D<int> determineActualIntersectionSlot( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,

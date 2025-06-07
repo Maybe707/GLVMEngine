@@ -72,27 +72,11 @@ namespace GLVM::ecs
 						/// Find left-upper pivot slot inventory
 						int rowBasicOffset    = 0;
 						int columnBasicOffset = 0;
-						
-						if( itemWidth % 2 == 0 ) {
-							const float slotCenterX = inventoryTransformComponent->position[0] + static_cast<float>(column) * inventorySlotScale;
-							if( slotCenterX > crosshairTransformComponent->position[0] ) {
-								columnBasicOffset = itemWidth / 2;
-							} else {
-								columnBasicOffset = itemWidth / 2 - 1;
-							}
-						} else {
-							columnBasicOffset = itemWidth / 2;
-						}
-						if( itemHeight % 2 == 0 ) {
-							const float slotCenterY = inventoryTransformComponent->position[1] + static_cast<float>(row) * inventorySlotScale * aspectRate;
-							if( slotCenterY > crosshairTransformComponent->position[1] ) {
-								rowBasicOffset = itemHeight / 2;
-							} else {
-								rowBasicOffset = itemHeight / 2 - 1;
-							}
-						} else {
-							rowBasicOffset = itemHeight / 2;
-						}
+
+						columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
+																  crosshairTransformComponent->position[0], column, inventorySlotScale );
+						rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
+																  crosshairTransformComponent->position[1], row, inventorySlotScale * aspectRate );
 
 						int pivotRow    = row - rowBasicOffset;
 						int pivotColumn = column - columnBasicOffset;
@@ -119,16 +103,25 @@ namespace GLVM::ecs
 		}
 	}
 
+	int InventorySystem::calculateBasicOffset( const int itemAxisSize, const float axisValue,
+											   const float crosshairAxisPosition, const int axisSlotIndex,
+											   const float inventorySlotScale) {
+		if( itemAxisSize % 2 == 0 ) {
+			const float slotCenterX = axisValue + static_cast<float>(axisSlotIndex) * inventorySlotScale;
+			if( slotCenterX > crosshairAxisPosition ) {
+				return itemAxisSize / 2;
+			}
+			return itemAxisSize / 2 - 1;
+		}
+		return itemAxisSize / 2;
+	}
+	
 	bool InventorySystem::checkCrosshairInventoryIntersection( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
 															   components::inventory* inventoryComponent, const float inventorySlotScale, const float inventorySlotHalfScale ) {
-		if( crosshairTransformComponent->position[0] > inventoryTransformComponent->position[0] - inventorySlotHalfScale &&
+		return crosshairTransformComponent->position[0] > inventoryTransformComponent->position[0] - inventorySlotHalfScale &&
 			crosshairTransformComponent->position[0] < inventoryTransformComponent->position[0] - inventorySlotHalfScale + inventorySlotScale * inventoryComponent->col &&
-			crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate &&
-			crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate + inventorySlotScale * inventoryComponent->row * aspectRate ) {
-			return true;
-		} else {
-			return false;
-		}
+													   crosshairTransformComponent->position[1] > inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate &&
+			crosshairTransformComponent->position[1] < inventoryTransformComponent->position[1] - inventorySlotHalfScale * aspectRate + inventorySlotScale * inventoryComponent->row * aspectRate;
 	}
 
 	point2D<int> InventorySystem::determineActualIntersectionSlot( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
@@ -136,7 +129,6 @@ namespace GLVM::ecs
 		float x_delta = crosshairTransformComponent->position[0] - inventoryTransformComponent->position[0] + inventorySlotHalfScale;
 		float y_delta = crosshairTransformComponent->position[1] - inventoryTransformComponent->position[1] + inventorySlotHalfScale * aspectRate;
 		
-		point2D<int> slotPosition{ (int)(x_delta / inventorySlotScale), (int)(y_delta / (inventorySlotScale * aspectRate)) };
-		return slotPosition;
+		return point2D<int>{ (int)(x_delta / inventorySlotScale), (int)(y_delta / (inventorySlotScale * aspectRate)) };
 	}
 } ///< namespace GLVM::ecs
