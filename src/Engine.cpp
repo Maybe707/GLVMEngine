@@ -149,6 +149,7 @@ namespace GLVM::core
 		procuduralLevelGeneratingSystem->textureHandlers = textureHandlers;
 
 		inventorySystem->isItemDraged     = &dragedItemEntity;
+		itemSystem->dragedItemEntity      = &dragedItemEntity;
 		
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
@@ -246,7 +247,6 @@ namespace GLVM::core
 			inventorySystem->isLeftMouseButtonPressed  = isLeftMouseButtonPressed;
 			inventorySystem->mouseOffsetX              = hud_screen_x;
 			inventorySystem->mouseOffsetY              = hud_screen_y;
-			itemSystem->dragedItemEntity              = dragedItemEntity;
 			itemSystem->inputStack                    = &Input_Stack_;
 			itemSystem->isInventoryOpened             = vulkanRenderer->isInventoryOpened;
 			itemSystem->isLeftMouseButtonReleased     = &g_eEvent.isLeftMouseButtonReleased;

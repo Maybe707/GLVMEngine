@@ -115,7 +115,7 @@ namespace GLVM::ecs
 				// 	itemColliderComponent->itemDrag = true;
 				// 	isItemDraged = true;
 				// }
-				if ( dragedItemEntity >= 0 && dragedItemEntity == entityItemContaining ) {
+				if ( *dragedItemEntity >= 0 && *dragedItemEntity == entityItemContaining ) {
 					itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged itemx
 				}
 			}

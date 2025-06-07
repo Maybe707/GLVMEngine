@@ -1,4 +1,5 @@
 #include "Systems/InventorySystem.hpp"
+#include "Components/TransformComponent.hpp"
 #include "VertexMath.hpp"
                                 
 namespace GLVM::ecs
@@ -100,17 +101,33 @@ namespace GLVM::ecs
 							swapedItemComponent->occupiedSlots.clear();
 							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
 						}
-					}
-				}
 
-				if( isSwapable == -1 ) {
-					*isLeftMouseButtonReleased = false;
-					*isItemDraged = -1;
-				} else if( isSwapable == -2) {
-					*isLeftMouseButtonReleased = false;
+						if( isSwapable == -1 ) {
+							*isLeftMouseButtonReleased = false;
+							*isItemDraged = -1;
+						} else if( isSwapable == -2) {
+							*isLeftMouseButtonReleased = false;
+						} else {
+							*isLeftMouseButtonReleased = false;
+							*isItemDraged = isSwapable;
+						}
+					}
 				} else {
+					componentManager->CreateComponent<cm::actor>(*isItemDraged);
+					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
+					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
+					core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
+					cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
+					cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
+					itemTransform->position = playerTransform->position;
+					vec3 normalizedForward = Normalize(playerTransform->forward);
+					itemTransform->position[0] += normalizedForward[0] * 2.5f;
+					itemTransform->position[1] += normalizedForward[1] * 2.5f;
+					itemTransform->position[2] += normalizedForward[2] * 2.5f;
+					itemTransform->scale = 0.05f;
+
+					*isItemDraged = -1;
 					*isLeftMouseButtonReleased = false;
-					*isItemDraged = isSwapable;
 				}
 			}
 		}
