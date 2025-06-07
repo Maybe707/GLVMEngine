@@ -57,6 +57,7 @@ namespace GLVM::ecs
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+				int isSwapable = 0;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -85,7 +86,7 @@ namespace GLVM::ecs
 						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
 
 						core::vector<unsigned int> potentialOccupiedSlots;
-						int isSwapable = determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
+						isSwapable = determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
 						
 						if( isSwapable == -1 ) {
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
@@ -98,16 +99,19 @@ namespace GLVM::ecs
 							
 							swapedItemComponent->occupiedSlots.clear();
 							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
-							
-							*isLeftMouseButtonReleased = false;
-							*isItemDraged = isSwapable;
-							return;
 						}
 					}
 				}
 
-				*isLeftMouseButtonReleased = false;
-				*isItemDraged = -1;
+				if( isSwapable == -1 ) {
+					*isLeftMouseButtonReleased = false;
+					*isItemDraged = -1;
+				} else if( isSwapable == -2) {
+					*isLeftMouseButtonReleased = false;
+				} else {
+					*isLeftMouseButtonReleased = false;
+					*isItemDraged = isSwapable;
+				}
 			}
 		}
 	}
