@@ -42,12 +42,12 @@ namespace GLVM::ecs
 						}
 					}
 					
-					// for( unsigned int i = 0; i < 8; ++i ) {
-					// 	for( unsigned int j = 0; j < 8; ++j ) {
-					// 		std::cout << inventoryComponent->slots[i][j] << " ";
-					// 	}
-					// 	std::cout << std::endl;
-					// }
+					for( unsigned int i = 0; i < 8; ++i ) {
+						for( unsigned int j = 0; j < 8; ++j ) {
+							std::cout << inventoryComponent->slots[i][j] << " ";
+						}
+						std::cout << std::endl;
+					}
 				}
 				*isLeftMouseButtonReleased = false;
 			}
