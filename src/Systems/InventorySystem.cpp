@@ -19,36 +19,32 @@ namespace GLVM::ecs
 			const float inventorySlotScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
 			const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
 
-			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {           ///< Take an item from inventory
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 					const unsigned int row    = intersectionSlot.y;
 					const unsigned int column = intersectionSlot.x;
 					const unsigned int entity = inventoryComponent->slots[row][column];
-					if( entity != UINT_MAX && entity >= 0 ) {
+					if( entity != UINT_MAX && entity >= 0 ) {  ///< Check slot is not empty and hold an item
 						cm::item* itemComponent   = componentManager->GetComponent<cm::item>(entity);
 						if( itemComponent != nullptr ) {
 							for( unsigned int i = 0; i < itemComponent->occupiedSlots.GetSize(); ++i ) {
 								unsigned int row_index = itemComponent->occupiedSlots[i] / inventoryComponent->row;
 								unsigned int col_index = itemComponent->occupiedSlots[i] % inventoryComponent->col;
 
-								inventoryComponent->slots[row_index][col_index] = UINT_MAX;
+								inventoryComponent->slots[row_index][col_index] = UINT_MAX;   ///< Need to free all slots that hold an item
 							}
 						}
-						cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entity);
-						cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(entity);
-						if( itemTransformComponent != nullptr && itemColliderComponent != nullptr ) {
-							*isItemDraged = entity;
-						}
+						*isItemDraged = entity;                                               ///< Set curretly draged item entity
 					}
 					
-					for( unsigned int i = 0; i < 8; ++i ) {
-						for( unsigned int j = 0; j < 8; ++j ) {
-							std::cout << inventoryComponent->slots[i][j] << " ";
-						}
-						std::cout << std::endl;
-					}
+					// for( unsigned int i = 0; i < 8; ++i ) {
+					// 	for( unsigned int j = 0; j < 8; ++j ) {
+					// 		std::cout << inventoryComponent->slots[i][j] << " ";
+					// 	}
+					// 	std::cout << std::endl;
+					// }
 				}
 				*isLeftMouseButtonReleased = false;
 			}
@@ -57,7 +53,7 @@ namespace GLVM::ecs
 //			std::cout << "highlight item slots" << std::endl;
 			}
 
-			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
+			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {    ///< Item drop to inventory, swaped or we just cant place
 				int isSwapable = 0;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
@@ -75,6 +71,15 @@ namespace GLVM::ecs
 						int rowBasicOffset    = 0;
 						int columnBasicOffset = 0;
 
+						/*
+						  ===============================================
+						  Set as pivot point slot in left upper corner.
+						  Need to calculate offset for row and column
+						  to change it from center. And need to It is
+						  necessary to take into account the offset
+						  relative to the center for additional correction
+						  ===============================================
+						 */
 						columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
 																  crosshairTransformComponent->position[0], column, inventorySlotScale );
 						rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
@@ -89,10 +94,10 @@ namespace GLVM::ecs
 						core::vector<unsigned int> potentialOccupiedSlots;
 						isSwapable = determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
 						
-						if( isSwapable == -1 ) {
+						if( isSwapable == -1 ) {               ///< Default value. Just drop item to all empty slots
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
 							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
-						} else if ( isSwapable > 0 ) {
+						} else if ( isSwapable > 0 ) {         ///< Swap one item that we draging to another one in inventory
 							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
 							fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height,
@@ -105,14 +110,14 @@ namespace GLVM::ecs
 						if( isSwapable == -1 ) {
 							*isLeftMouseButtonReleased = false;
 							*isItemDraged = -1;
-						} else if( isSwapable == -2) {
+						} else if( isSwapable == -2) {         ///< Already have 2 or more items in potential inventory slots
 							*isLeftMouseButtonReleased = false;
 						} else {
 							*isLeftMouseButtonReleased = false;
 							*isItemDraged = isSwapable;
 						}
 					}
-				} else {
+				} else {       ///< Item drop to the ground
 					componentManager->CreateComponent<cm::actor>(*isItemDraged);
 					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
 					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
