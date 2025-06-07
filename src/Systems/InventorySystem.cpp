@@ -51,6 +51,52 @@ namespace GLVM::ecs
 
 			if ( *isItemDraged >= 0 ) {
 //			std::cout << "highlight item slots" << std::endl;
+				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
+														  inventorySlotScale, inventorySlotHalfScale) ) {
+					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
+
+					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
+					if( itemComponent != nullptr ) {
+						const int itemWidth  = itemComponent->itemSlotType.width;
+						const int itemHeight = itemComponent->itemSlotType.height;
+
+						const int row    = intersectionSlot.y;
+						const int column = intersectionSlot.x;
+
+						/// Find left-upper pivot slot inventory
+						int rowBasicOffset    = 0;
+						int columnBasicOffset = 0;
+
+						/*
+						  ===============================================
+						  Set as pivot point slot in left upper corner.
+						  Need to calculate offset for row and column
+						  to change it from center. And need to It is
+						  necessary to take into account the offset
+						  relative to the center for additional correction
+						  ===============================================
+						*/
+						columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
+																  crosshairTransformComponent->position[0], column, inventorySlotScale );
+						rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
+																  crosshairTransformComponent->position[1], row, inventorySlotScale * aspectRate );
+
+						int pivotRow    = row - rowBasicOffset;
+						int pivotColumn = column - columnBasicOffset;
+
+						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
+						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
+
+						core::vector<unsigned int> potentialOccupiedSlots;
+						determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
+						inventoryComponent->highlightedSlots = potentialOccupiedSlots;
+						potentialOccupiedSlots.Print();
+						inventoryComponent->isAvailableHighlightedSlots = true;
+					}
+				}
+			} else {
+				inventoryComponent->highlightedSlots.clear();
+				inventoryComponent->isAvailableHighlightedSlots = false;
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {    ///< Item drop to inventory, swaped or we just cant place

@@ -4187,14 +4187,14 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, uint32_t offset,
-									   float slotScale, unsigned int inventorySlotEntity,
+									   float slotScale, [[maybe_unused]] unsigned int inventorySlotEntity,
 									   ecs::components::transform* slotTransfromComponent) {
 		UI_UBO hudUBO{};
 		mat4 model(1.0);
 		const float fullSlotScale     = slotTransfromComponent->gltf ? slotScale * 2.0f : slotScale;
-		const float x = slotTransfromComponent->position[0] + currentInventoryRow * fullSlotScale;
+		const float x = slotTransfromComponent->position[0] + currentInventoryColumn * fullSlotScale;
 		const float y_scaleMultilayer = aspectRate * fullSlotScale;
-		const float y = slotTransfromComponent->position[1] + currentInventoryColumn * y_scaleMultilayer;
+		const float y = slotTransfromComponent->position[1] + currentInventoryRow * y_scaleMultilayer;
 		const float inventorySlotScale = slotScale;
 		model[0][0] = inventorySlotScale;
 		model[1][1] = inventorySlotScale;
@@ -4217,7 +4217,8 @@ namespace GLVM::core
 //		std::cout << "number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
 		bool highLightedSlot = false;
 		for ( unsigned int i = 0; i < inventoryComponent->highlightedSlots.GetSize(); ++i ) {
-			if ( inventoryComponent->highlightedSlots[i] == inventorySlotEntity) {
+			if ( inventoryComponent->highlightedSlots[i] == currentInventoryRow * inventoryComponent->col + currentInventoryColumn ) {
+				std::cout << "index: " << currentInventoryRow * inventoryComponent->col + currentInventoryColumn << std::endl;
 				highLightedSlot = true;
 				break;
 			} else
@@ -4452,8 +4453,8 @@ namespace GLVM::core
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
 			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
 //			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
-			for ( unsigned int j = 0; j < 8; ++j ) {
-				for ( unsigned int m = 0; m < 8; ++m ) {
+			for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
+				for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
 //					std::cout << "slots index: " << (j / 8) + (j % 8) << " with entity: " << inventoryComponent->slots[j][m] << std::endl;
 					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
 					// cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
@@ -4461,7 +4462,7 @@ namespace GLVM::core
 					cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
 //					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
 
-					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * 8 + m;
+					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * inventoryComponent->col + m;
 					updateUBO_UI(j, m,
 								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity, slotTransformComponent);
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, uiPipeline.pipelineLayout,
