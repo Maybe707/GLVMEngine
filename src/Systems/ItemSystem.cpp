@@ -34,7 +34,7 @@ namespace GLVM::ecs
 				for ( unsigned int m = i; m < i + item_height; ++m )
 					for ( unsigned int n = j; n < j + item_width; ++n ) {
 						maybeAvailabeSlots.Push(inventoryComponent->slots[m][n]);
-						indicesOfMaybeAvailableSlots.Push(m * row + n);
+						indicesOfMaybeAvailableSlots.Push(m * col + n);
 					}
 
 				unsigned int isAllSlotsAvailable = 0;
