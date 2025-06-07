@@ -80,19 +80,66 @@ namespace GLVM::ecs
 
 						int pivotRow    = row - rowBasicOffset;
 						int pivotColumn = column - columnBasicOffset;
-						std::cout << "pivot column: " << pivotColumn << std::endl;
+//						std::cout << "pivot column: " << pivotColumn << std::endl;
 
 						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
 						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
 						
 						itemComponent->occupiedSlots.clear();
+						int isSwapable = -1;                   ///< -1: default value. -2: found two entities in potential slots. Any other value: swapable.
+						core::vector<unsigned int> potentialOccupiedSlots;
 						for( int i = 0; i < itemHeight; ++i ) {
 							for( int j = 0; j < itemWidth; ++j ) {
 								const unsigned int finalRow    = pivotRow + i;
 								const unsigned int finalColumn = pivotColumn + j;
-								inventoryComponent->slots[finalRow][finalColumn] = *isItemDraged;
-								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
+								if( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] == UINT_MAX ) {
+//									inventoryComponent->slots[finalRow][finalColumn] = *isItemDraged;
+								} else if ( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX ) {
+									isSwapable = inventoryComponent->slots[finalRow][finalColumn];
+								} else if ( isSwapable > 0 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX && (int)inventoryComponent->slots[finalRow][finalColumn] != isSwapable ) {
+									isSwapable = -2;
+								}
+								
+//								itemComponent->occupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
+								potentialOccupiedSlots.Push(finalRow * inventoryComponent->col + finalColumn);
 							}
+						}
+//						std::cout << "swapable: " << isSwapable << std::endl;
+						if( isSwapable == -1 ) {
+							itemComponent->occupiedSlots = potentialOccupiedSlots;
+							for( int i = 0; i < itemHeight; ++i ) {
+								for( int j = 0; j < itemWidth; ++j ) {
+									const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
+									const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
+
+									inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
+								}
+							}
+						} else if ( isSwapable > 0 ) {
+//							std::cout << "TEST" << std::endl;
+							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
+							itemComponent->occupiedSlots = potentialOccupiedSlots;
+							for( unsigned int i = 0; i < swapedItemComponent->itemSlotType.height; ++i ) {
+								for( unsigned int j = 0; j < swapedItemComponent->itemSlotType.width; ++j ) {
+									const unsigned int slotsRow = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] / inventoryComponent->col;
+									const unsigned int slotsColumn = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] % inventoryComponent->col;
+									std::cout << "row: " << slotsRow << std::endl;
+									std::cout << "col: " << slotsColumn << std::endl;
+									inventoryComponent->slots[slotsRow][slotsColumn] = UINT_MAX;
+								}
+							}
+							swapedItemComponent->occupiedSlots.clear();
+							for( int i = 0; i < itemHeight; ++i ) {
+								for( int j = 0; j < itemWidth; ++j ) {
+									const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
+									const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
+
+									inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
+								}
+							}
+							*isLeftMouseButtonReleased = false;
+							*isItemDraged = isSwapable;
+							return;
 						}
 					}
 				}
