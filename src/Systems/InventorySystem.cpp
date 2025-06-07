@@ -1,4 +1,5 @@
 #include "Systems/InventorySystem.hpp"
+#include "Components/InventoryComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VertexMath.hpp"
                                 
@@ -56,43 +57,13 @@ namespace GLVM::ecs
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
-					if( itemComponent != nullptr ) {
-						const int itemWidth  = itemComponent->itemSlotType.width;
-						const int itemHeight = itemComponent->itemSlotType.height;
-
-						const int row    = intersectionSlot.y;
-						const int column = intersectionSlot.x;
-
-						/// Find left-upper pivot slot inventory
-						int rowBasicOffset    = 0;
-						int columnBasicOffset = 0;
-
-						/*
-						  ===============================================
-						  Set as pivot point slot in left upper corner.
-						  Need to calculate offset for row and column
-						  to change it from center. And need to It is
-						  necessary to take into account the offset
-						  relative to the center for additional correction
-						  ===============================================
-						*/
-						columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
-																  crosshairTransformComponent->position[0], column, inventorySlotScale );
-						rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
-																  crosshairTransformComponent->position[1], row, inventorySlotScale * aspectRate );
-
-						int pivotRow    = row - rowBasicOffset;
-						int pivotColumn = column - columnBasicOffset;
-
-						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
-						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
-
-						core::vector<unsigned int> potentialOccupiedSlots;
-						determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
-						inventoryComponent->highlightedSlots = potentialOccupiedSlots;
-						potentialOccupiedSlots.Print();
-						inventoryComponent->isAvailableHighlightedSlots = true;
-					}
+					core::vector<unsigned int> potentialOccupiedSlots;
+					determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
+													  intersectionSlot, inventoryComponent, inventorySlotScale );
+					
+					inventoryComponent->highlightedSlots = potentialOccupiedSlots;
+					potentialOccupiedSlots.Print();
+					inventoryComponent->isAvailableHighlightedSlots = true;
 				}
 			} else {
 				inventoryComponent->highlightedSlots.clear();
@@ -104,86 +75,98 @@ namespace GLVM::ecs
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
-
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
-					if( itemComponent != nullptr ) {
-						const int itemWidth  = itemComponent->itemSlotType.width;
-						const int itemHeight = itemComponent->itemSlotType.height;
+					core::vector<unsigned int> potentialOccupiedSlots;
+					isSwapable = determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
+													  intersectionSlot, inventoryComponent, inventorySlotScale );
 
-						const int row    = intersectionSlot.y;
-						const int column = intersectionSlot.x;
+					const int itemWidth  = itemComponent->itemSlotType.width;
+					const int itemHeight = itemComponent->itemSlotType.height;
 
-						/// Find left-upper pivot slot inventory
-						int rowBasicOffset    = 0;
-						int columnBasicOffset = 0;
-
-						/*
-						  ===============================================
-						  Set as pivot point slot in left upper corner.
-						  Need to calculate offset for row and column
-						  to change it from center. And need to It is
-						  necessary to take into account the offset
-						  relative to the center for additional correction
-						  ===============================================
-						 */
-						columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
-																  crosshairTransformComponent->position[0], column, inventorySlotScale );
-						rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
-																  crosshairTransformComponent->position[1], row, inventorySlotScale * aspectRate );
-
-						int pivotRow    = row - rowBasicOffset;
-						int pivotColumn = column - columnBasicOffset;
-
-						clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
-						clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
-
-						core::vector<unsigned int> potentialOccupiedSlots;
-						isSwapable = determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
-						
-						if( isSwapable == -1 ) {               ///< Default value. Just drop item to all empty slots
-							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
-						} else if ( isSwapable > 0 ) {         ///< Swap one item that we draging to another one in inventory
-							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
-							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height,
-												inventoryComponent, UINT_MAX );
+					if( isSwapable == -1 ) {               ///< Default value. Just drop item to all empty slots
+						itemComponent->occupiedSlots = potentialOccupiedSlots;
+						fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
+					} else if ( isSwapable > 0 ) {         ///< Swap one item that we draging to another one in inventory
+						cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
+						itemComponent->occupiedSlots = potentialOccupiedSlots;
+						fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height,
+											inventoryComponent, UINT_MAX );
 							
-							swapedItemComponent->occupiedSlots.clear();
-							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
-						}
-
-						if( isSwapable == -1 ) {
-							*isLeftMouseButtonReleased = false;
-							*isItemDraged = -1;
-						} else if( isSwapable == -2) {         ///< Already have 2 or more items in potential inventory slots
-							*isLeftMouseButtonReleased = false;
-						} else {
-							*isLeftMouseButtonReleased = false;
-							*isItemDraged = isSwapable;
-						}
+						swapedItemComponent->occupiedSlots.clear();
+						fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
 					}
-				} else {       ///< Item drop to the ground
-					componentManager->CreateComponent<cm::actor>(*isItemDraged);
-					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
-					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
-					core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
-					cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-					cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
-					itemTransform->position = playerTransform->position;
-					vec3 normalizedForward = Normalize(playerTransform->forward);
-					itemTransform->position[0] += normalizedForward[0] * 2.5f;
-					itemTransform->position[1] += normalizedForward[1] * 2.5f;
-					itemTransform->position[2] += normalizedForward[2] * 2.5f;
-					itemTransform->scale = 0.05f;
 
-					*isItemDraged = -1;
-					*isLeftMouseButtonReleased = false;
+					if( isSwapable == -1 ) {
+						*isLeftMouseButtonReleased = false;
+						*isItemDraged = -1;
+					} else if( isSwapable == -2) {         ///< Already have 2 or more items in potential inventory slots
+						*isLeftMouseButtonReleased = false;
+					} else {
+						*isLeftMouseButtonReleased = false;
+						*isItemDraged = isSwapable;
+					}
 				}
+			} else {       ///< Item drop to the ground
+				std::cout << "is item draged: " << *isItemDraged << std::endl;
+				componentManager->CreateComponent<cm::actor>(*isItemDraged);
+				componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
+				*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
+				core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
+				cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
+				cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
+				itemTransform->position = playerTransform->position;
+				vec3 normalizedForward = Normalize(playerTransform->forward);
+				itemTransform->position[0] += normalizedForward[0] * 2.5f;
+				itemTransform->position[1] += normalizedForward[1] * 2.5f;
+				itemTransform->position[2] += normalizedForward[2] * 2.5f;
+				itemTransform->scale = 0.05f;
+
+				*isItemDraged = -1;
+				*isLeftMouseButtonReleased = false;
 			}
 		}
 	}
 
+	int InventorySystem::determineSwappableStatusAndSlots( components::item* itemComponent, components::transform* inventoryTransformComponent,
+														   core::vector<unsigned int> potentialOccupiedSlots, components::transform* crosshairTransformComponent,
+														   point2D<int> intersectionSlot, components::inventory* inventoryComponent, const float inventorySlotScale ) {
+		if( itemComponent != nullptr ) {
+			const int itemWidth  = itemComponent->itemSlotType.width;
+			const int itemHeight = itemComponent->itemSlotType.height;
+
+			const int row    = intersectionSlot.y;
+			const int column = intersectionSlot.x;
+
+			/// Find left-upper pivot slot inventory
+			int rowBasicOffset    = 0;
+			int columnBasicOffset = 0;
+
+			/*
+			  ===============================================
+			  Set as pivot point slot in left upper corner.
+			  Need to calculate offset for row and column
+			  to change it from center. And need to It is
+			  necessary to take into account the offset
+			  relative to the center for additional correction
+			  ===============================================
+			*/
+			columnBasicOffset = calculateBasicOffset( itemWidth, inventoryTransformComponent->position[0],
+													  crosshairTransformComponent->position[0], column, inventorySlotScale );
+			rowBasicOffset    = calculateBasicOffset( itemHeight, inventoryTransformComponent->position[1],
+													  crosshairTransformComponent->position[1], row, inventorySlotScale * aspectRate );
+
+			int pivotRow    = row - rowBasicOffset;
+			int pivotColumn = column - columnBasicOffset;
+
+			clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
+			clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
+
+			return determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
+		} else {
+			return -3; ///< Return -3 as error code means itemComponent is nullptr
+		}
+	}
+	
 	void InventorySystem::fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight,
 											  components::inventory* inventoryComponent, const int fillValue ) {
 		for( int i = 0; i < itemHeight; ++i ) {
