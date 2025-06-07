@@ -89,14 +89,15 @@ namespace GLVM::ecs
 						
 						if( isSwapable == -1 ) {
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent );
+							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
 						} else if ( isSwapable > 0 ) {
 							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height, inventoryComponent );
+							fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height,
+												inventoryComponent, UINT_MAX );
 							
 							swapedItemComponent->occupiedSlots.clear();
-							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent );
+							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
 							
 							*isLeftMouseButtonReleased = false;
 							*isItemDraged = isSwapable;
@@ -111,13 +112,14 @@ namespace GLVM::ecs
 		}
 	}
 
-	void InventorySystem::fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight, components::inventory* inventoryComponent ) {
+	void InventorySystem::fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight,
+											  components::inventory* inventoryComponent, const int fillValue ) {
 		for( int i = 0; i < itemHeight; ++i ) {
 			for( int j = 0; j < itemWidth; ++j ) {
 				const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
 				const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
 
-				inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
+				inventoryComponent->slots[slotsRow][slotsColumn] = fillValue;
 			}
 		}
 	}
