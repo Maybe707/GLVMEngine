@@ -13,6 +13,7 @@ namespace GLVM::ecs
 	class InventorySystem : public ecs::ISystem {
 	public:
 		void Update() override;
+		void fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight, components::inventory* inventoryComponent );
 		int determineSwappableField( components::item* itemComponent, const int itemWidth, const int itemHeight,
 									 int pivotRow, int pivotColumn, components::inventory* inventoryComponent,
 									 core::vector<unsigned int>& potentialOccupiedSlots );

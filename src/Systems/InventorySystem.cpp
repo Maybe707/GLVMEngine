@@ -89,34 +89,15 @@ namespace GLVM::ecs
 						
 						if( isSwapable == -1 ) {
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							for( int i = 0; i < itemHeight; ++i ) {
-								for( int j = 0; j < itemWidth; ++j ) {
-									const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
-									const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
-
-									inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
-								}
-							}
+							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent );
 						} else if ( isSwapable > 0 ) {
 							cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
-							for( unsigned int i = 0; i < swapedItemComponent->itemSlotType.height; ++i ) {
-								for( unsigned int j = 0; j < swapedItemComponent->itemSlotType.width; ++j ) {
-									const unsigned int slotsRow = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] / inventoryComponent->col;
-									const unsigned int slotsColumn = swapedItemComponent->occupiedSlots[i * swapedItemComponent->itemSlotType.width + j] % inventoryComponent->col;
-
-									inventoryComponent->slots[slotsRow][slotsColumn] = UINT_MAX;
-								}
-							}
+							fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height, inventoryComponent );
+							
 							swapedItemComponent->occupiedSlots.clear();
-							for( int i = 0; i < itemHeight; ++i ) {
-								for( int j = 0; j < itemWidth; ++j ) {
-									const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
-									const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
-
-									inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
-								}
-							}
+							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent );
+							
 							*isLeftMouseButtonReleased = false;
 							*isItemDraged = isSwapable;
 							return;
@@ -130,6 +111,17 @@ namespace GLVM::ecs
 		}
 	}
 
+	void InventorySystem::fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight, components::inventory* inventoryComponent ) {
+		for( int i = 0; i < itemHeight; ++i ) {
+			for( int j = 0; j < itemWidth; ++j ) {
+				const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
+				const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
+
+				inventoryComponent->slots[slotsRow][slotsColumn] = *isItemDraged;
+			}
+		}
+	}
+	
 	int InventorySystem::determineSwappableField( components::item* itemComponent, const int itemWidth, const int itemHeight,
 												  int pivotRow, int pivotColumn, components::inventory* inventoryComponent,
 												  core::vector<unsigned int>& potentialOccupiedSlots) {
