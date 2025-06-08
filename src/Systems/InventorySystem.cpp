@@ -58,16 +58,21 @@ namespace GLVM::ecs
 
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
 					core::vector<unsigned int> potentialOccupiedSlots;
-					determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
+					int isSwapable = 0;
+					isSwapable = determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
 													  intersectionSlot, inventoryComponent, inventorySlotScale );
 					
 					inventoryComponent->highlightedSlots = potentialOccupiedSlots;
-					potentialOccupiedSlots.Print();
-					inventoryComponent->isAvailableHighlightedSlots = true;
+//					potentialOccupiedSlots.Print();
+					std::cout << isSwapable << std::endl;
+					if( isSwapable == -2 ) 
+						inventoryComponent->isAvailableHighlightedSlots = false;
+					else
+						inventoryComponent->isAvailableHighlightedSlots = true;
 				}
 			} else {
-				inventoryComponent->highlightedSlots.clear();
-				inventoryComponent->isAvailableHighlightedSlots = false;
+				// inventoryComponent->highlightedSlots.clear();
+				// inventoryComponent->isAvailableHighlightedSlots = false;
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {    ///< Item drop to inventory, swaped or we just cant place
@@ -106,7 +111,7 @@ namespace GLVM::ecs
 						*isItemDraged = isSwapable;
 					}
 				} else {       ///< Item drop to the ground
-					std::cout << "is item draged: " << *isItemDraged << std::endl;
+//					std::cout << "is item draged: " << *isItemDraged << std::endl;
 					componentManager->CreateComponent<cm::actor>(*isItemDraged);
 					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
 					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };

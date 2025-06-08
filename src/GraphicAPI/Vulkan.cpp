@@ -4218,7 +4218,7 @@ namespace GLVM::core
 		bool highLightedSlot = false;
 		for ( unsigned int i = 0; i < inventoryComponent->highlightedSlots.GetSize(); ++i ) {
 			if ( inventoryComponent->highlightedSlots[i] == currentInventoryRow * inventoryComponent->col + currentInventoryColumn ) {
-				std::cout << "index: " << currentInventoryRow * inventoryComponent->col + currentInventoryColumn << std::endl;
+//				std::cout << "index: " << currentInventoryRow * inventoryComponent->col + currentInventoryColumn << std::endl;
 				highLightedSlot = true;
 				break;
 			} else
@@ -4230,8 +4230,10 @@ namespace GLVM::core
 			if ( highLightedSlot ) {
 				if ( inventoryComponent->isAvailableHighlightedSlots )
 					hudUBO.color = { 0.0, 0.3, 0.0 };
-				else
+				else {
+					std::cout << "RED" << std::endl;
 					hudUBO.color = { 0.3, 0.0, 0.0 };
+				}
 			}
 		} else {
 			hudUBO.color = { 0.0, 0.0, 0.0 };

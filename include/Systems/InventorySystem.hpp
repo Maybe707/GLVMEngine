@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.hpp"
 #include "VertexMath.hpp"
 #include "Components/TransformComponent.hpp"
+#include <print>
 
 namespace GLVM::ecs
 {
