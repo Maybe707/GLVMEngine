@@ -78,7 +78,7 @@ namespace GLVM::ecs
 					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
 					core::vector<unsigned int> potentialOccupiedSlots;
 					isSwapable = determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
-													  intersectionSlot, inventoryComponent, inventorySlotScale );
+																   intersectionSlot, inventoryComponent, inventorySlotScale );
 
 					const int itemWidth  = itemComponent->itemSlotType.width;
 					const int itemHeight = itemComponent->itemSlotType.height;
@@ -105,30 +105,30 @@ namespace GLVM::ecs
 						*isLeftMouseButtonReleased = false;
 						*isItemDraged = isSwapable;
 					}
-				}
-			} else {       ///< Item drop to the ground
-				std::cout << "is item draged: " << *isItemDraged << std::endl;
-				componentManager->CreateComponent<cm::actor>(*isItemDraged);
-				componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
-				*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
-				core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
-				cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-				cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
-				itemTransform->position = playerTransform->position;
-				vec3 normalizedForward = Normalize(playerTransform->forward);
-				itemTransform->position[0] += normalizedForward[0] * 2.5f;
-				itemTransform->position[1] += normalizedForward[1] * 2.5f;
-				itemTransform->position[2] += normalizedForward[2] * 2.5f;
-				itemTransform->scale = 0.05f;
+				} else {       ///< Item drop to the ground
+					std::cout << "is item draged: " << *isItemDraged << std::endl;
+					componentManager->CreateComponent<cm::actor>(*isItemDraged);
+					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
+					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
+					core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
+					cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
+					cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
+					itemTransform->position = playerTransform->position;
+					vec3 normalizedForward = Normalize(playerTransform->forward);
+					itemTransform->position[0] += normalizedForward[0] * 2.5f;
+					itemTransform->position[1] += normalizedForward[1] * 2.5f;
+					itemTransform->position[2] += normalizedForward[2] * 2.5f;
+					itemTransform->scale = 0.05f;
 
-				*isItemDraged = -1;
-				*isLeftMouseButtonReleased = false;
+					*isItemDraged = -1;
+					*isLeftMouseButtonReleased = false;
+				}
 			}
 		}
 	}
 
 	int InventorySystem::determineSwappableStatusAndSlots( components::item* itemComponent, components::transform* inventoryTransformComponent,
-														   core::vector<unsigned int> potentialOccupiedSlots, components::transform* crosshairTransformComponent,
+														   core::vector<unsigned int>& potentialOccupiedSlots, components::transform* crosshairTransformComponent,
 														   point2D<int> intersectionSlot, components::inventory* inventoryComponent, const float inventorySlotScale ) {
 		if( itemComponent != nullptr ) {
 			const int itemWidth  = itemComponent->itemSlotType.width;
