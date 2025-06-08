@@ -4230,10 +4230,8 @@ namespace GLVM::core
 			if ( highLightedSlot ) {
 				if ( inventoryComponent->isAvailableHighlightedSlots )
 					hudUBO.color = { 0.0, 0.3, 0.0 };
-				else {
-					std::cout << "RED" << std::endl;
+				else
 					hudUBO.color = { 0.3, 0.0, 0.0 };
-				}
 			}
 		} else {
 			hudUBO.color = { 0.0, 0.0, 0.0 };

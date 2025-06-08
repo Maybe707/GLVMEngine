@@ -39,19 +39,11 @@ namespace GLVM::ecs
 						}
 						*isItemDraged = entity;                                               ///< Set curretly draged item entity
 					}
-					
-					// for( unsigned int i = 0; i < 8; ++i ) {
-					// 	for( unsigned int j = 0; j < 8; ++j ) {
-					// 		std::cout << inventoryComponent->slots[i][j] << " ";
-					// 	}
-					// 	std::cout << std::endl;
-					// }
 				}
 				*isLeftMouseButtonReleased = false;
 			}
 
 			if ( *isItemDraged >= 0 ) {
-//			std::cout << "highlight item slots" << std::endl;
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
@@ -63,16 +55,13 @@ namespace GLVM::ecs
 													  intersectionSlot, inventoryComponent, inventorySlotScale );
 					
 					inventoryComponent->highlightedSlots = potentialOccupiedSlots;
-//					potentialOccupiedSlots.Print();
-					std::cout << isSwapable << std::endl;
-					if( isSwapable == -2 ) 
-						inventoryComponent->isAvailableHighlightedSlots = false;
-					else
+					if( isSwapable == -1 || isSwapable >= 0 ) 
 						inventoryComponent->isAvailableHighlightedSlots = true;
+					else
+						inventoryComponent->isAvailableHighlightedSlots = false;
+				} else {
+					inventoryComponent->highlightedSlots.clear();
 				}
-			} else {
-				// inventoryComponent->highlightedSlots.clear();
-				// inventoryComponent->isAvailableHighlightedSlots = false;
 			}
 
 			if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {    ///< Item drop to inventory, swaped or we just cant place
@@ -111,7 +100,6 @@ namespace GLVM::ecs
 						*isItemDraged = isSwapable;
 					}
 				} else {       ///< Item drop to the ground
-//					std::cout << "is item draged: " << *isItemDraged << std::endl;
 					componentManager->CreateComponent<cm::actor>(*isItemDraged);
 					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
 					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
