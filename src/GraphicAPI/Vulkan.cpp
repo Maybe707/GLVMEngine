@@ -1298,36 +1298,46 @@ namespace GLVM::core
         //     vkFreeMemory(device, vertexBufferMemoryContainer[i], nullptr);
         // }
 
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             vkDestroySemaphore(device, directionalLightShadowMapImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, directionalLightShadowMapInFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, spotLightShadowMapImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, spotLightShadowMapInFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, pointLightShadowMapImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, pointLightShadowMapInFlightFences[i], nullptr);
 			
-            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, hudImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, hudInFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, fontImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, fontInFlightFences[i], nullptr);
 
 			vkDestroySemaphore(device, virtualTexturesImageAvailableSemaphores[i], nullptr);
-            vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
+//            vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, virtualTexturesInFlightFences[i], nullptr);
         }
 
+		for( size_t i = 0; i < swapChainImages.size(); ++i ) {
+			vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
+			vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
+		}
+		
         vkDestroyCommandPool(device, directionalLightCommandPool, nullptr);
 		vkDestroyCommandPool(device, spotLightCommandPool, nullptr);
 		vkDestroyCommandPool(device, pointLightCommandPool, nullptr);
@@ -2909,7 +2919,7 @@ namespace GLVM::core
 						 hudUniformBuffer, hudUniformBuffersMemory);
 
 
-		memory = fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber;
+		memory = fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 						 fontUniformBuffer, fontUniformBuffersMemory);
 
@@ -3355,9 +3365,9 @@ namespace GLVM::core
 
 		constexpr unsigned int descriptorID = 0; 
 		allocateDescriptorSets( fontDescriptorUboSets, fontPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber );
+								MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8 );
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber; ++i) {
+		for  (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
@@ -3413,7 +3423,7 @@ namespace GLVM::core
  
 		int fontUboBinding = fontUboBindings[0];
 		
-		constexpr u32 font_ubo_ds = 64;
+		const u32 font_ubo_ds = fontUboDescriptorNumber * 8;
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
@@ -4930,15 +4940,14 @@ namespace GLVM::core
         fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
         fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 		
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-                vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
                 vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
         }
 
-		for (size_t i = 0; i < swapChainImages.size(); i++) {
+		for (size_t i = 0; i < swapChainImages.size(); ++i) {
             if ( vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ) {
                 throw std::runtime_error("failed to create synchronization objects for a frame!");
             }
@@ -5486,8 +5495,8 @@ namespace GLVM::core
             throw std::runtime_error("failed to present swap chain image!");
         }
 
-//        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-		currentFrame = 0;
+        currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
+//		currentFrame = 0;
     }
 
     void CVulkanRenderer::directionalLightShadowMapDrawFrame() {
