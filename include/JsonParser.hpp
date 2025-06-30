@@ -48,7 +48,7 @@ namespace GLVM::Core
         HashMap<JsonValue>* object;
         JsonVariant() {}
 		JsonVariant(const JsonVariant& object) {
-			memcpy(this, &object, sizeof(JsonVariant));
+			memcpy((void*)this, &object, sizeof(JsonVariant));
 		}
 		
         ~JsonVariant() {}

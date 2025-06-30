@@ -295,7 +295,7 @@ namespace GLVM::core {
 			resize( data );
 		}
 
-		draw( data );
+//		draw( data );
 	}
 
 	void new_frame( [[maybe_unused]] void* data, struct wl_callback* frame_call_back, [[maybe_unused]] uint32_t callback_data ) {
@@ -306,7 +306,7 @@ namespace GLVM::core {
 		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, data );
 
 //	++constant_byte;
-		draw( data );
+//		draw( data );
 	}
 
 	void shell_ping( [[maybe_unused]] void* data, struct xdg_wm_base* shell, uint32_t serial ) {
