@@ -24,13 +24,25 @@
 #include "SpritesData.hpp"
 #include "Texture.hpp"
 #include "VertexMath.hpp"
+#include "PGA.hpp"
 
 #include <cstdio>
 #include <map>
 #include <random>
 
+struct World{
+};
+
 int main()
 {
+	GLVM::core::pga::plane plane;
+	GLVM::core::pga::point point = !plane;
+	std::cout << point.w << std::endl;
+	auto a = !plane;
+	std::cout << typeid(a).name() << std::endl;
+//	std::cout << point.y << std::endl;
+	std::cout << !plane.x << std::endl;
+	
 	using namespace GLVM;
 	namespace cm  = GLVM::ecs::components;
 
