@@ -42,6 +42,14 @@ namespace GLVM::core::pga
 		float w;
 	};
 
+	inline line operator-( line line ) {
+		return { .rx = -line.rx, .ry = -line.ry, .rz = -line.rz, .ix = -line.ix, .iy = -line.iy, .iz = -line.iz };
+	}
+
+	inline point operator-( point point ) {
+		return { .x = -point.x, .y = -point.y, .z = -point.z, .w = -point.w };
+	}
+	
 	/*================== DUAL OPERATOR ======================*/
 	inline point operator!( const plane& plane ) { return point{ .x = plane.x, .y = plane.y, .z = plane.z, .w = plane.w }; }
 	inline plane operator!( const point& point ) { return plane{ .x = point.x, .y = point.y, .z = point.z, .w = point.w }; }
@@ -68,10 +76,10 @@ namespace GLVM::core::pga
 	/*===================== REVERSE =========================*/
 	inline plane operator~( const plane& plane ) { return plane; }
 	inline line operator~( const line& line ) {
-		return { .rx = line.rx, .ry = line.ry, .rz = line.rz, .ix = line.ix, .iy = line.iy, .iz = line.iz };
+		return -line;
 	}
 	inline point operator~( const point& point ) {
-		return { .x = point.x, .y = point.y, .z = point.z, .w = point.w };
+		return -point;
 	}
 
 	/*===================== INNER PRODUCT====================*/
