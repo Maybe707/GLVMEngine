@@ -75,12 +75,8 @@ namespace GLVM::core::pga
 
 	/*===================== REVERSE =========================*/
 	inline plane operator~( const plane& plane ) { return plane; }
-	inline line operator~( const line& line ) {
-		return -line;
-	}
-	inline point operator~( const point& point ) {
-		return -point;
-	}
+	inline line operator~( const line& line ) { return -line; }
+	inline point operator~( const point& point ) { return -point; }
 
 	/*===================== INNER PRODUCT====================*/
 	/// Scalar product of the plane normals
@@ -244,7 +240,47 @@ namespace GLVM::core::pga
 	  A ∨ B = (⟦A⟧ ∧ ⟦B⟧)*, where ⟦A⟧ is the dual of object A,
 	  and * is the dual of the result
 	 =========================================================*/
-	
-}; // namespace GLVM::core::gpa
+	inline float operator&( [[maybe_unused]] plane plane0, [[maybe_unused]] plane plane1 ) {
+		return 0.0f;
+	}
+
+	inline pseudoScalar operator&( plane plane, point point ) {
+		/// plane below link with dual point from outer product and point below link with dual plane from outer product
+		return { .w = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w * point.w };
+	}
+
+	inline plane operator&( point point, line line ) {
+		/// point below link with dual plane from outer product and line below link with dual line from outer product
+		return {
+			.x = point.y * line.iz - point.z * line.iy - point.w * line.rx,
+			.y = -point.x * line.iz + point.z * line.ix - point.w * line.ry,
+			.z = point.x * line.iy - point.y * line.ix - point.w * line.rz,
+			.w = point.x * line.rx + point.y * line.ry + point.z * line.rz
+		};
+	}
+
+	inline line operator&( [[maybe_unused]] point point0, [[maybe_unused]] point point1 ) {
+		/// point0 below link with dual plane0 from outer product and point1 below link with dual plane1 from outer product
+		return {
+			/// real part ( moment ): e23, e31, e12
+			.rx = point0.y * point1.z - point0.z * point1.y,
+			.ry = point0.z * point1.x - point0.x * point1.z,
+			.rz = point0.x * point1.y - point0.y * point1.x,
+			/// ideal part (direction): e01, e02, e03
+			.ix = point0.w * point1.x - point0.x * point1.w,
+			.iy = point0.w * point1.y - point0.y * point1.w,
+			.iz = point0.w * point1.z - point0.z * point1.w
+		};
+	}
+
+	inline scalar operator&( line line0, line line1 ) {
+		return { .value = line0.rx * line1.ix + line0.ry * line1.iy + line0.rz * line1.iz +
+			line0.ix * line1.rx + line0.iy * line1.ry + line0.iz * line1.rz };
+	}
+
+	inline float operator&( [[maybe_unused]] plane plane, [[maybe_unused]] line line ) {
+		return 0.0f;
+	}
+}; // namespace GLVM::core::pga
 
 #endif
