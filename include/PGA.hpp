@@ -95,6 +95,11 @@ namespace GLVM::core::pga
 		os << "value: " << scalar.value;
 		return os;
 	}
+
+	inline std::ostream& operator<<( std::ostream& os, const pseudoScalar& pseudoScalar ) {
+		os << "w: " << pseudoScalar.w;
+		return os;
+	}
 	
 	inline line operator-( line line ) {
 		return { .rx = -line.rx, .ry = -line.ry, .rz = -line.rz, .ix = -line.ix, .iy = -line.iy, .iz = -line.iz };
