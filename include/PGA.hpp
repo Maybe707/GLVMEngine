@@ -8,6 +8,8 @@
 
 #include<cmath>
 #include<assert.h>
+#include <ostream>
+#include<iostream>
 
 namespace GLVM::core::pga
 {
@@ -72,6 +74,27 @@ namespace GLVM::core::pga
 		float iz;
 		float iw;
 	};
+
+	inline std::ostream& operator<<( std::ostream& os, const line& line ) {
+		os << "rx: " << line.rx << " ry: " << line.ry << " rz: " << line.rz <<
+			" ix: " << line.ix << " iy: " << line.iy << " iz: " << line.iz;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const point& point ) {
+		os << "x: " << point.x << " y: " << point.y << " z: " << point.z << " w: " << point.w;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const plane& plane ) {
+		os << "x: " << plane.x << " y: " << plane.y << " z: " << plane.z << " w: " << plane.w;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const scalar& scalar ) {
+		os << "value: " << scalar.value;
+		return os;
+	}
 	
 	inline line operator-( line line ) {
 		return { .rx = -line.rx, .ry = -line.ry, .rz = -line.rz, .ix = -line.ix, .iy = -line.iy, .iz = -line.iz };
@@ -117,9 +140,12 @@ namespace GLVM::core::pga
 	/// This gives the oriented distance from the point to the plane (if normalized)
 	inline line operator|( const plane& plane, const point& point ) {
 //		return plane.x * point.x + plane.y * point.y + plane.z * point.z - plane.w * point.w;
+		// std::cout << "inner ix: " << plane.z * point.y - plane.y * point.z << std::endl;
+		// std::cout << "inner iy: " << plane.x * point.z - plane.z * point.x << std::endl;
+		// std::cout << "inner iz: " << plane.y * point.x - plane.x * point.y << std::endl;
 		return {
 			.rx = plane.x * point.w,                        ///< e2 ^ e3
-			.ry = plane.y * point.w,                        ///< e1 ^ e3
+			.ry = plane.y * point.w,                        ///< e3 ^ e1
 			.rz = plane.z * point.w,                        ///< e1 ^ e2
 			.ix = plane.z * point.y - plane.y * point.z,    ///< e0 ^ e1
 			.iy = plane.x * point.z - plane.z * point.x,    ///< e0 ^ e2
@@ -165,8 +191,8 @@ namespace GLVM::core::pga
 		};
 	}
 	/// Points do not have an inner product: it is always zero (if strictly by definition).
-	inline float operator|( [[maybe_unused]] const point& point0, [[maybe_unused]] const point& point1 ) {
-		return 0.0f;
+	inline scalar operator|( [[maybe_unused]] const point& point0, [[maybe_unused]] const point& point1 ) {
+		return { .value = -point0.w * point1.w };
 	}
 
 	/*====================== OUTER PRODUCT ====================*/

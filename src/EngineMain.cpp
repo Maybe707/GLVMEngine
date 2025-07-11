@@ -35,16 +35,26 @@ struct World{
 
 int main()
 {
-	GLVM::core::pga::plane plane;
-	GLVM::core::pga::point point = !plane;
-	std::cout << point.w << std::endl;
-	auto a = !plane;
-	std::cout << typeid(a).name() << std::endl;
-//	std::cout << point.y << std::endl;
-	std::cout << !plane.x << std::endl;
+	// GLVM::core::pga::plane plane;
+	// GLVM::core::pga::point point = !plane;
+	// std::cout << point.w << std::endl;
+	// auto a = !plane;
+	// std::cout << typeid(a).name() << std::endl;
+	// std::cout << point.y << std::endl;
+	// std::cout << !plane.x << std::endl;
 	
 	using namespace GLVM;
 	namespace cm  = GLVM::ecs::components;
+	namespace pga = GLVM::core::pga;
+
+	[[maybe_unused]] pga::plane plane0 = { 2.1f, 3.5f, 4.2f, 3.87f };
+	[[maybe_unused]] pga::plane plane1 = { 3.17f, 10.20f, 7.832f, 3.87f };
+	[[maybe_unused]] pga::point point0 = { 1.5f, 2.77f, 6.55f, 8.99f };
+	[[maybe_unused]] pga::point point1 = { 3.577f, 0.787f, 16.575f, 888.99f };
+	[[maybe_unused]] pga::line line0 = { 1.87, 2.053, 6.234, 10.34, 3234.32, 223.43 };
+	[[maybe_unused]] pga::line line1 = { 5.723, 10.234, 3.343, 0.344, 234.123, 77.345 };
+	
+	std::cout << (point0 | point1) << std::endl;
 
 	
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
@@ -231,7 +241,7 @@ int main()
 
 	for ( unsigned int i = 0; i < 5; ++i ) {
 		Entity testItem = EntityManager->CreateEntity();
-		std::cout << "item entity id: " << testItem << std::endl;
+//		std::cout << "item entity id: " << testItem << std::endl;
 		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
 		[[maybe_unused]] unsigned int row = i + 1;
 		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { 2, row };
