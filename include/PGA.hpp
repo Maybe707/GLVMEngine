@@ -31,6 +31,12 @@ namespace GLVM::core::pga
 		float iz;
 	};
 
+	struct rline {
+		float rx;
+		float ry;
+		float rz;
+	};
+	
 	struct point {     ///< trivector
 		float x;
 		float y;
@@ -42,6 +48,31 @@ namespace GLVM::core::pga
 		float w;
 	};
 
+	struct motor {
+		float rx;
+		float ry;
+		float rz;
+		float rw;         ///< Scalar
+		float ix;
+		float iy;
+		float iz;
+		float iw;         ///< Pseudoscalar
+	};
+
+	struct rotor {
+		float rx;
+		float ry;
+		float rz;
+		float rw;
+	};
+
+	struct translator {
+		float ix;
+		float iy;
+		float iz;
+		float iw;
+	};
+	
 	inline line operator-( line line ) {
 		return { .rx = -line.rx, .ry = -line.ry, .rz = -line.rz, .ix = -line.ix, .iy = -line.iy, .iz = -line.iz };
 	}
@@ -280,6 +311,58 @@ namespace GLVM::core::pga
 
 	inline float operator&( [[maybe_unused]] plane plane, [[maybe_unused]] line line ) {
 		return 0.0f;
+	}
+
+
+	/*========================= GEOMETRIC PRODUCT =========================*/
+	inline motor operator*( plane plane0, plane plane1 ) {
+		return {
+			/// real part ( moment ): e23, e31, e12
+			.rx = plane0.y * plane1.z - plane0.z * plane1.y,
+			.ry = plane0.z * plane1.x - plane0.x * plane1.z,
+			.rz = plane0.x * plane1.y - plane0.y * plane1.x,
+			.rw = plane0.x * plane1.x + plane0.y * plane1.y + plane0.z * plane1.z, ///< Scalar
+			/// ideal part (direction): e01, e02, e03
+			.ix = plane0.w * plane1.x - plane0.x * plane1.w,
+			.iy = plane0.w * plane1.y - plane0.y * plane1.w,
+			.iz = plane0.w * plane1.z - plane0.z * plane1.w,
+			.iw = 0.0                                                              ///< Pseudoscalar
+		};
+	}
+
+	inline motor operator*( line line0, line line1 ) {
+		return {
+			/// real part ( moment ): e23, e31, e12
+			.rx = -line0.ry * line1.rz + line0.rz * line1.ry,
+			.ry = line0.rx * line1.rz + line0.rz * line1.rx,
+			.rz = -line0.rx * line1.ry + line0.ry * line1.rx,
+			.rw = -line0.rx * line1.rx - line0.ry * line1.ry - line0.rz * line1.rz, ///< Scalar
+			/// ideal part (direction): e01, e02, e03
+			.ix = -line0.ry * line1.iz + line0.rz * line1.iy - line0.iy * line1.rz + line0.iz * line1.ry,
+			.iy = line0.rx * line1.iz - line0.rz * line1.ix + line0.ix * line1.rz - line0.iz * line1.rx,
+			.iz = -line0.rx * line1.iy + line0.ry * line1.ix - line0.ix * line1.ry + line0.iy * line1.rx,
+			.iw = line0.rx * line1.ix + line0.ry * line1.iy + line0.rz * line1.iz +
+			line0.ix * line1.rx + line0.iy * line1.ry + line0.iz * line1.rz        ///< Pseudoscalar
+		};
+	}
+
+	inline rotor operator*( rline rline0, rline rline1 ) {
+		return {
+			/// real part ( moment ): e23, e31, e12
+			.rx = -rline0.ry * rline1.rz + rline0.rz * rline1.ry,
+			.ry = rline0.rx * rline1.rz + rline0.rz * rline1.rx,
+			.rz = -rline0.rx * rline1.ry + rline0.ry * rline1.rx,
+			.rw = -rline0.rx * rline1.rx - rline0.ry * rline1.ry - rline0.rz * rline1.rz, ///< Scalar
+		};
+	}
+
+	inline translator operator*( point point0, point point1 ) {
+		return {
+			.ix = point0.x * point1.w - point0.w * point1.x,
+			.iy = point0.y * point1.w - point0.w * point1.y,
+			.iz = point0.z * point1.w - point0.w * point1.z,
+			.iw = point0.w * point1.w
+		};
 	}
 }; // namespace GLVM::core::pga
 
