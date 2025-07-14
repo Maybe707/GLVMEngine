@@ -53,9 +53,11 @@ int main()
 	[[maybe_unused]] pga::point point1 = { 3.577f, 0.787f, 16.575f, 888.99f };
 	[[maybe_unused]] pga::line line0 = { 1.87, 2.053, 6.234, 10.34, 3234.32, 223.43 };
 	[[maybe_unused]] pga::line line1 = { 5.723, 10.234, 3.343, 0.344, 234.123, 77.345 };
+	[[maybe_unused]] pga::rline rline0 = { 21.87, 25.053, 63.234 };
+	[[maybe_unused]] pga::rline rline1 = { 15.723, 510.234, 73.343 };
 	
 //	std::cout << (line0 ^ plane0) << std::endl;
-	std::cout << (line0 & line1) << std::endl;
+	std::cout << (point0 * point1) << std::endl;
 
 	
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();

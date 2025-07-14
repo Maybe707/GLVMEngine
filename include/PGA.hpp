@@ -96,8 +96,29 @@ namespace GLVM::core::pga
 		return os;
 	}
 
+	inline std::ostream& operator<<( std::ostream& os, const motor& motor ) {
+		os << "rx: " << motor.rx << " ry: " << motor.ry << " rz: " << motor.rz << " rw: " << motor.rw <<
+			" ix: " << motor.ix << " iy: " << motor.iy << " iz: " << motor.iz << " iw: " << motor.iw;
+		return os;
+	}
+	
 	inline std::ostream& operator<<( std::ostream& os, const pseudoScalar& pseudoScalar ) {
 		os << "w: " << pseudoScalar.w;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const rline& rline ) {
+		std::cout << "rx: " << rline.rx << " ry: " << rline.ry << " rz: " << rline.rz;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const rotor& rotor ) {
+		std::cout << "rx: " << rotor.rx << " ry: " << rotor.ry << " rz: " << rotor.rz << " rw: " << rotor.rw;
+		return os;
+	}
+
+	inline std::ostream& operator<<( std::ostream& os, const translator& translator ) {
+		std::cout << "ix: " << translator.ix << " iy: " << translator.iy << " iz: " << translator.iz << " iw: " << translator.iw;
 		return os;
 	}
 	
@@ -402,7 +423,7 @@ namespace GLVM::core::pga
 		return {
 			/// real part ( moment ): e23, e31, e12
 			.rx = -line0.ry * line1.rz + line0.rz * line1.ry,
-			.ry = line0.rx * line1.rz + line0.rz * line1.rx,
+			.ry = line0.rx * line1.rz - line0.rz * line1.rx,
 			.rz = -line0.rx * line1.ry + line0.ry * line1.rx,
 			.rw = -line0.rx * line1.rx - line0.ry * line1.ry - line0.rz * line1.rz, ///< Scalar
 			/// ideal part (direction): e01, e02, e03
@@ -418,7 +439,7 @@ namespace GLVM::core::pga
 		return {
 			/// real part ( moment ): e23, e31, e12
 			.rx = -rline0.ry * rline1.rz + rline0.rz * rline1.ry,
-			.ry = rline0.rx * rline1.rz + rline0.rz * rline1.rx,
+			.ry = rline0.rx * rline1.rz - rline0.rz * rline1.rx,
 			.rz = -rline0.rx * rline1.ry + rline0.ry * rline1.rx,
 			.rw = -rline0.rx * rline1.rx - rline0.ry * rline1.ry - rline0.rz * rline1.rz, ///< Scalar
 		};
@@ -429,7 +450,7 @@ namespace GLVM::core::pga
 			.ix = point0.x * point1.w - point0.w * point1.x,
 			.iy = point0.y * point1.w - point0.w * point1.y,
 			.iz = point0.z * point1.w - point0.w * point1.z,
-			.iw = point0.w * point1.w
+			.iw = -point0.w * point1.w
 		};
 	}
 }; // namespace GLVM::core::pga
