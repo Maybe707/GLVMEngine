@@ -294,6 +294,22 @@ namespace GLVM::core::pga
 		};
 	}
 
+	inline point operator^( const line& line, const plane& plane ) {
+		// return {
+		// 	.x = line.ry * plane.z - line.rz * plane.y - line.iy * plane.w,
+		// 	.y = line.rz * plane.x - line.rx * plane.z - line.iz * plane.w,
+		// 	.z = line.rx * plane.y - line.ry * plane.x - line.ix * plane.w,
+		// 	.w = line.ix * plane.x + line.iy * plane.y + line.iz * plane.z
+		// };
+		return {
+			.x = -line.rx * plane.w - line.iy * plane.z + line.iz * plane.y,
+			.y = -line.ry * plane.w + line.ix * plane.z - line.iz * plane.x,
+			.z = -line.rz * plane.w - line.ix * plane.y + line.iy * plane.x,
+			.w = line.rx * plane.x + line.ry * plane.y + line.rz * plane.z
+		};
+	}
+
+
 	/*================== REGRESSIVE PRODUCT ===================
 	  Regressive product gives the intersection of objects.
 	  In Projective Geometric Algebra (PGA), the regressive
@@ -306,32 +322,49 @@ namespace GLVM::core::pga
 		return 0.0f;
 	}
 
-	inline pseudoScalar operator&( plane plane, point point ) {
+	inline scalar operator&( plane plane, point point ) {
 		/// plane below link with dual point from outer product and point below link with dual plane from outer product
-		return { .w = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w * point.w };
+		return { .value = -plane.x * point.x + -plane.y * point.y + -plane.z * point.z + -plane.w * point.w };
 	}
 
-	inline plane operator&( point point, line line ) {
+	inline scalar operator&( point point, plane plane  ) {
+		/// plane below link with dual point from outer product and point below link with dual plane from outer product
+		return { .value = plane.x * point.x + plane.y * point.y + plane.z * point.z + plane.w * point.w };
+	}
+	
+	inline plane operator&( [[maybe_unused]] point point, [[maybe_unused]] line line ) {
 		/// point below link with dual plane from outer product and line below link with dual line from outer product
 		return {
-			.x = point.y * line.iz - point.z * line.iy - point.w * line.rx,
-			.y = -point.x * line.iz + point.z * line.ix - point.w * line.ry,
-			.z = point.x * line.iy - point.y * line.ix - point.w * line.rz,
-			.w = point.x * line.rx + point.y * line.ry + point.z * line.rz
+			.x = point.y * line.rz - point.z * line.ry - point.w * line.ix,
+			.y = -point.x * line.rz + point.z * line.rx - point.w * line.iy,
+			.z = point.x * line.ry - point.y * line.rx - point.w * line.iz,
+			.w = point.x * line.ix + point.y * line.iy + point.z * line.iz
 		};
+//		return {};
 	}
 
+	inline plane operator&( [[maybe_unused]] line line, [[maybe_unused]] point point ) {
+		/// point below link with dual plane from outer product and line below link with dual line from outer product
+		return {
+			.x = -line.ix * point.w - line.ry * point.z + line.rz * point.y,
+			.y = -line.iy * point.w + line.rx * point.z - line.rz * point.x,
+			.z = -line.iz * point.w - line.rx * point.y + line.ry * point.x,
+			.w = line.ix * point.x + line.iy * point.y + line.iz * point.z,
+		};
+//		return {};
+	}
+	
 	inline line operator&( [[maybe_unused]] point point0, [[maybe_unused]] point point1 ) {
 		/// point0 below link with dual plane0 from outer product and point1 below link with dual plane1 from outer product
 		return {
 			/// real part ( moment ): e23, e31, e12
-			.rx = point0.y * point1.z - point0.z * point1.y,
-			.ry = point0.z * point1.x - point0.x * point1.z,
-			.rz = point0.x * point1.y - point0.y * point1.x,
+			.rx = point0.w * point1.x - point0.x * point1.w,
+			.ry = point0.w * point1.y - point0.y * point1.w,
+			.rz = point0.w * point1.z - point0.z * point1.w,
 			/// ideal part (direction): e01, e02, e03
-			.ix = point0.w * point1.x - point0.x * point1.w,
-			.iy = point0.w * point1.y - point0.y * point1.w,
-			.iz = point0.w * point1.z - point0.z * point1.w
+			.ix = point0.y * point1.z - point0.z * point1.y,
+			.iy = point0.z * point1.x - point0.x * point1.z,
+			.iz = point0.x * point1.y - point0.y * point1.x
 		};
 	}
 
@@ -341,6 +374,10 @@ namespace GLVM::core::pga
 	}
 
 	inline float operator&( [[maybe_unused]] plane plane, [[maybe_unused]] line line ) {
+		return 0.0f;
+	}
+
+	inline float operator&( [[maybe_unused]] line line, [[maybe_unused]] plane plane ) {
 		return 0.0f;
 	}
 
