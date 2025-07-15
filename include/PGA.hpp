@@ -38,6 +38,12 @@ namespace GLVM::core::pga
 		float ry;
 		float rz;
 	};
+
+	struct iline {
+		float ix;
+		float iy;
+		float iz;
+	};
 	
 	struct point {     ///< trivector
 		float x;
@@ -157,6 +163,8 @@ namespace GLVM::core::pga
 	inline plane operator~( const plane& plane ) { return plane; }
 	inline line operator~( const line& line ) { return -line; }
 	inline point operator~( const point& point ) { return -point; }
+	inline scalar operator~( const scalar& scalar ) { return scalar; }
+	inline rline operator~( const rline& rline ) { return rline; }
 
 	/*===================== INNER PRODUCT====================*/
 	/// Scalar product of the plane normals
@@ -453,6 +461,25 @@ namespace GLVM::core::pga
 			.iw = -point0.w * point1.w
 		};
 	}
+
+	/* exp(-theta * B ) = cos(-theta) + sin(-theta) * B = cos(theta) - sin(theta) * B
+	   берут ряд тейлора и раскрывают полное выражение. в случае с поворотом там происходит такая
+	   же ситуация как в формуле Эйлера поэтому там синус и косинус, в случае сдвига получается просто
+	   1 + t/2 * iline. так любая степень n >= 2 уже содержит n = 2, следовательно они все будут нулем.
+	   если плейн нормализован, то он сам собой будет двигать на 1.
+	 */
+	inline rotor exp( float theta, rline rline ) {
+		float sin = std::sin(theta / 2.0f);
+		return { .rx = rline.rx * sin, .ry = rline.ry * sin, .rz = rline.rz * sin, .rw = std::cos(theta / 2.0f) };
+	}
+
+	inline translator exp( float distance, iline iline ) {
+		float half = distance / 2.0f;
+		return { .ix = iline.ix * half, .iy = iline.iy * half, .iz = iline.iz * half, .iw = 1.0f };
+	}
+
+	/* TODO: и еще по хорошему композиции ротора * транслятора, мотора * мотора, мотора * ротора,
+	   мотора * транслятора */
 }; // namespace GLVM::core::pga
 
 #endif
