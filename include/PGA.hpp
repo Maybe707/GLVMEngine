@@ -478,6 +478,25 @@ namespace GLVM::core::pga
 		return { .ix = iline.ix * half, .iy = iline.iy * half, .iz = iline.iz * half, .iw = 1.0f };
 	}
 
+	inline point operator>>( rotor rotor, point point ) {
+		const float rwx = rotor.rw * rotor.rx;
+		const float ryz = rotor.ry * rotor.rz;
+		const float rxz = rotor.rx * rotor.rz;
+		const float rwy = rotor.rw * rotor.ry;
+		const float ryy = rotor.ry * rotor.ry;
+		const float rxx = rotor.rx * rotor.rx;
+		const float rxy = rotor.rx * rotor.ry;
+		const float rwz = rotor.rw * rotor.rz;
+		const float rzz = rotor.rz * rotor.rz;
+		
+		return {
+			.x = point.x + 2.0f * (point.z * (-rwy + rxz) + point.y * (rwz + rxy) - point.x * (rzz + ryy)),
+			.y = point.y + 2.0f * (point.z * (ryz + rwx) + point.x * (rxy - rwz) - point.y * (rzz + rxx)),
+			.z = point.z + 2.0f * (point.y * (-rwx + ryz) + point.x * (rxz + rwy) - point.z * (ryy + rxx)),
+			.w = point.w
+		};
+	}
+	
 	/* TODO: и еще по хорошему композиции ротора * транслятора, мотора * мотора, мотора * ротора,
 	   мотора * транслятора */
 }; // namespace GLVM::core::pga
