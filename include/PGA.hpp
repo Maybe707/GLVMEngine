@@ -479,20 +479,30 @@ namespace GLVM::core::pga
 	}
 
 	inline point operator>>( const rotor& rotor, const point& point ) {
-		const float rwx = rotor.rw * rotor.rx;
-		const float ryz = rotor.ry * rotor.rz;
-		const float rxz = rotor.rx * rotor.rz;
-		const float rwy = rotor.rw * rotor.ry;
-		const float ryy = rotor.ry * rotor.ry;
-		const float rxx = rotor.rx * rotor.rx;
-		const float rxy = rotor.rx * rotor.ry;
-		const float rwz = rotor.rw * rotor.rz;
-		const float rzz = rotor.rz * rotor.rz;
+		// const float rwx = rotor.rw * rotor.rx;
+		// const float ryz = rotor.ry * rotor.rz;
+		// const float rxz = rotor.rx * rotor.rz;
+		// const float rwy = rotor.rw * rotor.ry;
+		// const float ryy = rotor.ry * rotor.ry;
+		// const float rxx = rotor.rx * rotor.rx;
+		// const float rxy = rotor.rx * rotor.ry;
+		// const float rwz = rotor.rw * rotor.rz;
+		// const float rzz = rotor.rz * rotor.rz;
 		
+		// return {
+		// 	.x = point.x + 2.0f * (point.z * (-rwy + rxz) + point.y * (rwz + rxy) - point.x * (rzz + ryy)),
+		// 	.y = point.y + 2.0f * (point.z * (ryz + rwx) + point.x * (rxy - rwz) - point.y * (rzz + rxx)),
+		// 	.z = point.z + 2.0f * (point.y * (-rwx + ryz) + point.x * (rxz + rwy) - point.z * (ryy + rxx)),
+		// 	.w = point.w
+		// };
+		const float d0 = point.x * rotor.rw + point.y * rotor.rz - point.z * rotor.ry;
+		const float d1 = point.x * rotor.ry - point.y * rotor.rx + point.z * rotor.rw;
+		const float d2 = -point.x * rotor.rz + point.y * rotor.rw + point.z * rotor.rx;
+
 		return {
-			.x = point.x + 2.0f * (point.z * (-rwy + rxz) + point.y * (rwz + rxy) - point.x * (rzz + ryy)),
-			.y = point.y + 2.0f * (point.z * (ryz + rwx) + point.x * (rxy - rwz) - point.y * (rzz + rxx)),
-			.z = point.z + 2.0f * (point.y * (-rwx + ryz) + point.x * (rxz + rwy) - point.z * (ryy + rxx)),
+			.x = point.x + 2.0f * ( -rotor.ry * d1 + rotor.rz * d2 ),
+			.y = point.y + 2.0f * ( -rotor.rz * d0 + rotor.rx * d1 ),
+			.z = point.z + 2.0f * ( -rotor.rx * d2 + rotor.ry * d0 ),
 			.w = point.w
 		};
 	}

@@ -41,6 +41,7 @@
 #include "ShaderStructs.hpp"
 #include "Components/FontComponent.hpp"
 #include <print>
+#include "PGA.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR

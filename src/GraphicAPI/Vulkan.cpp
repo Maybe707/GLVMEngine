@@ -21,6 +21,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "EntityManager.hpp"
+#include "PGA.hpp"
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "UnixApi/WindowWaylandVulkan.hpp"
@@ -305,20 +306,26 @@ namespace GLVM::core
 			constexpr float angleScale = 0.1f;                                                                                     
 			rotationAngle = Radians(rotationAngle * angleScale);
 			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-			const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-			const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-												 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-			// const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-			// 																								cameraComponent.forward[1], cameraComponent.forward[2])),
-			// 													conjugate(rotationQuat));
+			[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+			// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+			// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+			// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+			// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
+			// // 													conjugate(rotationQuat));
 
-			const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
-																			  cameraComponent.forward[2])) * conjugate(rotationQuat);
+			// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
+			// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
 
 			
-			forward[0] = appliedRotationQuat.x;
-			forward[1] = appliedRotationQuat.y;
-			forward[2] = appliedRotationQuat.z;
+			// forward[0] = appliedRotationQuat.x;
+			// forward[1] = appliedRotationQuat.y;
+			// forward[2] = appliedRotationQuat.z;
+			pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
+					.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent.forward[0],
+					.y = cameraComponent.forward[1], .z = cameraComponent.forward[2], .w = 1.0f };
+			forward[0] = appliedRotationPoint.x;
+			forward[1] = appliedRotationPoint.y;
+			forward[2] = appliedRotationPoint.z;
 		}
 		cameraComponent.forward = Normalize(forward);
 		_Player.forward = cameraComponent.forward;
