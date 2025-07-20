@@ -195,13 +195,12 @@ namespace GLVM::core
 	};
 	
 	struct Descriptor {
-		core::vector<VkDescriptorType>       vkType;
+		VkDescriptorType       vkType;
 		DescriptorsTypes       type;
-		core::vector<u32> binding;
+		u32                    binding;
 		VkShaderStageFlags     shaderStageFlag;
+		u32                    descriptorsNumber;
 		VkDescriptorSetLayout  setLayout;
-		core::vector<u32>               descriptorsNumber;
-
 		// std::vector<VkBuffer> uniformBuffers;
 		// std::vector<VkDeviceMemory> uniformBuffersMemory;
 		
@@ -220,19 +219,17 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
-		void addDescriptor(core::vector<VkDescriptorType> vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag,
-						   core::vector<u32> descriptorsNumbers, core::vector<uint32_t> bindings) {
-			descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
+		void addDescriptor(Descriptor descriptor) {
+			descriptors.Push(descriptor);
 		}
 
-		core::vector<u32> getBindingOfDescriptor(DescriptorsTypes type) const {
+		u32 getBindingOfDescriptor(DescriptorsTypes type) const {
 			for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
 				if ( type == descriptors[i].type )
 					return descriptors[i].binding;
 			}
 
-			core::vector<u32> empty;
-			return empty;
+			return -1;
 		}
 	};
 
