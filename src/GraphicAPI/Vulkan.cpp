@@ -27,6 +27,7 @@
 #include "UnixApi/WindowWaylandVulkan.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
+#include "VkStructs.hpp"
 #include "WavefrontObjParser.hpp"
 #include <cmath>
 #include <cstddef>
@@ -607,19 +608,19 @@ namespace GLVM::core
 		mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
 		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes1, DescriptorsTypes::LIGHT_DATA, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCountSet1, descriptorSet1Bindings);
 
-		core::vector<u32> descriptorCountSet2;
-		descriptorCountSet2.Push(1);
-		descriptorCountSet2.Push(1);
-		core::vector<u32> descriptorSet2Bindings;
-		descriptorSet2Bindings.Push(0);
-		descriptorSet2Bindings.Push(1);
+		// core::vector<u32> descriptorCountSet2;
+		// descriptorCountSet2.Push(1);
+		// descriptorCountSet2.Push(1);
+		// core::vector<u32> descriptorSet2Bindings;
+		// descriptorSet2Bindings.Push(0);
+		// descriptorSet2Bindings.Push(1);
 		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes2;
 		mainRenderScenePipelineDescriptorTypes2.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipelineDescriptorTypes2.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes2, DescriptorsTypes::SPECULAR_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCountSet2, descriptorSet2Bindings);
+		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes2, DescriptorsTypes::SPECULAR_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
-			
-//		mainRenderScenePipeline.addDescriptor(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCountSet3, descriptorSet3Bindings);
+		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes3;
+		mainRenderScenePipelineDescriptorTypes3.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes3, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
@@ -3134,50 +3135,25 @@ namespace GLVM::core
 	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, [[maybe_unused]] const unsigned int& descriptorSetsNumber,
 																	const core::vector<unsigned int> bindings, std::vector<VkDescriptorSet>& descriptorSets,
 																	const unsigned int descriptorCount ) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::material>();
-
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
-			u32 entityID = linkedEntities[i];
-			[[maybe_unused]] cm::material* material = componentManager->GetComponent<cm::material>(entityID);
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			[[maybe_unused]] unsigned int textureIndex = i / 2;
-			imageInfo.imageView = textureImages[material->diffuseTextureID_.id].views[0];
-//			imageInfo.imageView = textureImages[textureIndex].views[0];
+			unsigned int textureIndex = i / 2;
+			imageInfo.imageView = textureImages[textureIndex].views[0];
 			imageInfo.sampler = textureSampler;
 
-			VkDescriptorImageInfo specularimageInfo{};
-			specularimageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			specularimageInfo.imageView = textureImages[material->specularTextureID_.id].views[0];
-//			specularimageInfo.imageView = textureImages[textureIndex].views[0];
-			specularimageInfo.sampler = textureSampler;
-			material->vkInnerId_ = i;
-			
-			// constexpr int var = descriptorCount;
-			// std::array<VkWriteDescriptorSet, var> descriptorWrites{};
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
 			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
 				descriptorWrites.Push({});
-				descriptorWrites.Push({});
-				const unsigned int lastElement = descriptorWrites.GetSize() - 2;
+				const unsigned int lastElement = descriptorWrites.GetSize() - 1;
 				descriptorWrites[lastElement].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[lastElement].dstSet = descriptorSets[i];
 				descriptorWrites[lastElement].dstBinding = bindings[j];
 				descriptorWrites[lastElement].dstArrayElement = 0;
 				descriptorWrites[lastElement].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 				descriptorWrites[lastElement].descriptorCount = descriptorCount;
-				descriptorWrites[lastElement].pImageInfo = &specularimageInfo;
-
-				descriptorWrites[lastElement + 1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[lastElement + 1].dstSet = descriptorSets[i];
-				descriptorWrites[lastElement + 1].dstBinding = 1;
-				descriptorWrites[lastElement + 1].dstArrayElement = 0;
-				descriptorWrites[lastElement + 1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[lastElement + 1].descriptorCount = 1;
-				descriptorWrites[lastElement + 1].pImageInfo = &imageInfo;
+				descriptorWrites[lastElement].pImageInfo = &imageInfo;
 			}
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
@@ -3741,23 +3717,31 @@ namespace GLVM::core
 									   lightDataUboBinding,lightDataUboDescriptorSets );
 
 		core::vector<u32> specularSamplerBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_SAMPLER);
- 
 		int specularSamplerBinding = specularSamplerBindigs[0];
+		core::vector<u32> diffuseSamplerBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
+		[[maybe_unused]] int diffuseSamplerBinding = diffuseSamplerBindings[0];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			[[maybe_unused]] u32 DS_specular_number = initializeTextureData_.size();
-
+			u32 DS_specular_number = initializeTextureData_.size();
+			// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+			// namespace cm = GLVM::ecs::components;
+			// core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::material>();
 			constexpr unsigned int specularSamplerUboDescriptorID = 2;
-			ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-			namespace cm = GLVM::ecs::components;
-			core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::material>();
-
 			allocateDescriptorSets( specularSamplerDescriptorSets, mainRenderScenePipeline, specularSamplerUboDescriptorID,
-									linkedEntities.GetSize() );
+									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
 
 			core::vector<unsigned int> bindings;
 			bindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, linkedEntities.GetSize(), bindings, specularSamplerDescriptorSets, 1 );
+			updateDescriptorSetsCombinedImageSampler( textureImages, MAX_FRAMES_IN_FLIGHT * DS_specular_number, bindings, specularSamplerDescriptorSets, 1 );
+
+			constexpr unsigned int diffuseSamplerUboDescriptorID = 3;
+			allocateDescriptorSets( diffuseSamplerDescriptorSets, mainRenderScenePipeline, diffuseSamplerUboDescriptorID,
+									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			
+			core::vector<unsigned int> diffuseBindings;
+			diffuseBindings.Push(specularSamplerBinding);
+			updateDescriptorSetsCombinedImageSampler( textureImages, MAX_FRAMES_IN_FLIGHT * DS_specular_number, diffuseBindings, diffuseSamplerDescriptorSets, 1 );
+			
 			// for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
 			// 	VkDescriptorImageInfo imageInfo{};
 			// 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -5032,9 +5016,8 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			[[maybe_unused]] unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			[[maybe_unused]] unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-			u32 textureID = componentManager->GetComponent<cm::material>(uiEntity)->vkInnerId_;
+			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
 			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
@@ -5056,9 +5039,9 @@ namespace GLVM::core
 
 //			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 2, 1,
-									&specularSamplerDescriptorSets[textureID], 0, nullptr);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
-			// 						&diffuseSamplerDescriptorSets[currentFrame], 0, nullptr);
+									&specularSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame], 0, nullptr);
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, mainRenderScenePipeline.pipelineLayout, 3, 1,
+									&diffuseSamplerDescriptorSets[MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame], 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}

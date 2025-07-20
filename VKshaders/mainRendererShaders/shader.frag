@@ -119,7 +119,7 @@ layout(set = 1, binding = 37) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS
 // } spotLights;
 
 layout(set = 2, binding = 0) uniform sampler2D specular;
-layout(set = 2, binding = 1) uniform sampler2D diffuse;
+layout(set = 3, binding = 0) uniform sampler2D diffuse;
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);
