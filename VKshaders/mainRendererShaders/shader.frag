@@ -102,6 +102,9 @@ layout(set = 1, binding = 0) uniform LightData {
 	ivec4 indirectTexture[INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4 + 1];
 } lightData;
 vec2 tilesetFinalUV;
+layout(set = 1, binding = 1) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
+layout(set = 1, binding = 5) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+layout(set = 1, binding = 37) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 // layout(set = 3, binding = 0) uniform DirectionalLightsUBO {
 
@@ -117,10 +120,6 @@ vec2 tilesetFinalUV;
 
 layout(set = 2, binding = 0) uniform sampler2D specular;
 layout(set = 2, binding = 1) uniform sampler2D diffuse;
-
-layout(set = 3, binding = 0) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 3, binding = 4) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 3, binding = 36) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirection);
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection);

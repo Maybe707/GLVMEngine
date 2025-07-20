@@ -195,7 +195,7 @@ namespace GLVM::core
 	};
 	
 	struct Descriptor {
-		VkDescriptorType       vkType;
+		core::vector<VkDescriptorType>       vkType;
 		DescriptorsTypes       type;
 		core::vector<u32> binding;
 		VkShaderStageFlags     shaderStageFlag;
@@ -220,17 +220,9 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
-		void addDescriptor(VkDescriptorType vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag,
+		void addDescriptor(core::vector<VkDescriptorType> vkType, DescriptorsTypes type, VkShaderStageFlags shaderStageFlag,
 						   core::vector<u32> descriptorsNumbers, core::vector<uint32_t> bindings) {
-			if (vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER) {
-				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
-				++uboDescriptorsNumber;
-			} else if (vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
-				descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
-				++combinedImageSamplersNumber;
-			} else {
-				assert(!"unreachable");
-			}
+			descriptors.Push({vkType, type, bindings, shaderStageFlag, VkDescriptorSetLayout(), descriptorsNumbers, {}});
 		}
 
 		core::vector<u32> getBindingOfDescriptor(DescriptorsTypes type) const {
@@ -627,6 +619,8 @@ namespace GLVM::core
 									 unsigned int desriptorID, unsigned int descriptorSetsNumber);
 		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
 									  int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets);
+		void updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
+											int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets );
 		void updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, const unsigned int& descriptorSetsNumber,
 													   const core::vector<unsigned int> bindings, std::vector<VkDescriptorSet>& descriptorSets,
 													   const unsigned int descriptorCount );
