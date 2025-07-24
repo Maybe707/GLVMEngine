@@ -90,7 +90,7 @@ namespace GLVM::core
 
 		LIGHT_DATA,
 		SPECULAR_SAMPLER,
-		LIGHT_SAMPLERS,
+		DIFFUSE_SAMPLER,
 	};
 } 
 

@@ -34,6 +34,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <exception>
+#include <string>
 #include <thread>
 #include <vulkan/vulkan_core.h>
 #include <vulkan/vulkan_wayland.h>
@@ -476,15 +477,14 @@ namespace GLVM::core
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
 
-		core::vector<u32> descriptorCount1Set0;
-		descriptorCount1Set0.Push(1);
-		core::vector<u32> descriptorSet0Binding0;
-		descriptorSet0Binding0.Push(0);
-
-		core::vector<VkDescriptorType> directionalLightPipelineDescriptorTypes;
-		directionalLightPipelineDescriptorTypes.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		directionalLightPipeline.addDescriptor(directionalLightPipelineDescriptorTypes,
-											   DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		u32 binding_0 = 0;
+		u32 descriptorNumber_1 = 1;
+		DescriptorBinding directionalLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet directionalLightDescriptorSet0;
+		directionalLightDescriptorSet0.hostDescriptorNumber = directionalLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		directionalLightDescriptorSet0.descriptorBindings.Push( directionalLightDescriptorBinding0_Set0 );
+		directionalLightPipeline.addDescriptor( directionalLightDescriptorSet0 );
 		
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
@@ -495,118 +495,167 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-		core::vector<VkDescriptorType> spotLightPipelineDescriptorTypes;
-		spotLightPipelineDescriptorTypes.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		spotLightPipeline.addDescriptor(spotLightPipelineDescriptorTypes,
-										DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		DescriptorBinding spotLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };                     
+		DescriptorSet spotLightDescriptorSet0;
+		spotLightDescriptorSet0.hostDescriptorNumber = spotLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		spotLightDescriptorSet0.descriptorBindings.Push( spotLightDescriptorBinding0_Set0 );
+		spotLightPipeline.addDescriptor( spotLightDescriptorSet0 );
 		
 		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::pointLight,
-																							   cm::mesh>();
+																								cm::pointLight,
+																								cm::mesh>();
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-		core::vector<VkDescriptorType> pointLightPipelineDescriptorTypes;
-		pointLightPipelineDescriptorTypes.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		pointLightPipeline.addDescriptor(pointLightPipelineDescriptorTypes,
-										 DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		DescriptorBinding pointLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };                            ///< 6 is number of layers for cube shadow map
+		DescriptorSet pointLightDescriptorSet0;
+		pointLightDescriptorSet0.hostDescriptorNumber = pointLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		pointLightDescriptorSet0.descriptorBindings.Push( pointLightDescriptorBinding0_Set0 );
+		pointLightPipeline.addDescriptor( pointLightDescriptorSet0 );
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
 		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		core::vector<VkDescriptorType> hudPipelineDescriptorTypes;
-		hudPipelineDescriptorTypes.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		hudPipeline.addDescriptor(hudPipelineDescriptorTypes, DescriptorsTypes::HUD_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		DescriptorBinding hudDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet hudDescriptorSet0;
+		hudDescriptorSet0.hostDescriptorNumber = hudUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT;
+		hudDescriptorSet0.descriptorBindings.Push( hudDescriptorBinding0_Set0 );
+		hudPipeline.addDescriptor( hudDescriptorSet0 );
 		hudPipeline.vertShader = vertShaderHUD;
 		hudPipeline.fragShader = fragShaderHUD;
-
 		hudPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
+		DescriptorBinding fontDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::FONT_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet fontDescriptorSet0;
+		fontDescriptorSet0.hostDescriptorNumber = fontUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT * 8;
+		fontDescriptorSet0.descriptorBindings.Push( fontDescriptorBinding0_Set0 );
+		fontPipeline.addDescriptor( fontDescriptorSet0 );
+		DescriptorBinding fontDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet fontDescriptorSet1;
+		fontDescriptorSet1.hostDescriptorNumber = 2;
+		fontDescriptorSet1.descriptorBindings.Push( fontDescriptorBinding0_Set1 );
+		fontPipeline.addDescriptor( fontDescriptorSet1 );
 		fontPipeline.vertShader = vertShaderFont;
 		fontPipeline.fragShader = fragShaderFont;
-
 		fontPipeline.bindingDescription = Vertex::getBindingDescription();
 		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		core::vector<VkDescriptorType> fontPipelineDescriptorTypes0;
-		fontPipelineDescriptorTypes0.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		fontPipeline.addDescriptor(fontPipelineDescriptorTypes0, DescriptorsTypes::FONT_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
-		core::vector<VkDescriptorType> fontPipelineDescriptorTypes1;
-		fontPipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		fontPipeline.addDescriptor(fontPipelineDescriptorTypes1, DescriptorsTypes::FONT_ATLAS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
+		DescriptorBinding hudScreenDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_SCREEN_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet hudScreenDescriptorSet0;
+		hudScreenDescriptorSet0.hostDescriptorNumber = hudScreenUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT;
+		hudScreenDescriptorSet0.descriptorBindings.Push( hudScreenDescriptorBinding0_Set0 );
+		hudScreenPipeline.addDescriptor( hudScreenDescriptorSet0);
 		hudScreenPipeline.vertShader = vertexShaderHudScreen;
 		hudScreenPipeline.fragShader = fragmentShaderHudScreen;
 		hudScreenPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudScreenPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		core::vector<VkDescriptorType> hudScreenPipelineDescriptorTypes;
-		hudScreenPipelineDescriptorTypes.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		hudScreenPipeline.addDescriptor(hudPipelineDescriptorTypes, DescriptorsTypes::HUD_SCREEN_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
+		DescriptorBinding uiDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet uiDescriptorSet0;
+		uiDescriptorSet0.hostDescriptorNumber = uiUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		uiDescriptorSet0.descriptorBindings.Push( uiDescriptorBinding0_Set0 );
+		uiPipeline.addDescriptor( uiDescriptorSet0 );
+		DescriptorBinding uiDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1, };
+		DescriptorSet uiDescriptroSet1;
+		uiDescriptroSet1.hostDescriptorNumber = 2;
+		uiDescriptroSet1.descriptorBindings.Push( uiDescriptorBinding0_Set1 );
+		uiPipeline.addDescriptor( uiDescriptroSet1 );
 		uiPipeline.vertShader = vertexShaderUI;
 		uiPipeline.fragShader = fragmentShaderUI;
 		uiPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		core::vector<VkDescriptorType> uiPipelineDescriptorTypes0;
-		uiPipelineDescriptorTypes0.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		uiPipeline.addDescriptor(uiPipelineDescriptorTypes0, DescriptorsTypes::UI_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
-		core::vector<VkDescriptorType> uiPipelineDescriptorTypes1;
-		uiPipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		uiPipeline.addDescriptor(uiPipelineDescriptorTypes1, DescriptorsTypes::UI_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
+		DescriptorBinding uiIconsDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet uiIconsDescriptorSet0;
+		uiIconsDescriptorSet0.hostDescriptorNumber = uiIconsDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		uiIconsDescriptorSet0.descriptorBindings.Push( uiIconsDescriptorBinding0_Set0 );
+		uiIconsPipeline.addDescriptor( uiIconsDescriptorSet0 );
+		DescriptorBinding uiIconsDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_ICONS_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet uiIconsDescriptorSet1;
+		uiIconsDescriptorSet1.hostDescriptorNumber = initializeTextureData_.size();
+		uiIconsDescriptorSet1.descriptorBindings.Push( uiIconsDescriptorBinding0_Set1 );
+		uiIconsPipeline.addDescriptor( uiIconsDescriptorSet1 );
 		uiIconsPipeline.vertShader = vertexShaderIconsUI;
 		uiIconsPipeline.fragShader = fragmentShaderIconsUI;
 		uiIconsPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiIconsPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		core::vector<VkDescriptorType> uiIconsPipelineDescriptorTypes0;
-		uiIconsPipelineDescriptorTypes0.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		uiIconsPipeline.addDescriptor(uiIconsPipelineDescriptorTypes0, DescriptorsTypes::UI_ICONS_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
-		core::vector<VkDescriptorType> uiIconsPipelineDescriptorTypes1;
-		uiIconsPipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		uiIconsPipeline.addDescriptor(uiIconsPipelineDescriptorTypes1, DescriptorsTypes::UI_ICONS_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 
+		DescriptorBinding virtualTexturesDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::VIRTUAL_TEXTURES_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet virtualTexturesDescriptorSet0;
+		virtualTexturesDescriptorSet0.hostDescriptorNumber = virtualTexturesDescriptorsNumber;
+		virtualTexturesDescriptorSet0.descriptorBindings.Push( virtualTexturesDescriptorBinding0_Set0 );
+		virtualTexturesPipeline.addDescriptor( virtualTexturesDescriptorSet0 );
+		DescriptorBinding virtualTexturesDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::VIRTUAL_TEXTURE_TILESET,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet virtualTexturesDescriptorSet1;
+		virtualTexturesDescriptorSet1.hostDescriptorNumber = 2;
+		virtualTexturesDescriptorSet1.descriptorBindings.Push( virtualTexturesDescriptorBinding0_Set1 );
+		virtualTexturesPipeline.addDescriptor( virtualTexturesDescriptorSet1 );
 		virtualTexturesPipeline.vertShader = virtualTexturesVertexShader;
 		virtualTexturesPipeline.fragShader = virtualTexturesFragmentShader;
 		virtualTexturesPipeline.bindingDescription = Vertex::getBindingDescription();
 		virtualTexturesPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		core::vector<VkDescriptorType> virtualTexturePipelineDescriptorTypes0;
-		virtualTexturePipelineDescriptorTypes0.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		virtualTexturesPipeline.addDescriptor(virtualTexturePipelineDescriptorTypes0, DescriptorsTypes::VIRTUAL_TEXTURES_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
-		core::vector<VkDescriptorType> virtualTexturePipelineDescriptorTypes1;
-		virtualTexturePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		virtualTexturesPipeline.addDescriptor(virtualTexturePipelineDescriptorTypes1, DescriptorsTypes::VIRTUAL_TEXTURE_TILESET, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
 		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::material,
-																								cm::mesh>();
+																							cm::material,
+																							cm::mesh>();
 
 		actorsNumber = actorsLinkedEntities.GetSize();
 
-		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes0;
-		mainRenderScenePipelineDescriptorTypes0.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes0, DescriptorsTypes::MODEL_MATRIX_UBO, VK_SHADER_STAGE_VERTEX_BIT, descriptorCount1Set0, descriptorSet0Binding0);
-		core::vector<u32> descriptorCountSet1;
-		descriptorCountSet1.Push(1);
-		descriptorCountSet1.Push(4);
-		descriptorCountSet1.Push(32);
-		descriptorCountSet1.Push(8);
+		DescriptorBinding mainRenderSceneDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO,
+			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet mainRenderSceneDescriptorSet0;
+		mainRenderSceneDescriptorSet0.hostDescriptorNumber = matrixUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
+		mainRenderSceneDescriptorSet0.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set0 );
+		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet0 );
+		// core::vector<u32> descriptorCountSet1;
+		// descriptorCountSet1.Push(1);
+		// descriptorCountSet1.Push(4);
+		// descriptorCountSet1.Push(32);
+		// descriptorCountSet1.Push(8);
 
-		core::vector<u32> descriptorSet1Bindings;
-		descriptorSet1Bindings.Push(0);
-		descriptorSet1Bindings.Push(1);
-		descriptorSet1Bindings.Push(5);
-		descriptorSet1Bindings.Push(37);
-		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes1;
-		mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes1, DescriptorsTypes::LIGHT_DATA, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCountSet1, descriptorSet1Bindings);
+		// core::vector<u32> descriptorSet1Bindings;
+		// descriptorSet1Bindings.Push(0);
+		// descriptorSet1Bindings.Push(1);
+		// descriptorSet1Bindings.Push(5);
+		// descriptorSet1Bindings.Push(37);
+		// core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes1;
+		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
+		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		DescriptorBinding mainRenderSceneDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::LIGHT_DATA,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorBinding mainRenderSceneDescriptorBinding1_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
+			VK_SHADER_STAGE_FRAGMENT_BIT, 1, 4 };
+		DescriptorBinding mainRenderSceneDescriptorBinding2_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
+			VK_SHADER_STAGE_FRAGMENT_BIT, 5, 32 };
+		DescriptorBinding mainRenderSceneDescriptorBinding3_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
+			VK_SHADER_STAGE_FRAGMENT_BIT, 37, 8 };
+		DescriptorSet mainRenderSceneDescriptorSet1;
+		mainRenderSceneDescriptorSet1.hostDescriptorNumber = 2;
+		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set1 );
+		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding1_Set1 );
+		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding2_Set1 );
+		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding3_Set1 );
+		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet1 );
 
 		// core::vector<u32> descriptorCountSet2;
 		// descriptorCountSet2.Push(1);
@@ -614,13 +663,23 @@ namespace GLVM::core
 		// core::vector<u32> descriptorSet2Bindings;
 		// descriptorSet2Bindings.Push(0);
 		// descriptorSet2Bindings.Push(1);
-		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes2;
-		mainRenderScenePipelineDescriptorTypes2.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes2, DescriptorsTypes::SPECULAR_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		// core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes2;
+		// mainRenderScenePipelineDescriptorTypes2.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
+		DescriptorBinding mainRenderSceneDescriptorBinding0_Set2{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet mainRenderSceneDescriptorSet2;
+		mainRenderSceneDescriptorSet2.hostDescriptorNumber = initializeTextureData_.size() * MAX_FRAMES_IN_FLIGHT;
+		mainRenderSceneDescriptorSet2.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set2 );
+		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet2 );
 
 		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes3;
 		mainRenderScenePipelineDescriptorTypes3.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		mainRenderScenePipeline.addDescriptor(mainRenderScenePipelineDescriptorTypes3, DescriptorsTypes::LIGHT_SAMPLERS, VK_SHADER_STAGE_FRAGMENT_BIT, descriptorCount1Set0, descriptorSet0Binding0);
+		DescriptorBinding mainRenderSceneDescriptorBinding0_Set3{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIFFUSE_SAMPLER,
+			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
+		DescriptorSet mainRenderSceneDescriptorSet3;
+		mainRenderSceneDescriptorSet3.hostDescriptorNumber = initializeTextureData_.size() * MAX_FRAMES_IN_FLIGHT;
+		mainRenderSceneDescriptorSet3.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set3 );
+		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet3 );
 
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
@@ -894,16 +953,16 @@ namespace GLVM::core
 		createSpotLightShadowMapRenderPass();
 		createPointLightShadowMapRenderPass();
 		createVirtualTextureRenderPass();
-        createDescriptorSetLayout(directionalLightPipeline.descriptors);
-		createDescriptorSetLayout(spotLightPipeline.descriptors);
-		createDescriptorSetLayout(pointLightPipeline.descriptors);
-		createDescriptorSetLayout(fontPipeline.descriptors);
-		createDescriptorSetLayout(hudPipeline.descriptors);
-		createDescriptorSetLayout(hudScreenPipeline.descriptors);
-        createDescriptorSetLayout(mainRenderScenePipeline.descriptors);
-		createDescriptorSetLayout(uiPipeline.descriptors);
-		createDescriptorSetLayout(uiIconsPipeline.descriptors);
-		createDescriptorSetLayout(virtualTexturesPipeline.descriptors);
+        createDescriptorSetLayout(directionalLightPipeline.descriptorSets);
+		createDescriptorSetLayout(spotLightPipeline.descriptorSets);
+		createDescriptorSetLayout(pointLightPipeline.descriptorSets);
+		createDescriptorSetLayout(fontPipeline.descriptorSets);
+		createDescriptorSetLayout(hudPipeline.descriptorSets);
+		createDescriptorSetLayout(hudScreenPipeline.descriptorSets);
+        createDescriptorSetLayout(mainRenderScenePipeline.descriptorSets);
+		createDescriptorSetLayout(uiPipeline.descriptorSets);
+		createDescriptorSetLayout(uiIconsPipeline.descriptorSets);
+		createDescriptorSetLayout(virtualTexturesPipeline.descriptorSets);
         createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
 		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
@@ -974,27 +1033,30 @@ namespace GLVM::core
 		createSyncObjects(virtualTexturesImageAvailableSemaphores, virtualTexturesRenderFinishedSemaphores, virtualTexturesInFlightFences);
     }
 
-	void CVulkanRenderer::clearPipeline( Pipeline& pipeline ) {
-		for ( unsigned int m = 0; m < pipeline.descriptors.GetSize(); ++m ) {
+	void CVulkanRenderer::clearPipeline( core::vector<VK_Image>& textureImages ) {
+		// for ( unsigned int n = 0; n < pipeline.descriptorSets.GetSize(); ++n ) {
+		// 	DescriptorSet currentDescriptorSet = pipeline.descriptorSets[n];
+		// 	for ( unsigned int m = 0; m < currentDescriptorSet.descriptorBindings.GetSize(); ++m ) {
 //			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
-			for(unsigned int i = 0; i < pipeline.descriptors[m].textureImages.size(); ++i)
-				{
+				for(unsigned int i = 0; i < textureImages.GetSize(); ++i)
+					{
 //					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
-					vkDestroySampler(device, pipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < pipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, pipeline.descriptors[m].textureImages[i].views[j], nullptr);
+						vkDestroySampler(device, textureImages[i].sampler, nullptr);
+						for ( unsigned int j = 0; j < textureImages[i].views.size(); ++j )
+							vkDestroyImageView(device, textureImages[i].views[j], nullptr);
 
-					pipeline.descriptors[m].textureImages[i].views.clear();
+						textureImages[i].views.clear();
 					
-					vkDestroyImage(device, pipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, pipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-			pipeline.descriptors[m].textureImages.clear();
-		}
+						vkDestroyImage(device, textureImages[i].image, nullptr);
+						vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
+						// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+						// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
+						// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+						// }
+					}
+				textureImages.clear();
+		// 	}
+		// }
 	}
 	
     void CVulkanRenderer::cleanupSwapChain() {
@@ -1025,15 +1087,9 @@ namespace GLVM::core
             vkDestroyImageView(device, imageView, nullptr);
         }
 
-		clearPipeline( mainRenderScenePipeline );
-		clearPipeline( hudPipeline );
-		clearPipeline( directionalLightPipeline );
-		clearPipeline( spotLightPipeline );
-		clearPipeline( pointLightPipeline );
-		clearPipeline( fontPipeline );
-		clearPipeline( hudScreenPipeline );
-		clearPipeline( uiIconsPipeline );
-		clearPipeline( virtualTexturesPipeline );
+		clearPipeline( directionalLightTextureImages );
+		clearPipeline( pointLightTextureImages );
+		clearPipeline( spotLightTextureImages );
 
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
 		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
@@ -1122,19 +1178,19 @@ namespace GLVM::core
 
 		vkDestroyPipeline(device, directionalLightPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, directionalLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < directionalLightPipeline.descriptors.GetSize(); ++i ) {
-			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < directionalLightPipeline.descriptorSets.GetSize(); ++i ) {
+			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptorSets[i].setLayout, nullptr);
 		}
 
 		vkDestroyPipeline(device, spotLightPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, spotLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < spotLightPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < spotLightPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptorSets[i].setLayout, nullptr);
 
 		vkDestroyPipeline(device, pointLightPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, pointLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < pointLightPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < pointLightPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptorSets[i].setLayout, nullptr);
 
 		vkDestroyPipeline(device, fontPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, fontPipeline.pipelineLayout, nullptr);
@@ -1151,173 +1207,173 @@ namespace GLVM::core
 		vkDestroyPipeline(device, virtualTexturesPipeline.pipeline, nullptr);
 		vkDestroyPipelineLayout(device, virtualTexturesPipeline.pipelineLayout, nullptr);
 		
-		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < hudPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, hudPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < hudPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, hudPipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < fontPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, fontPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < fontPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, fontPipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < hudScreenPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, hudScreenPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < hudScreenPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, hudScreenPipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < uiPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, uiPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < uiPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, uiPipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < uiIconsPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptors[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < uiIconsPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptorSets[i].setLayout, nullptr);
 
-		for ( unsigned int i = 0; i < virtualTexturesPipeline.descriptors.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, virtualTexturesPipeline.descriptors[i].setLayout, nullptr);
-		
-		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
-//			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
-			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
-				{
-//					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
-					vkDestroySampler(device, mainRenderScenePipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, mainRenderScenePipeline.descriptors[m].textureImages[i].views[j], nullptr);
+		for ( unsigned int i = 0; i < virtualTexturesPipeline.descriptorSets.GetSize(); ++i ) 
+			vkDestroyDescriptorSetLayout(device, virtualTexturesPipeline.descriptorSets[i].setLayout, nullptr);
+
+// 		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
+// //			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
+// 			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// //					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
+// 					vkDestroySampler(device, mainRenderScenePipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, mainRenderScenePipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, mainRenderScenePipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, mainRenderScenePipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for(unsigned int m = 0; m < hudPipeline.descriptors.GetSize(); ++m) {
-			for(unsigned int i = 0; i < hudPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, hudPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < hudPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, hudPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for(unsigned int m = 0; m < hudPipeline.descriptors.GetSize(); ++m) {
+// 			for(unsigned int i = 0; i < hudPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, hudPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < hudPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, hudPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, hudPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, hudPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < hudPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, hudPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, hudPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, hudPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, hudPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < hudPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, hudPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, hudPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
 
-		for ( unsigned int m = 0; m < directionalLightPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < directionalLightPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, directionalLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, directionalLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < directionalLightPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < directionalLightPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, directionalLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, directionalLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, directionalLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, directionalLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, directionalLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, directionalLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, directionalLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, directionalLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, directionalLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, directionalLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < spotLightPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < spotLightPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, spotLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, spotLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < spotLightPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < spotLightPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, spotLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, spotLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, spotLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, spotLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, spotLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, spotLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, spotLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, spotLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, spotLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, spotLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < pointLightPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < pointLightPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, pointLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, pointLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < pointLightPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < pointLightPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, pointLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, pointLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, pointLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, pointLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, pointLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, pointLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, pointLightPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, pointLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, pointLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, pointLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < fontPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < fontPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, fontPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < fontPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, fontPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < fontPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < fontPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, fontPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < fontPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, fontPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, fontPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, fontPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < fontPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, fontPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, fontPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, fontPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, fontPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < fontPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, fontPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, fontPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < hudScreenPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < hudScreenPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, hudScreenPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, hudScreenPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < hudScreenPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < hudScreenPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, hudScreenPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, hudScreenPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, hudScreenPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, hudScreenPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, hudScreenPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, hudScreenPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, hudScreenPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, hudScreenPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, hudScreenPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, hudScreenPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < uiPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, uiPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < uiPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, uiPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < uiPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, uiPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < uiPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, uiPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, uiPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, uiPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < uiPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, uiPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, uiPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, uiPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, uiPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < uiPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, uiPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, uiPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
-		for ( unsigned int m = 0; m < virtualTexturesPipeline.descriptors.GetSize(); ++m ) {
-			for(unsigned int i = 0; i < virtualTexturesPipeline.descriptors[m].textureImages.size(); ++i)
-				{
-					vkDestroySampler(device, virtualTexturesPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-					for ( unsigned int j = 0; j < virtualTexturesPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-						vkDestroyImageView(device, virtualTexturesPipeline.descriptors[m].textureImages[i].views[j], nullptr);
+// 		for ( unsigned int m = 0; m < virtualTexturesPipeline.descriptors.GetSize(); ++m ) {
+// 			for(unsigned int i = 0; i < virtualTexturesPipeline.descriptors[m].textureImages.size(); ++i)
+// 				{
+// 					vkDestroySampler(device, virtualTexturesPipeline.descriptors[m].textureImages[i].sampler, nullptr);
+// 					for ( unsigned int j = 0; j < virtualTexturesPipeline.descriptors[m].textureImages[i].views.size(); ++j )
+// 						vkDestroyImageView(device, virtualTexturesPipeline.descriptors[m].textureImages[i].views[j], nullptr);
 			
-					vkDestroyImage(device, virtualTexturesPipeline.descriptors[m].textureImages[i].image, nullptr);
-					vkFreeMemory(device, virtualTexturesPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
-					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-					// }
-				}
-		}
+// 					vkDestroyImage(device, virtualTexturesPipeline.descriptors[m].textureImages[i].image, nullptr);
+// 					vkFreeMemory(device, virtualTexturesPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
+// 					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
+// 					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
+// 					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
+// 					// }
+// 				}
+// 		}
 
 
 		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
@@ -2213,17 +2269,17 @@ namespace GLVM::core
         }
     }
 	
-    void CVulkanRenderer::createDescriptorSetLayout(core::vector<Descriptor>& descriptors) {
-		for ( u32 i = 0; i < descriptors.GetSize(); ++i ) {
-			u32 bindigs_size = descriptors[i].binding.GetSize();
+    void CVulkanRenderer::createDescriptorSetLayout(core::vector<DescriptorSet>& descriptorSets) {
+		for ( u32 i = 0; i < descriptorSets.GetSize(); ++i ) {
+			u32 bindigsNumber = descriptorSets[i].descriptorBindings.GetSize();
 			std::vector<VkDescriptorSetLayoutBinding> bindings;
-			for ( u32 j = 0; j < bindigs_size; ++j ) {
+			for ( u32 j = 0; j < bindigsNumber; ++j ) {
 				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
-				modelMatrixUboLayout.binding = descriptors[i].binding[j];
-				modelMatrixUboLayout.descriptorCount = descriptors[i].descriptorsNumber[j];
-				modelMatrixUboLayout.descriptorType = descriptors[i].vkType[j];
+				modelMatrixUboLayout.binding = descriptorSets[i].descriptorBindings[j].binding;
+				modelMatrixUboLayout.descriptorCount = descriptorSets[i].descriptorBindings[j].descriptorsNumber;
+				modelMatrixUboLayout.descriptorType = descriptorSets[i].descriptorBindings[j].vkType;
 				modelMatrixUboLayout.pImmutableSamplers = nullptr;
-				modelMatrixUboLayout.stageFlags = descriptors[i].shaderStageFlag;
+				modelMatrixUboLayout.stageFlags = descriptorSets[i].descriptorBindings[j].shaderStageFlag;
 
 				bindings.push_back(modelMatrixUboLayout);
 			}
@@ -2234,7 +2290,7 @@ namespace GLVM::core
 			layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 			layoutInfo.pBindings = bindings.data();
 
-			if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptors[i].setLayout) != VK_SUCCESS) {
+			if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSets[i].setLayout) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create descriptor set layout!");
 			}
 		}
@@ -2336,10 +2392,10 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		unsigned int descriptorLayoutsNumber = pipeline.descriptors.GetSize();
+		unsigned int descriptorLayoutsNumber = pipeline.descriptorSets.GetSize();
 		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		for (unsigned int i = 0; i < descriptorLayoutsNumber; ++i) {
-			descriptorSetLayouts.push_back(pipeline.descriptors[i].setLayout);
+			descriptorSetLayouts.push_back(pipeline.descriptorSets[i].setLayout);
 		}
 			
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -2395,7 +2451,7 @@ namespace GLVM::core
 		directionalLightShadowMapFrameBuffers.resize(DIRECTIONAL_LIGHTS_NUMBER);
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
-			directionalLightsRenderAttachments.push_back(directionalLightPipeline.descriptors[0].textureImages[i].views[0]);
+			directionalLightsRenderAttachments.push_back(directionalLightTextureImages[i].views[0]);
 			createRenderPassFramebuffers(directionalLightsRenderAttachments, directionalLightShadowMapRenderPass, directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
@@ -2403,7 +2459,7 @@ namespace GLVM::core
 		spotLightShadowMapFrameBuffers.resize(SPOT_LIGHTS_NUMBER);
         for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
-			spotLightsRenderAttachments.push_back(spotLightPipeline.descriptors[0].textureImages[i].views[0]);
+			spotLightsRenderAttachments.push_back(spotLightTextureImages[i].views[0]);
 			
 			createRenderPassFramebuffers(spotLightsRenderAttachments, spotLightShadowMapRenderPass, spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
@@ -2413,8 +2469,8 @@ namespace GLVM::core
 		for ( size_t j = 0; j < POINT_LIGHTS_NUMBER; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
-				if ( pointLightPipeline.descriptors.GetSize() > 0 && pointLightPipeline.descriptors[0].textureImages.size() > 0 ) {
-					pointLightsRenderAttachments.push_back(pointLightPipeline.descriptors[0].textureImages[j].views[m]);
+				if ( pointLightTextureImages.GetSize() > 0 ) {
+					pointLightsRenderAttachments.push_back(pointLightTextureImages[j].views[m]);
 					pointLightShadowMapFrameBuffers[j].push_back({});
 					createRenderPassFramebuffers(pointLightsRenderAttachments, pointLightShadowMapRenderPass, pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 				}
@@ -2530,7 +2586,7 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			directionalLightPipeline.descriptors[0].textureImages.push_back(depthImage);
+			directionalLightTextureImages.Push(depthImage);
 		}
 	}
 
@@ -2590,7 +2646,7 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			spotLightPipeline.descriptors[0].textureImages.push_back(depthImage);
+			spotLightTextureImages.Push(depthImage);
 		}
 	}
 
@@ -2654,14 +2710,14 @@ namespace GLVM::core
 			}
 
 			setImageDebugObjectName(depthImage);
-			pointLightPipeline.descriptors[0].textureImages.push_back(depthImage);
+			pointLightTextureImages.Push(depthImage);
 		}
 
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
-			pointLightPipeline.descriptors[0].textureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+			pointLightTextureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			setImageDebugObjectName(pointLightPipeline.descriptors[0].textureImages[i]);
-			pointLightPipeline.descriptors[0].textureImages[i].views.push_back(createImageView(pointLightPipeline.descriptors[0].textureImages[i], 0, 6));
+			setImageDebugObjectName(pointLightTextureImages[i]);
+			pointLightTextureImages[i].views.push_back(createImageView(pointLightTextureImages[i], 0, 6));
 		}
 	}
 	
@@ -2953,6 +3009,16 @@ namespace GLVM::core
 		VkDeviceSize uiIconsUboSize = sizeof(UI_UBO);
 		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
 		VkDeviceSize virtualTexturesBufferSize = sizeof(VIRTUAL_TEXTURES_UBO);
+		std::cout << modelMatrixBufferSize << std::endl;
+		std::cout << lightDataBufferSize << std::endl;
+		std::cout << modelShadowMapMatrixBufferSize << std::endl;
+		std::cout << modelCubeShadowMapMatrixBufferSize << std::endl;
+		std::cout << fontUboSize << std::endl;
+		std::cout << hudScreenUboSize << std::endl;
+		std::cout << uiUboSize << std::endl;
+		std::cout << uiIconsUboSize << std::endl;
+		std::cout << hudBufferSize << std::endl;
+		std::cout << virtualTexturesBufferSize << std::endl;
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -3010,7 +3076,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 220000;
+		uint32_t descriptorCount = 1300000;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -3027,24 +3093,23 @@ namespace GLVM::core
         }
     }
 
-	void CVulkanRenderer::allocateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline,
-												  unsigned int desriptorID, unsigned int descriptorSetsNumber ) {
-		std::vector<VkDescriptorSetLayout> matrixUboLayouts(descriptorSetsNumber,
-															pipeline.descriptors[desriptorID].setLayout);
+	void CVulkanRenderer::allocateDescriptorSets( core::vector<VkDescriptorSet>& descriptorSets, VkDescriptorSetLayout setLayout,
+												  unsigned int descriptorSetsNumber ) {
+		std::vector<VkDescriptorSetLayout> matrixUboLayouts(descriptorSetsNumber, setLayout);
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 		allocInfo.descriptorPool = descriptorPool;
 		allocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetsNumber);
 		allocInfo.pSetLayouts = matrixUboLayouts.data();
 			
-		descriptorSets.resize(descriptorSetsNumber);
-		if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+		descriptorSets.Resize(descriptorSetsNumber);
+		if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.GetVectorContainer()) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 	}
 
 	void CVulkanRenderer::updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-												   int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets ) {
+												   int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
 		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = ubo;
@@ -3069,22 +3134,86 @@ namespace GLVM::core
 		}
 	}
 
-	void CVulkanRenderer::updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-												   int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets ) {
-		core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
+	void CVulkanRenderer::updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize,
+														 int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
+		// core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
 
-		int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[1];
-		int pointLightShadowMapsCisBinding = lightsSamplersBindigs[2];
-		int spotLightShadowMapsCisBinding = lightsSamplersBindigs[3];
+		// int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[1];
+		// int pointLightShadowMapsCisBinding = lightsSamplersBindigs[2];
+		// int spotLightShadowMapsCisBinding = lightsSamplersBindigs[3];
 
-		createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-								   directionalLightPipeline.descriptors[0].textureImages, 0, directionalLightsImageInfo );
-		createDescriptorImageInfo( POINT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-								   pointLightPipeline.descriptors[0].textureImages, 6, pointLightsImageInfo );
-		createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-									spotLightPipeline.descriptors[0].textureImages, 0, spotLightsImageInfo );
+		// createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		// 						   directionalLightPipeline.descriptors[0].textureImages, 0, directionalLightsImageInfo );
+		// createDescriptorImageInfo( POINT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		// 						   pointLightPipeline.descriptors[0].textureImages, 6, pointLightsImageInfo );
+		// createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+		// 							spotLightPipeline.descriptors[0].textureImages, 0, spotLightsImageInfo );
 		
-		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
+		// for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
+		// 	VkDescriptorBufferInfo modelMatrixBufferInfo{};
+		// 	modelMatrixBufferInfo.buffer = ubo;
+		// 	modelMatrixBufferInfo.offset = i * uboStructSize;
+		// 	modelMatrixBufferInfo.range = uboStructSize;
+
+		// 	// std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
+		// 	// std::cout << "buffer size: " << uboStructSize << std::endl;
+		// 	// std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
+			
+		// 	std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
+			
+		// 	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		// 	descriptorWrites[0].dstSet = uboDescriptorSets[i];
+		// 	descriptorWrites[0].dstBinding = uboBinding;
+		// 	descriptorWrites[0].dstArrayElement = 0;
+		// 	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		// 	descriptorWrites[0].descriptorCount = 1;
+		// 	descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+
+		// 	descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		// 	descriptorWrites[1].dstSet = uboDescriptorSets[i];
+		// 	descriptorWrites[1].dstBinding = directionalLightShadowMapsCisBinding;
+		// 	descriptorWrites[1].dstArrayElement = 0;
+		// 	descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		// 	descriptorWrites[1].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
+		// 	descriptorWrites[1].pImageInfo = directionalLightsImageInfo;
+
+		// 	descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		// 	descriptorWrites[2].dstSet = uboDescriptorSets[i];
+		// 	descriptorWrites[2].dstBinding = pointLightShadowMapsCisBinding;
+		// 	descriptorWrites[2].dstArrayElement = 0;
+		// 	descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		// 	descriptorWrites[2].descriptorCount = POINT_LIGHTS_NUMBER;
+		// 	descriptorWrites[2].pImageInfo = pointLightsImageInfo;
+
+		// 	descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		// 	descriptorWrites[3].dstSet = uboDescriptorSets[i];
+		// 	descriptorWrites[3].dstBinding = spotLightShadowMapsCisBinding;
+		// 	descriptorWrites[3].dstArrayElement = 0;
+		// 	descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		// 	descriptorWrites[3].descriptorCount = SPOT_LIGHTS_NUMBER;
+		// 	descriptorWrites[3].pImageInfo = spotLightsImageInfo;
+			
+		// 	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		// }
+
+		const DescriptorSet& currentDescriptorSet1 = mainRenderScenePipeline.descriptorSets[1];
+
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+		}
+		
+		createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+								   directionalLightTextureImages, 0, directionalLightsImageInfo );
+		createDescriptorImageInfo( POINT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+								   pointLightTextureImages, 6, pointLightsImageInfo );
+		createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
+									spotLightTextureImages, 0, spotLightsImageInfo );
+		// std::cout << "1 bind: " << uboBinding << std::endl;
+		// std::cout << "2 bind: " << shaderBindings[1] << std::endl;
+		// std::cout << "3 bind: " << shaderBindings[2] << std::endl;
+		// std::cout << "4 bind: " << shaderBindings[3] << std::endl;
+		for (size_t i = 0; i < currentDescriptorSet1.hostDescriptorNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = ubo;
 			modelMatrixBufferInfo.offset = i * uboStructSize;
@@ -3106,7 +3235,7 @@ namespace GLVM::core
 
 			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[1].dstSet = uboDescriptorSets[i];
-			descriptorWrites[1].dstBinding = directionalLightShadowMapsCisBinding;
+			descriptorWrites[1].dstBinding = shaderBindings[1];
 			descriptorWrites[1].dstArrayElement = 0;
 			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[1].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
@@ -3114,7 +3243,7 @@ namespace GLVM::core
 
 			descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[2].dstSet = uboDescriptorSets[i];
-			descriptorWrites[2].dstBinding = pointLightShadowMapsCisBinding;
+			descriptorWrites[2].dstBinding = shaderBindings[2];
 			descriptorWrites[2].dstArrayElement = 0;
 			descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[2].descriptorCount = POINT_LIGHTS_NUMBER;
@@ -3122,7 +3251,7 @@ namespace GLVM::core
 
 			descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[3].dstSet = uboDescriptorSets[i];
-			descriptorWrites[3].dstBinding = spotLightShadowMapsCisBinding;
+			descriptorWrites[3].dstBinding = shaderBindings[3];
 			descriptorWrites[3].dstArrayElement = 0;
 			descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[3].descriptorCount = SPOT_LIGHTS_NUMBER;
@@ -3133,12 +3262,14 @@ namespace GLVM::core
 	}
 	
 	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, [[maybe_unused]] const unsigned int& descriptorSetsNumber,
-																	const core::vector<unsigned int> bindings, std::vector<VkDescriptorSet>& descriptorSets,
+																	const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
 																	const unsigned int descriptorCount ) {
+		std::cout << "ds number: " << descriptorSetsNumber << std::endl;
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
 			VkDescriptorImageInfo imageInfo{};
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 			unsigned int textureIndex = i / 2;
+			std::cout << "texture index: " << textureIndex << std::endl;
 			imageInfo.imageView = textureImages[textureIndex].views[0];
 			imageInfo.sampler = textureSampler;
 
@@ -3160,7 +3291,7 @@ namespace GLVM::core
 	}
 	
 	void CVulkanRenderer::createDescriptorImageInfo( const unsigned int descriptorNumber, VkImageLayout imageLayout,
-													 std::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
+													 core::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
 													 VkDescriptorImageInfo descriptorImageInfos[] ) {
 		for (size_t i = 0; i < descriptorNumber; ++i) {
 			descriptorImageInfos[i] = {};
@@ -3173,225 +3304,247 @@ namespace GLVM::core
 	void CVulkanRenderer::updateDescriptorSets( [[maybe_unused]] std::vector<VkDescriptorSet>& descriptorSets, [[maybe_unused]] const Pipeline& pipeline,
 												[[maybe_unused]] DescriptorsTypes descriptorType) {
 	}
+
+	VkDescriptorBufferInfo CVulkanRenderer::createDescriptorBufferInfo( VkBuffer ubo, u32 offset, u32 range ) {
+		VkDescriptorBufferInfo uboInfo{};
+		uboInfo.buffer = ubo;
+		uboInfo.offset = offset;
+		uboInfo.range = range;
+
+		return uboInfo;
+	}
 	
     void CVulkanRenderer::createDirectionalLightShadowMapDescriptorSets() {
-		core::vector<u32> dirLightBindings = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		for( size_t descriptorSetID = 0; descriptorSetID < directionalLightPipeline.descriptorSets.GetSize(); ++descriptorSetID ) {
+			const DescriptorSet& currentDescriptorSet = directionalLightPipeline.descriptorSets[descriptorSetID];
+			allocateDescriptorSets( shadowMapDirectionalLightDescriptorSets, currentDescriptorSet.setLayout,
+									currentDescriptorSet.hostDescriptorNumber );
 
-		int directionalLightShadowMapMatrixUboBinding = dirLightBindings[0];
-
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( shadowMapDirectionalLightDescriptorSets, directionalLightPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
-			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+			}
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = directionalLightShadowMapMatrixUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites;
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
+				modelMatrixBufferInfo.offset = i * sizeof( ShadowMapMatrixUBO );
+				modelMatrixBufferInfo.range = sizeof( ShadowMapMatrixUBO );
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = shadowMapDirectionalLightDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			}
 		}
 	}
 
     void CVulkanRenderer::createSpotLightShadowMapDescriptorSets() {
-		core::vector<u32> spotLightsBindings = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
- 
-		int spotLightShadowMapMatrixUboBinding = spotLightsBindings[0];
+		for( size_t descriptorSetID = 0; descriptorSetID < spotLightPipeline.descriptorSets.GetSize(); ++descriptorSetID ) {
+ 			const DescriptorSet& currentDescriptorSet = spotLightPipeline.descriptorSets[descriptorSetID];
+			allocateDescriptorSets( shadowMapSpotLightDescriptorSets, spotLightPipeline.descriptorSets[descriptorSetID].setLayout,
+									currentDescriptorSet.hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( shadowMapSpotLightDescriptorSets, spotLightPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
-			modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+			}
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapSpotLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = spotLightShadowMapMatrixUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			for (size_t i = 0; i < spotLightUboDescriptorsNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapSpotLightModelMatrixUniformBuffer;
+				modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
+				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = shadowMapSpotLightDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			}
 		}
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDescriptorSets() {
-		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		for( size_t descriptorSetID = 0; descriptorSetID < pointLightPipeline.descriptorSets.GetSize(); ++descriptorSetID ) {
+ 			const DescriptorSet& currentDescriptorSet = pointLightPipeline.descriptorSets[descriptorSetID];
+			allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline.descriptorSets[descriptorSetID].setLayout,
+									currentDescriptorSet.hostDescriptorNumber );
 
-		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-//		std::cout << "POINTER LIGHTS: " << pointLightUboDescriptorsNumber << std::endl;
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( shadowMapPointLightDescriptorSets, pointLightPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
-			modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+			}
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
+				modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
+				modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = shadowMapPointLightDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			}
 		}
 	}
 
     void CVulkanRenderer::createHudDescriptorSets() {
-		core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
- 
-		int hudUboBinding = hudBindings[0];
+		for( size_t descriptorSetID = 0; descriptorSetID < hudPipeline.descriptorSets.GetSize(); ++descriptorSetID ) {
+  			const DescriptorSet& currentDescriptorSet = hudPipeline.descriptorSets[descriptorSetID];
+			allocateDescriptorSets( hudDescriptorSets, hudPipeline.descriptorSets[descriptorSetID].setLayout,
+									currentDescriptorSet.hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( hudDescriptorSets, hudPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = hudUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
-			modelMatrixBufferInfo.range = sizeof(HUD_UBO);
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+			}
 			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = hudUniformBuffer;
+				modelMatrixBufferInfo.offset = i * sizeof(HUD_UBO);
+				modelMatrixBufferInfo.range = sizeof(HUD_UBO);
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = hudDescriptorSets[i];
-			descriptorWrites[0].dstBinding = hudUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = hudDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			}
 		}
 	}
 
     void CVulkanRenderer::createHudScreenDescriptorSets() {
-		core::vector<u32> hudScreenBindings = hudScreenPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_SCREEN_UBO);
- 
-		int hudScreenUboBinding = hudScreenBindings[0];
+		for( size_t descriptorSetID = 0; descriptorSetID < hudScreenPipeline.descriptorSets.GetSize(); ++descriptorSetID ) {
+   			const DescriptorSet& currentDescriptorSet = hudScreenPipeline.descriptorSets[descriptorSetID];
+			allocateDescriptorSets( hudScreenDescriptorSets, hudScreenPipeline.descriptorSets[descriptorSetID].setLayout,
+									currentDescriptorSet.hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( hudScreenDescriptorSets, hudScreenPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber );
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = hudScreenUniformBuffer;
-			modelMatrixBufferInfo.offset = i * sizeof(HUD_SCREEN_UBO);
-			modelMatrixBufferInfo.range = sizeof(HUD_SCREEN_UBO);
-
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+			}
 			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = hudScreenDescriptorSets[i];
-			descriptorWrites[0].dstBinding = hudScreenUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
+			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
+				VkDescriptorBufferInfo modelMatrixBufferInfo{};
+				modelMatrixBufferInfo.buffer = hudScreenUniformBuffer;
+				modelMatrixBufferInfo.offset = i * sizeof(HUD_SCREEN_UBO);
+				modelMatrixBufferInfo.range = sizeof(HUD_SCREEN_UBO);
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = hudScreenDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			}
 		}
 	}
 
     void CVulkanRenderer::createDescriptorSets_UI() {
-		core::vector<u32> uiBindings = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_UBO);
- 
-		int uiUboBinding = uiBindings[0];
+		const DescriptorSet& currentDescriptorSet = uiPipeline.descriptorSets[0];
+		allocateDescriptorSets( uiDescriptorSets, uiPipeline.descriptorSets[0].setLayout,
+								uiPipeline.descriptorSets[0].hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( uiDescriptorSets, uiPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber );
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet.descriptorBindings[j].binding );
+		}
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < uiPipeline.descriptorSets[0].hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = uiUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
 			modelMatrixBufferInfo.range = sizeof(UI_UBO);
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = uiDescriptorSets[i];
-			descriptorWrites[0].dstBinding = uiUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = uiDescriptorSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
 
-		core::vector<u32> uiSamplerBindigs = uiPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_SAMPLER);
- 
-		int uiSamplerBinding = uiSamplerBindigs[0];
-
+		const DescriptorSet& currentDescriptorSet1 = uiPipeline.descriptorSets[1];
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = 64;
-			std::vector<VkDescriptorSetLayout> fontSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																	 uiPipeline.descriptors[1].setLayout);
-			VkDescriptorSetAllocateInfo uiSamplerUboAllocInfo{};
-			uiSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			uiSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			uiSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			uiSamplerUboAllocInfo.pSetLayouts = fontSamplerUboLayouts.data();
-			
-			uiSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			if (vkAllocateDescriptorSets(device, &uiSamplerUboAllocInfo, uiSamplerDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
+			allocateDescriptorSets( uiSamplerDescriptorSets, uiPipeline.descriptorSets[1].setLayout,
+									MAX_FRAMES_IN_FLIGHT * uiPipeline.descriptorSets[1].hostDescriptorNumber );
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+			}
+			
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uiPipeline.descriptorSets[1].hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 //				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[7].views[0];
 				imageInfo.sampler = textureSampler;
 				
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = uiSamplerDescriptorSets[i];
-				descriptorWrites[0].dstBinding = uiSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = uiSamplerDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 
     void CVulkanRenderer::createDescriptorSetsIcons_UI() {
-		core::vector<u32> uiIconsBindings = uiIconsPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_ICONS_UBO);
- 
-		int uiIconsUboBinding = uiIconsBindings[0];
+		const DescriptorSet& currentDescriptorSet0 = uiIconsPipeline.descriptorSets[0];
 		// std::vector<VkDescriptorSetLayout> uiIconsUboLayouts(MAX_FRAMES_IN_FLIGHT * uiIconsDescriptorsNumber,
 		// 													uiIconsPipeline.descriptors[uiIconsUboBinding].setLayout);
 		// VkDescriptorSetAllocateInfo uiIconsUboAllocInfo{};
@@ -3406,341 +3559,347 @@ namespace GLVM::core
 		// 	throw std::runtime_error("failed to allocate descriptor sets!");
 		// }
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( uiIconsDescriptorSets, uiIconsPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * uiIconsDescriptorsNumber );
+		allocateDescriptorSets( uiIconsDescriptorSets, uiIconsPipeline.descriptorSets[0].setLayout,
+								uiIconsPipeline.descriptorSets[0].hostDescriptorNumber );
+
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+		}
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * uiIconsDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < uiIconsPipeline.descriptorSets[0].hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = uiIconsUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(UI_UBO);
 			modelMatrixBufferInfo.range = sizeof(UI_UBO);
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = uiIconsDescriptorSets[i];
-			descriptorWrites[0].dstBinding = uiIconsUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = uiIconsDescriptorSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
 
-		core::vector<u32> uiIconsSamplerBindigs = uiIconsPipeline.getBindingOfDescriptor(DescriptorsTypes::UI_ICONS_SAMPLER);
- 
-		int uiIconsSamplerBinding = uiIconsSamplerBindigs[0];
+		const DescriptorSet& currentDescriptorSet1 = uiIconsPipeline.descriptorSets[1];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = initializeTextureData_.size();
-			std::vector<VkDescriptorSetLayout> uiIconsSamplerUboLayouts(MAX_FRAMES_IN_FLIGHT * DS_specular_number,
-																	 uiIconsPipeline.descriptors[1].setLayout);
-			VkDescriptorSetAllocateInfo uiIconsSamplerUboAllocInfo{};
-			uiIconsSamplerUboAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-			uiIconsSamplerUboAllocInfo.descriptorPool = descriptorPool;
-			uiIconsSamplerUboAllocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			uiIconsSamplerUboAllocInfo.pSetLayouts = uiIconsSamplerUboLayouts.data();
-			
-			uiIconsSamplerDescriptorSets.resize(MAX_FRAMES_IN_FLIGHT * DS_specular_number);
-			if (vkAllocateDescriptorSets(device, &uiIconsSamplerUboAllocInfo, uiIconsSamplerDescriptorSets.data()) != VK_SUCCESS) {
-				throw std::runtime_error("failed to allocate descriptor sets!");
-			}
+			allocateDescriptorSets( uiIconsSamplerDescriptorSets, currentDescriptorSet1.setLayout,
+									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber );
 
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+			}
+			
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[textureIndex].views[0];
 				imageInfo.sampler = textureSampler;
 				
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = uiIconsSamplerDescriptorSets[i];
-				descriptorWrites[0].dstBinding = uiIconsSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = uiIconsSamplerDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 	
 	void CVulkanRenderer::createFontRenderDescriptorSets() {
-		core::vector<u32> fontUboBindings = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_UBO);
- 
-		int fontUboBinding = fontUboBindings[0];
+		const DescriptorSet& currentDescriptorSet0 = fontPipeline.descriptorSets[0];
+		allocateDescriptorSets( fontDescriptorUboSets, currentDescriptorSet0.setLayout,
+								currentDescriptorSet0.hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( fontDescriptorUboSets, fontPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8 );
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+		}
 		
-		for  (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8; ++i) {
+		for  (size_t i = 0; i < currentDescriptorSet0.hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
 			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = fontDescriptorUboSets[i];
-			descriptorWrites[0].dstBinding = fontUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = fontDescriptorUboSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
 
-		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
- 
-		int fontSamplerBinding = fontSamplerBindigs[0];
+		const DescriptorSet& currentDescriptorSet1 = fontPipeline.descriptorSets[1];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = 64;
+			allocateDescriptorSets( fontDescriptorSets, currentDescriptorSet1.setLayout,
+									currentDescriptorSet1.hostDescriptorNumber );
 
-			constexpr unsigned int descriptorID = 1; 
-			allocateDescriptorSets( fontDescriptorSets, fontPipeline, descriptorID,
-									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+			}
 			
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			for (size_t i = 0; i < currentDescriptorSet1.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				imageInfo.imageView = textureImages[6].views[0];
 				imageInfo.sampler = textureSampler;
 				
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = fontDescriptorSets[i];
-				descriptorWrites[0].dstBinding = fontSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = fontDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet1.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 
 	void CVulkanRenderer::updateFontRenderDescriptorSets() {
-		core::vector<u32> fontUboBindings = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_UBO);
- 
-		int fontUboBinding = fontUboBindings[0];
+		const DescriptorSet& currentDescriptorSet0 = fontPipeline.descriptorSets[0];
+
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+		}
 		
-		const u32 font_ubo_ds = fontUboDescriptorNumber * 8;
-		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * font_ubo_ds; ++i) {
+		for  (size_t i = 0; i < currentDescriptorSet0.hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = fontUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
 			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
-			
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = fontDescriptorUboSets[i];
-			descriptorWrites[0].dstBinding = fontUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = fontDescriptorUboSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
-		
-		core::vector<u32> fontSamplerBindigs = fontPipeline.getBindingOfDescriptor(DescriptorsTypes::FONT_ATLAS_SAMPLER);
- 
-		int fontSamplerBinding = fontSamplerBindigs[0];
+
+		const DescriptorSet& currentDescriptorSet1 = fontPipeline.descriptorSets[1];
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = 64;
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+			}
+			
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-//				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[6].views[0];
 				imageInfo.sampler = textureSampler;
-
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = fontDescriptorSets[i];
-				descriptorWrites[0].dstBinding = fontSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = fontDescriptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 
 	void CVulkanRenderer::createVirtualTexturesDescriptorSets() {
-		core::vector<u32> virtualTexturesUboBindings = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURES_UBO);
- 
-		int virtualTexturesUboBinding = virtualTexturesUboBindings[0];
+		const DescriptorSet& currentDescriptorSet0 = fontPipeline.descriptorSets[0];
+		allocateDescriptorSets( virtualTexturesUBODesctiptorSets, currentDescriptorSet0.setLayout,
+								MAX_FRAMES_IN_FLIGHT * currentDescriptorSet0.hostDescriptorNumber );
 
-		constexpr unsigned int descriptorID = 0; 
-		allocateDescriptorSets( virtualTexturesUBODesctiptorSets, virtualTexturesPipeline, descriptorID,
-								MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber );
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+		}
 		
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber; ++i) {
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet0.hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = virtualTexturesUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(VIRTUAL_TEXTURES_UBO);
 			modelMatrixBufferInfo.range = sizeof(VIRTUAL_TEXTURES_UBO);
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = virtualTexturesUBODesctiptorSets[i];
-			descriptorWrites[0].dstBinding = virtualTexturesUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = virtualTexturesUBODesctiptorSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
 
-		core::vector<u32> virtualTexturesSamplerBindigs = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURE_TILESET);
- 
-		int virtualTexturesSamplerBinding = virtualTexturesSamplerBindigs[0];
-
+		const DescriptorSet& currentDescriptorSet1 = fontPipeline.descriptorSets[1];
 		if ( initializeTextureData_.size() > 0 ) {
-			constexpr u32 DS_specular_number = 64;
+			allocateDescriptorSets( virtualTexturesSamplersDesctiptorSets, currentDescriptorSet1.setLayout,
+									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber );
 
-			constexpr unsigned int descriptorID = 1; 
-			allocateDescriptorSets( virtualTexturesSamplersDesctiptorSets, virtualTexturesPipeline, descriptorID,
-									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+			}
+			
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 //				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[6].views[0];
 				imageInfo.sampler = textureSampler;
 
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = virtualTexturesSamplersDesctiptorSets[i];
-				descriptorWrites[0].dstBinding = virtualTexturesSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = virtualTexturesSamplersDesctiptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 
 	void CVulkanRenderer::updateVirtualTexturesDescriptorSets() {
-		core::vector<u32> virtualTexturesUboBindings = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURES_UBO);
- 
-		int virtualTexturesUboBinding = virtualTexturesUboBindings[0];
+		const DescriptorSet& currentDescriptorSet0 = fontPipeline.descriptorSets[0];
 
-		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * virtualTexturesDescriptorsNumber; ++i) {
+		core::vector<u32> shaderBindings;
+		for ( size_t j = 0; j < currentDescriptorSet0.descriptorBindings.GetSize(); ++j ) {
+			shaderBindings.Push( currentDescriptorSet0.descriptorBindings[j].binding );
+		}
+		
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet0.hostDescriptorNumber; ++i) {
+			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = virtualTexturesUniformBuffer;
 			modelMatrixBufferInfo.offset = i * sizeof(VIRTUAL_TEXTURES_UBO);
 			modelMatrixBufferInfo.range = sizeof(VIRTUAL_TEXTURES_UBO);
 
-			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = virtualTexturesUBODesctiptorSets[i];
-			descriptorWrites[0].dstBinding = virtualTexturesUboBinding;
-			descriptorWrites[0].dstArrayElement = 0;
-			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-			descriptorWrites[0].descriptorCount = 1;
-			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+				descriptorWrites.Push({});
+				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrites[shaderDescriptorID].dstSet = virtualTexturesUBODesctiptorSets[i];
+				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+				descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+				descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+			}
+			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 		}
 
-		core::vector<u32> virtualTexturesSamplerBindigs = virtualTexturesPipeline.getBindingOfDescriptor(DescriptorsTypes::VIRTUAL_TEXTURE_TILESET);
- 
-		int virtualTexturesSamplerBinding = virtualTexturesSamplerBindigs[0];
-
+		const DescriptorSet& currentDescriptorSet1 = fontPipeline.descriptorSets[1];
 		if ( initializeTextureData_.size() > 0 ) {
-			constexpr u32 DS_specular_number = 64;
-
-			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
+			core::vector<u32> shaderBindings;
+			for ( size_t j = 0; j < currentDescriptorSet1.descriptorBindings.GetSize(); ++j ) {
+				shaderBindings.Push( currentDescriptorSet1.descriptorBindings[j].binding );
+			}
+			
+			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber; ++i) {
+				core::vector<VkWriteDescriptorSet> descriptorWrites{};
 				VkDescriptorImageInfo imageInfo{};
 				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 //				unsigned int textureIndex = i / 2;
 				imageInfo.imageView = textureImages[6].views[0];
 				imageInfo.sampler = textureSampler;
 
-				std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
-			
-				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[0].dstSet = virtualTexturesSamplersDesctiptorSets[i];
-				descriptorWrites[0].dstBinding = virtualTexturesSamplerBinding;
-				descriptorWrites[0].dstArrayElement = 0;
-				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[0].descriptorCount = 1;
-				descriptorWrites[0].pImageInfo = &imageInfo;
-
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+					descriptorWrites.Push({});
+					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+					descriptorWrites[shaderDescriptorID].dstSet = virtualTexturesSamplersDesctiptorSets[i];
+					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+					descriptorWrites[shaderDescriptorID].descriptorType = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].vkType;
+					descriptorWrites[shaderDescriptorID].descriptorCount = currentDescriptorSet0.descriptorBindings[shaderDescriptorID].descriptorsNumber;
+					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+				}
+				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
 			}
 		}
 	}
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
-		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
-		int modelMatrixUboBinding = modelMatrixBindings[0];
-		constexpr unsigned int matrixUboDescriptorID = 0; 
-		allocateDescriptorSets( matrixUboDescriptorSets, mainRenderScenePipeline, matrixUboDescriptorID,
-								MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber );
-		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber,
+		const DescriptorSet& currentDescriptorSet0 = mainRenderScenePipeline.descriptorSets[0];
+		int modelMatrixUboBinding = currentDescriptorSet0.descriptorBindings[0].binding;
+		allocateDescriptorSets( matrixUboDescriptorSets, currentDescriptorSet0.setLayout,
+								currentDescriptorSet0.hostDescriptorNumber );
+		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
 								 modelMatrixUboBinding, matrixUboDescriptorSets );
 
-		core::vector<u32> lightDataBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
-		int lightDataUboBinding = lightDataBindings[0];
-		constexpr unsigned int lightDataUboDescriptorID = 1; 
-		allocateDescriptorSets( lightDataUboDescriptorSets, mainRenderScenePipeline, lightDataUboDescriptorID,
-								MAX_FRAMES_IN_FLIGHT );
-		updateLightDataDescriptorSets( lightDataUniformBuffer, sizeof(LightData), MAX_FRAMES_IN_FLIGHT,
-									   lightDataUboBinding,lightDataUboDescriptorSets );
+		const DescriptorSet& currentDescriptorSet1 = mainRenderScenePipeline.descriptorSets[1];
+		int lightDataUboBinding = currentDescriptorSet1.descriptorBindings[0].binding;
+		allocateDescriptorSets( lightDataUboDescriptorSets, currentDescriptorSet1.setLayout,
+								currentDescriptorSet1.hostDescriptorNumber );
+		updateLightDataDescriptorSets( lightDataUniformBuffer, sizeof(LightData),
+									   lightDataUboBinding, lightDataUboDescriptorSets );
 
-		core::vector<u32> specularSamplerBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_SAMPLER);
-		int specularSamplerBinding = specularSamplerBindigs[0];
-		core::vector<u32> diffuseSamplerBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
-		[[maybe_unused]] int diffuseSamplerBinding = diffuseSamplerBindings[0];
+		const DescriptorSet& currentDescriptorSet2 = mainRenderScenePipeline.descriptorSets[2];
+		int specularSamplerBinding = currentDescriptorSet2.descriptorBindings[0].binding;
+		const DescriptorSet& currentDescriptorSet3 = mainRenderScenePipeline.descriptorSets[3];
+		int diffuseSamplerBinding = currentDescriptorSet3.descriptorBindings[0].binding;
 
 		if ( initializeTextureData_.size() > 0 ) {
-			u32 DS_specular_number = initializeTextureData_.size();
+			// u32 DS_specular_number = initializeTextureData_.size();
 			// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 			// namespace cm = GLVM::ecs::components;
 			// core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::material>();
-			constexpr unsigned int specularSamplerUboDescriptorID = 2;
-			allocateDescriptorSets( specularSamplerDescriptorSets, mainRenderScenePipeline, specularSamplerUboDescriptorID,
-									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			allocateDescriptorSets( specularSamplerDescriptorSets, currentDescriptorSet2.setLayout,
+									currentDescriptorSet2.hostDescriptorNumber );
 
 			core::vector<unsigned int> bindings;
 			bindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, MAX_FRAMES_IN_FLIGHT * DS_specular_number, bindings, specularSamplerDescriptorSets, 1 );
+			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet2.hostDescriptorNumber, bindings, specularSamplerDescriptorSets, 1 );
 
-			constexpr unsigned int diffuseSamplerUboDescriptorID = 3;
-			allocateDescriptorSets( diffuseSamplerDescriptorSets, mainRenderScenePipeline, diffuseSamplerUboDescriptorID,
-									MAX_FRAMES_IN_FLIGHT * DS_specular_number );
+			allocateDescriptorSets( diffuseSamplerDescriptorSets, currentDescriptorSet3.setLayout,
+									currentDescriptorSet3.hostDescriptorNumber );
 			
 			core::vector<unsigned int> diffuseBindings;
-			diffuseBindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, MAX_FRAMES_IN_FLIGHT * DS_specular_number, diffuseBindings, diffuseSamplerDescriptorSets, 1 );
+			diffuseBindings.Push(diffuseSamplerBinding);
+			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet3.hostDescriptorNumber, diffuseBindings, diffuseSamplerDescriptorSets, 1 );
 			
 			// for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * DS_specular_number; ++i) {
 			// 	VkDescriptorImageInfo imageInfo{};
@@ -3830,33 +3989,33 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id) {
-		core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
+//		core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
 
-		int diffuseCisBinding = lightsSamplersBindigs[0];
-		int specularCisBinding = lightsSamplersBindigs[1];
-		int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[2];
-		int pointLightShadowMapsCisBinding = lightsSamplersBindigs[3];
-		int spotLightShadowMapsCisBinding = lightsSamplersBindigs[4];
+		// int diffuseCisBinding = lightsSamplersBindigs[0];
+		// int specularCisBinding = lightsSamplersBindigs[1];
+		// int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[2];
+		// int pointLightShadowMapsCisBinding = lightsSamplersBindigs[3];
+		// int spotLightShadowMapsCisBinding = lightsSamplersBindigs[4];
 
 		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
-			directionalLightsImageInfo[i].sampler = directionalLightPipeline.descriptors[0].textureImages[i].sampler;
+			directionalLightsImageInfo[i].imageView = directionalLightTextureImages[i].views[0];
+			directionalLightsImageInfo[i].sampler = directionalLightTextureImages[i].sampler;
 		}
 
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
-			pointLightsImageInfo[i].sampler = pointLightPipeline.descriptors[0].textureImages[i].sampler;
+			pointLightsImageInfo[i].imageView = pointLightTextureImages[i].views[6];
+			pointLightsImageInfo[i].sampler = pointLightTextureImages[i].sampler;
 		}
 
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
-			spotLightsImageInfo[i].sampler = spotLightPipeline.descriptors[0].textureImages[i].sampler;
+			spotLightsImageInfo[i].imageView = spotLightTextureImages[i].views[0];
+			spotLightsImageInfo[i].sampler = spotLightTextureImages[i].sampler;
 		}
 		
 		constexpr u32 DS_writes_size = 5;
@@ -3874,7 +4033,7 @@ namespace GLVM::core
 		std::array<VkWriteDescriptorSet, DS_writes_size> descriptorWrites{};
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = diffuseSamplerDescriptorSets[currentFrame];
-		descriptorWrites[0].dstBinding = diffuseCisBinding;
+		descriptorWrites[0].dstBinding = 0;
 		descriptorWrites[0].dstArrayElement = 0;
 		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[0].descriptorCount = 1;
@@ -3882,7 +4041,7 @@ namespace GLVM::core
 
 		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[1].dstSet = diffuseSamplerDescriptorSets[currentFrame];
-		descriptorWrites[1].dstBinding = specularCisBinding;
+		descriptorWrites[1].dstBinding = 0;
 		descriptorWrites[1].dstArrayElement = 0;
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[1].descriptorCount = 1;
@@ -3890,7 +4049,7 @@ namespace GLVM::core
 
 		descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[2].dstSet = diffuseSamplerDescriptorSets[currentFrame];
-		descriptorWrites[2].dstBinding = directionalLightShadowMapsCisBinding;
+		descriptorWrites[2].dstBinding = 0;
 		descriptorWrites[2].dstArrayElement = 0;
 		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[2].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
@@ -3898,7 +4057,7 @@ namespace GLVM::core
 
 		descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[3].dstSet = diffuseSamplerDescriptorSets[currentFrame];
-		descriptorWrites[3].dstBinding = pointLightShadowMapsCisBinding;
+		descriptorWrites[3].dstBinding = 0;
 		descriptorWrites[3].dstArrayElement = 0;
 		descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[3].descriptorCount = POINT_LIGHTS_NUMBER;
@@ -3906,7 +4065,7 @@ namespace GLVM::core
 
 		descriptorWrites[4].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[4].dstSet = diffuseSamplerDescriptorSets[currentFrame];
-		descriptorWrites[4].dstBinding = spotLightShadowMapsCisBinding;
+		descriptorWrites[4].dstBinding = 0;
 		descriptorWrites[4].dstArrayElement = 0;
 		descriptorWrites[4].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[4].descriptorCount = SPOT_LIGHTS_NUMBER;
@@ -3916,8 +4075,8 @@ namespace GLVM::core
 	}
 	
 	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
-		core::vector<u32> directionalLightBindigs = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		int directionalLightShadowMapMatrixUboBinding = directionalLightBindigs[0];
+//		core::vector<u32> directionalLightBindigs = directionalLightPipeline.getBindingOfDescriptor(DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO);
+//		int directionalLightShadowMapMatrixUboBinding = directionalLightBindigs[0];
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
@@ -3929,7 +4088,7 @@ namespace GLVM::core
 			
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[0].dstSet = shadowMapDirectionalLightDescriptorSets[i];
-				descriptorWrites[0].dstBinding = directionalLightShadowMapMatrixUboBinding;
+				descriptorWrites[0].dstBinding = 0;
 				descriptorWrites[0].dstArrayElement = 0;
 				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 				descriptorWrites[0].descriptorCount = 1;
@@ -3940,8 +4099,8 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateSpotLightShadowMapDescriptorSets() {
-		core::vector<u32> spotLightBindings = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		int spotLightShadowMapMatrixUboBinding = spotLightBindings[0];
+		// core::vector<u32> spotLightBindings = spotLightPipeline.getBindingOfDescriptor(DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		// int spotLightShadowMapMatrixUboBinding = spotLightBindings[0];
 		
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
@@ -3953,7 +4112,7 @@ namespace GLVM::core
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = shadowMapSpotLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = spotLightShadowMapMatrixUboBinding;
+			descriptorWrites[0].dstBinding = 0;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -3964,9 +4123,11 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updatePointLightShadowMapDescriptorSets() {
-		core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
-		int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
-		
+		// core::vector<u32> pointLightBindings = pointLightPipeline.getBindingOfDescriptor(DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO);
+		// int pointLightShadowMapMatrixUboBinding = pointLightBindings[0];
+		// std::cout << "TEST UPDATEA GOVNO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+		// std::cout << std::endl;
+		// std::cout << std::endl;
 		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo{};
 			modelMatrixBufferInfo.buffer = shadowMapPointLightModelMatrixUniformBuffer;
@@ -3977,7 +4138,7 @@ namespace GLVM::core
 //			std::cout << "vector size: " << shadowMapPointLightDescriptorSets.size() << std::endl;
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = shadowMapPointLightDescriptorSets[i];
-			descriptorWrites[0].dstBinding = pointLightShadowMapMatrixUboBinding;
+			descriptorWrites[0].dstBinding = 0;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -3988,8 +4149,8 @@ namespace GLVM::core
 	}
 
     void CVulkanRenderer::updateHudDescriptorSets() {
-		core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
-		int hudUboBinding = hudBindings[0];
+		// core::vector<u32> hudBindings = hudPipeline.getBindingOfDescriptor(DescriptorsTypes::HUD_UBO);
+		// int hudUboBinding = hudBindings[0];
 		
 		unsigned int actual_size = actorsNumber ? actorsNumber : 1;
 		
@@ -4003,7 +4164,7 @@ namespace GLVM::core
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = hudDescriptorSets[i];
-			descriptorWrites[0].dstBinding = hudUboBinding;
+			descriptorWrites[0].dstBinding = 0;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -4014,10 +4175,9 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::updateDescriptorSets() {
-		core::vector<u32> modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
-		int modelMatrixUboBinding = modelMatrixBindings[0];
+		int modelMatrixBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::MODEL_MATRIX_UBO);
 		
-		if ( modelMatrixUboBinding != -1 ) {
+		if ( modelMatrixBindings != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
 				modelMatrixBufferInfo.buffer = modelMatrixUniformBuffer;
@@ -4028,7 +4188,7 @@ namespace GLVM::core
 			
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[0].dstSet = matrixUboDescriptorSets[i];
-				descriptorWrites[0].dstBinding = modelMatrixUboBinding;
+				descriptorWrites[0].dstBinding = 0;
 				descriptorWrites[0].dstArrayElement = 0;
 				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 				descriptorWrites[0].descriptorCount = 1;
@@ -4038,8 +4198,8 @@ namespace GLVM::core
 			}
 		}
 
-		core::vector<u32> specularSamplerBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_SAMPLER);
- 		int specularSamplerBinding = specularSamplerBindigs[0];
+		// core::vector<u32> specularSamplerBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::SPECULAR_SAMPLER);
+ 		// int specularSamplerBinding = specularSamplerBindigs[0];
 		[[maybe_unused]] u32 DS_specular_number = initializeTextureData_.size();
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
@@ -4056,7 +4216,7 @@ namespace GLVM::core
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrites[0].dstSet = specularSamplerDescriptorSets[i];
-			descriptorWrites[0].dstBinding = specularSamplerBinding;
+			descriptorWrites[0].dstBinding = 0;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 			descriptorWrites[0].descriptorCount = 1;
@@ -4065,10 +4225,10 @@ namespace GLVM::core
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 		}
 
-		core::vector<u32> lightDataBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
-		int lightDataUboBinding = lightDataBindigs[0];
+		int lightDataBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
+//		int lightDataUboBinding = lightDataBindigs[0];
 		
-		if ( lightDataUboBinding != -1 ) {
+		if ( lightDataBindigs != -1 ) {
 			for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT * lightDataSize; ++i) {
 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
 				modelMatrixBufferInfo.buffer = lightDataUniformBuffer;
@@ -4079,7 +4239,7 @@ namespace GLVM::core
 			
 				descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 				descriptorWrites[0].dstSet = lightDataUboDescriptorSets[i];
-				descriptorWrites[0].dstBinding = lightDataUboBinding;
+				descriptorWrites[0].dstBinding = 0;
 				descriptorWrites[0].dstArrayElement = 0;
 				descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 				descriptorWrites[0].descriptorCount = 1;
@@ -4089,17 +4249,18 @@ namespace GLVM::core
 			}
 		}
 
-		core::vector<u32> lightsSamplersBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
-		int diffuseCisBinding = lightsSamplersBindings[0];
-		int directionalLightShadowMapsCisBinding = lightsSamplersBindings[1];
-		int pointLightShadowMapsCisBinding = lightsSamplersBindings[2];
-		int spotLightShadowMapsCisBinding = lightsSamplersBindings[3];
+//		core::vector<u32> lightsSamplersBindings = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_SAMPLERS);
+		const DescriptorSet& currentDescriptorSet0 = mainRenderScenePipeline.descriptorSets[2];
+		int diffuseCisBinding = currentDescriptorSet0.descriptorBindings[0].binding;
+		int directionalLightShadowMapsCisBinding = currentDescriptorSet0.descriptorBindings[1].binding;
+		int pointLightShadowMapsCisBinding = currentDescriptorSet0.descriptorBindings[2].binding;
+		int spotLightShadowMapsCisBinding = currentDescriptorSet0.descriptorBindings[3].binding;
 
 		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
 		for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			directionalLightsImageInfo[i] = {};
 			directionalLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			directionalLightsImageInfo[i].imageView = directionalLightPipeline.descriptors[0].textureImages[i].views[0];
+			directionalLightsImageInfo[i].imageView = directionalLightTextureImages[i].views[0];
 			directionalLightsImageInfo[i].sampler = textureSampler;
 		}
 
@@ -4107,7 +4268,7 @@ namespace GLVM::core
 		for (size_t i = 0; i < POINT_LIGHTS_NUMBER; ++i) {
 			pointLightsImageInfo[i] = {};
 			pointLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			pointLightsImageInfo[i].imageView = pointLightPipeline.descriptors[0].textureImages[i].views[6];
+			pointLightsImageInfo[i].imageView = pointLightTextureImages[i].views[6];
 			pointLightsImageInfo[i].sampler = textureSampler;
 		}
 
@@ -4115,7 +4276,7 @@ namespace GLVM::core
 		for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			spotLightsImageInfo[i] = {};
 			spotLightsImageInfo[i].imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-			spotLightsImageInfo[i].imageView = spotLightPipeline.descriptors[0].textureImages[i].views[0];
+			spotLightsImageInfo[i].imageView = spotLightTextureImages[i].views[0];
 			spotLightsImageInfo[i].sampler = textureSampler;
 		}
 
@@ -6461,8 +6622,34 @@ namespace GLVM::core
 		imageObjectInfo.objectHandle = (uint64_t)image.image;
 		SetDebugObjectName(device, &imageObjectInfo);
 	}
+
+	void CVulkanRenderer::setPipelineDebugObjectName( VkPipeline pipeline, std::string pipelineName ) {
+		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
+		mainPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string mainPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31m" + pipelineName + " pipeline #\x1b[0m ", 0);
+		const char* mainPipeLineStrImageName = mainPipeLineImageName.c_str();
+		mainPipelineObjectInfo.pObjectName = mainPipeLineStrImageName;
+		mainPipelineObjectInfo.objectType = VK_OBJECT_TYPE_PIPELINE;
+		mainPipelineObjectInfo.objectHandle = (uint64_t)pipeline;
+		SetDebugObjectName(device, &mainPipelineObjectInfo);
+	}
+
+	void CVulkanRenderer::setDescriptorSetObjectName( VkDescriptorSet descriptorSet, std::string descriptorSetName, unsigned int index ) {
+		VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
+		descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " \x1b[31m" + descriptorSetName + " descriptor set #\x1b[0m ", index);
+		const char* strName = name.c_str();
+		descriptorSetObjectInfo.pObjectName = strName;
+		descriptorSetObjectInfo.objectType = VK_OBJECT_TYPE_DESCRIPTOR_SET;
+		descriptorSetObjectInfo.objectHandle = (uint64_t)descriptorSet;
+		SetDebugObjectName(device, &descriptorSetObjectInfo);
+	}
 	
 	void CVulkanRenderer::setDebugObjectNames() {
+		setPipelineDebugObjectName( fontPipeline.pipeline, "fontPipeline" );
+		setPipelineDebugObjectName( uiPipeline.pipeline, "uiPipeline" );
+		setPipelineDebugObjectName( uiIconsPipeline.pipeline, "uiIconsPipeline" );
+		
  		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
 		mainPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 		std::string mainPipeLineImageName = ConcatIntBetweenTwoStrings(VK_DEBUG_PIPELINE_RED, " \x1b[31mMain pipeline #\x1b[0m ", 0);
@@ -6715,7 +6902,7 @@ namespace GLVM::core
 		// 	SetDebugObjectName(device, &descriptorSetLayoutObjectInfo);			
 		// }
 		
-		for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.size(); ++i ) {
+		for ( unsigned long i = 0; i < shadowMapDirectionalLightDescriptorSets.GetSize(); ++i ) {
 			VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
 			descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
 			std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_DESCRIPTOR_SET_RED, " Directional light shadow map descriptor set # ", i);
@@ -6726,6 +6913,34 @@ namespace GLVM::core
 			SetDebugObjectName(device, &descriptorSetObjectInfo);
 		}
 
+		for ( unsigned int i = 0; i < fontDescriptorUboSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( fontDescriptorUboSets[i], "fontUbo", i );
+		}
+
+		for ( unsigned int i = 0; i < fontDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( fontDescriptorSets[i], "font", i );
+		}
+
+		for ( unsigned int i = 0; i < shadowMapSpotLightDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( shadowMapSpotLightDescriptorSets[i], "shadowMapSpotLight", i );
+		}
+		for ( unsigned int i = 0; i < shadowMapPointLightDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( shadowMapPointLightDescriptorSets[i], "shadowMapPointLight", i );
+		}
+		for ( unsigned int i = 0; i < hudScreenDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( hudScreenDescriptorSets[i], "hudScreen", i );
+		}
+		for ( unsigned int i = 0; i < uiDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( uiDescriptorSets[i], "ui", i );
+		}
+		for ( unsigned int i = 0; i < uiIconsDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( uiIconsDescriptorSets[i], "uiIcons", i );
+		}
+		for ( unsigned int i = 0; i < hudDescriptorSets.GetSize(); ++i ) {
+			setDescriptorSetObjectName( hudDescriptorSets[i], "hud", i );
+		}
+
+		
 		// for ( unsigned long i = 0; i < viewPositionUboDescriptorSets.size(); ++i ) {
 		// 	VkDebugUtilsObjectNameInfoEXT descriptorSetObjectInfo{};
 		// 	descriptorSetObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;

@@ -194,21 +194,27 @@ namespace GLVM::core
 		uint32_t height = 0;
 	};
 	
-	struct Descriptor {
+	struct DescriptorBinding {                 ///< Meta data for descriptor bindings
 		VkDescriptorType       vkType;
 		DescriptorsTypes       type;
-		u32                    binding;
 		VkShaderStageFlags     shaderStageFlag;
+		u32                    binding;
 		u32                    descriptorsNumber;
-		VkDescriptorSetLayout  setLayout;
 		// std::vector<VkBuffer> uniformBuffers;
 		// std::vector<VkDeviceMemory> uniformBuffersMemory;
-		
-		std::vector<VK_Image> textureImages;
+		// std::vector<VK_Image> textureImages;
 	};
 
+	struct DescriptorSet {
+		VkDescriptorSetLayout           setLayout;
+		core::vector<DescriptorBinding> descriptorBindings;
+		core::vector<VkDescriptorSet>   data;
+		u32                    hostDescriptorNumber;
+	};
+	
 	struct Pipeline {
-		core::vector<Descriptor> descriptors;
+		core::vector<DescriptorSet> descriptorSets;
+		u32 descriptorsBindingNumber;
 		unsigned int globalDescriptorsNumber = 0;
 		unsigned int uboDescriptorsNumber = 0;
 		unsigned int combinedImageSamplersNumber = 0;
@@ -219,14 +225,17 @@ namespace GLVM::core
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 
-		void addDescriptor(Descriptor descriptor) {
-			descriptors.Push(descriptor);
+		void addDescriptor(DescriptorSet descriptorSet) {
+			descriptorSets.Push(descriptorSet);
 		}
 
-		u32 getBindingOfDescriptor(DescriptorsTypes type) const {
-			for ( unsigned int i = 0; i < descriptors.GetSize(); ++i ) {
-				if ( type == descriptors[i].type )
-					return descriptors[i].binding;
+		int getBindingOfDescriptor(DescriptorsTypes type) const {
+			for ( unsigned int j = 0; j < descriptorSets.GetSize(); ++j ) {
+				for ( unsigned int i = 0; i < descriptorSets[j].descriptorBindings.GetSize(); ++i ) {
+					const DescriptorBinding descriptorBinding = descriptorSets[j].descriptorBindings[i];
+					if ( type == descriptorBinding.type )
+						return descriptorBinding.binding;
+				}
 			}
 
 			return -1;
@@ -381,7 +390,7 @@ namespace GLVM::core
 		Pipeline mainRenderScenePipeline;
 		Pipeline hudPipeline;
 		VkRenderPass hudRenderPass;
-		std::vector<VkDescriptorSet> hudDescriptorSets;
+		core::vector<VkDescriptorSet> hudDescriptorSets;
 		VkBuffer hudUniformBuffer;
 		VkDeviceMemory hudUniformBuffersMemory;
 		Pipeline directionalLightPipeline;
@@ -389,31 +398,31 @@ namespace GLVM::core
 		Pipeline pointLightPipeline;
 		Pipeline fontPipeline;
 		VkRenderPass fontRenderPass;
-		std::vector<VkDescriptorSet> fontDescriptorSets;
-		std::vector<VkDescriptorSet> fontDescriptorUboSets;
+		core::vector<VkDescriptorSet> fontDescriptorSets;
+		core::vector<VkDescriptorSet> fontDescriptorUboSets;
 		VkBuffer fontUniformBuffer;
 		VkDeviceMemory fontUniformBuffersMemory;
 		Pipeline hudScreenPipeline;
 		VkRenderPass hudScreenRenderPass;
-		std::vector<VkDescriptorSet> hudScreenDescriptorSets;
+		core::vector<VkDescriptorSet> hudScreenDescriptorSets;
 		VkBuffer hudScreenUniformBuffer;
 		VkDeviceMemory hudScreenUniformBuffersMemory;
 		Pipeline uiPipeline;
 		VkRenderPass uiRenderPass;
-		std::vector<VkDescriptorSet> uiDescriptorSets;
-		std::vector<VkDescriptorSet> uiSamplerDescriptorSets;
+		core::vector<VkDescriptorSet> uiDescriptorSets;
+		core::vector<VkDescriptorSet> uiSamplerDescriptorSets;
 		VkBuffer uiUniformBuffer;
 		VkDeviceMemory uiUniformBuffersMemory;
 		Pipeline uiIconsPipeline;
 		VkRenderPass uiIconsRenderPass;
-		std::vector<VkDescriptorSet> uiIconsDescriptorSets;
-		std::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
+		core::vector<VkDescriptorSet> uiIconsDescriptorSets;
+		core::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
 		Pipeline virtualTexturesPipeline;
 		VkRenderPass virtualTexturesRenderPass;
-		std::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
-		std::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
+		core::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
+		core::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
 		VkBuffer virtualTexturesUniformBuffer;
 		VkDeviceMemory virtualTexturesUniformBufferMemory;
 		
@@ -437,9 +446,10 @@ namespace GLVM::core
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
-		std::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
+		core::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
+		core::vector<VK_Image> directionalLightTextureImages;
 
 		/*
 		===================================
@@ -452,16 +462,18 @@ namespace GLVM::core
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
-		std::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
+		core::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
 		VkBuffer shadowMapPointLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory;
+		core::vector<VK_Image> pointLightTextureImages;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;
-		std::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
+		core::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
 		VkBuffer shadowMapSpotLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapSpotLightModelMatrixUniformBuffersMemory;
+		core::vector<VK_Image> spotLightTextureImages;
 
 		std::vector<VK_Image> textureImages;
 		VkSampler textureSampler;
@@ -501,10 +513,10 @@ namespace GLVM::core
 		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
 		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of spot lights
 		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number
-        std::vector<VkDescriptorSet> matrixUboDescriptorSets;
-		std::vector<VkDescriptorSet> lightDataUboDescriptorSets;
-		std::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
-		std::vector<VkDescriptorSet> specularSamplerDescriptorSets;
+        core::vector<VkDescriptorSet> matrixUboDescriptorSets;
+		core::vector<VkDescriptorSet> lightDataUboDescriptorSets;
+		core::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
+		core::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
@@ -587,7 +599,7 @@ namespace GLVM::core
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
 		void createVirtualTextureRenderPass();
-        void createDescriptorSetLayout(core::vector<Descriptor>& descriptors);
+        void createDescriptorSetLayout(core::vector<DescriptorSet>& descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
@@ -612,18 +624,18 @@ namespace GLVM::core
         void createIndexBuffer(VkBuffer& _indexBuffer, VkDeviceMemory& _indexBufferMemory, const std::vector<uint32_t>& _indices);
         void createMainRenderUniformBuffers();
         void createMainRenderDescriptorPool();
-		void allocateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline,
-									 unsigned int desriptorID, unsigned int descriptorSetsNumber);
+		void allocateDescriptorSets( core::vector<VkDescriptorSet>& descriptorSets, VkDescriptorSetLayout setLayout,
+									 unsigned int descriptorSetsNumber);
 		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-									  int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets);
-		void updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-											int uboBinding, std::vector<VkDescriptorSet> uboDescriptorSets );
+									  int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets);
+		void updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize, int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets );
 		void updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, const unsigned int& descriptorSetsNumber,
-													   const core::vector<unsigned int> bindings, std::vector<VkDescriptorSet>& descriptorSets,
+													   const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
 													   const unsigned int descriptorCount );
 		void createDescriptorImageInfo( const unsigned int descriptorNumber, VkImageLayout imageLayout,
-										std::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
+										core::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
 										VkDescriptorImageInfo descriptorImageInfos[]);
+		VkDescriptorBufferInfo createDescriptorBufferInfo( VkBuffer ubo, u32 offset, u32 range );
 		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
 		void createDirectionalLightShadowMapDescriptorSets();
 		void createSpotLightShadowMapDescriptorSets();
@@ -700,8 +712,10 @@ namespace GLVM::core
 		[[nodiscard]] mat4* updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void setImageDebugObjectName(VK_Image image);
+		void setPipelineDebugObjectName( VkPipeline pipeline, std::string pipelineName );
+		void setDescriptorSetObjectName( VkDescriptorSet descriptorSet, std::string descriptorSetName, unsigned int index );
 		void setDebugObjectNames();
-		void clearPipeline( Pipeline& pipeline );
+		void clearPipeline( core::vector<VK_Image>& textureImages );
     };
 
 };
