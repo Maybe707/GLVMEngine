@@ -42,6 +42,7 @@
 #include "Components/FontComponent.hpp"
 #include <print>
 #include "PGA.hpp"
+#include "VkBuilders.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
@@ -382,7 +383,6 @@ namespace GLVM::core
 		Pipeline mainRenderScenePipeline;
 		Pipeline hudPipeline;
 		VkRenderPass hudRenderPass;
-		core::vector<VkDescriptorSet> hudDescriptorSets;
 		VkBuffer hudUniformBuffer;
 		VkDeviceMemory hudUniformBuffersMemory;
 		Pipeline directionalLightPipeline;
@@ -390,25 +390,18 @@ namespace GLVM::core
 		Pipeline pointLightPipeline;
 		Pipeline fontPipeline;
 		VkRenderPass fontRenderPass;
-		core::vector<VkDescriptorSet> fontDescriptorSets;
-		core::vector<VkDescriptorSet> fontDescriptorUboSets;
 		VkBuffer fontUniformBuffer;
 		VkDeviceMemory fontUniformBuffersMemory;
 		Pipeline hudScreenPipeline;
 		VkRenderPass hudScreenRenderPass;
-		core::vector<VkDescriptorSet> hudScreenDescriptorSets;
 		VkBuffer hudScreenUniformBuffer;
 		VkDeviceMemory hudScreenUniformBuffersMemory;
 		Pipeline uiPipeline;
 		VkRenderPass uiRenderPass;
-		core::vector<VkDescriptorSet> uiDescriptorSets;
-		core::vector<VkDescriptorSet> uiSamplerDescriptorSets;
 		VkBuffer uiUniformBuffer;
 		VkDeviceMemory uiUniformBuffersMemory;
 		Pipeline uiIconsPipeline;
 		VkRenderPass uiIconsRenderPass;
-		core::vector<VkDescriptorSet> uiIconsDescriptorSets;
-		core::vector<VkDescriptorSet> uiIconsSamplerDescriptorSets;
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
 		Pipeline virtualTexturesPipeline;
@@ -438,7 +431,6 @@ namespace GLVM::core
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkRenderPass directionalLightShadowMapRenderPass;
-		core::vector<VkDescriptorSet> shadowMapDirectionalLightDescriptorSets;
 		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> directionalLightTextureImages;
@@ -454,7 +446,6 @@ namespace GLVM::core
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
 		VkRenderPass pointLightShadowMapRenderPass;
-		core::vector<VkDescriptorSet> shadowMapPointLightDescriptorSets;
 		VkBuffer shadowMapPointLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> pointLightTextureImages;
@@ -462,7 +453,6 @@ namespace GLVM::core
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
 		VkRenderPass spotLightShadowMapRenderPass;
-		core::vector<VkDescriptorSet> shadowMapSpotLightDescriptorSets;
 		VkBuffer shadowMapSpotLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapSpotLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> spotLightTextureImages;
@@ -504,11 +494,6 @@ namespace GLVM::core
 		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
 		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
 		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of spot lights
-		u32 lightDataSize;                                                        ///< Var for choose correct number of ds from dir, spot, point light and beholder number
-        core::vector<VkDescriptorSet> matrixUboDescriptorSets;
-		core::vector<VkDescriptorSet> lightDataUboDescriptorSets;
-		core::vector<VkDescriptorSet> diffuseSamplerDescriptorSets;
-		core::vector<VkDescriptorSet> specularSamplerDescriptorSets;
 
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
