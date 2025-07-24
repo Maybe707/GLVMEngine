@@ -200,24 +200,16 @@ namespace GLVM::core
 		VkShaderStageFlags     shaderStageFlag;
 		u32                    binding;
 		u32                    descriptorsNumber;
-		// std::vector<VkBuffer> uniformBuffers;
-		// std::vector<VkDeviceMemory> uniformBuffersMemory;
-		// std::vector<VK_Image> textureImages;
 	};
 
-	struct DescriptorSet {
+	struct DescriptorSet {                     ///< Meta data for descriptor sets
 		VkDescriptorSetLayout           setLayout;
 		core::vector<DescriptorBinding> descriptorBindings;
-		core::vector<VkDescriptorSet>   data;
 		u32                    hostDescriptorNumber;
 	};
 	
 	struct Pipeline {
 		core::vector<DescriptorSet> descriptorSets;
-		u32 descriptorsBindingNumber;
-		unsigned int globalDescriptorsNumber = 0;
-		unsigned int uboDescriptorsNumber = 0;
-		unsigned int combinedImageSamplersNumber = 0;
 		VkPipeline  pipeline;
 		VkPipelineLayout pipelineLayout;
 		const char* vertShader = nullptr;
