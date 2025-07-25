@@ -174,67 +174,6 @@ namespace GLVM::core
         }
     };
 
-	struct VK_Image {
-		VkImage image = {};
-		VkDeviceMemory deviceMemory = {};
-		std::vector<VkImageView> views = {};
-		VkImageViewType viewType = {};
-		VkImageCreateFlags createFlags = {};
-		VkMemoryPropertyFlags memoryPropertyFlags = {};
-		VkImageUsageFlags usageFlags = {};
-		VkImageAspectFlags aspectFlags = {};
-		VkFormat format = {};
-		VkImageTiling tiling = {};
-		VkSampler sampler = {};
-		VkComponentSwizzle red = {};
-		VkComponentSwizzle green = {};
-		VkComponentSwizzle blue = {};
-		VkComponentSwizzle alpha = {};
-		uint32_t arrayLayers = 0;
-		uint32_t width = 0;
-		uint32_t height = 0;
-	};
-	
-	struct DescriptorBinding {                 ///< Meta data for descriptor bindings
-		VkDescriptorType       vkType;
-		DescriptorsTypes       type;
-		VkShaderStageFlags     shaderStageFlag;
-		u32                    binding;
-		u32                    descriptorsNumber;
-	};
-
-	struct DescriptorSet {                     ///< Meta data for descriptor sets
-		VkDescriptorSetLayout           setLayout;
-		core::vector<DescriptorBinding> descriptorBindings;
-		u32                    hostDescriptorNumber;
-	};
-	
-	struct Pipeline {
-		core::vector<DescriptorSet> descriptorSets;
-		VkPipeline  pipeline;
-		VkPipelineLayout pipelineLayout;
-		const char* vertShader = nullptr;
-		const char* fragShader = nullptr;
-		VkVertexInputBindingDescription bindingDescription;
-		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
-
-		void addDescriptor(DescriptorSet descriptorSet) {
-			descriptorSets.Push(descriptorSet);
-		}
-
-		int getBindingOfDescriptor(DescriptorsTypes type) const {
-			for ( unsigned int j = 0; j < descriptorSets.GetSize(); ++j ) {
-				for ( unsigned int i = 0; i < descriptorSets[j].descriptorBindings.GetSize(); ++i ) {
-					const DescriptorBinding descriptorBinding = descriptorSets[j].descriptorBindings[i];
-					if ( type == descriptorBinding.type )
-						return descriptorBinding.binding;
-				}
-			}
-
-			return -1;
-		}
-	};
-
     class CVulkanRenderer {
     public:
 		bool print = true;
