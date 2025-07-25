@@ -477,16 +477,6 @@ namespace GLVM::core
 																									  cm::mesh>();
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-
-		u32 binding_0 = 0;
-		u32 descriptorNumber_1 = 1;
-		DescriptorBinding directionalLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet directionalLightDescriptorSet0;
-		directionalLightDescriptorSet0.hostDescriptorNumber = directionalLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		directionalLightDescriptorSet0.descriptorBindings.Push( directionalLightDescriptorBinding0_Set0 );
-		directionalLightPipeline.addDescriptor( directionalLightDescriptorSet0 );
-		
 		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
 		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -496,13 +486,6 @@ namespace GLVM::core
 																							   cm::mesh>();
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-		DescriptorBinding spotLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };                     
-		DescriptorSet spotLightDescriptorSet0;
-		spotLightDescriptorSet0.hostDescriptorNumber = spotLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		spotLightDescriptorSet0.descriptorBindings.Push( spotLightDescriptorBinding0_Set0 );
-		spotLightPipeline.addDescriptor( spotLightDescriptorSet0 );
-		
 		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
 		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
@@ -512,103 +495,36 @@ namespace GLVM::core
 																								cm::mesh>();
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-		DescriptorBinding pointLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };                            ///< 6 is number of layers for cube shadow map
-		DescriptorSet pointLightDescriptorSet0;
-		pointLightDescriptorSet0.hostDescriptorNumber = pointLightUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		pointLightDescriptorSet0.descriptorBindings.Push( pointLightDescriptorBinding0_Set0 );
-		pointLightPipeline.addDescriptor( pointLightDescriptorSet0 );
 		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
 		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
-		
 		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
 		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding hudDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet hudDescriptorSet0;
-		hudDescriptorSet0.hostDescriptorNumber = hudUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT;
-		hudDescriptorSet0.descriptorBindings.Push( hudDescriptorBinding0_Set0 );
-		hudPipeline.addDescriptor( hudDescriptorSet0 );
 		hudPipeline.vertShader = vertShaderHUD;
 		hudPipeline.fragShader = fragShaderHUD;
 		hudPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding fontDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::FONT_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet fontDescriptorSet0;
-		fontDescriptorSet0.hostDescriptorNumber = fontUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT * 8;
-		fontDescriptorSet0.descriptorBindings.Push( fontDescriptorBinding0_Set0 );
-		fontPipeline.addDescriptor( fontDescriptorSet0 );
-		DescriptorBinding fontDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::FONT_ATLAS_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet fontDescriptorSet1;
-		fontDescriptorSet1.hostDescriptorNumber = 2;
-		fontDescriptorSet1.descriptorBindings.Push( fontDescriptorBinding0_Set1 );
-		fontPipeline.addDescriptor( fontDescriptorSet1 );
 		fontPipeline.vertShader = vertShaderFont;
 		fontPipeline.fragShader = fragShaderFont;
 		fontPipeline.bindingDescription = Vertex::getBindingDescription();
 		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding hudScreenDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::HUD_SCREEN_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet hudScreenDescriptorSet0;
-		hudScreenDescriptorSet0.hostDescriptorNumber = hudScreenUboDescriptorNumber * MAX_FRAMES_IN_FLIGHT;
-		hudScreenDescriptorSet0.descriptorBindings.Push( hudScreenDescriptorBinding0_Set0 );
-		hudScreenPipeline.addDescriptor( hudScreenDescriptorSet0);
 		hudScreenPipeline.vertShader = vertexShaderHudScreen;
 		hudScreenPipeline.fragShader = fragmentShaderHudScreen;
 		hudScreenPipeline.bindingDescription = Vertex::getBindingDescription();
 		hudScreenPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding uiDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet uiDescriptorSet0;
-		uiDescriptorSet0.hostDescriptorNumber = uiUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		uiDescriptorSet0.descriptorBindings.Push( uiDescriptorBinding0_Set0 );
-		uiPipeline.addDescriptor( uiDescriptorSet0 );
-		DescriptorBinding uiDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1, };
-		DescriptorSet uiDescriptroSet1;
-		uiDescriptroSet1.hostDescriptorNumber = 2;
-		uiDescriptroSet1.descriptorBindings.Push( uiDescriptorBinding0_Set1 );
-		uiPipeline.addDescriptor( uiDescriptroSet1 );
 		uiPipeline.vertShader = vertexShaderUI;
 		uiPipeline.fragShader = fragmentShaderUI;
 		uiPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding uiIconsDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::UI_ICONS_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet uiIconsDescriptorSet0;
-		uiIconsDescriptorSet0.hostDescriptorNumber = uiIconsDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		uiIconsDescriptorSet0.descriptorBindings.Push( uiIconsDescriptorBinding0_Set0 );
-		uiIconsPipeline.addDescriptor( uiIconsDescriptorSet0 );
-		DescriptorBinding uiIconsDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::UI_ICONS_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet uiIconsDescriptorSet1;
-		uiIconsDescriptorSet1.hostDescriptorNumber = initializeTextureData_.size();
-		uiIconsDescriptorSet1.descriptorBindings.Push( uiIconsDescriptorBinding0_Set1 );
-		uiIconsPipeline.addDescriptor( uiIconsDescriptorSet1 );
 		uiIconsPipeline.vertShader = vertexShaderIconsUI;
 		uiIconsPipeline.fragShader = fragmentShaderIconsUI;
 		uiIconsPipeline.bindingDescription = Vertex::getBindingDescription();
 		uiIconsPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		DescriptorBinding virtualTexturesDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::VIRTUAL_TEXTURES_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet virtualTexturesDescriptorSet0;
-		virtualTexturesDescriptorSet0.hostDescriptorNumber = virtualTexturesDescriptorsNumber;
-		virtualTexturesDescriptorSet0.descriptorBindings.Push( virtualTexturesDescriptorBinding0_Set0 );
-		virtualTexturesPipeline.addDescriptor( virtualTexturesDescriptorSet0 );
-		DescriptorBinding virtualTexturesDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::VIRTUAL_TEXTURE_TILESET,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet virtualTexturesDescriptorSet1;
-		virtualTexturesDescriptorSet1.hostDescriptorNumber = 2;
-		virtualTexturesDescriptorSet1.descriptorBindings.Push( virtualTexturesDescriptorBinding0_Set1 );
-		virtualTexturesPipeline.addDescriptor( virtualTexturesDescriptorSet1 );
 		virtualTexturesPipeline.vertShader = virtualTexturesVertexShader;
 		virtualTexturesPipeline.fragShader = virtualTexturesFragmentShader;
 		virtualTexturesPipeline.bindingDescription = Vertex::getBindingDescription();
@@ -619,69 +535,6 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		actorsNumber = actorsLinkedEntities.GetSize();
-
-		DescriptorBinding mainRenderSceneDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::MODEL_MATRIX_UBO,
-			VK_SHADER_STAGE_VERTEX_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet mainRenderSceneDescriptorSet0;
-		mainRenderSceneDescriptorSet0.hostDescriptorNumber = matrixUboDescriptorsNumber * MAX_FRAMES_IN_FLIGHT;
-		mainRenderSceneDescriptorSet0.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set0 );
-		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet0 );
-		// core::vector<u32> descriptorCountSet1;
-		// descriptorCountSet1.Push(1);
-		// descriptorCountSet1.Push(4);
-		// descriptorCountSet1.Push(32);
-		// descriptorCountSet1.Push(8);
-
-		// core::vector<u32> descriptorSet1Bindings;
-		// descriptorSet1Bindings.Push(0);
-		// descriptorSet1Bindings.Push(1);
-		// descriptorSet1Bindings.Push(5);
-		// descriptorSet1Bindings.Push(37);
-		// core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes1;
-		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER);
-		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		// mainRenderScenePipelineDescriptorTypes1.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		DescriptorBinding mainRenderSceneDescriptorBinding0_Set1{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::LIGHT_DATA,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorBinding mainRenderSceneDescriptorBinding1_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
-			VK_SHADER_STAGE_FRAGMENT_BIT, 1, 4 };
-		DescriptorBinding mainRenderSceneDescriptorBinding2_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
-			VK_SHADER_STAGE_FRAGMENT_BIT, 5, 32 };
-		DescriptorBinding mainRenderSceneDescriptorBinding3_Set1{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::LIGHT_DATA,
-			VK_SHADER_STAGE_FRAGMENT_BIT, 37, 8 };
-		DescriptorSet mainRenderSceneDescriptorSet1;
-		mainRenderSceneDescriptorSet1.hostDescriptorNumber = 2;
-		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set1 );
-		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding1_Set1 );
-		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding2_Set1 );
-		mainRenderSceneDescriptorSet1.descriptorBindings.Push( mainRenderSceneDescriptorBinding3_Set1 );
-		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet1 );
-
-		// core::vector<u32> descriptorCountSet2;
-		// descriptorCountSet2.Push(1);
-		// descriptorCountSet2.Push(1);
-		// core::vector<u32> descriptorSet2Bindings;
-		// descriptorSet2Bindings.Push(0);
-		// descriptorSet2Bindings.Push(1);
-		// core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes2;
-		// mainRenderScenePipelineDescriptorTypes2.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		DescriptorBinding mainRenderSceneDescriptorBinding0_Set2{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::SPECULAR_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet mainRenderSceneDescriptorSet2;
-		mainRenderSceneDescriptorSet2.hostDescriptorNumber = initializeTextureData_.size() * MAX_FRAMES_IN_FLIGHT;
-		mainRenderSceneDescriptorSet2.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set2 );
-		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet2 );
-
-		core::vector<VkDescriptorType> mainRenderScenePipelineDescriptorTypes3;
-		mainRenderScenePipelineDescriptorTypes3.Push(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER);
-		DescriptorBinding mainRenderSceneDescriptorBinding0_Set3{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DescriptorsTypes::DIFFUSE_SAMPLER,
-			VK_SHADER_STAGE_FRAGMENT_BIT, binding_0, descriptorNumber_1 };
-		DescriptorSet mainRenderSceneDescriptorSet3;
-		mainRenderSceneDescriptorSet3.hostDescriptorNumber = initializeTextureData_.size() * MAX_FRAMES_IN_FLIGHT;
-		mainRenderSceneDescriptorSet3.descriptorBindings.Push( mainRenderSceneDescriptorBinding0_Set3 );
-		mainRenderScenePipeline.addDescriptor( mainRenderSceneDescriptorSet3 );
-
 		mainRenderScenePipeline.vertShader = vertShaderMain_;
 		mainRenderScenePipeline.fragShader = fragShaderMain_;
 

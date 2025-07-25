@@ -120,39 +120,24 @@ namespace GLVM::core
 		DescriptorsTypes       type;
 		VkShaderStageFlags     shaderStageFlag;
 		unsigned int           binding;
-		unsigned int           descriptorsNumber;
+		unsigned int           shaderDescriptorsNumber;
 	};
 
 	struct DescriptorSet {                     ///< Meta data for descriptor sets
-		VkDescriptorSetLayout           setLayout;
-		core::vector<DescriptorBinding> descriptorBindings;
+		unsigned int                    actualDescriptorBindings;
 		unsigned int                    hostDescriptorNumber;
+		VkDescriptorSetLayout           setLayout;
+		static constexpr unsigned int   maximumDescriptorBindings = 32;
+		unsigned int                    descriptorsBindingsIDs[maximumDescriptorBindings];
 	};
 	
 	struct Pipeline {
-		core::vector<DescriptorSet> descriptorSets;
 		VkPipeline  pipeline;
 		VkPipelineLayout pipelineLayout;
 		const char* vertShader = nullptr;
 		const char* fragShader = nullptr;
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
-
-		void addDescriptor(DescriptorSet descriptorSet) {
-			descriptorSets.Push(descriptorSet);
-		}
-
-		int getBindingOfDescriptor(DescriptorsTypes type) const {
-			for ( unsigned int j = 0; j < descriptorSets.GetSize(); ++j ) {
-				for ( unsigned int i = 0; i < descriptorSets[j].descriptorBindings.GetSize(); ++i ) {
-					const DescriptorBinding descriptorBinding = descriptorSets[j].descriptorBindings[i];
-					if ( type == descriptorBinding.type )
-						return descriptorBinding.binding;
-				}
-			}
-
-			return -1;
-		}
 	};
 } 
 
