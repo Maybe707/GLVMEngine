@@ -4,25 +4,8 @@
 #include "Vector.hpp"
 #include <vulkan/vulkan_core.h>
 
-enum DescriptorSetDataLink {
-	SHADOW_MAP_DIRECTIONAL_LIGHT,
-	SHADOW_MAP_SPOT_LIGHT,
-	SHADOW_MAP_POINT_LIGHT,
-	HUD,
-	HUD_SCREEN,
-	UI,
-	UI_SAMPLERS,
-	UI_ICONS,
-	UI_ICONS_SAMPLERS,
-	FONT_RENDER_UBO,
-	FONT_RENDER_SAMPLER,
-	MAIN_RENDER_MATRIX_UBO,
-	MAIN_RENDER_LIGHT_DATA_UBO,
-	MAIN_RENDER_SPECULAR_SAMPLER,
-	MAIN_RENDER_DIFFUSE_SAMPLER,
-	DESCRIPTOR_CHUNKS_NUMBER
-};
 
 extern GLVM::core::vector<GLVM::core::vector<VkDescriptorSet>> descriptorSetsChunks;
+extern GLVM::core::vector<VkRenderPass> renderPasses;
 
 #endif

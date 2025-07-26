@@ -126,53 +126,6 @@ namespace GLVM::core
         std::vector<VkPresentModeKHR> presentModes;
     };
     
-    struct Vertex {
-        vec3 pos;
-        vec3 color;
-        vec2 texCoord;
-		vec4 joinIndices;
-		vec4 weights;
-
-        static VkVertexInputBindingDescription getBindingDescription() {
-            VkVertexInputBindingDescription bindingDescription{};
-            bindingDescription.binding = 0;
-            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-            bindingDescription.stride = sizeof(Vertex);
-
-            return bindingDescription;
-        }
-
-        static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
-            std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
-
-            attributeDescriptions[0].binding = 0;
-            attributeDescriptions[0].location = 0;
-            attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-            attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-            attributeDescriptions[1].binding = 0;
-            attributeDescriptions[1].location = 1;
-            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-            attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-            attributeDescriptions[2].binding = 0;
-            attributeDescriptions[2].location = 2;
-            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-            attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-            attributeDescriptions[3].binding = 0;
-            attributeDescriptions[3].location = 3;
-            attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-            attributeDescriptions[3].offset = offsetof(Vertex, joinIndices);
-
-            attributeDescriptions[4].binding = 0;
-            attributeDescriptions[4].location = 4;
-            attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
-            attributeDescriptions[4].offset = offsetof(Vertex, weights);
-			
-            return attributeDescriptions;
-        }
-    };
 
     class CVulkanRenderer {
     public:
@@ -221,32 +174,6 @@ namespace GLVM::core
 		float aspectRate = 0.0f;                   ///< Multiplier of current aspect rate. For full hd this must be 1920 / 1080
 		int   dragedItemEntity;
 
-        const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
-        const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
-
-        const char* vertShaderFlatShadowMap = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
-        const char* fragShaderDirectionalLightShadowMap = "../VKshaders/flatShadowMapShaders/fragFlatShadowMap.spv";
-
-        const char* vertShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/vertCubeShadowMap.spv";
-        const char* fragShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
-
-		const char* vertShaderHUD = "../VKshaders/hudShaders/hud_vert.spv";
-		const char* fragShaderHUD = "../VKshaders/hudShaders/hud_frag.spv";
-
-		const char* vertShaderFont = "../VKshaders/fontShaders/font_vert.spv";
-		const char* fragShaderFont = "../VKshaders/fontShaders/font_frag.spv";
-
-		const char* vertexShaderHudScreen = "../VKshaders/hud_screen_shaders/vert_hud_screen.spv";
-		const char* fragmentShaderHudScreen = "../VKshaders/hud_screen_shaders/frag_hud_screen.spv";
-
-		const char* vertexShaderUI = "../VKshaders/ui_shaders/vert_ui.spv";
-		const char* fragmentShaderUI = "../VKshaders/ui_shaders/frag_ui.spv";
-
-		const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
-		const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
-
-		const char* virtualTexturesVertexShader = "../VKshaders/virtualTextures/virtualTexturesVert.spv";
-		const char* virtualTexturesFragmentShader = "../VKshaders/virtualTextures/virtualTexturesFrag.spv";
 		
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 		GLVM::core::WindowWaylandVulkan* Window;
@@ -319,31 +246,21 @@ namespace GLVM::core
 
         VkRenderPass renderPass;
 
-		Pipeline mainRenderScenePipeline;
-		Pipeline hudPipeline;
 		VkRenderPass hudRenderPass;
 		VkBuffer hudUniformBuffer;
 		VkDeviceMemory hudUniformBuffersMemory;
-		Pipeline directionalLightPipeline;
-		Pipeline spotLightPipeline;
-		Pipeline pointLightPipeline;
-		Pipeline fontPipeline;
 		VkRenderPass fontRenderPass;
 		VkBuffer fontUniformBuffer;
 		VkDeviceMemory fontUniformBuffersMemory;
-		Pipeline hudScreenPipeline;
 		VkRenderPass hudScreenRenderPass;
 		VkBuffer hudScreenUniformBuffer;
 		VkDeviceMemory hudScreenUniformBuffersMemory;
-		Pipeline uiPipeline;
 		VkRenderPass uiRenderPass;
 		VkBuffer uiUniformBuffer;
 		VkDeviceMemory uiUniformBuffersMemory;
-		Pipeline uiIconsPipeline;
 		VkRenderPass uiIconsRenderPass;
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
-		Pipeline virtualTexturesPipeline;
 		VkRenderPass virtualTexturesRenderPass;
 		core::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
 		core::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
@@ -515,7 +432,7 @@ namespace GLVM::core
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
 		void createVirtualTextureRenderPass();
-        void createDescriptorSetLayout(core::vector<DescriptorSet>& descriptors);
+        void createDescriptorSetLayout(DescriptorSet descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,

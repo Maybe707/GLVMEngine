@@ -21,6 +21,7 @@
 #include "Components/ViewComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "EntityManager.hpp"
+#include "GraphicAPI/RenderConfig.hpp"
 #include "GraphicAPI/RenderData.hpp"
 #include "PGA.hpp"
 #include "ShaderStructs.hpp"
@@ -470,6 +471,8 @@ namespace GLVM::core
 
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		descriptorSetBuilder();
+		pipelineBuilder();
+		renderPassesBuilder();
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -477,69 +480,24 @@ namespace GLVM::core
 																									  cm::mesh>();
 
 		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		directionalLightPipeline.vertShader = vertShaderFlatShadowMap;
-		directionalLightPipeline.bindingDescription = Vertex::getBindingDescription();
-		directionalLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::mesh>();
 
 		spotLightNumber = spotLightLinkedEntities.GetSize();
-		spotLightPipeline.vertShader = vertShaderFlatShadowMap;
-		spotLightPipeline.bindingDescription = Vertex::getBindingDescription();
-		spotLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::mesh>();
 
 		pointLightNumber = pointLightLinkedEntities.GetSize();
-		pointLightPipeline.vertShader = vertShaderCubeShadowMap;
-		pointLightPipeline.fragShader = fragShaderCubeShadowMap;
-		pointLightPipeline.bindingDescription = Vertex::getBindingDescription();
-		pointLightPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 
-		hudPipeline.vertShader = vertShaderHUD;
-		hudPipeline.fragShader = fragShaderHUD;
-		hudPipeline.bindingDescription = Vertex::getBindingDescription();
-		hudPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-
-		fontPipeline.vertShader = vertShaderFont;
-		fontPipeline.fragShader = fragShaderFont;
-		fontPipeline.bindingDescription = Vertex::getBindingDescription();
-		fontPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-
-		hudScreenPipeline.vertShader = vertexShaderHudScreen;
-		hudScreenPipeline.fragShader = fragmentShaderHudScreen;
-		hudScreenPipeline.bindingDescription = Vertex::getBindingDescription();
-		hudScreenPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-
-		uiPipeline.vertShader = vertexShaderUI;
-		uiPipeline.fragShader = fragmentShaderUI;
-		uiPipeline.bindingDescription = Vertex::getBindingDescription();
-		uiPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-
-		uiIconsPipeline.vertShader = vertexShaderIconsUI;
-		uiIconsPipeline.fragShader = fragmentShaderIconsUI;
-		uiIconsPipeline.bindingDescription = Vertex::getBindingDescription();
-		uiIconsPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-
-		virtualTexturesPipeline.vertShader = virtualTexturesVertexShader;
-		virtualTexturesPipeline.fragShader = virtualTexturesFragmentShader;
-		virtualTexturesPipeline.bindingDescription = Vertex::getBindingDescription();
-		virtualTexturesPipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
-		
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							cm::material,
 																							cm::mesh>();
 
 		actorsNumber = actorsLinkedEntities.GetSize();
-		mainRenderScenePipeline.vertShader = vertShaderMain_;
-		mainRenderScenePipeline.fragShader = fragShaderMain_;
-
-		mainRenderScenePipeline.bindingDescription = Vertex::getBindingDescription();
-		mainRenderScenePipeline.attributeDescriptions = Vertex::getAttributeDescriptions();
 		
         initWindow();
         initVulkan();
@@ -807,26 +765,12 @@ namespace GLVM::core
 		createSpotLightShadowMapRenderPass();
 		createPointLightShadowMapRenderPass();
 		createVirtualTextureRenderPass();
-        createDescriptorSetLayout(directionalLightPipeline.descriptorSets);
-		createDescriptorSetLayout(spotLightPipeline.descriptorSets);
-		createDescriptorSetLayout(pointLightPipeline.descriptorSets);
-		createDescriptorSetLayout(fontPipeline.descriptorSets);
-		createDescriptorSetLayout(hudPipeline.descriptorSets);
-		createDescriptorSetLayout(hudScreenPipeline.descriptorSets);
-        createDescriptorSetLayout(mainRenderScenePipeline.descriptorSets);
-		createDescriptorSetLayout(uiPipeline.descriptorSets);
-		createDescriptorSetLayout(uiIconsPipeline.descriptorSets);
-		createDescriptorSetLayout(virtualTexturesPipeline.descriptorSets);
-        createGraphicsPipeline(directionalLightPipeline, directionalLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(spotLightPipeline, spotLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(pointLightPipeline, pointLightShadowMapRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(fontPipeline, fontRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(hudPipeline, hudRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(hudScreenPipeline, hudScreenRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(uiPipeline, uiRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(uiIconsPipeline, uiIconsRenderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(mainRenderScenePipeline, renderPass, VK_POLYGON_MODE_FILL);
-		createGraphicsPipeline(virtualTexturesPipeline, virtualTexturesRenderPass, VK_POLYGON_MODE_FILL);
+		for ( int descriptorSetCounter = 0; descriptorSetCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetCounter ) {
+			createDescriptorSetLayout(descriptorSetsConfig[descriptorSetCounter]);
+		}
+		for ( int graphicsPipelineCounter = 0; graphicsPipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++graphicsPipelineCounter ) {
+			createGraphicsPipeline( pipelineConfigs[graphicsPipelineCounter], renderPasses[graphicsPipelineCounter], VK_POLYGON_MODE_FILL );
+		}
         createCommandPool(directionalLightCommandPool);
 		createCommandPool(spotLightCommandPool);
 		createCommandPool(pointLightCommandPool);
@@ -1030,216 +974,14 @@ namespace GLVM::core
 		vkDestroyRenderPass(device, spotLightShadowMapRenderPass, nullptr);
 		vkDestroyRenderPass(device, virtualTexturesRenderPass, nullptr);
 
-		vkDestroyPipeline(device, directionalLightPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, directionalLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < directionalLightPipeline.descriptorSets.GetSize(); ++i ) {
-			vkDestroyDescriptorSetLayout(device, directionalLightPipeline.descriptorSets[i].setLayout, nullptr);
+		for ( unsigned int i = 0; i < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++i ) {
+			vkDestroyDescriptorSetLayout(device, descriptorSetsConfig[i].setLayout, nullptr);
 		}
-
-		vkDestroyPipeline(device, spotLightPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, spotLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < spotLightPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, spotLightPipeline.descriptorSets[i].setLayout, nullptr);
-
-		vkDestroyPipeline(device, pointLightPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, pointLightPipeline.pipelineLayout, nullptr);
-		for ( unsigned int i = 0; i < pointLightPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, pointLightPipeline.descriptorSets[i].setLayout, nullptr);
-
-		vkDestroyPipeline(device, fontPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, fontPipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, hudPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, hudPipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, hudScreenPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, hudScreenPipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, uiPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, uiPipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, uiIconsPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, uiIconsPipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, mainRenderScenePipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, mainRenderScenePipeline.pipelineLayout, nullptr);
-		vkDestroyPipeline(device, virtualTexturesPipeline.pipeline, nullptr);
-		vkDestroyPipelineLayout(device, virtualTexturesPipeline.pipelineLayout, nullptr);
+		for ( unsigned int i = 0; i < SpecificPipeline::PIPELINES_NUMBER; ++i ) {
+			vkDestroyPipeline(device, pipelineConfigs[i].pipeline, nullptr);
+			vkDestroyPipelineLayout(device, pipelineConfigs[i].pipelineLayout, nullptr);
+		}
 		
-		for ( unsigned int i = 0; i < mainRenderScenePipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, mainRenderScenePipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < hudPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, hudPipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < fontPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, fontPipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < hudScreenPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, hudScreenPipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < uiPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, uiPipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < uiIconsPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, uiIconsPipeline.descriptorSets[i].setLayout, nullptr);
-
-		for ( unsigned int i = 0; i < virtualTexturesPipeline.descriptorSets.GetSize(); ++i ) 
-			vkDestroyDescriptorSetLayout(device, virtualTexturesPipeline.descriptorSets[i].setLayout, nullptr);
-
-// 		for ( unsigned int m = 0; m < mainRenderScenePipeline.descriptors.GetSize(); ++m ) {
-// //			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
-// 			for(unsigned int i = 0; i < mainRenderScenePipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// //					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
-// 					vkDestroySampler(device, mainRenderScenePipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, mainRenderScenePipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, mainRenderScenePipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for(unsigned int m = 0; m < hudPipeline.descriptors.GetSize(); ++m) {
-// 			for(unsigned int i = 0; i < hudPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, hudPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < hudPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, hudPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, hudPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, hudPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < hudPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, hudPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, hudPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-
-// 		for ( unsigned int m = 0; m < directionalLightPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < directionalLightPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, directionalLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, directionalLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, directionalLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, directionalLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < directionalLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, directionalLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, directionalLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < spotLightPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < spotLightPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, spotLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, spotLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, spotLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, spotLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < spotLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, spotLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, spotLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < pointLightPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < pointLightPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, pointLightPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, pointLightPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, pointLightPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, pointLightPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < pointLightPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, pointLightPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, pointLightPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < fontPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < fontPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, fontPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < fontPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, fontPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, fontPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, fontPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < fontPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, fontPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, fontPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < hudScreenPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < hudScreenPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, hudScreenPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, hudScreenPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, hudScreenPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, hudScreenPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < hudScreenPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, hudScreenPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, hudScreenPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < uiIconsPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < uiPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, uiPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < uiPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, uiPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, uiPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, uiPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < uiPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, uiPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, uiPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-// 		for ( unsigned int m = 0; m < virtualTexturesPipeline.descriptors.GetSize(); ++m ) {
-// 			for(unsigned int i = 0; i < virtualTexturesPipeline.descriptors[m].textureImages.size(); ++i)
-// 				{
-// 					vkDestroySampler(device, virtualTexturesPipeline.descriptors[m].textureImages[i].sampler, nullptr);
-// 					for ( unsigned int j = 0; j < virtualTexturesPipeline.descriptors[m].textureImages[i].views.size(); ++j )
-// 						vkDestroyImageView(device, virtualTexturesPipeline.descriptors[m].textureImages[i].views[j], nullptr);
-			
-// 					vkDestroyImage(device, virtualTexturesPipeline.descriptors[m].textureImages[i].image, nullptr);
-// 					vkFreeMemory(device, virtualTexturesPipeline.descriptors[m].textureImages[i].deviceMemory, nullptr);
-// 					// for ( unsigned int j = 0; j < uiIconsPipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-// 					// 	vkDestroyBuffer(device, uiIconsPipeline.descriptors[m].uniformBuffers[j], nullptr);
-// 					// 	vkFreeMemory(device, uiIconsPipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-// 					// }
-// 				}
-// 		}
-
-
-		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
-		
-		
-
-//        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
 		vkDestroySampler(device, textureSampler, nullptr);
         for(unsigned int i = 0; i < textureImages.size(); ++i)
         {
@@ -1250,14 +992,6 @@ namespace GLVM::core
 			vkDestroyImage(device, textureImages[i].image, nullptr);
             vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
         }
-
-        // for (size_t i = 0; i < vertexBufferContainer.size(); ++i) {
-        //     vkDestroyBuffer(device, indexBufferContainer[i], nullptr);
-        //     vkFreeMemory(device, indexBufferMemoryContaner[i], nullptr);
-
-        //     vkDestroyBuffer(device, vertexBufferContainer[i], nullptr);
-        //     vkFreeMemory(device, vertexBufferMemoryContainer[i], nullptr);
-        // }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
             vkDestroySemaphore(device, directionalLightShadowMapImageAvailableSemaphores[i], nullptr);
@@ -2123,30 +1857,28 @@ namespace GLVM::core
         }
     }
 	
-    void CVulkanRenderer::createDescriptorSetLayout(core::vector<DescriptorSet>& descriptorSets) {
-		for ( u32 i = 0; i < descriptorSets.GetSize(); ++i ) {
-			u32 bindigsNumber = descriptorSets[i].descriptorBindings.GetSize();
-			std::vector<VkDescriptorSetLayoutBinding> bindings;
-			for ( u32 j = 0; j < bindigsNumber; ++j ) {
-				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
-				modelMatrixUboLayout.binding = descriptorSets[i].descriptorBindings[j].binding;
-				modelMatrixUboLayout.descriptorCount = descriptorSets[i].descriptorBindings[j].descriptorsNumber;
-				modelMatrixUboLayout.descriptorType = descriptorSets[i].descriptorBindings[j].vkType;
-				modelMatrixUboLayout.pImmutableSamplers = nullptr;
-				modelMatrixUboLayout.stageFlags = descriptorSets[i].descriptorBindings[j].shaderStageFlag;
+    void CVulkanRenderer::createDescriptorSetLayout(DescriptorSet descriptorSet) {
+		std::vector<VkDescriptorSetLayoutBinding> bindings;
+		for ( u32 j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
+			u32 currentDescriptorBindingID = descriptorSet.descriptorsBindingsIDs[j];
+			VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
+			modelMatrixUboLayout.binding = descriptorBindingsConfig[currentDescriptorBindingID].binding;
+			modelMatrixUboLayout.descriptorCount = descriptorBindingsConfig[currentDescriptorBindingID].shaderDescriptorsNumber;
+			modelMatrixUboLayout.descriptorType = descriptorBindingsConfig[currentDescriptorBindingID].vkType;
+			modelMatrixUboLayout.pImmutableSamplers = nullptr;
+			modelMatrixUboLayout.stageFlags = descriptorBindingsConfig[currentDescriptorBindingID].shaderStageFlag;
 
-				bindings.push_back(modelMatrixUboLayout);
-			}
+			bindings.push_back(modelMatrixUboLayout);
+		}
 
-			VkDescriptorSetLayoutCreateInfo layoutInfo{};
-			layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-			layoutInfo.flags = 0;
-			layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-			layoutInfo.pBindings = bindings.data();
+		VkDescriptorSetLayoutCreateInfo layoutInfo{};
+		layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+		layoutInfo.flags = 0;
+		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
+		layoutInfo.pBindings = bindings.data();
 
-			if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSets[i].setLayout) != VK_SUCCESS) {
-				throw std::runtime_error("failed to create descriptor set layout!");
-			}
+		if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSet.setLayout) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create descriptor set layout!");
 		}
     }
 
@@ -2246,16 +1978,20 @@ namespace GLVM::core
         dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
         dynamicState.pDynamicStates = dynamicStates.data();
 
-		unsigned int descriptorLayoutsNumber = pipeline.descriptorSets.GetSize();
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
-		for (unsigned int i = 0; i < descriptorLayoutsNumber; ++i) {
-			descriptorSetLayouts.push_back(pipeline.descriptorSets[i].setLayout);
+		/*
+		  Need to access inside pipeline and take ID for specific descriptor set,
+		  then with that ID we got descriptor set and take it's layout
+		 */
+		unsigned int descriptorLayoutsNumber = pipeline.actualLinkedDescriptorSetsNumber;
+		core::vector<VkDescriptorSetLayout> descriptorSetLayouts;
+		for ( unsigned i = 0; i < descriptorLayoutsNumber; ++i ) {
+			descriptorSetLayouts.Push( descriptorSetsConfig[pipeline.linkedDescriptorSetIDs[i]].setLayout );
 		}
-			
+		
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         pipelineLayoutInfo.setLayoutCount = descriptorLayoutsNumber;
-        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.data();
+        pipelineLayoutInfo.pSetLayouts = descriptorSetLayouts.GetVectorContainer();
 
         if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &pipeline.pipelineLayout) != VK_SUCCESS) {
             throw std::runtime_error("failed to create pipeline layout!");

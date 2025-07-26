@@ -94,6 +94,39 @@ namespace GLVM::core
 		DIFFUSE_SAMPLER,
 	};
 
+	enum DescriptorSetDataLink {
+		SHADOW_MAP_DIRECTIONAL_LIGHT,
+		SHADOW_MAP_SPOT_LIGHT,
+		SHADOW_MAP_POINT_LIGHT,
+		HUD,
+		HUD_SCREEN,
+		UI,
+		UI_SAMPLERS,
+		UI_ICONS,
+		UI_ICONS_SAMPLERS,
+		FONT_RENDER_UBO,
+		FONT_RENDER_SAMPLER,
+		MAIN_RENDER_MATRIX_UBO,
+		MAIN_RENDER_LIGHT_DATA_UBO,
+		MAIN_RENDER_SPECULAR_SAMPLER,
+		MAIN_RENDER_DIFFUSE_SAMPLER,
+		DESCRIPTOR_CHUNKS_NUMBER
+	};
+	
+	enum SpecificPipeline {
+		DIRECTIONAL_LIGHT_PIPELINE,
+		SPOT_LIGHT_PIPELINE,
+		POINT_LIGHT_PIPELINE,
+		HUD_PIPELINE,
+		FONT_PIPELINE,
+		HUD_SCREEN_PIPELINE,
+		UI_PIPELINE,
+		UI_ICONS_PIPELINE,
+		VIRTUAL_TEXTURES_PIPELINE,
+		MAIN_RENDER_PIPELINE,
+		PIPELINES_NUMBER
+	};
+	
 	struct VK_Image {
 		VkImage image = {};
 		VkDeviceMemory deviceMemory = {};
@@ -124,11 +157,11 @@ namespace GLVM::core
 	};
 
 	struct DescriptorSet {                     ///< Meta data for descriptor sets
-		unsigned int                    actualDescriptorBindings;
+		unsigned int                    actualLinkedDescriptorBindingsNumber;
 		unsigned int                    hostDescriptorNumber;
 		VkDescriptorSetLayout           setLayout;
-		static constexpr unsigned int   maximumDescriptorBindings = 32;
-		unsigned int                    descriptorsBindingsIDs[maximumDescriptorBindings];
+		static constexpr unsigned int   maximumLinkedDescriptorBindingsDS = 32;
+		unsigned int                    descriptorsBindingsIDs[maximumLinkedDescriptorBindingsDS];
 	};
 	
 	struct Pipeline {
@@ -138,7 +171,58 @@ namespace GLVM::core
 		const char* fragShader = nullptr;
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
+		unsigned int                    actualLinkedDescriptorSetsNumber;
+		static constexpr unsigned int   maximumLinkedDescriptorSetDS = 32;
+		unsigned int                    linkedDescriptorSetIDs[maximumLinkedDescriptorSetDS];
 	};
+
+	struct Vertex {
+        vec3 pos;
+        vec3 color;
+        vec2 texCoord;
+		vec4 joinIndices;
+		vec4 weights;
+
+        static VkVertexInputBindingDescription getBindingDescription() {
+            VkVertexInputBindingDescription bindingDescription{};
+            bindingDescription.binding = 0;
+            bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+            bindingDescription.stride = sizeof(Vertex);
+
+            return bindingDescription;
+        }
+
+        static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions() {
+            std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions{};
+
+            attributeDescriptions[0].binding = 0;
+            attributeDescriptions[0].location = 0;
+            attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[0].offset = offsetof(Vertex, pos);
+
+            attributeDescriptions[1].binding = 0;
+            attributeDescriptions[1].location = 1;
+            attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+            attributeDescriptions[1].offset = offsetof(Vertex, color);
+
+            attributeDescriptions[2].binding = 0;
+            attributeDescriptions[2].location = 2;
+            attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+            attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+
+            attributeDescriptions[3].binding = 0;
+            attributeDescriptions[3].location = 3;
+            attributeDescriptions[3].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[3].offset = offsetof(Vertex, joinIndices);
+
+            attributeDescriptions[4].binding = 0;
+            attributeDescriptions[4].location = 4;
+            attributeDescriptions[4].format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            attributeDescriptions[4].offset = offsetof(Vertex, weights);
+			
+            return attributeDescriptions;
+        }
+    };
 } 
 
 #endif

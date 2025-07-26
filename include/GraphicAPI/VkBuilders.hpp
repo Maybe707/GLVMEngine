@@ -5,6 +5,8 @@
 
 namespace GLVM::core {
 	void descriptorSetBuilder();
+	void pipelineBuilder();
+	void renderPassesBuilder();
 }; // GLVM::core
 
 
