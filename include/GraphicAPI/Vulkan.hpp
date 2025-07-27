@@ -345,7 +345,7 @@ namespace GLVM::core
 		const unsigned int hudScreenUboDescriptorNumber = 32;
 		const unsigned int uiUboDescriptorsNumber = 64;
 		const unsigned int uiIconsDescriptorsNumber = 64;
-		const unsigned int virtualTexturesDescriptorsNumber= 64;
+		[[maybe_unused]] const unsigned int virtualTexturesDescriptorsNumber= 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
 		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
 		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
@@ -432,8 +432,8 @@ namespace GLVM::core
 		void createSpotLightShadowMapRenderPass();
 		void createPointLightShadowMapRenderPass();
 		void createVirtualTextureRenderPass();
-        void createDescriptorSetLayout(DescriptorSet descriptors);
-        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass& renderPass, VkPolygonMode polygonMode);
+        void createDescriptorSetLayout(DescriptorSet& descriptors);
+        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
 										  uint32_t height);

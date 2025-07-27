@@ -2,6 +2,7 @@
 #define VK_STRUCTS
 
 #include <math.h>
+#include "ShaderStructs.hpp"
 #include "WavefrontObjParser.hpp"
 #include <vulkan/vulkan_core.h>
 
@@ -106,6 +107,8 @@ namespace GLVM::core
 		UI_ICONS_SAMPLERS,
 		FONT_RENDER_UBO,
 		FONT_RENDER_SAMPLER,
+		VIRTUAL_TEXTURES_UBO,
+		VIRTUAL_TEXTURES_TILESET,
 		MAIN_RENDER_MATRIX_UBO,
 		MAIN_RENDER_LIGHT_DATA_UBO,
 		MAIN_RENDER_SPECULAR_SAMPLER,

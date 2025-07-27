@@ -11,7 +11,7 @@ namespace GLVM::core {
 			for( unsigned int bindingsIdCounter = 0; bindingsIdCounter < descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++bindingsIdCounter ) {
 				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;
 			}
-			descriptorBindingsIdCounter = descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
+			descriptorBindingsIdCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
 		}
 	}
 
@@ -22,7 +22,7 @@ namespace GLVM::core {
 			for( unsigned int linkedDSLayoutConter = 0; linkedDSLayoutConter < pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++linkedDSLayoutConter ) {
 				pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[linkedDSLayoutConter] = descriptorSetsLayoutIdCounter + linkedDSLayoutConter;
 			}
-			descriptorSetsLayoutIdCounter = pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber;
+			descriptorSetsLayoutIdCounter += pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber;
 		}
 	}
 
