@@ -771,16 +771,16 @@ namespace GLVM::core
 		for ( int graphicsPipelineCounter = 0; graphicsPipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++graphicsPipelineCounter ) {
 			createGraphicsPipeline( pipelineConfigs[graphicsPipelineCounter], renderPasses[graphicsPipelineCounter], VK_POLYGON_MODE_FILL );
 		}
-        createCommandPool(directionalLightCommandPool);
-		createCommandPool(spotLightCommandPool);
-		createCommandPool(pointLightCommandPool);
-		createCommandPool(fontCommandPool);
-		createCommandPool(hudCommandPool);
-		createCommandPool(hudScreenCommandPool);
-		createCommandPool(uiCommandPool);
-		createCommandPool(uiIconsCommandPool);
+        // createCommandPool(directionalLightCommandPool);
+		// createCommandPool(spotLightCommandPool);
+		// createCommandPool(pointLightCommandPool);
+		// createCommandPool(fontCommandPool);
+		// createCommandPool(hudCommandPool);
+		// createCommandPool(hudScreenCommandPool);
+		// createCommandPool(uiCommandPool);
+		// createCommandPool(uiIconsCommandPool);
 		createCommandPool(mainRenderCommandPool);
-		createCommandPool(virtualTexturesCommandPool);
+//		createCommandPool(virtualTexturesCommandPool);
         createDepthResources();
 		createDirectionalLightShadowMapDepthResources();
 		createSpotLightShadowMapDepthResources();
@@ -805,13 +805,10 @@ namespace GLVM::core
 		createFontRenderDescriptorSets();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
-        createCommandBuffers(directionalLightCommandPool, directionalLightCommandBuffers);
-		createCommandBuffers(spotLightCommandPool, spotLightCommandBuffers);
-		createCommandBuffers(pointLightCommandPool, pointLightCommandBuffers);
+        createCommandBuffers(mainRenderCommandPool, directionalLightCommandBuffers);
+		createCommandBuffers(mainRenderCommandPool, spotLightCommandBuffers);
+		createCommandBuffers(mainRenderCommandPool, pointLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
-		createCommandBuffers(fontCommandPool, fontCommandBuffers);
-		createCommandBuffers(hudCommandPool, hudCommandBuffers);
-		createCommandBuffers(virtualTexturesCommandPool, virtualTexturesCommandBuffers);
 		createSyncObjects(fontImageAvailableSemaphores,
 						  fontRenderFinishedSemaphores,
 						  fontInFlightFences);
@@ -2111,7 +2108,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 			
-			VkCommandBuffer commandBuffer = beginSingleTimeCommands(directionalLightCommandPool);
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -2144,7 +2141,7 @@ namespace GLVM::core
 				1, &barrier
 				);
 
-			endSingleTimeCommands(directionalLightCommandPool, commandBuffer);
+			endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
@@ -2171,7 +2168,7 @@ namespace GLVM::core
 
 			createImage(depthImage);
 
-			VkCommandBuffer commandBuffer = beginSingleTimeCommands(spotLightCommandPool);
+			VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
 			VkImageMemoryBarrier barrier{};
 			barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -2204,7 +2201,7 @@ namespace GLVM::core
 				1, &barrier
 				);
 
-			endSingleTimeCommands(spotLightCommandPool, commandBuffer);
+			endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
@@ -2232,7 +2229,7 @@ namespace GLVM::core
 			createImage(depthImage);
 
 			for ( unsigned int j = 0; j < 6; ++j ) {
-				VkCommandBuffer commandBuffer = beginSingleTimeCommands(pointLightCommandPool);
+				VkCommandBuffer commandBuffer = beginSingleTimeCommands(mainRenderCommandPool);
 
 				VkImageMemoryBarrier barrier{};
 				barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -2265,7 +2262,7 @@ namespace GLVM::core
 					1, &barrier
 					);
 
-				endSingleTimeCommands(pointLightCommandPool, commandBuffer);
+				endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
 
 				
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
