@@ -2731,72 +2731,13 @@ namespace GLVM::core
 
 	void CVulkanRenderer::updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize,
 														 int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
-		// core::vector<u32> lightsSamplersBindigs = mainRenderScenePipeline.getBindingOfDescriptor(DescriptorsTypes::LIGHT_DATA);
-
-		// int directionalLightShadowMapsCisBinding = lightsSamplersBindigs[1];
-		// int pointLightShadowMapsCisBinding = lightsSamplersBindigs[2];
-		// int spotLightShadowMapsCisBinding = lightsSamplersBindigs[3];
-
-		// createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		// 						   directionalLightPipeline.descriptors[0].textureImages, 0, directionalLightsImageInfo );
-		// createDescriptorImageInfo( POINT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		// 						   pointLightPipeline.descriptors[0].textureImages, 6, pointLightsImageInfo );
-		// createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-		// 							spotLightPipeline.descriptors[0].textureImages, 0, spotLightsImageInfo );
-		
-		// for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
-		// 	VkDescriptorBufferInfo modelMatrixBufferInfo{};
-		// 	modelMatrixBufferInfo.buffer = ubo;
-		// 	modelMatrixBufferInfo.offset = i * uboStructSize;
-		// 	modelMatrixBufferInfo.range = uboStructSize;
-
-		// 	// std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
-		// 	// std::cout << "buffer size: " << uboStructSize << std::endl;
-		// 	// std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
-			
-		// 	std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
-			
-		// 	descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		// 	descriptorWrites[0].dstSet = uboDescriptorSets[i];
-		// 	descriptorWrites[0].dstBinding = uboBinding;
-		// 	descriptorWrites[0].dstArrayElement = 0;
-		// 	descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		// 	descriptorWrites[0].descriptorCount = 1;
-		// 	descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
-
-		// 	descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		// 	descriptorWrites[1].dstSet = uboDescriptorSets[i];
-		// 	descriptorWrites[1].dstBinding = directionalLightShadowMapsCisBinding;
-		// 	descriptorWrites[1].dstArrayElement = 0;
-		// 	descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		// 	descriptorWrites[1].descriptorCount = DIRECTIONAL_LIGHTS_NUMBER;
-		// 	descriptorWrites[1].pImageInfo = directionalLightsImageInfo;
-
-		// 	descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		// 	descriptorWrites[2].dstSet = uboDescriptorSets[i];
-		// 	descriptorWrites[2].dstBinding = pointLightShadowMapsCisBinding;
-		// 	descriptorWrites[2].dstArrayElement = 0;
-		// 	descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		// 	descriptorWrites[2].descriptorCount = POINT_LIGHTS_NUMBER;
-		// 	descriptorWrites[2].pImageInfo = pointLightsImageInfo;
-
-		// 	descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		// 	descriptorWrites[3].dstSet = uboDescriptorSets[i];
-		// 	descriptorWrites[3].dstBinding = spotLightShadowMapsCisBinding;
-		// 	descriptorWrites[3].dstArrayElement = 0;
-		// 	descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		// 	descriptorWrites[3].descriptorCount = SPOT_LIGHTS_NUMBER;
-		// 	descriptorWrites[3].pImageInfo = spotLightsImageInfo;
-			
-		// 	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-		// }
-
 		unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID];
 
+		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
-		for ( size_t j = 0; j < currentDescriptorSet1.actualLinkedDescriptorBindingsNumber; ++j ) {
-			shaderBindings.Push( currentDescriptorSet1.descriptorsBindingsIDs[j] );
+		for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
+			shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[j]].binding );
 		}
 		
 		createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
@@ -3877,7 +3818,7 @@ namespace GLVM::core
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = uiRenderPass;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::UI_PIPELINE];
         renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent.height = swapChainExtent.height;
@@ -3984,7 +3925,7 @@ namespace GLVM::core
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass = uiIconsRenderPass;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::UI_ICONS_PIPELINE];
         renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
         renderPassInfo.renderArea.offset = {0, 0};
         renderPassInfo.renderArea.extent.height = swapChainExtent.height;
