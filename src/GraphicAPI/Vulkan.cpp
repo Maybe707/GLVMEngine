@@ -889,27 +889,6 @@ namespace GLVM::core
 		clearPipeline( pointLightTextureImages );
 		clearPipeline( spotLightTextureImages );
 
-		// for ( unsigned int i = 0; i < directionalLightShadowMapFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, directionalLightShadowMapFrameBuffers[i], nullptr);
-
-		// for ( unsigned int i = 0; i < spotLightShadowMapFrameBuffers.size(); ++i )
-		// 	vkDestroyFramebuffer(device, spotLightShadowMapFrameBuffers[i], nullptr);
-		
-		
-
-//        vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-
-		// vkDestroySampler(device, textureSampler, nullptr);
-        // for(unsigned int i = 0; i < textureImages.size(); ++i)
-        // {
-        //     vkDestroySampler(device, textureImages[i].sampler, nullptr);
-		// 	for ( unsigned int j = 0; j < textureImages[i].views.size(); ++j )
-		// 		vkDestroyImageView(device, textureImages[i].views[j], nullptr);
-			
-		// 	vkDestroyImage(device, textureImages[i].image, nullptr);
-        //     vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
-        // }
-
         vkDestroySwapchainKHR(device, swapChain, nullptr);
     }
 
@@ -944,12 +923,10 @@ namespace GLVM::core
 			vkFreeMemory(device, indexBufferMemoryContaner[j], nullptr);
 		}
 		for ( size_t j = 0; j < fontIndicesContainer.size(); ++j ) {
-//			std::cout << "font vertex buffer container size: " << fontVertexBufferContainer.size() << std::endl;
 			vkDestroyBuffer(device, fontVertexBufferContainer[fontIndicesContainer[j]], nullptr);
 			vkFreeMemory(device, fontVertexBufferMemoryContainer[fontIndicesContainer[j]], nullptr);
 		}
 		for ( size_t j = 0; j < fontIndicesContainer.size(); ++j ) {
-//			std::cout << "font index buffer container size: " << fontIndexBufferContainer.size() << std::endl;
 			vkDestroyBuffer(device, fontIndexBufferContainer[fontIndicesContainer[j]], nullptr);
 			vkFreeMemory(device, fontIndexBufferMemoryContaner[fontIndicesContainer[j]], nullptr);
 		}
@@ -960,20 +937,10 @@ namespace GLVM::core
 
 		vkDeviceWaitIdle(device);
 
+		for( int i = 0; i < SpecificPipeline::PIPELINES_NUMBER; ++i ) {
+			vkDestroyRenderPass( device, renderPasses[i], nullptr );
+		}
 		
-//		std::cout << "DESTRUCTOR CALL" << std::endl;
-        vkDestroyRenderPass(device, renderPass, nullptr);		
-
-		vkDestroyRenderPass(device, hudRenderPass, nullptr);
-		vkDestroyRenderPass(device, fontRenderPass, nullptr);
-		vkDestroyRenderPass(device, hudScreenRenderPass, nullptr);
-		vkDestroyRenderPass(device, uiRenderPass, nullptr);
-		vkDestroyRenderPass(device, uiIconsRenderPass, nullptr);
-		vkDestroyRenderPass(device, directionalLightShadowMapRenderPass, nullptr);
-		vkDestroyRenderPass(device, pointLightShadowMapRenderPass, nullptr);
-		vkDestroyRenderPass(device, spotLightShadowMapRenderPass, nullptr);
-		vkDestroyRenderPass(device, virtualTexturesRenderPass, nullptr);
-
 		for ( unsigned int i = 0; i < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++i ) {
 			vkDestroyDescriptorSetLayout(device, descriptorSetsConfig[i].setLayout, nullptr);
 		}
@@ -3956,26 +3923,16 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-
-		// cm::transform* playerTransformComponent = nullptr;
-
-		// if ( viewPositionLinkedEntities.GetSize() > 0 )
-		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 		core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
 		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
 		cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(inventoryEntities[0]);
 		
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-//			std::cout << "i: " << i << std::endl;
 			unsigned int itemEntity = linkedEntities[i];
-//			std::cout << "item entity id: " << itemEntity << std::endl;
 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
 			cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
 			if ( actorComponent != nullptr )
 				continue;
-			// if ( itemComponent->occupiedSlots.GetSize() == 0 )
-			// 	continue;
 			
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
 			unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
@@ -3992,15 +3949,6 @@ namespace GLVM::core
 
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipelineLayout,
 									1, 1, &descriptorSetsChunks[DescriptorSetDataLink::UI_ICONS_SAMPLERS][MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame], 0, nullptr);
-//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-				
-			// unsigned int uboIndex = i;
-			// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-			// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-			// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};

@@ -244,24 +244,16 @@ namespace GLVM::core
         std::vector<VkImageView> swapChainImageViews;
         std::vector<VkFramebuffer> swapChainFramebuffers;
 
-        VkRenderPass renderPass;
-
-		VkRenderPass hudRenderPass;
 		VkBuffer hudUniformBuffer;
 		VkDeviceMemory hudUniformBuffersMemory;
-		VkRenderPass fontRenderPass;
 		VkBuffer fontUniformBuffer;
 		VkDeviceMemory fontUniformBuffersMemory;
-		VkRenderPass hudScreenRenderPass;
 		VkBuffer hudScreenUniformBuffer;
 		VkDeviceMemory hudScreenUniformBuffersMemory;
-		VkRenderPass uiRenderPass;
 		VkBuffer uiUniformBuffer;
 		VkDeviceMemory uiUniformBuffersMemory;
-		VkRenderPass uiIconsRenderPass;
 		VkBuffer uiIconsUniformBuffer;
 		VkDeviceMemory uiIconsUniformBuffersMemory;
-		VkRenderPass virtualTexturesRenderPass;
 		core::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
 		core::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
 		VkBuffer virtualTexturesUniformBuffer;
@@ -286,7 +278,6 @@ namespace GLVM::core
 		/// Depth varialbes for shadow map.
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
-		VkRenderPass directionalLightShadowMapRenderPass;
 		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> directionalLightTextureImages;
@@ -301,14 +292,12 @@ namespace GLVM::core
 		
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
-		VkRenderPass pointLightShadowMapRenderPass;
 		VkBuffer shadowMapPointLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> pointLightTextureImages;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
-		VkRenderPass spotLightShadowMapRenderPass;
 		VkBuffer shadowMapSpotLightModelMatrixUniformBuffer;
 		VkDeviceMemory shadowMapSpotLightModelMatrixUniformBuffersMemory;
 		core::vector<VK_Image> spotLightTextureImages;
