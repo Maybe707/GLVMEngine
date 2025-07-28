@@ -529,6 +529,9 @@ namespace GLVM::core
         QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
         std::vector<const char*> getRequiredExtensions();
         bool checkValidationLayerSupport();
+	    VkDescriptorBufferInfo createDescriptorBufferInfo( VkBuffer ubo, const VkDeviceSize& uboStructSize, const VkDeviceSize& offsetStep );
+		VkDescriptorImageInfo createDescriptorImageInfo( const std::vector<VK_Image>& textureImages, unsigned int textureIndex,
+																	  unsigned int textureViewIndex, VkSampler textureSampler );
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 		[[nodiscard]] mat4* updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);

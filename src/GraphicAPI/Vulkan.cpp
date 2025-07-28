@@ -2651,15 +2651,7 @@ namespace GLVM::core
 	void CVulkanRenderer::updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
 												   int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
 		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			modelMatrixBufferInfo.buffer = ubo;
-			modelMatrixBufferInfo.offset = i * uboStructSize;
-			modelMatrixBufferInfo.range = uboStructSize;
-
-			// std::cout << "buffer offset: " << modelMatrixBufferInfo.offset << std::endl;
-			// std::cout << "buffer size: " << uboStructSize << std::endl;
-			// std::cout << "buffer range: " << modelMatrixBufferInfo.range << std::endl;
-			
+			VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo( ubo, uboStructSize, i );
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -2748,12 +2740,14 @@ namespace GLVM::core
 																	const unsigned int descriptorCount ) {
 		std::cout << "ds number: " << descriptorSetsNumber << std::endl;
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
-			VkDescriptorImageInfo imageInfo{};
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			unsigned int textureIndex = i / 2;
-			std::cout << "texture index: " << textureIndex << std::endl;
-			imageInfo.imageView = textureImages[textureIndex].views[0];
-			imageInfo.sampler = textureSampler;
+			const unsigned int textureIndex = i / 2;
+			constexpr unsigned int textureViewIndex = 0;
+			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages, textureIndex, textureViewIndex, textureSampler );
+			// imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+
+			// std::cout << "texture index: " << textureIndex << std::endl;
+			// imageInfo.imageView = textureImages[textureIndex].views[0];
+			// imageInfo.sampler = textureSampler;
 
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
@@ -5428,6 +5422,25 @@ namespace GLVM::core
         return true;
     }
 
+	VkDescriptorBufferInfo CVulkanRenderer::createDescriptorBufferInfo( VkBuffer ubo, const VkDeviceSize& uboStructSize, const VkDeviceSize& offsetStep ) {
+		VkDescriptorBufferInfo uboBufferInfo{};
+		uboBufferInfo.buffer = ubo;
+		uboBufferInfo.offset = offsetStep * uboStructSize;
+		uboBufferInfo.range = uboStructSize;
+
+		return uboBufferInfo;
+	}
+
+	VkDescriptorImageInfo CVulkanRenderer::createDescriptorImageInfo( const std::vector<VK_Image>& textureImages, unsigned int textureIndex,
+																	  unsigned int textureViewIndex, VkSampler textureSampler ) {
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = textureImages[textureIndex].views[textureViewIndex];
+		imageInfo.sampler = textureSampler;
+
+		return imageInfo;
+	}
+	
     std::vector<char> CVulkanRenderer::readFile(const std::string& filename) {
         std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
