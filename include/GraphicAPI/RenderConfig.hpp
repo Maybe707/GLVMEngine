@@ -33,23 +33,23 @@ namespace GLVM::core
 	inline const char* virtualTexturesFragmentShader = "../VKshaders/virtualTextures/virtualTexturesFrag.spv";
 	
 	inline DescriptorSet     descriptorSetsConfig[] = {
-		{1, 4000,   {}, {} },                     ///< Directional light
-		{1, 8000,   {}, {} },                     ///< Spot light
-		{1, 128000, {}, {} },                     ///< Point light
-		{1, 1000,   {}, {} },                     ///< Hud
-		{1, 2048,   {}, {} },                     ///< Font ubo
-		{1, 2,      {}, {} },                     ///< Font sampler
-		{1, 64,     {}, {} },                     ///< Hudscreen
-		{1, 128,    {}, {} },                     ///< UI ubo
-		{1, 2,      {}, {} },                     ///< UI sampler
-		{1, 128,    {}, {} },                     ///< UIIcons ubo
-		{1, 9,      {}, {} },                     ///< UIIcons sampler
-		{1, 64,     {}, {} },                     ///< Virtual textures ubo
-		{1, 2,      {}, {} },                     ///< Virtual textures sampler
-		{1, 1000,   {}, {} },                     ///< Main render matrix ubo
-		{4, 2,      {}, {} },                     ///< Main render light data
-		{1, 18,     {}, {} },                     ///< Main render specular sampler
-		{1, 18,     {}, {} },                     ///< Main render diffuse sampler
+		{1, 4000,   {}, {}, {} },                     ///< Directional light
+		{1, 8000,   {}, {}, {} },                     ///< Spot light
+		{1, 128000, {}, {}, {} },                     ///< Point light
+		{1, 1000,   {}, {}, {} },                     ///< Hud
+		{1, 2048,   {}, {}, {} },                     ///< Font ubo
+		{1, 2,      {}, {}, {} },                     ///< Font sampler
+		{1, 64,     {}, {}, {} },                     ///< Hudscreen
+		{1, 128,    {}, {}, {} },                     ///< UI ubo
+		{1, 2,      {}, {}, {} },                     ///< UI sampler
+		{1, 128,    {}, {}, {} },                     ///< UIIcons ubo
+		{1, 9,      {}, {}, {} },                     ///< UIIcons sampler
+		{1, 64,     {}, {}, {} },                     ///< Virtual textures ubo
+		{1, 2,      {}, {}, {} },                     ///< Virtual textures sampler
+		{1, 1000,   {}, {}, {} },                     ///< Main render matrix ubo
+		{4, 2,      {}, {}, {} },                     ///< Main render light data
+		{1, 18,     {}, {}, {} },                     ///< Main render specular sampler
+		{1, 18,     {}, {}, {} },                     ///< Main render diffuse sampler
 	};
 	
 	inline DescriptorBinding descriptorBindingsConfig[] = {
