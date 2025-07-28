@@ -2738,17 +2738,10 @@ namespace GLVM::core
 	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, [[maybe_unused]] const unsigned int& descriptorSetsNumber,
 																	const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
 																	const unsigned int descriptorCount ) {
-		std::cout << "ds number: " << descriptorSetsNumber << std::endl;
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
 			const unsigned int textureIndex = i / 2;
 			constexpr unsigned int textureViewIndex = 0;
 			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages, textureIndex, textureViewIndex, textureSampler );
-			// imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-			// std::cout << "texture index: " << textureIndex << std::endl;
-			// imageInfo.imageView = textureImages[textureIndex].views[0];
-			// imageInfo.sampler = textureSampler;
-
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
 			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
@@ -2808,10 +2801,8 @@ namespace GLVM::core
 			
 			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
 				core::vector<VkWriteDescriptorSet> descriptorWrites;
-				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				modelMatrixBufferInfo.buffer = shadowMapDirectionalLightModelMatrixUniformBuffer;
-				modelMatrixBufferInfo.offset = i * sizeof( ShadowMapMatrixUBO );
-				modelMatrixBufferInfo.range = sizeof( ShadowMapMatrixUBO );
+				VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo( shadowMapDirectionalLightModelMatrixUniformBuffer,
+																						   sizeof( ShadowMapMatrixUBO ), i );			   
 
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					

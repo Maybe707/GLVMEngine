@@ -179,6 +179,19 @@ namespace GLVM::core
 		unsigned int                    linkedDescriptorSetIDs[maximumLinkedDescriptorSetDS];
 	};
 
+	struct GPUBuffer {
+		VkBuffer buffer;
+		VkDeviceMemory deviceMemory;
+	};
+
+	union Descriptor {
+		Descriptor() {};
+		~Descriptor() {};
+		
+		GPUBuffer* GPUBuffer;
+		VK_Image* GPUImage;
+	};
+	
 	struct Vertex {
         vec3 pos;
         vec3 color;

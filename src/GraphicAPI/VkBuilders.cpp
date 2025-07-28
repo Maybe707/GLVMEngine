@@ -10,6 +10,13 @@ namespace GLVM::core {
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
 			for( unsigned int bindingsIdCounter = 0; bindingsIdCounter < descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++bindingsIdCounter ) {
 				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;
+				if( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+					GPUDescriptors.Push( {} );
+					GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
+				} else if ( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+					GPUDescriptors.Push( {} );
+					GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
+				}
 			}
 			descriptorBindingsIdCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
 		}

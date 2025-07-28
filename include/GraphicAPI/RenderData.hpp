@@ -3,9 +3,11 @@
 
 #include "Vector.hpp"
 #include <vulkan/vulkan_core.h>
-
-
-extern GLVM::core::vector<GLVM::core::vector<VkDescriptorSet>> descriptorSetsChunks;
-extern GLVM::core::vector<VkRenderPass> renderPasses;
+#include "VkStructs.hpp"
+namespace GLVM::core {
+	extern GLVM::core::vector<vector<VkDescriptorSet>> descriptorSetsChunks;
+	extern GLVM::core::vector<VkRenderPass> renderPasses;
+	extern GLVM::core::vector<Descriptor> GPUDescriptors;
+} // namespace GLVM::core
 
 #endif
