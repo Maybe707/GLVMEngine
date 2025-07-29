@@ -165,7 +165,7 @@ namespace GLVM::core
 		VkDescriptorSetLayout           setLayout;
 		static constexpr unsigned int   maximumLinkedDescriptorBindingsDS = 32;
 		unsigned int                    descriptorsBindingsIDs[maximumLinkedDescriptorBindingsDS];
-		unsigned int                    descriptorSetsBindingOffsets[maximumLinkedDescriptorBindingsDS];
+		unsigned int                    descriptorSetOffset;
 	};
 	
 	struct Pipeline {

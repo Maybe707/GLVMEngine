@@ -766,9 +766,11 @@ namespace GLVM::core
 		createPointLightShadowMapRenderPass();
 		createVirtualTextureRenderPass();
 		for ( int descriptorSetCounter = 0; descriptorSetCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetCounter ) {
+			std::cout << "ds #: " << descriptorSetCounter << std::endl;
 			createDescriptorSetLayout(descriptorSetsConfig[descriptorSetCounter]);
 		}
 		for ( int graphicsPipelineCounter = 0; graphicsPipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++graphicsPipelineCounter ) {
+			std::cout << "next pipeline: " << std::endl;
 			createGraphicsPipeline( pipelineConfigs[graphicsPipelineCounter], renderPasses[graphicsPipelineCounter], VK_POLYGON_MODE_FILL );
 		}
 		createCommandPool(mainRenderCommandPool);
@@ -1815,8 +1817,10 @@ namespace GLVM::core
     void CVulkanRenderer::createDescriptorSetLayout(DescriptorSet& descriptorSet) {
 		std::vector<VkDescriptorSetLayoutBinding> bindings;
 		std::cout << "NEXT DS" << std::endl;
+		std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
 		for ( u32 j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
 			u32 currentDescriptorBindingID = descriptorSet.descriptorsBindingsIDs[j];
+//			u32 currentDescriptorBindingID = j;
 			std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
 			VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 			modelMatrixUboLayout.binding = descriptorBindingsConfig[currentDescriptorBindingID].binding;
@@ -1833,7 +1837,7 @@ namespace GLVM::core
 		layoutInfo.flags = 0;
 		layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 		layoutInfo.pBindings = bindings.data();
-
+		std::cout << "NUMBER OF BINDINGS: " << static_cast<uint32_t>(bindings.size()) << std::endl;
 		if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSet.setLayout) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create descriptor set layout!");
 		}
@@ -1942,6 +1946,7 @@ namespace GLVM::core
 		unsigned int descriptorLayoutsNumber = pipeline.actualLinkedDescriptorSetsNumber;
 		core::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		for ( unsigned i = 0; i < descriptorLayoutsNumber; ++i ) {
+			std::cout << "ds inside pipeline: " << pipeline.linkedDescriptorSetIDs[i] << std::endl;
 			descriptorSetLayouts.Push( descriptorSetsConfig[pipeline.linkedDescriptorSetIDs[i]].setLayout );
 		}
 		
@@ -2634,7 +2639,7 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::allocateDescriptorSets( core::vector<VkDescriptorSet>& descriptorSets, VkDescriptorSetLayout setLayout,
-												  unsigned int descriptorSetsNumber ) {
+												  const unsigned int descriptorSetsNumber, const unsigned int descriptorOffset ) {
 		std::vector<VkDescriptorSetLayout> matrixUboLayouts(descriptorSetsNumber, setLayout);
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -2642,14 +2647,14 @@ namespace GLVM::core
 		allocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetsNumber);
 		allocInfo.pSetLayouts = matrixUboLayouts.data();
 
-		descriptorSets.Resize(descriptorSetsNumber);
-		if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.GetVectorContainer()) != VK_SUCCESS) {
+//		descriptorSets.Resize(descriptorSetsNumber);
+		if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.GetVectorContainer() + descriptorOffset) != VK_SUCCESS) {
 			throw std::runtime_error("failed to allocate descriptor sets!");
 		}
 	}
 
 	void CVulkanRenderer::updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-												   int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
+												   int uboBinding, core::vector<VkDescriptorSet>& uboDescriptorSets ) {
 		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo( ubo, uboStructSize, i );
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
@@ -2667,8 +2672,9 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize,
-														 int uboBinding, core::vector<VkDescriptorSet> uboDescriptorSets ) {
+														 int uboBinding, [[maybe_unused]] core::vector<VkDescriptorSet>& uboDescriptorSets ) {
 		unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
+		std::cout << "INDEX SUK: " << linkedDescriptorSetID << std::endl;
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID];
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
@@ -2700,7 +2706,7 @@ namespace GLVM::core
 			std::array<VkWriteDescriptorSet, 4> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = uboDescriptorSets[i];
+			descriptorWrites[0].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);
 			descriptorWrites[0].dstBinding = uboBinding;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -2708,7 +2714,7 @@ namespace GLVM::core
 			descriptorWrites[0].pBufferInfo = &modelMatrixBufferInfo;
 
 			descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[1].dstSet = uboDescriptorSets[i];
+			descriptorWrites[1].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);
 			descriptorWrites[1].dstBinding = shaderBindings[1];
 			descriptorWrites[1].dstArrayElement = 0;
 			descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -2716,7 +2722,7 @@ namespace GLVM::core
 			descriptorWrites[1].pImageInfo = directionalLightsImageInfo;
 
 			descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[2].dstSet = uboDescriptorSets[i];
+			descriptorWrites[2].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);
 			descriptorWrites[2].dstBinding = shaderBindings[2];
 			descriptorWrites[2].dstArrayElement = 0;
 			descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -2724,7 +2730,7 @@ namespace GLVM::core
 			descriptorWrites[2].pImageInfo = pointLightsImageInfo;
 
 			descriptorWrites[3].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[3].dstSet = uboDescriptorSets[i];
+			descriptorWrites[3].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);
 			descriptorWrites[3].dstBinding = shaderBindings[3];
 			descriptorWrites[3].dstArrayElement = 0;
 			descriptorWrites[3].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -2736,8 +2742,8 @@ namespace GLVM::core
 	}
 	
 	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, [[maybe_unused]] const unsigned int& descriptorSetsNumber,
-																	const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
-																	const unsigned int descriptorCount ) {
+																	const core::vector<unsigned int> bindings, [[maybe_unused]] core::vector<VkDescriptorSet>& descriptorSets,
+																	const unsigned int descriptorCount, const unsigned int offset ) {
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
 			const unsigned int textureIndex = i / 2;
 			constexpr unsigned int textureViewIndex = 0;
@@ -2748,11 +2754,11 @@ namespace GLVM::core
 				descriptorWrites.Push({});
 				const unsigned int lastElement = descriptorWrites.GetSize() - 1;
 				descriptorWrites[lastElement].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[lastElement].dstSet = descriptorSets[i];
+				descriptorWrites[lastElement].dstSet = *(descriptorSetsChunks.GetVectorContainer() + offset + i);
 				descriptorWrites[lastElement].dstBinding = bindings[j];
 				descriptorWrites[lastElement].dstArrayElement = 0;
 				descriptorWrites[lastElement].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[lastElement].descriptorCount = descriptorCount;
+				descriptorWrites[lastElement].descriptorCount = descriptorSetsNumber;
 				descriptorWrites[lastElement].pImageInfo = &imageInfo;
 			}
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
@@ -2788,9 +2794,8 @@ namespace GLVM::core
 		for( size_t descriptorSetID = 0; descriptorSetID < linkedDescriptorSetsNumber; ++descriptorSetID ) {
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[descriptorSetID];
 			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
-			std::cout << "chunks number: " << descriptorSetsChunks.GetSize() << std::endl;
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-									currentDescriptorSet.hostDescriptorNumber );
+									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
@@ -2798,7 +2803,6 @@ namespace GLVM::core
 			for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
 				shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[j]].binding );
 			}
-			
 			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
 				core::vector<VkWriteDescriptorSet> descriptorWrites;
 				VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo( shadowMapDirectionalLightModelMatrixUniformBuffer,
@@ -2808,7 +2812,7 @@ namespace GLVM::core
 					
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -2826,7 +2830,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].linkedDescriptorSetIDs[descriptorSetID];
  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-									currentDescriptorSet.hostDescriptorNumber );
+									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -2844,7 +2848,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -2862,7 +2866,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].linkedDescriptorSetIDs[descriptorSetID];
  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID]; 
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-									currentDescriptorSet.hostDescriptorNumber );
+									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -2879,10 +2883,10 @@ namespace GLVM::core
 				
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
- 					// std::cout << "offset: " << currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] << std::endl;
+ 					// std::cout << "offset: " << currentDescriptorSet.descriptorSetOffset << std::endl;
 					// std::cout << "i: " << i << std::endl;
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -2900,7 +2904,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_PIPELINE].linkedDescriptorSetIDs[descriptorSetID];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-									currentDescriptorSet.hostDescriptorNumber );
+									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -2918,7 +2922,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -2936,7 +2940,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_SCREEN_PIPELINE].linkedDescriptorSetIDs[descriptorSetID];
    			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-									currentDescriptorSet.hostDescriptorNumber );
+									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -2954,7 +2958,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -2970,7 +2974,7 @@ namespace GLVM::core
 		const unsigned int linkedDescriptorSetUboID = pipelineConfigs[SpecificPipeline::UI_PIPELINE].linkedDescriptorSetIDs[0];
 		const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetUboID];
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
-								currentDescriptorSet.hostDescriptorNumber );
+								currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
@@ -2988,7 +2992,7 @@ namespace GLVM::core
 			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 				descriptorWrites.Push({});
 				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
 				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 				descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3002,7 +3006,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetSamplerID];
 		if ( initializeTextureData_.size() > 0 ) {
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-									currentDescriptorSet1.hostDescriptorNumber );
+									currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -3021,7 +3025,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3037,7 +3041,7 @@ namespace GLVM::core
 		const unsigned int linkedDescriptorSetUboID = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[0];
 		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetUboID];
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-								currentDescriptorSet0.hostDescriptorNumber );
+								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet0.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
@@ -3055,7 +3059,7 @@ namespace GLVM::core
 			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 				descriptorWrites.Push({});
 				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetOffset + i);;
 				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 				descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3069,7 +3073,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetSamplerID];
 		if ( initializeTextureData_.size() > 0 ) {
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber );
+									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -3088,7 +3092,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3104,7 +3108,7 @@ namespace GLVM::core
 		const unsigned int linkedDescriptorSetUboID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[0];
 		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetUboID];
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-								currentDescriptorSet0.hostDescriptorNumber );
+								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet0.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
@@ -3122,7 +3126,7 @@ namespace GLVM::core
 			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 				descriptorWrites.Push({});
 				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetOffset + i);;
 				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 				descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3136,7 +3140,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetSamplerID];
 		if ( initializeTextureData_.size() > 0 ) {
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-									currentDescriptorSet1.hostDescriptorNumber );
+									currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -3154,7 +3158,7 @@ namespace GLVM::core
 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
 					descriptorWrites.Push({});
 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[shaderDescriptorID] + i);;
+					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);;
 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
@@ -3173,7 +3177,7 @@ namespace GLVM::core
 		const unsigned int linkedDescriptorSetUboID = pipelineConfigs[SpecificPipeline::VIRTUAL_TEXTURES_PIPELINE].linkedDescriptorSetIDs[0];
 		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetUboID];
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-								MAX_FRAMES_IN_FLIGHT * currentDescriptorSet0.hostDescriptorNumber );
+								MAX_FRAMES_IN_FLIGHT * currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet0.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
@@ -3205,7 +3209,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetSamplerID];
 		if ( initializeTextureData_.size() > 0 ) {
 			allocateDescriptorSets( virtualTexturesSamplersDesctiptorSets, currentDescriptorSet1.setLayout,
-									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber );
+									MAX_FRAMES_IN_FLIGHT * currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 			core::vector<u32> shaderBindings;
@@ -3244,7 +3248,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
 		int modelMatrixUboBinding = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[0]].binding;
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-								currentDescriptorSet0.hostDescriptorNumber );
+								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
 								 modelMatrixUboBinding, descriptorSetsChunks );
 
@@ -3252,7 +3256,7 @@ namespace GLVM::core
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetMatrixLightDataID];
 		int lightDataUboBinding = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[0]].binding;
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-								currentDescriptorSet1.hostDescriptorNumber );
+								currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 		updateLightDataDescriptorSets( lightDataUniformBuffer, sizeof(LightData),
 									   lightDataUboBinding, descriptorSetsChunks );
 
@@ -3265,18 +3269,20 @@ namespace GLVM::core
 
 		if ( initializeTextureData_.size() > 0 ) {
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet2.setLayout,
-									currentDescriptorSet2.hostDescriptorNumber );
+									currentDescriptorSet2.hostDescriptorNumber, currentDescriptorSet2.descriptorSetOffset );
 
 			core::vector<unsigned int> bindings;
 			bindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet2.hostDescriptorNumber, bindings, descriptorSetsChunks, 1 );
+			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet2.hostDescriptorNumber, bindings, descriptorSetsChunks, 1,
+													  descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_SPECULAR_SAMPLER].descriptorSetOffset);
 
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet3.setLayout,
-									currentDescriptorSet3.hostDescriptorNumber );
+									currentDescriptorSet3.hostDescriptorNumber, currentDescriptorSet3.descriptorSetOffset );
 			
 			core::vector<unsigned int> diffuseBindings;
 			diffuseBindings.Push(diffuseSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet3.hostDescriptorNumber, diffuseBindings, descriptorSetsChunks, 1 );
+			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet3.hostDescriptorNumber, diffuseBindings, descriptorSetsChunks, 1,
+													  descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_DIFFUSE_SAMPLER].descriptorSetOffset);
 		}
 	}
 
@@ -3629,7 +3635,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::HUD_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + i)), 0, nullptr);
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i)), 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
@@ -3722,12 +3728,12 @@ namespace GLVM::core
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::UI_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipelineLayout,
-											0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + uboIndex)), 0, nullptr);
+											0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
 					const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::UI_PIPELINE].linkedDescriptorSetIDs[1];
 					const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipelineLayout,
-											1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[0] + currentFrame)), 0, nullptr);
+											1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 					// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 					// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
@@ -3829,12 +3835,12 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + uboIndex)), 0, nullptr);
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
 			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[1];
   			const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipelineLayout,
-									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[0] + diffuseTexureID + currentFrame)), 0, nullptr);
+									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + diffuseTexureID + currentFrame)), 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
@@ -3911,7 +3917,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_SCREEN_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::HUD_SCREEN_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + uboIndex)), 0, nullptr);
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
@@ -4032,11 +4038,11 @@ namespace GLVM::core
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 0, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0])), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset)), 0, nullptr);
 				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
 				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 1, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[0])), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset)), 0, nullptr);
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
@@ -4120,13 +4126,13 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + currentFrame)), 0, nullptr);
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT + uboIndex)), 0, nullptr);
 
 			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
   			const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetsBindingOffsets[0] + currentFrame)), 0, nullptr);
+									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
@@ -4140,11 +4146,11 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
   			const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetsBindingOffsets[0] + specularTextureIndex + currentFrame)), 0, nullptr);
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + specularTextureIndex + currentFrame)), 0, nullptr);
 			const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
   			const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetsBindingOffsets[0] + diffuseTextureIndex + currentFrame)), 0, nullptr);
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + diffuseTextureIndex + currentFrame)), 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
@@ -4999,7 +5005,7 @@ namespace GLVM::core
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].pipelineLayout, 0, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + uboDirectionalLightIndex)), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboDirectionalLightIndex)), 0, nullptr);
 				
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshId]};
 				VkDeviceSize offsets[] = {0};
@@ -5093,7 +5099,7 @@ namespace GLVM::core
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].pipelineLayout, 0, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + currentFrame)), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + currentFrame)), 0, nullptr);
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
@@ -5227,7 +5233,7 @@ namespace GLVM::core
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].pipelineLayout, 0, 1,
-											&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetsBindingOffsets[0] + uboIndex)), 0, nullptr);
+											&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
 					VkDeviceSize offsets[] = {0};
