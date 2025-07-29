@@ -2654,13 +2654,13 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
-												   int uboBinding, core::vector<VkDescriptorSet>& uboDescriptorSets ) {
+												   int uboBinding, [[maybe_unused]] core::vector<VkDescriptorSet>& uboDescriptorSets, const unsigned int offset ) {
 		for (size_t i = 0; i < uboDescriptorsNumber; ++i) {
 			VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo( ubo, uboStructSize, i );
 			std::array<VkWriteDescriptorSet, 1> descriptorWrites{};
 			
 			descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrites[0].dstSet = uboDescriptorSets[i];
+			descriptorWrites[0].dstSet = *(descriptorSetsChunks.GetVectorContainer() + offset + i);
 			descriptorWrites[0].dstBinding = uboBinding;
 			descriptorWrites[0].dstArrayElement = 0;
 			descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -3250,7 +3250,7 @@ namespace GLVM::core
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
 								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
-								 modelMatrixUboBinding, descriptorSetsChunks );
+								 modelMatrixUboBinding, descriptorSetsChunks, currentDescriptorSet0.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetMatrixLightDataID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetMatrixLightDataID];
@@ -4126,7 +4126,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT + uboIndex)), 0, nullptr);
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
 			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
 			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
