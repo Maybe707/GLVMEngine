@@ -2758,7 +2758,7 @@ namespace GLVM::core
 				descriptorWrites[lastElement].dstBinding = bindings[j];
 				descriptorWrites[lastElement].dstArrayElement = 0;
 				descriptorWrites[lastElement].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-				descriptorWrites[lastElement].descriptorCount = descriptorSetsNumber;
+				descriptorWrites[lastElement].descriptorCount = 1;
 				descriptorWrites[lastElement].pImageInfo = &imageInfo;
 			}
 			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
@@ -3278,7 +3278,7 @@ namespace GLVM::core
 
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet3.setLayout,
 									currentDescriptorSet3.hostDescriptorNumber, currentDescriptorSet3.descriptorSetOffset );
-			
+
 			core::vector<unsigned int> diffuseBindings;
 			diffuseBindings.Push(diffuseSamplerBinding);
 			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet3.hostDescriptorNumber, diffuseBindings, descriptorSetsChunks, 1,
@@ -3840,7 +3840,7 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[1];
   			const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipelineLayout,
-									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + diffuseTexureID + currentFrame)), 0, nullptr);
+									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTexureID + currentFrame)), 0, nullptr);
 
 			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
@@ -4146,11 +4146,11 @@ namespace GLVM::core
 			const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
   			const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + specularTextureIndex + currentFrame)), 0, nullptr);
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame)), 0, nullptr);
 			const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
   			const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + diffuseTextureIndex + currentFrame)), 0, nullptr);
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame)), 0, nullptr);
 			
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
