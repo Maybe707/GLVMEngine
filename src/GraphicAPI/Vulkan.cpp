@@ -5099,7 +5099,7 @@ namespace GLVM::core
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].pipelineLayout, 0, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + currentFrame)), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboSpotLightIndex)), 0, nullptr);
 				VkBuffer vertexBuffers[] = {vertexBufferContainer[meshID]};
 				VkDeviceSize offsets[] = {0};
 				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
