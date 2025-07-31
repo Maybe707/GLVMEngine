@@ -2003,26 +2003,28 @@ namespace GLVM::core
 		}
 
 		/// Directional lights shadow map renderer frame buffers initialization
+		unsigned int directionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
 		directionalLightShadowMapFrameBuffers.resize(DIRECTIONAL_LIGHTS_NUMBER);
         for (size_t i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> directionalLightsRenderAttachments;
-			directionalLightsRenderAttachments.push_back(directionalLightTextureImages[i].views[0]);
+			directionalLightsRenderAttachments.push_back((*GPUDescriptors[descriptorBindingsConfig[directionalLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage).views[0]);
 			createRenderPassFramebuffers(directionalLightsRenderAttachments, renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE],
 										 directionalLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Spot lights shadow map renderer frame buffers initialization
+		unsigned int spotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[3];
 		spotLightShadowMapFrameBuffers.resize(SPOT_LIGHTS_NUMBER);
         for (size_t i = 0; i < SPOT_LIGHTS_NUMBER; ++i) {
 			std::vector<VkImageView> spotLightsRenderAttachments;
-			spotLightsRenderAttachments.push_back(spotLightTextureImages[i].views[0]);
+			spotLightsRenderAttachments.push_back((*GPUDescriptors[descriptorBindingsConfig[spotLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage).views[0]);
 			
 			createRenderPassFramebuffers(spotLightsRenderAttachments, renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE],
 										 spotLightShadowMapFrameBuffers[i], swapChainExtent.width, swapChainExtent.height);
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
-		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];
+		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[2];
 		pointLightShadowMapFrameBuffers.resize(POINT_LIGHTS_NUMBER);
 		for ( size_t j = 0; j < POINT_LIGHTS_NUMBER; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
@@ -2088,6 +2090,7 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::createDirectionalLightShadowMapDepthResources() {
+		unsigned int directionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
 		for ( unsigned int i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -2143,11 +2146,12 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			directionalLightTextureImages.Push(depthImage);
+			*GPUDescriptors[descriptorBindingsConfig[directionalLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 	}
 
 	void CVulkanRenderer::createSpotLightShadowMapDepthResources() {
+		unsigned int spotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[3];		
 		for ( unsigned int i = 0; i < SPOT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -2203,12 +2207,12 @@ namespace GLVM::core
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
 			setImageDebugObjectName(depthImage);
-			spotLightTextureImages.Push(depthImage);
+			*GPUDescriptors[descriptorBindingsConfig[spotLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDepthResources() {
-		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];
+		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[2];
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -2690,16 +2694,22 @@ namespace GLVM::core
 		for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
 			shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[j]].binding );
 		}
-		
-		createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-								   directionalLightTextureImages, 0, directionalLightsImageInfo );
-		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
+
+		unsigned int directionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
+		for( int i = 0; i < DIRECTIONAL_LIGHTS_NUMBER; ++i ) {
+		directionalLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[directionalLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage,
+																   VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 0, textureSampler );
+		}
+		unsigned int pointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[2];		
 		for( int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
-			pointLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage,
+			pointLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[pointLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage,
 																 VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 6, textureSampler );
 		}
-		createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-									spotLightTextureImages, 0, spotLightsImageInfo );
+		unsigned int spotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[3];		
+		for( int i = 0; i < SPOT_LIGHTS_NUMBER; ++i ) {
+			spotLightsImageInfo[i] = createDescriptorImageInfo ( *GPUDescriptors[descriptorBindingsConfig[spotLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage,
+										VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 0, textureSampler );
+		}
 		// std::cout << "1 bind: " << uboBinding << std::endl;
 		// std::cout << "2 bind: " << shaderBindings[1] << std::endl;
 		// std::cout << "3 bind: " << shaderBindings[2] << std::endl;
