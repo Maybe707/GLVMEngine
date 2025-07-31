@@ -4,17 +4,17 @@
 
 namespace GLVM::core {
 	void descriptorSetBuilder() {
-		static unsigned int descriptorBindingsIdCounter = 0;
-		static unsigned int descriptorSetsBindigOffsetCounter = 0;
-		static unsigned int globalDescriptorsOffset = 0;
+		static unsigned int descriptorBindingsIdCounter = 0;              ///< Counts ds bindings indexes inside ds
+		static unsigned int descriptorSetsBindigOffsetCounter = 0;        ///< Counts host data ds
+		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
 		
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
 			descriptorSetsConfig[dsCounter].descriptorSetOffset = descriptorSetsBindigOffsetCounter;                  ///< Offset for indexing inside descriptorSetsChunks
 			descriptorSetsBindigOffsetCounter += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
 			std::cout << "pravilni idealni offset: " << descriptorSetsConfig[dsCounter].descriptorSetOffset << std::endl;
 			for( unsigned int bindingsIdCounter = 0; bindingsIdCounter < descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++bindingsIdCounter ) {
-				descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].globalDescriptorOffset = globalDescriptorsOffset;
-				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;
+				descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].globalDescriptorOffset = globalDescriptorsOffset;     ///< Global offset for discriptors inside ds binding
+				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;    ///< Index for ds bindings inside ds
 				if( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
 					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
 						GPUDescriptors.Push( {} );
