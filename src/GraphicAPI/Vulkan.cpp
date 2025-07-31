@@ -2695,7 +2695,7 @@ namespace GLVM::core
 								   directionalLightTextureImages, 0, directionalLightsImageInfo );
 		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
 		for( int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
-			pointLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUImage,
+			pointLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage,
 																 VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 6, textureSampler );
 		}
 		createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
