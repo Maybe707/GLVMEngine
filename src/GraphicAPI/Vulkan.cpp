@@ -473,6 +473,9 @@ namespace GLVM::core
 		descriptorSetBuilder();
 		pipelineBuilder();
 		renderPassesBuilder();
+		for( int i = 0; i < 20; ++i ) {
+			std::cout << "descriptor offset: " << descriptorBindingsConfig[i].globalDescriptorOffset << std::endl;
+		}
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -2019,16 +2022,15 @@ namespace GLVM::core
 		}
 
 		/// Point lights shadow map renderer frame buffers initialization
+		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];
 		pointLightShadowMapFrameBuffers.resize(POINT_LIGHTS_NUMBER);
 		for ( size_t j = 0; j < POINT_LIGHTS_NUMBER; ++j ) {
 			for ( size_t m = 0; m < 6; ++m ) {
 				std::vector<VkImageView> pointLightsRenderAttachments;
-				if ( pointLightTextureImages.GetSize() > 0 ) {
-					pointLightsRenderAttachments.push_back(pointLightTextureImages[j].views[m]);
-					pointLightShadowMapFrameBuffers[j].push_back({});
-					createRenderPassFramebuffers(pointLightsRenderAttachments, renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE],
-												 pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
-				}
+				pointLightsRenderAttachments.push_back((*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + j].GPUImage).views[m]);
+				pointLightShadowMapFrameBuffers[j].push_back({});
+				createRenderPassFramebuffers(pointLightsRenderAttachments, renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE],
+											 pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
 		}
     }
@@ -2206,6 +2208,7 @@ namespace GLVM::core
 	}
 
 	void CVulkanRenderer::createPointLightShadowMapDepthResources() {
+		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 			VK_Image depthImage		 = {
 				.image				 = VkImage{},
@@ -2231,6 +2234,7 @@ namespace GLVM::core
 				barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
 				barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 				barrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+//				barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 				barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
 				barrier.image = depthImage.image;
@@ -2265,14 +2269,17 @@ namespace GLVM::core
 			}
 
 			setImageDebugObjectName(depthImage);
-			pointLightTextureImages.Push(depthImage);
+			std::cout << "GPU DESCRIPTORS: " << GPUDescriptors.GetSize() << std::endl;
+			std::cout << "OFFSET: " << descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i << std::endl;
+			*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
-			pointLightTextureImages[i].viewType = VK_IMAGE_VIEW_TYPE_CUBE;
+		    (*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage).viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			setImageDebugObjectName(pointLightTextureImages[i]);
-			pointLightTextureImages[i].views.push_back(createImageView(pointLightTextureImages[i], 0, 6));
+			setImageDebugObjectName(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage);
+			(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage).views.push_back(
+				createImageView(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage, 0, 6));
 		}
 	}
 	
@@ -2574,7 +2581,8 @@ namespace GLVM::core
 		u32 memory = 0;
 		memory = modelMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-						 modelMatrixUniformBuffer, modelMatrixUniformBuffersMemory);
+					 GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->buffer,
+					 GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory);
 
 		memory = hudBufferSize * MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -2685,8 +2693,11 @@ namespace GLVM::core
 		
 		createDescriptorImageInfo( DIRECTIONAL_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 								   directionalLightTextureImages, 0, directionalLightsImageInfo );
-		createDescriptorImageInfo( POINT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
-								   pointLightTextureImages, 6, pointLightsImageInfo );
+		unsigned int descriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[1];		
+		for( int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
+			pointLightsImageInfo[i] = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUImage,
+																 VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL, 6, textureSampler );
+		}
 		createDescriptorImageInfo ( SPOT_LIGHTS_NUMBER, VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL,
 									spotLightTextureImages, 0, spotLightsImageInfo );
 		// std::cout << "1 bind: " << uboBinding << std::endl;
@@ -2747,7 +2758,7 @@ namespace GLVM::core
 		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
 			const unsigned int textureIndex = i / 2;
 			constexpr unsigned int textureViewIndex = 0;
-			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages, textureIndex, textureViewIndex, textureSampler );
+			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages[textureIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, textureViewIndex, textureSampler );
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
 			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
@@ -3249,7 +3260,7 @@ namespace GLVM::core
 		int modelMatrixUboBinding = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[0]].binding;
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
 								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
-		updateDescriptorSetsUBO( modelMatrixUniformBuffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
+		updateDescriptorSetsUBO( GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->buffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
 								 modelMatrixUboBinding, descriptorSetsChunks, currentDescriptorSet0.descriptorSetOffset );
 
 		const unsigned int linkedDescriptorSetMatrixLightDataID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
@@ -4375,10 +4386,10 @@ namespace GLVM::core
 		modelMatrixUBO.spotLightsNumber        = spotLightNumber;
 		
         void* modelMatrixData;
-        vkMapMemory(device, modelMatrixUniformBuffersMemory, sizeof(modelMatrixUBO) * offset,
+        vkMapMemory(device, GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory, sizeof(modelMatrixUBO) * offset,
 					sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, modelMatrixUniformBuffersMemory);
+        vkUnmapMemory(device, GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory);
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
@@ -5460,11 +5471,11 @@ namespace GLVM::core
 		return uboBufferInfo;
 	}
 
-	VkDescriptorImageInfo CVulkanRenderer::createDescriptorImageInfo( const std::vector<VK_Image>& textureImages, unsigned int textureIndex,
-																	  unsigned int textureViewIndex, VkSampler textureSampler ) {
+	VkDescriptorImageInfo CVulkanRenderer::createDescriptorImageInfo( const VK_Image& textureImage, VkImageLayout layout, unsigned int textureViewIndex, VkSampler textureSampler ) {
 		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textureImages[textureIndex].views[textureViewIndex];
+//		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageLayout = layout;
+		imageInfo.imageView = textureImage.views[textureViewIndex];
 		imageInfo.sampler = textureSampler;
 
 		return imageInfo;
@@ -5811,7 +5822,7 @@ namespace GLVM::core
 		const char* strImageName = imageName.c_str();
 		uniformBufferObjectInfo.pObjectName = strImageName;
 		uniformBufferObjectInfo.objectType = VK_OBJECT_TYPE_BUFFER;
-		uniformBufferObjectInfo.objectHandle = (uint64_t)modelMatrixUniformBuffer;
+		uniformBufferObjectInfo.objectHandle = (uint64_t)GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->buffer;
 		SetDebugObjectName(device, &uniformBufferObjectInfo);
 
 		VkDebugUtilsObjectNameInfoEXT lightDataUniformBufferObjectInfo{};

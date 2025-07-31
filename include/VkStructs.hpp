@@ -157,6 +157,7 @@ namespace GLVM::core
 		VkShaderStageFlags     shaderStageFlag;
 		unsigned int           binding;
 		unsigned int           shaderDescriptorsNumber;
+		unsigned int           globalDescriptorOffset;
 	};
 
 	struct DescriptorSet {                     ///< Meta data for descriptor sets

@@ -6,19 +6,27 @@ namespace GLVM::core {
 	void descriptorSetBuilder() {
 		static unsigned int descriptorBindingsIdCounter = 0;
 		static unsigned int descriptorSetsBindigOffsetCounter = 0;
+		static unsigned int globalDescriptorsOffset = 0;
 		
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
-			descriptorSetsConfig[dsCounter].descriptorSetOffset = descriptorSetsBindigOffsetCounter;
+			descriptorSetsConfig[dsCounter].descriptorSetOffset = descriptorSetsBindigOffsetCounter;                  ///< Offset for indexing inside descriptorSetsChunks
 			descriptorSetsBindigOffsetCounter += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
 			std::cout << "pravilni idealni offset: " << descriptorSetsConfig[dsCounter].descriptorSetOffset << std::endl;
 			for( unsigned int bindingsIdCounter = 0; bindingsIdCounter < descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++bindingsIdCounter ) {
+				descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].globalDescriptorOffset = globalDescriptorsOffset;
 				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;
 				if( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-					GPUDescriptors.Push( {} );
-					GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
+					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						GPUDescriptors.Push( {} );
+						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
+						++globalDescriptorsOffset;
+					}
 				} else if ( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
-					GPUDescriptors.Push( {} );
-					GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
+					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						GPUDescriptors.Push( {} );
+						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
+						++globalDescriptorsOffset;
+					}
 				}
 			}
 			descriptorBindingsIdCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
