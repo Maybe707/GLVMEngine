@@ -323,9 +323,9 @@ namespace GLVM::core
         VkBuffer lightDataUniformBuffer;
         VkDeviceMemory lightDataUniformBuffersMemory;
 
-		VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
-		VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
-		VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
+		// VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
+		// VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
+		// VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		
         VkDescriptorPool descriptorPool;
 		const unsigned int matrixUboDescriptorsNumber = 500;
@@ -450,7 +450,7 @@ namespace GLVM::core
 									 const unsigned int descriptorSetsNumber, const unsigned int descriptorOffset );
 		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
 									  int uboBinding, core::vector<VkDescriptorSet>& uboDescriptorSets, const unsigned int offset);
-		void updateLightDataDescriptorSets( VkBuffer ubo, const VkDeviceSize& uboStructSize, int uboBinding, core::vector<VkDescriptorSet>& uboDescriptorSets );
+		void updateLightDataDescriptorSets( const VkDeviceSize& uboStructSize );
 		void updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, const unsigned int& descriptorSetsNumber,
 													   const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
 													   const unsigned int descriptorCount, const unsigned int offset );
