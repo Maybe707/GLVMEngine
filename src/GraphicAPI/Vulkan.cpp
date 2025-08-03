@@ -3332,42 +3332,22 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
-		const unsigned int linkedDescriptorSetMatrixUboID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
-		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
-		[[maybe_unused]] int modelMatrixUboBinding = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[0]].binding;
-		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
-		updateLightDataDescriptorSets( currentDescriptorSet0, sizeof(ModelMatrixUBO) );
-
-		const unsigned int linkedDescriptorSetMatrixLightDataID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
-		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetMatrixLightDataID];
-//		int lightDataUboBinding = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[0]].binding;
-		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-								currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
-
-		updateLightDataDescriptorSets( currentDescriptorSet1, sizeof(LightData) );
-
-		const unsigned int linkedDescriptorSetMatrixSpecularID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
-		const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetMatrixSpecularID];
-		int specularSamplerBinding = descriptorBindingsConfig[currentDescriptorSet2.descriptorsBindingsIDs[0]].binding;
-		const unsigned int linkedDescriptorSetMatrixDiffuseID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
-		const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetMatrixDiffuseID];
-		int diffuseSamplerBinding = descriptorBindingsConfig[currentDescriptorSet3.descriptorsBindingsIDs[0]].binding;
-
-		if ( initializeTextureData_.size() > 0 ) {
-			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet2.setLayout,
-									currentDescriptorSet2.hostDescriptorNumber, currentDescriptorSet2.descriptorSetOffset );
-
-			core::vector<unsigned int> bindings;
-			bindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet2);
-
-			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet3.setLayout,
-									currentDescriptorSet3.hostDescriptorNumber, currentDescriptorSet3.descriptorSetOffset );
-
-			core::vector<unsigned int> diffuseBindings;
-			diffuseBindings.Push(diffuseSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet3);
+		for( unsigned int descriptorSetCounter = 0; descriptorSetCounter < pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].actualLinkedDescriptorSetsNumber; ++descriptorSetCounter ) {
+			const unsigned int linkedDescriptorSetMatrixUboID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[descriptorSetCounter];
+			const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
+			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
+									currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
+			if( currentDescriptorSet0.isTexture ) {
+				updateDescriptorSetsCombinedImageSampler( currentDescriptorSet0);
+			} else {
+				VkDeviceSize size = 0;
+				if( descriptorSetCounter == 0 ) {
+					size = sizeof(ModelMatrixUBO);
+				} else {
+					size = sizeof(LightData);
+				}
+				updateLightDataDescriptorSets( currentDescriptorSet0, size );
+			}
 		}
 	}
 

@@ -167,6 +167,7 @@ namespace GLVM::core
 		static constexpr unsigned int   maximumLinkedDescriptorBindingsDS = 32;
 		unsigned int                    descriptorsBindingsIDs[maximumLinkedDescriptorBindingsDS];
 		unsigned int                    descriptorSetOffset;
+		bool                   isTexture;
 	};
 	
 	struct Pipeline {
