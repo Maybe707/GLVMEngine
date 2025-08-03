@@ -333,12 +333,12 @@ namespace GLVM::core
 		const unsigned int fontUboDescriptorNumber = 128;
 		const unsigned int hudScreenUboDescriptorNumber = 32;
 		const unsigned int uiUboDescriptorsNumber = 64;
-		const unsigned int uiIconsDescriptorsNumber = 64;
+//		const unsigned int uiIconsDescriptorsNumber = 64;
 		[[maybe_unused]] const unsigned int virtualTexturesDescriptorsNumber= 64;
 //		unsigned int viewPositionUboDescriptorsNumber = 0;
-		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
-		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
-		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of spot lights
+//		const unsigned int directionalLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 4;        ///< 4 - maximum number of directional lights
+//		const unsigned int pointLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 32 * 6;         ///< 32 - maximum number of point lights, 6 - number of layers for cube shadow map
+//		const unsigned int spotLightUboDescriptorsNumber = matrixUboDescriptorsNumber * 8;               ///< 8 - maximum number of spot lights
 
         std::vector<VkCommandBuffer> directionalLightCommandBuffers;
 		std::vector<VkCommandBuffer> spotLightCommandBuffers;
