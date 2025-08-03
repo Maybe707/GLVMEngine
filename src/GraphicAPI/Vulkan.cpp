@@ -2628,7 +2628,7 @@ namespace GLVM::core
 		
 		memory = modelShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber;
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];
-		GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelMatrixBufferSize;
+		GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelShadowMapMatrixBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
@@ -2824,30 +2824,10 @@ namespace GLVM::core
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
 									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
-
-			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
-			core::vector<u32> shaderBindings;
-			for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
-				shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[j]].binding );
-			}
-			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
-				core::vector<VkWriteDescriptorSet> descriptorWrites;
-				unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
-				VkDescriptorBufferInfo modelMatrixBufferInfo = createDescriptorBufferInfo(
-					GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer, sizeof( ShadowMapMatrixUBO ), i );			   
-
-				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
-					
-					descriptorWrites.Push({});
-					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);
-					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
-					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
-					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
-					descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
-					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
-				}
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			if( currentDescriptorSet.isTexture ) {
+				updateDescriptorSetsCombinedImageSampler( currentDescriptorSet);
+			} else {
+				updateLightDataDescriptorSets( currentDescriptorSet );
 			}
 		}
 	}
@@ -2860,31 +2840,10 @@ namespace GLVM::core
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet.setLayout,
 									currentDescriptorSet.hostDescriptorNumber, currentDescriptorSet.descriptorSetOffset );
 
-			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
-			core::vector<u32> shaderBindings;
-			for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
-				shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[j]].binding );
-			}
-			
-			for (size_t i = 0; i < spotLightUboDescriptorsNumber; ++i) {
-				core::vector<VkWriteDescriptorSet> descriptorWrites{};
-				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-				unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
-				modelMatrixBufferInfo.buffer = GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer;
-				modelMatrixBufferInfo.offset = i * sizeof(ShadowMapMatrixUBO);
-				modelMatrixBufferInfo.range = sizeof(ShadowMapMatrixUBO);
-
-				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
-					descriptorWrites.Push({});
-					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
-					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
-					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
-					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
-					descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
-					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
-				}
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			if( currentDescriptorSet.isTexture ) {
+				updateDescriptorSetsCombinedImageSampler( currentDescriptorSet);
+			} else {
+				updateLightDataDescriptorSets( currentDescriptorSet );
 			}
 		}
 	}
