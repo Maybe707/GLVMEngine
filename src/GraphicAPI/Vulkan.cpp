@@ -2273,8 +2273,6 @@ namespace GLVM::core
 			}
 
 			setImageDebugObjectName(depthImage);
-			std::cout << "GPU DESCRIPTORS: " << GPUDescriptors.GetSize() << std::endl;
-			std::cout << "OFFSET: " << descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i << std::endl;
 			*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 
@@ -2861,35 +2859,6 @@ namespace GLVM::core
 			} else {
 				updateLightDataDescriptorSets( currentDescriptorSet );
 			}
-
-// 			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet.actualLinkedDescriptorBindingsNumber;
-// 			core::vector<u32> shaderBindings;
-// 			for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
-// 				shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[j]].binding );
-// 			}
-// //			std::cout << "SIZE OF DS: " << descriptorSetsChunks.GetSize() << std::endl;
-// 			for (size_t i = 0; i < currentDescriptorSet.hostDescriptorNumber; ++i) {
-// 				core::vector<VkWriteDescriptorSet> descriptorWrites{};
-// 				VkDescriptorBufferInfo modelMatrixBufferInfo{};
-// 				unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];		
-// 				modelMatrixBufferInfo.buffer = GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer;
-// 				modelMatrixBufferInfo.offset = i * sizeof(PointLightShadowMapMatrixUBO);
-// 				modelMatrixBufferInfo.range = sizeof(PointLightShadowMapMatrixUBO);
-				
-// 				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
-// 					descriptorWrites.Push({});
-//  					// std::cout << "offset: " << currentDescriptorSet.descriptorSetOffset << std::endl;
-// 					// std::cout << "i: " << i << std::endl;
-// 					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-// 					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + i);;
-// 					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
-// 					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
-// 					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
-// 					descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
-// 					descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
-// 				}
-// 				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
-// 			}
 		}
 	}
 
@@ -3109,65 +3078,77 @@ namespace GLVM::core
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
 								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
 
-		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet0.actualLinkedDescriptorBindingsNumber;
-		core::vector<u32> shaderBindings;
-		for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
-			shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[j]].binding );
+		if( currentDescriptorSet0.isTexture ) {
+			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet0);
+		} else {
+			updateLightDataDescriptorSets( currentDescriptorSet0 );
 		}
-		
-		for  (size_t i = 0; i < currentDescriptorSet0.hostDescriptorNumber; ++i) {
-			core::vector<VkWriteDescriptorSet> descriptorWrites{};
-			VkDescriptorBufferInfo modelMatrixBufferInfo{};
-			unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
-			modelMatrixBufferInfo.buffer = GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer;
-			modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
-			modelMatrixBufferInfo.range = sizeof(FONT_UBO);
 
-			for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
-				descriptorWrites.Push({});
-				descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetOffset + i);;
-				descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
-				descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
-				descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
-				descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
-				descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
-			}
-			vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
-		}
+		// const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet0.actualLinkedDescriptorBindingsNumber;
+		// core::vector<u32> shaderBindings;
+		// for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
+		// 	shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[j]].binding );
+		// }
+		
+		// for  (size_t i = 0; i < currentDescriptorSet0.hostDescriptorNumber; ++i) {
+		// 	core::vector<VkWriteDescriptorSet> descriptorWrites{};
+		// 	VkDescriptorBufferInfo modelMatrixBufferInfo{};
+		// 	unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
+		// 	modelMatrixBufferInfo.buffer = GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer;
+		// 	modelMatrixBufferInfo.offset = i * sizeof(FONT_UBO);
+		// 	modelMatrixBufferInfo.range = sizeof(FONT_UBO);
+
+		// 	for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+		// 		descriptorWrites.Push({});
+		// 		descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		// 		descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet0.descriptorSetOffset + i);;
+		// 		descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+		// 		descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+		// 		descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
+		// 		descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
+		// 		descriptorWrites[shaderDescriptorID].pBufferInfo = &modelMatrixBufferInfo;
+		// 	}
+		// 	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+		// }
 		
 		const unsigned int linkedDescriptorSetSamplerID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetSamplerID];
-		if ( initializeTextureData_.size() > 0 ) {
-			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
-									currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
+//		if ( initializeTextureData_.size() > 0 ) {
+		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
+								currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
-			const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
-			core::vector<u32> shaderBindings;
-			for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
-				shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[j]].binding );
-			}
-			
-			for (size_t i = 0; i < currentDescriptorSet1.hostDescriptorNumber; ++i) {
-				core::vector<VkWriteDescriptorSet> descriptorWrites{};
-				VkDescriptorImageInfo imageInfo{};
-				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				imageInfo.imageView = textureImages[6].views[0];
-				imageInfo.sampler = textureSampler;
-				
-				for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
-					descriptorWrites.Push({});
-					descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);;
-					descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
-					descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
-					descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
-					descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
-					descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
-				}
-				vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
-			}
+		if( currentDescriptorSet1.isTexture ) {
+			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet1);
+		} else {
+			updateLightDataDescriptorSets( currentDescriptorSet1 );
 		}
+
+			// const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
+			// core::vector<u32> shaderBindings;
+			// for ( size_t j = 0; j < linkedDescriptorSetBindingsNumber; ++j ) {
+			// 	shaderBindings.Push( descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[j]].binding );
+			// }
+			
+			// for (size_t i = 0; i < currentDescriptorSet1.hostDescriptorNumber; ++i) {
+			// 	core::vector<VkWriteDescriptorSet> descriptorWrites{};
+			// 	VkDescriptorImageInfo imageInfo{};
+			// 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			// 	imageInfo.imageView = textureImages[6].views[0];
+			// 	imageInfo.sampler = textureSampler;
+				
+			// 	for( size_t shaderDescriptorID = 0; shaderDescriptorID < shaderBindings.GetSize(); ++shaderDescriptorID ) {
+			// 		descriptorWrites.Push({});
+			// 		descriptorWrites[shaderDescriptorID].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+			// 		descriptorWrites[shaderDescriptorID].dstSet = *(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + i);;
+			// 		descriptorWrites[shaderDescriptorID].dstBinding = shaderBindings[shaderDescriptorID];
+			// 		descriptorWrites[shaderDescriptorID].dstArrayElement = 0;
+			// 		descriptorWrites[shaderDescriptorID].descriptorType = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].vkType;
+			// 		descriptorWrites[shaderDescriptorID].descriptorCount = descriptorBindingsConfig[currentDescriptorSet1.descriptorsBindingsIDs[shaderDescriptorID]].shaderDescriptorsNumber;
+			// 		descriptorWrites[shaderDescriptorID].pImageInfo = &imageInfo;
+			// 	}
+			// 	vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.GetSize()), descriptorWrites.GetVectorContainer(), 0, nullptr);
+			// }
+//		}
 	}
 
 	void CVulkanRenderer::updateFontRenderDescriptorSets() {
