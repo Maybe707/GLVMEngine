@@ -158,6 +158,7 @@ namespace GLVM::core
 		unsigned int           binding;
 		unsigned int           shaderDescriptorsNumber;
 		unsigned int           globalDescriptorOffset;
+		VkDeviceSize           uboChunkSize;
 	};
 
 	struct DescriptorSet {                     ///< Meta data for descriptor sets
