@@ -451,9 +451,7 @@ namespace GLVM::core
 		void updateDescriptorSetsUBO( VkBuffer ubo, const VkDeviceSize& uboStructSize, const unsigned int& uboDescriptorsNumber,
 									  int uboBinding, core::vector<VkDescriptorSet>& uboDescriptorSets, const unsigned int offset);
 		void updateLightDataDescriptorSets( const VkDeviceSize& uboStructSize );
-		void updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, const unsigned int& descriptorSetsNumber,
-													   const core::vector<unsigned int> bindings, core::vector<VkDescriptorSet>& descriptorSets,
-													   const unsigned int descriptorCount, const unsigned int offset );
+		void updateDescriptorSetsCombinedImageSampler( const DescriptorSet& descriptorSet );
 		void createDescriptorImageInfo( const unsigned int descriptorNumber, VkImageLayout imageLayout,
 										core::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
 										VkDescriptorImageInfo descriptorImageInfos[]);

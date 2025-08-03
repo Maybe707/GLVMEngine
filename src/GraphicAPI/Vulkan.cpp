@@ -2818,21 +2818,24 @@ namespace GLVM::core
 		}
 	}
 	
-	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( std::vector<VK_Image>& textureImages, [[maybe_unused]] const unsigned int& descriptorSetsNumber,
-																	const core::vector<unsigned int> bindings, [[maybe_unused]] core::vector<VkDescriptorSet>& descriptorSets,
-																	const unsigned int descriptorCount, const unsigned int offset ) {
-		for (size_t i = 0; i < descriptorSetsNumber; ++i) {
+	void CVulkanRenderer::updateDescriptorSetsCombinedImageSampler( const DescriptorSet& descriptorSet ) {
+		core::vector<u32> bindingsIDs;
+		for ( size_t j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
+			bindingsIDs.Push( descriptorSet.descriptorsBindingsIDs[j] );
+		}
+		
+		for (size_t i = 0; i < descriptorSet.hostDescriptorNumber; ++i) {
 			const unsigned int textureIndex = i / 2;
 			constexpr unsigned int textureViewIndex = 0;
 			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages[textureIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, textureViewIndex, textureSampler );
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
-			for ( unsigned int j = 0; j < descriptorCount; ++j ) {
+			for ( unsigned int j = 0; j < bindingsIDs.GetSize(); ++j ) {
 				descriptorWrites.Push({});
 				const unsigned int lastElement = descriptorWrites.GetSize() - 1;
 				descriptorWrites[lastElement].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrites[lastElement].dstSet = *(descriptorSetsChunks.GetVectorContainer() + offset + i);
-				descriptorWrites[lastElement].dstBinding = bindings[j];
+				descriptorWrites[lastElement].dstSet = *(descriptorSetsChunks.GetVectorContainer() + descriptorSet.descriptorSetOffset + i);
+				descriptorWrites[lastElement].dstBinding = descriptorBindingsConfig[bindingsIDs[j]].binding;;
 				descriptorWrites[lastElement].dstArrayElement = 0;
 				descriptorWrites[lastElement].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 				descriptorWrites[lastElement].descriptorCount = 1;
@@ -3358,16 +3361,14 @@ namespace GLVM::core
 
 			core::vector<unsigned int> bindings;
 			bindings.Push(specularSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet2.hostDescriptorNumber, bindings, descriptorSetsChunks, 1,
-													  descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_SPECULAR_SAMPLER].descriptorSetOffset);
+			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet2);
 
 			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet3.setLayout,
 									currentDescriptorSet3.hostDescriptorNumber, currentDescriptorSet3.descriptorSetOffset );
 
 			core::vector<unsigned int> diffuseBindings;
 			diffuseBindings.Push(diffuseSamplerBinding);
-			updateDescriptorSetsCombinedImageSampler( textureImages, currentDescriptorSet3.hostDescriptorNumber, diffuseBindings, descriptorSetsChunks, 1,
-													  descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_DIFFUSE_SAMPLER].descriptorSetOffset);
+			updateDescriptorSetsCombinedImageSampler( currentDescriptorSet3);
 		}
 	}
 
