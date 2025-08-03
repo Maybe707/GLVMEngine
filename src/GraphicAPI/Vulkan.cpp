@@ -2584,13 +2584,15 @@ namespace GLVM::core
 
 		u32 memory = 0;
 		memory = modelMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * matrixUboDescriptorsNumber;
-		unsigned int mainMatrixUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].descriptorsBindingsIDs[0];		
+		unsigned int mainMatrixUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[mainMatrixUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelMatrixBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[mainMatrixUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[mainMatrixUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = hudBufferSize * MAX_FRAMES_IN_FLIGHT * hudUboDescriptorNumber;
-		unsigned int hudUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD].descriptorsBindingsIDs[0];		
+		unsigned int hudUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = hudBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
@@ -2598,54 +2600,63 @@ namespace GLVM::core
 
 		memory = fontUboSize * MAX_FRAMES_IN_FLIGHT * fontUboDescriptorNumber * 8;
 		unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = fontUboSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = hudScreenUboSize * MAX_FRAMES_IN_FLIGHT * hudScreenUboDescriptorNumber;
-		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD_SCREEN].descriptorsBindingsIDs[0];		
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD_SCREEN].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = hudScreenUboSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = uiUboSize * MAX_FRAMES_IN_FLIGHT * uiUboDescriptorsNumber;
-		unsigned int uiUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI].descriptorsBindingsIDs[0];		
+		unsigned int uiUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = uiUboSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = uiIconsUboSize * MAX_FRAMES_IN_FLIGHT * uiIconsDescriptorsNumber;
-		unsigned int uiIconsUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI_ICONS].descriptorsBindingsIDs[0];		
+		unsigned int uiIconsUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI_ICONS].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = uiIconsUboSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 		
 		memory = modelShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * directionalLightUboDescriptorsNumber;
-		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
+		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelMatrixBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = modelShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * spotLightUboDescriptorsNumber;
-		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
+		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelShadowMapMatrixBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 		
 		memory = modelCubeShadowMapMatrixBufferSize * MAX_FRAMES_IN_FLIGHT * pointLightUboDescriptorsNumber;
-		unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];		
+		unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = modelCubeShadowMapMatrixBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = lightDataBufferSize * MAX_FRAMES_IN_FLIGHT;
-		unsigned int lightDataUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[0];		
+		unsigned int lightDataUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = lightDataBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 		memory = virtualTexturesBufferSize * MAX_FRAMES_IN_FLIGHT;
 		unsigned int virtualTexturesUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::VIRTUAL_TEXTURES_UBO].descriptorsBindingsIDs[0];
+		GPUDescriptors[descriptorBindingsConfig[virtualTexturesUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = virtualTexturesBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 					 GPUDescriptors[descriptorBindingsConfig[virtualTexturesUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[virtualTexturesUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
@@ -2704,7 +2715,7 @@ namespace GLVM::core
 		}
 	}
 
-	void CVulkanRenderer::updateLightDataDescriptorSets( const DescriptorSet& currentDescriptorSet1, const VkDeviceSize& uboStructSize ) {
+	void CVulkanRenderer::updateLightDataDescriptorSets( const DescriptorSet& currentDescriptorSet1 ) {
 		// unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
 		// std::cout << "INDEX SUK: " << linkedDescriptorSetID << std::endl;
 		// const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID];
@@ -2753,7 +2764,7 @@ namespace GLVM::core
 					for( size_t m = 0; m < descriptorBindingsConfig[bindingsIDs[j]].shaderDescriptorsNumber; ++m ) {
 						descriptorBufferInfos[j] = createDescriptorBufferInfo(
 							GPUDescriptors[descriptorBindingsConfig[bindingsIDs[j]].globalDescriptorOffset].GPUBuffer->buffer,
-							uboStructSize, i );
+							GPUDescriptors[descriptorBindingsConfig[bindingsIDs[j]].globalDescriptorOffset].GPUBuffer->uboChunkSize, i );
 					}
 					descriptorWrites[j].pBufferInfo = descriptorBufferInfos.GetVectorContainer();
 				} else if ( descriptorBindingsConfig[bindingsIDs[j]].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
@@ -3340,13 +3351,7 @@ namespace GLVM::core
 			if( currentDescriptorSet0.isTexture ) {
 				updateDescriptorSetsCombinedImageSampler( currentDescriptorSet0);
 			} else {
-				VkDeviceSize size = 0;
-				if( descriptorSetCounter == 0 ) {
-					size = sizeof(ModelMatrixUBO);
-				} else {
-					size = sizeof(LightData);
-				}
-				updateLightDataDescriptorSets( currentDescriptorSet0, size );
+				updateLightDataDescriptorSets( currentDescriptorSet0 );
 			}
 		}
 	}
