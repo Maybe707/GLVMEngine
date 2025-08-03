@@ -2704,10 +2704,10 @@ namespace GLVM::core
 		}
 	}
 
-	void CVulkanRenderer::updateLightDataDescriptorSets( const VkDeviceSize& uboStructSize ) {
-		unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
-		std::cout << "INDEX SUK: " << linkedDescriptorSetID << std::endl;
-		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID];
+	void CVulkanRenderer::updateLightDataDescriptorSets( const DescriptorSet& currentDescriptorSet1, const VkDeviceSize& uboStructSize ) {
+		// unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
+		// std::cout << "INDEX SUK: " << linkedDescriptorSetID << std::endl;
+		// const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID];
 
 		const unsigned int linkedDescriptorSetBindingsNumber = currentDescriptorSet1.actualLinkedDescriptorBindingsNumber;
 		core::vector<u32> shaderBindings;
@@ -3334,11 +3334,10 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorSets() {
 		const unsigned int linkedDescriptorSetMatrixUboID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
 		const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
-		int modelMatrixUboBinding = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[0]].binding;
+		[[maybe_unused]] int modelMatrixUboBinding = descriptorBindingsConfig[currentDescriptorSet0.descriptorsBindingsIDs[0]].binding;
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
 								currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
-		updateDescriptorSetsUBO( GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->buffer, sizeof(ModelMatrixUBO), currentDescriptorSet0.hostDescriptorNumber,
-								 modelMatrixUboBinding, descriptorSetsChunks, currentDescriptorSet0.descriptorSetOffset );
+		updateLightDataDescriptorSets( currentDescriptorSet0, sizeof(ModelMatrixUBO) );
 
 		const unsigned int linkedDescriptorSetMatrixLightDataID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
 		const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetMatrixLightDataID];
@@ -3346,7 +3345,7 @@ namespace GLVM::core
 		allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet1.setLayout,
 								currentDescriptorSet1.hostDescriptorNumber, currentDescriptorSet1.descriptorSetOffset );
 
-		updateLightDataDescriptorSets( sizeof(LightData) );
+		updateLightDataDescriptorSets( currentDescriptorSet1, sizeof(LightData) );
 
 		const unsigned int linkedDescriptorSetMatrixSpecularID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
 		const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetMatrixSpecularID];
