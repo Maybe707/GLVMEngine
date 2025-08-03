@@ -162,7 +162,7 @@ namespace GLVM::core {
 		vec3 color;
 	};
 
-	struct alignas(64) VIRTUAL_TEXTURES_UBO {
+	struct alignas(64) VIRTUAL_TEXTURE_UBO {
 		
 	};
 } // namespace GLVM::core

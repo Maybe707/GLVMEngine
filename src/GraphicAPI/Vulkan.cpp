@@ -791,14 +791,6 @@ namespace GLVM::core
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
-		createDirectionalLightShadowMapDescriptorSets();
-		createSpotLightShadowMapDescriptorSets();
-		createPointLightShadowMapDescriptorSets();
-		createFontRenderDescriptorSets();
-		createHudDescriptorSets();
-		createHudScreenDescriptorSets();
-		createDescriptorSets_UI();
-		createDescriptorSetsIcons_UI();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
         createCommandBuffers(mainRenderCommandPool, directionalLightCommandBuffers);
@@ -2572,7 +2564,7 @@ namespace GLVM::core
 		VkDeviceSize uiUboSize = sizeof(UI_UBO);
 		VkDeviceSize uiIconsUboSize = sizeof(UI_UBO);
 		VkDeviceSize hudBufferSize = sizeof(HUD_UBO);
-		VkDeviceSize virtualTexturesBufferSize = sizeof(VIRTUAL_TEXTURES_UBO);
+		VkDeviceSize virtualTexturesBufferSize = sizeof(VIRTUAL_TEXTURE_UBO);
 		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
 
@@ -2652,7 +2644,7 @@ namespace GLVM::core
 					 GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 					 GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
-		memory = virtualTexturesBufferSize * MAX_FRAMES_IN_FLIGHT;
+		memory = virtualTexturesBufferSize * MAX_FRAMES_IN_FLIGHT * 64;
 		unsigned int virtualTexturesUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::VIRTUAL_TEXTURES_UBO].descriptorsBindingsIDs[0];
 		GPUDescriptors[descriptorBindingsConfig[virtualTexturesUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = virtualTexturesBufferSize;
 		createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -3207,15 +3199,17 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
-		for( unsigned int descriptorSetCounter = 0; descriptorSetCounter < pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].actualLinkedDescriptorSetsNumber; ++descriptorSetCounter ) {
-			const unsigned int linkedDescriptorSetMatrixUboID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[descriptorSetCounter];
-			const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
-			allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
-									currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
-			if( currentDescriptorSet0.isTexture ) {
-				updateDescriptorSetsCombinedImageSampler( currentDescriptorSet0);
-			} else {
-				updateLightDataDescriptorSets( currentDescriptorSet0 );
+		for( unsigned int pipelineCounter = 0; pipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++pipelineCounter ) {
+			for( unsigned int descriptorSetCounter = 0; descriptorSetCounter < pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++descriptorSetCounter ) {
+				const unsigned int linkedDescriptorSetMatrixUboID = pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[descriptorSetCounter];
+				const DescriptorSet& currentDescriptorSet0 = descriptorSetsConfig[linkedDescriptorSetMatrixUboID];
+				allocateDescriptorSets( descriptorSetsChunks, currentDescriptorSet0.setLayout,
+										currentDescriptorSet0.hostDescriptorNumber, currentDescriptorSet0.descriptorSetOffset );
+				if( currentDescriptorSet0.isTexture ) {
+					updateDescriptorSetsCombinedImageSampler( currentDescriptorSet0);
+				} else {
+					updateLightDataDescriptorSets( currentDescriptorSet0 );
+				}
 			}
 		}
 	}
