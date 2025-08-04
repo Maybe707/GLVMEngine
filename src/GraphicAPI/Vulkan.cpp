@@ -805,7 +805,6 @@ namespace GLVM::core
 						  pointLightShadowMapRenderFinishedSemaphores,
 						  pointLightShadowMapInFlightFences);
         createSyncObjects(imageAvailableSemaphores, renderFinishedSemaphores, inFlightFences);
-		createSyncObjects(virtualTexturesImageAvailableSemaphores, virtualTexturesRenderFinishedSemaphores, virtualTexturesInFlightFences);
     }
 
 	void CVulkanRenderer::clearPipeline( core::vector<VK_Image>& textureImages ) {
@@ -953,10 +952,6 @@ namespace GLVM::core
 //            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
-
-			vkDestroySemaphore(device, virtualTexturesImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, virtualTexturesInFlightFences[i], nullptr);
         }
 
 		for( size_t i = 0; i < swapChainImages.size(); ++i ) {
@@ -964,7 +959,6 @@ namespace GLVM::core
 			vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
 		}
 		
         vkDestroyCommandPool(device, directionalLightCommandPool, nullptr);
