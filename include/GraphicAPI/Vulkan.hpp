@@ -384,8 +384,6 @@ namespace GLVM::core
         std::vector<VkFence> virtualTexturesInFlightFences;
 		
         uint32_t currentFrame = 0;
-		uint32_t fontCurrentFrame = 0;
-		uint32_t hudCurrentFrame = 0;
 		uint32_t directionalLightCurrentFrame = 0;
 		uint32_t spotLightCurrentFrame = 0;
 		uint32_t pointLightCurrentFrame = 0;
@@ -508,8 +506,6 @@ namespace GLVM::core
         void updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
 									   unsigned int meshID, ecs::components::material* materialComponent);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
-		void hudDrawFrame();
-		void fontDrawFrame();
         void mainRenderDrawFrame();
 		void directionalLightShadowMapDrawFrame();
 		void spotLightShadowMapDrawFrame();

@@ -114,8 +114,6 @@ namespace GLVM::core
 		directionalLightShadowMapDrawFrame();
 		spotLightShadowMapDrawFrame();
 		pointLightShadowMapDrawFrame();
-//		fontDrawFrame();
-//		hudDrawFrame();
 		mainRenderDrawFrame();
 		
 		// #ifdef VK_USE_PLATFORM_XCB_KHR
@@ -797,12 +795,6 @@ namespace GLVM::core
 		createCommandBuffers(mainRenderCommandPool, spotLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, pointLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
-		createSyncObjects(fontImageAvailableSemaphores,
-						  fontRenderFinishedSemaphores,
-						  fontInFlightFences);
-		createSyncObjects(hudImageAvailableSemaphores,
-						  hudRenderFinishedSemaphores,
-						  hudInFlightFences);
 		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 						  directionalLightShadowMapRenderFinishedSemaphores,
 						  directionalLightShadowMapInFlightFences);
@@ -962,14 +954,6 @@ namespace GLVM::core
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
 
-			vkDestroySemaphore(device, hudImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, hudInFlightFences[i], nullptr);
-
-			vkDestroySemaphore(device, fontImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, fontInFlightFences[i], nullptr);
-
 			vkDestroySemaphore(device, virtualTexturesImageAvailableSemaphores[i], nullptr);
 //            vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
             vkDestroyFence(device, virtualTexturesInFlightFences[i], nullptr);
@@ -980,8 +964,6 @@ namespace GLVM::core
 			vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device, hudRenderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device, fontRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, virtualTexturesRenderFinishedSemaphores[i], nullptr);
 		}
 		
@@ -4381,142 +4363,6 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-    void CVulkanRenderer::hudDrawFrame() {
-		namespace cm = GLVM::ecs::components;
-		// mutex0.lock();
-		// mutex0.unlock();
-		// mutex1.lock();
-		// mutex1.unlock();
-		// mutex2.lock();
-		// mutex2.unlock();
-        vkWaitForFences(device, 1, &hudInFlightFences[hudCurrentFrame], VK_TRUE, UINT64_MAX);
-
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, hudImageAvailableSemaphores[hudCurrentFrame], VK_NULL_HANDLE, &imageIndex);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
-
-        vkResetFences(device, 1, &hudInFlightFences[hudCurrentFrame]);
-        vkResetCommandBuffer(hudCommandBuffers[hudCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        hudRecordCommandBuffer(hudCommandBuffers[hudCurrentFrame], imageIndex);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        VkSemaphore waitSemaphores[] = {hudImageAvailableSemaphores[hudCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &hudCommandBuffers[hudCurrentFrame];
-
-        VkSemaphore signalSemaphores[] = {hudRenderFinishedSemaphores[hudCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, hudInFlightFences[hudCurrentFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit draw command buffer!");
-        }
-
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-
-        presentInfo.pImageIndices = &imageIndex;
-
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
-
-        hudCurrentFrame = (hudCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-    }
-
-    void CVulkanRenderer::fontDrawFrame() {
-		namespace cm = GLVM::ecs::components;
-		// mutex0.lock();
-		// mutex0.unlock();
-		// mutex1.lock();
-		// mutex1.unlock();
-		// mutex2.lock();
-		// mutex2.unlock();
-        vkWaitForFences(device, 1, &fontInFlightFences[fontCurrentFrame], VK_TRUE, UINT64_MAX);
-
-        uint32_t imageIndex;
-        VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, fontImageAvailableSemaphores[fontCurrentFrame], VK_NULL_HANDLE, &imageIndex);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-            recreateSwapChain();
-            return;
-        } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-            throw std::runtime_error("failed to acquire swap chain image!");
-        }
-
-        vkResetFences(device, 1, &fontInFlightFences[fontCurrentFrame]);
-        vkResetCommandBuffer(fontCommandBuffers[fontCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        fontRecordCommandBuffer(fontCommandBuffers[fontCurrentFrame], imageIndex);
-
-        VkSubmitInfo submitInfo{};
-        submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-
-        VkSemaphore waitSemaphores[] = {fontImageAvailableSemaphores[fontCurrentFrame]};
-        VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submitInfo.waitSemaphoreCount = 1;
-        submitInfo.pWaitSemaphores = waitSemaphores;
-        submitInfo.pWaitDstStageMask = waitStages;
-
-        submitInfo.commandBufferCount = 1;
-        submitInfo.pCommandBuffers = &fontCommandBuffers[fontCurrentFrame];
-
-        VkSemaphore signalSemaphores[] = {fontRenderFinishedSemaphores[fontCurrentFrame]};
-        submitInfo.signalSemaphoreCount = 1;
-        submitInfo.pSignalSemaphores = signalSemaphores;
-
-        if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, fontInFlightFences[fontCurrentFrame]) != VK_SUCCESS) {
-            throw std::runtime_error("failed to submit draw command buffer!");
-        }
-
-        VkPresentInfoKHR presentInfo{};
-        presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-
-        presentInfo.waitSemaphoreCount = 1;
-        presentInfo.pWaitSemaphores = signalSemaphores;
-
-        VkSwapchainKHR swapChains[] = {swapChain};
-        presentInfo.swapchainCount = 1;
-        presentInfo.pSwapchains = swapChains;
-
-        presentInfo.pImageIndices = &imageIndex;
-
-        result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-        if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-            framebufferResized = false;
-            recreateSwapChain();
-        } else if (result != VK_SUCCESS) {
-            throw std::runtime_error("failed to present swap chain image!");
-        }
-
-        fontCurrentFrame = (fontCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-    }
-	
     void CVulkanRenderer::mainRenderDrawFrame() {
 		namespace cm = GLVM::ecs::components;
 		// mutex0.lock();
