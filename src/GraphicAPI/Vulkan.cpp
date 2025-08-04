@@ -111,9 +111,9 @@ namespace GLVM::core
 		// std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
 		// std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
 
-		directionalLightShadowMapDrawFrame();
-		spotLightShadowMapDrawFrame();
-		pointLightShadowMapDrawFrame();
+		// directionalLightShadowMapDrawFrame();
+		// spotLightShadowMapDrawFrame();
+		// pointLightShadowMapDrawFrame();
 		mainRenderDrawFrame();
 		
 		// #ifdef VK_USE_PLATFORM_XCB_KHR
@@ -2973,9 +2973,9 @@ namespace GLVM::core
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -3459,6 +3459,9 @@ namespace GLVM::core
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
+		directionalLightRecordCoomandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		spotLightRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		pointLightRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		fontRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
@@ -3800,9 +3803,9 @@ namespace GLVM::core
 			vkCmdEndRenderPass(commandBuffer);
 		}
 
-		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
 	}
 
 	void CVulkanRenderer::spotLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
@@ -3810,9 +3813,9 @@ namespace GLVM::core
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -3893,9 +3896,9 @@ namespace GLVM::core
 			vkCmdEndRenderPass(commandBuffer);
 		}
 
-		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
 	}
 
 	void CVulkanRenderer::pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
@@ -3904,9 +3907,9 @@ namespace GLVM::core
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
 
 		namespace cm = GLVM::ecs::components;
 		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
@@ -4029,9 +4032,9 @@ namespace GLVM::core
 			}
 		}
 
-		if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
 	}
 	
     VkShaderModule CVulkanRenderer::createShaderModule(const std::vector<char>& code) {
