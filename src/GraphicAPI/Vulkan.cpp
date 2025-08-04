@@ -2568,7 +2568,6 @@ namespace GLVM::core
 				VkDescriptorType descriptorType = descriptorBindingsConfig[descriptorBindingIndex].vkType;
 				if( descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
 					u32 memory = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize * descriptorSetsConfig[descriptorBindingIndex].hostDescriptorNumber;
-					GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUBuffer->uboChunkSize = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize;
 					createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 								 GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 								 GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
@@ -2654,7 +2653,7 @@ namespace GLVM::core
 					for( size_t m = 0; m < descriptorBindingsConfig[bindingsIDs[j]].shaderDescriptorsNumber; ++m ) {
 						descriptorBufferInfos[j] = createDescriptorBufferInfo(
 							GPUDescriptors[descriptorBindingsConfig[bindingsIDs[j]].globalDescriptorOffset].GPUBuffer->buffer,
-							GPUDescriptors[descriptorBindingsConfig[bindingsIDs[j]].globalDescriptorOffset].GPUBuffer->uboChunkSize, i );
+							descriptorBindingsConfig[bindingsIDs[j]].uboChunkSize, i );
 					}
 					descriptorWrites[j].pBufferInfo = descriptorBufferInfos.GetVectorContainer();
 				} else if ( descriptorBindingsConfig[bindingsIDs[j]].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {

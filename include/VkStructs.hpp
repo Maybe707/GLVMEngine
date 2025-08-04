@@ -186,7 +186,6 @@ namespace GLVM::core
 	struct GPUBuffer {
 		VkBuffer buffer;
 		VkDeviceMemory deviceMemory;
-		VkDeviceSize uboChunkSize;
 	};
 
 	union Descriptor {
