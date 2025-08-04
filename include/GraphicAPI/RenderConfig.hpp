@@ -91,7 +91,7 @@ namespace GLVM::core
 
 	inline RenderPass renderPassConfigs[] = {
 		{                                                                   ///< Directional light renderPass
-			1,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -105,11 +105,11 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
 				}
 			},
-			1,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
 			{
 				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			2,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
 			{
 				{ 
 					VK_SUBPASS_EXTERNAL,
@@ -132,7 +132,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                   ///< Spot light renderPass
-			1,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -146,11 +146,11 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
 				}
 			},
-			1,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
 			{
 				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			2,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
 			{
 				{ 
 					VK_SUBPASS_EXTERNAL,
@@ -173,7 +173,7 @@ namespace GLVM::core
 			}
 		}, 
 		{                                                                   ///< Point light renderPass
-			1,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -187,11 +187,11 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
 				}
 			},
-			1,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
 			{
 				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			2,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
 			{
 				{ 
 					VK_SUBPASS_EXTERNAL,
@@ -214,7 +214,7 @@ namespace GLVM::core
 			}
 		}, 
 		{                                                                     ///< Hud renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -239,12 +239,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -258,7 +258,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< Font renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -283,12 +283,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -302,7 +302,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< Hud screen renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -327,12 +327,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -346,7 +346,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< UI renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -371,12 +371,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -390,7 +390,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< UIIcons renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -415,12 +415,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -434,7 +434,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< Virtual texture renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -459,12 +459,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
@@ -478,7 +478,7 @@ namespace GLVM::core
 			}
 		},
 		{                                                                     ///< Main render renderPass
-			2,
+			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
 			{
 				{
 					{},
@@ -503,12 +503,12 @@ namespace GLVM::core
 					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
 				}
 			},
-			2,
+			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
 			{
 				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
 				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
 			},
-			1,
+			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
 			{
 				{
 					0,
