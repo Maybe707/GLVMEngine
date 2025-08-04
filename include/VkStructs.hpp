@@ -129,6 +129,15 @@ namespace GLVM::core
 		MAIN_RENDER_PIPELINE,
 		PIPELINES_NUMBER
 	};
+
+	struct RenderPass {
+		unsigned int            actualAttachmentDescriptionNumber;
+		VkAttachmentDescription attachmentDescriptions[16];
+		unsigned int            actualAttachmentReferenceNumber;
+		VkAttachmentReference   attachmentReferences[16];
+		unsigned int            actualSubpassDependencyNumber;
+		VkSubpassDependency     subpassDependencies[8];
+	};
 	
 	struct VK_Image {
 		VkImage image = {};

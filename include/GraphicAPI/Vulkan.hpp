@@ -410,15 +410,6 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createMainRenderPass();
-		void createFontRenderPass();
-		void createHudRenderPass();
-		void createHudScreenRenderPass();
-		void createRenderPass_UI();
-		void createRenderPassIcons_UI();
-		void createDirectionalLightShadowMapRenderPass();
-		void createSpotLightShadowMapRenderPass();
-		void createPointLightShadowMapRenderPass();
-		void createVirtualTextureRenderPass();
         void createDescriptorSetLayout(DescriptorSet& descriptors);
         void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass renderPass, VkPolygonMode polygonMode);
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
