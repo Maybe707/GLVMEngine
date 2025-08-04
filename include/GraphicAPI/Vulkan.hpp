@@ -410,8 +410,8 @@ namespace GLVM::core
         void createSwapChain();
         void createImageViews();
         void createMainRenderPass();
-        void createDescriptorSetLayout(DescriptorSet& descriptors);
-        void createGraphicsPipeline(Pipeline& pipeline, VkRenderPass renderPass, VkPolygonMode polygonMode);
+        void createDescriptorSetLayout();
+        void createGraphicsPipeline();
         void createRenderPassFramebuffers(std::vector<VkImageView>& attachments, VkRenderPass& renderPass_,
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
 										  uint32_t height);
