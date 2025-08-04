@@ -446,15 +446,6 @@ namespace GLVM::core
 										VkDescriptorImageInfo descriptorImageInfos[]);
 		VkDescriptorBufferInfo createDescriptorBufferInfo( VkBuffer ubo, u32 offset, u32 range );
 		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
-		void createDirectionalLightShadowMapDescriptorSets();
-		void createSpotLightShadowMapDescriptorSets();
-		void createPointLightShadowMapDescriptorSets();
-		void createHudDescriptorSets();
-		void createHudScreenDescriptorSets();
-		void createDescriptorSets_UI();
-		void createDescriptorSetsIcons_UI();
-		void createFontRenderDescriptorSets();
-		void createVirtualTexturesDescriptorSets();
         void createMainRenderDescriptorSets();
 		void updateSamplersDescriptroSets(uint32_t diffuse_id, uint32_t specular_id );
 		void updateDirectionalLightShadowMapDescriptorSets();
