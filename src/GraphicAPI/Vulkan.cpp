@@ -776,46 +776,31 @@ namespace GLVM::core
         createMainRenderDescriptorPool();
         createMainRenderDescriptorSets();
 		setDebugObjectNames();
-        createCommandBuffers(mainRenderCommandPool, directionalLightCommandBuffers);
-		createCommandBuffers(mainRenderCommandPool, spotLightCommandBuffers);
-		createCommandBuffers(mainRenderCommandPool, pointLightCommandBuffers);
+        // createCommandBuffers(mainRenderCommandPool, directionalLightCommandBuffers);
+		// createCommandBuffers(mainRenderCommandPool, spotLightCommandBuffers);
+		// createCommandBuffers(mainRenderCommandPool, pointLightCommandBuffers);
 		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
-		createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
-						  directionalLightShadowMapRenderFinishedSemaphores,
-						  directionalLightShadowMapInFlightFences);
-		createSyncObjects(spotLightShadowMapImageAvailableSemaphores,
-						  spotLightShadowMapRenderFinishedSemaphores,
-						  spotLightShadowMapInFlightFences);
-		createSyncObjects(pointLightShadowMapImageAvailableSemaphores,
-						  pointLightShadowMapRenderFinishedSemaphores,
-						  pointLightShadowMapInFlightFences);
+		// createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
+		// 				  directionalLightShadowMapRenderFinishedSemaphores,
+		// 				  directionalLightShadowMapInFlightFences);
+		// createSyncObjects(spotLightShadowMapImageAvailableSemaphores,
+		// 				  spotLightShadowMapRenderFinishedSemaphores,
+		// 				  spotLightShadowMapInFlightFences);
+		// createSyncObjects(pointLightShadowMapImageAvailableSemaphores,
+		// 				  pointLightShadowMapRenderFinishedSemaphores,
+		// 				  pointLightShadowMapInFlightFences);
         createSyncObjects(imageAvailableSemaphores, renderFinishedSemaphores, inFlightFences);
     }
 
-	void CVulkanRenderer::clearPipeline( core::vector<VK_Image>& textureImages ) {
-		// for ( unsigned int n = 0; n < pipeline.descriptorSets.GetSize(); ++n ) {
-		// 	DescriptorSet currentDescriptorSet = pipeline.descriptorSets[n];
-		// 	for ( unsigned int m = 0; m < currentDescriptorSet.descriptorBindings.GetSize(); ++m ) {
-//			std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors.GetSize() << std::endl;
-				for(unsigned int i = 0; i < textureImages.GetSize(); ++i)
-					{
-//					std::cout << "size of main descriptors: " << mainRenderScenePipeline.descriptors[m].uniformBuffers.size() << std::endl;
-						vkDestroySampler(device, textureImages[i].sampler, nullptr);
-						for ( unsigned int j = 0; j < textureImages[i].views.size(); ++j )
-							vkDestroyImageView(device, textureImages[i].views[j], nullptr);
+	void CVulkanRenderer::clearVK_Image( VK_Image* textureImages ) {
+		vkDestroySampler(device, textureImages->sampler, nullptr);
+		for ( unsigned int j = 0; j < textureImages->views.size(); ++j )
+			vkDestroyImageView(device, textureImages->views[j], nullptr);
 
-						textureImages[i].views.clear();
+		textureImages->views.clear();
 					
-						vkDestroyImage(device, textureImages[i].image, nullptr);
-						vkFreeMemory(device, textureImages[i].deviceMemory, nullptr);
-						// for ( unsigned int j = 0; j < mainRenderScenePipeline.descriptors[m].uniformBuffersMemory.size(); ++j ) {
-						// 	vkDestroyBuffer(device, mainRenderScenePipeline.descriptors[m].uniformBuffers[j], nullptr);
-						// 	vkFreeMemory(device, mainRenderScenePipeline.descriptors[m].uniformBuffersMemory[j], nullptr);
-						// }
-					}
-				textureImages.clear();
-		// 	}
-		// }
+		vkDestroyImage(device, textureImages->image, nullptr);
+		vkFreeMemory(device, textureImages->deviceMemory, nullptr);
 	}
 	
     void CVulkanRenderer::cleanupSwapChain() {
@@ -846,16 +831,30 @@ namespace GLVM::core
             vkDestroyImageView(device, imageView, nullptr);
         }
 
-		clearPipeline( directionalLightTextureImages );
-		clearPipeline( pointLightTextureImages );
-		clearPipeline( spotLightTextureImages );
-
         vkDestroySwapchainKHR(device, swapChain, nullptr);
     }
 
     void CVulkanRenderer::cleanup() {
         cleanupSwapChain();
 
+		for( unsigned int i = 0, j = 0; i < GPUDescriptors.GetSize(); ++j ) {
+			if( descriptorBindingsConfig[j].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+				vkDestroyBuffer(device, GPUDescriptors[i].GPUBuffer->buffer, nullptr);
+				vkFreeMemory(device, GPUDescriptors[i].GPUBuffer->deviceMemory, nullptr);
+				delete GPUDescriptors[i].GPUBuffer;
+				GPUDescriptors[i].GPUBuffer = nullptr;
+			} else if( descriptorBindingsConfig[j].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+				for( unsigned int n = i; n < i + descriptorBindingsConfig[j].shaderDescriptorsNumber; ++n ) {
+					if( GPUDescriptors[n].GPUImage->views.size() )
+						clearVK_Image( GPUDescriptors[n].GPUImage );
+
+					delete GPUDescriptors[n].GPUImage;
+					GPUDescriptors[n].GPUImage = nullptr;
+				}
+			}
+			i = i + descriptorBindingsConfig[j].shaderDescriptorsNumber;
+		}
+		
 		vkDestroyBuffer(device, hudUniformBuffer, nullptr);
 		vkFreeMemory(device, hudUniformBuffersMemory, nullptr);
 		vkDestroyBuffer(device, fontUniformBuffer, nullptr);
@@ -922,27 +921,12 @@ namespace GLVM::core
         }
 
         for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
-            vkDestroySemaphore(device, directionalLightShadowMapImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, directionalLightShadowMapInFlightFences[i], nullptr);
-
-			vkDestroySemaphore(device, spotLightShadowMapImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, spotLightShadowMapInFlightFences[i], nullptr);
-
-			vkDestroySemaphore(device, pointLightShadowMapImageAvailableSemaphores[i], nullptr);
-//            vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
-            vkDestroyFence(device, pointLightShadowMapInFlightFences[i], nullptr);
-			
 //            vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
             vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
             vkDestroyFence(device, inFlightFences[i], nullptr);
         }
 
 		for( size_t i = 0; i < swapChainImages.size(); ++i ) {
-			vkDestroySemaphore(device, directionalLightShadowMapRenderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device, spotLightShadowMapRenderFinishedSemaphores[i], nullptr);
-			vkDestroySemaphore(device, pointLightShadowMapRenderFinishedSemaphores[i], nullptr);
 			vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		}
 		
@@ -1574,7 +1558,7 @@ namespace GLVM::core
 			endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
-			setImageDebugObjectName(depthImage);
+			setImageDebugObjectName(depthImage, "directional light");
 			*GPUDescriptors[descriptorBindingsConfig[directionalLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 	}
@@ -1635,7 +1619,7 @@ namespace GLVM::core
 			endSingleTimeCommands(mainRenderCommandPool, commandBuffer);
 			
 			depthImage.views.push_back(createImageView(depthImage, 0, 1));
-			setImageDebugObjectName(depthImage);
+			setImageDebugObjectName(depthImage, "spot light");
 			*GPUDescriptors[descriptorBindingsConfig[spotLightDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 	}
@@ -1701,14 +1685,14 @@ namespace GLVM::core
 				depthImage.views.push_back(createImageView(depthImage, j, 1));
 			}
 
-			setImageDebugObjectName(depthImage);
+			setImageDebugObjectName(depthImage, "point light laryer");
 			*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage = depthImage;
 		}
 
 		for ( unsigned int i = 0; i < POINT_LIGHTS_NUMBER; ++i ) {
 		    (*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage).viewType = VK_IMAGE_VIEW_TYPE_CUBE;
 
-			setImageDebugObjectName(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage);
+			setImageDebugObjectName(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage, "point light cube");
 			(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage).views.push_back(
 				createImageView(*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + i].GPUImage, 0, 6));
 		}
@@ -4371,11 +4355,11 @@ namespace GLVM::core
         return scalingMatrix * translationMatrix;
 	}
 	
-	void CVulkanRenderer::setImageDebugObjectName(VK_Image image) {
+	void CVulkanRenderer::setImageDebugObjectName(VK_Image image, std::string imageName ) {
 		VkDebugUtilsObjectNameInfoEXT imageObjectInfo{};
 		imageObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
-		std::string imageName = VK_DEBUG_IMAGE_SET_RED;
-		const char* strImageName = imageName.c_str();
+		std::string imageName1 = ConcatIntBetweenTwoStrings(VK_DEBUG_IMAGE_SET_RED, " \x1b[31m" + imageName + " pipeline #\x1b[0m ", 0);
+		const char* strImageName = imageName1.c_str();
 		imageObjectInfo.pObjectName = strImageName;
 		imageObjectInfo.objectType = VK_OBJECT_TYPE_IMAGE;
 		imageObjectInfo.objectHandle = (uint64_t)image.image;

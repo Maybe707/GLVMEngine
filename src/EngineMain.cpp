@@ -131,22 +131,6 @@ int main()
 	// *materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
 	// 	.shininess = 128.0f * 0.078125f };
 
-
-	int* arrayPtr = new int[10];
-	for( int i = 0; i < 10; ++i ) {
-		arrayPtr[i] = i * 2;
-//		std::cout << arrayPtr[i] << std::endl;
-	}
-
-	int array[3][2] = { { 1, 2 }, { 20, 30 }, { 450, 665 } };
-//	asm volatile ("" : : "r,m"(array) : "memory");
-//	int array[3][2];
-	array[0][1] = 1000;
-	array[2][1] = 2500;
-	// for( int i = 0; i < 3; ++i )
-	// 	for( int j = 0; j < 2; ++j )
-	// 		std::cout << array[i][j] << std::endl;
-	
     std::random_device rd;
     std::map<int, int> hist;
 	std::mt19937 mersenne(rd());

@@ -179,7 +179,7 @@ namespace GLVM::core
 	};
 	
 	struct VK_Image {
-		VkImage image = {};
+		VkImage image;
 		VkDeviceMemory deviceMemory = {};
 		std::vector<VkImageView> views = {};
 		VkImageViewType viewType = {};

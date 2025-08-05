@@ -1,6 +1,6 @@
 C = clang
 CC = clang++
-SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=undefined
+SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
 LDFLAGS = -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb -lwayland-client
 CXXFLAGS = -c -std=c++23 -static -Wall -Wextra -Wpedantic -Werror -g -march=x86-64-v3 -O2
 CFLAGS = -c -g -Wall -Wextra -Wpedantic -Werror -march=x86-64-v3 -O2
