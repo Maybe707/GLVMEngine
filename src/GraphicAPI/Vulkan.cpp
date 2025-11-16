@@ -2900,7 +2900,7 @@ namespace GLVM::core
 				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
 				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 1, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset)), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * 6 + currentFrame)), 0, nullptr);
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}

@@ -39,7 +39,7 @@ namespace GLVM::core
 		{1, 128000, {}, {}, {}, false },                     ///< Point light
 		{1, 1000,   {}, {}, {}, false },                     ///< Hud
 		{1, 2048,   {}, {}, {}, false },                     ///< Font ubo
-		{1, 2,      {}, {}, {}, true },                     ///< Font sampler
+		{1, 18,      {}, {}, {}, true },                     ///< Font sampler
 		{1, 64,     {}, {}, {}, false },                     ///< Hudscreen
 		{1, 128,    {}, {}, {}, false },                     ///< UI ubo
 		{1, 2,      {}, {}, {}, true },                     ///< UI sampler
