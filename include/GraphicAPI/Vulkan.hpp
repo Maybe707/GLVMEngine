@@ -43,6 +43,7 @@
 #include <print>
 #include "PGA.hpp"
 #include "VkBuilders.hpp"
+#include "VkDebugUtils.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
@@ -511,10 +512,6 @@ namespace GLVM::core
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 		[[nodiscard]] mat4* updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
-		void setImageDebugObjectName(VK_Image image, std::string imageName );
-		void setPipelineDebugObjectName( VkPipeline pipeline, std::string pipelineName );
-		void setDescriptorSetObjectName( VkDescriptorSet descriptorSet, std::string descriptorSetName, unsigned int index );
-		void setDebugObjectNames();
 		void clearVK_Image( VK_Image* textureImages );
     };
 

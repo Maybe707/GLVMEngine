@@ -22,7 +22,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./src/Network/UDP_ClientLinux.cpp ./src/UnixApi/WindowWaylandVulkan.cpp \
 	  ./src/UnixApi/WaylandVariables.cpp ./textures/tileset.cpp \
 	  ./src/Systems/InventorySystem.cpp ./src/GraphicAPI/VkBuilders.cpp \
-	  ./src/GraphicAPI/RenderData.cpp
+	  ./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp
 
 SOURCES_C = xdg-shell-protocol.c pointer-constraints-unstable-v1-protocol.c relative-pointer-unstable-v1-protocol.c
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
