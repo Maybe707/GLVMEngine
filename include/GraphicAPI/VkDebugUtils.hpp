@@ -8,6 +8,10 @@
 
 namespace GLVM::core::vkDebugUtils
 {
+	VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
+	void CreateBeginDebugUtilsLabelEXT([[maybe_unused]] VkInstance instance, [[maybe_unused]] VkCommandBuffer commandBuffer, [[maybe_unused]] const VkDebugUtilsLabelEXT* labelInfo);
+	void CreateEndDebugUtilsLabelEXT([[maybe_unused]] VkInstance instance, [[maybe_unused]] VkCommandBuffer commandBuffer);
+	void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
 	VkResult SetDebugObjectName(VkDevice device, const VkDebugUtilsObjectNameInfoEXT* objectNameInfo);
 	void setImageDebugObjectName( VkDevice device, VK_Image image, std::string imageName );
 	void setPipelineDebugObjectName( VkDevice device, VkPipeline pipeline, std::string pipelineName );

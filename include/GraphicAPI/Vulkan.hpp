@@ -103,10 +103,6 @@ namespace GLVM::core
     const bool enableValidationLayers = true;
 #endif
 
-    VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger);
-
-    void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator);
-
     struct Texture {
         VkDeviceSize textureSize_;
         unsigned char* textureData_;
