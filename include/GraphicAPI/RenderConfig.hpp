@@ -42,9 +42,9 @@ namespace GLVM::core
 		{1, 18,      {}, {}, {}, true },                     ///< Font sampler
 		{1, 64,     {}, {}, {}, false },                     ///< Hudscreen
 		{1, 128,    {}, {}, {}, false },                     ///< UI ubo
-		{1, 2,      {}, {}, {}, true },                     ///< UI sampler
+		{1, 18,      {}, {}, {}, true },                     ///< UI sampler
 		{1, 128,    {}, {}, {}, false },                     ///< UIIcons ubo
-		{1, 9,      {}, {}, {}, true },                     ///< UIIcons sampler
+		{1, 18,      {}, {}, {}, true },                     ///< UIIcons sampler
 		{1, 128,     {}, {}, {}, false },                     ///< Virtual textures ubo
 		{1, 2,      {}, {}, {}, true },                     ///< Virtual textures sampler
 		{1, 1000,   {}, {}, {}, false },                     ///< Main render matrix ubo

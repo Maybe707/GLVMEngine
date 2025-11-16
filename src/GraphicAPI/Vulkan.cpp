@@ -2568,6 +2568,7 @@ namespace GLVM::core
 //			std::cout << "i: " << i << std::endl;
 			unsigned int uiEntity = linkedEntities[i];
 			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
+			unsigned int inventoryTextureID            = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
 //			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
 			for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
@@ -2590,7 +2591,7 @@ namespace GLVM::core
 					const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::UI_PIPELINE].linkedDescriptorSetIDs[1];
 					const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipelineLayout,
-											1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
+											1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * inventoryTextureID + currentFrame)), 0, nullptr);
 //			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 					// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
 					// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
@@ -2898,9 +2899,10 @@ namespace GLVM::core
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 0, 1,
 										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + currentActorMemoryOffset + j)), 0, nullptr);
 				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
+				const unsigned int fontAtlasTextureID = 6;
 				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 1, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * 6 + currentFrame)), 0, nullptr);
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * fontAtlasTextureID + currentFrame)), 0, nullptr);
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}

@@ -210,13 +210,16 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 
 	Entity inventory = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::transform, cm::inventory>(inventory);
+	ComponentManager->CreateComponent<cm::transform, cm::inventory, cm::material>(inventory);
 	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
 	inventoryComponent->entityOwner = uiPlayer;
 	inventoryComponent->slotMeshID  = inventory_Handle_GLTF;
 	inventoryComponent->slotScale   = 0.05;
 	*ComponentManager->GetComponent<cm::transform>(inventory) = { .position = { 0.0f, -0.5f, 0.0f },
 		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
+	cm::material* materialInventory = ComponentManager->GetComponent<cm::material>(inventory);
+	*materialInventory = { .diffuseTextureID_ = inventoryTexturehandle, .specularTextureID_ = inventoryTexturehandle, .ambient = { 0.05f, 0.05f, 0.05f },
+		.shininess = 128.0f * 0.078125f };
 // 	for ( unsigned int i = 0; i < 8; ++i )
 // 		for ( unsigned int j = 0; j < 8; ++j ) {
 // 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
