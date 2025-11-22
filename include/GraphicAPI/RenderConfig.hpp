@@ -12,439 +12,6 @@ namespace GLVM::core
 	inline DescriptorBinding descriptorBindingsConfig[32];
 	inline Pipeline pipelineConfigs[32];
 	inline RenderPass renderPassConfigs[32];
-	// 	{                                                                   ///< Directional light renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				0,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			},
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                   ///< Spot light renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				0,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			},
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			}
-	// 		}
-	// 	}, 
-	// 	{                                                                   ///< Point light renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				0,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			},
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				VK_ACCESS_SHADER_READ_BIT,
-	// 				VK_DEPENDENCY_BY_REGION_BIT
-	// 			}
-	// 		}
-	// 	}, 
-	// 	{                                                                     ///< Hud renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< Font renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< Hud screen renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< UI renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< UIIcons renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< Virtual texture renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	},
-	// 	{                                                                     ///< Main render renderPass
-	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_STORE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-	// 			},
-	// 			{
-	// 				{},
-	// 				{},
-	// 				VK_SAMPLE_COUNT_1_BIT,
-	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
-	// 				VK_IMAGE_LAYOUT_UNDEFINED,
-	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-	// 			}
-	// 		},
-	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-	// 		{
-	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-	// 		},
-	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-	// 		{
-	// 			{
-	// 				0,
-	// 				VK_SUBPASS_EXTERNAL,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-	// 				{},
-	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-	// 				{}
-	// 			}
-	// 		}
-	// 	}
-	// };
-
 	
 	inline void VkConfigInitializer() {
 		/// ======================= DESCRIPTOR SETS AND ITS BINDINGS ============================ ///
@@ -714,7 +281,7 @@ namespace GLVM::core
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 		
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
@@ -722,7 +289,7 @@ namespace GLVM::core
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
-		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 
 		/// ===================================================================================== ///
 
@@ -752,7 +319,7 @@ namespace GLVM::core
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 		
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
@@ -760,7 +327,7 @@ namespace GLVM::core
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
-		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 		
 		/// ===================================================================================== ///
 
@@ -791,7 +358,7 @@ namespace GLVM::core
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 		
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
@@ -799,7 +366,7 @@ namespace GLVM::core
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
-		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dependencyFlags   = VK_DEPENDENCY_BY_REGION_BIT;
 
 		/// ===================================================================================== ///
 
@@ -842,7 +409,7 @@ namespace GLVM::core
 		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 		
 		/// ===================================================================================== ///
 
@@ -885,7 +452,7 @@ namespace GLVM::core
 		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 		
 		/// ===================================================================================== ///
 
@@ -928,7 +495,7 @@ namespace GLVM::core
 		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
 		/// ===================================================================================== ///
 
@@ -971,7 +538,7 @@ namespace GLVM::core
 		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
 		/// ===================================================================================== ///
 
@@ -1014,7 +581,7 @@ namespace GLVM::core
 		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
 		/// ===================================================================================== ///
 
@@ -1057,7 +624,7 @@ namespace GLVM::core
 		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
 		/// ===================================================================================== ///
 
@@ -1100,11 +667,10 @@ namespace GLVM::core
 		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
 		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
 		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
 		/// ===================================================================================== ///
 	}
-
 	// inline DescriptorSet directionalLightDescriptorSet0{ {}, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
 	// 			VK_SHADER_STAGE_VERTEX_BIT, 0, 1}}, 512};
 	// inline DescriptorBinding directionalLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
