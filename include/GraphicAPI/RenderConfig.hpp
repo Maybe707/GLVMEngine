@@ -1,6 +1,7 @@
 #ifndef RENDER_CONFIG
 #define RENDER_CONFIG
 
+#include "GraphicAPI/RenderData.hpp"
 #include "ShaderStructs.hpp"
 #include "VkStructs.hpp"
 #include <vulkan/vulkan_core.h>
@@ -10,6 +11,440 @@ namespace GLVM::core
 	inline DescriptorSet descriptorSetsConfig[32];
 	inline DescriptorBinding descriptorBindingsConfig[32];
 	inline Pipeline pipelineConfigs[32];
+	inline RenderPass renderPassConfigs[32];
+	// 	{                                                                   ///< Directional light renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				0,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			},
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                   ///< Spot light renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				0,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			},
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			}
+	// 		}
+	// 	}, 
+	// 	{                                                                   ///< Point light renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				0,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			},
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+	// 				VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				VK_ACCESS_SHADER_READ_BIT,
+	// 				VK_DEPENDENCY_BY_REGION_BIT
+	// 			}
+	// 		}
+	// 	}, 
+	// 	{                                                                     ///< Hud renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< Font renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< Hud screen renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< UI renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< UIIcons renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< Virtual texture renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_LOAD,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	},
+	// 	{                                                                     ///< Main render renderPass
+	// 		ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_STORE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
+	// 			},
+	// 			{
+	// 				{},
+	// 				{},
+	// 				VK_SAMPLE_COUNT_1_BIT,
+	// 				VK_ATTACHMENT_LOAD_OP_CLEAR,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_LOAD_OP_DONT_CARE,
+	// 				VK_ATTACHMENT_STORE_OP_DONT_CARE,
+	// 				VK_IMAGE_LAYOUT_UNDEFINED,
+	// 				VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
+	// 			}
+	// 		},
+	// 		ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
+	// 		{
+	// 			{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
+	// 			{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
+	// 		},
+	// 		SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
+	// 		{
+	// 			{
+	// 				0,
+	// 				VK_SUBPASS_EXTERNAL,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
+	// 				{},
+	// 				VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
+	// 				{}
+	// 			}
+	// 		}
+	// 	}
+	// };
+
 	
 	inline void VkConfigInitializer() {
 		/// ======================= DESCRIPTOR SETS AND ITS BINDINGS ============================ ///
@@ -258,12 +693,74 @@ namespace GLVM::core
 		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
 
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualAttachmentReferenceNumber          = 1;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualSubpassDependencyNumber            = 2;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].srcSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = 0;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].srcStageMask      = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].vertShader                       = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].actualAttachmentReferenceNumber          = 1;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].actualSubpassDependencyNumber            = 2;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].srcSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = 0;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].srcStageMask      = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[SPOT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
 		
 		/// ===================================================================================== ///
 
@@ -272,7 +769,38 @@ namespace GLVM::core
 		pipelineConfigs[POINT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[POINT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[POINT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+
+		renderPassConfigs[POINT_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
 		
+		renderPassConfigs[POINT_LIGHT_PIPELINE].actualAttachmentReferenceNumber          = 1;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[POINT_LIGHT_PIPELINE].actualSubpassDependencyNumber            = 2;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].srcSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = 0;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].srcAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+		
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].srcSubpass        = 0;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].srcStageMask      = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstStageMask      = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].srcAccessMask     = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstAccessMask     = VK_ACCESS_SHADER_READ_BIT;
+		renderPassConfigs[POINT_LIGHT_PIPELINE].subpassDependencies[1].dstSubpass        = VK_DEPENDENCY_BY_REGION_BIT;
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[HUD_PIPELINE].vertShader                       = "../VKshaders/hudShaders/hud_vert.spv";
@@ -280,6 +808,41 @@ namespace GLVM::core
 		pipelineConfigs[HUD_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[HUD_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[HUD_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+
+		renderPassConfigs[HUD_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[HUD_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[HUD_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[HUD_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[HUD_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+		renderPassConfigs[HUD_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[HUD_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[HUD_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[HUD_PIPELINE].subpassDependencies[0].dstSubpass        = {};
 		
 		/// ===================================================================================== ///
 
@@ -288,6 +851,41 @@ namespace GLVM::core
 		pipelineConfigs[FONT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[FONT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[FONT_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+
+		renderPassConfigs[FONT_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[FONT_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[FONT_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[FONT_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[FONT_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[FONT_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[FONT_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[FONT_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[FONT_PIPELINE].subpassDependencies[0].dstSubpass        = {};
 		
 		/// ===================================================================================== ///
 
@@ -296,7 +894,42 @@ namespace GLVM::core
 		pipelineConfigs[HUD_SCREEN_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[HUD_SCREEN_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[HUD_SCREEN_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+
+		renderPassConfigs[HUD_SCREEN_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[HUD_SCREEN_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[HUD_SCREEN_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[HUD_SCREEN_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[UI_PIPELINE].vertShader                       = "../VKshaders/ui_shaders/vert_ui.spv";
@@ -304,7 +937,42 @@ namespace GLVM::core
 		pipelineConfigs[UI_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[UI_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[UI_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+
+		renderPassConfigs[UI_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[UI_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[UI_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[UI_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[UI_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[UI_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[UI_ICONS_PIPELINE].vertShader                       = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
@@ -312,7 +980,42 @@ namespace GLVM::core
 		pipelineConfigs[UI_ICONS_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[UI_ICONS_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[UI_ICONS_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+
+		renderPassConfigs[UI_ICONS_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_ICONS_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[UI_ICONS_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[UI_ICONS_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[UI_ICONS_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].vertShader                       = "../VKshaders/virtualTextures/virtualTexturesVert.spv";
@@ -320,7 +1023,42 @@ namespace GLVM::core
 		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[VIRTUAL_TEXTURES_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+
 		/// ===================================================================================== ///
 
 		pipelineConfigs[MAIN_RENDER_PIPELINE].vertShader                       = "../VKshaders/mainRendererShaders/vert.spv";
@@ -328,446 +1066,45 @@ namespace GLVM::core
 		pipelineConfigs[MAIN_RENDER_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[MAIN_RENDER_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[MAIN_RENDER_PIPELINE].actualLinkedDescriptorSetsNumber = 4;
+
+		renderPassConfigs[MAIN_RENDER_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 		
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[MAIN_RENDER_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[MAIN_RENDER_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[MAIN_RENDER_PIPELINE].subpassDependencies[0].dstSubpass        = {};
+
 		/// ===================================================================================== ///
-
 	}
-	
 
-
-	inline RenderPass renderPassConfigs[] = {
-		{                                                                   ///< Directional light renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-			{
-				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-			{
-				{ 
-					VK_SUBPASS_EXTERNAL,
-					0,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				},
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				}
-			}
-		},
-		{                                                                   ///< Spot light renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-			{
-				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-			{
-				{ 
-					VK_SUBPASS_EXTERNAL,
-					0,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				},
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				}
-			}
-		}, 
-		{                                                                   ///< Point light renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_1,
-			{
-				{ 0, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_2,
-			{
-				{ 
-					VK_SUBPASS_EXTERNAL,
-					0,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				},
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
-					VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					VK_ACCESS_SHADER_READ_BIT,
-					VK_DEPENDENCY_BY_REGION_BIT
-				}
-			}
-		}, 
-		{                                                                     ///< Hud renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< Font renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< Hud screen renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< UI renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< UIIcons renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< Virtual texture renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_LOAD,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		},
-		{                                                                     ///< Main render renderPass
-			ATTACHMENT_DESCRIPTION_NEXT_ARRAY_COUNT_2,
-			{
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_STORE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_PRESENT_SRC_KHR
-				},
-				{
-					{},
-					{},
-					VK_SAMPLE_COUNT_1_BIT,
-					VK_ATTACHMENT_LOAD_OP_CLEAR,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_ATTACHMENT_LOAD_OP_DONT_CARE,
-					VK_ATTACHMENT_STORE_OP_DONT_CARE,
-					VK_IMAGE_LAYOUT_UNDEFINED,
-					VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL
-				}
-			},
-			ATTACHMENT_REFERENCE_NEXT_ARRAY_COUNT_2,
-			{
-				{ 0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL },
-				{ 1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL }
-			},
-			SUBPASS_DEPENDENCY_NEXT_ARRAY_COUNT_1,
-			{
-				{
-					0,
-					VK_SUBPASS_EXTERNAL,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT,
-					{},
-					VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
-					{}
-				}
-			}
-		}
-	};
 	// inline DescriptorSet directionalLightDescriptorSet0{ {}, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
 	// 			VK_SHADER_STAGE_VERTEX_BIT, 0, 1}}, 512};
 	// inline DescriptorBinding directionalLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,

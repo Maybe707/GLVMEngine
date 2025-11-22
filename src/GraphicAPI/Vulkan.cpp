@@ -1178,7 +1178,7 @@ namespace GLVM::core
 			renderPassInfo.pSubpasses = &subpass;
 			renderPassInfo.dependencyCount = renderPassConfigs[j].actualSubpassDependencyNumber;
 			renderPassInfo.pDependencies = renderPassConfigs[j].subpassDependencies;
-
+			std::cout << "PIPELINE NUMBER: " << j << std::endl;
 			if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPasses[j]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create render pass!");
 			}
