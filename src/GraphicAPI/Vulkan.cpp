@@ -429,6 +429,7 @@ namespace GLVM::core
         GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 
 		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+		VkConfigInitializer();
 		descriptorSetBuilder();
 		pipelineBuilder();
 		renderPassesBuilder();

@@ -44,6 +44,7 @@
 #include "PGA.hpp"
 #include "VkBuilders.hpp"
 #include "VkDebugUtils.hpp"
+#include "GraphicAPI/RenderConfig.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
