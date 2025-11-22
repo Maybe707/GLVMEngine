@@ -7,48 +7,9 @@
 
 namespace GLVM::core
 {
-	static const char* vertShaderMain_ = "../VKshaders/mainRendererShaders/vert.spv";
-	static const char* fragShaderMain_ = "../VKshaders/mainRendererShaders/frag.spv";
-
-	static const char* vertShaderFlatShadowMap = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
-	static const char* fragShaderDirectionalLightShadowMap = "../VKshaders/flatShadowMapShaders/fragFlatShadowMap.spv";
-
-	static const char* vertShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/vertCubeShadowMap.spv";
-	static const char* fragShaderCubeShadowMap = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
-
-	static const char* vertShaderHUD = "../VKshaders/hudShaders/hud_vert.spv";
-	static const char* fragShaderHUD = "../VKshaders/hudShaders/hud_frag.spv";
-
-	static const char* vertShaderFont = "../VKshaders/fontShaders/font_vert.spv";
-	static const char* fragShaderFont = "../VKshaders/fontShaders/font_frag.spv";
-
-	static const char* vertexShaderHudScreen = "../VKshaders/hud_screen_shaders/vert_hud_screen.spv";
-	static const char* fragmentShaderHudScreen = "../VKshaders/hud_screen_shaders/frag_hud_screen.spv";
-
-	static const char* vertexShaderUI = "../VKshaders/ui_shaders/vert_ui.spv";
-	static const char* fragmentShaderUI = "../VKshaders/ui_shaders/frag_ui.spv";
-
-	static const char* vertexShaderIconsUI = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
-	static const char* fragmentShaderIconsUI = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
-
-	static const char* virtualTexturesVertexShader = "../VKshaders/virtualTextures/virtualTexturesVert.spv";
-	static const char* virtualTexturesFragmentShader = "../VKshaders/virtualTextures/virtualTexturesFrag.spv";
-	
 	inline DescriptorSet descriptorSetsConfig[32];
 	inline DescriptorBinding descriptorBindingsConfig[32];
 	inline Pipeline pipelineConfigs[32];
-	// {
-	// 	{ {}, {}, vertShaderFlatShadowMap, nullptr, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 1, {} },                            ///< directionalLightPipeline
-	// 	{ {}, {}, vertShaderFlatShadowMap, nullptr, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 1, {} },                            ///< spotLightPipeline
-	// 	{ {}, {}, vertShaderCubeShadowMap, fragShaderCubeShadowMap, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 1, {} },            ///< pointLightPipeline
-	// 	{ {}, {}, vertShaderHUD, fragShaderHUD, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 1, {} },                                ///< hudPipeline  
-	// 	{ {}, {}, vertShaderFont, fragShaderFont, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 2, {} },                              ///< fontPipeline
-	// 	{ {}, {}, vertexShaderHudScreen, fragmentShaderHudScreen, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 1, {} },              ///< hudScreenPipeline
-	// 	{ {}, {}, vertexShaderUI, fragmentShaderUI, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 2, {} },                            ///< uiPipeline
-	// 	{ {}, {}, vertexShaderIconsUI, fragmentShaderIconsUI, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 2, {} },                  ///< uiIconsPipeline
-	// 	{ {}, {}, virtualTexturesVertexShader, virtualTexturesFragmentShader, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 2, {} },  ///< virtualTexturesPipeline
-	// 	{ {}, {}, vertShaderMain_, fragShaderMain_, Vertex::getBindingDescription(), Vertex::getAttributeDescriptions(), 4, {} },                            ///< mainRenderPipeline
-	// };
 	
 	inline void VkConfigInitializer() {
 		/// ======================= DESCRIPTOR SETS AND ITS BINDINGS ============================ ///
@@ -57,7 +18,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[SHADOW_MAP_DIRECTIONAL_LIGHT].actualLinkedDescriptorBindingsNumber = 1;
 		descriptorSetsConfig[SHADOW_MAP_DIRECTIONAL_LIGHT].hostDescriptorNumber                 = 4000;
-		descriptorSetsConfig[SHADOW_MAP_DIRECTIONAL_LIGHT].setLayout                            = {};
 		descriptorSetsConfig[SHADOW_MAP_DIRECTIONAL_LIGHT].isTexture                            = false;
 
 		descriptorBindingsConfig[0].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -71,7 +31,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[SHADOW_MAP_SPOT_LIGHT].actualLinkedDescriptorBindingsNumber        = 1;
 		descriptorSetsConfig[SHADOW_MAP_SPOT_LIGHT].hostDescriptorNumber                        = 8000;
-		descriptorSetsConfig[SHADOW_MAP_SPOT_LIGHT].setLayout                                   = {};
 		descriptorSetsConfig[SHADOW_MAP_SPOT_LIGHT].isTexture                                   = false;
 
 		descriptorBindingsConfig[1].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -85,7 +44,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].actualLinkedDescriptorBindingsNumber       = 1;
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].hostDescriptorNumber                       = 128000;
-		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].setLayout                                  = {};
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].isTexture                                  = false;
 
 		descriptorBindingsConfig[2].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -99,7 +57,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[HUD].actualLinkedDescriptorBindingsNumber                          = 1;
 		descriptorSetsConfig[HUD].hostDescriptorNumber                                          = 1000;
-		descriptorSetsConfig[HUD].setLayout                                                     = {};
 		descriptorSetsConfig[HUD].isTexture                                                     = false;
 
 		descriptorBindingsConfig[3].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -113,7 +70,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[FONT_RENDER_UBO].actualLinkedDescriptorBindingsNumber              = 1;
 		descriptorSetsConfig[FONT_RENDER_UBO].hostDescriptorNumber                              = 2048;
-		descriptorSetsConfig[FONT_RENDER_UBO].setLayout                                         = {};
 		descriptorSetsConfig[FONT_RENDER_UBO].isTexture                                         = false;
 
 		descriptorBindingsConfig[4].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -127,7 +83,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[FONT_RENDER_SAMPLER].actualLinkedDescriptorBindingsNumber          = 1;
 		descriptorSetsConfig[FONT_RENDER_SAMPLER].hostDescriptorNumber                          = 18;
-		descriptorSetsConfig[FONT_RENDER_SAMPLER].setLayout                                     = {};
 		descriptorSetsConfig[FONT_RENDER_SAMPLER].isTexture                                     = true;
 
 		descriptorBindingsConfig[5].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -140,7 +95,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[HUD_SCREEN].actualLinkedDescriptorBindingsNumber                   = 1;
 		descriptorSetsConfig[HUD_SCREEN].hostDescriptorNumber                                   = 64;
-		descriptorSetsConfig[HUD_SCREEN].setLayout                                              = {};
 		descriptorSetsConfig[HUD_SCREEN].isTexture                                              = false;
 
 		descriptorBindingsConfig[6].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -154,7 +108,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[UI].actualLinkedDescriptorBindingsNumber                           = 1;
 		descriptorSetsConfig[UI].hostDescriptorNumber                                           = 128;
-		descriptorSetsConfig[UI].setLayout                                                      = {};
 		descriptorSetsConfig[UI].isTexture                                                      = false;
 
 		descriptorBindingsConfig[7].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -168,7 +121,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[UI_SAMPLERS].actualLinkedDescriptorBindingsNumber                  = 1;
 		descriptorSetsConfig[UI_SAMPLERS].hostDescriptorNumber                                  = 18;
-		descriptorSetsConfig[UI_SAMPLERS].setLayout                                             = {};
 		descriptorSetsConfig[UI_SAMPLERS].isTexture                                             = true;
 
 		descriptorBindingsConfig[8].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -181,7 +133,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[UI_ICONS].actualLinkedDescriptorBindingsNumber                     = 1;
 		descriptorSetsConfig[UI_ICONS].hostDescriptorNumber                                     = 128;
-		descriptorSetsConfig[UI_ICONS].setLayout                                                = {};
 		descriptorSetsConfig[UI_ICONS].isTexture                                                = false;
 
 		descriptorBindingsConfig[9].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -195,7 +146,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[UI_ICONS_SAMPLERS].actualLinkedDescriptorBindingsNumber            = 1;
 		descriptorSetsConfig[UI_ICONS_SAMPLERS].hostDescriptorNumber                            = 18;
-		descriptorSetsConfig[UI_ICONS_SAMPLERS].setLayout                                       = {};
 		descriptorSetsConfig[UI_ICONS_SAMPLERS].isTexture                                       = true;
 
 		descriptorBindingsConfig[10].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -208,7 +158,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[VIRTUAL_TEXTURES_UBO].actualLinkedDescriptorBindingsNumber         = 1;
 		descriptorSetsConfig[VIRTUAL_TEXTURES_UBO].hostDescriptorNumber                         = 128;
-		descriptorSetsConfig[VIRTUAL_TEXTURES_UBO].setLayout                                    = {};
 		descriptorSetsConfig[VIRTUAL_TEXTURES_UBO].isTexture                                    = false;
 
 		descriptorBindingsConfig[11].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -222,7 +171,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].actualLinkedDescriptorBindingsNumber     = 1;
 		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].hostDescriptorNumber                     = 18;
-		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].setLayout                                = {};
 		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].isTexture                                = true;
 
 		descriptorBindingsConfig[12].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -235,7 +183,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[MAIN_RENDER_MATRIX_UBO].actualLinkedDescriptorBindingsNumber       = 1;
 		descriptorSetsConfig[MAIN_RENDER_MATRIX_UBO].hostDescriptorNumber                       = 1000;
-		descriptorSetsConfig[MAIN_RENDER_MATRIX_UBO].setLayout                                  = {};
 		descriptorSetsConfig[MAIN_RENDER_MATRIX_UBO].isTexture                                  = false;
 
 		descriptorBindingsConfig[13].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -249,7 +196,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[MAIN_RENDER_LIGHT_DATA_UBO].actualLinkedDescriptorBindingsNumber   = 4;
 		descriptorSetsConfig[MAIN_RENDER_LIGHT_DATA_UBO].hostDescriptorNumber                   = 2;
-		descriptorSetsConfig[MAIN_RENDER_LIGHT_DATA_UBO].setLayout                              = {};
 		descriptorSetsConfig[MAIN_RENDER_LIGHT_DATA_UBO].isTexture                              = false;
 
 		descriptorBindingsConfig[14].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -281,7 +227,6 @@ namespace GLVM::core
 
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].actualLinkedDescriptorBindingsNumber = 1;
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].hostDescriptorNumber                 = 18;
-		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].setLayout                            = {};
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].isTexture                            = true;
 
 		descriptorBindingsConfig[18].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -294,7 +239,6 @@ namespace GLVM::core
 		
 		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].actualLinkedDescriptorBindingsNumber  = 1;
 		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].hostDescriptorNumber                  = 18;
-		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].setLayout                             = {};
 		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].isTexture                             = true;
 
 		descriptorBindingsConfig[19].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -309,7 +253,84 @@ namespace GLVM::core
 
 		/// ===================================================================================== ///
 
+		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].vertShader                       = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
+		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+
+		/// ===================================================================================== ///
+
+		pipelineConfigs[SPOT_LIGHT_PIPELINE].vertShader                       = "../VKshaders/flatShadowMapShaders/vertFlatShadowMap.spv";
+		pipelineConfigs[SPOT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[SPOT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[SPOT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
 		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[POINT_LIGHT_PIPELINE].vertShader                       = "../VKshaders/cubeShadowMapShaders/vertCubeShadowMap.spv";
+		pipelineConfigs[POINT_LIGHT_PIPELINE].fragShader                       = "../VKshaders/cubeShadowMapShaders/fragCubeShadowMap.spv";
+		pipelineConfigs[POINT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[POINT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[POINT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[HUD_PIPELINE].vertShader                       = "../VKshaders/hudShaders/hud_vert.spv";
+		pipelineConfigs[HUD_PIPELINE].fragShader                       = "../VKshaders/hudShaders/hud_frag.spv";
+		pipelineConfigs[HUD_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[HUD_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[HUD_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[FONT_PIPELINE].vertShader                       = "../VKshaders/fontShaders/font_vert.spv";
+		pipelineConfigs[FONT_PIPELINE].fragShader                       = "../VKshaders/fontShaders/font_frag.spv";
+		pipelineConfigs[FONT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[FONT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[FONT_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[HUD_SCREEN_PIPELINE].vertShader                       = "../VKshaders/hud_screen_shaders/vert_hud_screen.spv";
+		pipelineConfigs[HUD_SCREEN_PIPELINE].fragShader                       = "../VKshaders/hud_screen_shaders/frag_hud_screen.spv";
+		pipelineConfigs[HUD_SCREEN_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[HUD_SCREEN_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[HUD_SCREEN_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[UI_PIPELINE].vertShader                       = "../VKshaders/ui_shaders/vert_ui.spv";
+		pipelineConfigs[UI_PIPELINE].fragShader                       = "../VKshaders/ui_shaders/frag_ui.spv";
+		pipelineConfigs[UI_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[UI_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[UI_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[UI_ICONS_PIPELINE].vertShader                       = "../VKshaders/ui_icons_shaders/vert_ui_icons.spv";
+		pipelineConfigs[UI_ICONS_PIPELINE].fragShader                       = "../VKshaders/ui_icons_shaders/frag_ui_icons.spv";
+		pipelineConfigs[UI_ICONS_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[UI_ICONS_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[UI_ICONS_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].vertShader                       = "../VKshaders/virtualTextures/virtualTexturesVert.spv";
+		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].fragShader                       = "../VKshaders/virtualTextures/virtualTexturesFrag.spv";
+		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[VIRTUAL_TEXTURES_PIPELINE].actualLinkedDescriptorSetsNumber = 2;
+		
+		/// ===================================================================================== ///
+
+		pipelineConfigs[MAIN_RENDER_PIPELINE].vertShader                       = "../VKshaders/mainRendererShaders/vert.spv";
+		pipelineConfigs[MAIN_RENDER_PIPELINE].fragShader                       = "../VKshaders/mainRendererShaders/frag.spv";
+		pipelineConfigs[MAIN_RENDER_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[MAIN_RENDER_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[MAIN_RENDER_PIPELINE].actualLinkedDescriptorSetsNumber = 4;
+		
+		/// ===================================================================================== ///
+
 	}
 	
 
