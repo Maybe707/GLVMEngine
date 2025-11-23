@@ -315,6 +315,7 @@ namespace GLVM::core
 		uint32_t texWidth, texHeight;
 		[[maybe_unused]] uint32_t texChannels;
 
+		unsigned int readableTextureDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::RIDABLE_TEXTURES].descriptorsBindingsIDs[0];		
         for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
         {
 			VkDeviceSize imageSize{};
@@ -368,7 +369,8 @@ namespace GLVM::core
             copyBufferToImage(stagingBuffer, textureImage.image, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
             transitionImageLayout(textureImage.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
-			textureImages.push_back(textureImage);
+//			GPUDescriptors[descriptorBindingsConfig[readableTextureDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = new VK_Image;
+			*GPUDescriptors[descriptorBindingsConfig[readableTextureDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage = textureImage;
 			
             vkDestroyBuffer(device, stagingBuffer, nullptr);
             vkFreeMemory(device, stagingBufferMemory, nullptr);
@@ -1689,8 +1691,11 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::createTextureImageView() {
-        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i)
-            textureImages[i].views.push_back(createImageView(textureImages[i], 0, 1));
+		unsigned int readableTextureDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::RIDABLE_TEXTURES].descriptorsBindingsIDs[0];		
+        for(unsigned int i = 0; i < initializeTextureData_.size(); ++i) {
+			VK_Image* image = GPUDescriptors[descriptorBindingsConfig[readableTextureDescriptorBindingIndex].globalDescriptorOffset + i].GPUImage;
+			image->views.push_back(createImageView(*image, 0, 1));
+		}
     }
 
     void CVulkanRenderer::createTextureSampler() {
@@ -2070,11 +2075,12 @@ namespace GLVM::core
 		for ( size_t j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
 			bindingsIDs.Push( descriptorSet.descriptorsBindingsIDs[j] );
 		}
-		
+
+		unsigned int readableTextureDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::RIDABLE_TEXTURES].descriptorsBindingsIDs[0];		
 		for (size_t i = 0; i < descriptorSet.hostDescriptorNumber; ++i) {
 			const unsigned int textureIndex = i / 2;
 			constexpr unsigned int textureViewIndex = 0;
-			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( textureImages[textureIndex], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, textureViewIndex, textureSampler );
+			VkDescriptorImageInfo imageInfo = createDescriptorImageInfo( *GPUDescriptors[descriptorBindingsConfig[readableTextureDescriptorBindingIndex].globalDescriptorOffset + textureIndex].GPUImage, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, textureViewIndex, textureSampler );
 			core::vector<VkWriteDescriptorSet> descriptorWrites{};
 
 			for ( unsigned int j = 0; j < bindingsIDs.GetSize(); ++j ) {

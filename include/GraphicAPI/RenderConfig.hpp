@@ -251,6 +251,18 @@ namespace GLVM::core
 		
 		/// ===================================================================================== ///
 
+		descriptorSetsConfig[RIDABLE_TEXTURES].actualLinkedDescriptorBindingsNumber  = 1;
+		descriptorSetsConfig[RIDABLE_TEXTURES].hostDescriptorNumber                  = 18;
+		descriptorSetsConfig[RIDABLE_TEXTURES].isTexture                             = true;
+
+		descriptorBindingsConfig[20].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorBindingsConfig[20].type                    = DescriptorsTypes::TEXTURES_SAMPLER;
+		descriptorBindingsConfig[20].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
+		descriptorBindingsConfig[20].binding                 = 0;
+		descriptorBindingsConfig[20].shaderDescriptorsNumber = 18;
+		
+		/// ===================================================================================== ///
+
 		/// ======================== PIPELINES AND ITS RENDER PASSES ============================ ///
 
 		/// ===================================================================================== ///

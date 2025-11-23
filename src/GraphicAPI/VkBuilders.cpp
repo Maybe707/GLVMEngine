@@ -9,6 +9,7 @@ namespace GLVM::core {
 		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
 		
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
+			std::cout << "ENUM NUM: " << dsCounter << std::endl;
 			descriptorSetsConfig[dsCounter].descriptorSetOffset = descriptorSetsBindigOffsetCounter;                  ///< Offset for indexing inside descriptorSetsChunks
 			descriptorSetsBindigOffsetCounter += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
 			std::cout << "pravilni idealni offset: " << descriptorSetsConfig[dsCounter].descriptorSetOffset << std::endl;
@@ -17,12 +18,14 @@ namespace GLVM::core {
 				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;    ///< Index for ds bindings inside ds
 				if( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
 					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						std::cout << "allocate ubo" << std::endl;
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
 						++globalDescriptorsOffset;
 					}
 				} else if ( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
 					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						std::cout << "allocate texture" << std::endl;
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
 						++globalDescriptorsOffset;
