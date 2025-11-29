@@ -35,8 +35,8 @@ namespace GLVM::core
 		static void print_modifiers (uint32_t mask);
 	public:
 //		CStack           * Input_Stack_;
-		uint32_t           windowWidth;
-		uint32_t           windowHeight;
+		uint32_t           width;
+		uint32_t           height;
 		bool               isWindowResizeRead = false;
 		
 		WindowXCBVulkan ();

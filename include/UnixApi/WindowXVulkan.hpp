@@ -31,6 +31,8 @@ namespace GLVM::core
     public:
         Display* pDisp_;
         Window Win_;
+		uint32_t           width;
+		uint32_t           height;
 
         WindowXVulkan();
         ~WindowXVulkan();

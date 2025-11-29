@@ -30,8 +30,10 @@ namespace GLVM::core
         Set_Window_Attributes_.event_mask = KeyPressMask | KeyReleaseMask |
             PointerMotionMask | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask;
 
-        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, 1920, 1080, 0, CopyFromParent, InputOutput,
-                            CopyFromParent, CWEventMask, &Set_Window_Attributes_);    
+		width = 1920;
+		height = 1080;
+        Win_ = XCreateWindow(pDisp_, Root_Window_, 0, 0, width, height, 0, CopyFromParent, InputOutput,
+                            CopyFromParent, CWEventMask, &Set_Window_Attributes_);
         ///< Show_the_window
 
         XMapWindow(pDisp_, Win_);

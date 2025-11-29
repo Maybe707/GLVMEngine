@@ -84,8 +84,8 @@ namespace GLVM::core
 		const uint32_t values[] = {
 			320,    /* x */
 			180,    /* y */
-			windowWidth,
-			windowHeight
+			width,
+			height
 		};
 
 		xcb_configure_window(connection, window, mask, values);
@@ -172,8 +172,8 @@ namespace GLVM::core
 						expose_event->window, expose_event->x, expose_event->y, expose_event->width, expose_event->height);
 
 				if ( !isWindowResizeRead ) {
-					windowWidth = expose_event->width;
-					windowHeight = expose_event->height;
+					width = expose_event->width;
+					height = expose_event->height;
 					isWindowResizeRead = true;
 				}
 				break;
