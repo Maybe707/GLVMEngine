@@ -383,7 +383,8 @@ namespace GLVM::core
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		Window->configureWindow();
 #endif
-
+		aspectRate = (float)Window->width / (float)Window->height;
+		
 // #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 // 		Window.Close();
 // 		Window = GLVM::core::WindowWaylandVulkan();
@@ -490,6 +491,7 @@ namespace GLVM::core
 		Window = new GLVM::core::WindowXVulkan();
         createXlibSurfaceInfo.dpy = Window->GetDisplay();
         createXlibSurfaceInfo.window = Window->GetWindow();
+		aspectRate = (float)Window->width / (float)Window->height;
 
         createXlibSurfaceInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
         createXlibSurfaceInfo.pNext = nullptr;
@@ -500,6 +502,7 @@ namespace GLVM::core
 		Window = new GLVM::core::WindowXCBVulkan();
 		createXcbSurfaceInfo.window = Window->GetWindow();
 		createXcbSurfaceInfo.connection = Window->GetConnection();
+		aspectRate = (float)Window->width / (float)Window->height;
 
 		createXcbSurfaceInfo.sType = VK_STRUCTURE_TYPE_XCB_SURFACE_CREATE_INFO_KHR;
 		createXcbSurfaceInfo.pNext = nullptr;
@@ -508,6 +511,7 @@ namespace GLVM::core
 		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
         createWin32SurfaceInfo.hwnd = Window.GetModernWindowHWND();
+		aspectRate = (float)Window->width / (float)Window->height;
         
         createWin32SurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
         createWin32SurfaceInfo.pNext = nullptr;
