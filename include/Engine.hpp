@@ -60,6 +60,8 @@ namespace GLVM::core
 		int                  dragedItemEntity = -1;             ///< If dont have any draged item then this variable have value of -1
 		[[maybe_unused]] float fYaw   = -90.0f;
         [[maybe_unused]] float fPitch = 0.0f;
+		float previousMouseOffsetX = 0.0f;
+		float previousMouseOffsetY = 0.0f;
 
 		CVulkanRenderer*     vulkanRenderer;
 

@@ -276,8 +276,10 @@ namespace GLVM::core
 		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
 		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
 #else
-		hud_screen_y += (g_eEvent.mousePointerPosition.offset_Y - fPitch * 10.0) / 1080.0f;
-		hud_screen_x += (g_eEvent.mousePointerPosition.offset_X - fYaw * 10.0f) / 1920.0f;
+		hud_screen_y -= (previousMouseOffsetY - g_eEvent.mousePointerPosition.offset_Y) / 1080.0f;
+		hud_screen_x += (previousMouseOffsetX - g_eEvent.mousePointerPosition.offset_X) / 1920.0f;
+		previousMouseOffsetX = g_eEvent.mousePointerPosition.offset_X;
+		previousMouseOffsetY = g_eEvent.mousePointerPosition.offset_Y;
 #endif
 
 		if ( hud_screen_x > 1.0f )

@@ -2244,6 +2244,10 @@ namespace GLVM::core
 		HUD_SCREEN_UBO hudUBO{};
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
+#ifndef VK_USE_PLATFORM_WAYLAND_KHR
+		hud_screen_x = -hud_screen_x;
+#endif
+		
 		cursorTransform->position[0] = hud_screen_x;
 		cursorTransform->position[1] = -hud_screen_y;
 //		std::cout << "cursor scale: " << cursorTransform->fScale << std::endl;
