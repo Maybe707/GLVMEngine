@@ -2103,14 +2103,6 @@ namespace GLVM::core
 		return uboInfo;
 	}
 	
-	
-	void CVulkanRenderer::updateFontRenderDescriptorSets() {
-	}
-
-
-	void CVulkanRenderer::updateVirtualTexturesDescriptorSets() {
-	}
-	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
 		for( unsigned int pipelineCounter = 0; pipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++pipelineCounter ) {
 			for( unsigned int descriptorSetCounter = 0; descriptorSetCounter < pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++descriptorSetCounter ) {
@@ -2127,24 +2119,6 @@ namespace GLVM::core
 		}
 	}
 
-	void CVulkanRenderer::updateSamplersDescriptroSets([[maybe_unused]] uint32_t diffuse_id, [[maybe_unused]] uint32_t specular_id) {
-	}
-	
-	void CVulkanRenderer::updateDirectionalLightShadowMapDescriptorSets() {
-	}
-
-	void CVulkanRenderer::updateSpotLightShadowMapDescriptorSets() {
-	}
-
-	void CVulkanRenderer::updatePointLightShadowMapDescriptorSets() {
-	}
-
-    void CVulkanRenderer::updateHudDescriptorSets() {
-	}
-	
-    void CVulkanRenderer::updateDescriptorSets() {
-	}
-	
 	void CVulkanRenderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 		VkBufferCreateInfo bufferInfo{};
 		bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
