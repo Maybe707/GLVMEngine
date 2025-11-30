@@ -385,20 +385,6 @@ namespace GLVM::core
 #endif
 		aspectRate = (float)Window->width / (float)Window->height;
 		
-// #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-// 		Window.Close();
-// 		Window = GLVM::core::WindowWaylandVulkan();
-// 		// if ( buffer == NULL )
-// 		// 	std::cout << "BUFFER V GOVNE" << std::endl;
-			
-// 		createWaylandSurfaceInfo.display = display;
-// 		createWaylandSurfaceInfo.surface = wl_surface;
-
-// 		createWaylandSurfaceInfo.sType   = VK_STRUCTURE_TYPE_WAYLAND_SURFACE_CREATE_INFO_KHR;
-// 		createWaylandSurfaceInfo.pNext   = nullptr;
-// 		createWaylandSurfaceInfo.flags   = 0;
-// #endif
-		
         cleanupSwapChain();
 		
         createSwapChain();
@@ -408,16 +394,7 @@ namespace GLVM::core
 		createSpotLightShadowMapDepthResources();
 		createPointLightShadowMapDepthResources();
 		createFramebuffers();
-		// createTextureImage();
-        // createTextureImageView();
-        // createTextureSampler();
-
-		updateDirectionalLightShadowMapDescriptorSets();
-		updateSpotLightShadowMapDescriptorSets();
-		updatePointLightShadowMapDescriptorSets();
-//		updateDescriptorSets();
-		updateHudDescriptorSets();
-		updateFontRenderDescriptorSets();
+		createMainRenderDescriptorSets();
     }
 
     void CVulkanRenderer::SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF) {
