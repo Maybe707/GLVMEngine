@@ -142,6 +142,7 @@ namespace GLVM::core
                 {
                 case 1:
                     _Event.SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
+					_Event.isLeftMouseButtonReleased = true;
                     break;
                 }
                 break;
@@ -150,6 +151,9 @@ namespace GLVM::core
 				ulKey = XLookupKeysym(&uXEvent.xkey, 0);
 				switch(ulKey)
 				{
+				case XKEY_I:
+					_Event.SetEvent(EEvents::eINVENTORY);
+					break;
 				case XKEY_ESCAPE:
 					_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
 					break;
@@ -188,6 +192,9 @@ namespace GLVM::core
 		    	ulKey = XLookupKeysym(&uXEvent.xkey, 0);
                 switch(ulKey)
                 {
+				case XKEY_I:
+					_Event.SetEvent(EEvents::eINVENTORY_RELEASE);
+					break;
                 case XKEY_A:
                     _Event.SetEvent(GLVM::core::eKEYRELEASE_A);
                     break;

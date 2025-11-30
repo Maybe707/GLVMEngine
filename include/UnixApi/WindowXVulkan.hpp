@@ -11,6 +11,7 @@
 #include "EventsStack.hpp"
 #include "Globals.hpp"
 
+#define XKEY_I      0x69
 #define XKEY_ESCAPE 0xff1b
 #define XKEY_A      0x61
 #define XKEY_D      0x64
