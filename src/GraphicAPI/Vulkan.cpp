@@ -705,6 +705,11 @@ namespace GLVM::core
 		createDescriptorSetLayout();
 		createGraphicsPipeline();
 		createCommandPool(mainRenderCommandPool);
+		const uint32_t secondaryBuffersCommandPoolsNumber = 3;
+		secondaryBuffersCommandPools.resize(secondaryBuffersCommandPoolsNumber);
+		for( uint32_t i = 0; i < secondaryBuffersCommandPools.size(); ++i ) {
+			createCommandPool(secondaryBuffersCommandPools[i]);
+		}
         createDepthResources();
 		createDirectionalLightShadowMapDepthResources();
 		createSpotLightShadowMapDepthResources();
@@ -725,7 +730,16 @@ namespace GLVM::core
         // createCommandBuffers(mainRenderCommandPool, directionalLightCommandBuffers);
 		// createCommandBuffers(mainRenderCommandPool, spotLightCommandBuffers);
 		// createCommandBuffers(mainRenderCommandPool, pointLightCommandBuffers);
-		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers);
+		const uint32_t mainRenderCommandBuffersNumber = 1;
+		createCommandBuffers(mainRenderCommandPool, mainRenderCommandBuffers,
+							 mainRenderCommandBuffersNumber, VK_COMMAND_BUFFER_LEVEL_PRIMARY);
+
+		createCommandBuffers(secondaryBuffersCommandPools[0], directionalLightSecondaryCommandBuffers,
+							 directionalLightNumber, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
+		createCommandBuffers(secondaryBuffersCommandPools[1], spotLightSecondaryCommandBuffers,
+							 spotLightNumber, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
+		createCommandBuffers(secondaryBuffersCommandPools[2], pointLightSecondaryCommandBuffers,
+							 pointLightNumber * 6 * 2, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 		// createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 		// 				  directionalLightShadowMapRenderFinishedSemaphores,
 		// 				  directionalLightShadowMapInFlightFences);
@@ -886,6 +900,9 @@ namespace GLVM::core
 		vkDestroyCommandPool(device, uiCommandPool, nullptr);
 		vkDestroyCommandPool(device, uiIconsCommandPool, nullptr);
 		vkDestroyCommandPool(device, virtualTexturesCommandPool, nullptr);
+		for( uint32_t i = 0; i < secondaryBuffersCommandPools.size(); ++i ) {
+			vkDestroyCommandPool(device, secondaryBuffersCommandPools[i], nullptr);
+		}
 		vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
 		vkDeviceWaitIdle(device);
@@ -1411,17 +1428,17 @@ namespace GLVM::core
             }
     }
 	
-    void CVulkanRenderer::createCommandPool(VkCommandPool& commandPool) {
-        QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
+    void CVulkanRenderer::createCommandPool( VkCommandPool& commandPools ) {
+		QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
-        VkCommandPoolCreateInfo poolInfo{};
-        poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-        poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+		VkCommandPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
 
-        if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-            throw std::runtime_error("failed to create graphics command pool!");
-        }
+		if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPools) != VK_SUCCESS) {
+			throw std::runtime_error("failed to create graphics command pool!");
+		}
     }
 
     void CVulkanRenderer::createDepthResources() {
@@ -2204,13 +2221,14 @@ namespace GLVM::core
         throw std::runtime_error("failed to find suitable memory type!");
     }
 
-    void CVulkanRenderer::createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers) {
-        commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+    void CVulkanRenderer::createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers,
+											   uint32_t commandBuffersNumber, VkCommandBufferLevel commandBufferLevelFlag) {
+        commandBuffers.resize(commandBuffersNumber * MAX_FRAMES_IN_FLIGHT);
 
         VkCommandBufferAllocateInfo allocInfo{};
         allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
         allocInfo.commandPool = commandPool;
-        allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocInfo.level = commandBufferLevelFlag;
         allocInfo.commandBufferCount = (uint32_t) commandBuffers.size();
 
         if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
@@ -2884,8 +2902,8 @@ namespace GLVM::core
 	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        // VkCommandBufferBeginInfo beginInfo{};
+        // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
         // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
         //     throw std::runtime_error("failed to begin recording command buffer!");
@@ -3367,9 +3385,54 @@ namespace GLVM::core
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-		directionalLightRecordCoomandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
-		spotLightRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
-		pointLightRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, currentFrame);
+		spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
+		pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
+
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+		
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh,
+																						  cm::actor>();
+
+
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
+			uint32_t maxCubeMapLayers = 6;
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                    
+				VkClearValue pointLightShadowMapClearValues[2];
+				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
+
+				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
+				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				pointLightShadowMapRenderPassInfo.pNext = NULL;
+				pointLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE];
+				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
+				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
+				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
+				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+
+				vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &pointLightShadowMapRenderPassInfo, 
+									 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+				vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
+									 &pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
+					pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter]);
+				vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
+			}
+		}
+		
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		fontRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
@@ -3430,11 +3493,11 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex = 0;
+        [[maybe_unused]] uint32_t imageIndex = 0;
 
         vkResetFences(device, 1, &directionalLightShadowMapInFlightFences[directionalLightCurrentFrame]);
         vkResetCommandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        directionalLightRecordCoomandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], imageIndex);
+//        directionalLightRecordCoomandBuffer(directionalLightCommandBuffers[directionalLightCurrentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -3453,11 +3516,11 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex = 0;
+        [[maybe_unused]] uint32_t imageIndex = 0;
 
         vkResetFences(device, 1, &spotLightShadowMapInFlightFences[spotLightCurrentFrame]);
         vkResetCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        spotLightRecordCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], imageIndex);
+//        spotLightRecordCommandBuffer(spotLightCommandBuffers[spotLightCurrentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -3476,11 +3539,11 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
         vkWaitForFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame], VK_TRUE, UINT64_MAX);
 
-        uint32_t imageIndex = 0;
+        [[maybe_unused]] uint32_t imageIndex = 0;
 
         vkResetFences(device, 1, &pointLightShadowMapInFlightFences[pointLightCurrentFrame]);
         vkResetCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-        pointLightRecordCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], imageIndex);
+//        pointLightRecordCommandBuffer(pointLightCommandBuffers[pointLightCurrentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -3495,14 +3558,8 @@ namespace GLVM::core
         pointLightCurrentFrame = (pointLightCurrentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
     }
 	
-	void CVulkanRenderer::directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		void CVulkanRenderer::directionalLightRecordCoomandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
 
 		
 		namespace cm = GLVM::ecs::components;
@@ -3517,23 +3574,39 @@ namespace GLVM::core
 																						   cm::actor>();
 
 		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-			VkClearValue shadowMapClearValues[1];
-			shadowMapClearValues[0].depthStencil.depth = 1.0f;
-			shadowMapClearValues[0].depthStencil.stencil = 0;
+			VkCommandBufferInheritanceInfo inheritanceInfo{};
+			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
+			inheritanceInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+			inheritanceInfo.subpass = 0;
+			
+			VkCommandBufferBeginInfo beginInfo{};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+			beginInfo.pInheritanceInfo = &inheritanceInfo;
 
-			VkRenderPassBeginInfo shadowMapRenderPassInfo{};
-			shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			shadowMapRenderPassInfo.pNext = NULL;
-			shadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
-			shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
-			shadowMapRenderPassInfo.renderArea.offset.x = 0;
-			shadowMapRenderPassInfo.renderArea.offset.y = 0;
-			shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-			shadowMapRenderPassInfo.clearValueCount = 1;
-			shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+			VkCommandBuffer commandBuffer = commandBuffers[currentFrame * directionalLightNumber + directionalLightCounter];
+			if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+				throw std::runtime_error("failed to begin recording command buffer!");
+			}
 
-			vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+			// VkClearValue shadowMapClearValues[1];
+			// shadowMapClearValues[0].depthStencil.depth = 1.0f;
+			// shadowMapClearValues[0].depthStencil.stencil = 0;
+
+			// VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+			// shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			// shadowMapRenderPassInfo.pNext = NULL;
+			// shadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
+			// shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+			// shadowMapRenderPassInfo.renderArea.offset.x = 0;
+			// shadowMapRenderPassInfo.renderArea.offset.y = 0;
+			// shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			// shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			// shadowMapRenderPassInfo.clearValueCount = 1;
+			// shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+			// vkCmdBeginRenderPass(commandBuffer, &shadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport shadowMapViewPort;
 			shadowMapViewPort.height = swapChainExtent.height;
@@ -3581,23 +3654,16 @@ namespace GLVM::core
 				unsigned int indicesContainerSize = aIndices_[meshId].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
-		
-			vkCmdEndRenderPass(commandBuffer);
-		}
 
-		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to record command buffer!");
-        // }
+			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+				throw std::runtime_error("failed to record command buffer!");
+			}
+//			vkCmdEndRenderPass(commandBuffer);
+		}
 	}
 
-	void CVulkanRenderer::spotLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		void CVulkanRenderer::spotLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to begin recording command buffer!");
-        // }
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -3612,23 +3678,39 @@ namespace GLVM::core
 																							  cm::actor>();
 
 		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-			VkClearValue spotLightShadowMapClearValues[1];
-			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-			spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
+			VkCommandBufferInheritanceInfo inheritanceInfo{};
+			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
+			inheritanceInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
+			inheritanceInfo.subpass = 0;
+			
+			VkCommandBufferBeginInfo beginInfo{};
+			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+			beginInfo.pInheritanceInfo = &inheritanceInfo;
 
-			VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
-			spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			spotLightShadowMapRenderPassInfo.pNext = NULL;
-			spotLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
-			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
-			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
-			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
+			VkCommandBuffer commandBuffer = commandBuffers[currentFrame * spotLightNumber + spotLightCounter];
+			if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+				throw std::runtime_error("failed to begin recording command buffer!");
+			}
 
-			vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+			// VkClearValue spotLightShadowMapClearValues[1];
+			// spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+			// spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
+
+			// VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
+			// spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			// spotLightShadowMapRenderPassInfo.pNext = NULL;
+			// spotLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
+			// spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
+			// spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+			// spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+			// spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			// spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			// spotLightShadowMapRenderPassInfo.clearValueCount = 1;
+			// spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
+
+			// vkCmdBeginRenderPass(commandBuffer, &spotLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 			VkViewport spotLightShadowMapViewPort;
 			spotLightShadowMapViewPort.height = swapChainExtent.height;
@@ -3674,25 +3756,17 @@ namespace GLVM::core
 				unsigned int indicesContainerSize = aIndices_[meshID].size();
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
-		
-			vkCmdEndRenderPass(commandBuffer);
-		}
 
-		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to record command buffer!");
-        // }
+			if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+				throw std::runtime_error("failed to record command buffer!");
+			}
+//			vkCmdEndRenderPass(commandBuffer);
+		}
 	}
 
-	void CVulkanRenderer::pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, [[maybe_unused]] uint32_t imageIndex) {
+		void CVulkanRenderer::pointLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		ecs::EntityManager*    entityManager     = ecs::EntityManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to begin recording command buffer!");
-        // }
-
 		namespace cm = GLVM::ecs::components;
 		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
 			core::vector<Entity> linkedEntitiesTemp      = componentManager->collectLinkedEntities<cm::transform,
@@ -3738,28 +3812,45 @@ namespace GLVM::core
 		label.pLabelName = "pointLightShadowMap";
 		label.pNext = NULL;
 		
-		vkDebugUtils::CreateBeginDebugUtilsLabelEXT(instance, commandBuffer, &label);
+		vkDebugUtils::CreateBeginDebugUtilsLabelEXT(instance, commandBuffers[0], &label);
 		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
-				VkClearValue pointLightShadowMapClearValues[2];
-				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
-				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
+				VkCommandBufferInheritanceInfo inheritanceInfo{};
+				inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
+				inheritanceInfo.renderPass = renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE];
+				inheritanceInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
+				inheritanceInfo.subpass = 0;
+				
+				VkCommandBufferBeginInfo beginInfo{};
+				beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+				beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+				beginInfo.pInheritanceInfo = &inheritanceInfo;
 
-				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
-				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-				pointLightShadowMapRenderPassInfo.pNext = NULL;
-				pointLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE];
-				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
-				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
-				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+				VkCommandBuffer commandBuffer = commandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
+					pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter];
+				if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+					throw std::runtime_error("failed to begin recording command buffer!");
+				}
+				
+				// VkClearValue pointLightShadowMapClearValues[2];
+				// pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+				// pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
+				// pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
 
-				vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+				// VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
+				// pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+				// pointLightShadowMapRenderPassInfo.pNext = NULL;
+				// pointLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE];
+				// pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
+				// pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+				// pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+				// pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
+				// pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
+				// pointLightShadowMapRenderPassInfo.clearValueCount = 2;
+				// pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
+
+				// vkCmdBeginRenderPass(commandBuffer, &pointLightShadowMapRenderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 				VkViewport pointLightShadowMapViewPort;
 				pointLightShadowMapViewPort.height = SHADOW_MAP_SIZE;
@@ -3809,14 +3900,13 @@ namespace GLVM::core
 					unsigned int indicesContainerSize = aIndices_[meshID].size();
 					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 				}
-		
-				vkCmdEndRenderPass(commandBuffer);
+
+				if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+					throw std::runtime_error("failed to record command buffer!");
+				}
+//				vkCmdEndRenderPass(commandBuffer);
 			}
 		}
-
-		// if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to record command buffer!");
-        // }
 	}
 	
     VkShaderModule CVulkanRenderer::createShaderModule(const std::vector<char>& code) {

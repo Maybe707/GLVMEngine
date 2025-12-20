@@ -48,8 +48,8 @@
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
-#define VK_USE_PLATFORM_XCB_KHR
-//#define VK_USE_PLATFORM_WAYLAND_KHR
+//#define VK_USE_PLATFORM_XCB_KHR
+#define VK_USE_PLATFORM_WAYLAND_KHR
 #endif
 
 #ifdef _WIN32
@@ -266,6 +266,7 @@ namespace GLVM::core
 		VkCommandPool uiCommandPool;
 		VkCommandPool uiIconsCommandPool;
 		VkCommandPool mainRenderCommandPool;
+		std::vector<VkCommandPool> secondaryBuffersCommandPools;
 		VkCommandPool virtualTexturesCommandPool;
 
 		/// Main pipeline depth.
@@ -344,6 +345,9 @@ namespace GLVM::core
 		std::vector<VkCommandBuffer> fontCommandBuffers;
 		std::vector<VkCommandBuffer> hudCommandBuffers;
 		std::vector<VkCommandBuffer> mainRenderCommandBuffers;
+		std::vector<VkCommandBuffer> directionalLightSecondaryCommandBuffers;
+		std::vector<VkCommandBuffer> spotLightSecondaryCommandBuffers;
+		std::vector<VkCommandBuffer> pointLightSecondaryCommandBuffers;
 		std::vector<VkCommandBuffer> virtualTexturesCommandBuffers;
 
 		/// Main render pipe line sync objects
@@ -414,7 +418,7 @@ namespace GLVM::core
 										  VkFramebuffer& swapChainFramebuffer, uint32_t width,
 										  uint32_t height);
 		void createFramebuffers();
-        void createCommandPool(VkCommandPool& commandPool);
+        void createCommandPool( VkCommandPool& commandPool );
         void createDepthResources();
 		void createDirectionalLightShadowMapDepthResources();
 		void createSpotLightShadowMapDepthResources();
@@ -450,7 +454,8 @@ namespace GLVM::core
         void endSingleTimeCommands(VkCommandPool& commandPool, VkCommandBuffer& commandBuffer);
         void copyBuffer(VkBuffer& srcBuffer, VkBuffer& dstBuffer, VkDeviceSize size);
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-        void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers);
+        void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers,
+								  uint32_t commandBuffersNumber, VkCommandBufferLevel commandBufferLevelFlag);
 		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
@@ -482,9 +487,9 @@ namespace GLVM::core
 		void directionalLightShadowMapDrawFrame();
 		void spotLightShadowMapDrawFrame();
 		void pointLightShadowMapDrawFrame();
-		void directionalLightRecordCoomandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
-		void spotLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
-		void pointLightRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void directionalLightRecordCoomandBuffer( std::vector<VkCommandBuffer>& commandBuffer, uint32_t currentFrame );
+		void spotLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffer, uint32_t currentFrame);
+		void pointLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, uint32_t currentFrame);
         VkShaderModule createShaderModule(const std::vector<char>& code);
         VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
         VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
