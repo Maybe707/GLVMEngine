@@ -3398,11 +3398,73 @@ namespace GLVM::core
 		
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
+
+		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									 cm::directionalLight,
+																									 cm::mesh,
+																									 cm::actor>();
+
+
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+
+		VkClearValue shadowMapClearValues[1];
+		shadowMapClearValues[0].depthStencil.depth = 1.0f;
+		shadowMapClearValues[0].depthStencil.stencil = 0;
+
+		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		shadowMapRenderPassInfo.pNext = NULL;
+		shadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
+		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+		shadowMapRenderPassInfo.renderArea.offset.x = 0;
+		shadowMapRenderPassInfo.renderArea.offset.y = 0;
+		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		shadowMapRenderPassInfo.clearValueCount = 1;
+		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+		vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &shadowMapRenderPassInfo, 
+							 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+		vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
+							 &pointLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter]);
+		vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
+
+		}		
+
+
+		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::spotLight,
+																							  cm::mesh,
+																							  cm::actor>();
+
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+			VkClearValue spotLightShadowMapClearValues[1];
+			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
+			spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
+
+			VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
+			spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+			spotLightShadowMapRenderPassInfo.pNext = NULL;
+			spotLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
+			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
+			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
+			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
+			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
+			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
+			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
+
+			vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &spotLightShadowMapRenderPassInfo, 
+								 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+			vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
+								 &pointLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter]);
+			vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
+		}
+		
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																						  cm::pointLight,
 																						  cm::mesh,
 																						  cm::actor>();
-
 
 		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
