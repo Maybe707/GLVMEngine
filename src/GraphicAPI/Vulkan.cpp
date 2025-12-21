@@ -26,6 +26,7 @@
 #include "PGA.hpp"
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
+#include "ThreadPool.hpp"
 #include "UnixApi/WindowWaylandVulkan.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
@@ -441,6 +442,8 @@ namespace GLVM::core
 																							cm::mesh>();
 
 		actorsNumber = actorsLinkedEntities.GetSize();
+
+		renderThreadPool = new ThreadPool(3);
 		
         initWindow();
         initVulkan();
@@ -3389,24 +3392,21 @@ namespace GLVM::core
 		// spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
 		// pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
 
-		std::vector<std::thread> threads;
-    
-		threads.emplace_back([&]() {
-			directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, currentFrame);
+		auto future1 = renderThreadPool->enqueue([this]() {
+			directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, this->currentFrame);
 		});
     
-		threads.emplace_back([&]() {
-			spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
+		auto future2 = renderThreadPool->enqueue([this]() {
+			spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, this->currentFrame);
 		});
     
-		threads.emplace_back([&]() {
-			pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
+		auto future3 = renderThreadPool->enqueue([this]() {
+			pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, this->currentFrame);
 		});
     
-		// Ждем завершения всех потоков
-		for (auto& thread : threads) {
-			thread.join();
-		}
+		future1.wait();
+		future2.wait();
+		future3.wait();
 		
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;

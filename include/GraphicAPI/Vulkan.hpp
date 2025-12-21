@@ -45,6 +45,7 @@
 #include "VkBuilders.hpp"
 #include "VkDebugUtils.hpp"
 #include "GraphicAPI/RenderConfig.hpp"
+#include "ThreadPool.hpp"
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
@@ -210,6 +211,7 @@ namespace GLVM::core
         VkDebugUtilsMessengerEXT debugMessenger;
 		mat4 viewMatrix;
 		mat4 projectionMatrix;
+		ThreadPool* renderThreadPool;
 
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 		VkWaylandSurfaceCreateInfoKHR createWaylandSurfaceInfo;

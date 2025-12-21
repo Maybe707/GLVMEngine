@@ -1,7 +1,7 @@
 C = clang
 CC = clang++
-SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
-#SANITIZE =
+#SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
+SANITIZE =
 LDFLAGS = -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb -lwayland-client
 CXXFLAGS = -c -std=c++23 -static -Wall -Wextra -Wpedantic -Werror -g -march=x86-64-v3 -O2
 CFLAGS = -c -g -Wall -Wextra -Wpedantic -Werror -march=x86-64-v3 -O2
@@ -23,7 +23,8 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./src/Network/UDP_ClientLinux.cpp ./src/UnixApi/WindowWaylandVulkan.cpp \
 	  ./src/UnixApi/WaylandVariables.cpp ./textures/tileset.cpp \
 	  ./src/Systems/InventorySystem.cpp ./src/GraphicAPI/VkBuilders.cpp \
-	  ./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp
+	  ./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp \
+	  ./src/ThreadPool.cpp
 
 SOURCES_C = xdg-shell-protocol.c pointer-constraints-unstable-v1-protocol.c relative-pointer-unstable-v1-protocol.c
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
