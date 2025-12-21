@@ -2239,6 +2239,31 @@ namespace GLVM::core
         }
     }
 
+	void CVulkanRenderer::executeSecondaryCommandBuffer( VkRenderPass renderPass, VkFramebuffer frameBuffer, VkExtent2D extent,
+														 VkCommandBuffer primaryCommandBuffer, VkCommandBuffer secondaryCommandBuffer ) {
+		VkClearValue shadowMapClearValues[1];
+		shadowMapClearValues[0].depthStencil.depth = 1.0f;
+		shadowMapClearValues[0].depthStencil.stencil = 0;
+
+		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
+		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+		shadowMapRenderPassInfo.pNext = NULL;
+		shadowMapRenderPassInfo.renderPass = renderPass;
+		shadowMapRenderPassInfo.framebuffer = frameBuffer;
+		shadowMapRenderPassInfo.renderArea.offset.x = 0;
+		shadowMapRenderPassInfo.renderArea.offset.y = 0;
+		shadowMapRenderPassInfo.renderArea.extent.width = extent.width;
+		shadowMapRenderPassInfo.renderArea.extent.height = extent.height;
+		shadowMapRenderPassInfo.clearValueCount = 1;
+		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
+
+		vkCmdBeginRenderPass(primaryCommandBuffer, &shadowMapRenderPassInfo, 
+							 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
+		vkCmdExecuteCommands(primaryCommandBuffer, 1, 
+							 &secondaryCommandBuffer);
+		vkCmdEndRenderPass(primaryCommandBuffer);
+	}
+	
 	void CVulkanRenderer::updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 									   ecs::components::health* entityOwnHudHealth, bool isHudExists,
 									   float highestY) {
@@ -3425,29 +3450,8 @@ namespace GLVM::core
 
 
 		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-
-		VkClearValue shadowMapClearValues[1];
-		shadowMapClearValues[0].depthStencil.depth = 1.0f;
-		shadowMapClearValues[0].depthStencil.stencil = 0;
-
-		VkRenderPassBeginInfo shadowMapRenderPassInfo{};
-		shadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		shadowMapRenderPassInfo.pNext = NULL;
-		shadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
-		shadowMapRenderPassInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
-		shadowMapRenderPassInfo.renderArea.offset.x = 0;
-		shadowMapRenderPassInfo.renderArea.offset.y = 0;
-		shadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-		shadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-		shadowMapRenderPassInfo.clearValueCount = 1;
-		shadowMapRenderPassInfo.pClearValues = shadowMapClearValues;
-
-		vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &shadowMapRenderPassInfo, 
-							 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
-		vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
-							 &directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter]);
-		vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
-
+			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
+										   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
 		}		
 
 
@@ -3457,27 +3461,8 @@ namespace GLVM::core
 																							  cm::actor>();
 
 		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-			VkClearValue spotLightShadowMapClearValues[1];
-			spotLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-			spotLightShadowMapClearValues[0].depthStencil.stencil = 0;
-
-			VkRenderPassBeginInfo spotLightShadowMapRenderPassInfo{};
-			spotLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-			spotLightShadowMapRenderPassInfo.pNext = NULL;
-			spotLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
-			spotLightShadowMapRenderPassInfo.framebuffer = spotLightShadowMapFrameBuffers[spotLightCounter];
-			spotLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.width = swapChainExtent.width;
-			spotLightShadowMapRenderPassInfo.renderArea.extent.height = swapChainExtent.height;
-			spotLightShadowMapRenderPassInfo.clearValueCount = 1;
-			spotLightShadowMapRenderPassInfo.pClearValues = spotLightShadowMapClearValues;
-
-			vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &spotLightShadowMapRenderPassInfo, 
-								 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
-			vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
-								 &spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter]);
-			vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
+			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
+										   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
 		}
 		
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -3487,30 +3472,13 @@ namespace GLVM::core
 
 		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
-			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                    
-				VkClearValue pointLightShadowMapClearValues[2];
-				pointLightShadowMapClearValues[0].depthStencil.depth = 1.0f;
-				pointLightShadowMapClearValues[0].depthStencil.stencil = 0;
-				pointLightShadowMapClearValues[1].color = {{0.5f, 0.5f, 0.5f, 1.0f}};
-
-				VkRenderPassBeginInfo pointLightShadowMapRenderPassInfo{};
-				pointLightShadowMapRenderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-				pointLightShadowMapRenderPassInfo.pNext = NULL;
-				pointLightShadowMapRenderPassInfo.renderPass = renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE];
-				pointLightShadowMapRenderPassInfo.framebuffer = pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter];
-				pointLightShadowMapRenderPassInfo.renderArea.offset.x = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.offset.y = 0;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.width = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.renderArea.extent.height = SHADOW_MAP_SIZE;
-				pointLightShadowMapRenderPassInfo.clearValueCount = 2;
-				pointLightShadowMapRenderPassInfo.pClearValues = pointLightShadowMapClearValues;
-
-				vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &pointLightShadowMapRenderPassInfo, 
-									 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
-				vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
-									 &pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
-					pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter]);
-				vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
+				VkExtent2D extent;
+				extent.width  = SHADOW_MAP_SIZE;
+				extent.height = SHADOW_MAP_SIZE;
+				executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE], pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter],
+											   extent, mainRenderCommandBuffers[currentFrame], pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
+																																		  pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter] );
 			}
 		}
 		

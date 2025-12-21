@@ -458,6 +458,8 @@ namespace GLVM::core
         uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
         void createCommandBuffers(VkCommandPool& commandPool, std::vector<VkCommandBuffer>& commandBuffers,
 								  uint32_t commandBuffersNumber, VkCommandBufferLevel commandBufferLevelFlag);
+		void executeSecondaryCommandBuffer( VkRenderPass renderPass, VkFramebuffer frameBuffer, VkExtent2D extent,
+											VkCommandBuffer primaryCommandBuffer, VkCommandBuffer secondaryCommandBuffer );
 		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
 						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
