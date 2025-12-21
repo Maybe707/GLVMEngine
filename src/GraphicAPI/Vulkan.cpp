@@ -739,7 +739,7 @@ namespace GLVM::core
 		createCommandBuffers(secondaryBuffersCommandPools[1], spotLightSecondaryCommandBuffers,
 							 spotLightNumber, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 		createCommandBuffers(secondaryBuffersCommandPools[2], pointLightSecondaryCommandBuffers,
-							 pointLightNumber * 6 * 2, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
+							 pointLightNumber * 6 * 16, VK_COMMAND_BUFFER_LEVEL_SECONDARY);
 		// createSyncObjects(directionalLightShadowMapImageAvailableSemaphores,
 		// 				  directionalLightShadowMapRenderFinishedSemaphores,
 		// 				  directionalLightShadowMapInFlightFences);
@@ -2915,7 +2915,7 @@ namespace GLVM::core
 																						   cm::mesh,
 																						   cm::actor>();
 		
-		vkDebugUtils::CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+//		vkDebugUtils::CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -3385,10 +3385,29 @@ namespace GLVM::core
 
         vkResetFences(device, 1, &inFlightFences[currentFrame]);
         vkResetCommandBuffer(mainRenderCommandBuffers[currentFrame], /*VkCommandBufferResetFlagBits*/ 0);
-		directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, currentFrame);
-		spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
-		pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
+		// directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, currentFrame);
+		// spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
+		// pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
 
+		std::vector<std::thread> threads;
+    
+		threads.emplace_back([&]() {
+			directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, currentFrame);
+		});
+    
+		threads.emplace_back([&]() {
+			spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
+		});
+    
+		threads.emplace_back([&]() {
+			pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
+		});
+    
+		// Ждем завершения всех потоков
+		for (auto& thread : threads) {
+			thread.join();
+		}
+		
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -3426,7 +3445,7 @@ namespace GLVM::core
 		vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &shadowMapRenderPassInfo, 
 							 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 		vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
-							 &pointLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter]);
+							 &directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter]);
 		vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
 
 		}		
@@ -3457,7 +3476,7 @@ namespace GLVM::core
 			vkCmdBeginRenderPass(mainRenderCommandBuffers[currentFrame], &spotLightShadowMapRenderPassInfo, 
 								 VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS);
 			vkCmdExecuteCommands(mainRenderCommandBuffers[currentFrame], 1, 
-								 &pointLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter]);
+								 &spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter]);
 			vkCmdEndRenderPass(mainRenderCommandBuffers[currentFrame]);
 		}
 		
@@ -3466,7 +3485,7 @@ namespace GLVM::core
 																						  cm::mesh,
 																						  cm::actor>();
 
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                    
 				VkClearValue pointLightShadowMapClearValues[2];
@@ -3644,7 +3663,8 @@ namespace GLVM::core
 			
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT |
+				VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 			beginInfo.pInheritanceInfo = &inheritanceInfo;
 
 			VkCommandBuffer commandBuffer = commandBuffers[currentFrame * directionalLightNumber + directionalLightCounter];
@@ -3748,7 +3768,8 @@ namespace GLVM::core
 			
 			VkCommandBufferBeginInfo beginInfo{};
 			beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+			beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT |
+				VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 			beginInfo.pInheritanceInfo = &inheritanceInfo;
 
 			VkCommandBuffer commandBuffer = commandBuffers[currentFrame * spotLightNumber + spotLightCounter];
@@ -3865,16 +3886,16 @@ namespace GLVM::core
 			componentManager->isComponentsCollectionChanged = false;
 		}
 
-		VkDebugUtilsLabelEXT label;
-		label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
-		label.color[0] = 0.1;
-		label.color[0] = 0.7;
-		label.color[0] = 0.2;
-		label.color[0] = 1.0;
-		label.pLabelName = "pointLightShadowMap";
-		label.pNext = NULL;
+		// VkDebugUtilsLabelEXT label;
+		// label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
+		// label.color[0] = 0.1;
+		// label.color[0] = 0.7;
+		// label.color[0] = 0.2;
+		// label.color[0] = 1.0;
+		// label.pLabelName = "pointLightShadowMap";
+		// label.pNext = NULL;
 		
-		vkDebugUtils::CreateBeginDebugUtilsLabelEXT(instance, commandBuffers[0], &label);
+		// vkDebugUtils::CreateBeginDebugUtilsLabelEXT(instance, commandBuffers[0], &label);
 		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
@@ -3886,7 +3907,8 @@ namespace GLVM::core
 				
 				VkCommandBufferBeginInfo beginInfo{};
 				beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-				beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT;
+				beginInfo.flags = VK_COMMAND_BUFFER_USAGE_RENDER_PASS_CONTINUE_BIT |
+					VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
 				beginInfo.pInheritanceInfo = &inheritanceInfo;
 
 				VkCommandBuffer commandBuffer = commandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
