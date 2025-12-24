@@ -136,7 +136,7 @@ int main()
 	std::mt19937 mersenne(rd());
     std::uniform_int_distribution<int> dist(0, 3);
 	
-	for ( u32 i = 0; i < 13; ++i ) {
+	for ( u32 i = 0; i < 100; ++i ) {
 	Entity uiWitch = EntityManager->CreateEntity();
 	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
 	unsigned int random = dist(mersenne);
