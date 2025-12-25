@@ -164,6 +164,8 @@ namespace GLVM::core
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;
 
+		unsigned int entities[32]; ///< 
+
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
 		float prev_Y = 0.0f;
@@ -449,7 +451,6 @@ namespace GLVM::core
 										core::vector<VK_Image>& textureImages, const unsigned int imageViewIndex,
 										VkDescriptorImageInfo descriptorImageInfos[]);
 		VkDescriptorBufferInfo createDescriptorBufferInfo( VkBuffer ubo, u32 offset, u32 range );
-		void updateDescriptorSets( std::vector<VkDescriptorSet>& descriptorSets, const Pipeline& pipeline, DescriptorsTypes descriptorType );
         void createMainRenderDescriptorSets();
         void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
         VkCommandBuffer beginSingleTimeCommands(VkCommandPool& commandPool);

@@ -2110,19 +2110,6 @@ namespace GLVM::core
 		}
 	}
 	
-	void CVulkanRenderer::updateDescriptorSets( [[maybe_unused]] std::vector<VkDescriptorSet>& descriptorSets, [[maybe_unused]] const Pipeline& pipeline,
-												[[maybe_unused]] DescriptorsTypes descriptorType) {
-	}
-
-	VkDescriptorBufferInfo CVulkanRenderer::createDescriptorBufferInfo( VkBuffer ubo, u32 offset, u32 range ) {
-		VkDescriptorBufferInfo uboInfo{};
-		uboInfo.buffer = ubo;
-		uboInfo.offset = offset;
-		uboInfo.range = range;
-
-		return uboInfo;
-	}
-	
     void CVulkanRenderer::createMainRenderDescriptorSets() {
 		for( unsigned int pipelineCounter = 0; pipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++pipelineCounter ) {
 			for( unsigned int descriptorSetCounter = 0; descriptorSetCounter < pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++descriptorSetCounter ) {

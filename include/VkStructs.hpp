@@ -73,29 +73,6 @@ namespace GLVM::core
 		}
 	};
 	
-	enum class DescriptorsTypes {
-		/// UBO - uniform buffer object
-		DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		SPOT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		POINT_LIGHT_SHADOW_MAP_MATRIX_UBO,
-		HUD_UBO,
-		FONT_UBO,
-		FONT_ATLAS_SAMPLER,
-		HUD_SCREEN_UBO,
-		UI_UBO,
-		UI_SAMPLER,
-		UI_ICONS_UBO,
-		UI_ICONS_SAMPLER,
-		VIRTUAL_TEXTURES_UBO,
-		VIRTUAL_TEXTURE_TILESET,
-		MODEL_MATRIX_UBO,
-
-		LIGHT_DATA,
-		SPECULAR_SAMPLER,
-		DIFFUSE_SAMPLER,
-		TEXTURES_SAMPLER
-	};
-
 	enum DescriptorSetDataLink {
 		SHADOW_MAP_DIRECTIONAL_LIGHT,
 		SHADOW_MAP_SPOT_LIGHT,
@@ -164,7 +141,6 @@ namespace GLVM::core
 	
 	struct DescriptorBinding {                 ///< Meta data for descriptor bindings
 		VkDescriptorType       vkType;
-		DescriptorsTypes       type;
 		VkShaderStageFlags     shaderStageFlag;
 		unsigned int           binding;
 		unsigned int           shaderDescriptorsNumber;
