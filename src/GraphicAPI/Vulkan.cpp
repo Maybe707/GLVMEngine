@@ -2917,12 +2917,12 @@ namespace GLVM::core
 	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        // VkCommandBufferBeginInfo beginInfo{};
+        // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -3074,17 +3074,18 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
-																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
+																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = jointMatrices[actor];
 
-		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		// }
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		}
 
 		// delete [] jointMatricesData;
 		// jointMatricesData = nullptr;
@@ -3114,17 +3115,19 @@ namespace GLVM::core
 		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
 	}
 	
-    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent, [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID) {
+    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
+															[[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 		
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = jointMatrices[actor];
 		
-		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		// }
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		}
 
 		// delete [] jointMatricesData;
 		// jointMatricesData = nullptr;
@@ -3137,7 +3140,7 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID, unsigned int actor) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		vec3 positionVectorLight  = pointLightComponent->position;
@@ -3193,11 +3196,12 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 		modelMatrixUBO.lightPosition = positionVectorLight;
 
-		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = jointMatrices[actor];
 		
-		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		// }
+		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		}
 		
 		// delete [] jointMatricesData;
 		// jointMatricesData = nullptr;
@@ -3411,70 +3415,70 @@ namespace GLVM::core
 		// spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
 		// pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
 
-		// auto future1 = renderThreadPool->enqueue([this]() {
-		// 	directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, this->currentFrame);
-		// });
+		auto future1 = renderThreadPool->enqueue([this]() {
+			directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, this->currentFrame);
+		});
     
-		// auto future2 = renderThreadPool->enqueue([this]() {
-		// 	spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, this->currentFrame);
-		// });
+		auto future2 = renderThreadPool->enqueue([this]() {
+			spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, this->currentFrame);
+		});
     
-		// auto future3 = renderThreadPool->enqueue([this]() {
-		// 	pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, this->currentFrame);
-		// });
+		auto future3 = renderThreadPool->enqueue([this]() {
+			pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, this->currentFrame);
+		});
     
-		// future1.wait();
-		// future2.wait();
-		// future3.wait();
+		future1.wait();
+		future2.wait();
+		future3.wait();
 		
-        // VkCommandBufferBeginInfo beginInfo{};
-        // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        // if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to begin recording command buffer!");
-        // }
+        if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
 		
-		// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		// namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
 
-		// core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-		// 																							 cm::directionalLight,
-		// 																							 cm::mesh,
-		// 																							 cm::actor>();
-
-
-		// for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-		// 	executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
-		// 								   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
-		// }		
+		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									 cm::directionalLight,
+																									 cm::mesh,
+																									 cm::actor>();
 
 
-		// core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-		// 																					  cm::spotLight,
-		// 																					  cm::mesh,
-		// 																					  cm::actor>();
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
+										   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
+		}		
 
-		// for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-		// 	executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
-		// 								   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
-		// }
+
+		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::spotLight,
+																							  cm::mesh,
+																							  cm::actor>();
+
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
+										   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
+		}
 		
-		// core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-		// 																				  cm::pointLight,
-		// 																				  cm::mesh,
-		// 																				  cm::actor>();
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh,
+																						  cm::actor>();
 
-		// for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
-		// 	uint32_t maxCubeMapLayers = 6;
-		// 	for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
-		// 		VkExtent2D extent;
-		// 		extent.width  = SHADOW_MAP_SIZE;
-		// 		extent.height = SHADOW_MAP_SIZE;
-		// 		executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE], pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter],
-		// 									   extent, mainRenderCommandBuffers[currentFrame], pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
-		// 																																  pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter] );
-		// 	}
-		// }
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+			uint32_t maxCubeMapLayers = 6;
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
+				VkExtent2D extent;
+				extent.width  = SHADOW_MAP_SIZE;
+				extent.height = SHADOW_MAP_SIZE;
+				executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE], pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter],
+											   extent, mainRenderCommandBuffers[currentFrame], pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
+																																		  pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter] );
+			}
+		}
 		
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
@@ -3683,7 +3687,7 @@ namespace GLVM::core
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * directionalLightCurrentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId);
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId, actorCounter);
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].pipelineLayout, 0, 1,
@@ -3787,7 +3791,7 @@ namespace GLVM::core
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * spotLightCurrentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID);
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID, actorsCounter);
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].pipelineLayout, 0, 1,
@@ -3931,7 +3935,7 @@ namespace GLVM::core
 						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
 						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
 
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID);
+					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID, actorCounter);
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].pipelineLayout, 0, 1,

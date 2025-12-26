@@ -43,7 +43,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 		
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].actualLinkedDescriptorBindingsNumber       = 1;
-		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].hostDescriptorNumber                       = 1024;
+		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].hostDescriptorNumber                       = 2048;
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].isTexture                                  = false;
 
 		descriptorBindingsConfig[2].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
