@@ -3081,8 +3081,9 @@ namespace GLVM::core
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
 //		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-		mat4* jointMatricesData = jointMatrices[actor];
+//		mat4* jointMatricesData = jointMatrices[actor];
 
+		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
@@ -3123,8 +3124,9 @@ namespace GLVM::core
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
 //		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-		mat4* jointMatricesData = jointMatrices[actor];
-		
+//		mat4* jointMatricesData = jointMatrices[actor];
+
+		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
@@ -3197,8 +3199,9 @@ namespace GLVM::core
 		modelMatrixUBO.lightPosition = positionVectorLight;
 
 //		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-		mat4* jointMatricesData = jointMatrices[actor];
-		
+//		mat4* jointMatricesData = jointMatrices[actor];
+
+		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
@@ -3225,14 +3228,15 @@ namespace GLVM::core
 
 		/// Start of animation logic
 //		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-		mat4* jointMatricesData = jointMatrices[actor];
+//		mat4* jointMatricesData = jointMatrices[actor];
 
+		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
 		
-		delete [] jointMatricesData;
-		jointMatricesData = nullptr;
+		// delete [] jointMatricesData;
+		// jointMatricesData = nullptr;
 		/// End of animation logic
 
 		modelMatrixUBO.ambient = materialComponent->ambient;

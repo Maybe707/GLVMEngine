@@ -273,7 +273,7 @@ namespace GLVM::core
 		delete vulkanRenderer;
 	}
 
-	[[nodiscard]] mat4* Engine::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
+	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
 		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 &&
 			 _transformComponent->frameAccumulator >= vulkanRenderer->frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
 			++_transformComponent->currentAnimationFrame;
@@ -287,27 +287,27 @@ namespace GLVM::core
 		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 )
 			joinMatricesDataSize = vulkanRenderer->jointMatricesPerMesh[meshID].GetSize();
 
-		mat4* jointMatricesData = nullptr;
+		core::vector<mat4> jointMatrices;
 		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
 				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
+				jointMatrices[i] = unitMatrix;
 			}
 				
 		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatricesData[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+				jointMatrices[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
 			}
 
 			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
 				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
+				jointMatrices[j] = unitMatrix;
 			}
 		}
 
-		return jointMatricesData;
+		return jointMatrices;
 	}
 
 	void Engine::setFrameData() {
