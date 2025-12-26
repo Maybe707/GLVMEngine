@@ -3077,12 +3077,11 @@ namespace GLVM::core
 																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-		modelMatrixUBO.model = modelMatrices[actor];		
+		modelMatrixUBO.model = actors[actor].modelMatrix;		
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 
         void* modelMatrixData = nullptr;
@@ -3114,12 +3113,11 @@ namespace GLVM::core
 															[[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 		
-		modelMatrixUBO.model = modelMatrices[actor];		
+		modelMatrixUBO.model = actors[actor].modelMatrix;		
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 
         void* modelMatrixData;
@@ -3179,7 +3177,7 @@ namespace GLVM::core
 										  directionalVectorLight,
 										  upVector);
 
-		modelMatrixUBO.model = modelMatrices[actor];
+		modelMatrixUBO.model = actors[actor].modelMatrix;
 		
 //		projectionMatrixCubeShadowMap[1][1] *= -1;
 		
@@ -3187,9 +3185,8 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 		modelMatrixUBO.lightPosition = positionVectorLight;
 
-		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
         void* modelMatrixData;
@@ -3204,15 +3201,14 @@ namespace GLVM::core
 													[[maybe_unused]] unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor) {
         ModelMatrixUBO modelMatrixUBO{};
 		
-		modelMatrixUBO.model = modelMatrices[actor];		
+		modelMatrixUBO.model = actors[actor].modelMatrix;		
 		
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		/// End of animation logic
 

@@ -317,18 +317,14 @@ namespace GLVM::core
 																						   cm::material,
 																						   cm::mesh,
 																						   cm::actor>();
-		vulkanRenderer->jointMatrices.clear();
-		vulkanRenderer->modelMatrices.clear();
-//		vulkanRenderer->jointMatrices.Resize(linkedEntities.GetSize());
+		vulkanRenderer->actors.clear();
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
-			vulkanRenderer->jointMatrices.Push({});
-			vulkanRenderer->modelMatrices.Push({});
+			vulkanRenderer->actors.Push({});
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-
-			vulkanRenderer->jointMatrices[i] = updateAnimationFrames(transformComponent, uiVertexId);
-			vulkanRenderer->modelMatrices[i] = computeModelMatrix(transformComponent);
+			vulkanRenderer->actors[i].modelMatrix   = computeModelMatrix(transformComponent);
+			vulkanRenderer->actors[i].jointMatrices = updateAnimationFrames(transformComponent, uiVertexId);
 		}
 	}
 

@@ -230,6 +230,11 @@ namespace GLVM::core
             return attributeDescriptions;
         }
     };
-} 
+}
+
+struct RenderActor {
+	mat4 modelMatrix;
+	GLVM::core::vector<mat4> jointMatrices;
+};
 
 #endif

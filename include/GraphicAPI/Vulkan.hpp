@@ -165,8 +165,7 @@ namespace GLVM::core
 		float hud_screen_y;
 
 		unsigned int entities[32]; ///<
-		core::vector<core::vector<mat4>> jointMatrices;
-		core::vector<mat4> modelMatrices;
+		core::vector<RenderActor> actors;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
