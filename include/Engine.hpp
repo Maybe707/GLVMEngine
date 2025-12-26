@@ -98,6 +98,7 @@ namespace GLVM::core
 		void RenderVulkan();
 		[[nodiscard]] core::vector<mat4> updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		void setFrameData();
+		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);
 		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,

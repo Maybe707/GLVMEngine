@@ -3077,20 +3077,14 @@ namespace GLVM::core
 																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
-        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
+		modelMatrixUBO.model = modelMatrices[actor];		
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
-
-//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-//		mat4* jointMatricesData = jointMatrices[actor];
 
 		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
 
-		// delete [] jointMatricesData;
-		// jointMatricesData = nullptr;
-		
         void* modelMatrixData = nullptr;
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
@@ -3120,20 +3114,14 @@ namespace GLVM::core
 															[[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 		
-        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
+		modelMatrixUBO.model = modelMatrices[actor];		
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
-
-//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-//		mat4* jointMatricesData = jointMatrices[actor];
 
 		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
 
-		// delete [] jointMatricesData;
-		// jointMatricesData = nullptr;
-		
         void* modelMatrixData;
 		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
@@ -3142,7 +3130,8 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID, unsigned int actor) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
+															 ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID, unsigned int actor) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		vec3 positionVectorLight  = pointLightComponent->position;
@@ -3190,7 +3179,7 @@ namespace GLVM::core
 										  directionalVectorLight,
 										  upVector);
 
-        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
+		modelMatrixUBO.model = modelMatrices[actor];
 		
 //		projectionMatrixCubeShadowMap[1][1] *= -1;
 		
@@ -3198,16 +3187,10 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 		modelMatrixUBO.lightPosition = positionVectorLight;
 
-//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-//		mat4* jointMatricesData = jointMatrices[actor];
-
 		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
-		
-		// delete [] jointMatricesData;
-		// jointMatricesData = nullptr;
 		
         void* modelMatrixData;
 		unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];		
@@ -3217,26 +3200,20 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, [[maybe_unused]] ecs::components::transform* _transformComponent,
 													[[maybe_unused]] unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor) {
         ModelMatrixUBO modelMatrixUBO{};
 		
-        modelMatrixUBO.model = computeModelMatrix(_transformComponent);
+		modelMatrixUBO.model = modelMatrices[actor];		
 		
         modelMatrixUBO.view = viewMatrix;
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
-//		mat4* jointMatricesData = jointMatrices[actor];
-
 		core::vector<mat4> jointMatricesData = jointMatrices[actor];
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
 		}
-		
-		// delete [] jointMatricesData;
-		// jointMatricesData = nullptr;
 		/// End of animation logic
 
 		modelMatrixUBO.ambient = materialComponent->ambient;
@@ -4213,51 +4190,5 @@ namespace GLVM::core
 
         return VK_FALSE;
     }
-
-	mat4 CVulkanRenderer::computeModelMatrix(ecs::components::transform* _transformComponent) {
-		mat4 rotationMatrix(1.0f);
-        mat4 scalingMatrix(1.0f);
-        mat4 translationMatrix(1.0f);
-		
-		scalingMatrix[0][0] = _transformComponent->scale;
-		scalingMatrix[1][1] = _transformComponent->scale;
-		scalingMatrix[2][2] = _transformComponent->scale;
-
-		translationMatrix[3][0] = _transformComponent->position[0];
-		translationMatrix[3][1] = _transformComponent->position[1];
-		translationMatrix[3][2] = _transformComponent->position[2];
-		translationMatrix[3][3] = 1.0f;
-
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians((_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians((_transformComponent->yaw)  / 2));
-		
-		Quaternion pitchQuat;
-		Quaternion yawQuat;
-		pitchQuat.w = cosPitch;
-		pitchQuat.x = sinPitch;
-		pitchQuat.y = 0.0f;
-		pitchQuat.z = 0.0f;
-
-		yawQuat.w = cosYaw;
-		yawQuat.x = 0.0f;
-		yawQuat.y = sinYaw;
-		yawQuat.z = 0.0f;
-
-//		Quaternion result;
-		// result = multiplyQuaternion(pitchQuat, yawQuat);
-
-
-		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
-		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
-		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
-		// // rotationMatrix = rotateQuaternion<float, 4>(result);
-		// for ( unsigned int i = 0; i < 4; ++i )
-		// 	for ( unsigned int j = 0; j < 4; ++j )
-		// 		rotationMatrix[i][j] = rotationMat[i][j];
-		
-        return scalingMatrix * translationMatrix;
-	}
 }
 

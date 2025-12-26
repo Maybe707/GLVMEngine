@@ -166,6 +166,7 @@ namespace GLVM::core
 
 		unsigned int entities[32]; ///<
 		core::vector<core::vector<mat4>> jointMatrices;
+		core::vector<mat4> modelMatrices;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;

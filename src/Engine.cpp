@@ -318,15 +318,64 @@ namespace GLVM::core
 																						   cm::mesh,
 																						   cm::actor>();
 		vulkanRenderer->jointMatrices.clear();
+		vulkanRenderer->modelMatrices.clear();
 //		vulkanRenderer->jointMatrices.Resize(linkedEntities.GetSize());
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
 			unsigned int uiEntity = linkedEntities[i];
 			vulkanRenderer->jointMatrices.Push({});
+			vulkanRenderer->modelMatrices.Push({});
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 
 			vulkanRenderer->jointMatrices[i] = updateAnimationFrames(transformComponent, uiVertexId);
+			vulkanRenderer->modelMatrices[i] = computeModelMatrix(transformComponent);
 		}
+	}
+
+	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent) {
+		mat4 rotationMatrix(1.0f);
+        mat4 scalingMatrix(1.0f);
+        mat4 translationMatrix(1.0f);
+		
+		scalingMatrix[0][0] = _transformComponent->scale;
+		scalingMatrix[1][1] = _transformComponent->scale;
+		scalingMatrix[2][2] = _transformComponent->scale;
+
+		translationMatrix[3][0] = _transformComponent->position[0];
+		translationMatrix[3][1] = _transformComponent->position[1];
+		translationMatrix[3][2] = _transformComponent->position[2];
+		translationMatrix[3][3] = 1.0f;
+
+		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
+		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
+		float sinYaw = std::sin(Radians((_transformComponent->yaw)  / 2));
+		float cosYaw = std::cos(Radians((_transformComponent->yaw)  / 2));
+		
+		Quaternion pitchQuat;
+		Quaternion yawQuat;
+		pitchQuat.w = cosPitch;
+		pitchQuat.x = sinPitch;
+		pitchQuat.y = 0.0f;
+		pitchQuat.z = 0.0f;
+
+		yawQuat.w = cosYaw;
+		yawQuat.x = 0.0f;
+		yawQuat.y = sinYaw;
+		yawQuat.z = 0.0f;
+
+//		Quaternion result;
+		// result = multiplyQuaternion(pitchQuat, yawQuat);
+
+
+		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
+		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
+		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
+		// // rotationMatrix = rotateQuaternion<float, 4>(result);
+		// for ( unsigned int i = 0; i < 4; ++i )
+		// 	for ( unsigned int j = 0; j < 4; ++j )
+		// 		rotationMatrix[i][j] = rotationMat[i][j];
+		
+        return scalingMatrix * translationMatrix;
 	}
 	
 	void Engine::computeHudScreeenCoordinates() {
