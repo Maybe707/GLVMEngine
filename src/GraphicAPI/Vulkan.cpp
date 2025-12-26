@@ -2973,12 +2973,6 @@ namespace GLVM::core
 			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			if( linkedEntities.GetSize() != jointMatrices.GetSize() ) {
-				std::cout << "PLOHOE GOVNO!" << std::endl;
-				std::cout << "entities number: " << linkedEntities.GetSize() << std::endl;
-				std::cout << "join matrices number: " << jointMatrices.GetSize() << std::endl;
-			}
-			
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -3073,8 +3067,7 @@ namespace GLVM::core
 		dirLightSpaceMatrix[currentLight] = viewMatrixLight * directionalProjectionMatrixLight;
 	}
 	
-    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
-																   [[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
+    void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
 		modelMatrixUBO.model = actors[actor].modelMatrix;		
@@ -3109,8 +3102,7 @@ namespace GLVM::core
 		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
 	}
 	
-    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
-															[[maybe_unused]] uint32_t currentLight, [[maybe_unused]] u32 meshID, unsigned int actor) {
+    void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 		
 		modelMatrixUBO.model = actors[actor].modelMatrix;		
@@ -3592,11 +3584,6 @@ namespace GLVM::core
 																									 cm::mesh,
 																									 cm::actor>();
 
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::actor>();
-
 		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
 			VkCommandBufferInheritanceInfo inheritanceInfo{};
 			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
@@ -3655,16 +3642,15 @@ namespace GLVM::core
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
 			updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent, directionalLightCounter);
 
-			uint32_t actorsNumber = linkedEntities.GetSize();
+			uint32_t actorsNumber = actors.GetSize();
 			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
-				unsigned int meshOwnerEntity = linkedEntities[actorCounter];
-				unsigned int meshId = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+				RenderActor actor = actors[actorCounter];
+				unsigned int meshId = actor.meshID;
 
 				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * directionalLightCurrentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
-				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, meshOwnerTransformComponent, directionalLightCounter, meshId, actorCounter);
+				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, directionalLightCounter, actorCounter);
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].pipelineLayout, 0, 1,
@@ -3689,14 +3675,7 @@ namespace GLVM::core
 
 		void CVulkanRenderer::spotLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::actor>();
-
-		
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																							  cm::spotLight,
 																							  cm::mesh,
@@ -3760,15 +3739,14 @@ namespace GLVM::core
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
 			updateSpotLightSpaceMatrixShadowMapUBO(spotLightComponent, spotLightCounter);
 
-			uint32_t actorsNumber = linkedEntities.GetSize();
+			uint32_t actorsNumber = actors.GetSize();
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
-				unsigned int meshOwnerEntity = linkedEntities[actorsCounter];
-				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-				cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+				RenderActor actor = actors[actorsCounter];
+				unsigned int meshID = actor.meshID;
 				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * spotLightCurrentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
-				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, meshOwnerTransformComponent, spotLightCounter, meshID, actorsCounter);
+				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, spotLightCounter, actorsCounter);
 				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].pipelineLayout, 0, 1,

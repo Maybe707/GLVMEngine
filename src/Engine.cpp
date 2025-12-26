@@ -322,9 +322,10 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			vulkanRenderer->actors.Push({});
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+			unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			vulkanRenderer->actors[i].modelMatrix   = computeModelMatrix(transformComponent);
-			vulkanRenderer->actors[i].jointMatrices = updateAnimationFrames(transformComponent, uiVertexId);
+			vulkanRenderer->actors[i].jointMatrices = updateAnimationFrames(transformComponent, meshID);
+			vulkanRenderer->actors[i].meshID        = meshID;
 		}
 	}
 
