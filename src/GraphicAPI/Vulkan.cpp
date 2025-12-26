@@ -2917,12 +2917,12 @@ namespace GLVM::core
 	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-        // VkCommandBufferBeginInfo beginInfo{};
-        // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to begin recording command buffer!");
-        // }
+        if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
 
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -2973,6 +2973,12 @@ namespace GLVM::core
 			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
 		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			if( linkedEntities.GetSize() != jointMatrices.GetSize() ) {
+				std::cout << "PLOHOE GOVNO!" << std::endl;
+				std::cout << "entities number: " << linkedEntities.GetSize() << std::endl;
+				std::cout << "join matrices number: " << jointMatrices.GetSize() << std::endl;
+			}
+			
 			unsigned int uiEntity = linkedEntities[i];
 			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
@@ -2981,7 +2987,7 @@ namespace GLVM::core
 			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
 				
 			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
-			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent);
+			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent, i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
@@ -3074,14 +3080,14 @@ namespace GLVM::core
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		}
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		// }
 
-		delete [] jointMatricesData;
-		jointMatricesData = nullptr;
+		// delete [] jointMatricesData;
+		// jointMatricesData = nullptr;
 		
         void* modelMatrixData = nullptr;
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
@@ -3114,14 +3120,14 @@ namespace GLVM::core
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 		
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		}
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		// }
 
-		delete [] jointMatricesData;
-		jointMatricesData = nullptr;
+		// delete [] jointMatricesData;
+		// jointMatricesData = nullptr;
 		
         void* modelMatrixData;
 		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
@@ -3131,7 +3137,7 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		vec3 positionVectorLight  = pointLightComponent->position;
@@ -3187,14 +3193,14 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 		modelMatrixUBO.lightPosition = positionVectorLight;
 
-		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		// mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
 		
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
-		}
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
+		// }
 		
-		delete [] jointMatricesData;
-		jointMatricesData = nullptr;
+		// delete [] jointMatricesData;
+		// jointMatricesData = nullptr;
 		
         void* modelMatrixData;
 		unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];		
@@ -3205,7 +3211,7 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
-													unsigned int meshID, ecs::components::material* materialComponent) {
+													[[maybe_unused]] unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor) {
         ModelMatrixUBO modelMatrixUBO{};
 		
         modelMatrixUBO.model = computeModelMatrix(_transformComponent);
@@ -3214,7 +3220,8 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+//		mat4* jointMatricesData = updateAnimationFrames(_transformComponent, meshID);
+		mat4* jointMatricesData = jointMatrices[actor];
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = jointMatricesData[j];
@@ -3404,70 +3411,70 @@ namespace GLVM::core
 		// spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, currentFrame);
 		// pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, currentFrame);
 
-		auto future1 = renderThreadPool->enqueue([this]() {
-			directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, this->currentFrame);
-		});
+		// auto future1 = renderThreadPool->enqueue([this]() {
+		// 	directionalLightRecordCoomandBuffer(directionalLightSecondaryCommandBuffers, this->currentFrame);
+		// });
     
-		auto future2 = renderThreadPool->enqueue([this]() {
-			spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, this->currentFrame);
-		});
+		// auto future2 = renderThreadPool->enqueue([this]() {
+		// 	spotLightRecordCommandBuffer(spotLightSecondaryCommandBuffers, this->currentFrame);
+		// });
     
-		auto future3 = renderThreadPool->enqueue([this]() {
-			pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, this->currentFrame);
-		});
+		// auto future3 = renderThreadPool->enqueue([this]() {
+		// 	pointLightRecordCommandBuffer(pointLightSecondaryCommandBuffers, this->currentFrame);
+		// });
     
-		future1.wait();
-		future2.wait();
-		future3.wait();
+		// future1.wait();
+		// future2.wait();
+		// future3.wait();
 		
-        VkCommandBufferBeginInfo beginInfo{};
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        // VkCommandBufferBeginInfo beginInfo{};
+        // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
-            throw std::runtime_error("failed to begin recording command buffer!");
-        }
+        // if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
 		
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
+		// ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		// namespace cm = GLVM::ecs::components;
 
-		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									 cm::directionalLight,
-																									 cm::mesh,
-																									 cm::actor>();
-
-
-		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
-										   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
-		}		
+		// core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+		// 																							 cm::directionalLight,
+		// 																							 cm::mesh,
+		// 																							 cm::actor>();
 
 
-		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::spotLight,
-																							  cm::mesh,
-																							  cm::actor>();
+		// for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+		// 	executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
+		// 								   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
+		// }		
 
-		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
-										   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
-		}
+
+		// core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+		// 																					  cm::spotLight,
+		// 																					  cm::mesh,
+		// 																					  cm::actor>();
+
+		// for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+		// 	executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
+		// 								   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
+		// }
 		
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																						  cm::pointLight,
-																						  cm::mesh,
-																						  cm::actor>();
+		// core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+		// 																				  cm::pointLight,
+		// 																				  cm::mesh,
+		// 																				  cm::actor>();
 
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
-			uint32_t maxCubeMapLayers = 6;
-			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
-				VkExtent2D extent;
-				extent.width  = SHADOW_MAP_SIZE;
-				extent.height = SHADOW_MAP_SIZE;
-				executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE], pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter],
-											   extent, mainRenderCommandBuffers[currentFrame], pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
-																																		  pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter] );
-			}
-		}
+		// for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+		// 	uint32_t maxCubeMapLayers = 6;
+		// 	for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
+		// 		VkExtent2D extent;
+		// 		extent.width  = SHADOW_MAP_SIZE;
+		// 		extent.height = SHADOW_MAP_SIZE;
+		// 		executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE], pointLightShadowMapFrameBuffers[pointLightCounter][cubeMapLayerCounter],
+		// 									   extent, mainRenderCommandBuffers[currentFrame], pointLightSecondaryCommandBuffers[currentFrame * pointLightNumber * maxCubeMapLayers +
+		// 																																  pointLightCounter * maxCubeMapLayers + cubeMapLayerCounter] );
+		// 	}
+		// }
 		
         recordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		hudRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
@@ -4198,43 +4205,6 @@ namespace GLVM::core
 
         return VK_FALSE;
     }
-
-	[[nodiscard]] mat4* CVulkanRenderer::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
-		if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
-			}
-		}
-
-		unsigned int joinMatricesDataSize{};
-		if ( jointMatricesPerMesh.GetSize() > 0 )
-			joinMatricesDataSize = jointMatricesPerMesh[meshID].GetSize();
-
-		mat4* jointMatricesData = nullptr;
-		if ( joinMatricesDataSize == 0 ) {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[i] = unitMatrix;
-			}
-				
-		} else {
-			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
-			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatricesData[i] = jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
-			}
-
-			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
-				mat4 unitMatrix(1.0f);
-				jointMatricesData[j] = unitMatrix;
-			}
-		}
-
-		return jointMatricesData;
-	}
 
 	mat4 CVulkanRenderer::computeModelMatrix(ecs::components::transform* _transformComponent) {
 		mat4 rotationMatrix(1.0f);

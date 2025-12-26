@@ -164,7 +164,8 @@ namespace GLVM::core
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;
 
-		unsigned int entities[32]; ///< 
+		unsigned int entities[32]; ///<
+		core::vector<mat4*> jointMatrices;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -486,7 +487,7 @@ namespace GLVM::core
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, uint32_t currentLight, u32 meshID);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int meshID);
         void updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
-									   unsigned int meshID, ecs::components::material* materialComponent);
+									   unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
         void mainRenderDrawFrame();
 		void directionalLightShadowMapDrawFrame();
@@ -509,7 +510,6 @@ namespace GLVM::core
 		VkDescriptorImageInfo createDescriptorImageInfo( const VK_Image& textureImage, VkImageLayout layout, unsigned int textureIndex, VkSampler textureSampler );
         static std::vector<char> readFile(const std::string& filename);
         static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
-		[[nodiscard]] mat4* updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void clearVK_Image( VK_Image* textureImages );
     };

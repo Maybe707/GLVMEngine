@@ -96,6 +96,8 @@ namespace GLVM::core
 		void GameLoop();
 		void EventQueueFlush();
 		void RenderVulkan();
+		[[nodiscard]] mat4* updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
+		void setFrameData();
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);
 		ecs::TextureHandle LoadTextureFromAddress(unsigned int iWidth, unsigned int iHeight,

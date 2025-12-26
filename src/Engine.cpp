@@ -10,6 +10,7 @@
 #include "GraphicAPI/Vulkan.hpp"
 #include "ISoundEngine.hpp"
 #include "ProceduralLevelGeneratingSystem.hpp"
+#include "ShaderStructs.hpp"
 #include "SoundEngineFactory.hpp"
 #include "SystemManager.hpp"
 #include "Systems/CollisionSystem.hpp"
@@ -263,6 +264,7 @@ namespace GLVM::core
 			vulkanRenderer->hud_screen_x              = hud_screen_x;
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
+			setFrameData();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
 		}
@@ -271,6 +273,62 @@ namespace GLVM::core
 		delete vulkanRenderer;
 	}
 
+	[[nodiscard]] mat4* Engine::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
+		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 &&
+			 _transformComponent->frameAccumulator >= vulkanRenderer->frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
+			++_transformComponent->currentAnimationFrame;
+			if ( vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == vulkanRenderer->frames[meshID].GetSize() ) {
+				_transformComponent->currentAnimationFrame = 0;
+				_transformComponent->frameAccumulator = 0.0f;
+			}
+		}
+
+		unsigned int joinMatricesDataSize{};
+		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 )
+			joinMatricesDataSize = vulkanRenderer->jointMatricesPerMesh[meshID].GetSize();
+
+		mat4* jointMatricesData = nullptr;
+		if ( joinMatricesDataSize == 0 ) {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[i] = unitMatrix;
+			}
+				
+		} else {
+			jointMatricesData = new mat4[MAX_JOINTS_NUMBER];
+			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+				jointMatricesData[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+			}
+
+			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
+				mat4 unitMatrix(1.0f);
+				jointMatricesData[j] = unitMatrix;
+			}
+		}
+
+		return jointMatricesData;
+	}
+
+	void Engine::setFrameData() {
+		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::material,
+																						   cm::mesh,
+																						   cm::actor>();
+		vulkanRenderer->jointMatrices.clear();
+//		vulkanRenderer->jointMatrices.Resize(linkedEntities.GetSize());
+		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = linkedEntities[i];
+			vulkanRenderer->jointMatrices.Push({});
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+
+			vulkanRenderer->jointMatrices[i] = updateAnimationFrames(transformComponent, uiVertexId);
+		}
+	}
+	
 	void Engine::computeHudScreeenCoordinates() {
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
