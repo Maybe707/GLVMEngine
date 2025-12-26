@@ -2925,11 +2925,6 @@ namespace GLVM::core
         // }
 
 		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::actor>();
-		
 //		vkDebugUtils::CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -2972,16 +2967,14 @@ namespace GLVM::core
 		if ( viewPositionLinkedEntities.GetSize() > 0 )
 			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
+		for ( unsigned int i = 0; i < actors.GetSize(); ++i ) {
+			RenderActor actor = actors[i];
+			unsigned int uiVertexId = actor.meshID;
+			unsigned int diffuseTextureIndex = actor.diffuseTextureIndex;
+			unsigned int specularTextureIndex = actor.specularTextureIndex;
 				
 			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
-			updateMatrixUniformBuffer(uboIndex, transformComponent, uiVertexId, materialComponent, i);
+			updateMatrixUniformBuffer(uboIndex, i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
@@ -3120,8 +3113,7 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, [[maybe_unused]] ecs::components::transform* _transformComponent,
-															 ecs::components::pointLight* pointLightComponent, uint32_t layer, [[maybe_unused]] unsigned int meshID, unsigned int actor) {
+    void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int actor) {
 		PointLightShadowMapMatrixUBO modelMatrixUBO{};
 
 		vec3 positionVectorLight  = pointLightComponent->position;
@@ -3189,8 +3181,7 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, [[maybe_unused]] ecs::components::transform* _transformComponent,
-													[[maybe_unused]] unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor) {
+    void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, unsigned int actor) {
         ModelMatrixUBO modelMatrixUBO{};
 		
 		modelMatrixUBO.model = actors[actor].modelMatrix;		
@@ -3204,8 +3195,8 @@ namespace GLVM::core
 		}
 		/// End of animation logic
 
-		modelMatrixUBO.ambient = materialComponent->ambient;
-		modelMatrixUBO.shininess = materialComponent->shininess;
+		modelMatrixUBO.ambient = actors[actor].ambient;
+		modelMatrixUBO.shininess = actors[actor].shininess;
 
 		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
 			modelMatrixUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
@@ -3770,42 +3761,38 @@ namespace GLVM::core
 
 		void CVulkanRenderer::pointLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		ecs::EntityManager*    entityManager     = ecs::EntityManager::GetInstance();
+//		ecs::EntityManager*    entityManager     = ecs::EntityManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
-		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
-			core::vector<Entity> linkedEntitiesTemp      = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::material,
-																							   cm::mesh,
-																							   cm::actor>();
-			
-			core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::pointLight,
-																							  cm::mesh,
-																							  cm::actor>();
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh,
+																						  cm::actor>();
 
-			core::vector<unsigned int> linkedEntities;
-			for ( unsigned int i = 0; i < linkedEntitiesTemp.GetSize(); ++i ) {
-				unsigned int entity = linkedEntitiesTemp[i];
-				for ( unsigned int j = 0; j < pointLightEntities.GetSize(); ++j ) {
-					if ( entity == pointLightEntities[j] ) {
-						break;
-					} else if ( entity != pointLightEntities[j] && j == pointLightEntities.GetSize() - 1 ) {
-						linkedEntities.Push(entity);
-					}
-				}
-			}
-//			std::cout << "number of actors: " << linkedEntities.GetSize() << std::endl;
-			entitiesCollectionLinked__Trn_Mat_Mes_Act.clear();
-			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i )
-				entitiesCollectionLinked__Trn_Mat_Mes_Act.Push(linkedEntities[i]);
+// 		if ( entityManager->isEntitiesCollectionChanged && componentManager->isComponentsCollectionChanged ) {
+
+// 			core::vector<unsigned int> linkedEntities;
+// 			for ( unsigned int i = 0; i < linkedEntitiesTemp.GetSize(); ++i ) {
+// 				unsigned int entity = linkedEntitiesTemp[i];
+// 				for ( unsigned int j = 0; j < pointLightEntities.GetSize(); ++j ) {
+// 					if ( entity == pointLightEntities[j] ) {
+// 						break;
+// 					} else if ( entity != pointLightEntities[j] && j == pointLightEntities.GetSize() - 1 ) {
+// 						linkedEntities.Push(entity);
+// 					}
+// 				}
+// 			}
+// //			std::cout << "number of actors: " << linkedEntities.GetSize() << std::endl;
+// 			entitiesCollectionLinked__Trn_Mat_Mes_Act.clear();
+// 			for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i )
+// 				entitiesCollectionLinked__Trn_Mat_Mes_Act.Push(linkedEntities[i]);
 				
-			entitiesCollectionLinked__Trn_PoL_Mes_Act.clear();
-			for ( unsigned int i = 0; i < pointLightEntities.GetSize(); ++i )
-				entitiesCollectionLinked__Trn_PoL_Mes_Act.Push(pointLightEntities[i]);
+// 			entitiesCollectionLinked__Trn_PoL_Mes_Act.clear();
+// 			for ( unsigned int i = 0; i < pointLightEntities.GetSize(); ++i )
+// 				entitiesCollectionLinked__Trn_PoL_Mes_Act.Push(pointLightEntities[i]);
 
-			entityManager->isEntitiesCollectionChanged = false;
-			componentManager->isComponentsCollectionChanged = false;
-		}
+// 			entityManager->isEntitiesCollectionChanged = false;
+// 			componentManager->isComponentsCollectionChanged = false;
+// 		}
 
 		// VkDebugUtilsLabelEXT label;
 		// label.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_LABEL_EXT;
@@ -3817,7 +3804,7 @@ namespace GLVM::core
 		// label.pNext = NULL;
 		
 		// vkDebugUtils::CreateBeginDebugUtilsLabelEXT(instance, commandBuffers[0], &label);
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < entitiesCollectionLinked__Trn_PoL_Mes_Act.GetSize(); ++pointLightCounter ) {
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
 				VkCommandBufferInheritanceInfo inheritanceInfo{};
@@ -3875,22 +3862,23 @@ namespace GLVM::core
 
 				vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].pipeline);
 
-				unsigned int pointLightEntity = entitiesCollectionLinked__Trn_PoL_Mes_Act[pointLightCounter];
+//				unsigned int pointLightEntity = entitiesCollectionLinked__Trn_PoL_Mes_Act[pointLightCounter];
+				unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
 				
 				cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 				
-				uint32_t actorsNumber = entitiesCollectionLinked__Trn_Mat_Mes_Act.GetSize();
+				uint32_t actorsNumber = actors.GetSize();
 				for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
-					unsigned int meshOwnerEntity = entitiesCollectionLinked__Trn_Mat_Mes_Act[actorCounter];
-					unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(meshOwnerEntity)->handle.id;
-					cm::transform* meshOwnerTransformComponent = componentManager->GetComponent<cm::transform>(meshOwnerEntity);
+//					unsigned int meshOwnerEntity = entitiesCollectionLinked__Trn_Mat_Mes_Act[actorCounter];
+					RenderActor actor = actors[actorCounter];
+					unsigned int meshID = actor.meshID;
 						
 					unsigned int uboIndex = pointLightNumber *
 						actorsNumber * maxCubeMapLayers * pointLightCurrentFrame +                           ///< Choose frame (first 168 or second 168)
 						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
 						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
 
-					updatePointLightShadowMapMatrixUBO(uboIndex, meshOwnerTransformComponent, pointLightComponent, cubeMapLayerCounter, meshID, actorCounter);
+					updatePointLightShadowMapMatrixUBO(uboIndex, pointLightComponent, cubeMapLayerCounter, actorCounter);
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::POINT_LIGHT_PIPELINE].pipelineLayout, 0, 1,

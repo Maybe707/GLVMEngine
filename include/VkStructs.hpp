@@ -236,6 +236,10 @@ struct RenderActor {
 	mat4 modelMatrix;
 	GLVM::core::vector<mat4> jointMatrices;
 	unsigned int meshID;
+	unsigned int diffuseTextureIndex;
+	unsigned int specularTextureIndex;
+	vec3 ambient;
+	float shininess;
 };
 
 #endif

@@ -485,10 +485,8 @@ namespace GLVM::core
 		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		 uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
-		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::transform* _transformComponent, ecs::components::pointLight* pointLightComponent,
-												uint32_t layer, unsigned int meshID, unsigned int actor);
-        void updateMatrixUniformBuffer(uint32_t offset, ecs::components::transform* _transformComponent,
-									   unsigned int meshID, ecs::components::material* materialComponent, unsigned int actor);
+		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int actor);
+        void updateMatrixUniformBuffer(uint32_t offset, unsigned int actor);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
         void mainRenderDrawFrame();
 		void directionalLightShadowMapDrawFrame();

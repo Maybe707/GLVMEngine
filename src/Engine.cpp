@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Engine.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
@@ -322,10 +323,15 @@ namespace GLVM::core
 			unsigned int uiEntity = linkedEntities[i];
 			vulkanRenderer->actors.Push({});
 			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::material*  materialComponent  = componentManager->GetComponent<cm::material>(uiEntity);
 			unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
 			vulkanRenderer->actors[i].modelMatrix   = computeModelMatrix(transformComponent);
 			vulkanRenderer->actors[i].jointMatrices = updateAnimationFrames(transformComponent, meshID);
 			vulkanRenderer->actors[i].meshID        = meshID;
+			vulkanRenderer->actors[i].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+			vulkanRenderer->actors[i].specularTextureIndex = materialComponent->specularTextureID_.id;
+			vulkanRenderer->actors[i].ambient   = materialComponent->ambient;
+			vulkanRenderer->actors[i].shininess = materialComponent->shininess;
 		}
 	}
 
