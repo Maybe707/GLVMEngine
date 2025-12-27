@@ -2251,18 +2251,16 @@ namespace GLVM::core
 		vkCmdEndRenderPass(primaryCommandBuffer);
 	}
 	
-	void CVulkanRenderer::updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
-									   ecs::components::health* entityOwnHudHealth, bool isHudExists,
-									   float highestY) {
+	void CVulkanRenderer::updateHudUBO(uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter) {
 		HUD_UBO hudUBO{};
 
 		hudUBO.view = viewMatrix;
 		hudUBO.proj = projectionMatrix;
 		
 		hudUBO.isHudExists = isHudExists;
-		hudUBO.currentHP   = entityOwnHudHealth->currentHealth;
-		hudUBO.maxHP       = entityOwnHudHealth->maxHealth;
-		hudUBO.entityPosition = entityOwnHudTransform->position;
+		hudUBO.currentHP   = healthBars[healthCounter].currentHealth;
+		hudUBO.maxHP       = healthBars[healthCounter].maxHealth;
+		hudUBO.entityPosition = healthBars[healthCounter].position;
 		hudUBO.highestY    = highestY;
 
 		void* hudMatrixData;
@@ -2433,7 +2431,6 @@ namespace GLVM::core
 	}
 	
     void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2441,9 +2438,6 @@ namespace GLVM::core
         //     throw std::runtime_error("failed to begin recording command buffer!");
         // }
 
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::health>();
 		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
@@ -2480,14 +2474,10 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = linkedEntities[i];
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
-
+		for ( unsigned int i = 0; i < healthBars.GetSize(); ++i ) {
+			unsigned int uiVertexId = healthBars[i].meshID;
 			unsigned int uboIndex = currentFrame * hudUboDescriptorNumber + i;
-			updateHudUBO(uboIndex, transformComponent, healthComponent, true, highest_gltf_Y[uiVertexId]);
+			updateHudUBO(uboIndex, true, highest_gltf_Y[uiVertexId], i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::HUD_PIPELINE].pipelineLayout,
@@ -3317,38 +3307,15 @@ namespace GLVM::core
         if (vkBeginCommandBuffer(mainRenderCommandBuffers[currentFrame], &beginInfo) != VK_SUCCESS) {
             throw std::runtime_error("failed to begin recording command buffer!");
         }
-		
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
-
-		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									 cm::directionalLight,
-																									 cm::mesh,
-																									 cm::actor>();
-
-
-		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLights.GetSize(); ++ directionalLightCounter ) {
 			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE], directionalLightShadowMapFrameBuffers[directionalLightCounter],
 										   swapChainExtent, mainRenderCommandBuffers[currentFrame], directionalLightSecondaryCommandBuffers[currentFrame * directionalLightNumber + directionalLightCounter] );
 		}		
-
-
-		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::spotLight,
-																							  cm::mesh,
-																							  cm::actor>();
-
-		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLights.GetSize(); ++ spotLightCounter ) {
 			executeSecondaryCommandBuffer( renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE], spotLightShadowMapFrameBuffers[spotLightCounter],
 										   swapChainExtent, mainRenderCommandBuffers[currentFrame], spotLightSecondaryCommandBuffers[currentFrame * spotLightNumber + spotLightCounter] );
 		}
-		
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																						  cm::pointLight,
-																						  cm::mesh,
-																						  cm::actor>();
-
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLights.GetSize(); ++pointLightCounter ) {
 			uint32_t maxCubeMapLayers = 6;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {
 				VkExtent2D extent;

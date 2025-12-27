@@ -441,8 +441,25 @@ namespace GLVM::core
 					updatePointLightSpaceMatrixShadowMapUBO( pointLightComponent, cubeMapLayerCounter );
 			}
 		}
+
+		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> healthEntities = componentManager->collectLinkedEntities<cm::transform,
+																					  cm::health>();
+
+		vulkanRenderer->healthBars.clear();
+		for ( unsigned int i = 0; i < healthEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = healthEntities[i];
+			vulkanRenderer->healthBars.Push({});
+			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
+			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
+			vulkanRenderer->healthBars[i].meshID        = uiVertexId;
+			vulkanRenderer->healthBars[i].position      = transformComponent->position;
+			vulkanRenderer->healthBars[i].maxHealth     = healthComponent->maxHealth;
+			vulkanRenderer->healthBars[i].currentHealth = healthComponent->currentHealth;
+		}
 		
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
 																						   cm::mesh,
 																						   cm::actor>();

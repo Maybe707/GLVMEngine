@@ -169,6 +169,7 @@ namespace GLVM::core
 		core::vector<RenderDirectionalLight> directionalLights;
 		core::vector<RenderSpotLight> spotLights;
 		core::vector<RenderPointLight> pointLights;
+		core::vector<RenderHealth> healthBars;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -466,8 +467,7 @@ namespace GLVM::core
 								  uint32_t commandBuffersNumber, VkCommandBufferLevel commandBufferLevelFlag);
 		void executeSecondaryCommandBuffer( VkRenderPass renderPass, VkFramebuffer frameBuffer, VkExtent2D extent,
 											VkCommandBuffer primaryCommandBuffer, VkCommandBuffer secondaryCommandBuffer );
-		void updateHudUBO(uint32_t offset, ecs::components::transform* entityOwnHudTransform,
-						  ecs::components::health* entityOwnHudHealth, bool isHudExists, float highestY);
+		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, uint32_t offset,
 						  float slotScale, unsigned int inventorySlotEntity, ecs::components::transform* slotTransfromComponent);

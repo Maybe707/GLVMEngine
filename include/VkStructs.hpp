@@ -257,4 +257,11 @@ struct RenderPointLight {
 	vec3 lightPosition;
 };
 
+struct RenderHealth {
+	vec3 position;
+	float maxHealth; 
+	float currentHealth;
+	unsigned int meshID;
+};
+
 #endif
