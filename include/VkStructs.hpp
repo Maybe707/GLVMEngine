@@ -290,4 +290,9 @@ struct RenderItem {
 	unsigned int diffuseTexureID;
 };
 
+struct RenderCrosshair {
+	mat4 model;
+	unsigned int meshID;
+};
+
 #endif

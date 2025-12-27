@@ -173,6 +173,7 @@ namespace GLVM::core
 		core::vector<RenderFont> fonts;
 		core::vector<RenderInventory> inventories;
 		core::vector<RenderItem> items;
+		core::vector<RenderCrosshair> crosshairs;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -471,7 +472,7 @@ namespace GLVM::core
 		void executeSecondaryCommandBuffer( VkRenderPass renderPass, VkFramebuffer frameBuffer, VkExtent2D extent,
 											VkCommandBuffer primaryCommandBuffer, VkCommandBuffer secondaryCommandBuffer );
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
-		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
+		void updateHudScreenUBO( uint32_t offset, uint32_t crosshair );
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
 		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

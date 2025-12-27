@@ -113,6 +113,7 @@ namespace GLVM::core
 							   const unsigned int columnInventory,
 							   ecs::components::transform* inventoryTransformComponent,
 							   int itemEntity);
+		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
 		void setFrameData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();

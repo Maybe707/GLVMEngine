@@ -2271,41 +2271,10 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-	void CVulkanRenderer::updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform) {
+	void CVulkanRenderer::updateHudScreenUBO(uint32_t offset, uint32_t crosshair) {
 		HUD_SCREEN_UBO hudUBO{};
-		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
-
-#ifndef VK_USE_PLATFORM_WAYLAND_KHR
-		hud_screen_x = -hud_screen_x;
-#endif
+		hudUBO.model = crosshairs[crosshair].model;
 		
-		cursorTransform->position[0] = hud_screen_x;
-		cursorTransform->position[1] = -hud_screen_y;
-//		std::cout << "cursor scale: " << cursorTransform->fScale << std::endl;
-
-//		std::cout << "x: " << cursorTransform->tPosition[0] << " y: " << cursorTransform->tPosition << std::endl;
-		
-		if ( !isInventoryOpened ) {
-			hudUBO.model[3][0] = defaultPosition[0];
-			hudUBO.model[3][1] = defaultPosition[1];
-			hudUBO.model[3][2] = defaultPosition[2];
-			hudUBO.model[0][0] = cursorTransform->scale;
-			hudUBO.model[1][1] = cursorTransform->scale;
-			hudUBO.model[2][2] = cursorTransform->scale;
-			hudUBO.model[3][3] = 1.0f;
-		} else {
-			defaultPosition[0] = hud_screen_x;
-			defaultPosition[1] = -hud_screen_y;
-			
-			hudUBO.model[3][0] = defaultPosition[0];
-			hudUBO.model[3][1] = defaultPosition[1];
-			hudUBO.model[3][2] = defaultPosition[2];
-			hudUBO.model[0][0] = cursorTransform->scale;
-			hudUBO.model[1][1] = cursorTransform->scale;
-			hudUBO.model[2][2] = cursorTransform->scale;
-			hudUBO.model[3][3] = 1.0f;
-		}
-
 		void* hudMatrixData;
 		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD_SCREEN].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(HUD_SCREEN_UBO) * offset,
@@ -2570,7 +2539,6 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2578,9 +2546,6 @@ namespace GLVM::core
         //     throw std::runtime_error("failed to begin recording command buffer!");
         // }
 
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -2616,13 +2581,12 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = linkedEntities[i];
-			cm::transform* cursorTransform = componentManager->GetComponent<ecs::components::transform>(uiEntity);
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+		for ( unsigned int i = 0; i < crosshairs.GetSize(); ++i ) {
+			RenderCrosshair crosshair = crosshairs[i];
+			unsigned int uiVertexId = crosshair.meshID;
 
 			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
-			updateHudScreenUBO(uboIndex, cursorTransform);
+			updateHudScreenUBO(uboIndex, i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::HUD_SCREEN_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::HUD_SCREEN_PIPELINE].pipelineLayout,

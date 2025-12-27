@@ -485,6 +485,44 @@ namespace GLVM::core
 
 		return model;
 	}
+
+	mat4 Engine::updateDataHudScreenUBO( ecs::components::transform* cursorTransform ) {
+		mat4 model;
+		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
+
+#ifndef VK_USE_PLATFORM_WAYLAND_KHR
+		hud_screen_x = -hud_screen_x;
+#endif
+		
+		cursorTransform->position[0] = hud_screen_x;
+		cursorTransform->position[1] = -hud_screen_y;
+//		std::cout << "cursor scale: " << cursorTransform->fScale << std::endl;
+
+//		std::cout << "x: " << cursorTransform->tPosition[0] << " y: " << cursorTransform->tPosition << std::endl;
+		
+		if ( !vulkanRenderer->isInventoryOpened ) {
+			model[3][0] = defaultPosition[0];
+			model[3][1] = defaultPosition[1];
+			model[3][2] = defaultPosition[2];
+			model[0][0] = cursorTransform->scale;
+			model[1][1] = cursorTransform->scale;
+			model[2][2] = cursorTransform->scale;
+			model[3][3] = 1.0f;
+		} else {
+			defaultPosition[0] = hud_screen_x;
+			defaultPosition[1] = -hud_screen_y;
+			
+			model[3][0] = defaultPosition[0];
+			model[3][1] = defaultPosition[1];
+			model[3][2] = defaultPosition[2];
+			model[0][0] = cursorTransform->scale;
+			model[1][1] = cursorTransform->scale;
+			model[2][2] = cursorTransform->scale;
+			model[3][3] = 1.0f;
+		}
+
+		return model;
+	}
 	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -618,6 +656,17 @@ namespace GLVM::core
 																	   inventoryTransformComponent,
 																	   itemEntity);
 			}
+		}
+
+		core::vector<Entity> crosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+		vulkanRenderer->crosshairs.clear();
+		for ( unsigned int i = 0; i < crosshairEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = crosshairEntities[i];
+			vulkanRenderer->crosshairs.Push({});
+			cm::transform* cursorTransform = componentManager->GetComponent<ecs::components::transform>(uiEntity);
+			unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
+			vulkanRenderer->crosshairs[i].meshID = meshID;
+			vulkanRenderer->crosshairs[i].model  = updateDataHudScreenUBO( cursorTransform );
 		}
 		
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform,
