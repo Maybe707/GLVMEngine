@@ -170,6 +170,7 @@ namespace GLVM::core
 		core::vector<RenderSpotLight> spotLights;
 		core::vector<RenderPointLight> pointLights;
 		core::vector<RenderHealth> healthBars;
+		core::vector<RenderFont> fonts;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;

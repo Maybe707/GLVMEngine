@@ -264,4 +264,10 @@ struct RenderHealth {
 	unsigned int meshID;
 };
 
+struct RenderFont {
+	vec3 position;
+	GLVM::core::vector<char> font_string;
+	float lifeTime;
+};
+
 #endif

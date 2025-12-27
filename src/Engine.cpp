@@ -458,6 +458,19 @@ namespace GLVM::core
 			vulkanRenderer->healthBars[i].maxHealth     = healthComponent->maxHealth;
 			vulkanRenderer->healthBars[i].currentHealth = healthComponent->currentHealth;
 		}
+
+		core::vector<Entity> fontEntities      = componentManager->collectLinkedEntities<cm::transform,
+																						   cm::font>();
+		vulkanRenderer->fonts.clear();
+		for ( unsigned int i = 0; i < fontEntities.GetSize(); ++i ) {
+			unsigned int entity = fontEntities[i];
+			vulkanRenderer->fonts.Push({});
+			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
+			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
+			vulkanRenderer->fonts[i].position    = transformComponent->position;
+			vulkanRenderer->fonts[i].font_string = fontComponent->font_string;
+			vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
+		}
 		
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,

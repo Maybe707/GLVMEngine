@@ -2836,20 +2836,16 @@ namespace GLVM::core
 		if ( viewPositionLinkedEntities.GetSize() > 0 )
 			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
 
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::font>();
 		unsigned int currentActorMemoryOffset = 0;
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int entity = linkedEntities[i];
-			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
-			vec3 playerTragetDirection = transformComponent->position - playerTransformComponent->position;
+		for ( unsigned int i = 0; i < fonts.GetSize(); ++i ) {
+			RenderFont font = fonts[i];
+			vec3 playerTragetDirection = font.position - playerTransformComponent->position;
 			float dotProduct = Dot(playerTragetDirection, playerTransformComponent->forward);
 			if ( dotProduct <= 0 )
 				continue;
 
-			for ( unsigned int j = 0; j < fontComponent->font_string.GetSize(); ++j ) {
-				unsigned int ascii_code = static_cast<unsigned int>(fontComponent->font_string[j]);
+			for ( unsigned int j = 0; j < font.font_string.GetSize(); ++j ) {
+				unsigned int ascii_code = static_cast<unsigned int>(font.font_string[j]);
 				VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
 				VkDeviceSize offsets[] = {0};
 				
@@ -2859,9 +2855,9 @@ namespace GLVM::core
 				unsigned int indicesContainerSize = symbol_g_indices.size();
 				FONT_UBO fontUBO{};
 				vec3 result;
-				vec4 pos = vec4(transformComponent->position[0],
-								transformComponent->position[1],
-								transformComponent->position[2], 1.0f);
+				vec4 pos = vec4(font.position[0],
+								font.position[1],
+								font.position[2], 1.0f);
 
 				vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
 				vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
@@ -2873,7 +2869,7 @@ namespace GLVM::core
 
 				fontUBO.scale    = 0.3f;
 				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
-				ndcPosition[1] -= fontComponent->lifeTime / 5.0f;
+				ndcPosition[1] -= font.lifeTime / 5.0f;
 				fontUBO.position = ndcPosition;
 
 				void* modelMatrixData;
@@ -2895,7 +2891,7 @@ namespace GLVM::core
 			
 				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			}
-			currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + fontComponent->font_string.GetSize();
+			currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + font.font_string.GetSize();
 		}
 
         vkCmdEndRenderPass(commandBuffer);
