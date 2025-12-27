@@ -3041,24 +3041,6 @@ namespace GLVM::core
             }
         }
     }
-
-	void CVulkanRenderer::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent,
-																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 5.5f;
-		float farPlaneFlatShadowMap = 100.0f;
-		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
-													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-
-		vec3 positionVectorLight = directionalLightComponent->position;
-		vec3 directionVectorLight = directionalLightComponent->direction;
-
-		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
-										  directionVectorLight,
-										  { 0.0f, -1.0f, 0.0f });
-
-//		directionalProjectionMatrixLight[1][1] *= -1;
-		dirLightSpaceMatrix[currentLight] = viewMatrixLight * directionalProjectionMatrixLight;
-	}
 	
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
@@ -3566,16 +3548,7 @@ namespace GLVM::core
     }
 	
 		void CVulkanRenderer::directionalLightRecordCoomandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-
-		
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									 cm::directionalLight,
-																									 cm::mesh,
-																									 cm::actor>();
-
-		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLights.GetSize(); ++ directionalLightCounter ) {
 			VkCommandBufferInheritanceInfo inheritanceInfo{};
 			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
@@ -3628,11 +3601,8 @@ namespace GLVM::core
 			vkCmdSetScissor(commandBuffer, 0, 1, &shadowMapScissor);
 
 			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].pipeline);
-
-			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
-			updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent, directionalLightCounter);
-
+			dirLightSpaceMatrix[directionalLightCounter] = directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix;
+			
 			uint32_t actorsNumber = actors.GetSize();
 			for ( unsigned int actorCounter = 0; actorCounter < actorsNumber; ++actorCounter ) {
 				RenderActor actor = actors[actorCounter];

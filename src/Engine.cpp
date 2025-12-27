@@ -311,9 +311,39 @@ namespace GLVM::core
 		return jointMatrices;
 	}
 
+	mat4 Engine::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent) {
+		float nearPlaneFlatShadowMap = 5.5f;
+		float farPlaneFlatShadowMap = 100.0f;
+		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
+													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+
+		vec3 positionVectorLight = directionalLightComponent->position;
+		vec3 directionVectorLight = directionalLightComponent->direction;
+
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
+										  directionVectorLight,
+										  { 0.0f, -1.0f, 0.0f });
+
+//		directionalProjectionMatrixLight[1][1] *= -1;
+		return viewMatrixLight * directionalProjectionMatrixLight;
+	}
+	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
+		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																									 cm::directionalLight,
+																									 cm::mesh,
+																									 cm::actor>();
+		vulkanRenderer->directionalLights.clear();
+		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
+			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
+			vulkanRenderer->directionalLights.Push({});
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+			vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
+				updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent);
+		}
+		
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::material,
 																						   cm::mesh,

@@ -242,4 +242,8 @@ struct RenderActor {
 	float shininess;
 };
 
+struct RenderDirectionalLight {
+	mat4 DirectionalLightSpaceMatrix;
+};
+
 #endif

@@ -166,6 +166,7 @@ namespace GLVM::core
 
 		unsigned int entities[32]; ///<
 		core::vector<RenderActor> actors;
+		core::vector<RenderDirectionalLight> directionalLights;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -291,6 +292,7 @@ namespace GLVM::core
 		FOR TEST ONLY!!!
 		===================================
 		*/
+	public:
 		mat4 dirLightSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
 		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		
@@ -480,7 +482,6 @@ namespace GLVM::core
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,
 							   std::vector<VkSemaphore>& renderFinishedSemaphores,
 							   std::vector<VkFence>& inFlightFences);
-		void updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent, uint32_t currentLight);
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
 		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
 																		 uint32_t currentLight);
