@@ -172,6 +172,7 @@ namespace GLVM::core
 		core::vector<RenderHealth> healthBars;
 		core::vector<RenderFont> fonts;
 		core::vector<RenderInventory> inventories;
+		core::vector<RenderItem> items;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -472,10 +473,7 @@ namespace GLVM::core
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO(uint32_t offset, ecs::components::transform* cursorTransform);
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
-		void updateUBO_IconsUI(uint32_t offset, ecs::components::transform* itemTransfromComponent,
-							   ecs::components::collider* itemColliderComponent, ecs::components::item* itemComponent,
-							   const unsigned int rowInventory, const unsigned int columnInventory,
-							   ecs::components::transform* inventoryTransformComponent, int itemEntity);
+		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

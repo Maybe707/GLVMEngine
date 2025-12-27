@@ -105,7 +105,14 @@ namespace GLVM::core
 		mat4 updatePointLightSpaceMatrixShadowMapUBO( ecs::components::pointLight* pointLightComponent, uint32_t layer );
 		SlotData updateDataUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn,
 							  ecs::components::inventory* inventoryComponent,
-							  ecs::components::transform* slotTransfromComponent);
+								  ecs::components::transform* slotTransfromComponent);
+		mat4 updateDataUBO_IconsUI(ecs::components::transform* itemTransfromComponent,
+							   [[maybe_unused]] ecs::components::collider* itemColliderComponent,
+							   ecs::components::item* itemComponent,
+							   const unsigned int rowInventory,
+							   const unsigned int columnInventory,
+							   ecs::components::transform* inventoryTransformComponent,
+							   int itemEntity);
 		void setFrameData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();

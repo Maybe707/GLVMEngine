@@ -437,6 +437,54 @@ namespace GLVM::core
 
 		return hudUBO;
 	}
+
+	mat4 Engine::updateDataUBO_IconsUI(ecs::components::transform* itemTransfromComponent,
+								   [[maybe_unused]] ecs::components::collider* itemColliderComponent,
+								   ecs::components::item* itemComponent,
+								   const unsigned int rowInventory,
+								   const unsigned int columnInventory,
+								   ecs::components::transform* inventoryTransformComponent,
+								   int itemEntity) {
+		float x_result_offset = 0.0f;
+		float y_result_offset = 0.0f;
+		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
+		} else {
+			const unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
+			const unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
+			const unsigned int rowIndexFirstSlot = inventorySlotEntity_0 / rowInventory;
+			const unsigned int colIndexFirstSlot = inventorySlotEntity_0 % columnInventory;
+			const unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / rowInventory;
+			const unsigned int colIndexSecondSlot = inventorySlotEntity_3 % columnInventory;
+
+			const float itemScale             = itemTransfromComponent->scale;
+			const float fullSlotScale         = itemTransfromComponent->gltf ? itemScale * 2.0f : itemScale;
+			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
+			x_result_offset = inventoryTransformComponent->position[0] + (colIndexFirstSlot * fullSlotScale + colIndexSecondSlot * fullSlotScale) * centreMultiplayer;
+			y_result_offset = inventoryTransformComponent->position[1] + (rowIndexFirstSlot * fullSlotScale + rowIndexSecondSlot * fullSlotScale) * centreMultiplayer * vulkanRenderer->aspectRate;
+		}
+		float itemScale = itemTransfromComponent->scale;
+
+		if ( dragedItemEntity != itemEntity ) {
+			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
+		} else {
+//			std::cout << "item entity: " << itemEntity << std::endl;
+			itemScale *= 1.1f;
+//			itemColliderComponent->itemDrag = false;
+			itemTransfromComponent->position[2] = 0.0f;
+		}
+
+//		std::cout << itemTransfromComponent->position << std::endl;
+		
+		mat4 model(1.0);
+		model[0][0] = itemScale * itemComponent->itemSlotType.width;
+		model[1][1] = itemScale * itemComponent->itemSlotType.height;
+		model[2][2] = 0.0f;
+		model[3][0] = itemTransfromComponent->position[0];
+		model[3][1] = itemTransfromComponent->position[1];
+		model[3][2] = itemTransfromComponent->position[2];
+
+		return model;
+	}
 	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -515,26 +563,60 @@ namespace GLVM::core
 			vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
 		}
 
-		core::vector<Entity> inventoryEntities      = componentManager->collectLinkedEntities<cm::inventory>();
-		vulkanRenderer->inventories.clear();
-		for ( unsigned int i = 0; i < inventoryEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = inventoryEntities[i];
-			vulkanRenderer->inventories.Push({});
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
-			unsigned int inventoryTextureID   = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			unsigned int meshID           = inventoryComponent->slotMeshID.id;
-			vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
-			vulkanRenderer->inventories[i].meshID             = meshID;
-			vulkanRenderer->inventories[i].row                = inventoryComponent->row;
-			vulkanRenderer->inventories[i].col                = inventoryComponent->col;
-			vulkanRenderer->inventories[i].slotData.clear();
-			for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
-				for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
-					cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
-					vulkanRenderer->inventories[i].slotData.Push({});
-					vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
-						updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent );
+		if ( vulkanRenderer->isInventoryOpened ) {
+			core::vector<Entity> inventoryEntities      = componentManager->collectLinkedEntities<cm::inventory>();
+			vulkanRenderer->inventories.clear();
+			for ( unsigned int i = 0; i < inventoryEntities.GetSize(); ++i ) {
+				unsigned int uiEntity = inventoryEntities[i];
+				vulkanRenderer->inventories.Push({});
+				cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
+				unsigned int inventoryTextureID   = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+				unsigned int meshID           = inventoryComponent->slotMeshID.id;
+				vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
+				vulkanRenderer->inventories[i].meshID             = meshID;
+				vulkanRenderer->inventories[i].row                = inventoryComponent->row;
+				vulkanRenderer->inventories[i].col                = inventoryComponent->col;
+				vulkanRenderer->inventories[i].slotData.clear();
+				for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
+					for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
+						cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
+						vulkanRenderer->inventories[i].slotData.Push({});
+						vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
+							updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent );
+					}
 				}
+			}
+
+			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
+			cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(inventoryEntities[0]);
+		
+			core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
+			vulkanRenderer->items.clear();
+			for ( unsigned int i = 0; i < itemEntities.GetSize(); ++i ) {
+				unsigned int itemEntity = itemEntities[i];
+				vulkanRenderer->items.Push({});
+				cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
+				cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
+				if ( actorComponent != nullptr )
+					continue;
+			
+				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
+				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
+				vulkanRenderer->items[i].meshID          = meshID;
+				vulkanRenderer->items[i].diffuseTexureID = diffuseTexureID;
+				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(itemEntity);
+				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
+
+				if ( itemTransformComponent == nullptr )
+					std::cout << "NULL POINTER" << std::endl;
+
+				vulkanRenderer->items[i].model = updateDataUBO_IconsUI(itemTransformComponent,
+																	   itemColliderComponent,
+																	   itemComponent,
+																	   inventoryComponent->row,
+																	   inventoryComponent->col,
+																	   inventoryTransformComponent,
+																	   itemEntity);
 			}
 		}
 		

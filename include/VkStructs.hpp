@@ -284,4 +284,10 @@ struct RenderInventory {
 	unsigned int col;
 };
 
+struct RenderItem {
+	mat4 model;
+	unsigned int meshID;
+	unsigned int diffuseTexureID;
+};
+
 #endif

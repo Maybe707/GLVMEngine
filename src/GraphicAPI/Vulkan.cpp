@@ -2329,54 +2329,9 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-	void CVulkanRenderer::updateUBO_IconsUI(uint32_t offset,
-											ecs::components::transform* itemTransfromComponent,
-											[[maybe_unused]] ecs::components::collider* itemColliderComponent,
-											ecs::components::item* itemComponent,
-											const unsigned int rowInventory,
-											const unsigned int columnInventory,
-											ecs::components::transform* inventoryTransformComponent,
-											int itemEntity) {
+	void CVulkanRenderer::updateUBO_IconsUI( uint32_t offset, uint32_t item ) {
 		UI_UBO hudUBO{};
-		float x_result_offset = 0.0f;
-		float y_result_offset = 0.0f;
-		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
-		} else {
-			const unsigned int inventorySlotEntity_0 = itemComponent->occupiedSlots[0];
-			const unsigned int inventorySlotEntity_3 = itemComponent->occupiedSlots.GetHead();
-			const unsigned int rowIndexFirstSlot = inventorySlotEntity_0 / rowInventory;
-			const unsigned int colIndexFirstSlot = inventorySlotEntity_0 % columnInventory;
-			const unsigned int rowIndexSecondSlot = inventorySlotEntity_3 / rowInventory;
-			const unsigned int colIndexSecondSlot = inventorySlotEntity_3 % columnInventory;
-
-			const float itemScale             = itemTransfromComponent->scale;
-			const float fullSlotScale         = itemTransfromComponent->gltf ? itemScale * 2.0f : itemScale;
-			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
-			x_result_offset = inventoryTransformComponent->position[0] + (colIndexFirstSlot * fullSlotScale + colIndexSecondSlot * fullSlotScale) * centreMultiplayer;
-			y_result_offset = inventoryTransformComponent->position[1] + (rowIndexFirstSlot * fullSlotScale + rowIndexSecondSlot * fullSlotScale) * centreMultiplayer * aspectRate;
-		}
-		float itemScale = itemTransfromComponent->scale;
-
-		if ( dragedItemEntity != itemEntity ) {
-			itemTransfromComponent->position = vec3(x_result_offset, y_result_offset, 0.1f);
-		} else {
-//			std::cout << "item entity: " << itemEntity << std::endl;
-			itemScale *= 1.1f;
-//			itemColliderComponent->itemDrag = false;
-			itemTransfromComponent->position[2] = 0.0f;
-		}
-
-//		std::cout << itemTransfromComponent->position << std::endl;
-		
-		mat4 model(1.0);
-		model[0][0] = itemScale * itemComponent->itemSlotType.width;
-		model[1][1] = itemScale * itemComponent->itemSlotType.height;
-		model[2][2] = 0.0f;
-		model[3][0] = itemTransfromComponent->position[0];
-		model[3][1] = itemTransfromComponent->position[1];
-		model[3][2] = itemTransfromComponent->position[2];
-
-		hudUBO.model = model;
+		hudUBO.model = items[item].model;
 		
 		void* hudMatrixData;
 		unsigned int uiIconsUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI_ICONS].descriptorsBindingsIDs[0];
@@ -2537,7 +2492,6 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2545,9 +2499,6 @@ namespace GLVM::core
         //     throw std::runtime_error("failed to begin recording command buffer!");
         // }
 
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
-		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -2583,27 +2534,13 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-		cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(inventoryEntities[0]);
-		
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int itemEntity = linkedEntities[i];
-			cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
-			cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
-			if ( actorComponent != nullptr )
-				continue;
-			
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
-			unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
-			cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(itemEntity);
-			cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
-
+		for ( unsigned int i = 0; i < items.GetSize(); ++i ) {
+			RenderItem item = items[i];
+			unsigned int uiVertexId = item.meshID;
+			unsigned int diffuseTexureID = item.diffuseTexureID;
 			unsigned int uboIndex = currentFrame * MAX_FRAMES_IN_FLIGHT + i;
-			if ( itemTransformComponent == nullptr )
-				std::cout << "NULL POINTER" << std::endl;
 			
-			updateUBO_IconsUI(uboIndex, itemTransformComponent, itemColliderComponent, itemComponent, inventoryComponent->row, inventoryComponent->col, inventoryTransformComponent, itemEntity);
+			updateUBO_IconsUI(uboIndex, i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipelineLayout,
