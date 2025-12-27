@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Engine.hpp"
+#include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
 #include "Components/VertexComponent.hpp"
@@ -394,6 +395,48 @@ namespace GLVM::core
 
 		return viewMatrixLight * projectionMatrixCubeShadowMap;
 	}
+
+	[[nodiscard]] SlotData Engine::updateDataUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn,
+								  ecs::components::inventory* inventoryComponent,
+								  ecs::components::transform* slotTransfromComponent) {
+		SlotData hudUBO{};
+		mat4 model(1.0);
+		const float fullSlotScale     = slotTransfromComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
+		const float x = slotTransfromComponent->position[0] + currentInventoryColumn * fullSlotScale;
+		const float y_scaleMultilayer = vulkanRenderer->aspectRate * fullSlotScale;
+		const float y = slotTransfromComponent->position[1] + currentInventoryRow * y_scaleMultilayer;
+		const float inventorySlotScale = inventoryComponent->slotScale;
+		model[0][0] = inventorySlotScale;
+		model[1][1] = inventorySlotScale;
+		model[2][2] = inventorySlotScale;
+		model[3][0] = x;
+		model[3][1] = y;
+		model[3][2] = 0.1f;
+		
+		hudUBO.model = model;
+
+		bool highLightedSlot = false;
+		for ( unsigned int i = 0; i < inventoryComponent->highlightedSlots.GetSize(); ++i ) {
+			if ( inventoryComponent->highlightedSlots[i] == currentInventoryRow * inventoryComponent->col + currentInventoryColumn ) {
+				highLightedSlot = true;
+				break;
+			} else
+				continue;
+		}
+
+		if ( inventoryComponent->highlightedSlots.GetSize() > 0 ) {
+			if ( highLightedSlot ) {
+				if ( inventoryComponent->isAvailableHighlightedSlots )
+					hudUBO.color = { 0.0, 0.3, 0.0 };
+				else
+					hudUBO.color = { 0.3, 0.0, 0.0 };
+			}
+		} else {
+			hudUBO.color = { 0.0, 0.0, 0.0 };
+		}
+
+		return hudUBO;
+	}
 	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -470,6 +513,29 @@ namespace GLVM::core
 			vulkanRenderer->fonts[i].position    = transformComponent->position;
 			vulkanRenderer->fonts[i].font_string = fontComponent->font_string;
 			vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
+		}
+
+		core::vector<Entity> inventoryEntities      = componentManager->collectLinkedEntities<cm::inventory>();
+		vulkanRenderer->inventories.clear();
+		for ( unsigned int i = 0; i < inventoryEntities.GetSize(); ++i ) {
+			unsigned int uiEntity = inventoryEntities[i];
+			vulkanRenderer->inventories.Push({});
+			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
+			unsigned int inventoryTextureID   = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
+			unsigned int meshID           = inventoryComponent->slotMeshID.id;
+			vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
+			vulkanRenderer->inventories[i].meshID             = meshID;
+			vulkanRenderer->inventories[i].row                = inventoryComponent->row;
+			vulkanRenderer->inventories[i].col                = inventoryComponent->col;
+			vulkanRenderer->inventories[i].slotData.clear();
+			for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
+				for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
+					cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
+					vulkanRenderer->inventories[i].slotData.Push({});
+					vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
+						updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent );
+				}
+			}
 		}
 		
 		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform,

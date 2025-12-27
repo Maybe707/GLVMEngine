@@ -232,6 +232,7 @@ namespace GLVM::core
     };
 }
 
+/// Render objects
 struct RenderActor {
 	mat4 modelMatrix;
 	GLVM::core::vector<mat4> jointMatrices;
@@ -268,6 +269,19 @@ struct RenderFont {
 	vec3 position;
 	GLVM::core::vector<char> font_string;
 	float lifeTime;
+};
+
+struct SlotData {
+	mat4 model;
+	vec3 color;
+};
+
+struct RenderInventory {
+	GLVM::core::vector<SlotData> slotData;
+	unsigned int inventoryTextureID;
+	unsigned int meshID;
+	unsigned int row;
+	unsigned int col;
 };
 
 #endif

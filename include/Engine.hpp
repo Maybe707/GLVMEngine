@@ -6,9 +6,11 @@
 #ifndef ENGINE
 #define ENGINE
 
+#include "Components/InventoryComponent.hpp"
 #include "ComponentsFullSet.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "ProceduralLevelGeneratingSystem.hpp"
+#include "ShaderStructs.hpp"
 #include "Systems/DamageSystem.hpp"
 #include "Systems/EnemySystem.hpp"
 #include "Systems/InventorySystem.hpp"
@@ -30,6 +32,7 @@
 #include <mutex>
 #include "TextureManager.hpp"
 #include "Network/UDP_ServerLinux.hpp"
+#include "VkStructs.hpp"
 
 using Entity = unsigned int;
 
@@ -100,6 +103,9 @@ namespace GLVM::core
 		mat4 updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent);
 		mat4 updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent );
 		mat4 updatePointLightSpaceMatrixShadowMapUBO( ecs::components::pointLight* pointLightComponent, uint32_t layer );
+		SlotData updateDataUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn,
+							  ecs::components::inventory* inventoryComponent,
+							  ecs::components::transform* slotTransfromComponent);
 		void setFrameData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();

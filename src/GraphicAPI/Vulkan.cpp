@@ -2314,57 +2314,13 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-	void CVulkanRenderer::updateUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, uint32_t offset,
-									   float slotScale, [[maybe_unused]] unsigned int inventorySlotEntity,
-									   ecs::components::transform* slotTransfromComponent) {
+	void CVulkanRenderer::updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset ) {
 		UI_UBO hudUBO{};
-		mat4 model(1.0);
-		const float fullSlotScale     = slotTransfromComponent->gltf ? slotScale * 2.0f : slotScale;
-		const float x = slotTransfromComponent->position[0] + currentInventoryColumn * fullSlotScale;
-		const float y_scaleMultilayer = aspectRate * fullSlotScale;
-		const float y = slotTransfromComponent->position[1] + currentInventoryRow * y_scaleMultilayer;
-		const float inventorySlotScale = slotScale;
-		model[0][0] = inventorySlotScale;
-		model[1][1] = inventorySlotScale;
-		model[2][2] = inventorySlotScale;
-		model[3][0] = x;
-		model[3][1] = y;
-		model[3][2] = 0.1f;
 
-		// inventorySlotTransform->position[0] = x;
-		// inventorySlotTransform->position[1] = y;
-		// inventorySlotTransform->position[2] = 0.1f;
-		
-		hudUBO.model = model;
+		const unsigned int colSize = inventories[inventory].col;
+		hudUBO.model = inventories[inventory].slotData[colSize * currentInventoryRow + currentInventoryColumn].model;
+		hudUBO.color = inventories[inventory].slotData[colSize * currentInventoryRow + currentInventoryColumn].color;
 
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager = ecs::ComponentManager::GetInstance();
-		core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-
-//		std::cout << "number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
-		bool highLightedSlot = false;
-		for ( unsigned int i = 0; i < inventoryComponent->highlightedSlots.GetSize(); ++i ) {
-			if ( inventoryComponent->highlightedSlots[i] == currentInventoryRow * inventoryComponent->col + currentInventoryColumn ) {
-//				std::cout << "index: " << currentInventoryRow * inventoryComponent->col + currentInventoryColumn << std::endl;
-				highLightedSlot = true;
-				break;
-			} else
-				continue;
-		}
-
-//		std::cout << "second intrence number of slots: " << inventoryComponent->highlightedSlots.GetSize() << std::endl;
-		if ( inventoryComponent->highlightedSlots.GetSize() > 0 ) {
-			if ( highLightedSlot ) {
-				if ( inventoryComponent->isAvailableHighlightedSlots )
-					hudUBO.color = { 0.0, 0.3, 0.0 };
-				else
-					hudUBO.color = { 0.3, 0.0, 0.0 };
-			}
-		} else {
-			hudUBO.color = { 0.0, 0.0, 0.0 };
-		}
-		
 		void* hudMatrixData;
 		unsigned int uiUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI].descriptorsBindingsIDs[0];
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(UI_UBO) * offset,
@@ -2502,7 +2458,6 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2510,9 +2465,6 @@ namespace GLVM::core
         //     throw std::runtime_error("failed to begin recording command buffer!");
         // }
 
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::inventory>();
-		
         VkRenderPassBeginInfo renderPassInfo{};
         renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass = renderPasses[SpecificPipeline::UI_PIPELINE];
@@ -2546,32 +2498,14 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-//		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-
-		// cm::transform* playerTransformComponent = nullptr;
-
-		// if ( viewPositionLinkedEntities.GetSize() > 0 )
-		// 	playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
-
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-//			std::cout << "i: " << i << std::endl;
-			unsigned int uiEntity = linkedEntities[i];
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
-			unsigned int inventoryTextureID            = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-			unsigned int uiVertexId           = inventoryComponent->slotMeshID.id;
-//			std::cout << "PRINT INVENTORY SLOTS INDIXES" << std::endl;
-			for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
-				for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
-//					std::cout << "slots index: " << (j / 8) + (j % 8) << " with entity: " << inventoryComponent->slots[j][m] << std::endl;
-					unsigned int inventorySlotEntity = inventoryComponent->slots[j][m];
-					// cm::mesh* inventorySlotMeshComponent = componentManager->GetComponent<cm::mesh>(inventorySlotEntity);
-					// unsigned int uiVertexId = inventorySlotMeshComponent->handle.id;
-					cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
-//					cm::transform* inventorySlotTransformComponent = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-
-					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * inventoryComponent->col + m;
-					updateUBO_UI(j, m,
-								 uboIndex, inventoryComponent->slotScale, inventorySlotEntity, slotTransformComponent);
+		for ( unsigned int i = 0; i < inventories.GetSize(); ++i ) {
+			RenderInventory inventory = inventories[i];
+			unsigned int inventoryTextureID   = inventory.inventoryTextureID;
+			unsigned int uiVertexId           = inventory.meshID;
+			for ( unsigned int j = 0; j < inventory.row; ++j ) {
+				for ( unsigned int m = 0; m < inventory.col; ++m ) {
+					unsigned int uboIndex = currentFrame * uiUboDescriptorsNumber + j * inventory.col + m;
+					updateUBO_UI(j, m, i, uboIndex);
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::UI_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipelineLayout,
@@ -2581,15 +2515,6 @@ namespace GLVM::core
 					const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
 					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipelineLayout,
 											1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * inventoryTextureID + currentFrame)), 0, nullptr);
-//			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-					// unsigned int diffuseTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-					// unsigned int specularTextureIndex = componentManager->GetComponent<cm::material>(uiEntity)->specularTextureID_.id;
-//			cm::material* materialComponent = componentManager->GetComponent<cm::material>(uiEntity);
-				
-					// unsigned int uboIndex = i;
-					// updateMatrixUniformBuffer(currentFrame, uboIndex, transformComponent, uiVertexId, materialComponent);
-					// vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, hudPipeline.pipelineLayout,
-					// 						0, 1, &hudDescriptorSets[uboIndex], 0, nullptr);
 
 					VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
 					VkDeviceSize offsets[] = {0};
