@@ -250,4 +250,11 @@ struct RenderSpotLight {
 	mat4 SpotLigthSpaceMatrix;
 };
 
+#define CUBE_MAP_LAYER_NUMBER 6
+
+struct RenderPointLight {
+	mat4 pointLightSpaceMatrix[CUBE_MAP_LAYER_NUMBER];
+	vec3 lightPosition;
+};
+
 #endif

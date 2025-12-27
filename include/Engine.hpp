@@ -99,6 +99,7 @@ namespace GLVM::core
 		[[nodiscard]] core::vector<mat4> updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		mat4 updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent);
 		mat4 updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent );
+		mat4 updatePointLightSpaceMatrixShadowMapUBO( ecs::components::pointLight* pointLightComponent, uint32_t layer );
 		void setFrameData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();

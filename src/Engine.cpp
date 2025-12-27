@@ -5,6 +5,7 @@
 
 #include "Engine.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/PointLightComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
@@ -23,6 +24,7 @@
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
 #include "Texture.hpp"
+#include "VkStructs.hpp"
 #include <cstdint>
 #include <limits>
 #include <mutex>
@@ -343,6 +345,55 @@ namespace GLVM::core
 //		spotProjectionMatrixLight[1][1] *= -1;
 		return viewMatrixLight * spotProjectionMatrixLight;
 	}
+
+	mat4 Engine::updatePointLightSpaceMatrixShadowMapUBO( ecs::components::pointLight* pointLightComponent, uint32_t layer ) {
+		vec3 positionVectorLight  = pointLightComponent->position;
+		vec3 directionalVectorLight = vec3(0.0f, 0.0f, 0.0f);
+		vec3 upVector = { 0.0, 0.0, 0.0 };
+
+		switch(layer) {
+		case 0:
+			/// Positive X
+			directionalVectorLight = positionVectorLight + vec3( 1.0f,  0.0f, 0.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+			break;
+		case 1:
+			/// Negative X
+			directionalVectorLight = positionVectorLight + vec3( -1.0f,  0.0f,  0.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+			break;
+		case 2:
+			/// Positive Y
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  1.0f);
+			break;
+		case 3:
+			/// Negative Y
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  -1.0f,  0.0f);
+			upVector = vec3(0.0f, 0.0f,  -1.0f);
+			break;
+		case 4:
+			/// Positive Z
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  1.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+			break;
+			/// Negative Z
+		case 5:
+			directionalVectorLight = positionVectorLight + vec3( 0.0f,  0.0f,  -1.0f);
+			upVector = vec3(0.0f, -1.0f,  0.0f);
+			break;
+		default:
+			break;
+		}
+		
+		mat4 projectionMatrixCubeShadowMap = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE, 0.3f, 100.0f);
+
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
+										  directionalVectorLight,
+										  upVector);
+
+		return viewMatrixLight * projectionMatrixCubeShadowMap;
+	}
 	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -371,6 +422,24 @@ namespace GLVM::core
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>( spotLightEntity );
 			vulkanRenderer->spotLights[spotLightCounter].SpotLigthSpaceMatrix =
 				updateSpotLightSpaceMatrixShadowMapUBO( spotLightComponent );
+		}
+
+		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
+																						  cm::pointLight,
+																						  cm::mesh,
+																						  cm::actor>();
+
+		vulkanRenderer->pointLights.clear();
+		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
+			unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
+			vulkanRenderer->pointLights.Push({});
+			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
+			uint32_t maxCubeMapLayers = 6;
+			vulkanRenderer->pointLights[pointLightCounter].lightPosition = pointLightComponent->position;
+			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
+				vulkanRenderer->pointLights[pointLightCounter].pointLightSpaceMatrix[cubeMapLayerCounter] =
+					updatePointLightSpaceMatrixShadowMapUBO( pointLightComponent, cubeMapLayerCounter );
+			}
 		}
 		
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,

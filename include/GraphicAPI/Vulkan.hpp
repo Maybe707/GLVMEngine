@@ -168,6 +168,7 @@ namespace GLVM::core
 		core::vector<RenderActor> actors;
 		core::vector<RenderDirectionalLight> directionalLights;
 		core::vector<RenderSpotLight> spotLights;
+		core::vector<RenderPointLight> pointLights;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -485,7 +486,7 @@ namespace GLVM::core
 							   std::vector<VkFence>& inFlightFences);
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
-		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int actor);
+		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, uint32_t layer, unsigned int actor);
         void updateMatrixUniformBuffer(uint32_t offset, unsigned int actor);
 		void updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent);
         void mainRenderDrawFrame();
