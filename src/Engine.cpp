@@ -311,7 +311,7 @@ namespace GLVM::core
 		return jointMatrices;
 	}
 
-	mat4 Engine::updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent) {
+	mat4 Engine::updateDirectionalLightSpaceMatrixShadowMapUBO( ecs::components::directionalLight* directionalLightComponent ) {
 		float nearPlaneFlatShadowMap = 5.5f;
 		float farPlaneFlatShadowMap = 100.0f;
 		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
@@ -327,6 +327,22 @@ namespace GLVM::core
 //		directionalProjectionMatrixLight[1][1] *= -1;
 		return viewMatrixLight * directionalProjectionMatrixLight;
 	}
+
+	mat4 Engine::updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent ) {
+		float nearPlaneFlatShadowMap = 5.5f;
+		float farPlaneFlatShadowMap = 100.0f;
+		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
+														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
+		
+		vec3 positionVectorLight  = spotLightComponent->position;
+		vec3 directionVectorLight = spotLightComponent->direction;
+		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
+										  directionVectorLight,
+										  { 0.0f, -1.0f, 0.0f });
+
+//		spotProjectionMatrixLight[1][1] *= -1;
+		return viewMatrixLight * spotProjectionMatrixLight;
+	}
 	
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
@@ -339,9 +355,22 @@ namespace GLVM::core
 		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
 			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
 			vulkanRenderer->directionalLights.Push({});
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(directionalLightEntity);
+			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>( directionalLightEntity );
 			vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
-				updateDirectionalLightSpaceMatrixShadowMapUBO(directionalLightComponent);
+				updateDirectionalLightSpaceMatrixShadowMapUBO( directionalLightComponent );
+		}
+
+		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
+																							  cm::spotLight,
+																							  cm::mesh,
+																							  cm::actor>();
+		vulkanRenderer->spotLights.clear();
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
+			vulkanRenderer->spotLights.Push({});
+			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>( spotLightEntity );
+			vulkanRenderer->spotLights[spotLightCounter].SpotLigthSpaceMatrix =
+				updateSpotLightSpaceMatrixShadowMapUBO( spotLightComponent );
 		}
 		
 		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::transform,

@@ -167,6 +167,7 @@ namespace GLVM::core
 		unsigned int entities[32]; ///<
 		core::vector<RenderActor> actors;
 		core::vector<RenderDirectionalLight> directionalLights;
+		core::vector<RenderSpotLight> spotLights;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -483,8 +484,6 @@ namespace GLVM::core
 							   std::vector<VkSemaphore>& renderFinishedSemaphores,
 							   std::vector<VkFence>& inFlightFences);
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
-		void updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
-																		 uint32_t currentLight);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, ecs::components::pointLight* pointLightComponent, uint32_t layer, unsigned int actor);
         void updateMatrixUniformBuffer(uint32_t offset, unsigned int actor);

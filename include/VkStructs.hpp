@@ -246,4 +246,8 @@ struct RenderDirectionalLight {
 	mat4 DirectionalLightSpaceMatrix;
 };
 
+struct RenderSpotLight {
+	mat4 SpotLigthSpaceMatrix;
+};
+
 #endif

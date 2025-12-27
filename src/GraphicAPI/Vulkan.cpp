@@ -3060,23 +3060,6 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
-	void CVulkanRenderer::updateSpotLightSpaceMatrixShadowMapUBO(ecs::components::spotLight* spotLightComponent,
-																		uint32_t currentLight) {
-		float nearPlaneFlatShadowMap = 5.5f;
-		float farPlaneFlatShadowMap = 100.0f;
-		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
-														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
-		
-		vec3 positionVectorLight  = spotLightComponent->position;
-		vec3 directionVectorLight = spotLightComponent->direction;
-		mat4 viewMatrixLight = LookAtMain(positionVectorLight,
-										  directionVectorLight,
-										  { 0.0f, -1.0f, 0.0f });
-
-//		spotProjectionMatrixLight[1][1] *= -1;
-		spotLightSpaceMatrix[currentLight] = viewMatrixLight * spotProjectionMatrixLight;
-	}
-	
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 		
@@ -3635,14 +3618,7 @@ namespace GLVM::core
 	}
 
 		void CVulkanRenderer::spotLightRecordCommandBuffer(std::vector<VkCommandBuffer>& commandBuffers, [[maybe_unused]] uint32_t currentFrame) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::spotLight,
-																							  cm::mesh,
-																							  cm::actor>();
-
-		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
+		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLights.GetSize(); ++ spotLightCounter ) {
 			VkCommandBufferInheritanceInfo inheritanceInfo{};
 			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::SPOT_LIGHT_PIPELINE];
@@ -3696,10 +3672,7 @@ namespace GLVM::core
 
 			vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPOT_LIGHT_PIPELINE].pipeline);
 
-			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
-			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(spotLightEntity);
-			updateSpotLightSpaceMatrixShadowMapUBO(spotLightComponent, spotLightCounter);
-
+			spotLightSpaceMatrix[spotLightCounter] = spotLights[spotLightCounter].SpotLigthSpaceMatrix; 
 			uint32_t actorsNumber = actors.GetSize();
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
 				RenderActor actor = actors[actorsCounter];
