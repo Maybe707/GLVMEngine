@@ -2899,7 +2899,7 @@ namespace GLVM::core
 		
 		modelMatrixUBO.lightSpaceMatrix = pointLights[currentLight].pointLightSpaceMatrix[layer];
 		modelMatrixUBO.farPlane = 100.0f;
-		modelMatrixUBO.lightPosition = pointLights[currentLight].lightPosition;
+		modelMatrixUBO.lightPosition = pointLights[currentLight].position;
 
 		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
@@ -2947,104 +2947,66 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
-		namespace cm = GLVM::ecs::components;
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		LightData lightDataUBO{};
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GLVM::ecs::components::controller>();
 		if ( pointLightEntities.GetSize() > 0 )
-
 			lightDataUBO.viewPosition = transformComponent->position;
 
 		DirectionalLight directionalLight{};
-
-		core::vector<Entity> linkedEntitiesDirLight      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::directionalLight,
-																						   cm::mesh>();
-
-		directionalLightNumber = linkedEntitiesDirLight.GetSize();
+		directionalLightNumber = directionalLights.GetSize();
 		assert(directionalLightNumber <= 4 && "Directional lights number greater then 4");
-
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>(linkedEntitiesDirLight[i]);
+			RenderDirectionalLight dirLight = directionalLights[i];
 			
-			directionalLight.position  = vec4(directionalLightComponent->position[0],
-											  directionalLightComponent->position[1],
-											  directionalLightComponent->position[2], 0.0f);
-			directionalLight.direction = vec4(directionalLightComponent->direction[0],
-											  directionalLightComponent->direction[1],
-											  directionalLightComponent->direction[2], 0.0f);
-			directionalLight.ambient   = vec4(directionalLightComponent->ambient[0],
-											  directionalLightComponent->ambient[1],
-											  directionalLightComponent->ambient[2], 0.0f);
-			directionalLight.diffuse   = vec4(directionalLightComponent->diffuse[0],
-											  directionalLightComponent->diffuse[1],
-											  directionalLightComponent->diffuse[2], 0.0f);
-			directionalLight.specular  = vec4(directionalLightComponent->specular[0],
-											  directionalLightComponent->specular[1],
-											  directionalLightComponent->specular[2], 0.0f);
+			directionalLight.position  = dirLight.position;
+			directionalLight.direction = dirLight.direction;
+			directionalLight.ambient   = dirLight.ambient;
+			directionalLight.diffuse   = dirLight.diffuse;
+			directionalLight.specular  = dirLight.specular;
 
 			lightDataUBO.directionalLights[i] = directionalLight;			
 		}
-
 		lightDataUBO.directionalLightsArraySize = directionalLightNumber;
 
-		core::vector<Entity> linkedEntitiesPointLight      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::pointLight,
-																						   cm::mesh>();
-
-		pointLightNumber = linkedEntitiesPointLight.GetSize();
+		pointLightNumber = pointLights.GetSize();
 		assert(pointLightNumber <= POINT_LIGHTS_NUMBER && "Point lights number greater than 32");
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
-			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(linkedEntitiesPointLight[i]);
+			RenderPointLight pointLight = pointLights[i];
 			PointLight pointLightUBO{};
 
- 			pointLightUBO.position  = vec3(pointLightComponent->position[0],
-										   pointLightComponent->position[1],
-										   pointLightComponent->position[2]);
-			pointLightUBO.ambient   = vec3(pointLightComponent->ambient[0],
-										   pointLightComponent->ambient[1],
-										   pointLightComponent->ambient[2]);
-			pointLightUBO.diffuse   = vec3(pointLightComponent->diffuse[0],
-										   pointLightComponent->diffuse[1],
-										   pointLightComponent->diffuse[2]);
-			pointLightUBO.specular  = pointLightComponent->specular;
-
-			pointLightUBO.constant  = pointLightComponent->constant;
-
-			pointLightUBO.linear    = pointLightComponent->linear;
-
-			pointLightUBO.quadratic = pointLightComponent->quadratic;
+ 			pointLightUBO.position  = pointLight.position;
+			pointLightUBO.ambient   = pointLight.ambient;
+			pointLightUBO.diffuse   = pointLight.diffuse;
+			pointLightUBO.specular  = pointLight.specular;
+			pointLightUBO.constant  = pointLight.constant;
+			pointLightUBO.linear    = pointLight.linear;
+			pointLightUBO.quadratic = pointLight.quadratic;
 
 			lightDataUBO.pointLights[i] = pointLightUBO;
 		}
-		
 		lightDataUBO.pointLightsArraySize = pointLightNumber;
 		lightDataUBO.farPlane = 100.0f;
 
-		SpotLight spotLight{};
-		core::vector<Entity> linkedEntitiesSpotLight      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::spotLight,
-																						   cm::mesh>();
-
-		spotLightNumber = linkedEntitiesSpotLight.GetSize();
+		SpotLight spotLightUBO{};
+		spotLightNumber = spotLights.GetSize();
 		assert(spotLightNumber <= 8 && "Spot light number greater then 8");
 		for ( unsigned int i = 0; i < spotLightNumber; ++i ) {
-			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>(linkedEntitiesSpotLight[i]);
+			RenderSpotLight spotLight = spotLights[i];
 			
-			spotLight.position    = spotLightComponent->position;
-			spotLight.direction   = spotLightComponent->direction;
-			spotLight.cutOff      = std::cos(Radians(spotLightComponent->cutOff));
-			spotLight.outerCutOff = std::cos(Radians(spotLightComponent->outerCutOff));
-			spotLight.ambient     = spotLightComponent->ambient;
-			spotLight.diffuse     = spotLightComponent->diffuse;
-			spotLight.specular    = spotLightComponent->specular;
-			spotLight.constant    = spotLightComponent->constant;
-			spotLight.linear      = spotLightComponent->linear;
-			spotLight.quadratic   = spotLightComponent->quadratic; 
+			spotLightUBO.position    = spotLight.position;
+			spotLightUBO.direction   = spotLight.direction;
+			spotLightUBO.cutOff      = std::cos(Radians(spotLight.cutOff));
+			spotLightUBO.outerCutOff = std::cos(Radians(spotLight.outerCutOff));
+			spotLightUBO.ambient     = spotLight.ambient;
+			spotLightUBO.diffuse     = spotLight.diffuse;
+			spotLightUBO.specular    = spotLight.specular;
+			spotLightUBO.constant    = spotLight.constant;
+			spotLightUBO.linear      = spotLight.linear;
+			spotLightUBO.quadratic   = spotLight.quadratic; 
 
-			lightDataUBO.spotLights[i] = spotLight;
+			lightDataUBO.spotLights[i] = spotLightUBO;
 		}
-
 		lightDataUBO.spotLightArraySize = spotLightNumber;
 
 		std::random_device rd;

@@ -233,6 +233,10 @@ namespace GLVM::core
 }
 
 /// Render objects
+struct RenderPlayer {
+	
+};
+
 struct RenderActor {
 	mat4 modelMatrix;
 	GLVM::core::vector<mat4> jointMatrices;
@@ -245,17 +249,43 @@ struct RenderActor {
 
 struct RenderDirectionalLight {
 	mat4 DirectionalLightSpaceMatrix;
+	vec4 position;
+	vec4 direction;
+		
+	vec4 ambient;
+	vec4 diffuse;
+	vec4 specular;
 };
 
 struct RenderSpotLight {
 	mat4 SpotLigthSpaceMatrix;
+	vec3  position;
+	vec3  direction;
+	float cutOff;
+	float outerCutOff;
+
+	vec3  ambient;
+	vec3  diffuse;
+	vec3  specular;
+
+	float constant;
+	float linear;
+	float quadratic; 
 };
 
 #define CUBE_MAP_LAYER_NUMBER 6
 
 struct RenderPointLight {
 	mat4 pointLightSpaceMatrix[CUBE_MAP_LAYER_NUMBER];
-	vec3 lightPosition;
+	vec3 position;
+
+	vec3 ambient;
+	vec3 diffuse;
+	vec3 specular;
+
+	float constant;
+	float linear;
+	float quadratic;
 };
 
 struct RenderHealth {

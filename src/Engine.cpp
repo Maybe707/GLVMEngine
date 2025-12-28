@@ -538,6 +538,21 @@ namespace GLVM::core
 			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>( directionalLightEntity );
 			vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
 				updateDirectionalLightSpaceMatrixShadowMapUBO( directionalLightComponent );
+			vulkanRenderer->directionalLights[directionalLightCounter].position = vec4(directionalLightComponent->position[0],
+																					   directionalLightComponent->position[1],
+																					   directionalLightComponent->position[2], 0.0);
+			vulkanRenderer->directionalLights[directionalLightCounter].direction = vec4(directionalLightComponent->direction[0],
+																						directionalLightComponent->direction[1],
+																						directionalLightComponent->direction[2], 0.0);
+			vulkanRenderer->directionalLights[directionalLightCounter].ambient = vec4(directionalLightComponent->ambient[0],
+																					  directionalLightComponent->ambient[1],
+																					  directionalLightComponent->ambient[2], 0.0);
+			vulkanRenderer->directionalLights[directionalLightCounter].diffuse = vec4(directionalLightComponent->diffuse[0],
+																					  directionalLightComponent->diffuse[1],
+																					  directionalLightComponent->diffuse[2], 0.0);
+			vulkanRenderer->directionalLights[directionalLightCounter].specular = vec4(directionalLightComponent->specular[0],
+																					   directionalLightComponent->specular[1],
+																					   directionalLightComponent->specular[2], 0.0);
 		}
 
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
@@ -551,6 +566,16 @@ namespace GLVM::core
 			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>( spotLightEntity );
 			vulkanRenderer->spotLights[spotLightCounter].SpotLigthSpaceMatrix =
 				updateSpotLightSpaceMatrixShadowMapUBO( spotLightComponent );
+			vulkanRenderer->spotLights[spotLightCounter].position    = spotLightComponent->position;
+			vulkanRenderer->spotLights[spotLightCounter].direction   = spotLightComponent->direction;
+			vulkanRenderer->spotLights[spotLightCounter].cutOff      = spotLightComponent->cutOff;
+			vulkanRenderer->spotLights[spotLightCounter].outerCutOff = spotLightComponent->outerCutOff;
+			vulkanRenderer->spotLights[spotLightCounter].ambient     = spotLightComponent->ambient;
+			vulkanRenderer->spotLights[spotLightCounter].diffuse     = spotLightComponent->diffuse;
+			vulkanRenderer->spotLights[spotLightCounter].specular    = spotLightComponent->specular;
+			vulkanRenderer->spotLights[spotLightCounter].constant    = spotLightComponent->constant;
+			vulkanRenderer->spotLights[spotLightCounter].linear      = spotLightComponent->linear;
+			vulkanRenderer->spotLights[spotLightCounter].quadratic   = spotLightComponent->quadratic;
 		}
 
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
@@ -564,11 +589,17 @@ namespace GLVM::core
 			vulkanRenderer->pointLights.Push({});
 			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
 			uint32_t maxCubeMapLayers = 6;
-			vulkanRenderer->pointLights[pointLightCounter].lightPosition = pointLightComponent->position;
 			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
 				vulkanRenderer->pointLights[pointLightCounter].pointLightSpaceMatrix[cubeMapLayerCounter] =
 					updatePointLightSpaceMatrixShadowMapUBO( pointLightComponent, cubeMapLayerCounter );
 			}
+			vulkanRenderer->pointLights[pointLightCounter].position  = pointLightComponent->position;
+			vulkanRenderer->pointLights[pointLightCounter].ambient   = pointLightComponent->ambient;
+			vulkanRenderer->pointLights[pointLightCounter].diffuse   = pointLightComponent->diffuse;
+			vulkanRenderer->pointLights[pointLightCounter].specular  = pointLightComponent->specular;
+			vulkanRenderer->pointLights[pointLightCounter].constant  = pointLightComponent->constant;
+			vulkanRenderer->pointLights[pointLightCounter].linear    = pointLightComponent->linear;
+			vulkanRenderer->pointLights[pointLightCounter].quadratic = pointLightComponent->quadratic;
 		}
 
 		namespace cm = GLVM::ecs::components;
