@@ -121,6 +121,7 @@ namespace GLVM::core
 		void setFrameData();
 		void loadWavefrontObj();
 		void initializeGLTF();
+		void initializeFontData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);

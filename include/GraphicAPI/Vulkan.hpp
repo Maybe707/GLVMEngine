@@ -323,6 +323,7 @@ namespace GLVM::core
 		uint32_t wavefrontObjCounter = 0;
 		uint32_t gltfCounter         = 0;
 
+		core::vector<core::vector<Vertex>> symbolGVerticesContainer;
 		std::vector<unsigned int> fontIndicesContainer;
         std::vector<VkBuffer> fontVertexBufferContainer;
         std::vector<VkDeviceMemory> fontVertexBufferMemoryContainer;
@@ -410,10 +411,10 @@ namespace GLVM::core
         bool framebufferResized = false;
 
         void initWindow();
-		void initializeFontData();
         void initVulkan();
 		void initializeVertexBuffersWithWavefrontData();
 		void initializeVertexBuffersWithGLTFData();
+		void initializeVertexBuffersWithFontData();
         void cleanupSwapChain();
         void cleanup();
         void createInstance();

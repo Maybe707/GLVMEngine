@@ -183,6 +183,7 @@ namespace GLVM::core
 		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
 		loadWavefrontObj();
 		initializeGLTF();
+		initializeFontData();
 		vulkanRenderer->run();
 //		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 
@@ -1093,7 +1094,42 @@ namespace GLVM::core
 			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
 		}
 	}
-	
+
+	void Engine::initializeFontData() {
+		constexpr float fontStep = 1.0 / 12;
+		constexpr unsigned int glyph_row = 7;
+		constexpr unsigned int glyph_column = 12;
+
+		vulkanRenderer->fontVertexBufferContainer.resize(128);
+		vulkanRenderer->fontVertexBufferMemoryContainer.resize(128);
+
+		vulkanRenderer->fontIndexBufferContainer.resize(128);
+		vulkanRenderer->fontIndexBufferMemoryContaner.resize(128);
+		
+		for ( unsigned int i = 0; i < glyph_row; ++i )
+			for ( unsigned int j = 0; j < glyph_column; ++j ) {
+				core::vector<Vertex> symbol_g_vertices;
+					symbol_g_vertices.Push({{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * j, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * j, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+					symbol_g_vertices.Push({{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
+				unsigned int currentBufferIndex = i * glyph_column + j;
+
+				bool exitFlag = false;
+				const unsigned int nextBufferIndex = static_cast<const unsigned int>(vulkanRenderer->glyphs[currentBufferIndex]);
+				for ( unsigned int n = 0; n < vulkanRenderer->fontIndicesContainer.size(); ++n ) {                 ///< TODO: Fix gabage algo
+					if ( nextBufferIndex == vulkanRenderer->fontIndicesContainer[n] )
+						exitFlag = true;
+				}
+
+				if ( exitFlag )
+					continue;
+
+				vulkanRenderer->symbolGVerticesContainer.Push(symbol_g_vertices);
+				vulkanRenderer->fontIndicesContainer.push_back(nextBufferIndex);
+			}
+	}
+
 	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent) {
 		mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);

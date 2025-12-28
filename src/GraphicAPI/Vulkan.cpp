@@ -257,45 +257,6 @@ namespace GLVM::core
 		}
 	}
 	
-	void CVulkanRenderer::initializeFontData() {
-		constexpr float fontStep = 1.0 / 12;
-		constexpr unsigned int glyph_row = 7;
-		constexpr unsigned int glyph_column = 12;
-
-		fontVertexBufferContainer.resize(128);
-		fontVertexBufferMemoryContainer.resize(128);
-
-		fontIndexBufferContainer.resize(128);
-		fontIndexBufferMemoryContaner.resize(128);
-		
-		for ( unsigned int i = 0; i < glyph_row; ++i )
-			for ( unsigned int j = 0; j < glyph_column; ++j ) {
-				core::vector<Vertex> symbol_g_vertices;
-					symbol_g_vertices.Push({{-0.5f, 0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {fontStep * j, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
-					symbol_g_vertices.Push({{0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i + fontStep}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
-					symbol_g_vertices.Push({{-0.5f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {fontStep * j, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
-					symbol_g_vertices.Push({{0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {fontStep * j + fontStep, fontStep * i}, {0.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f, 0.0f}});
-				unsigned int currentBufferIndex = i * glyph_column + j;
-
-				bool exitFlag = false;
-				const unsigned int nextBufferIndex = static_cast<const unsigned int>(glyphs[currentBufferIndex]);
-				for ( unsigned int n = 0; n < fontIndicesContainer.size(); ++n ) {                 ///< TODO: Fix gabage algo
-					if ( nextBufferIndex == fontIndicesContainer[n] )
-						exitFlag = true;
-				}
-
-				if ( exitFlag )
-					continue;
-				
-				fontIndicesContainer.push_back(nextBufferIndex);
-				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
-
-				createIndexBuffer(fontIndexBufferContainer[nextBufferIndex], fontIndexBufferMemoryContaner[nextBufferIndex], symbol_g_indices);
-
-			}
-	}
-
-	
     void CVulkanRenderer::initVulkan() {
         createInstance();
         setupDebugMessenger();
@@ -323,7 +284,7 @@ namespace GLVM::core
         createTextureSampler();
 		initializeVertexBuffersWithWavefrontData();
 		initializeVertexBuffersWithGLTFData();
-		initializeFontData();
+		initializeVertexBuffersWithFontData();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
@@ -379,6 +340,16 @@ namespace GLVM::core
 			indexBufferMemoryContaner.emplace_back();
 			createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
 			++gltfCounter;
+		}
+	}
+
+	void CVulkanRenderer::initializeVertexBuffersWithFontData() {
+		for ( unsigned int i = 0; i < symbolGVerticesContainer.GetSize(); ++i ) {
+				const unsigned int nextBufferIndex = fontIndicesContainer[i];
+				core::vector<Vertex> symbol_g_vertices = symbolGVerticesContainer[i];
+				
+				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
+				createIndexBuffer(fontIndexBufferContainer[nextBufferIndex], fontIndexBufferMemoryContaner[nextBufferIndex], symbol_g_indices);
 		}
 	}
 	
