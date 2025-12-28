@@ -89,6 +89,7 @@ namespace GLVM::core
 	public:
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::vector<ecs::TextureHandle> textureHandlers;
+		uint32_t wavefrontObjCounter = 0;
         
         ~Engine();
         
@@ -119,6 +120,7 @@ namespace GLVM::core
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
 		void setFrameData();
 		void loadWavefrontObj();
+		void initializeGLTF();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);

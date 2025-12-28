@@ -411,9 +411,9 @@ namespace GLVM::core
 
         void initWindow();
 		void initializeFontData();
-		void initializeGLTF();
         void initVulkan();
 		void initializeVertexBuffersWithWavefrontData();
+		void initializeVertexBuffersWithGLTFData();
         void cleanupSwapChain();
         void cleanup();
         void createInstance();

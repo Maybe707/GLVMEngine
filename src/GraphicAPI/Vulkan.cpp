@@ -222,129 +222,6 @@ namespace GLVM::core
 #endif
     }
 
-	void CVulkanRenderer::initializeGLTF() {
-		core::vector<bool> animationFlags;
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-			Core::CJsonParser jsonParser;
-			aVertexesTemp_.emplace_back();
-			aIndices_.emplace_back();
-			frames.Push({});
-			jointMatricesPerMesh.Push({});
-			animationFlags.Push({});
-			highest_gltf_Y.emplace_back();
-			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			jsonParser.LoadGLTF(pathsGLTF_[m], aVertexesTemp_[m], aIndices_[nextIndexGLTF], jointMatricesPerMesh[nextIndexGLTF], frames[nextIndexGLTF], animationFlags[m], highest_gltf_Y[nextIndexGLTF]);
-		}
-
-		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
-//            aIndices_.emplace_back();
-//            aVertices_.emplace_back();
-			aVertices_.emplace_back();
-			allMeshMaxAbsoluteValues.Push({});
-
-			meshAxisLimitingValues.highest_x = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-			meshAxisLimitingValues.highest_y = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-			meshAxisLimitingValues.highest_z = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_z  = MAXFLOAT;
-			
-			int stepOffset = 0;
-			if ( animationFlags[m] )
-				stepOffset = 8;
-			else
-				stepOffset = 16;
-			for ( unsigned int n = 0; n < aVertexesTemp_[m].size(); n += stepOffset ) {
-				SVertex vertex;
-				vertex[0] = aVertexesTemp_[m][n];
-			    vertex[1] = aVertexesTemp_[m][n + 1];
-				vertex[2] = aVertexesTemp_[m][n + 2];
-				SVertex normal;
-				normal[0] = aVertexesTemp_[m][n + 3];
-				normal[1] = aVertexesTemp_[m][n + 4];
-				normal[2] = aVertexesTemp_[m][n + 5];
-				SVertex texture;
-				texture[0] = aVertexesTemp_[m][n + 6];
-				texture[1] = aVertexesTemp_[m][n + 7];
-
-				if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
-					meshAxisLimitingValues.lowest_x = vertex[0];
-				} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
-					meshAxisLimitingValues.highest_x = vertex[0];
-				}
-
-				if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
-					meshAxisLimitingValues.lowest_y = vertex[1];
-				} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
-					meshAxisLimitingValues.highest_y = vertex[1];
-				}
-
-				if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
-					meshAxisLimitingValues.lowest_z = vertex[2];
-				} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
-					meshAxisLimitingValues.highest_z = vertex[2];
-				}
-				
-				vec4 joinIndices;
-				vec4 weights;
-				if ( animationFlags[m] ) {
-					joinIndices[0] = -1;
-					joinIndices[1] = -1;
-					joinIndices[2] = -1;
-					joinIndices[3] = -1;
-
-					weights[0] = 1;
-					weights[1] = 1;
-					weights[2] = 1;
-					weights[3] = 1;
-					
-				} else {
-					joinIndices[0] = aVertexesTemp_[m][n + 8];
-					joinIndices[1] = aVertexesTemp_[m][n + 9];
-					joinIndices[2] = aVertexesTemp_[m][n + 10];
-					joinIndices[3] = aVertexesTemp_[m][n + 11];
-
-					weights[0] = aVertexesTemp_[m][n + 12];
-					weights[1] = aVertexesTemp_[m][n + 13];
-					weights[2] = aVertexesTemp_[m][n + 14];
-					weights[3] = aVertexesTemp_[m][n + 15];
-				}
-
-				uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-				aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
-										 {normal[0], normal[1], normal[2]},
-										 {texture[0], texture[1]},
-										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-										 {weights[0], weights[1], weights[2], weights[3]}});
-			}
-			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-
-			// std::cout << "GLTF" << std::endl;
-			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-			// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-			// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-			// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-			// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-			// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-			// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-			// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
-			
-            vertexBufferContainer.emplace_back();
-            vertexBufferMemoryContainer.emplace_back();
-            createVertexBuffer(vertexBufferContainer[nextIndexGLTF], vertexBufferMemoryContainer[nextIndexGLTF], aVertices_[nextIndexGLTF]);
-
-            indexBufferContainer.emplace_back();
-            indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
-			++gltfCounter;
-		}
-	}
-
 	void CVulkanRenderer::initializeGameLevelVertices() {
 		for ( unsigned int m = 0; m < levelGeneratedVertices.size(); ++m ) {
 			aVertices_.push_back(levelGeneratedVertices[m]);
@@ -445,7 +322,7 @@ namespace GLVM::core
         createTextureImageView();
         createTextureSampler();
 		initializeVertexBuffersWithWavefrontData();
-		initializeGLTF();
+		initializeVertexBuffersWithGLTFData();
 		initializeFontData();
 		
         createMainRenderUniformBuffers();
@@ -488,6 +365,20 @@ namespace GLVM::core
 			indexBufferMemoryContaner.emplace_back();
 			createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
 			++wavefrontObjCounter;
+		}
+	}
+
+	void CVulkanRenderer::initializeVertexBuffersWithGLTFData() {
+		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
+			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+			vertexBufferContainer.emplace_back();
+			vertexBufferMemoryContainer.emplace_back();
+			createVertexBuffer(vertexBufferContainer[nextIndexGLTF], vertexBufferMemoryContainer[nextIndexGLTF], aVertices_[nextIndexGLTF]);
+
+			indexBufferContainer.emplace_back();
+			indexBufferMemoryContaner.emplace_back();
+			createIndexBuffer(indexBufferContainer[nextIndexGLTF], indexBufferMemoryContaner[nextIndexGLTF], aIndices_[nextIndexGLTF]);
+			++gltfCounter;
 		}
 	}
 	
