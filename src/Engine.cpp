@@ -161,6 +161,26 @@ namespace GLVM::core
 		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->pathsArray_            = pathsArray_;
 		vulkanRenderer->pathsGLTF_             = pathsGLTF_;
+		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
+		vulkanRenderer->SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
+		namespace cm = GLVM::ecs::components;
+		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
+		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																									  cm::directionalLight,
+																									  cm::mesh>();
+		vulkanRenderer->directionalLightNumber = directionalLightLinkedEntities.GetSize();
+		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																							   cm::spotLight,
+																							   cm::mesh>();
+		vulkanRenderer->spotLightNumber = spotLightLinkedEntities.GetSize();
+		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																								cm::pointLight,
+																								cm::mesh>();
+		vulkanRenderer->pointLightNumber = pointLightLinkedEntities.GetSize();
+		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
+																							cm::material,
+																							cm::mesh>();
+		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
 		vulkanRenderer->run();
 //		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 

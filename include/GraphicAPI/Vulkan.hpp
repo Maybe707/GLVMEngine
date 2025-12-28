@@ -289,6 +289,7 @@ namespace GLVM::core
         VkImageView mainDepthImageView;
 
 		/// Depth varialbes for shadow map.
+	public:
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
 		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
@@ -300,7 +301,7 @@ namespace GLVM::core
 		FOR TEST ONLY!!!
 		===================================
 		*/
-	public:
+
 		mat4 dirLightSpaceMatrix[DIRECTIONAL_LIGHTS_NUMBER];
 		mat4 spotLightSpaceMatrix[SPOT_LIGHTS_NUMBER];
 		

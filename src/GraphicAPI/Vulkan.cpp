@@ -407,9 +407,6 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::run() {
-        GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
-
-		SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		VkConfigInitializer();
 		descriptorSetBuilder();
 		pipelineBuilder();
@@ -417,31 +414,6 @@ namespace GLVM::core
 		for( int i = 0; i < 20; ++i ) {
 			std::cout << "descriptor offset: " << descriptorBindingsConfig[i].globalDescriptorOffset << std::endl;
 		}
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																									  cm::directionalLight,
-																									  cm::mesh>();
-
-		directionalLightNumber = directionalLightLinkedEntities.GetSize();
-
-		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::spotLight,
-																							   cm::mesh>();
-
-		spotLightNumber = spotLightLinkedEntities.GetSize();
-
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::pointLight,
-																								cm::mesh>();
-
-		pointLightNumber = pointLightLinkedEntities.GetSize();
-
-		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							cm::material,
-																							cm::mesh>();
-
-		actorsNumber = actorsLinkedEntities.GetSize();
 
 		renderThreadPool = new ThreadPool(3);
 		
