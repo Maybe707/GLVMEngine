@@ -192,22 +192,6 @@ namespace GLVM::core
         }
     }
 
-	void CVulkanRenderer::EnlargeFrameAccumulator(float value) {
-		namespace cm = GLVM::ecs::components;
-		
-		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::animation, cm::transform, cm::mesh>();
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			Entity currentEntity                = linkedEntities[i];
-			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->handle.id;
-
-			if ( jointMatricesPerMesh.GetSize() > 0 && jointMatricesPerMesh[mesh_id].GetSize() > 0 )
-				transformComponent->frameAccumulator += value;
-		}
-	}
-	
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
         viewMatrix = _viewMatrix; // 
     }
@@ -1917,13 +1901,6 @@ namespace GLVM::core
 	// }
 	
     void CVulkanRenderer::createMainRenderUniformBuffers() {
-		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-
-		core::vector<Entity> matrixLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							cm::material,
-																							cm::mesh>();
-
 		for( unsigned int i = 0; i < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++i ) {
 			for( unsigned int j = 0; j < descriptorSetsConfig[i].actualLinkedDescriptorBindingsNumber; ++j ) {
 				unsigned int descriptorBindingIndex = descriptorSetsConfig[i].descriptorsBindingsIDs[j];
@@ -2906,11 +2883,8 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		LightData lightDataUBO{};
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GLVM::ecs::components::controller>();
-		if ( pointLightEntities.GetSize() > 0 )
-			lightDataUBO.viewPosition = players[player].position;
+		lightDataUBO.viewPosition = players[player].position;
 
 		DirectionalLight directionalLight{};
 		directionalLightNumber = directionalLights.GetSize();

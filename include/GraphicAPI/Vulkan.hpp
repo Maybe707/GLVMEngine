@@ -209,7 +209,6 @@ namespace GLVM::core
         void recreateSwapChain();
         void draw();
         void loadWavefrontObj();
-		void EnlargeFrameAccumulator(float value);
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
         void SetViewMatrix(mat4 _viewMatrix);
         void SetProjectionMatrix(mat4 _projectionMatrix);

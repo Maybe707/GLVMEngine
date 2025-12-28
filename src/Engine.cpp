@@ -279,7 +279,7 @@ namespace GLVM::core
 			itemSystem->isLeftMouseButtonPressed      = isLeftMouseButtonPressed;
 			itemSystem->mouseOffsetX                  = hud_screen_x;
 			itemSystem->mouseOffsetY                  = hud_screen_y;
-			vulkanRenderer->EnlargeFrameAccumulator(deltaFrameTime);
+			EnlargeFrameAccumulator(deltaFrameTime);
 			pSystem_Manager->Update();
 			vulkanRenderer->levelGeneratedVertices    = procuduralLevelGeneratingSystem->levelGeneratedVertices;
 			vulkanRenderer->levelGeneratedIndices     = procuduralLevelGeneratingSystem->levelGeneratedIndices;
@@ -298,6 +298,22 @@ namespace GLVM::core
 		delete vulkanRenderer;
 	}
 
+	void Engine::EnlargeFrameAccumulator(float value) {
+		namespace cm = GLVM::ecs::components;
+		
+		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::animation, cm::transform, cm::mesh>();
+		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
+			Entity currentEntity                = linkedEntities[i];
+			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
+			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->handle.id;
+
+			if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+				transformComponent->frameAccumulator += value;
+		}
+	}
+	
 	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
 		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 &&
 			 _transformComponent->frameAccumulator >= vulkanRenderer->frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {

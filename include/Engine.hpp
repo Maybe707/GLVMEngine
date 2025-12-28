@@ -99,6 +99,7 @@ namespace GLVM::core
 		void GameLoop();
 		void EventQueueFlush();
 		void RenderVulkan();
+		void EnlargeFrameAccumulator(float value);
 		[[nodiscard]] core::vector<mat4> updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID);
 		mat4 updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent);
 		mat4 updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent );
