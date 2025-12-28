@@ -55,111 +55,6 @@ namespace GLVM::core
 		mainRenderDrawFrame();
     }
 
-    void CVulkanRenderer::loadWavefrontObj() {
-        for (unsigned int m = 0; m < pathsArray_.size(); ++m) {
-            CWaveFrontObjParser parser;
-            CWaveFrontObjParser* wavefrontObjParser = &parser;
-            
-            wavefrontObjParser->ReadFile(pathsArray_[m]);
-            wavefrontObjParser->ParseFile();
-
-            aIndices_.emplace_back();
-            aVertices_.emplace_back();
-			highest_gltf_Y.emplace_back();
-			highest_gltf_Y[m] = -999.999f;
-
-			frames.Push({});
-			jointMatricesPerMesh.Push({});
-			allMeshMaxAbsoluteValues.Push({});
-            
-            unsigned int vertexIndex  = 0;
-            unsigned int textureIndex = 0;
-			unsigned int normalIndex  = 0;
-            unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
-
-			meshAxisLimitingValues.highest_x = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-			meshAxisLimitingValues.highest_y = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-			meshAxisLimitingValues.highest_z = -MAXFLOAT;
-			meshAxisLimitingValues.lowest_z  = MAXFLOAT;
-			
-            for (unsigned int i = 0; i < faceVerticesSize; ++i)
-                for (int j = 0; j < 3; ++j) {
-                    vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
-					aIndices_[m].push_back(i * 3 + j);
-                    SVertex vertex  = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
-                    textureIndex    = wavefrontObjParser->getFaces()[i][1][j] - 1;
-                    SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
-					normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
-					SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
-
-					vec4 jointIndices;
-					vec4 weights;
-
-					if ( vertex[1] > highest_gltf_Y[m] )
-						highest_gltf_Y[m] = vertex[1];
-
-					if ( vertex[0] < meshAxisLimitingValues.lowest_x ) {
-						meshAxisLimitingValues.lowest_x = vertex[0];
-					} else if ( vertex[0] > meshAxisLimitingValues.highest_x ) {
-						meshAxisLimitingValues.highest_x = vertex[0];
-					}
-
-					if ( vertex[1] < meshAxisLimitingValues.lowest_y ) {
-						meshAxisLimitingValues.lowest_y = vertex[1];
-					} else if ( vertex[1] > meshAxisLimitingValues.highest_y ) {
-						meshAxisLimitingValues.highest_y = vertex[1];
-					}
-
-					if ( vertex[2] < meshAxisLimitingValues.lowest_z ) {
-						meshAxisLimitingValues.lowest_z = vertex[2];
-					} else if ( vertex[2] > meshAxisLimitingValues.highest_z ) {
-						meshAxisLimitingValues.highest_z = vertex[2];
-					}
-					
-					jointIndices[0] = -1;
-					jointIndices[1] = -1;
-					jointIndices[2] = -1;
-					jointIndices[3] = -1;
-
-					weights[0] = 1.0f;
-					weights[1] = 1.0f;
-					weights[2] = 1.0f;
-					weights[2] = 1.0f;
-					
-                    aVertices_[m].Push({{vertex[0], vertex[1], vertex[2]},
-										{normal[0], normal[1], normal[2]},
-										{texture[0], texture[1]},
-										{jointIndices[0], jointIndices[1], jointIndices[2]},
-										{weights[0], weights[1], weights[2]}});
-                }
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-
-			// std::cout << "WAVEFRONT" << std::endl;
-			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-			// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-			// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-			// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-			// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-			// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-			// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-			// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
-            vertexBufferContainer.emplace_back();
-            vertexBufferMemoryContainer.emplace_back();
-            createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
-
-            indexBufferContainer.emplace_back();
-            indexBufferMemoryContaner.emplace_back();
-            createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
-			++wavefrontObjCounter;
-        }
-    }
-
     void CVulkanRenderer::SetViewMatrix(mat4 _viewMatrix) {
         viewMatrix = _viewMatrix; // 
     }
@@ -549,7 +444,7 @@ namespace GLVM::core
         createTextureImage();
         createTextureImageView();
         createTextureSampler();
-        loadWavefrontObj();
+		initializeVertexBuffersWithWavefrontData();
 		initializeGLTF();
 		initializeFontData();
 		
@@ -583,6 +478,19 @@ namespace GLVM::core
         createSyncObjects(imageAvailableSemaphores, renderFinishedSemaphores, inFlightFences);
     }
 
+	void CVulkanRenderer::initializeVertexBuffersWithWavefrontData() {
+        for (unsigned int m = 0; m < pathsArray_.size(); ++m) {		
+			vertexBufferContainer.emplace_back();
+			vertexBufferMemoryContainer.emplace_back();
+			createVertexBuffer(vertexBufferContainer[m], vertexBufferMemoryContainer[m], aVertices_[m]);
+
+			indexBufferContainer.emplace_back();
+			indexBufferMemoryContaner.emplace_back();
+			createIndexBuffer(indexBufferContainer[m], indexBufferMemoryContaner[m], aIndices_[m]);
+			++wavefrontObjCounter;
+		}
+	}
+	
 	void CVulkanRenderer::clearVK_Image( VK_Image* textureImages ) {
 		vkDestroySampler(device, textureImages->sampler, nullptr);
 		for ( unsigned int j = 0; j < textureImages->views.size(); ++j )

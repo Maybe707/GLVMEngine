@@ -118,6 +118,7 @@ namespace GLVM::core
 							   int itemEntity);
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
 		void setFrameData();
+		void loadWavefrontObj();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);

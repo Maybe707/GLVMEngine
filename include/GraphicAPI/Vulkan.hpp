@@ -208,7 +208,6 @@ namespace GLVM::core
         void createTextureImage();
         void recreateSwapChain();
         void draw();
-        void loadWavefrontObj();
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
         void SetProjectionMatrix(mat4 _projectionMatrix);
 		void SetViewMatrix(mat4 _viewMatrix);
@@ -414,6 +413,7 @@ namespace GLVM::core
 		void initializeFontData();
 		void initializeGLTF();
         void initVulkan();
+		void initializeVertexBuffersWithWavefrontData();
         void cleanupSwapChain();
         void cleanup();
         void createInstance();

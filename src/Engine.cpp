@@ -181,6 +181,7 @@ namespace GLVM::core
 																							cm::material,
 																							cm::mesh>();
 		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
+		loadWavefrontObj();
 		vulkanRenderer->run();
 //		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 
@@ -879,6 +880,103 @@ namespace GLVM::core
 		}
 	}
 
+    void Engine::loadWavefrontObj() {
+        for (unsigned int m = 0; m < pathsArray_.size(); ++m) {
+            CWaveFrontObjParser parser;
+            CWaveFrontObjParser* wavefrontObjParser = &parser;
+            
+            wavefrontObjParser->ReadFile(pathsArray_[m]);
+            wavefrontObjParser->ParseFile();
+
+            vulkanRenderer->aIndices_.emplace_back();
+            vulkanRenderer->aVertices_.emplace_back();
+			vulkanRenderer->highest_gltf_Y.emplace_back();
+			vulkanRenderer->highest_gltf_Y[m] = -999.999f;
+
+			vulkanRenderer->frames.Push({});
+			vulkanRenderer->jointMatricesPerMesh.Push({});
+			allMeshMaxAbsoluteValues.Push({});
+            
+            unsigned int vertexIndex  = 0;
+            unsigned int textureIndex = 0;
+			unsigned int normalIndex  = 0;
+            unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
+
+			vulkanRenderer->meshAxisLimitingValues.highest_x = -MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.lowest_x  = MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.highest_y = -MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.lowest_y  = MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.highest_z = -MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+			
+            for (unsigned int i = 0; i < faceVerticesSize; ++i)
+                for (int j = 0; j < 3; ++j) {
+                    vertexIndex     = wavefrontObjParser->getFaces()[i][0][j] - 1;
+					vulkanRenderer->aIndices_[m].push_back(i * 3 + j);
+                    SVertex vertex  = wavefrontObjParser->getCoordinateVertices()[vertexIndex];
+                    textureIndex    = wavefrontObjParser->getFaces()[i][1][j] - 1;
+                    SVertex texture = wavefrontObjParser->getTextureVertices()[textureIndex];
+					normalIndex     = wavefrontObjParser->getFaces()[i][2][j] - 1;
+					SVertex normal  = wavefrontObjParser->getNormals()[normalIndex];
+
+					vec4 jointIndices;
+					vec4 weights;
+
+					if ( vertex[1] > vulkanRenderer->highest_gltf_Y[m] )
+						vulkanRenderer->highest_gltf_Y[m] = vertex[1];
+
+					if ( vertex[0] < vulkanRenderer->meshAxisLimitingValues.lowest_x ) {
+						vulkanRenderer->meshAxisLimitingValues.lowest_x = vertex[0];
+					} else if ( vertex[0] > vulkanRenderer->meshAxisLimitingValues.highest_x ) {
+						vulkanRenderer->meshAxisLimitingValues.highest_x = vertex[0];
+					}
+
+					if ( vertex[1] < vulkanRenderer->meshAxisLimitingValues.lowest_y ) {
+						vulkanRenderer->meshAxisLimitingValues.lowest_y = vertex[1];
+					} else if ( vertex[1] > vulkanRenderer->meshAxisLimitingValues.highest_y ) {
+						vulkanRenderer->meshAxisLimitingValues.highest_y = vertex[1];
+					}
+
+					if ( vertex[2] < vulkanRenderer->meshAxisLimitingValues.lowest_z ) {
+						vulkanRenderer->meshAxisLimitingValues.lowest_z = vertex[2];
+					} else if ( vertex[2] > vulkanRenderer->meshAxisLimitingValues.highest_z ) {
+						vulkanRenderer->meshAxisLimitingValues.highest_z = vertex[2];
+					}
+					
+					jointIndices[0] = -1;
+					jointIndices[1] = -1;
+					jointIndices[2] = -1;
+					jointIndices[3] = -1;
+
+					weights[0] = 1.0f;
+					weights[1] = 1.0f;
+					weights[2] = 1.0f;
+					weights[2] = 1.0f;
+					
+                    vulkanRenderer->aVertices_[m].Push({{vertex[0], vertex[1], vertex[2]},
+										{normal[0], normal[1], normal[2]},
+										{texture[0], texture[1]},
+										{jointIndices[0], jointIndices[1], jointIndices[2]},
+										{weights[0], weights[1], weights[2]}});
+                }
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
+
+			// std::cout << "WAVEFRONT" << std::endl;
+			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
+			// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
+			// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
+			// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
+			// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
+			// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
+			
+			// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
+			// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
+			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
+        }
+    }
+	
 	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent) {
 		mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
