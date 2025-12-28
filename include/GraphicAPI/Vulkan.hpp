@@ -210,14 +210,12 @@ namespace GLVM::core
         void draw();
         void loadWavefrontObj();
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
-        void SetViewMatrix(mat4 _viewMatrix);
         void SetProjectionMatrix(mat4 _projectionMatrix);
-		void SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent);
-		void SetProjectionMatrix();
+		void SetViewMatrix(mat4 _viewMatrix);
 		void initializeGameLevelVertices();
         void run();
     
-    private:
+    public:
         VkInstance instance;
         VkDebugUtilsMessengerEXT debugMessenger;
 		mat4 viewMatrix;

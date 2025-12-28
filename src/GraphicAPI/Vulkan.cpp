@@ -52,39 +52,7 @@ namespace GLVM::core
     }
     
     void CVulkanRenderer::draw() {
-		namespace cm = GLVM::ecs::components;
-
-		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			Entity currentEntity                = linkedEntities[i];
-			cm::beholder* beholderComponent     = componentManager->GetComponent<cm::beholder>(currentEntity);
-			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			SetViewMatrix(*transformComponent, *beholderComponent);
-		}
-		
-		SetProjectionMatrix();
-		// mutex0.lock();
-		// mutex1.lock();
-		// mutex2.lock();
-		// std::thread directionalLightShadowMapThread(&CVulkanRenderer::directionalLightShadowMapDrawFrame, this);
-		// std::thread spotLightShadowMapThread(&CVulkanRenderer::spotLightShadowMapDrawFrame, this);
-		// std::thread pointLightShadowMapThread(&CVulkanRenderer::pointLightShadowMapDrawFrame, this);
-		// std::thread mainRenderThread(&CVulkanRenderer::mainRenderDrawFrame, this);
-
-		// directionalLightShadowMapDrawFrame();
-		// spotLightShadowMapDrawFrame();
-		// pointLightShadowMapDrawFrame();
 		mainRenderDrawFrame();
-		
-		// #ifdef VK_USE_PLATFORM_XCB_KHR
-        // vkDeviceWaitIdle(device);
-		// #endif
-		// directionalLightShadowMapThread.join();
-		// spotLightShadowMapThread.join();
-		// pointLightShadowMapThread.join();
-		// mainRenderThread.join();
     }
 
     void CVulkanRenderer::loadWavefrontObj() {
@@ -200,102 +168,6 @@ namespace GLVM::core
         projectionMatrix = _projectionMatrix;
     }
 
-    void CVulkanRenderer::SetViewMatrix(ecs::components::transform& _Player, ecs::components::beholder& cameraComponent)
-    {
-		Matrix<float, 4> viewMatrix_(1.0f);
-        const float kSensitivity = 0.1f;
-
-
-		// if ( hud_screen_x > 1.0f )
-		// 	hud_screen_x = 1.0f;
-		// else if ( hud_screen_x < -1.0f )
-		// 	hud_screen_x = -1.0f;
-		
-		// if ( hud_screen_y > 1.0f )
-		// 	hud_screen_y = 1.0f;
-		// else if ( hud_screen_y < -1.0f )
-		// 	hud_screen_y = -1.0f;
-		
-        fYaw = g_eEvent.mousePointerPosition.offset_X;
-        fPitch = g_eEvent.mousePointerPosition.offset_Y;
-        fYaw *= kSensitivity;
-        fPitch *= kSensitivity;
-
-        g_eEvent.mousePointerPosition.pitch = fPitch;
-        g_eEvent.mousePointerPosition.yaw = fYaw;
-
-		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-		float delta_x = 0.0f;
-		float delta_y = 0.0f;
-		#ifdef VK_USE_PLATFORM_WAYLAND_KHR
-		delta_x = current_X;
-		delta_y = current_Y;
-		#else
-		delta_x = current_X - prev_X;
-		delta_y = current_Y - prev_Y;
-		delta_y *= -1.0f;
-		#endif
-		// delta_x *= kSensitivity;
-		// delta_y *= kSensitivity;
-		
-		const vec3 rightVec = Cross(cameraComponent.forward, cameraComponent.up);
-		const vec3 newUpVec = Cross(rightVec, cameraComponent.forward);
-		/*
-		 * 1. The mouse direction determines the "intended direction of rotation" for the object.
-		 * 2. The camera is "looking forward."
-		 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
-		 */
-		const vec3 rotateAxis = Normalize(Cross(cameraComponent.forward, rightVec * delta_x + newUpVec * delta_y));
-
-		if ( VecLength(rotateAxis) >= 0.001f ) {
-			/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
-			float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
-			constexpr float angleScale = 0.1f;                                                                                     
-			rotationAngle = Radians(rotationAngle * angleScale);
-			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-			[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-			// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-			// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-			// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-			// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
-			// // 													conjugate(rotationQuat));
-
-			// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
-			// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
-
-			
-			// forward[0] = appliedRotationQuat.x;
-			// forward[1] = appliedRotationQuat.y;
-			// forward[2] = appliedRotationQuat.z;
-			pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
-					.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent.forward[0],
-					.y = cameraComponent.forward[1], .z = cameraComponent.forward[2], .w = 1.0f };
-			forward[0] = appliedRotationPoint.x;
-			forward[1] = appliedRotationPoint.y;
-			forward[2] = appliedRotationPoint.z;
-		}
-		cameraComponent.forward = Normalize(forward);
-		_Player.forward = cameraComponent.forward;
-		mat4 view = LookAtMain(cameraComponent.Position + _Player.position, cameraComponent.Position + _Player.position + cameraComponent.forward, cameraComponent.up);
-		for ( unsigned int i = 0; i < 4; ++i )
-			for ( unsigned int j = 0; j < 4; ++j )
-				 viewMatrix_[i][j] = view[i][j];
-		
-		if ( !isInventoryOpened )
-			viewMatrix = viewMatrix_;
-
-		prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
-    }
-
-    void CVulkanRenderer::SetProjectionMatrix()
-	{
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
-		projectionMatrix = tProjection_Matrix;
-		projectionMatrix[1][1] *= 1.0f;
-	}
-	
     void CVulkanRenderer::createTextureImage() {
 		uint32_t texWidth, texHeight;
 		[[maybe_unused]] uint32_t texChannels;
