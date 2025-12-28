@@ -234,7 +234,8 @@ namespace GLVM::core
 
 /// Render objects
 struct RenderPlayer {
-	
+	vec3 position;
+	vec3 forward;
 };
 
 struct RenderActor {

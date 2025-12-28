@@ -7,6 +7,7 @@
 #include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
@@ -718,6 +719,16 @@ namespace GLVM::core
 			vulkanRenderer->actors[i].specularTextureIndex = materialComponent->specularTextureID_.id;
 			vulkanRenderer->actors[i].ambient   = materialComponent->ambient;
 			vulkanRenderer->actors[i].shininess = materialComponent->shininess;
+		}
+
+		core::vector<Entity> playerEntities = componentManager->collectLinkedEntities<cm::beholder, cm::transform>();
+		vulkanRenderer->players.clear();
+		for( unsigned int i = 0; i < playerEntities.GetSize(); ++i ) {
+			unsigned int entityID = playerEntities[i];
+			vulkanRenderer->players.Push({});
+			cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(entityID);
+			vulkanRenderer->players[i].position = playerTransformComponent->position;
+			vulkanRenderer->players[i].forward  = playerTransformComponent->forward;
 		}
 	}
 

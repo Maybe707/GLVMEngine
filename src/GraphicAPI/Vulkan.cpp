@@ -2611,7 +2611,6 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2619,8 +2618,6 @@ namespace GLVM::core
         //     throw std::runtime_error("failed to begin recording command buffer!");
         // }
 
-		namespace cm = GLVM::ecs::components;
-		
 //		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
 		
         VkRenderPassBeginInfo renderPassInfo{};
@@ -2656,68 +2653,65 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
+		for( unsigned int playerCounter = 0; playerCounter < players.GetSize(); ++playerCounter ) {
+			RenderPlayer player = players[playerCounter];
+			unsigned int currentActorMemoryOffset = 0;
+			for ( unsigned int i = 0; i < fonts.GetSize(); ++i ) {
+				RenderFont font = fonts[i];
+				vec3 playerTragetDirection = font.position - player.position;
+				float dotProduct = Dot(playerTragetDirection, player.forward);
+				if ( dotProduct <= 0 )
+					continue;
 
-		cm::transform* playerTransformComponent = nullptr;
-		if ( viewPositionLinkedEntities.GetSize() > 0 )
-			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
-
-		unsigned int currentActorMemoryOffset = 0;
-		for ( unsigned int i = 0; i < fonts.GetSize(); ++i ) {
-			RenderFont font = fonts[i];
-			vec3 playerTragetDirection = font.position - playerTransformComponent->position;
-			float dotProduct = Dot(playerTragetDirection, playerTransformComponent->forward);
-			if ( dotProduct <= 0 )
-				continue;
-
-			for ( unsigned int j = 0; j < font.font_string.GetSize(); ++j ) {
-				unsigned int ascii_code = static_cast<unsigned int>(font.font_string[j]);
-				VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
-				VkDeviceSize offsets[] = {0};
+				for ( unsigned int j = 0; j < font.font_string.GetSize(); ++j ) {
+					unsigned int ascii_code = static_cast<unsigned int>(font.font_string[j]);
+					VkBuffer vertexBuffers[] = { fontVertexBufferContainer[ascii_code] };
+					VkDeviceSize offsets[] = {0};
 				
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-				vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[ascii_code], 0, VK_INDEX_TYPE_UINT32);
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+					vkCmdBindIndexBuffer(commandBuffer, fontIndexBufferContainer[ascii_code], 0, VK_INDEX_TYPE_UINT32);
 
-				unsigned int indicesContainerSize = symbol_g_indices.size();
-				FONT_UBO fontUBO{};
-				vec3 result;
-				vec4 pos = vec4(font.position[0],
-								font.position[1],
-								font.position[2], 1.0f);
+					unsigned int indicesContainerSize = symbol_g_indices.size();
+					FONT_UBO fontUBO{};
+					vec3 result;
+					vec4 pos = vec4(font.position[0],
+									font.position[1],
+									font.position[2], 1.0f);
 
-				vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
-				vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
-										clipSpacePosition[1] / clipSpacePosition[3],
-										clipSpacePosition[2] / clipSpacePosition[3]);
+					vec4 clipSpacePosition =  pos * viewMatrix * projectionMatrix;
+					vec3 ndcPosition = vec3(clipSpacePosition[0] / clipSpacePosition[3],
+											clipSpacePosition[1] / clipSpacePosition[3],
+											clipSpacePosition[2] / clipSpacePosition[3]);
 
-				fontUBO.view = viewMatrix;
-				fontUBO.proj = projectionMatrix;
+					fontUBO.view = viewMatrix;
+					fontUBO.proj = projectionMatrix;
 
-				fontUBO.scale    = 0.3f;
-				ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
-				ndcPosition[1] -= font.lifeTime / 5.0f;
-				fontUBO.position = ndcPosition;
+					fontUBO.scale    = 0.3f;
+					ndcPosition[0] += (float)j * 0.17f * fontUBO.scale;
+					ndcPosition[1] -= font.lifeTime / 5.0f;
+					fontUBO.position = ndcPosition;
 
-				void* modelMatrixData;
-				unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
-				vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(fontUBO) * (currentActorMemoryOffset + j),
-							sizeof(fontUBO), 0, &modelMatrixData);
-				memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
-				vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+					void* modelMatrixData;
+					unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
+					vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(fontUBO) * (currentActorMemoryOffset + j),
+								sizeof(fontUBO), 0, &modelMatrixData);
+					memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
+					vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
-				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[0];
-				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 0, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + currentActorMemoryOffset + j)), 0, nullptr);
-				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
-				const unsigned int fontAtlasTextureID = 6;
-				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 1, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * fontAtlasTextureID + currentFrame)), 0, nullptr);
+					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[0];
+					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 0, 1,
+											&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + currentActorMemoryOffset + j)), 0, nullptr);
+					const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[1];
+					const unsigned int fontAtlasTextureID = 6;
+					const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipelineLayout, 1, 1,
+											&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * fontAtlasTextureID + currentFrame)), 0, nullptr);
 			
-				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				}
+				currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + font.font_string.GetSize();
 			}
-			currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + font.font_string.GetSize();
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -2728,7 +2722,6 @@ namespace GLVM::core
     }
 	
     void CVulkanRenderer::recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
         // VkCommandBufferBeginInfo beginInfo{};
         // beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
@@ -2772,51 +2765,45 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		core::vector<Entity> viewPositionLinkedEntities = componentManager->collectLinkedEntities<cm::beholder>();
-
-		cm::transform* playerTransformComponent = nullptr;
-
-		if ( viewPositionLinkedEntities.GetSize() > 0 )
-			playerTransformComponent = componentManager->GetComponent<cm::transform>(viewPositionLinkedEntities[0]);
-
-		for ( unsigned int i = 0; i < actors.GetSize(); ++i ) {
-			RenderActor actor = actors[i];
-			unsigned int uiVertexId = actor.meshID;
-			unsigned int diffuseTextureIndex = actor.diffuseTextureIndex;
-			unsigned int specularTextureIndex = actor.specularTextureIndex;
+		for( unsigned int player = 0; player < players.GetSize(); ++player ) {
+			for ( unsigned int i = 0; i < actors.GetSize(); ++i ) {
+				RenderActor actor = actors[i];
+				unsigned int uiVertexId = actor.meshID;
+				unsigned int diffuseTextureIndex = actor.diffuseTextureIndex;
+				unsigned int specularTextureIndex = actor.specularTextureIndex;
 				
-			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
-			updateMatrixUniformBuffer(uboIndex, i);
-			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
-  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+				unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
+				updateMatrixUniformBuffer(uboIndex, i);
+				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
+				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
+										0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
-			updateViewPositionUniformBuffer(currentFrame, playerTransformComponent);
-			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
-  			const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
+				updateViewPositionUniformBuffer(currentFrame, player);
+				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
+				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
+										1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
 
-			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-			VkDeviceSize offsets[] = {0};
-			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+				VkDeviceSize offsets[] = {0};
+				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			updateSamplersDescriptroSets(diffuseTextureIndex, specularTextureIndex);
-			const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
-  			const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame)), 0, nullptr);
-			const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
-  			const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
-			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
-									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame)), 0, nullptr);
+				const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
+				const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame)), 0, nullptr);
+				const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
+				const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
+				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
+										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame)), 0, nullptr);
 			
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			}
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -2946,12 +2933,12 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory);
     }
 
-	void CVulkanRenderer::updateViewPositionUniformBuffer(uint32_t currentImage, ecs::components::transform* transformComponent) {
+	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		LightData lightDataUBO{};
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<GLVM::ecs::components::controller>();
 		if ( pointLightEntities.GetSize() > 0 )
-			lightDataUBO.viewPosition = transformComponent->position;
+			lightDataUBO.viewPosition = players[player].position;
 
 		DirectionalLight directionalLight{};
 		directionalLightNumber = directionalLights.GetSize();
