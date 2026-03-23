@@ -1,0 +1,99 @@
+#+title: Simple table of systems components usage
+#+author: Maybe
+
+* ProceduralLevelGeneratingSystem
+** Transform
+** Mesh
+** Collider
+** Material
+** Actor (taged like component)
+
+* MovementSystem
+** Transform
+** Beholder
+** Controller
+*** Weird logic related to gravity
+**** Transform
+**** RigidBody
+
+* EnemySystem
+** Transform
+** Enemy
+** State
+** Controller (for Player)
+*** CalculateProjectile()
+**** Mesh
+**** Collider
+**** Transform
+**** Material
+**** Projectile
+**** PointLight
+**** Damage
+**** Actor
+***** Transform (of Player entity as parameter)
+***** Transform (of Enemy enetity as parameter)
+
+* ProjectileSystem
+** Controller (of Player)
+** Beholder (of Player)
+** Transform
+** Projectile
+** Material
+** Mesh
+** Collider
+** PointLight
+** Damage
+*** CalculateProjectile()
+**** Mesh
+**** Collider
+**** Transform
+**** Material
+**** Projectile
+**** PointLight
+**** Damage
+**** Actor
+***** Transform (of Player entity as parameter)
+***** Transform (of Enemy enetity as parameter)
+
+* CollisionSystem
+** Transform
+** Collider
+** Mesh
+** Actor
+
+* DamageSystem
+** Atack
+** Health
+** Font
+
+* PhysicsSystem
+** Transform
+** Collider
+** Move
+** RigidBody
+
+* InventorySystem
+** Transform (of Crosshair)
+** Crosshair
+** Transform (of Inventory)
+** Inventory
+** Item (entity inside Inventory)
+** Actor (for item that drops on the ground)
+** RigidBody (for item that drops on the ground)
+** Controller (of Player to calculate position where we hate to drop item)
+
+* ItemSystem
+** Transform
+** Inventory
+** Item
+** Collider
+** RigidBody
+*** putItem2x2()
+**** Item
+*** isInventoryOpened
+**** Transform
+**** Item
+**** Mesh
+**** Material
+**** Collider
+
