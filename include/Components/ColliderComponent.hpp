@@ -14,10 +14,6 @@ namespace GLVM::ecs::components
 	class collider
 	{
     public:
-        bool groundCollision = false;
-		bool roofCollision = false;
-        bool wallCollision = false;
-		bool itemDrag = false;
 		core::vector<unsigned int> colliders;
 	};
 }

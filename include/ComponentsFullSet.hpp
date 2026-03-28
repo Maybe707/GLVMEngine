@@ -12,7 +12,6 @@
 #include "Components/ColliderComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/VertexComponent.hpp"
-#include "Components/AnimationMoveComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Components/StateComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -23,5 +22,8 @@
 #include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/EnemyComponent.hpp"
+#include "Components/PhysicsComponent.hpp"
+#include "Components/AnimationComponent.hpp"
+#include "Components/HudComponent.hpp"
 
 #endif

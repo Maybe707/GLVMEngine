@@ -15,7 +15,6 @@ namespace GLVM::ecs::components
 	{
 		ecs::TextureHandle diffuseTextureID_ = {};
 		ecs::TextureHandle specularTextureID_ = {};
-        unsigned int vkInnerId_ = 0; ///< This field using to choose specific instance of texture image in Vulkan.
 		vec3 ambient = { 0.0f, 0.0f, 0.0f };
 		float shininess = 0.0f;
 	};

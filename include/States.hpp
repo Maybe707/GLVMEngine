@@ -6,9 +6,11 @@
 #ifndef STATES_TYPES
 #define STATES_TYPES
 
+#include <cstdint>
+
 namespace GLVM::core
 {
-	enum States
+	enum States : uint8_t
 	{
 		IDLE,
 		ATTACK,

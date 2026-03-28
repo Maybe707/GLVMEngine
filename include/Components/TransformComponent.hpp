@@ -14,16 +14,20 @@ namespace GLVM::ecs::components
 	{
         vec3 position{ 0.0f, 0.0f, 0.0f };
         vec3 forward{ 0.0f, 0.0f, 0.0f };
-        vec3 right{ 0.0f, 0.0f, 0.0f };
-        vec3 up{ 0.0f, 0.0f, 0.0 };
-        float yaw = 0.0f;
-		float pitch = 0.0f;
-        float scale = 1.0f;
-        bool hud = false;
+		
+        // float yaw = 0.0f;
+		// float pitch = 0.0f;
+		
+		float scale = 1.0f;
 		float gravityAccumulator = 0.0f;
-		unsigned int currentAnimationFrame = 0;
-		float frameAccumulator = 0.0f;
-		bool gltf = true;
+        // bool hud = false;
+		// float gravityAccumulator = 0.0f;
+
+		// Animation
+		// unsigned int currentAnimationFrame = 0;
+		// float frameAccumulator = 0.0f;
+		
+		// bool gltf = true;
 	};
 }
 
