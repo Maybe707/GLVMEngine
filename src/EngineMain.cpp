@@ -3,6 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Archetypes/LevelChunkArchetype.hpp"
+#include "Archetypes/RigidBodyArchetype.hpp"
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
@@ -44,8 +46,9 @@ int main()
 	// std::cout << !plane.x << std::endl;
 	
 	using namespace GLVM;
-	namespace cm  = GLVM::ecs::components;
-	namespace pga = GLVM::core::pga;
+	namespace cm   = GLVM::ecs::components;
+	namespace pga  = GLVM::core::pga;
+	namespace arch = GLVM::ecs::arch;
 
 	[[maybe_unused]] pga::plane plane0 = { 2.1f, 3.5f, 4.2f, 3.87f };
 	[[maybe_unused]] pga::plane plane1 = { 3.17f, 10.20f, 7.832f, 3.87f };
@@ -89,6 +92,14 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(64, 64, inventorySlot_dat_len, inventorySlot_dat);
 	[[maybe_unused]] ecs::TextureHandle tilesetTexturehandle = GLVM->LoadTextureFromAddress(512, 512, tileset_dat_len, tileset_dat);
 
+	arch::World World;
+	arch::LevelChunkArchetype* levelChunkArch = new arch::LevelChunkArchetype;
+	arch::PlayerArchetype* playerArch = new arch::PlayerArchetype;
+	arch::RigidBodyArch* rigidBodyArch = new arch::RigidBodyArch;
+	World.archetypes.Push( levelChunkArch );
+	World.archetypes.Push( playerArch );
+	World.archetypes.Push( rigidBodyArch );
+	
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
 	// [[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromFile("../textures/witch.h");

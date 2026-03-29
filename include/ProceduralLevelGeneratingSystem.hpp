@@ -5,9 +5,11 @@
 #include "EntityManager.hpp"
 #include "ISystem.hpp"
 #include <cmath>
+#include <cstdint>
 #include <map>
 #include <random>
 #include "GraphicAPI/Vulkan.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::core
 {
@@ -22,6 +24,14 @@ namespace GLVM::core
 		vec3 transitionBridgePosition     = { 0.0f, 0.0f, 0.0f };
 		unsigned int nextLevelTransitionDirection = 0;
 		unsigned int previousIterationTransitionBridgeDirection = 0;
+		core::vector<ecs::arch::Archetype*> cachedArchetypes;
+		ecs::arch::componentMask mask     =
+			(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
 		
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		core::vector<ecs::TextureHandle> textureHandlers;

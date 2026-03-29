@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef ATTACK_COMPONENT
-#define ATTACK_COMPONENT
+#ifndef ATTACK_COMPONENT_HPP
+#define ATTACK_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

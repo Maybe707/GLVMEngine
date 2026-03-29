@@ -1,14 +1,12 @@
 #ifndef ARCHETYPE_ENTITY_MANAGER
 #define ARCHETYPE_ENTITY_MANAGER
 
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include <cstdint>
 #include "Vector.hpp"
 #include <mutex>
 
 namespace GLVM::ecs::arch {
-	typedef uint64_t entity;
-	typedef uint32_t id;
-	typedef uint32_t generation;
 	
 #define ENTITY_ID_BITS 32
 #define GENERATION_BITS 32

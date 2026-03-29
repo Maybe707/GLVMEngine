@@ -1,6 +1,7 @@
 #ifndef PLAYER_ARCHETYPE
 #define PLAYER_ARCHETYPE
 
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/HealthComponent.hpp"
@@ -9,6 +10,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "TagComponents/PlayerTagComponent.hpp"
 #include "Globals.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 
@@ -22,17 +24,19 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::mesh) +
 		 sizeof(components::rigidBody) +
 		 sizeof(components::health) +
-		 sizeof(components::material));
+		 sizeof(components::material) +
+		 sizeof(tagComponents::playerTagComponent));
 	
 	struct PlayerArchetype : Archetype {
-		components::transform     transforms[PLAYER_ARCH_CHUNK_SIZE];
-		components::beholder      beholders[PLAYER_ARCH_CHUNK_SIZE];
-		components::collider      colliders[PLAYER_ARCH_CHUNK_SIZE];
-		components::colliderFlags colliderFlags[PLAYER_ARCH_CHUNK_SIZE];
-		components::mesh          meshes[PLAYER_ARCH_CHUNK_SIZE];
-		components::rigidBody     rigidBodies[PLAYER_ARCH_CHUNK_SIZE];
-		components::health        health[PLAYER_ARCH_CHUNK_SIZE];
-		components::material      materials[PLAYER_ARCH_CHUNK_SIZE];
+		components::transform             transforms[PLAYER_ARCH_CHUNK_SIZE];
+		components::beholder              beholders[PLAYER_ARCH_CHUNK_SIZE];
+		components::collider              colliders[PLAYER_ARCH_CHUNK_SIZE];
+		components::colliderFlags         colliderFlags[PLAYER_ARCH_CHUNK_SIZE];
+		components::mesh                  meshes[PLAYER_ARCH_CHUNK_SIZE];
+		components::rigidBody             rigidBodies[PLAYER_ARCH_CHUNK_SIZE];
+		components::health                health[PLAYER_ARCH_CHUNK_SIZE];
+		components::material              materials[PLAYER_ARCH_CHUNK_SIZE];
+		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
 			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
@@ -43,6 +47,7 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
 			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
 			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			Components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -52,7 +57,8 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::MESH_COMPONENT) |
 				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT);
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch

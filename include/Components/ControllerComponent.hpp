@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef CONTROLLER_COMPONENT
-#define CONTROLLER_COMPONENT
+#ifndef CONTROLLER_COMPONENT_HPP
+#define CONTROLLER_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

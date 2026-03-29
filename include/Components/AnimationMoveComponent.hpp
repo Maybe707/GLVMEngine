@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef ANIMATION_MOVE_COMPONENT
-#define ANIMATION_MOVE_COMPONENT
+#ifndef ANIMATION_MOVE_COMPONENT_HPP
+#define ANIMATION_MOVE_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

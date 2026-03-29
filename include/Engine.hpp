@@ -33,6 +33,10 @@
 #include "TextureManager.hpp"
 #include "Network/UDP_ServerLinux.hpp"
 #include "VkStructs.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/LevelChunkArchetype.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/RigidBodyArchetype.hpp"
 
 using Entity = unsigned int;
 

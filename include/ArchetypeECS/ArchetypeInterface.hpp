@@ -1,37 +1,12 @@
 #ifndef ARCHETYPE_INTERFACE_HPP
 #define ARCHETYPE_INTERFACE_HPP
 
-#include <cstdint>
+#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "Vector.hpp"
 
 namespace GLVM::ecs::arch {
-	typedef uint64_t componentMask;
-	
-	struct ComponentsIndices {
-		enum Types : uint32_t {
-			TRANSFORM_COMPONENT,
-			RIGID_BODY_COMPONENT,
-			MESH_COMPONENT,
-			FONT_COMPONENT,
-			COLLIDER_COMPONENT,
-			COLLIDER_FLAGS_COMPONENT,
-			MATERIAL_COMPONENT,
-			VIEW_COMPONENT,
-			HEALTH_COMPONENT,
-			ANIMATION_COMPONENT,
-			STATE_COMPONENT,
-			ENEMY_COMPONENT,
-			DAMAGE_COMPONENT,
-			ATTACK_COMPONENT,
-			INVENTORY_COMPONENT,
-			DIRECTIONAL_LIGHT_COMPONENT,
-			SPOT_LIGHT_COMPONENT,
-			POINT_LIGHT_COMPONENT,
-			ITEM_COMPONENT,
-			COMPONENTS_COUNT
-		};
-	};
-		
 	struct Archetype {
+		core::vector<entity> entities;
 		void* Components[ComponentsIndices::COMPONENTS_COUNT];
 		componentMask mask;
 	};

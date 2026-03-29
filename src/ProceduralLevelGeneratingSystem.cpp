@@ -1,6 +1,7 @@
 #include <ProceduralLevelGeneratingSystem.hpp>
 #include <cmath>
 #include <random>
+#include "ArchetypeECS/ArchetypeEntityManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Constants.hpp"
@@ -13,10 +14,14 @@ namespace GLVM::core
 	void ProceduralLevelGeneratingSystem::Update() {
 		using namespace GLVM;
 		namespace cm  = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 		core::Engine* GLVM = core::Engine::GetInstance();
 		ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 		ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
+		/// New arch ECS
+		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+		
 		while ( levelNubmer < 5 ) {
 			core::vector<core::Vertex> nextLevel;
 			std::vector<uint32_t> indices;
@@ -70,6 +75,10 @@ namespace GLVM::core
 				*gameLevelMaterial = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f },
 					.shininess = 128.0f * 0.078125f };
 
+				/// New arch ECS
+				arch::entity gameLevelChunkEntitty = archEntityManager->createEntity();
+				
+				
 				for ( unsigned int i = 0; i < 36; ++i )
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
 
