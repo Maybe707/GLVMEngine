@@ -23,6 +23,11 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			Components[ComponentsIndices::INVENTORY_COMPONENT]       = invetories;
 			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+
+			mask =
+				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ull << ComponentsIndices::INVENTORY_COMPONENT) |
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch

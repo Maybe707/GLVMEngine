@@ -35,6 +35,14 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			Components[ComponentsIndices::FONT_COMPONENT]            = fonts;
+
+			mask =
+				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ull << ComponentsIndices::MESH_COMPONENT) |
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::FONT_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch

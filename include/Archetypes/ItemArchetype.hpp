@@ -39,6 +39,15 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
 			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			Components[ComponentsIndices::ITEM_COMPONENT]            = items;
+
+			mask =
+				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ull << ComponentsIndices::MESH_COMPONENT) |
+				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::ITEM_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch

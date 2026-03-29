@@ -55,6 +55,19 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
 			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
 			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+
+			mask =
+				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ull << ComponentsIndices::ENEMY_COMPONENT) |
+				(1ull << ComponentsIndices::STATE_COMPONENT) |
+				(1ull << ComponentsIndices::FONT_COMPONENT) |
+				(1ull << ComponentsIndices::ANIMATION_COMPONENT) |
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::MESH_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
+				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
+				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch

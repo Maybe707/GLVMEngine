@@ -1,9 +1,11 @@
-#ifndef ARCHETYPE_INTERFACE
-#define ARCHETYPE_INTERFACE
+#ifndef ARCHETYPE_INTERFACE_HPP
+#define ARCHETYPE_INTERFACE_HPP
 
 #include <cstdint>
 
 namespace GLVM::ecs::arch {
+	typedef uint64_t componentMask;
+	
 	struct ComponentsIndices {
 		enum Types : uint32_t {
 			TRANSFORM_COMPONENT,
@@ -31,6 +33,7 @@ namespace GLVM::ecs::arch {
 		
 	struct Archetype {
 		void* Components[ComponentsIndices::COMPONENTS_COUNT];
+		componentMask mask;
 	};
 }; // namespace GLVM::ecs::arch
 

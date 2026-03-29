@@ -27,6 +27,12 @@ namespace GLVM::ecs::arch {
 			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			Components[ComponentsIndices::POINT_LIGHT_COMPONENT]     = pointLights;
+
+			mask =
+				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ull << ComponentsIndices::MESH_COMPONENT) |
+				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::POINT_LIGHT_COMPONENT);
 		}
 	};
 }; // namespace GLVM::ecs::arch
