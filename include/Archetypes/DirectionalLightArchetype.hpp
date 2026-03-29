@@ -23,16 +23,22 @@ namespace GLVM::ecs::arch {
 		components::directionalLight directionalLights[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
 
 		DirectionalLightArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
-			Components[ComponentsIndices::MESH_COMPONENT]              = meshes;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]          = materials;
-			Components[ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT] = directionalLights;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
+			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
+			components[ComponentsIndices::MATERIAL_COMPONENT]          = materials;
+			components[ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT] = directionalLights;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
 				(1ull << ComponentsIndices::MESH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[3] = ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT;
+			componentCount = 4;
 		}
 	};
 }; // namespace GLVM::ecs::arch

@@ -18,18 +18,6 @@ namespace GLVM::ecs::arch {
         return pInstance_;
     }
 	
-	entity ArchetypeEntityManager::makeEntity( id id_, generation generation_ ) {
-		return ((uint64_t)generation_ << ENTITY_ID_BITS) | id_;
-	}
-
-	id ArchetypeEntityManager::getId( entity entity_ ) const {
-		return entity_ & entityBitsMask;
-	}
-
-	generation ArchetypeEntityManager::getGen( entity entity_ ) const {
-		return entity_ >> ENTITY_ID_BITS;
-	}
-
 	[[nodiscard]] entity ArchetypeEntityManager::createEntity() {
 		id newId = 0;
         if( !freeList.empty() ) {   ///< Check out wether or not free ID in removed entities registry.

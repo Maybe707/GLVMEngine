@@ -6,9 +6,22 @@
 
 namespace GLVM::ecs::arch {
 	struct Archetype {
-		core::vector<entity> entities;
-		void* Components[ComponentsIndices::COMPONENTS_COUNT];
+		static constexpr uint32_t CAPACITY = 1024;
+		
+		entity entities[CAPACITY];
+		uint32_t entityCount = 0;
+		uint32_t componentIds[ComponentsIndices::COMPONENTS_COUNT];
+		uint32_t componentCount = 0;
+		void* components[ComponentsIndices::COMPONENTS_COUNT];
 		componentMask mask;
+
+		uint32_t addEntity( entity entity_ );
+		entity removeEntity( uint32_t index );
+	};
+
+	struct EntityLocation {
+		Archetype* arch;
+		uint32_t   index;
 	};
 }; // namespace GLVM::ecs::arch
 

@@ -32,13 +32,13 @@ namespace GLVM::ecs::arch {
 		components::item          items[ITEM_ARCH_CHUNK_SIZE];
 
 		ItemArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			Components[ComponentsIndices::ITEM_COMPONENT]            = items;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::ITEM_COMPONENT]            = items;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -48,6 +48,15 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::ITEM_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::COLLIDER_COMPONENT;
+			componentIds[2] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
+			componentIds[3] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[4] = ComponentsIndices::RIGID_BODY_COMPONENT;
+			componentIds[5] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[6] = ComponentsIndices::ITEM_COMPONENT;
+			componentCount = 7;
 		}
 	};
 }; // namespace GLVM::ecs::arch

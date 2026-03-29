@@ -1,6 +1,7 @@
 #ifndef ENEMY_ARCHETYPE_HPP
 #define ENEMY_ARCHETYPE_HPP
 
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
@@ -44,17 +45,17 @@ namespace GLVM::ecs::arch {
 		components::rigidBody     rigidBodies[ENEMY_ARCH_CHUNK_SIZE];
 
 		EnemyArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::ENEMY_COMPONENT]           = enemies;
-			Components[ComponentsIndices::STATE_COMPONENT]           = states;
-			Components[ComponentsIndices::FONT_COMPONENT]            = fonts;
-			Components[ComponentsIndices::ANIMATION_COMPONENT]       = animations;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
-			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::ENEMY_COMPONENT]           = enemies;
+			components[ComponentsIndices::STATE_COMPONENT]           = states;
+			components[ComponentsIndices::FONT_COMPONENT]            = fonts;
+			components[ComponentsIndices::ANIMATION_COMPONENT]       = animations;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
+			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -68,6 +69,19 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::ENEMY_COMPONENT;
+			componentIds[2] = ComponentsIndices::STATE_COMPONENT;
+			componentIds[3] = ComponentsIndices::FONT_COMPONENT;
+			componentIds[4] = ComponentsIndices::ANIMATION_COMPONENT;
+			componentIds[5] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[6] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[7] = ComponentsIndices::COLLIDER_COMPONENT;
+			componentIds[8] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
+			componentIds[9] = ComponentsIndices::HEALTH_COMPONENT;
+			componentIds[10] = ComponentsIndices::RIGID_BODY_COMPONENT;
+			componentCount = 11;
 		}
 	};
 }; // namespace GLVM::ecs::arch

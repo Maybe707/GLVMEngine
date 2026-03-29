@@ -26,11 +26,11 @@ namespace GLVM::ecs::arch {
 		components::rigidBody     rigidBodies[PHYSICS_ARCH_CHUNK_SIZE];
 
 		PhysicsArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			Components[ComponentsIndices::MOVE_COMPONENT]            = moves;
-			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
+			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -38,6 +38,13 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ComponentsIndices::MOVE_COMPONENT) |
 				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::COLLIDER_COMPONENT;
+			componentIds[2] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
+			componentIds[3] = ComponentsIndices::MOVE_COMPONENT;
+			componentIds[4] = ComponentsIndices::RIGID_BODY_COMPONENT;
+			componentCount = 5;
 		}
 	};
 }; // namespace GLVM::ecs::arch

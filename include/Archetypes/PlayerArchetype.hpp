@@ -39,15 +39,15 @@ namespace GLVM::ecs::arch {
 		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::VIEW_COMPONENT]            = beholders;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
-			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			Components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::VIEW_COMPONENT]            = beholders;
+			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -59,6 +59,17 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::VIEW_COMPONENT;
+			componentIds[2] = ComponentsIndices::COLLIDER_COMPONENT;
+			componentIds[3] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
+			componentIds[4] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[5] = ComponentsIndices::RIGID_BODY_COMPONENT;
+			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
+			componentIds[7] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[8] = ComponentsIndices::PLAYER_TAG_COMPONENT;
+			componentCount = 9;
 		}
 	};
 }; // namespace GLVM::ecs::arch

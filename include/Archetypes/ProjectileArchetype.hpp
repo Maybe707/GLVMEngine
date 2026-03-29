@@ -34,11 +34,11 @@ namespace GLVM::ecs::arch {
 		ProjectileBundle          projectileBundles[PROJECTILE_ARCH_CHUNK_SIZE];
 
 		ProjectileArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
-			Components[ComponentsIndices::MESH_COMPONENT]              = meshes;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]          = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]    = colliderFlags;
-			Components[ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT] = projectileBundles;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
+			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
+			components[ComponentsIndices::COLLIDER_COMPONENT]          = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]    = colliderFlags;
+			components[ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT] = projectileBundles;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |

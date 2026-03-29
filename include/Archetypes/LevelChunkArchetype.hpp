@@ -29,12 +29,12 @@ namespace GLVM::ecs::arch {
 		tagComponents::levelChunkTagComponent levelChunkTagComponents[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 
 		LevelChunkArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			Components[ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT] = levelChunkTagComponents;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT] = levelChunkTagComponents;
 
 			mask =
 				(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -43,6 +43,15 @@ namespace GLVM::ecs::arch {
 				(1ull << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT) |
 				(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[2] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[3] = ComponentsIndices::COLLIDER_COMPONENT;
+			componentIds[4] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
+			componentIds[5] = ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT;
+			componentCount = 6;
+
 		}
 	};
 };

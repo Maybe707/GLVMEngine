@@ -20,14 +20,19 @@ namespace GLVM::ecs::arch {
 		components::font   fonts[DAMAGE_ARCH_CHUNK_SIZE];
 
 		DamageArchetype() {
-			Components[ComponentsIndices::ATTACK_COMPONENT]         = attacks;
-			Components[ComponentsIndices::HEALTH_COMPONENT]         = health;
-			Components[ComponentsIndices::FONT_COMPONENT]           = fonts;
+			components[ComponentsIndices::ATTACK_COMPONENT]         = attacks;
+			components[ComponentsIndices::HEALTH_COMPONENT]         = health;
+			components[ComponentsIndices::FONT_COMPONENT]           = fonts;
 
 			mask =
 				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 				(1ull << ComponentsIndices::FONT_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::ATTACK_COMPONENT;
+			componentIds[1] = ComponentsIndices::HEALTH_COMPONENT;
+			componentIds[2] = ComponentsIndices::FONT_COMPONENT;
+			componentCount = 3;
 		}
 	};
 }; // namespace GLVM::ecs::arch

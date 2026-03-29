@@ -2,6 +2,9 @@
 #define ARCH_ECS_UTILS_HPP
 
 #include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ComponentsFullSet.hpp"
+#include "TagComponents/LevelChunkTagComponent.hpp"
+#include "TagComponents/PlayerTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	struct ComponentsIndices {
@@ -30,11 +33,15 @@ namespace GLVM::ecs::arch {
 
 			LEVEL_CHUNK_TAG_COMPONENT,
 			PLAYER_TAG_COMPONENT,
+			CROSSHAIR_TAG_COMPONENT,
 			
 			COMPONENTS_COUNT
 		};
 	};
-	
+
+	entity     makeEntity( id id_, generation generation_ );
+	id         getId( entity entity_ );
+	generation getGen( entity entity_ );
 	bool matchesRequiredMask(const componentMask archetypeMask, const componentMask& systemMask);
 };
 

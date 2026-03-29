@@ -1,17 +1,13 @@
 #ifndef ARCHETYPE_ENTITY_MANAGER
 #define ARCHETYPE_ENTITY_MANAGER
 
-#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 #include <cstdint>
 #include "Vector.hpp"
 #include <mutex>
 
 namespace GLVM::ecs::arch {
-	
-#define ENTITY_ID_BITS 32
-#define GENERATION_BITS 32
 
-	constexpr uint64_t entityBitsMask = (1ull << ENTITY_ID_BITS) - 1;
 	
 	struct ArchetypeEntityManager {
 		inline static id nextId = 0;
@@ -20,10 +16,6 @@ namespace GLVM::ecs::arch {
 
 		ArchetypeEntityManager();
 		static ArchetypeEntityManager* getInstance();
-		
-		entity     makeEntity( id id_, generation generation_ );
-		id         getId( entity entity_ ) const;
-		generation getGen( entity entity_ ) const;
 		
 		entity createEntity();
 		void   removeEntity( entity entity_ );

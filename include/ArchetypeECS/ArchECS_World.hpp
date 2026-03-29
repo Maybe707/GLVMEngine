@@ -7,6 +7,10 @@
 namespace GLVM::ecs::arch {
 	struct World {
 		core::vector<Archetype*> archetypes;
+		core::vector<EntityLocation> entityLocations;
+
+		void addEntityToArchetype(entity entity_, Archetype* arch);
+		void removeEntity(entity entity_);
 	};
 }; // namespace GLVM::ecs::arch
 

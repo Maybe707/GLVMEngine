@@ -23,16 +23,22 @@ namespace GLVM::ecs::arch {
 		components::pointLight    pointLights[POINT_LIGHT_ARCH_CHUNK_SIZE];
 
 		PointLightArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			Components[ComponentsIndices::POINT_LIGHT_COMPONENT]     = pointLights;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::POINT_LIGHT_COMPONENT]     = pointLights;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
 				(1ull << ComponentsIndices::MESH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::POINT_LIGHT_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
+			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentIds[3] = ComponentsIndices::POINT_LIGHT_COMPONENT;
+			componentCount = 4;
 		}
 	};
 }; // namespace GLVM::ecs::arch

@@ -32,9 +32,6 @@
 #include <map>
 #include <random>
 
-struct World{
-};
-
 int main()
 {
 	// GLVM::core::pga::plane plane;

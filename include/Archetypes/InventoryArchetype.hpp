@@ -20,14 +20,19 @@ namespace GLVM::ecs::arch {
 		components::material  materials[INVENTORY_ARCH_CHUNK_SIZE];
 
 		InventoryArchetype() {
-			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			Components[ComponentsIndices::INVENTORY_COMPONENT]       = invetories;
-			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			components[ComponentsIndices::INVENTORY_COMPONENT]       = invetories;
+			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
 				(1ull << ComponentsIndices::INVENTORY_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT);
+
+			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
+			componentIds[1] = ComponentsIndices::INVENTORY_COMPONENT;
+			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
+			componentCount = 3;
 		}
 	};
 }; // namespace GLVM::ecs::arch
