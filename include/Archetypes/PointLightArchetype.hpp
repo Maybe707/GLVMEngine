@@ -6,6 +6,7 @@
 #include "Components/MaterialComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Globals.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t POINT_LIGHT_ARCH_CHUNK_SIZE =
@@ -15,11 +16,18 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::material) +
 		 sizeof(components::pointLight));
 	
-	struct PointLightArchetype {
+	struct PointLightArchetype : Archetype {
 		components::transform     transforms[POINT_LIGHT_ARCH_CHUNK_SIZE];
-		components::mesh          meshs[POINT_LIGHT_ARCH_CHUNK_SIZE];
+		components::mesh          meshes[POINT_LIGHT_ARCH_CHUNK_SIZE];
 		components::material      materials[POINT_LIGHT_ARCH_CHUNK_SIZE];
 		components::pointLight    pointLights[POINT_LIGHT_ARCH_CHUNK_SIZE];
+
+		PointLightArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			Components[ComponentsIndices::POINT_LIGHT_COMPONENT]     = pointLights;
+		}
 	};
 }; // namespace GLVM::ecs::arch
 

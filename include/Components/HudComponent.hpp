@@ -1,5 +1,5 @@
-#ifndef HUD_COMPONENT
-#define HUD_COMPONENT
+#ifndef HUD_COMPONENT_HPP
+#define HUD_COMPONENT_HPP
 
 namespace GLVM::ecs::components {
 	struct hud {

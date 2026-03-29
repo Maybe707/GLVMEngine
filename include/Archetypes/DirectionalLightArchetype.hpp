@@ -6,6 +6,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Globals.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE =
@@ -15,11 +16,18 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::material) +
 		 sizeof(components::directionalLight));
 	
-	struct DirectionalLightArchetype {
-		components::transform     transforms[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
-		components::mesh          meshs[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
-		components::material      materials[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
+	struct DirectionalLightArchetype : Archetype {
+		components::transform        transforms[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
+		components::mesh             meshes[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
+		components::material         materials[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
 		components::directionalLight directionalLights[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
+
+		DirectionalLightArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
+			Components[ComponentsIndices::MESH_COMPONENT]              = meshes;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]          = materials;
+			Components[ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT] = directionalLights;
+		}
 	};
 }; // namespace GLVM::ecs::arch
 

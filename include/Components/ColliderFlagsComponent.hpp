@@ -1,5 +1,5 @@
-#ifndef COLLIDER_FLAGS_COMPONENT
-#define COLLIDER_FLAGS_COMPONENT
+#ifndef COLLIDER_FLAGS_COMPONENT_HPP
+#define COLLIDER_FLAGS_COMPONENT_HPP
 
 namespace GLVM::ecs::components {
 	struct colliderFlags {

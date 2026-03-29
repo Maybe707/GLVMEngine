@@ -1,26 +1,37 @@
 #ifndef LEVEL_CHUNK_ARCHETYPE
 #define LEVEL_CHUNK_ARCHETYPE
 
+#include "Components/ColliderComponent.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Components/AnimationComponent.hpp"
 #include "Components/VertexComponent.hpp"
-#include "Components/HudComponent.hpp"
 #include "Globals.hpp"
-
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t LEVEL_CHUNK_ARCH_CHUNK_SIZE =
 		ARCHETYPE_CHUNK_SIZE /
-		(sizeof(GLVM::ecs::components::transform) +
-		 sizeof(GLVM::ecs::components::animation) +
-		 sizeof(GLVM::ecs::components::mesh) +
-		 sizeof(GLVM::ecs::components::hud));
+		(sizeof(components::transform) +
+		 sizeof(components::material) +
+		 sizeof(components::mesh) +
+		 sizeof(components::collider) +
+		 sizeof(components::colliderFlags));
 	
-	struct LevelChunkArch {
-		components::transform transform[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
-		components::animation animation[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
-		components::mesh      mesh[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
-		components::hud       hud[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+	struct LevelChunkArchetype : Archetype {
+		components::transform     transforms[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+		components::material      materials[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+		components::mesh          meshes[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+		components::collider      colliders[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+		components::colliderFlags colliderFlags[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+
+		LevelChunkArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+		}
 	};
 };
 

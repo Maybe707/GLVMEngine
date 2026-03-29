@@ -1,5 +1,5 @@
-#ifndef FONT_COMPONENT
-#define FONT_COMPONENT
+#ifndef FONT_COMPONENT_HPP
+#define FONT_COMPONENT_HPP
 
 #include "Vector.hpp"
 

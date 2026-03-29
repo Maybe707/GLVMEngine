@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef MATERIAL_COMPONENT
-#define MATERIAL_COMPONENT
+#ifndef MATERIAL_COMPONENT_HPP
+#define MATERIAL_COMPONENT_HPP
 
 #include "Texture.hpp"
 #include "VertexMath.hpp"

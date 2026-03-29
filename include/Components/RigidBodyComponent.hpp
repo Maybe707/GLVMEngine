@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef RIGIDBODY_COMPONENT
-#define RIGIDBODY_COMPONENT
+#ifndef RIGIDBODY_COMPONENT_HPP
+#define RIGIDBODY_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 

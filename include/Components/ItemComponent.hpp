@@ -1,5 +1,5 @@
-#ifndef ITEM_COMPONENT
-#define ITEM_COMPONENT
+#ifndef ITEM_COMPONENT_HPP
+#define ITEM_COMPONENT_HPP
 
 #include "Vector.hpp"
 

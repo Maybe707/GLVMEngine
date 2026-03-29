@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef STATE_COMPONENT
-#define STATE_COMPONENT
+#ifndef STATE_COMPONENT_HPP
+#define STATE_COMPONENT_HPP
 
 #include "States.hpp"
 

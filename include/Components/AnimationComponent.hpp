@@ -1,5 +1,5 @@
-#ifndef ANIMATION_COMPONENT
-#define ANIMATION_COMPONENT
+#ifndef ANIMATION_COMPONENT_HPP
+#define ANIMATION_COMPONENT_HPP
 
 #include <cstdint>
 namespace GLVM::ecs::components

@@ -1,5 +1,5 @@
-#ifndef PHYSICS_COMPONENT
-#define PHYSICS_COMPONENT
+#ifndef PHYSICS_COMPONENT_HPP
+#define PHYSICS_COMPONENT_HPP
 
 namespace GLVM::ecs::components {
 	struct physics {

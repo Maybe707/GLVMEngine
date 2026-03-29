@@ -1,5 +1,5 @@
-#ifndef ENEMY_ARCHETYPE
-#define ENEMY_ARCHETYPE
+#ifndef ENEMY_ARCHETYPE_HPP
+#define ENEMY_ARCHETYPE_HPP
 
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -13,6 +13,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Globals.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t ENEMY_ARCH_CHUNK_SIZE =
@@ -29,18 +30,32 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::health) +
 		 sizeof(components::rigidBody));
 	
-	struct EnemyArchetype {
+	struct EnemyArchetype : Archetype {
 		components::transform     transforms[ENEMY_ARCH_CHUNK_SIZE];
 		components::enemy         enemies[ENEMY_ARCH_CHUNK_SIZE];
 		components::state         states[ENEMY_ARCH_CHUNK_SIZE];
 		components::font          fonts[ENEMY_ARCH_CHUNK_SIZE];
 		components::animation     animations[ENEMY_ARCH_CHUNK_SIZE];
 		components::material      materials[ENEMY_ARCH_CHUNK_SIZE];
-		components::mesh          meshs[ENEMY_ARCH_CHUNK_SIZE];
+		components::mesh          meshes[ENEMY_ARCH_CHUNK_SIZE];
 		components::collider      colliders[ENEMY_ARCH_CHUNK_SIZE];
 		components::colliderFlags colliderFlags[ENEMY_ARCH_CHUNK_SIZE];
 		components::health        health[ENEMY_ARCH_CHUNK_SIZE];
 		components::rigidBody     rigidBodies[ENEMY_ARCH_CHUNK_SIZE];
+
+		EnemyArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			Components[ComponentsIndices::ENEMY_COMPONENT]           = enemies;
+			Components[ComponentsIndices::STATE_COMPONENT]           = states;
+			Components[ComponentsIndices::FONT_COMPONENT]            = fonts;
+			Components[ComponentsIndices::ANIMATION_COMPONENT]       = animations;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
+			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+		}
 	};
 }; // namespace GLVM::ecs::arch
 

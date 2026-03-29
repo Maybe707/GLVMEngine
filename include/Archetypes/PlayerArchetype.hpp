@@ -10,6 +10,7 @@
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
 #include "Globals.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t PLAYER_ARCH_CHUNK_SIZE =
@@ -23,15 +24,26 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::health) +
 		 sizeof(components::material));
 	
-	struct PlayerArchetype {
+	struct PlayerArchetype : Archetype {
 		components::transform     transforms[PLAYER_ARCH_CHUNK_SIZE];
 		components::beholder      beholders[PLAYER_ARCH_CHUNK_SIZE];
 		components::collider      colliders[PLAYER_ARCH_CHUNK_SIZE];
 		components::colliderFlags colliderFlags[PLAYER_ARCH_CHUNK_SIZE];
-		components::mesh          meshs[PLAYER_ARCH_CHUNK_SIZE];
+		components::mesh          meshes[PLAYER_ARCH_CHUNK_SIZE];
 		components::rigidBody     rigidBodies[PLAYER_ARCH_CHUNK_SIZE];
 		components::health        health[PLAYER_ARCH_CHUNK_SIZE];
 		components::material      materials[PLAYER_ARCH_CHUNK_SIZE];
+
+		PlayerArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			Components[ComponentsIndices::VIEW_COMPONENT]            = beholders;
+			Components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
+			Components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			Components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			Components[ComponentsIndices::HEALTH_COMPONENT]          = health;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+		}
 	};
 }; // namespace GLVM::ecs::arch
 

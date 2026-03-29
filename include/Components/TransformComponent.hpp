@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef TRANSFORM_COMPONENT
-#define TRANSFORM_COMPONENT
+#ifndef TRANSFORM_COMPONENT_HPP
+#define TRANSFORM_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 

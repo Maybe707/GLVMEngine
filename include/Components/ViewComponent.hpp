@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef VIEW_COMPONENT
-#define VIEW_COMPONENT
+#ifndef VIEW_COMPONENT_HPP
+#define VIEW_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 

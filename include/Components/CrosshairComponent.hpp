@@ -1,5 +1,5 @@
-#ifndef CROSSHAIR_COMPONENT
-#define CROSSHAIR_COMPONENT
+#ifndef CROSSHAIR_COMPONENT_HPP
+#define CROSSHAIR_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

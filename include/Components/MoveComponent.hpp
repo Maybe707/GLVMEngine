@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef MOVE_COMPONENT
-#define MOVE_COMPONENT
+#ifndef MOVE_COMPONENT_HPP
+#define MOVE_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 #include "Event.hpp"

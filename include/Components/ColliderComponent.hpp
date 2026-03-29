@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef COLLIDER_COMPONENT
-#define COLLIDER_COMPONENT
+#ifndef COLLIDER_COMPONENT_HPP
+#define COLLIDER_COMPONENT_HPP
 
 #include "Vector.hpp"
 #include <vector>

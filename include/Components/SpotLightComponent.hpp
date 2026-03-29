@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef SPOT_LIGHT_COMPONENT
-#define SPOT_LIGHT_COMPONENT
+#ifndef SPOT_LIGHT_COMPONENT_HPP
+#define SPOT_LIGHT_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 

@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef DIRECTIONAL_LIGHT_COMPONENT
-#define DIRECTIONAL_LIGHT_COMPONENT
+#ifndef DIRECTIONAL_LIGHT_COMPONENT_HPP
+#define DIRECTIONAL_LIGHT_COMPONENT_HPP
 
 #include "VertexMath.hpp"
 

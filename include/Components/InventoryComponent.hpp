@@ -1,5 +1,5 @@
-#ifndef INVENTORY_COMPONENT
-#define INVENTORY_COMPONENT
+#ifndef INVENTORY_COMPONENT_HPP
+#define INVENTORY_COMPONENT_HPP
 
 #include "Components/InventorySlotComponent.hpp"
 #include <climits>

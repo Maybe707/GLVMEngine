@@ -5,6 +5,7 @@
 #include "Components/VertexComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Globals.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t CROSSHAIR_ARCH_CHUNK_SIZE =
@@ -13,10 +14,16 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::mesh) +
 		 sizeof(components::material));
 	
-	struct CrosshairArchetype {
+	struct CrosshairArchetype : Archetype {
 		components::transform transforms[CROSSHAIR_ARCH_CHUNK_SIZE];
-		components::mesh      meshs[CROSSHAIR_ARCH_CHUNK_SIZE];
+		components::mesh      meshes[CROSSHAIR_ARCH_CHUNK_SIZE];
 		components::material  materials[CROSSHAIR_ARCH_CHUNK_SIZE];
+
+		CrosshairArchetype() {
+			Components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
+			Components[ComponentsIndices::MESH_COMPONENT]            = meshes;
+			Components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+		}
 	};
 }; // namespace GLVM::ecs::arch
 

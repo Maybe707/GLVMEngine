@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef HEALTH
-#define HEALTH
+#ifndef HEALTH_COMPONENT_HPP
+#define HEALTH_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

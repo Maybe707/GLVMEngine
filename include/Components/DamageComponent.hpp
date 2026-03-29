@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef DAMAGE_COMPONENT
-#define DAMAGE_COMPONENT
+#ifndef DAMAGE_COMPONENT_HPP
+#define DAMAGE_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {

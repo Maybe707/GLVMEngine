@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef VERTEX_COMPONENT
-#define VERTEX_COMPONENT
+#ifndef VERTEX_COMPONENT_HPP
+#define VERTEX_COMPONENT_HPP
 
 // #include <vector>
 // #include <iostream>
