@@ -25,6 +25,7 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::rigidBody) +
 		 sizeof(components::health) +
 		 sizeof(components::material) +
+		 sizeof(components::move) +
 		 sizeof(tagComponents::playerTagComponent));
 	
 	struct PlayerArchetype : Archetype {
@@ -36,6 +37,7 @@ namespace GLVM::ecs::arch {
 		components::rigidBody             rigidBodies[PLAYER_ARCH_CHUNK_SIZE];
 		components::health                health[PLAYER_ARCH_CHUNK_SIZE];
 		components::material              materials[PLAYER_ARCH_CHUNK_SIZE];
+		components::move                  moves[PLAYER_ARCH_CHUNK_SIZE];
 		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
@@ -47,6 +49,7 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
 			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
+			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
 			components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
 
 			mask =
@@ -58,6 +61,7 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ull << ComponentsIndices::MOVE_COMPONENT) |
 				(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
@@ -68,8 +72,9 @@ namespace GLVM::ecs::arch {
 			componentIds[5] = ComponentsIndices::RIGID_BODY_COMPONENT;
 			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
 			componentIds[7] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[8] = ComponentsIndices::PLAYER_TAG_COMPONENT;
-			componentCount = 9;
+			componentIds[8] = ComponentsIndices::MOVE_COMPONENT;
+			componentIds[9] = ComponentsIndices::PLAYER_TAG_COMPONENT;
+			componentCount = 10;
 		}
 	};
 }; // namespace GLVM::ecs::arch

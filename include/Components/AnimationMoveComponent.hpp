@@ -8,10 +8,10 @@
 
 namespace GLVM::ecs::components
 {
-	struct animation
-	{
+	// struct animation
+	// {
 		
-	};
+	// };
 }
 
 #endif

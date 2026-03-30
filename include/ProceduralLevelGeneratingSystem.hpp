@@ -10,6 +10,7 @@
 #include <random>
 #include "GraphicAPI/Vulkan.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
 
 namespace GLVM::core
 {

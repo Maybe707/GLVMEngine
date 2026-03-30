@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef VECTOR_CONTAINER
-#define VECTOR_CONTAINER
+#ifndef VECTOR_CONTAINER_HPP
+#define VECTOR_CONTAINER_HPP
 
 #include "Constants.hpp"
 #include "IContainer.hpp"

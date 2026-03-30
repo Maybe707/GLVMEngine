@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef MOVEMENT_SYSTEM
-#define MOVEMENT_SYSTEM
+#ifndef MOVEMENT_SYSTEM_HPP
+#define MOVEMENT_SYSTEM_HPP
 
 #include "Event.hpp"
 #include "Components/TransformComponent.hpp"
@@ -22,6 +22,8 @@
 #include "ISoundEngine.hpp"
 #include "Components/SpotLightComponent.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
 
 namespace GLVM::ecs
 {
@@ -35,7 +37,7 @@ namespace GLVM::ecs
 		float prev_X             = 0.0f;
 		float current_X          = 0.0f;
 		vec3  prev_forward;
-		arch::componentMask mask = 
+//		arch::componentMask mask = 
 			
         
         CMovementSystem( core::CStack& inputStack );

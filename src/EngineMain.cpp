@@ -89,13 +89,11 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(64, 64, inventorySlot_dat_len, inventorySlot_dat);
 	[[maybe_unused]] ecs::TextureHandle tilesetTexturehandle = GLVM->LoadTextureFromAddress(512, 512, tileset_dat_len, tileset_dat);
 
-	arch::World World;
 	arch::LevelChunkArchetype* levelChunkArch = new arch::LevelChunkArchetype;
 	arch::PlayerArchetype* playerArch = new arch::PlayerArchetype;
-	arch::RigidBodyArch* rigidBodyArch = new arch::RigidBodyArch;
-	World.archetypes.Push( levelChunkArch );
-	World.archetypes.Push( playerArch );
-	World.archetypes.Push( rigidBodyArch );
+	
+	arch::world.archetypes.Push( levelChunkArch );
+	arch::world.archetypes.Push( playerArch );
 	
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");

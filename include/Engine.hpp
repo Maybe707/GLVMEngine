@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef ENGINE
-#define ENGINE
+#ifndef ENGINE_HPP
+#define ENGINE_HPP
 
 #include "Components/InventoryComponent.hpp"
 #include "ComponentsFullSet.hpp"
@@ -37,6 +37,7 @@
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "Archetypes/RigidBodyArchetype.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
 
 using Entity = unsigned int;
 

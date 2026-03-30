@@ -12,6 +12,8 @@ namespace GLVM::ecs::arch {
 		void addEntityToArchetype(entity entity_, Archetype* arch);
 		void removeEntity(entity entity_);
 	};
+
+	static World world;
 }; // namespace GLVM::ecs::arch
 
 

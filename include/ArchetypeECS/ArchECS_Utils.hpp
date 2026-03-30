@@ -3,8 +3,8 @@
 
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ComponentsFullSet.hpp"
-#include "TagComponents/LevelChunkTagComponent.hpp"
-#include "TagComponents/PlayerTagComponent.hpp"
+//#include "TagComponents/LevelChunkTagComponent.hpp"
+//#include "TagComponents/PlayerTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	struct ComponentsIndices {

@@ -3,8 +3,8 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
-#ifndef COMPONENTS_FULL_SET
-#define COMPONENTS_FULL_SET
+#ifndef COMPONENTS_FULL_SET_HPP
+#define COMPONENTS_FULL_SET_HPP
 
 #include "Components/DirectionalLightComponent.hpp"
 #include "Components/SpotLightComponent.hpp"

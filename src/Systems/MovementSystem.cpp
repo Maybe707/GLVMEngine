@@ -4,6 +4,8 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/MovementSystem.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ControllerComponent.hpp"
@@ -32,22 +34,14 @@ namespace GLVM::ecs
         
     void CMovementSystem::Update()
     {
-		namespace cm = GLVM::ecs::components;
+		namespace cm   = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 		
-        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::controller,
-																						cm::beholder,
-																						cm::transform>();
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
+		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
         const float cameraSpeed = 1.0f * deltaFrameTime;            
 
-        for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			// std::cout << "i: " << i << std::endl;
-			// std::cout << "size: " << linkedEntitiesVectorSize << std::endl;
-			Entity currentEntity                = linkedEntities[i];
-			cm::beholder* beholderComponent     = componentManager->GetComponent<cm::beholder>(currentEntity);
-//			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-//			vec3 result = { 0.0f, 0.0f, 0.0f };
+        for(unsigned int i = 0; i < playerArch->entityCount; ++i) {
+			cm::beholder* beholderComponent     = &playerArch->beholders[i];
 			
             for(int n = 0; n < 6; ++n) {
 				vec3 right;
@@ -56,38 +50,24 @@ namespace GLVM::ecs
                 {
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*beholderComponent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
-					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						right * cameraSpeed;
-//					result -= right * cameraSpeed;
+					playerArch->moves[i].frameMovement -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*beholderComponent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
-					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						right * cameraSpeed;
-//					result += right * cameraSpeed;
+					playerArch->moves[i].frameMovement += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
-					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement -=
-						forward * cameraSpeed;
-//					result -= forward * cameraSpeed;
+					playerArch->moves[i].frameMovement -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					componentManager->CreateComponent<cm::move>(currentEntity);
-					componentManager->GetComponent<cm::move>(currentEntity)->frameMovement +=
-						forward * cameraSpeed;
-//					result += forward * cameraSpeed;
+					playerArch->moves[i].frameMovement += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
 				{
-					cm::collider* collider = componentManager->GetComponent<cm::collider>(currentEntity);
-					if ( collider->groundCollision ) {
-						cm::rigidBody* rigidBody = componentManager->GetComponent<cm::rigidBody>(currentEntity);
-						rigidBody->jumpAccumulator = 1.5f;
+					if ( playerArch->colliderFlags[i].flags & 1 ) {
+						playerArch->rigidBodies[i].jumpAccumulator = 1.5f;
 					}
 				}
                     break;
