@@ -74,27 +74,27 @@ namespace GLVM::ecs
                 default:
                     break;
                 }
-			  	// FIXME: FLASH LIGHT CRUTCH
-				
-				// core::vector<unsigned int>* pEntityContainerRefSpotLight = ecs::GetEntityContainer<ecs::spotLight>(*pComponent_Manager);
-				// unsigned int spotLightComponentContainerSize = pEntityContainerRefSpotLight->GetSize();
-				// for(int x = 0; x < spotLightComponentContainerSize; ++x) {
-				// 	unsigned int uiSpotLightEntity = (*pEntityContainerRefSpotLight)[x];
-				// 	ecs::spotLight& spotLightComponent = pComponent_Manager->GetComponent<ecs::spotLight>(uiSpotLightEntity);
-				// 	spotLightComponent.direction = rTransformComponent.tForward;
-				// 	spotLightComponent.position  = rTransformComponent.tPosition;
-				// }
             }
         }
-		// FIXME: NO NEED TO HAVE SPECIAL FIELD FOR GRAVITY FRAME MOVEMENT
-        for(unsigned int n = 0; n < componentManager->GetEntityContainer<cm::rigidBody>()->GetSize(); ++n) {
-//            int iEntity_refRigidBody = (*ecs::GetEntityContainer<ecs::rigidBody>(*pComponent_Manager))[n];
-			int iEntity_refRigidBody = (*componentManager->GetEntityContainer<cm::rigidBody>())[n];
-//            ecs::transform& rTransform_Component = pComponent_Manager->GetComponent<ecs::transform>(iEntity_refRigidBody);
-			cm::transform* rTransform_Component = componentManager->GetComponent<cm::transform>(iEntity_refRigidBody);
-			cm::rigidBody* rigidBodyComponennt = componentManager->GetComponent<cm::rigidBody>(iEntity_refRigidBody);
-			componentManager->CreateComponent<cm::move>(iEntity_refRigidBody);
-			cm::move* moveComponent = componentManager->GetComponent<cm::move>(iEntity_refRigidBody);
+
+		for(unsigned int n = 0; n < playerArch->entityCount; ++n) {
+			cm::transform* rTransform_Component = &playerArch->transforms[n];
+			cm::rigidBody* rigidBodyComponennt  = &playerArch->rigidBodies[n];
+			cm::move* moveComponent             = &playerArch->moves[n];
+			rTransform_Component->gravityAccumulator += deltaFrameTime;
+			float gravity = 9.8f * rTransform_Component->gravityAccumulator
+				* rigidBodyComponennt->fMass_ * 0.0005;
+			if ( gravity > 0.2f )
+				gravity = 0.2;
+
+			moveComponent->gravity[1] -= gravity;
+        }
+		
+		arch::EnemyArchetype* enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
+		for(unsigned int n = 0; n < enemyArch->entityCount; ++n) {
+			cm::transform* rTransform_Component = &enemyArch->transforms[n];
+			cm::rigidBody* rigidBodyComponennt  = &enemyArch->rigidBodies[n];
+			cm::move* moveComponent             = &enemyArch->moves[n];
 			rTransform_Component->gravityAccumulator += deltaFrameTime;
 			float gravity = 9.8f * rTransform_Component->gravityAccumulator
 				* rigidBodyComponennt->fMass_ * 0.0005;
@@ -106,7 +106,6 @@ namespace GLVM::ecs
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
-//		std::cout << beholder.up << std::endl;
         Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, beholder.up));
         return normalizedVector;
     }

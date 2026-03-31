@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "Archetypes/RigidBodyArchetype.hpp"
 #include "Components/AnimationMoveComponent.hpp"
@@ -90,10 +91,14 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle tilesetTexturehandle = GLVM->LoadTextureFromAddress(512, 512, tileset_dat_len, tileset_dat);
 
 	arch::LevelChunkArchetype* levelChunkArch = new arch::LevelChunkArchetype;
-	arch::PlayerArchetype* playerArch = new arch::PlayerArchetype;
+	arch::PlayerArchetype* playerArch         = new arch::PlayerArchetype;
+	arch::EnemyArchetype* enemyArch           = new arch::EnemyArchetype;
+	arch::ProjectileArchetype* projectileArch = new arch::ProjectileArchetype;
 	
 	arch::world.archetypes.Push( levelChunkArch );
 	arch::world.archetypes.Push( playerArch );
+	arch::world.archetypes.Push( enemyArch );
+	arch::world.archetypes.Push( projectileArch );
 	
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");

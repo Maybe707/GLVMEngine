@@ -4,69 +4,61 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/EnemySystem.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
 #include "Components/ActorComponent.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "ArchetypeECS/ArchetypeEntityManager.hpp"
 
 namespace GLVM::ecs
 {
 	void EnemySystem::Update() {
-		namespace cm = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 		
-        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+		arch::EnemyArchetype*  enemyArch  = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
+		for( uint32_t j = 0; j < playerArch->entityCount; ++j ) {
+			components::transform* playerTransformComponent = &playerArch->transforms[j];
+			for ( unsigned int i = 0; i < enemyArch->entityCount; ++i ) {
+				components::transform* enemyTransformComponent = &enemyArch->transforms[i];
+				components::state* stateEnemyComponent         = &enemyArch->states[i];
+				components::enemy* enemyComponent              = &enemyArch->enemies[i];
 
-		core::vector<unsigned int>* entityContainerRefController =
-			componentManager->GetEntityContainer<cm::controller>();
-		unsigned int playerEntity = (*entityContainerRefController)[0];
-		
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::enemy, cm::transform, cm::state>();
-
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
-			unsigned int enemyEntity = linkedEntities[i];
-			cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
-            cm::state* stateEnemyComponent = componentManager->GetComponent<cm::state>(enemyEntity);
-			cm::enemy* enemyComponent = componentManager->GetComponent<cm::enemy>(enemyEntity);
-
-			vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
+				vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
 			
-			float cameraSpeed = 5.5f * deltaFrameTime;            
+				float cameraSpeed = 5.5f * deltaFrameTime;            
 
 
-			if(projectileCooldown > 0)
-				projectileCooldown -= cameraSpeed;
-//			std::cout << distance << std::endl;
-			if ( distance.Length() > enemyComponent->detectRadius && stateEnemyComponent->state == core::States::ATTACK ) {
- 				// if(projectileCooldown <= 0) {
-				// 	CalculateProjectile(playerTransformComponent, enemyTransformComponent);
-				// 	projectileCooldown = 5.0;
-				// }
+				if(projectileCooldown > 0)
+					projectileCooldown -= cameraSpeed;
+				if ( distance.Length() > enemyComponent->detectRadius && stateEnemyComponent->state == core::States::ATTACK ) {
+					float deltaLenth = distance.Length() - enemyComponent->detectRadius;
+					vec3 enemyMove = distance * (deltaLenth / distance.Length());
 
-				float deltaLenth = distance.Length() - enemyComponent->detectRadius;
-				vec3 enemyMove = distance * (deltaLenth / distance.Length());
-
-				enemyTransformComponent->position += enemyMove;
-			}
-			
-			if ( distance.Length() <= enemyComponent->detectRadius ) {
- 				if(projectileCooldown <= 0) {
-					CalculateProjectile(playerEntity, enemyEntity);
-					projectileCooldown = 5.0;
+					enemyTransformComponent->position += enemyMove;
 				}
+			
+				if ( distance.Length() <= enemyComponent->detectRadius ) {
+					if(projectileCooldown <= 0) {
+						CalculateProjectile(playerTransformComponent, enemyTransformComponent);
+						projectileCooldown = 5.0;
+					}
 
-				stateEnemyComponent->state = core::States::ATTACK;
+					stateEnemyComponent->state = core::States::ATTACK;
+				}
 			}
 		}
 	}
 
-	void EnemySystem::CalculateProjectile(unsigned int playerEntity, unsigned int enemyEntity) {
-		ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		namespace cm = GLVM::ecs::components;
-
-		unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
-		ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
-															  cm::transform, cm::material,
-															  cm::projectile, cm::pointLight,
-															  cm::damage, cm::actor>(uiEntity_Projectile);
-
+	void EnemySystem::CalculateProjectile(components::transform* playerTransformComponent, components::transform* enemyTransformComponent) {
+		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+		arch::entity projectileEntity = archEntityManager->createEntity();
+		arch::world.addEntityToArchetype( projectileEntity, arch::world.archetypes[3] );
+		arch::EntityLocation projectileLocation = arch::world.entityLocations[arch::getId( projectileEntity )];
+		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
+		const uint32_t projectileIndex = projectileLocation.index;
+		
 		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
 		pSound_Sample->kPath_to_File_ = "../laser2.wav";
 		pSound_Sample->uiDuration_ = 5;
@@ -76,28 +68,27 @@ namespace GLVM::ecs
 		ecs::components::MeshHandle meshHandle{};
 		if ( meshHandlers.GetSize() > 0 )
 			meshHandle = meshHandlers[0];
-		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->handle = meshHandle;
+
+		projectileArch->meshes[projectileIndex].handle = meshHandle;
 		ecs::TextureHandle textureHandle{};
 		if ( textureHandlers.GetSize() > 0 )
 			textureHandle = textureHandlers[0];
-		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
-		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+
+		projectileArch->projectileBundles[projectileIndex].material  = { .diffuseTextureID_ = textureHandle,
+			.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 			.shininess = 128.0f * 0.078125f };
-		cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
+		components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
 		rTransformProjectile->scale = 0.1f;
 
-		cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(playerEntity);
-		cm::transform* enemyTransformComponent = componentManager->GetComponent<cm::transform>(enemyEntity);
-		
 		rTransformProjectile->position = enemyTransformComponent->position;
 		rTransformProjectile->forward   = playerTransformComponent->position - enemyTransformComponent->position;
 		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
 		
-		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
-			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
-			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
+		// *(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
+		// 	.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
+		// 	.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 
-		cm::damage* damageComponent = componentManager->GetComponent<cm::damage>(uiEntity_Projectile);
+		components::damage* damageComponent = &projectileArch->projectileBundles[projectileIndex].damage;
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;
 	}

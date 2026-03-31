@@ -38,6 +38,8 @@
 #include "Archetypes/PlayerArchetype.hpp"
 #include "Archetypes/RigidBodyArchetype.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
 
 using Entity = unsigned int;
 

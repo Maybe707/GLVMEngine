@@ -29,7 +29,8 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::collider) +
 		 sizeof(components::colliderFlags) +
 		 sizeof(components::health) +
-		 sizeof(components::rigidBody));
+		 sizeof(components::rigidBody) +
+		 sizeof(components::move));
 	
 	struct EnemyArchetype : Archetype {
 		components::transform     transforms[ENEMY_ARCH_CHUNK_SIZE];
@@ -43,6 +44,7 @@ namespace GLVM::ecs::arch {
 		components::colliderFlags colliderFlags[ENEMY_ARCH_CHUNK_SIZE];
 		components::health        health[ENEMY_ARCH_CHUNK_SIZE];
 		components::rigidBody     rigidBodies[ENEMY_ARCH_CHUNK_SIZE];
+		components::move          moves[ENEMY_ARCH_CHUNK_SIZE];
 
 		EnemyArchetype() {
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
@@ -56,6 +58,7 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
 			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
 			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
+			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -68,7 +71,8 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
 				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT);
+				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
+				(1ull << ComponentsIndices::MOVE_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
 			componentIds[1] = ComponentsIndices::ENEMY_COMPONENT;
@@ -81,7 +85,8 @@ namespace GLVM::ecs::arch {
 			componentIds[8] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
 			componentIds[9] = ComponentsIndices::HEALTH_COMPONENT;
 			componentIds[10] = ComponentsIndices::RIGID_BODY_COMPONENT;
-			componentCount = 11;
+			componentIds[11] = ComponentsIndices::MOVE_COMPONENT;
+			componentCount = 12;
 		}
 	};
 }; // namespace GLVM::ecs::arch
