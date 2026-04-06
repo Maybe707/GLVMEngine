@@ -3,9 +3,14 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
 #include "Components/ControllerComponent.hpp"
 #include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
@@ -17,6 +22,11 @@
 #include "Texture.hpp"
 #include "VertexMath.hpp"
 #include <Systems/ProjectileSystem.hpp>
+#include <cstdint>
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
+#include "ArchetypeECS/ArchetypeEntityManager.hpp"
 
 namespace GLVM::ecs
 {
@@ -25,101 +35,93 @@ namespace GLVM::ecs
     
     void CProjectileSystem::Update()
     {
-		namespace cm = GLVM::ecs::components;
-		
-        ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
-        EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
+        // ComponentManager* pComponent_Manager = GLVM::ecs::ComponentManager::GetInstance();
+        // EntityManager* pEntity_Manager       = GLVM::ecs::EntityManager::GetInstance();
     
-        core::vector<unsigned int>* pEntity_Container_refMove =
-			pComponent_Manager->GetEntityContainer<cm::controller>();
-        unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
+        // core::vector<unsigned int>* pEntity_Container_refMove =
+		// 	pComponent_Manager->GetEntityContainer<cm::controller>();
+        // unsigned int u_iVector_Move_Size = pEntity_Container_refMove->GetSize();
 
-        core::vector<unsigned int>* pEntity_Container_refView =
-			pComponent_Manager->GetEntityContainer<cm::beholder>();
+        // core::vector<unsigned int>* pEntity_Container_refView =
+		// 	pComponent_Manager->GetEntityContainer<cm::beholder>();
 
-		unsigned int iEntity_refView = 0;
-		if ( pEntity_Container_refView->GetSize() > 0 )
-			iEntity_refView = (*pEntity_Container_refView)[0];
+		// unsigned int iEntity_refView = 0;
+		// if ( pEntity_Container_refView->GetSize() > 0 )
+		// 	iEntity_refView = (*pEntity_Container_refView)[0];
+		namespace cm = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 		
-        cm::beholder* view_Component = pComponent_Manager->GetComponent<cm::beholder>(iEntity_refView);
-        
         float cameraSpeed = 5.5f * deltaFrameTime;            
-
+		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
         if(projectileCooldown > 0)
             projectileCooldown -= cameraSpeed;
 
-        for(unsigned int i = 0; i < u_iVector_Move_Size; ++i) {
+        for(unsigned int i = 0; i < playerArch->entityCount; ++i) {
+			cm::beholder* viewComponent = &playerArch->beholders[i];
+			cm::transform* playerTransform = &playerArch->transforms[i];
             for(int n = 0; n < 6; ++n) {
-                unsigned int iEntity_refMove = (*pEntity_Container_refMove)[i];
-
                 if(!isInventoryOpened && inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                     if(projectileCooldown <= 0) {
-                        CalculateProjectile(pComponent_Manager,
-                                            iEntity_refMove,
-                                            *view_Component);
+                        CalculateProjectile(playerTransform,
+                                            viewComponent);
                         projectileCooldown = 2.0;
                     }
                 }
             }
         }
 
-        // core::vector<unsigned int>* pEntity_Container_refProjectile =
-		// 	pComponent_Manager->GetEntityContainer<cm::projectile>();
-        // unsigned int uiVector_Projectile_Size = pEntity_Container_refProjectile->GetSize();
-
-        ComponentManager* componentManager       = ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities      = componentManager->collectLinkedEntities<cm::projectile,
-																						   cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::collider,
-																						   cm::pointLight,
-																						   cm::damage>();
-
-        for(unsigned int x = 0; x < linkedEntities.GetSize(); ++x) {
-            unsigned int uiEntity_refProjectile = linkedEntities[x];
-            cm::transform* rTransformProjectile = pComponent_Manager->GetComponent<cm::transform>(uiEntity_refProjectile);
-			rTransformProjectile->position += Normalize(rTransformProjectile->forward) * cameraSpeed * 0.5;
-//			rTransformProjectile->tForward += rTransformProjectile->tPosition + rTransformProjectile->tForward;
-			cm::pointLight* pointLightComponent = pComponent_Manager->GetComponent<cm::pointLight>(uiEntity_refProjectile);
-			pointLightComponent->position += Normalize(rTransformProjectile->forward) * cameraSpeed * 0.5;
+		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(arch::world.archetypes[3]);
+        for(unsigned int x = 0; x < projectileArch->entityCount; ++x) {
+            cm::transform* projectileTransform = &projectileArch->transforms[x];
+			projectileTransform->position += Normalize(projectileTransform->forward) * cameraSpeed * 0.5;
 		}
 
-        for(unsigned int i = 0; i < linkedEntities.GetSize(); ++i) {
-			
-            unsigned int uiEntity_refProjectile = linkedEntities[i];
-            if(pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->wallCollision ||
-               pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->groundCollision) {
-				cm::damage* projectileDamageComponent = pComponent_Manager->GetComponent<cm::damage>(uiEntity_refProjectile);
-				for ( unsigned int j = 0; j < pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders.GetSize(); ++j ) {
-					unsigned int collidedEntity = pComponent_Manager->GetComponent<cm::collider>(uiEntity_refProjectile)->colliders[j];
-					if ( pComponent_Manager->isComponentExists<cm::health>(collidedEntity) ) {
-						pComponent_Manager->CreateComponent<cm::attack>(collidedEntity);
-						pComponent_Manager->GetComponent<cm::attack>(collidedEntity)->damage = projectileDamageComponent->maximumDamage;
+        for(unsigned int i = 0; i < projectileArch->entityCount; ++i) {
+			cm::colliderFlags* projectileColliderFlags = &projectileArch->colliderFlags[i];
+            if((projectileColliderFlags->flags & 1) || (projectileColliderFlags->flags & (1 << 1))) {
+				cm::damage* projectileDamage = &projectileArch->projectileBundles[i].damage;
+				cm::collider* projectileCollider = &projectileArch->colliders[i];
+				for ( unsigned int j = 0; j < projectileCollider->colliders.GetSize(); ++j ) {
+					unsigned int collidedEntity = projectileCollider->colliders[j];
+
+					arch::EntityLocation collidedEntityLocation = arch::world.entityLocations[arch::getId( collidedEntity )];
+					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
+						(1ul << arch::ComponentsIndices::ATTACK_COMPONENT);
+
+					if( (collidedEntityLocation.arch->mask & requiredMask) == requiredMask ) {
+						switch( collidedEntityLocation.arch->mask ) {
+						case arch::playerComponentMask:
+							markAsAttacked( static_cast<arch::PlayerArchetype*>( collidedEntityLocation.arch ), projectileDamage,
+													collidedEntityLocation.index );
+
+							
+							static_cast<arch::PlayerArchetype*>(collidedEntityLocation.arch)->attacks[collidedEntityLocation.index].damage = projectileDamage->maximumDamage;
+							break;
+						case arch::enemyComponentMask:
+							markAsAttacked( static_cast<arch::EnemyArchetype*>( collidedEntityLocation.arch ), projectileDamage,
+													collidedEntityLocation.index );
+
+							static_cast<arch::EnemyArchetype*>(collidedEntityLocation.arch)->attacks[collidedEntityLocation.index].damage = projectileDamage->maximumDamage;
+							break;
+						}
 					}
 				}
-                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
+//                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
             }
-//			std::cout << "Size: " << linkedEntities.GetSize() << std::endl;
-//			pComponent_Manager->GetEntityContainer<cm::projectile>()->Print();
-//			std::cout << "Colliders container size: " << pComponent_Manager->GetEntityContainer<cm::collider>()->GetSize() << std::endl;
-//			std::cout << "Projectiles container size 1: " << linkedEntities.GetSize() << std::endl;
-//			std::cout << "Projectiles container size 2: " << uiVector_Projectile_Size << std::endl;
-//			std::cout << "entity: " << uiEntity_refProjectile << std::endl;
         }
     }
 
-    void CProjectileSystem::CalculateProjectile(ecs::ComponentManager* componentManager,
-												unsigned int entityRefMove,
-												components::beholder& beholder) {
+    void CProjectileSystem::CalculateProjectile(components::transform* playerTransform,
+												components::beholder* beholder) {
 		namespace cm = GLVM::ecs::components;
 
-        unsigned int uiEntity_Projectile = ecs::EntityManager::GetInstance()->CreateEntity();
-        ecs::ComponentManager::GetInstance()->CreateComponent<cm::mesh, cm::collider,
-															  cm::transform, cm::material,
-															  cm::projectile, cm::pointLight,
-															  cm::damage, cm::actor>(uiEntity_Projectile);
-
+		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+		arch::entity projectileEntity = archEntityManager->createEntity();
+		arch::world.addEntityToArchetype( projectileEntity, arch::world.archetypes[3] );
+		arch::EntityLocation projectileLocation = arch::world.entityLocations[arch::getId( projectileEntity )];
+		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
+		const uint32_t projectileIndex = projectileLocation.index;
+		
         core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";
         pSound_Sample->uiDuration_ = 5;
@@ -129,30 +131,28 @@ namespace GLVM::ecs
 		ecs::components::MeshHandle meshHandle{};
 		if ( meshHandlers.GetSize() > 0 )
 			meshHandle = meshHandlers[0];
-		componentManager->GetComponent<cm::mesh>(uiEntity_Projectile)->handle = meshHandle;
+		
+		projectileArch->meshes[projectileIndex].handle = meshHandle;
 		ecs::TextureHandle textureHandle{};
 		if ( textureHandlers.GetSize() > 0 )
 			textureHandle = textureHandlers[0];
-		cm::material* rTextureProjectile = componentManager->GetComponent<cm::material>(uiEntity_Projectile);
-		*rTextureProjectile = { .diffuseTextureID_ = textureHandle, .specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
-        cm::transform* rTransformProjectile = componentManager->GetComponent<cm::transform>(uiEntity_Projectile);
-        rTransformProjectile->scale = 0.1f;
 		
-		cm::transform* transform = componentManager->GetComponent<cm::transform>(entityRefMove);
+		projectileArch->projectileBundles[projectileIndex].material  = { .diffuseTextureID_ = textureHandle,
+			.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+			.shininess = 128.0f * 0.078125f };
+		components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
+		rTransformProjectile->scale = 0.1f;
+		
+		cm::transform* transform = playerTransform;
 		if ( transform != nullptr )
 			rTransformProjectile->position = transform->position;
 
         rTransformProjectile->forward   = beholder.forward;
-		rTransformProjectile->yaw        = fYaw;
-		rTransformProjectile->pitch      = fPitch;
+//		rTransformProjectile->yaw        = fYaw;
+//		rTransformProjectile->pitch      = fPitch;
 		rTransformProjectile->position  += rTransformProjectile->forward * 2.0f;
-		
-		*(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
-			.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
-			.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
 
-		cm::damage* damageComponent = componentManager->GetComponent<cm::damage>(uiEntity_Projectile);
+		components::damage* damageComponent = &projectileArch->projectileBundles[projectileIndex].damage;
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;
     }

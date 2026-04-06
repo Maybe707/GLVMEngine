@@ -6,6 +6,8 @@
 #ifndef PROJECTILE_SYSTEM
 #define PROJECTILE_SYSTEM
 
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
 #include "ISystem.hpp"
 #include "Vector.hpp"
 #include "ComponentManager.hpp"
@@ -21,9 +23,19 @@
 #include "EntityManager.hpp"
 #include "EventsStack.hpp"
 #include "ISoundEngine.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include <cstdint>
 
 namespace GLVM::ecs
 {
+	template<typename T>
+	concept UnitOrEnemy = std::is_same_v<T, arch::PlayerArchetype> || std::is_same_v<T, arch::EnemyArchetype>;
+
+	template<typename T>
+	concept HasAttack = requires(T* t) {
+		{ t->attacks };
+	};
+	
     class CProjectileSystem : public ISystem
     {
     public:
@@ -42,10 +54,20 @@ namespace GLVM::ecs
 
         CProjectileSystem(core::CStack& inputStack);
         void Update() override;
-        void CalculateProjectile(ecs::ComponentManager* componentManager,
-                                 unsigned int entityRefMove,
-                                 components::beholder& beholder);
+		template< typename T >
+	    requires UnitOrEnemy<T> && HasAttack<T>
+		static void markAsAttacked( T* arch, components::damage* projectileDamage, uint32_t entityIndex );
+        void CalculateProjectile(components::transform* playerTransform,
+                                 components::beholder* beholder);
     };
+
+	
+	template< typename T >
+	requires UnitOrEnemy<T> && HasAttack<T>
+	void CProjectileSystem::markAsAttacked( T* arch, components::damage* projectileDamage, uint32_t enitityIndex ) {
+		arch->attacks[enitityIndex].damage = projectileDamage->maximumDamage;
+	}
+
 }
 
 #endif

@@ -1,7 +1,7 @@
 #ifndef ARCHETYPE_INTERFACE_HPP
 #define ARCHETYPE_INTERFACE_HPP
 
-#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Vector.hpp"
 
 namespace GLVM::ecs::arch {

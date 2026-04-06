@@ -14,6 +14,7 @@
 #include "Vector.hpp"
 #include "EventsStack.hpp"
 #include "Components/ViewComponent.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs
 {
@@ -24,6 +25,8 @@ namespace GLVM::ecs
         float fDelta_Time_;
 		float& gravity;
         core::CStack& Input_Stack_;
+		arch::Archetype* cachedArchetypes[32];
+		uint32_t cachedArchetypesNumber = 0;
 
         CPhysicsSystem(float& gravity_, core::CStack& _input_Stack) : gravity(gravity_),
 																	  Input_Stack_(_input_Stack) {}

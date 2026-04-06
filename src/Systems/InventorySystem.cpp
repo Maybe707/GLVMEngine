@@ -1,7 +1,14 @@
 #include "Systems/InventorySystem.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VertexMath.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "TagComponents/CrosshairTagComponent.hpp"
+#include "Archetypes/CrosshairArchetype.hpp"
+#include "Archetypes/InventoryArchetype.hpp"
                                 
 namespace GLVM::ecs
 {
@@ -9,16 +16,62 @@ namespace GLVM::ecs
 		if ( isInventoryOpened ) {
 			namespace cm = GLVM::ecs::components;
 			ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
+
+			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+				arch::Archetype* arch = arch::world.archetypes[i];
+				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+					(1ul << arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
+
+				if( (arch->mask & requiredMask) == requiredMask ) {
+					cachedCrosshairArchetype = arch;
+				}
+			}
+
+			components::transform*                crosshair_transformsView    = nullptr;
+			tagComponents::crossHairTagComponent* crosshair_crosshairTagView  = nullptr;
+			switch( cachedCrosshairArchetype->mask ) {
+			case arch::crosshairComponentMask:
+				crosshair_transformsView    = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
+				crosshair_crosshairTagView  = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->crosshairTagComponents;
+				break;
+			}
 			
-			core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
+			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+				arch::Archetype* arch = arch::world.archetypes[i];
+				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+					(1ul << arch::ComponentsIndices::INVENTORY_COMPONENT);
 
-			core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::transform, cm::inventory>();
-			cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(linkedInventoryEntities[0]);
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(linkedInventoryEntities[0]);
+				if( (arch->mask & requiredMask) == requiredMask ) {
+					cachedInventoryArchetype = arch;
+				}
+			}
 
-			const float inventorySlotScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
-			const float inventorySlotHalfScale = inventoryTransformComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
+			components::transform*                inventory_transformsView    = nullptr;
+			components::inventory*                inventory_inventoriesView   = nullptr;
+			components::mesh*                     inventory_meshview          = nullptr;
+			switch( cachedInventoryArchetype->mask ) {
+			case arch::inventoryComponentMask:
+				inventory_transformsView    = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->transforms;
+				inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->invetories;
+				inventory_meshview          = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->meshes;
+				break;
+			}
+			
+			// core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
+			// cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
+
+			// core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::transform, cm::inventory>();
+			// cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(linkedInventoryEntities[0]);
+			// cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(linkedInventoryEntities[0]);
+
+			cm::transform* crosshairTransformComponent = &crosshair_transformsView[0];
+			
+			cm::transform* inventoryTransformComponent = &inventory_transformsView[0];
+			cm::inventory* inventoryComponent          = &inventory_inventoriesView[0];
+			cm::mesh*      inventoryMeshComponent      = &inventory_meshview[0];
+			
+			const float inventorySlotScale = inventoryMeshComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
+			const float inventorySlotHalfScale = inventoryMeshComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
 
 			if ( *isItemDraged < 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {           ///< Take an item from inventory
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,

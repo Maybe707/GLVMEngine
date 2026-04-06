@@ -7,24 +7,33 @@
 #include "ComponentManager.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "Components/ControllerComponent.hpp"
-#include "Components/CrosshairComponent.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/InventorySlotComponent.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/MoveComponent.hpp"
-#include "Components/RigidBodyComponent.hpp"
-#include "Components/MaterialComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
-#include "EntityManager.hpp"
-#include "Event.hpp"
-#include "Components/RigidBodyComponent.hpp"
-#include "Components/ViewComponent.hpp"
-#include "EventsStack.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include <climits>
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Components/ActorComponent.hpp"
+#include "Components/ColliderComponent.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
+#include "Texture.hpp"
+#include "VertexMath.hpp"
+#include <Systems/ProjectileSystem.hpp>
+#include <cstdint>
+#include <sys/types.h>
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
+#include "Archetypes/StaticMeshArchetype.hpp"
 
 namespace GLVM::ecs
 {
@@ -118,350 +127,182 @@ namespace GLVM::ecs
 
 	void CCollisionSystem::Update()
 	{
-		namespace cm = GLVM::ecs::components;
-		
-        ComponentManager* componentManager = ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::collider,
-																					  cm::transform,
-																					  cm::actor,
-																					  cm::mesh>();
-		
-        const float cameraSpeed = 5.5f * fDelta_Time_;            
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			const unsigned int backtrackingEntityRefCollider = linkedEntities[i];
-			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = false;
-			componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.clear();
-			cm::MeshHandle backtrackingEntityMeshHandle = componentManager->GetComponent<cm::mesh>(backtrackingEntityRefCollider)->handle;
+		namespace arch = GLVM::ecs::arch;
 
-			cm::transform* backtrackingTransformComponent = componentManager->
-				GetComponent<cm::transform>(backtrackingEntityRefCollider);
-			vec3 backtrackingTransform = backtrackingTransformComponent->position;
-			float backtrackingScale = backtrackingTransformComponent->scale;
-			float backtrackingGltfFlag = backtrackingTransformComponent->gltf;
+//		arch::EntityLocation collidedEntityLocation = arch::world.archetypes
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+				(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
-			if ( componentManager->isComponentExists<cm::move>(backtrackingEntityRefCollider) ) {
-				cm::move* backtrackingMove = componentManager->
-					GetComponent<cm::move>(backtrackingEntityRefCollider);
-				backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
-				backtrackingTransform += backtrackingMove->gravity;
-			}
-
-			for(unsigned int j = 0; j < linkedEntitiesVectorSize; ++j) {
-				if ( i == j )
-					continue;
-				
-                const unsigned int comparedEntityRefCollider     = linkedEntities[j];
-
-				cm::MeshHandle comparedEntityMeshHandle = componentManager->GetComponent<cm::mesh>(comparedEntityRefCollider)->handle;
-				cm::transform* comparedTransformComponent = componentManager->
-					GetComponent<cm::transform>(comparedEntityRefCollider);
-			    vec3  comparedTransform = comparedTransformComponent->position;
-				float comparedScale     = comparedTransformComponent->scale;
-				float comparedGltfFlag  = comparedTransformComponent->gltf;
-
-				if ( componentManager->isComponentExists<cm::move>(comparedEntityRefCollider) ) {
-					cm::move* comparedMove = componentManager->
-						GetComponent<cm::move>(comparedEntityRefCollider);
-					comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
-					comparedTransform += comparedMove->gravity;
-				}
-				
-				if ( !backtrackingGltfFlag ) {
-					backtrackingScale /= 2;
-				}
-
-				if ( !comparedGltfFlag ) {
-					comparedScale /= 2;
-				}
-				
-				bool boxColliderFlag = false;
-				bool upperActorCheckFlag = false;
-                boxColliderFlag = BoxCollider(backtrackingTransform,
-											  comparedTransform,
-											  backtrackingScale,
-											  comparedScale,
-											  backtrackingEntityMeshHandle,
-											  comparedEntityMeshHandle);
-				if ( boxColliderFlag ) {
-					upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
-														  comparedTransform,
-														  backtrackingScale,
-														  comparedScale,
-														  backtrackingEntityMeshHandle,
-														  comparedEntityMeshHandle);
-				}
-				
-				if(upperActorCheckFlag && boxColliderFlag) {
-                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->groundCollision = true;
-					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
-                    continue;
-                }
-                    
-                if(boxColliderFlag) {
-                    componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->wallCollision = true;
-					componentManager->GetComponent<cm::collider>(backtrackingEntityRefCollider)->colliders.Push(comparedEntityRefCollider);
-                    continue;
-                }
+			if( (arch->mask & requiredMask) == requiredMask ) {
+				cachedArchetypes[cachedArchetypesNumber] = arch;
+				++cachedArchetypesNumber;
 			}
 		}
-
-		// /// This code implements when inventory is open, player press left mouse button and he is not holding an item
-		// if ( isInventoryOpened && !*isItemDraged && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {
-		// 	*isLeftMouseButtonReleased = false;
-		// 	core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-		// 	core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-		// 	const unsigned int crosshairEntity = linkedCrosshairEntities[0];              ///< Thats ok to give array '0' element in this case because we have only one crosshair
-		// 	const cm::transform* crosshairTransform = componentManager->GetComponent<cm::transform>(crosshairEntity);
-		// 	cm::MeshHandle crosshairMeshhandle = componentManager->GetComponent<cm::mesh>(crosshairEntity)->handle;
-		// 	vec3 crosshairPosition;
-		// 	float crosshairScale = 0;
-		// 	float crosshairGltfFlag = 0;
-		// 	if ( linkedCrosshairEntities.GetSize() > 0 ) {
-		// 		crosshairPosition = crosshairTransform->position;                
-		// 		crosshairScale = crosshairTransform->scale;
-		// 		crosshairGltfFlag = crosshairTransform->gltf;
-		// 	}
-
-		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-		// 		unsigned int entityItemContaining = linkedItemEntities[i];
-		// 		const cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-		// 		if ( itemComponent->occupiedSlots.GetSize() == 0 )                        ///< If occupiedSlots is 0 then this item not in inventory
-		// 			continue;
-
-		// 		const cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(entityItemContaining);
-		// 		cm::MeshHandle itemMeshHandle = componentManager->GetComponent<cm::mesh>(entityItemContaining)->handle;
-		// 		vec3  itemPosition;
-		// 		float itemScale_X  = 0;
-		// 		float itemScale_Y  = 0;
-		// 		float itemGltfFlag = 0;
-		// 		constexpr float collitionCorrectnessMultiplayer = 0.8;
-		// 		itemPosition = itemTransformComponent->position;
-		// 		itemScale_X  = itemTransformComponent->scale * itemComponent->itemSlotType.width *
-		// 			collitionCorrectnessMultiplayer;
-		// 		itemScale_Y  = itemTransformComponent->scale * itemComponent->itemSlotType.height *
-		// 			collitionCorrectnessMultiplayer;
-		// 		itemGltfFlag = itemTransformComponent->gltf;
-
-		// 		if ( !crosshairGltfFlag ) {
-		// 			crosshairScale /= 2;
-		// 		}
-
-		// 		if ( !itemGltfFlag ) {
-		// 			itemScale_X /= 2;
-		// 		}
-
-		// 		bool squareColliderFlag = false;
-		// 		squareColliderFlag = SquareCollider(crosshairPosition, itemPosition,
-		// 											crosshairScale, itemScale_X, itemScale_Y,
-		// 											crosshairMeshhandle, itemMeshHandle);
-		// 		if ( squareColliderFlag ) {
-		// 			componentManager->GetComponent<cm::collider>(entityItemContaining)->wallCollision = true;
-		// 			componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(crosshairEntity);
-
-		// 			cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-		// 			for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
-		// 				unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
-		// 				cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-		// 				inventorySlotComponent->itemEntity = UINT_MAX;
-		// 			}
-		// 			collidedItemComponent->occupiedSlots.clear();
-		// 		}
-		// 	}
-		// }
-
-		// /// This code implements highlightning on inventory slots and show player is it possible to drop item in inventory
-		// if ( isInventoryOpened && *isItemDraged ) {
-		// 	core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-		// 	core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		// 	cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-		// 	inventoryComponent->highlightedSlots.clear();
-		// 	inventoryComponent->isAvailableHighlightedSlots = false;                         ///< Turn off highlightning flag before set it to the right value
-
-		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-		// 		unsigned int entityItemContaining = linkedItemEntities[i];
-		// 		cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-
-		// 		if ( itemCollider->wallCollision ) {
-		// 			cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-		// 			vec3 itemPosition = itemTransform->position;
-					
-		// 			core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
-		// 																									   cm::transform,
-		// 																									   cm::inventorySlot>();
-		// 			core::vector<unsigned int> collidedInventorySlotEntities;
-		// 			core::vector<vec3> collidedInventorySlotTransforms;
-					
-		// 			for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
-		// 				unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
-		// 				cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-		// 				cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
-		// 				vec3  inventorySlotPosition = inventorySlotTransform->position;
-		// 				float inventorySlotScale    = inventorySlotTransform->scale;
-		// 				bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
-
-		// 				if ( !isInventorySlot_GLTF )
-		// 					inventorySlotScale /= 2;
-
-		// 				bool squareColliderFlag = false;
-		// 				inventorySlotPosition[2] = 0.0f;                                        ///< We dont need z-axis here because we test collision for x-y plane with item pivot
-		// 				squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-		// 												 inventorySlotScale, slotMeshHandle);
-		// 				if ( squareColliderFlag ) {
-		// 					collidedInventorySlotEntities.Push(inventorySlotEntity);
-		// 					collidedInventorySlotTransforms.Push(inventorySlotPosition);
-		// 					componentManager->GetComponent<cm::collider>(entityItemContaining)->colliders.Push(entityItemContaining);
-		// 				} else {
-		// 					continue;
-		// 				}		
-		// 			}
-
-		// 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-		// 			core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
-
-		// 			bubbleSortVector(newColliderEntities);
-		// 			int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
-
-		// 			/// If this condition equal true then this means that we got inventory slots highlighted with green color what meancs thar player can drop item into inventory
-		// 			if ( (stateSlotsAvailability == INT_MAX && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ||
-		// 				 (stateSlotsAvailability >= 0 && itemComponent->itemSlotType.height * itemComponent->itemSlotType.width == newColliderEntities.GetSize()) ) {
-		// 				inventoryComponent->isAvailableHighlightedSlots = true;
-		// 			}
-
-		// 			for ( unsigned int v = 0; v < newColliderEntities.GetSize(); ++v )
-		// 				inventoryComponent->highlightedSlots.Push(newColliderEntities[v]);
-		// 		}
-		// 	}
-		// } else {
-		// 	core::vector<unsigned int> inventoryEntities = componentManager->collectLinkedEntities<cm::inventory>();
-		// 	cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-
-		// 	inventoryComponent->highlightedSlots.clear();
-		// }
-		
-		// /// This code implements state when inventory is opened, player hold item and press left mouse button
-		// if ( isInventoryOpened && isLeftMouseButtonPressed && *isLeftMouseButtonReleased && *isItemDraged ) {
-		// 	const core::vector<Entity> linkedItemEntities = componentManager->collectLinkedEntities<cm::item, cm::mesh, cm::material, cm::transform, cm::collider>();
-		// 	for ( unsigned int i = 0; i < linkedItemEntities.GetSize(); ++i ) {
-		// 		const unsigned int entityItemContaining = linkedItemEntities[i];
-		// 		cm::collider* itemCollider = componentManager->GetComponent<cm::collider>(entityItemContaining);
-		// 		const core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-		// 		bool isCrosshairCollided = false;
-		// 		for ( unsigned int n = 0; n < itemCollider->colliders.GetSize(); ++n ) {
-		// 			if ( itemCollider->colliders[n] == linkedCrosshairEntities[0] ) {
-		// 				isCrosshairCollided = true;
-		// 				break;
-		// 			}
-		// 		}
+			
+		const float cameraSpeed = 5.5f * fDelta_Time_;
+		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedArchetypes[x];
+			components::transform* backtrackingTransforms = nullptr;
+			components::collider*  backtrackingColliders  = nullptr;
+			components::colliderFlags* backtrackingColliderFlags = nullptr;
+			components::mesh*      backtrackingMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				backtrackingTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::PlayerArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::PlayerArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::PlayerArchetype*>( arch )->meshes;
+				break;
+			case arch::enemyComponentMask:
+				backtrackingTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::EnemyArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+				break;
+			case arch::staticMeshComponentMask:
+				backtrackingTransforms = static_cast<arch::staticMeshArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::staticMeshArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::staticMeshArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::staticMeshArchetype*>( arch )->meshes;
+				break;
+			}
+			
+			for(unsigned int i = 0; i < arch->entityCount; ++i) {
+				uint8_t groudCollisionTurnOffMask = (1u << 0) | (0u << 1) | (1u << 2) | (1u << 3);
+				backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags & groudCollisionTurnOffMask;
+				backtrackingColliders[i].colliders.clear();
+				components::mesh backtrackinEntityMesh = backtrackingMeshes[i];
+				components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
+				float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
 				
-		// 		if ( itemCollider->wallCollision && isCrosshairCollided ) {
-		// 			cm::transform* itemTransform = componentManager->GetComponent<cm::transform>(entityItemContaining);
-		// 			const vec3 itemPosition = itemTransform->position;
+				components::transform backtrackingTransformComponent = backtrackingTransforms[i];
+				vec3 backtrackingTransform = backtrackingTransformComponent.position;
+				float backtrackingScale = backtrackingTransformComponent.scale;
+
+				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+				if ( (arch->mask & requiredMask) == requiredMask  ) {
+					components::move* backtrackingMove = nullptr;
+					switch( arch->mask ) {
+					case arch::playerComponentMask:
+						backtrackingMove = static_cast<arch::PlayerArchetype*>( arch )->moves;
+						break;
+					case arch::enemyComponentMask:
+						backtrackingMove = static_cast<arch::EnemyArchetype*>( arch )->moves;
+						break;
+					}
 					
-		// 			const core::vector<Entity> linkedInventorySlotEntities = componentManager->collectLinkedEntities<cm::collider,
-		// 																									   cm::transform,
-		// 																									   cm::inventorySlot>();
-		// 			core::vector<unsigned int> collidedInventorySlotEntities;
-		// 			core::vector<vec3> collidedInventorySlotTransforms;
-		// 			for ( unsigned int j = 0; j < linkedInventorySlotEntities.GetSize(); ++j ) {
-		// 				const unsigned int inventorySlotEntity      = linkedInventorySlotEntities[j];
-		// 				const cm::transform* inventorySlotTransform = componentManager->GetComponent<cm::transform>(inventorySlotEntity);
-		// 				cm::MeshHandle slotMeshHandle = componentManager->GetComponent<cm::mesh>(inventorySlotEntity)->handle;
-		// 				vec3  inventorySlotPosition = inventorySlotTransform->position;
-		// 				float inventorySlotScale    = inventorySlotTransform->scale;
-		// 				bool  isInventorySlot_GLTF  = inventorySlotTransform->gltf;
+					backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+					backtrackingTransform += backtrackingMove->gravity;
+				}
 
-		// 				if ( !isInventorySlot_GLTF ) {
-		// 					inventorySlotScale /= 2;
-		// 				}
+				for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
+					arch::Archetype* comparedArch = cachedArchetypes[i1];
+					components::transform* comparedTransforms = nullptr;
+					components::collider*  comparedColliders  = nullptr;
+					components::colliderFlags* comparedColliderFlags = nullptr;
+					components::mesh*      comparedMeshes     = nullptr;
+					switch( arch->mask ) {
+					case arch::playerComponentMask:
+						comparedTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+						comparedColliders = static_cast<arch::PlayerArchetype*>( arch )->colliders;
+						comparedColliderFlags = static_cast<arch::PlayerArchetype*>( arch )->colliderFlags;
+						comparedMeshes = static_cast<arch::PlayerArchetype*>( arch )->meshes;
+						break;
+					case arch::enemyComponentMask:
+						comparedTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
+						comparedColliders = static_cast<arch::EnemyArchetype*>( arch )->colliders;
+						comparedColliderFlags = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
+						comparedMeshes = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+						break;
+					case arch::staticMeshComponentMask:
+						comparedTransforms = static_cast<arch::staticMeshArchetype*>( arch )->transforms;
+						comparedColliders = static_cast<arch::staticMeshArchetype*>( arch )->colliders;
+						comparedColliderFlags = static_cast<arch::staticMeshArchetype*>( arch )->colliderFlags;
+						comparedMeshes = static_cast<arch::staticMeshArchetype*>( arch )->meshes;
+						break;
+					}
 
-		// 				bool squareColliderFlag = false;
-		// 				inventorySlotPosition[2] = 0.0f;
-		// 				squareColliderFlag = DotCollider(itemPosition, inventorySlotPosition,
-		// 												 inventorySlotScale, slotMeshHandle);
-		// 				if ( squareColliderFlag ) {
-		// 					collidedInventorySlotEntities.Push(inventorySlotEntity);
-		// 					collidedInventorySlotTransforms.Push(inventorySlotPosition);
-		// 				} else {
-		// 					continue;
-		// 				}		
-		// 			}
-
-		// 			if ( collidedInventorySlotEntities.GetSize() == 0 ) {
-		// 				componentManager->GetComponent<cm::item>(entityItemContaining)->occupiedSlots.clear();
-		// 				componentManager->CreateComponent<cm::actor>(entityItemContaining);
-		// 				componentManager->CreateComponent<cm::rigidBody>(entityItemContaining);
-		// 				*componentManager->GetComponent<cm::rigidBody>(entityItemContaining) = { .fMass_ = 2.0f };
-		// 				core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
-		// 				cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-		// 				itemTransform->position = playerTransform->position;
-		// 				vec3 normalizedForward = Normalize(playerTransform->forward);
-		// 				itemTransform->position[0] += normalizedForward[0] * 2.5f;
-		// 				itemTransform->position[2] += normalizedForward[2] * 2.5f;
-		// 				itemTransform->scale = 0.05f;
-		// 				*isItemDraged = false;
-		// 				*isLeftMouseButtonReleased = false;
-		// 				itemCollider->itemDrag = false;
-		// 				itemCollider->wallCollision = false;
-		// 			}
-					
-		// 			cm::item* itemComponent = componentManager->GetComponent<cm::item>(entityItemContaining);
-		// 			core::vector<unsigned int> newColliderEntities = searchItemSlots(itemComponent->itemSlotType, itemPosition, collidedInventorySlotEntities, collidedInventorySlotTransforms);
-		// 			unsigned int slotsNumberForItem = itemComponent->itemSlotType.height * itemComponent->itemSlotType.width;
-
-		// 			if ( newColliderEntities.GetSize() != slotsNumberForItem )
-		// 				return;
-					
-		// 			bubbleSortVector(newColliderEntities);
-		// 			int stateSlotsAvailability = slotsAvailabilityState(newColliderEntities);
-		// 			if ( stateSlotsAvailability == INT_MAX ) {                                                         ///< Just drop an item into inventory because all slots are available
-		// 				itemComponent->occupiedSlots.clear();
+					for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
+						if ( i == j )
+							continue;
+				
+						components::mesh comparedEntityMesh = comparedMeshes[j];
+						components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
+						float comparedGltfFlag  = comparedEntityMesh.gltf;
 						
-		// 				for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-		// 					cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
-		// 					invetorySlot->itemEntity = entityItemContaining;
-		// 					itemComponent->occupiedSlots.Push(newColliderEntities[x]);
-		// 				}
-		// 				*isItemDraged = false;
-		// 				*isLeftMouseButtonReleased = false;
-		// 				itemCollider->itemDrag = false;
-		// 				itemCollider->wallCollision = false;
+						components::transform comparedTransformComponent = comparedTransforms[j];
+						vec3  comparedTransform = comparedTransformComponent.position;
+						float comparedScale     = comparedTransformComponent.scale;
 
-		// 				return;
-		// 			} else if ( stateSlotsAvailability == -1 ) {                                                       ///< We cant drop item into inventory
-		// 				return;
-		// 			} else if ( stateSlotsAvailability >= 0 ) {                                                        ///< We can switch holding item with another one
-		// 				cm::item* collidedItemComponent = componentManager->GetComponent<cm::item>(stateSlotsAvailability);
-		// 				for ( unsigned int j = 0; j < collidedItemComponent->occupiedSlots.GetSize(); ++j ) {
-		// 					unsigned int inventorySlotEntity = collidedItemComponent->occupiedSlots[j];
-		// 					cm::inventorySlot* inventorySlotComponent = componentManager->GetComponent<cm::inventorySlot>(inventorySlotEntity);
-		// 					inventorySlotComponent->itemEntity = UINT_MAX;
-		// 				}
-		// 				cm::collider* collidedItemColliderComponent = componentManager->GetComponent<cm::collider>(stateSlotsAvailability);
-		// 				core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-		// 				collidedItemColliderComponent->wallCollision = true;
-		// 				collidedItemColliderComponent->colliders.Push(linkedCrosshairEntities[0]);
+						arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+						if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
+							components::move* comparedMove = nullptr;
+							switch( arch->mask ) {
+							case arch::playerComponentMask:
+								comparedMove = static_cast<arch::PlayerArchetype*>( comparedArch )->moves;
+								break;
+							case arch::enemyComponentMask:
+								comparedMove = static_cast<arch::EnemyArchetype*>( comparedArch )->moves;
+								break;
+							}
+					
+							comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
+							comparedTransform += comparedMove->gravity;
+						}
 
-		// 				itemComponent->occupiedSlots.clear();
-						
-		// 				for ( unsigned int x = 0; x < newColliderEntities.GetSize(); ++x ) {
-		// 					cm::inventorySlot* invetorySlot = componentManager->GetComponent<cm::inventorySlot>(newColliderEntities[x]);
-		// 					invetorySlot->itemEntity = entityItemContaining;
-		// 					itemComponent->occupiedSlots.Push(newColliderEntities[x]);
-		// 				}
+						if ( !backtrackingGltfFlag ) {
+							backtrackingScale /= 2;
+						}
 
-		// 				*isLeftMouseButtonReleased = false;
-		// 				itemCollider->itemDrag = false;
-		// 				itemCollider->wallCollision = false;
-		// 				return;
-		// 			}
-		// 		}
-		// 	}
-		// }
+						if ( !comparedGltfFlag ) {
+							comparedScale /= 2;
+						}
+				
+						bool boxColliderFlag = false;
+						bool upperActorCheckFlag = false;
+						boxColliderFlag = BoxCollider(backtrackingTransform,
+													  comparedTransform,
+													  backtrackingScale,
+													  comparedScale,
+													  backtrackingEntityMeshHandle,
+													  comparedEntityMeshHandle);
+						if ( boxColliderFlag ) {
+							upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
+																  comparedTransform,
+																  backtrackingScale,
+																  comparedScale,
+																  backtrackingEntityMeshHandle,
+																  comparedEntityMeshHandle);
+						}
+				
+						if(upperActorCheckFlag && boxColliderFlag) {
+							uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+							backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | groudCollisionTurnOffMask;
+							backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
+							
+							continue;
+						}
+                    
+						if(boxColliderFlag) {
+							uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+							backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
+							backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
+							
+							continue;
+						}
+					}
+				}
+			}
+		}
+		cachedArchetypesNumber = 0;
 	}
-
+	
 	core::vector<unsigned int> CCollisionSystem::searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
-																	[[maybe_unused]] const core::vector<vec3>& collidedInventorySlotTransforms) {
+																 [[maybe_unused]] const core::vector<vec3>& collidedInventorySlotTransforms) {
 		float aspectRatio = 1920.0f / 1080.0f;
 		vec3 localItemPosition = itemPosition;
 		localItemPosition[0] = localItemPosition[0] * aspectRatio;

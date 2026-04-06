@@ -4,8 +4,12 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/CrosshairArchetype.hpp"
+#include "Archetypes/InventoryArchetype.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "Archetypes/RigidBodyArchetype.hpp"
+#include "Archetypes/SpotLightArchetype.hpp"
+#include "Archetypes/StaticMeshArchetype.hpp"
 #include "Components/AnimationMoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
@@ -64,6 +68,8 @@ int main()
 	ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
 	ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
+	arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+	
 	core::Engine* GLVM = core::Engine::GetInstance();
 	[[maybe_unused]] cm::MeshHandle cubeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cube.obj");
 	[[maybe_unused]] cm::MeshHandle coneHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cone.obj");
@@ -90,15 +96,31 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle inventoryTexturehandle = GLVM->LoadTextureFromAddress(64, 64, inventorySlot_dat_len, inventorySlot_dat);
 	[[maybe_unused]] ecs::TextureHandle tilesetTexturehandle = GLVM->LoadTextureFromAddress(512, 512, tileset_dat_len, tileset_dat);
 
-	arch::LevelChunkArchetype* levelChunkArch = new arch::LevelChunkArchetype;
-	arch::PlayerArchetype* playerArch         = new arch::PlayerArchetype;
-	arch::EnemyArchetype* enemyArch           = new arch::EnemyArchetype;
-	arch::ProjectileArchetype* projectileArch = new arch::ProjectileArchetype;
+	{
+		arch::LevelChunkArchetype* levelChunkArch = new arch::LevelChunkArchetype;
+		arch::PlayerArchetype* playerArch         = new arch::PlayerArchetype;
+		arch::EnemyArchetype* enemyArch           = new arch::EnemyArchetype;
+		arch::ProjectileArchetype* projectileArch = new arch::ProjectileArchetype;
+		arch::StaticMeshArchetype* staticMeshArch = new arch::StaticMeshArchetype;
+		arch::CrosshairArchetype* crosshairArch   = new arch::CrosshairArchetype;
+		arch::InventoryArchetype* inventoryArch   = new arch::InventoryArchetype;
+		arch::ItemArchetype*      itemArch        = new arch::ItemArchetype;
+		arch::DirectionalLightArchetype* directionalLightArch = new arch::DirectionalLightArchetype;
+		arch::PointLightArchetype*       pointLightArch       = new arch::PointLightArchetype;
+		arch::SpotLightArchetype*        spotLightArch        = new arch::SpotLightArchetype;
 	
-	arch::world.archetypes.Push( levelChunkArch );
-	arch::world.archetypes.Push( playerArch );
-	arch::world.archetypes.Push( enemyArch );
-	arch::world.archetypes.Push( projectileArch );
+		arch::world.archetypes.Push( levelChunkArch );
+		arch::world.archetypes.Push( playerArch );
+		arch::world.archetypes.Push( enemyArch );
+		arch::world.archetypes.Push( projectileArch );
+		arch::world.archetypes.Push( staticMeshArch );
+		arch::world.archetypes.Push( crosshairArch );
+		arch::world.archetypes.Push( inventoryArch );
+		arch::world.archetypes.Push( itemArch );
+		arch::world.archetypes.Push( directionalLightArch );
+		arch::world.archetypes.Push( pointLightArch );
+		arch::world.archetypes.Push( spotLightArch );
+	}
 	
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
@@ -121,35 +143,32 @@ int main()
 	// 	serverLinux.response();
 	// }
 	
-    Entity uiPlayer = EntityManager->CreateEntity();
-    ComponentManager->CreateComponent<cm::mesh, cm::controller, cm::collider, cm::beholder,
-		cm::transform, cm::rigidBody, cm::health, cm::actor, cm::material>(uiPlayer);
-	*ComponentManager->GetComponent<cm::transform>(uiPlayer) = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f, .gltf = true };
-	*ComponentManager->GetComponent<cm::rigidBody>(uiPlayer) = { .fMass_ = 5.0f };
-	*ComponentManager->GetComponent<cm::health>(uiPlayer) = { .maxHealth = 100, .currentHealth = 100 };
-    *ComponentManager->GetComponent<cm::beholder>(uiPlayer) = { .forward = { 0.0f, 0.0f, -1.0f },
-		.up = { 0.0f, -1.0f, 0.0f }, .Position = {0.0f, 0.0f, -3.0f} };
-    ComponentManager->GetComponent<cm::mesh>(uiPlayer)->handle = monkeyHandle_OBJ;
-	cm::material* materialPlainPlayer  = ComponentManager->GetComponent<cm::material>(uiPlayer);
-	*materialPlainPlayer = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
+	arch::entity player = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( player, arch::world.archetypes[1] );
+	arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
+	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
+	const uint32_t playerIndex = playerLocation.index;
 
-	// Entity plain0 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::material, cm::mesh, cm::transform, cm::collider, cm::actor>(plain0);
-	// *ComponentManager->GetComponent<cm::transform>(plain0) = { .position = { 0.0, -20.0, 0 }, .yaw = 0.0f, .pitch = 0.0f, .scale = 20.0f, .gltf = true };
-	// ComponentManager->GetComponent<cm::mesh>(plain0)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialPlain0  = ComponentManager->GetComponent<cm::material>(plain0);
-	// *materialPlain0 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
-
+	playerArch->transforms[playerIndex]  = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f };
+	playerArch->rigidBodies[playerIndex] = { .fMass_ = 5.0f };
+	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
+	playerArch->meshes[playerIndex]      = { .handle = monkeyHandle_OBJ, .gltf = true };
+	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
+	
     std::random_device rd;
     std::map<int, int> hist;
 	std::mt19937 mersenne(rd());
     std::uniform_int_distribution<int> dist(0, 3);
 	
 	for ( u32 i = 0; i < 100; ++i ) {
-	Entity uiWitch = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::font, cm::animation, cm::material, cm::mesh, cm::collider, cm::transform, cm::health, cm::enemy, cm::rigidBody, cm::state, cm::actor>(uiWitch);
+	arch::entity enemy = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( enemy, arch::world.archetypes[2] );
+	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];
+	arch::EnemyArchetype* enemyArch = static_cast<arch::EnemyArchetype*>(enemyLocation.arch);
+	const uint32_t enemyIndex = enemyLocation.index;
+	
 	unsigned int random = dist(mersenne);
 	vec3 randomDirection = {};
 	switch( random ) {
@@ -166,228 +185,128 @@ int main()
 		randomDirection = vec3( 0.0f, 0.0f, -3.0f, 0.0 );
 		break;
 	}
-	*ComponentManager->GetComponent<cm::transform>(uiWitch) = { .position = { vec3( (float)i * 5, 5.0f, 0.0f ) + randomDirection },
-		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.2f, .gltf = false };
-	*ComponentManager->GetComponent<cm::state>(uiWitch) = { .state = core::States::ROAMING };
-	*ComponentManager->GetComponent<cm::rigidBody>(uiWitch) = { .fMass_ = 6.0f };
-	*ComponentManager->GetComponent<cm::enemy>(uiWitch) = { .detectRadius = 10.0f };
-	*ComponentManager->GetComponent<cm::health>(uiWitch) = { .maxHealth = 100, .currentHealth = 100 };
-	cm::font* fontComponentWitch = ComponentManager->GetComponent<cm::font>(uiWitch);
+
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 5, 5.0f, 0.0f ) + randomDirection }, .scale = 1.2f };
+	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
+	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 6.0f };
+	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
+	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
+	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
+	
 	if ( i < 3 ) {
-		fontComponentWitch->font_string.Push('1');
+		enemyFontComponent->font_string.Push('1');
 	} else if ( i < 6 ) {
-		fontComponentWitch->font_string.Push('1');
-		fontComponentWitch->font_string.Push('0');
+		enemyFontComponent->font_string.Push('1');
+		enemyFontComponent->font_string.Push('0');
 	} else if ( i < 10 ) {
-		fontComponentWitch->font_string.Push('1');
-		fontComponentWitch->font_string.Push('0');
-		fontComponentWitch->font_string.Push('E');
+		enemyFontComponent->font_string.Push('1');
+		enemyFontComponent->font_string.Push('0');
+		enemyFontComponent->font_string.Push('E');
 	} else {
-		fontComponentWitch->font_string.Push('J');
-		fontComponentWitch->font_string.Push('r');
+		enemyFontComponent->font_string.Push('J');
+		enemyFontComponent->font_string.Push('r');
 	}
-	// fontComponentWitch->font_string.Push('N');
-	// fontComponentWitch->font_string.Push('K');
-	fontComponentWitch->lifeTime = 0.0f;
-	fontComponentWitch->removeble = false;
-	ComponentManager->GetComponent<cm::mesh>(uiWitch)->handle = megaChelHandle_GLTF;
-	cm::material* materialWitch  = ComponentManager->GetComponent<cm::material>(uiWitch);
-	*materialWitch  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
-	}
-
- 	Entity cube0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::font, cm::material, cm::mesh, cm::collider, cm::transform, cm::actor>(cube0);
-	*ComponentManager->GetComponent<cm::transform>(cube0) = { .position = { 7.0f, 3.0f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .scale = 4.0f, .gltf = true };
-    ComponentManager->GetComponent<cm::mesh>(cube0)->handle = hyperCubeHandle2_GLTF;
-	// cm::font* fontComponentCube0 = ComponentManager->GetComponent<cm::font>(cube0);
-	// fontComponentCube0->font_string.Push('1');
-	// fontComponentCube0->font_string.Push('2');
-	// fontComponentCube0->font_string.Push('3');
-	// fontComponentCube0->font_string.Push('4');
-	// fontComponentCube0->font_string.Push('5');
-	// fontComponentCube0->lifeTime = -10.0f;
-	cm::material* materialCube0  = ComponentManager->GetComponent<cm::material>(cube0);
-	*materialCube0  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
-
-	Entity crosshair = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::material, cm::mesh, cm::crosshair, cm::transform>(crosshair);
-	*ComponentManager->GetComponent<cm::transform>(crosshair) = { .scale = 0.01f };
-	ComponentManager->GetComponent<cm::mesh>(crosshair)->handle = crosshair_001_Handle_GLTF;
-	cm::material* materialCorsshair = ComponentManager->GetComponent<cm::material>(crosshair);
-	*materialCorsshair = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+	enemyFontComponent->lifeTime     = 0.0f;
+	enemyFontComponent->removeble    = false;
+	enemyArch->meshes[enemyIndex]    = { .handle = megaChelHandle_GLTF, .gltf = true };
+	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	}
 
-	Entity inventory = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::transform, cm::inventory, cm::material>(inventory);
-	cm::inventory* inventoryComponent = ComponentManager->GetComponent<cm::inventory>(inventory);
-	inventoryComponent->entityOwner = uiPlayer;
+	arch::entity cube = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
+	arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
+	arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
+	const uint32_t cubeIndex = cubeLocation.index;
+	cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 3.0f, 0.0f }, .scale = 4.0f };
+	cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
+	cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	
+	arch::entity crosshair = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( cube, arch::world.archetypes[5] );
+	arch::EntityLocation crosshairLocation = arch::world.entityLocations[arch::getId( crosshair )];
+	arch::CrosshairArchetype* crosshairArch = static_cast<arch::CrosshairArchetype*>(crosshairLocation.arch);
+	const uint32_t crosshairIndex = cubeLocation.index;
+	crosshairArch->transforms[crosshairIndex]    = { .scale = 0.01f };
+	crosshairArch->meshes[crosshairIndex].handle = crosshair_001_Handle_GLTF;
+	crosshairArch->materials[crosshairIndex]     = { .diffuseTextureID_ = container2Texturehandle,
+		.specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	
+	arch::entity inventory = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( inventory, arch::world.archetypes[6] );
+	arch::EntityLocation inventoryLocation = arch::world.entityLocations[arch::getId( inventory )];
+	arch::InventoryArchetype* inventoryArch = static_cast<arch::InventoryArchetype*>(inventoryLocation.arch);
+	const uint32_t inventoryIndex = inventoryLocation.index;
+	cm::inventory* inventoryComponent = &inventoryArch->invetories[inventoryIndex];
+	inventoryComponent->entityOwner = player;
 	inventoryComponent->slotMeshID  = inventory_Handle_GLTF;
 	inventoryComponent->slotScale   = 0.05;
-	*ComponentManager->GetComponent<cm::transform>(inventory) = { .position = { 0.0f, -0.5f, 0.0f },
-		.yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
-	cm::material* materialInventory = ComponentManager->GetComponent<cm::material>(inventory);
-	*materialInventory = { .diffuseTextureID_ = inventoryTexturehandle, .specularTextureID_ = inventoryTexturehandle, .ambient = { 0.05f, 0.05f, 0.05f },
-		.shininess = 128.0f * 0.078125f };
-// 	for ( unsigned int i = 0; i < 8; ++i )
-// 		for ( unsigned int j = 0; j < 8; ++j ) {
-// 			inventoryComponent->slots[i][j] = EntityManager->CreateEntity();
-// //			std::cout << "inventoryComponent enetities: " << inventoryComponent->slots[i][j] << std::endl;
-// 			ComponentManager->CreateComponent<cm::mesh, cm::inventorySlot, cm::transform, cm::collider>(inventoryComponent->slots[i][j]);
-// 			*ComponentManager->GetComponent<cm::transform>(inventoryComponent->slots[i][j]) = { .scale = 0.05f };
-// 			ComponentManager->GetComponent<cm::mesh>(inventoryComponent->slots[i][j])->handle = inventory_Handle_GLTF;
-// 		}
+	inventoryArch->transforms[inventoryIndex] = { .position = { 0.0f, -0.5f, 0.0f }, .scale = 1.0f };
+	inventoryArch->materials[inventoryIndex]  = { .diffuseTextureID_ = inventoryTexturehandle, .specularTextureID_ = inventoryTexturehandle,
+		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 
+	
 	for ( unsigned int i = 0; i < 5; ++i ) {
-		Entity testItem = EntityManager->CreateEntity();
-//		std::cout << "item entity id: " << testItem << std::endl;
-		ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody, cm::actor>(testItem);
-		[[maybe_unused]] unsigned int row = i + 1;
-		ComponentManager->GetComponent<cm::item>(testItem)->itemSlotType = { 2, row };
-		*ComponentManager->GetComponent<cm::transform>(testItem) = { .position = { 3.0f, 15.0f, 10.0f + i * 2.0f },
-			.yaw = 0.0f, .pitch = 0.0f, .scale = 0.05f, .gltf = true };
-		*ComponentManager->GetComponent<cm::rigidBody>(testItem) = { .fMass_ = 2.0f };
-		if ( i % 2 == 0 ) 
-			ComponentManager->GetComponent<cm::mesh>(testItem)->handle = hyperCubeHandle_GLTF;
+		arch::entity item = archEntityManager->createEntity();
+		arch::world.addEntityToArchetype( item, arch::world.archetypes[7] );
+		arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( item )];
+		arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+		const uint32_t itemIndex = itemLocation.index;
+		unsigned int row = i + 1;
+		itemArch->items[itemIndex].itemSlotType = { 2, row };
+		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 15.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
+		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 2.0f };
+		if ( i % 2 == 0 )
+			itemArch->meshes[itemIndex].handle = hyperCubeHandle_GLTF;
 		else
-			ComponentManager->GetComponent<cm::mesh>(testItem)->handle = hyperCubeHandle_GLTF;
-		
-		cm::material* materialTestItem  = ComponentManager->GetComponent<cm::material>(testItem);
-		*materialTestItem  = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-			.shininess = 128.0f * 0.078125f };
+			itemArch->meshes[itemIndex].handle = hyperCubeHandle_GLTF;
+
+		itemArch->materials[itemIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}
 
- 	// Entity testItem2 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::material, cm::mesh, cm::collider, cm::transform, cm::item, cm::rigidBody>(testItem2);
-	// *ComponentManager->GetComponent<cm::transform>(testItem2) = { .tPosition = { 3.0f, 15.0f, 13.0f },
-	// 	.yaw = 0.0f, .pitch = 0.0f, .fScale = 2.0f, .gltf = false };
-	// *ComponentManager->GetComponent<cm::rigidBody>(testItem2) = { .fMass_ = 2.0f };
-    // ComponentManager->GetComponent<cm::mesh>(testItem2)->handle = icoSphereHandle_OBJ;
-	// cm::material* materialTestItem2  = ComponentManager->GetComponent<cm::material>(testItem2);
-	// *materialTestItem2  = { .diffuseTextureID_ = witchTexturehandle, .specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-	// 	.shininess = 128.0f * 0.078125f };
-	
-	// cm::material* materialInventory = ComponentManager->GetComponent<cm::material>(inventory);
-	// *materialInventory = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
-	// 	.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
-	
-	// Entity font = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::transform, cm::font>(font);
-	// *ComponentManager->GetComponent<cm::transform>(font) = { .tPosition = { 5.0f, 5.0f, 5.0f },
-	// 	.fScale = 1.0f, .gltf = true };
-	// ComponentManager->GetComponent<cm::mesh>(font)->handle = cubeHandle_OBJ;
-	
-	Entity directionalLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight0);
-	*ComponentManager->GetComponent<cm::directionalLight>(directionalLight0) = { .position = { 0.0f, 10.0f, -15.0f },
+	arch::entity directionalLight = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( directionalLight, arch::world.archetypes[8] );
+	arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
+	arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
+	const uint32_t directionalLightIndex = directionalLightLocation.index;
+	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 10.0f, -15.0f },
 		.direction = { 1.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
 		.specular = {1.0f, 1.0f, 1.0f}};
- 	*ComponentManager->GetComponent<cm::transform>(directionalLight0) = { .position = { 0.0f, 10.0f, -15.0f },
-		.scale = 0.1f };
-	ComponentManager->GetComponent<cm::mesh>(directionalLight0)->handle = hyperCubeHandle_GLTF;
-	cm::material* materialDirectionalLight0  = ComponentManager->GetComponent<cm::material>(directionalLight0);
-	*materialDirectionalLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
-
-	// Entity directionalLight1 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight1);
-	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight1) = { .position = { 0.0f, 3.0f, 2.0f },
-	// 	.direction = { 5.0f, -1.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-	// 	.specular = {1.0f, 1.0f, 1.0f}};
- 	// *ComponentManager->GetComponent<cm::transform>(directionalLight1) = { .tPosition = { 0.0f, 3.0f, 2.0f },
-	// 	.fScale = 0.2f };
-	// ComponentManager->GetComponent<cm::mesh>(directionalLight1)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialDirectionalLight1  = ComponentManager->GetComponent<cm::material>(directionalLight1);
-	// *materialDirectionalLight1 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
-
-	// Entity directionalLight2 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::directionalLight, cm::transform>(directionalLight2);
-	// *ComponentManager->GetComponent<cm::directionalLight>(directionalLight2) = { .position = { 3.0f, 3.0f, 0.0f },
-	// 	.direction = { 1.0f, -1.0f, -5.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.8f, 0.8f, 0.8f},
-	// 	.specular = {1.0f, 1.0f, 1.0f}};
- 	// *ComponentManager->GetComponent<cm::transform>(directionalLight2) = { .tPosition = { 3.0f, 3.0f, 0.0f },
-	// 	.fScale = 0.2f };
-	// ComponentManager->GetComponent<cm::mesh>(directionalLight2)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialDirectionalLight2  = ComponentManager->GetComponent<cm::material>(directionalLight2);
-	// *materialDirectionalLight2 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle, .ambient = { 0.05f, 0.05f, 0.0f },
-	// 	.shininess = 128.0f * 0.078125f };
+	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 10.0f, -15.0f }, .scale = 0.1f };
+	directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;
+	directionalLightArch->materials[directionalLightIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 	
-	Entity pointLight0 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight0);
-	*ComponentManager->GetComponent<cm::pointLight>(pointLight0) = { .position = { 3.0f, 10.0f, 15.0f },
-		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
+	
+	arch::entity pointLight = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( pointLight, arch::world.archetypes[9] );
+	arch::EntityLocation pointLightLocation = arch::world.entityLocations[arch::getId( pointLight )];
+	arch::PointLightArchetype* pointLightArch = static_cast<arch::PointLightArchetype*>(pointLightLocation.arch);
+	const uint32_t pointLightIndex = pointLightLocation.index;
+	pointLightArch->pointLights[pointLightIndex]   = { .position = { 3.0f, 10.0f, 15.0f },
+		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse  = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(pointLight0) = { .position = { 3.0f, 10.0f, 15.0f }, .scale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(pointLight0)->handle = hyperCubeHandle_GLTF;
-	cm::material* materialPointLight0   = ComponentManager->GetComponent<cm::material>(pointLight0);
-	*materialPointLight0 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle, .ambient = { 0.05f, 0.05f, 0.0f },
-		.shininess = 128.0f * 0.078125f };
-
- 	// Entity pointLight1 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight1);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight1)  = { .position = { 0.0f, 3.0f, 0.0f },
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight1) = { .tPosition = { 0.0f, 3.0f, 0.0f }, .fScale = 0.3f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight1)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialPointLight1 = ComponentManager->GetComponent<cm::material>(pointLight1);
-	// *materialPointLight1 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
-
-	// Entity pointLight2 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight2);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight2)  = { .position = { 0.0f, 3.0f, 2.0f },
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight2) = { .tPosition = { 0.0f, 3.0f, 2.0f }, .fScale = 0.3f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight2)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialPointLight2 = ComponentManager->GetComponent<cm::material>(pointLight2);
-	// *materialPointLight2 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
-
-	// Entity pointLight3 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight3);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight3)  = { .position = { 2.0f, 3.0f, 0.0f },
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
-	// 	.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight3) = { .tPosition = { 2.0f, 3.0f, 0.0f }, .fScale = 0.3f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight3)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialPointLight3 = ComponentManager->GetComponent<cm::material>(pointLight3);
-	// *materialPointLight3 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
-
-	// Entity pointLight4 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::pointLight, cm::transform>(pointLight4);
-	// *ComponentManager->GetComponent<cm::pointLight>(pointLight4)  = { .position = { 0.27f, 5.3f, 0.25f },
-	// 	.ambient = { 0.2f, 0.2f, 0.2f }, .diffuse = { 0.7f, 0.7f, 0.7f }, .specular = { 0.8f, 0.8f, 0.8f },
-	// 	.constant = 2.17f, .linear = 0.39f, .quadratic = 0.532f };
-	// *ComponentManager->GetComponent<cm::transform>(pointLight4) = { .tPosition = { 0.5f, 3.0f, 0.8f }, .fScale = 0.3f };
-	// ComponentManager->GetComponent<cm::mesh>(pointLight4)->handle = hyperCubeHandle_GLTF;
-	// cm::material* materialPointLight4 = ComponentManager->GetComponent<cm::material>(pointLight4);
-	// *materialPointLight4 = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle };
+	pointLightArch->transforms[pointLightIndex]    = { .position = { 3.0f, 10.0f, 15.0f }, .scale = 0.2f };
+	pointLightArch->meshes[pointLightIndex].handle = hyperCubeHandle_GLTF;
+	pointLightArch->materials[pointLightIndex]     = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 	
-	Entity spotLight1 = EntityManager->CreateEntity();
-	ComponentManager->CreateComponent<cm::actor, cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight1);
-	*ComponentManager->GetComponent<cm::spotLight>(spotLight1) = { .position = { -10.0f, 35.0f, -15.0f },
+	
+	arch::entity spotLight = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
+	arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
+	arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
+	const uint32_t spotLightIndex = spotLightLocation.index;
+	spotLightArch->spotLights[spotLightIndex]    = { .position = { -10.0f, 35.0f, -15.0f },
 		.direction = { 0.0f, -3.0f, 2.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
 		.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
-	*ComponentManager->GetComponent<cm::transform>(spotLight1) = { .position = { -10.0f, 35.0f, -15.0f }, .scale = 0.2f };
-	ComponentManager->GetComponent<cm::mesh>(spotLight1)->handle = simpleCubeHandle_GLTF;
-	cm::material* materialSpotLight1   = ComponentManager->GetComponent<cm::material>(spotLight1);
-	*materialSpotLight1 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
-
-	// Entity spotLight2 = EntityManager->CreateEntity();
-	// ComponentManager->CreateComponent<cm::mesh, cm::material, cm::spotLight, cm::transform>(spotLight2);
-	// *ComponentManager->GetComponent<cm::spotLight>(spotLight2) = { .position = { 0.0f, 3.0f, 10.0f },
-	// 	.direction = { 0.0f, 0.0f, -5.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-	// 	.diffuse = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f }, .constant = 1.0f, .linear = 0.09f,
-	// 	.quadratic = 0.032f };
-	// *ComponentManager->GetComponent<cm::transform>(spotLight2) = { .tPosition = { 0.0f, 3.0f, 10.0f }, .fScale = 1.0f };
-	// ComponentManager->GetComponent<cm::mesh>(spotLight2)->handle = simpleCubeHandle_GLTF;
-	// cm::material* materialSpotLight2   = ComponentManager->GetComponent<cm::material>(spotLight2);
-	// *materialSpotLight2 = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
-
+	spotLightArch->transforms[spotLightIndex]    = { .position = { -10.0f, 35.0f, -15.0f }, .scale = 0.2f };
+	spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
+	spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
+	
 	
     ///< Game rendering loop
 //	Glvm->GameLoop(GLVM::core::OPENGL_RENDERER);

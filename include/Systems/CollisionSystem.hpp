@@ -6,6 +6,7 @@
 #ifndef COLLISION_SYSTEM
 #define COLLISION_SYSTEM
 
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Vector.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -18,6 +19,7 @@
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
+#include <cstdint>
 #include <mutex>
 #include "Globals.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -35,6 +37,8 @@ namespace GLVM::ecs
 		bool isLeftMouseButtonPressed;
 		bool* isLeftMouseButtonReleased;
         core::CStack& Input_Stack_;
+		arch::Archetype* cachedArchetypes[32];
+		uint32_t cachedArchetypesNumber = 0;
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
 		void Repel(components::transform& _transform_Component,

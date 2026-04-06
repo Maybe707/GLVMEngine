@@ -4,51 +4,99 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/DamageSystem.hpp"
+#include "Components/AttackComponent.hpp"
 #include "Components/FontComponent.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
+#include "Archetypes/StaticMeshArchetype.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
 
 namespace GLVM::ecs
 {
 	void DamageSystem::Update() {
 		namespace cm = GLVM::ecs::components;
 		
-        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-        EntityManager* entityManager       = GLVM::ecs::EntityManager::GetInstance();
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ATTACK_COMPONENT) |
+				(1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::FONT_COMPONENT);
 
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::attack>();
-
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int entity = linkedEntities[i];
-			cm::health* healthComponent = componentManager->GetComponent<cm::health>(entity);
-			cm::attack* attackComponent = componentManager->GetComponent<cm::attack>(entity);
-
-			healthComponent->currentHealth -= attackComponent->damage;
-			std::cout << "current health: " << healthComponent->currentHealth << " entity: " << entity << std::endl;
-			componentManager->RemoveComponent<cm::attack>(entity);
-			if ( healthComponent->currentHealth <= 0 ) {
-				std::cout << "remove entity: " << entity << std::endl;
-				entityManager->RemoveEntity(entity, componentManager);
+			if( (arch->mask & requiredMask) == requiredMask ) {
+				cachedArchetypes[cachedArchetypesNumber] = arch;
+				++cachedArchetypesNumber;
 			}
-
-			componentManager->CreateComponent<cm::font>(entity);
-			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
-			fontComponent->font_string.clear();
-			fontComponent->font_string.Push('4');
-			fontComponent->font_string.Push('0');
-			fontComponent->lifeTime = 0;
-			fontComponent->removeble = true;
 		}
 
-		core::vector<Entity> linkedEntitiesFont = componentManager->collectLinkedEntities<cm::font>();
-		for ( unsigned int i = 0; i < linkedEntitiesFont.GetSize(); ++i ) {
-			unsigned int entity = linkedEntitiesFont[i];
+		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedArchetypes[x];
+			components::attack* attackView = nullptr;
+			components::health* healthView = nullptr;
+			components::font*   fontView   = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				attackView = static_cast<arch::PlayerArchetype*>( arch )->attacks;
+				healthView = static_cast<arch::PlayerArchetype*>( arch )->health;
+				fontView   = static_cast<arch::PlayerArchetype*>( arch )->fonts;
+				break;
+			case arch::enemyComponentMask:
+				attackView = static_cast<arch::EnemyArchetype*>( arch )->attacks;
+				healthView = static_cast<arch::EnemyArchetype*>( arch )->health;
+				fontView   = static_cast<arch::EnemyArchetype*>( arch )->fonts;
+				break;
+			}
 
-			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
-			if ( fontComponent->removeble )
-				fontComponent->lifeTime += deltaTime;
+			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+//				unsigned int entity = linkedEntities[i];
+				cm::health& healthComponent = healthView[i];
+				cm::attack& attackComponent = attackView[i];
+				
+				healthComponent.currentHealth -= attackComponent.damage;
+				std::cout << "current health: " << healthComponent.currentHealth << std::endl;
+//				componentManager->RemoveComponent<cm::attack>(entity);
+				if ( healthComponent.currentHealth <= 0 ) {
+//					std::cout << "remove entity: " << entity << std::endl;
+//					entityManager->RemoveEntity(entity, componentManager);
+				}
+
+				cm::font& fontComponent = fontView[i];
+				fontComponent.font_string.clear();
+				fontComponent.font_string.Push('4');
+				fontComponent.font_string.Push('0');
+				fontComponent.lifeTime = 0;
+				fontComponent.removeble = true;
+			}
+		}
+
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::FONT_COMPONENT);
+
+			if( (arch->mask & requiredMask) == requiredMask ) {
+				cachedFontArchetypes[cachedFontArchetypesNumber] = arch;
+				++cachedFontArchetypesNumber;
+			}
+		}
+
+		for( uint32_t x = 0; x < cachedFontArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedFontArchetypes[x];
+			components::font* fontView = nullptr;
+			switch( arch->mask ) {
+			case arch::enemyComponentMask:
+				fontView = static_cast<arch::EnemyArchetype*>( arch )->fonts;
+				break;
+			}
+
+			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+				cm::font& fontComponent = fontView[i];
+				if ( fontComponent.removeble )
+					fontComponent.lifeTime += deltaTime;
 //			std::cout << "lifeTime" << fontComponent->lifeTime << std::endl;
-			if ( fontComponent->lifeTime >= 1.5 ) {
+				if ( fontComponent.lifeTime >= 1.5 ) {
 //				std::cout << "lifetime: " << fontComponent->lifeTime << std::endl;
-				componentManager->RemoveComponent<cm::font>(entity);
+//					componentManager->RemoveComponent<cm::font>(entity);
+				}
 			}
 		}
 	}

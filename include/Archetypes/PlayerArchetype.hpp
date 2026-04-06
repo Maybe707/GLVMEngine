@@ -1,15 +1,18 @@
-#ifndef PLAYER_ARCHETYPE
-#define PLAYER_ARCHETYPE
+#ifndef PLAYER_ARCHETYPE_HPP
+#define PLAYER_ARCHETYPE_HPP
 
-#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
+#include "Components/FontComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Components/MoveComponent.hpp"
 #include "TagComponents/PlayerTagComponent.hpp"
 #include "Globals.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
@@ -26,6 +29,8 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::health) +
 		 sizeof(components::material) +
 		 sizeof(components::move) +
+		 sizeof(components::attack) +
+		 sizeof(components::font) +
 		 sizeof(tagComponents::playerTagComponent));
 	
 	struct PlayerArchetype : Archetype {
@@ -38,6 +43,8 @@ namespace GLVM::ecs::arch {
 		components::health                health[PLAYER_ARCH_CHUNK_SIZE];
 		components::material              materials[PLAYER_ARCH_CHUNK_SIZE];
 		components::move                  moves[PLAYER_ARCH_CHUNK_SIZE];
+		components::attack                attacks[PLAYER_ARCH_CHUNK_SIZE];
+		components::font                  fonts[PLAYER_ARCH_CHUNK_SIZE];
 		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
@@ -50,6 +57,8 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
+			components[ComponentsIndices::ATTACK_COMPONENT]          = attacks;
+			components[ComponentsIndices::FONT_COMPONENT]            = fonts;
 			components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
 
 			mask =
@@ -62,6 +71,8 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::MOVE_COMPONENT) |
+				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
+				(1ull << ComponentsIndices::FONT_COMPONENT) |
 				(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
@@ -73,8 +84,10 @@ namespace GLVM::ecs::arch {
 			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
 			componentIds[7] = ComponentsIndices::MATERIAL_COMPONENT;
 			componentIds[8] = ComponentsIndices::MOVE_COMPONENT;
-			componentIds[9] = ComponentsIndices::PLAYER_TAG_COMPONENT;
-			componentCount = 10;
+			componentIds[9] = ComponentsIndices::ATTACK_COMPONENT;
+			componentIds[10] = ComponentsIndices::FONT_COMPONENT;
+			componentIds[11] = ComponentsIndices::PLAYER_TAG_COMPONENT;
+			componentCount = 12;
 		}
 	};
 }; // namespace GLVM::ecs::arch

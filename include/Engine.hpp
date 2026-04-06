@@ -40,6 +40,11 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/ProjectileArchetype.hpp"
+#include "Archetypes/StaticMeshArchetype.hpp"
+#include "Archetypes/ItemArchetype.hpp"
+#include "Archetypes/DirectionalLightArchetype.hpp"
+#include "Archetypes/PointLightArchetype.hpp"
+#include "Archetypes/SpotLightArchetype.hpp"
 
 using Entity = unsigned int;
 

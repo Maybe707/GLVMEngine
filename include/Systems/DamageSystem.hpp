@@ -12,6 +12,7 @@
 #include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/AttackComponent.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
 namespace GLVM::ecs
 {
@@ -21,6 +22,10 @@ namespace GLVM::ecs
 		void Update() override;
 
 		float deltaTime;
+		arch::Archetype* cachedArchetypes[32];
+		uint32_t cachedArchetypesNumber = 0;
+		arch::Archetype* cachedFontArchetypes[32];
+		uint32_t cachedFontArchetypesNumber = 0;
 	};
 } // namespace GLVM::ecs
 

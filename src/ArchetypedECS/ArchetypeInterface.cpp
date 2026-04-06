@@ -19,6 +19,7 @@
 #include "Components/ViewComponent.hpp"
 #include "TagComponents/LevelChunkTagComponent.hpp"
 #include "TagComponents/PlayerTagComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	uint32_t Archetype::addEntity( entity entity_ ) {
