@@ -106,7 +106,7 @@ namespace GLVM::ecs
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
-        Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, beholder.up));
+        Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0 }));
         return normalizedVector;
     }
 

@@ -147,7 +147,7 @@ namespace GLVM::ecs
 		if ( transform != nullptr )
 			rTransformProjectile->position = transform->position;
 
-        rTransformProjectile->forward   = beholder.forward;
+        rTransformProjectile->forward   = beholder->forward;
 //		rTransformProjectile->yaw        = fYaw;
 //		rTransformProjectile->pitch      = fPitch;
 		rTransformProjectile->position  += rTransformProjectile->forward * 2.0f;

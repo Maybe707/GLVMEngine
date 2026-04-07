@@ -298,9 +298,6 @@ namespace GLVM::ecs
 				} else if ( componentsTypes[i] == typeid(components::beholder).name() ) {
 					RemoveComponent<components::beholder>(entity);
 //					std::cout << "Delete beholder" << std::endl;
-				} else if ( componentsTypes[i] == typeid(components::animation).name() ) {
-					RemoveComponent<components::animation>(entity);
-//					std::cout << "Delete animation" << std::endl;
 				} else if ( componentsTypes[i] == typeid(components::rigidBody).name() ) {
 					RemoveComponent<components::rigidBody>(entity);
 //					std::cout << "Delete animation" << std::endl;

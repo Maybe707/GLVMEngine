@@ -21,8 +21,6 @@ namespace GLVM::core
 		namespace cm  = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 		core::Engine* GLVM = core::Engine::GetInstance();
-		ecs::EntityManager   * EntityManager     = ecs::EntityManager::GetInstance();
-		ecs::ComponentManager* ComponentManager  = ecs::ComponentManager::GetInstance();
 
 		/// New arch ECS
 		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();

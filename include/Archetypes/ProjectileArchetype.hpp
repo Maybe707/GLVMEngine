@@ -1,5 +1,5 @@
 #ifndef PROJECTILE_ARCHETYPE_HPP
-#define PROJECTILE_ARHCETYPE_HPP
+#define PROJECTILE_ARCHETYPE_HPP
 
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/ProjectileComponent.hpp"

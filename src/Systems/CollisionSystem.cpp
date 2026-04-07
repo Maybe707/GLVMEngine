@@ -164,10 +164,10 @@ namespace GLVM::ecs
 				backtrackingMeshes = static_cast<arch::EnemyArchetype*>( arch )->meshes;
 				break;
 			case arch::staticMeshComponentMask:
-				backtrackingTransforms = static_cast<arch::staticMeshArchetype*>( arch )->transforms;
-				backtrackingColliders = static_cast<arch::staticMeshArchetype*>( arch )->colliders;
-				backtrackingColliderFlags = static_cast<arch::staticMeshArchetype*>( arch )->colliderFlags;
-				backtrackingMeshes = static_cast<arch::staticMeshArchetype*>( arch )->meshes;
+				backtrackingTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::StaticMeshArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::StaticMeshArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
 				break;
 			}
 			
@@ -202,27 +202,19 @@ namespace GLVM::ecs
 				for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
 					arch::Archetype* comparedArch = cachedArchetypes[i1];
 					components::transform* comparedTransforms = nullptr;
-					components::collider*  comparedColliders  = nullptr;
-					components::colliderFlags* comparedColliderFlags = nullptr;
 					components::mesh*      comparedMeshes     = nullptr;
 					switch( arch->mask ) {
 					case arch::playerComponentMask:
 						comparedTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-						comparedColliders = static_cast<arch::PlayerArchetype*>( arch )->colliders;
-						comparedColliderFlags = static_cast<arch::PlayerArchetype*>( arch )->colliderFlags;
 						comparedMeshes = static_cast<arch::PlayerArchetype*>( arch )->meshes;
 						break;
 					case arch::enemyComponentMask:
 						comparedTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-						comparedColliders = static_cast<arch::EnemyArchetype*>( arch )->colliders;
-						comparedColliderFlags = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
 						comparedMeshes = static_cast<arch::EnemyArchetype*>( arch )->meshes;
 						break;
 					case arch::staticMeshComponentMask:
-						comparedTransforms = static_cast<arch::staticMeshArchetype*>( arch )->transforms;
-						comparedColliders = static_cast<arch::staticMeshArchetype*>( arch )->colliders;
-						comparedColliderFlags = static_cast<arch::staticMeshArchetype*>( arch )->colliderFlags;
-						comparedMeshes = static_cast<arch::staticMeshArchetype*>( arch )->meshes;
+						comparedTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
+						comparedMeshes = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
 						break;
 					}
 

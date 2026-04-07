@@ -17,7 +17,6 @@ namespace GLVM::ecs
 	void InventorySystem::Update() {
 		if ( isInventoryOpened ) {
 			namespace cm = GLVM::ecs::components;
-			ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 
 			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
 				arch::Archetype* arch = arch::world.archetypes[i];
@@ -30,11 +29,9 @@ namespace GLVM::ecs
 			}
 
 			components::transform*                crosshair_transformsView    = nullptr;
-			tagComponents::crossHairTagComponent* crosshair_crosshairTagView  = nullptr;
 			switch( cachedCrosshairArchetype->mask ) {
 			case arch::crosshairComponentMask:
 				crosshair_transformsView    = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
-				crosshair_crosshairTagView  = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->crosshairTagComponents;
 				break;
 			}
 			

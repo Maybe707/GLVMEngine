@@ -54,21 +54,18 @@ namespace GLVM::ecs
 			components::transform*     transformsView    = nullptr;
 			components::move*          movesView         = nullptr;
 			components::rigidBody*     rigidBodiesView   = nullptr;
-			components::collider*      collidersView     = nullptr;
 			components::colliderFlags* colliderFlagsView = nullptr;
 			switch( arch->mask ) {
 			case arch::playerComponentMask:
 				transformsView    = static_cast<arch::PlayerArchetype*>( arch )->transforms;
 				movesView         = static_cast<arch::PlayerArchetype*>( arch )->moves;
 				rigidBodiesView   = static_cast<arch::PlayerArchetype*>( arch )->rigidBodies;
-				collidersView     = static_cast<arch::PlayerArchetype*>( arch )->colliders;
 				colliderFlagsView = static_cast<arch::PlayerArchetype*>( arch )->colliderFlags;
 				break;
 			case arch::enemyComponentMask:
 				transformsView    = static_cast<arch::EnemyArchetype*>( arch )->transforms;
 				movesView         = static_cast<arch::EnemyArchetype*>( arch )->moves;
 				rigidBodiesView   = static_cast<arch::EnemyArchetype*>( arch )->rigidBodies;
-				collidersView     = static_cast<arch::EnemyArchetype*>( arch )->colliders;
 				colliderFlagsView = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
 				break;
 			}

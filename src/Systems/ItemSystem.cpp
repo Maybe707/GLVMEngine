@@ -1,4 +1,5 @@
 #include "Systems/ItemSystem.hpp"
+#include "Archetypes/ItemArchetype.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
@@ -21,7 +22,6 @@ namespace GLVM::ecs
 	
 	bool ItemSystem::putItem2x2(components::inventory* inventoryComponent, unsigned int itemEntity) {
 		namespace cm = GLVM::ecs::components;
-        ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
 		
 		bool isSlotFound = false;
 		unsigned int row = inventoryComponent->row;
@@ -103,24 +103,17 @@ namespace GLVM::ecs
 				}
 			}
 
-			components::transform*     itemTransformComponentView     = nullptr;
-			components::item*          itemComponentView              = nullptr;
 			components::collider*      itemColliderComponentView      = nullptr;
-			components::colliderFlags* itemColliderFlagsComponentView = nullptr;
-			components::rigidBody*     itemRigidBodyComponentView     = nullptr;
 			switch( cachedCrosshairArchetype->mask ) {
 			case arch::crosshairComponentMask:
-				itemTransformComponentView = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
+				itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedCrosshairArchetype )->colliders;
 				break;
 			}
 			
 			for ( unsigned int m = 0; m < cachedInventoryArchetype->entityCount; ++m ) {
-//				unsigned int inventoryEntity = inventoryLinkedEntities[m];
-				unsigned int inventoryEntity = cachedInventoryArchetype->entities[m];
 				cm::inventory* inventoryComponent = &inventory_inventoriesView[m];
 
 				for ( unsigned int i = 0; i < cachedItemArchetype->entityCount; ++i ) {
-//					unsigned int itemEntity = linkedEntities[i];
 					unsigned int itemEntity = cachedItemArchetype->entities[i];
 					cm::collider* itemColliderComponent = &itemColliderComponentView[i];
 
