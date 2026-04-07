@@ -1,6 +1,7 @@
 #ifndef ITEM_SYSTEM
 #define ITEM_SYSTEM
 
+#include "Archetypes/ItemArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "EventsStack.hpp"
@@ -14,6 +15,11 @@
 #include "Components/ActorComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include <climits>
+#include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Archetypes/CrosshairArchetype.hpp"
+#include "Archetypes/InventoryArchetype.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 
 namespace GLVM::ecs
 {
@@ -30,6 +36,9 @@ namespace GLVM::ecs
 		bool          isLeftMouseButtonPressed;
 		float         mouseOffsetX = 0;
 		float         mouseOffsetY = 0;
+		arch::Archetype* cachedInventoryArchetype;
+		arch::Archetype* cachedItemArchetype;
+		arch::Archetype* cachedCrosshairArchetype;
 	};
 } // namespace GLVM::ecs
 

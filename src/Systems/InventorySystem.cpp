@@ -1,5 +1,6 @@
 #include "Systems/InventorySystem.hpp"
 #include "ArchetypeECS/ArchECS_Types.hpp"
+#include "Archetypes/ItemArchetype.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VertexMath.hpp"
@@ -9,6 +10,7 @@
 #include "TagComponents/CrosshairTagComponent.hpp"
 #include "Archetypes/CrosshairArchetype.hpp"
 #include "Archetypes/InventoryArchetype.hpp"
+#include <cstdint>
                                 
 namespace GLVM::ecs
 {
@@ -81,7 +83,11 @@ namespace GLVM::ecs
 					const unsigned int column = intersectionSlot.x;
 					const unsigned int entity = inventoryComponent->slots[row][column];
 					if( entity != UINT_MAX && entity >= 0 ) {  ///< Check slot is not empty and hold an item
-						cm::item* itemComponent   = componentManager->GetComponent<cm::item>(entity);
+						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( entity )];
+						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+						const uint32_t itemIndex = itemLocation.index;
+						cm::item* itemComponent = &itemArch->items[itemIndex];
+
 						if( itemComponent != nullptr ) {
 							for( unsigned int i = 0; i < itemComponent->occupiedSlots.GetSize(); ++i ) {
 								unsigned int row_index = itemComponent->occupiedSlots[i] / inventoryComponent->row;
@@ -101,7 +107,11 @@ namespace GLVM::ecs
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 
-					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
+					arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+					arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+					const uint32_t itemIndex = itemLocation.index;
+					cm::item* itemComponent = &itemArch->items[itemIndex];
+					
 					core::vector<unsigned int> potentialOccupiedSlots;
 					int isSwapable = 0;
 					isSwapable = determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
@@ -122,7 +132,12 @@ namespace GLVM::ecs
 				if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
 														  inventorySlotScale, inventorySlotHalfScale) ) {
 					[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
-					cm::item* itemComponent   = componentManager->GetComponent<cm::item>(*isItemDraged);
+
+					arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+					arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+					const uint32_t itemIndex = itemLocation.index;
+					cm::item* itemComponent = &itemArch->items[itemIndex];
+
 					core::vector<unsigned int> potentialOccupiedSlots;
 					isSwapable = determineSwappableStatusAndSlots( itemComponent, inventoryTransformComponent, potentialOccupiedSlots, crosshairTransformComponent,
 																   intersectionSlot, inventoryComponent, inventorySlotScale );
@@ -134,7 +149,11 @@ namespace GLVM::ecs
 						itemComponent->occupiedSlots = potentialOccupiedSlots;
 						fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
 					} else if ( isSwapable > 0 ) {         ///< Swap one item that we draging to another one in inventory
-						cm::item* swapedItemComponent = componentManager->GetComponent<cm::item>( isSwapable );
+						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( isSwapable )];
+						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+						const uint32_t itemIndex = itemLocation.index;
+						cm::item* swapedItemComponent = &itemArch->items[itemIndex];
+
 						itemComponent->occupiedSlots = potentialOccupiedSlots;
 						fillInventorySlots( swapedItemComponent, swapedItemComponent->itemSlotType.width, swapedItemComponent->itemSlotType.height,
 											inventoryComponent, UINT_MAX );
@@ -153,19 +172,24 @@ namespace GLVM::ecs
 						*isItemDraged = isSwapable;
 					}
 				} else {       ///< Item drop to the ground
-					componentManager->CreateComponent<cm::actor>(*isItemDraged);
-					componentManager->CreateComponent<cm::rigidBody>(*isItemDraged);
-					*componentManager->GetComponent<cm::rigidBody>(*isItemDraged) = { .fMass_ = 2.0f };
-					core::vector<unsigned int> playerEntities = componentManager->collectLinkedEntities<cm::controller>();
-					cm::transform* playerTransform = componentManager->GetComponent<cm::transform>(playerEntities[0]);
-					cm::transform* itemTransform   = componentManager->GetComponent<cm::transform>(*isItemDraged);
+					arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+					arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
+					const uint32_t itemIndex = itemLocation.index;
+					itemArch->rigidBodies[itemIndex] = { .fMass_ = 2.0f };
+					cm::transform* itemTransform = &itemArch->transforms[itemIndex];
+					
+					const uint32_t player = 0;                          ///< REMOVE THIS CRINGE
+					arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
+					arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
+					const uint32_t playerIndex = playerLocation.index;
+					cm::transform* playerTransform = &playerArch->transforms[playerIndex];
 					itemTransform->position = playerTransform->position;
 					vec3 normalizedForward = Normalize(playerTransform->forward);
 					itemTransform->position[0] += normalizedForward[0] * 2.5f;
 					itemTransform->position[1] += normalizedForward[1] * 2.5f;
 					itemTransform->position[2] += normalizedForward[2] * 2.5f;
 					itemTransform->scale = 0.05f;
-
+					
 					*isItemDraged = -1;
 					*isLeftMouseButtonReleased = false;
 				}
