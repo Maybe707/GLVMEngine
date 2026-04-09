@@ -25,6 +25,7 @@
 #include "ISoundEngine.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
+#include <cstdint>
 #include <cstdio>
 
 namespace GLVM::ecs
@@ -36,13 +37,17 @@ namespace GLVM::ecs
     {
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
-		
-		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+
+		arch::PlayerArchetype* playerArch = {};
+		uint32_t entityCount = 0;
+		if( arch::world.archetypes.GetSize() > 1 ) {
+			playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+			entityCount = playerArch->entityCount;
+		}
         const float cameraSpeed = 1.0f * deltaFrameTime;            
 
-        for(unsigned int i = 0; i < playerArch->entityCount; ++i) {
+        for(unsigned int i = 0; i < entityCount; ++i) {
 			cm::beholder* beholderComponent     = &playerArch->beholders[i];
-			
             for(int n = 0; n < 6; ++n) {
 				vec3 right;
 				vec3 forward;
@@ -77,7 +82,7 @@ namespace GLVM::ecs
             }
         }
 
-		for(unsigned int n = 0; n < playerArch->entityCount; ++n) {
+		for(unsigned int n = 0; n < entityCount; ++n) {
 			cm::transform* rTransform_Component = &playerArch->transforms[n];
 			cm::rigidBody* rigidBodyComponennt  = &playerArch->rigidBodies[n];
 			cm::move* moveComponent             = &playerArch->moves[n];
@@ -89,9 +94,14 @@ namespace GLVM::ecs
 
 			moveComponent->gravity[1] -= gravity;
         }
-		
-		arch::EnemyArchetype* enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
-		for(unsigned int n = 0; n < enemyArch->entityCount; ++n) {
+
+		arch::EnemyArchetype* enemyArch = {};
+		entityCount = 0;
+		if( arch::world.archetypes.GetSize() > 2 ) {
+			enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
+			entityCount = enemyArch->entityCount;
+		}
+		for(unsigned int n = 0; n < entityCount; ++n) {
 			cm::transform* rTransform_Component = &enemyArch->transforms[n];
 			cm::rigidBody* rigidBodyComponennt  = &enemyArch->rigidBodies[n];
 			cm::move* moveComponent             = &enemyArch->moves[n];

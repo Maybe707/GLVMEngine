@@ -1,5 +1,5 @@
-#ifndef ROTATION_COMPONENT
-#define ROTATION_COMPONENT
+#ifndef ROTATION_COMPONENT_HPP
+#define ROTATION_COMPONENT_HPP
 
 namespace GLVM::ecs::components
 {    

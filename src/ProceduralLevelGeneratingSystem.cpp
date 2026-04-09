@@ -81,14 +81,23 @@ namespace GLVM::core
 				/// New arch ECS
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				arch::entity gameLevelChunkEntity = archEntityManager->createEntity();
-				arch::world.addEntityToArchetype( gameLevelChunkEntity, arch::world.archetypes[0] );
-				arch::EntityLocation gameLevelChunkLocation = arch::world.entityLocations[arch::getId( gameLevelChunkEntity )];
+				
+				if( arch::world.archetypes.GetSize() > 0 && arch::world.archetypes[0] != nullptr ) {
+					arch::world.addEntityToArchetype( gameLevelChunkEntity, arch::world.archetypes[0] );
+				}
+				arch::EntityLocation gameLevelChunkLocation = {};
+				if( arch::world.entityLocations.GetSize() > 0 ) {
+					gameLevelChunkLocation = arch::world.entityLocations[arch::getId( gameLevelChunkEntity )];
+				}
+				
 				arch::LevelChunkArchetype* levelChunkArch = static_cast<arch::LevelChunkArchetype*>(gameLevelChunkLocation.arch);
 				const uint32_t gameLevelChunkIndex = gameLevelChunkLocation.index;
 				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
-				levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
-				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
-				levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
+				if( levelChunkArch != nullptr ) {
+					levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
+					levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+					levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
+				}
 				
 				for ( unsigned int i = 0; i < 36; ++i )
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
@@ -124,14 +133,21 @@ namespace GLVM::core
 
 				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = GLVM->LoadMesh();
 				arch::entity transitionBridgeEntity = archEntityManager->createEntity();
-				arch::world.addEntityToArchetype( transitionBridgeEntity, arch::world.archetypes[0] );
-				arch::EntityLocation transitionBridgeLocation = arch::world.entityLocations[arch::getId( transitionBridgeEntity )];
+				if( arch::world.archetypes.GetSize() > 0 && arch::world.archetypes[0] != nullptr ) {
+					arch::world.addEntityToArchetype( transitionBridgeEntity, arch::world.archetypes[0] );
+				}
+				arch::EntityLocation transitionBridgeLocation = {};
+				if( arch::world.entityLocations.GetSize() > 0 ) {
+					transitionBridgeLocation = arch::world.entityLocations[arch::getId( transitionBridgeEntity )];
+				}
 				arch::LevelChunkArchetype* transitionBridgeArch = static_cast<arch::LevelChunkArchetype*>(transitionBridgeLocation.arch);
 				const uint32_t transitionBridgeIndex = transitionBridgeLocation.index;
 				ecs::TextureHandle transitionBridgeTexture = textureHandlers[3];
-				transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
-				transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
-				transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
+				if( transitionBridgeArch != nullptr ) {
+					transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
+					transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+					transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
+				}
 				
 				++levelNubmer;
 			}

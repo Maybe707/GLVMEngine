@@ -51,12 +51,17 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 		
-        float cameraSpeed = 5.5f * deltaFrameTime;            
-		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+        float cameraSpeed = 5.5f * deltaFrameTime;
+		arch::PlayerArchetype* playerArch = {};
+		uint32_t playerEntityCount = 0;
+		if( arch::world.archetypes.GetSize() > 1 ) {
+			playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+			playerEntityCount = playerArch->entityCount;
+		}
         if(projectileCooldown > 0)
             projectileCooldown -= cameraSpeed;
 
-        for(unsigned int i = 0; i < playerArch->entityCount; ++i) {
+        for(unsigned int i = 0; i < playerEntityCount; ++i) {
 			cm::beholder* viewComponent = &playerArch->beholders[i];
 			cm::transform* playerTransform = &playerArch->transforms[i];
             for(int n = 0; n < 6; ++n) {
@@ -70,13 +75,18 @@ namespace GLVM::ecs
             }
         }
 
-		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(arch::world.archetypes[3]);
-        for(unsigned int x = 0; x < projectileArch->entityCount; ++x) {
+		arch::ProjectileArchetype* projectileArch = {};
+		uint32_t projectileEntityCount = 0;
+		if( arch::world.archetypes.GetSize() > 3 ) {
+			projectileArch = static_cast<arch::ProjectileArchetype*>(arch::world.archetypes[3]);
+			projectileEntityCount = projectileArch->entityCount;
+		}
+        for(unsigned int x = 0; x < projectileEntityCount; ++x) {
             cm::transform* projectileTransform = &projectileArch->transforms[x];
 			projectileTransform->position += Normalize(projectileTransform->forward) * cameraSpeed * 0.5;
 		}
 
-        for(unsigned int i = 0; i < projectileArch->entityCount; ++i) {
+        for(unsigned int i = 0; i < projectileEntityCount; ++i) {
 			cm::colliderFlags* projectileColliderFlags = &projectileArch->colliderFlags[i];
             if((projectileColliderFlags->flags & 1) || (projectileColliderFlags->flags & (1 << 1))) {
 				cm::damage* projectileDamage = &projectileArch->projectileBundles[i].damage;

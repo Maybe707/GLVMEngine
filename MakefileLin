@@ -24,7 +24,9 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./src/UnixApi/WaylandVariables.cpp ./textures/tileset.cpp \
 	  ./src/Systems/InventorySystem.cpp ./src/GraphicAPI/VkBuilders.cpp \
 	  ./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp \
-	  ./src/ThreadPool.cpp
+	  ./src/ThreadPool.cpp ./src/ArchetypedECS/ArchECS_Utils.cpp \
+	  ./src/ArchetypedECS/ArchECS_World.cpp ./src/ArchetypedECS/ArchetypeEntityManager.cpp \
+	  ./src/ArchetypedECS/ArchetypeInterface.cpp
 
 SOURCES_C = xdg-shell-protocol.c pointer-constraints-unstable-v1-protocol.c relative-pointer-unstable-v1-protocol.c
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)

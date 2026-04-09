@@ -10,17 +10,28 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include <cstdint>
 
 namespace GLVM::ecs
 {
 	void EnemySystem::Update() {
 		namespace arch = GLVM::ecs::arch;
-		
-		arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
-		arch::EnemyArchetype*  enemyArch  = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
-		for( uint32_t j = 0; j < playerArch->entityCount; ++j ) {
+
+		uint32_t playerEntityCount = 0;
+		arch::PlayerArchetype* playerArch = {};
+		if( arch::world.archetypes.GetSize() > 1 ) {
+			playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
+			playerEntityCount = playerArch->entityCount;
+		}
+		uint32_t enemyEntityCount = 0;
+		arch::EnemyArchetype*  enemyArch = {};
+		if( arch::world.archetypes.GetSize() > 2 ) {
+			enemyArch  = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
+			enemyEntityCount = enemyArch->entityCount;
+		}
+		for( uint32_t j = 0; j < playerEntityCount; ++j ) {
 			components::transform* playerTransformComponent = &playerArch->transforms[j];
-			for ( unsigned int i = 0; i < enemyArch->entityCount; ++i ) {
+			for ( unsigned int i = 0; i < enemyEntityCount; ++i ) {
 				components::transform* enemyTransformComponent = &enemyArch->transforms[i];
 				components::state* stateEnemyComponent         = &enemyArch->states[i];
 				components::enemy* enemyComponent              = &enemyArch->enemies[i];

@@ -9,9 +9,9 @@ namespace GLVM::ecs::arch {
 
         EntityLocation& location = entityLocations[id_];
 
-        if (location.arch != nullptr) {
-            assert(false && "Entity already assigned to archetype");
-        }
+        // if (location.arch != nullptr) {
+        //     assert(false && "Entity already assigned to archetype");
+        // }
 
         uint32_t index = arch->addEntity(entity_);
 

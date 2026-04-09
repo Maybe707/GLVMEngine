@@ -4,6 +4,15 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Engine.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Archetypes/InventoryArchetype.hpp"
+#include "Archetypes/ItemArchetype.hpp"
+#include "Archetypes/StaticMeshArchetype.hpp"
+#include "Components/AnimationComponent.hpp"
+#include "Components/ColliderComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
@@ -304,18 +313,35 @@ namespace GLVM::core
 	}
 
 	void Engine::EnlargeFrameAccumulator(float value) {
-		namespace cm = GLVM::ecs::components;
-		
-		ecs::ComponentManager* componentManager = GLVM::ecs::ComponentManager::GetInstance();
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::animation, cm::transform, cm::mesh>();
-		unsigned int linkedEntitiesVectorSize = linkedEntities.GetSize();
-		for(unsigned int i = 0; i < linkedEntitiesVectorSize; ++i) {
-			Entity currentEntity                = linkedEntities[i];
-			cm::transform* transformComponent   = componentManager->GetComponent<cm::transform>(currentEntity);
-			unsigned int mesh_id                = componentManager->GetComponent<cm::mesh>(currentEntity)->handle.id;
+		namespace cm   = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
+		for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
+			arch::Archetype* arch = arch::world.archetypes[m];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT);
 
-			if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[mesh_id].GetSize() > 0 )
-				transformComponent->frameAccumulator += value;
+			if( arch::matchesRequiredMask( arch->mask, requiredMask ) ) {
+				cachedAnimationArchetypes[m] = arch;
+				++animationArchetypesNumber;
+			}
+		}
+
+		for( uint32_t n = 0; n < animationArchetypesNumber; ++n ) {
+			arch::Archetype* arch = cachedAnimationArchetypes[n];
+			cm::animation* animationView  = nullptr;
+			cm::mesh*      meshView       = nullptr;
+			switch( arch->mask ) {
+			case arch::enemyComponentMask:
+				animationView   = static_cast<arch::EnemyArchetype*>( arch )->animations;
+				meshView        = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+				break;
+			}
+		
+			for(unsigned int i = 0; i < cachedAnimationArchetypes[n]->entityCount; ++i) {
+				unsigned int mesh_id                = meshView[i].handle.id;
+				if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+					animationView[i].frameAccumulator += value;
+			}
 		}
 	}
 
@@ -371,8 +397,8 @@ namespace GLVM::core
 		// delta_x *= kSensitivity;
 		// delta_y *= kSensitivity;
 		
-		const vec3 rightVec = Cross(cameraComponent->forward, cameraComponent->up);
-		const vec3 newUpVec = Cross(rightVec, cameraComponent->forward);
+		const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, 1.0f, 0.0) );
+		const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
 		/*
 		 * 1. The mouse direction determines the "intended direction of rotation" for the object.
 		 * 2. The camera is "looking forward."
@@ -409,7 +435,9 @@ namespace GLVM::core
 		}
 		cameraComponent->forward = Normalize(vulkanRenderer->forward);
 		_Player->forward = cameraComponent->forward;
-		mat4 view = LookAtMain(cameraComponent->Position + _Player->position, cameraComponent->Position + _Player->position + cameraComponent->forward, cameraComponent->up);
+		mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
+							    cameraComponent->Position + _Player->position + cameraComponent->forward,
+							    vec3( 0.0f, 1.0f, 0.0) );
 		for ( unsigned int i = 0; i < 4; ++i )
 			for ( unsigned int j = 0; j < 4; ++j )
 				 viewMatrix_[i][j] = view[i][j];
@@ -428,13 +456,13 @@ namespace GLVM::core
 		vulkanRenderer->projectionMatrix[1][1] *= 1.0f;
 	}
 	
-	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames(ecs::components::transform* _transformComponent, unsigned int meshID) {
+	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames(ecs::components::animation* animationComponent, unsigned int meshID) {
 		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 &&
-			 _transformComponent->frameAccumulator >= vulkanRenderer->frames[meshID][_transformComponent->currentAnimationFrame] * 1.0f ) {
-			++_transformComponent->currentAnimationFrame;
-			if ( vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 && _transformComponent->currentAnimationFrame == vulkanRenderer->frames[meshID].GetSize() ) {
-				_transformComponent->currentAnimationFrame = 0;
-				_transformComponent->frameAccumulator = 0.0f;
+			 animationComponent->frameAccumulator >= vulkanRenderer->frames[meshID][animationComponent->currentAnimationFrame] * 1.0f ) {
+			++animationComponent->currentAnimationFrame;
+			if ( vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 && animationComponent->currentAnimationFrame == vulkanRenderer->frames[meshID].GetSize() ) {
+				animationComponent->currentAnimationFrame = 0;
+				animationComponent->frameAccumulator = 0.0f;
 			}
 		}
 
@@ -453,7 +481,7 @@ namespace GLVM::core
 		} else {
 			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
-				jointMatrices[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][_transformComponent->currentAnimationFrame];
+				jointMatrices[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][animationComponent->currentAnimationFrame];
 			}
 
 			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
@@ -548,11 +576,12 @@ namespace GLVM::core
 	}
 
 	[[nodiscard]] SlotData Engine::updateDataUBO_UI(const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn,
-								  ecs::components::inventory* inventoryComponent,
-								  ecs::components::transform* slotTransfromComponent) {
+													ecs::components::inventory* inventoryComponent,
+													ecs::components::transform* slotTransfromComponent,
+													ecs::components::mesh*      meshComponent) {
 		SlotData hudUBO{};
 		mat4 model(1.0);
-		const float fullSlotScale     = slotTransfromComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
+		const float fullSlotScale     = meshComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
 		const float x = slotTransfromComponent->position[0] + currentInventoryColumn * fullSlotScale;
 		const float y_scaleMultilayer = vulkanRenderer->aspectRate * fullSlotScale;
 		const float y = slotTransfromComponent->position[1] + currentInventoryRow * y_scaleMultilayer;
@@ -590,12 +619,13 @@ namespace GLVM::core
 	}
 
 	mat4 Engine::updateDataUBO_IconsUI(ecs::components::transform* itemTransfromComponent,
-								   [[maybe_unused]] ecs::components::collider* itemColliderComponent,
-								   ecs::components::item* itemComponent,
-								   const unsigned int rowInventory,
-								   const unsigned int columnInventory,
-								   ecs::components::transform* inventoryTransformComponent,
-								   int itemEntity) {
+									   [[maybe_unused]] ecs::components::collider* itemColliderComponent,
+									   ecs::components::item* itemComponent,
+									   const unsigned int rowInventory,
+									   const unsigned int columnInventory,
+									   ecs::components::transform* inventoryTransformComponent,
+									   ecs::components::mesh* itemMesh,
+									   int itemEntity) {
 		float x_result_offset = 0.0f;
 		float y_result_offset = 0.0f;
 		if ( itemComponent->occupiedSlots.GetSize() == 0 ) {
@@ -608,7 +638,7 @@ namespace GLVM::core
 			const unsigned int colIndexSecondSlot = inventorySlotEntity_3 % columnInventory;
 
 			const float itemScale             = itemTransfromComponent->scale;
-			const float fullSlotScale         = itemTransfromComponent->gltf ? itemScale * 2.0f : itemScale;
+			const float fullSlotScale         = itemMesh->gltf ? itemScale * 2.0f : itemScale;
 			constexpr float centreMultiplayer = 0.5f;                                                                   ///< Eather division by 2.0f using multiply on 0.5f
 			x_result_offset = inventoryTransformComponent->position[0] + (colIndexFirstSlot * fullSlotScale + colIndexSecondSlot * fullSlotScale) * centreMultiplayer;
 			y_result_offset = inventoryTransformComponent->position[1] + (rowIndexFirstSlot * fullSlotScale + rowIndexSecondSlot * fullSlotScale) * centreMultiplayer * vulkanRenderer->aspectRate;
@@ -678,6 +708,7 @@ namespace GLVM::core
 	void Engine::setFrameData() {
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
 																									 cm::directionalLight,
 																									 cm::mesh,
@@ -784,59 +815,119 @@ namespace GLVM::core
 		}
 
 		if ( vulkanRenderer->isInventoryOpened ) {
-			core::vector<Entity> inventoryEntities      = componentManager->collectLinkedEntities<cm::inventory>();
 			vulkanRenderer->inventories.clear();
-			for ( unsigned int i = 0; i < inventoryEntities.GetSize(); ++i ) {
-				unsigned int uiEntity = inventoryEntities[i];
-				vulkanRenderer->inventories.Push({});
-				cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(uiEntity);
-				unsigned int inventoryTextureID   = componentManager->GetComponent<cm::material>(uiEntity)->diffuseTextureID_.id;
-				unsigned int meshID           = inventoryComponent->slotMeshID.id;
-				vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
-				vulkanRenderer->inventories[i].meshID             = meshID;
-				vulkanRenderer->inventories[i].row                = inventoryComponent->row;
-				vulkanRenderer->inventories[i].col                = inventoryComponent->col;
-				vulkanRenderer->inventories[i].slotData.clear();
-				for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
-					for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
-						cm::transform* slotTransformComponent     = componentManager->GetComponent<cm::transform>(uiEntity);
-						vulkanRenderer->inventories[i].slotData.Push({});
-						vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
-							updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent );
-					}
+			for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+				arch::Archetype* arch = arch::world.archetypes[n];
+				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::INVENTORY_COMPONENT) |
+					(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+					(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+					(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
+
+				if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+					cachedInventoryArchetypes[inventoryArchetypesNumber] = arch;
+					++inventoryArchetypesNumber;
 				}
 			}
 
-			cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(inventoryEntities[0]);
-			cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(inventoryEntities[0]);
+			for( uint32_t x = 0; x < inventoryArchetypesNumber; ++x ) {
+				arch::Archetype* arch = cachedInventoryArchetypes[x];
+				cm::transform* inventoryTransforms = nullptr;
+				cm::material*  inventoryMaterials  = nullptr;
+				cm::inventory* inventory           = nullptr;
+				cm::mesh*      inventoryMeshes     = nullptr;
+				switch( arch->mask ) {
+				case arch::inventoryComponentMask:
+					inventoryTransforms = static_cast<arch::InventoryArchetype*>( arch )->transforms;
+					inventoryMaterials  = static_cast<arch::InventoryArchetype*>( arch )->materials;
+					inventory           = static_cast<arch::InventoryArchetype*>( arch )->invetories;
+					inventoryMeshes     = static_cast<arch::InventoryArchetype*>( arch )->meshes;
+					break;
+				}
+
+				for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+					vulkanRenderer->inventories.Push({});
+					cm::inventory* inventoryComponent = &inventory[i];
+					unsigned int inventoryTextureID   = inventoryMaterials[i].diffuseTextureID_.id;
+					unsigned int meshID           = inventoryComponent->slotMeshID.id;
+					vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
+					vulkanRenderer->inventories[i].meshID             = meshID;
+					vulkanRenderer->inventories[i].row                = inventoryComponent->row;
+					vulkanRenderer->inventories[i].col                = inventoryComponent->col;
+					vulkanRenderer->inventories[i].slotData.clear();
+					for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
+						for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
+							cm::transform* slotTransformComponent     = &inventoryTransforms[i];
+							vulkanRenderer->inventories[i].slotData.Push({});
+							vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
+								updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent, &inventoryMeshes[i] );
+						}
+					}
+				}
+
+				for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+					cm::inventory* inventoryComponent          = &inventory[i];
+					cm::transform* inventoryTransformComponent = &inventoryTransforms[i];
 		
-			core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
-			vulkanRenderer->items.clear();
-			for ( unsigned int i = 0; i < itemEntities.GetSize(); ++i ) {
-				unsigned int itemEntity = itemEntities[i];
-				vulkanRenderer->items.Push({});
-				cm::item* itemComponent = componentManager->GetComponent<cm::item>(itemEntity);
-				cm::actor* actorComponent = componentManager->GetComponent<cm::actor>(itemEntity);
-				if ( actorComponent != nullptr )
-					continue;
+					core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
+					vulkanRenderer->items.clear();
+					for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
+						arch::Archetype* arch = arch::world.archetypes[m];
+						arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
+							(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+							(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+							(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+							(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+							(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
+
+						if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+							cachedItemArchetypes[itemArchetypesNumber] = arch;
+							++itemArchetypesNumber;
+						}
+					}
+
+					for( uint32_t c = 0; c < itemArchetypesNumber; ++c ) {
+						arch::Archetype* arch = cachedItemArchetypes[c];
+						cm::transform* itemTransforms = nullptr;
+						cm::material*  itemMaterials  = nullptr;
+						cm::mesh*      itemMeshes     = nullptr;
+						cm::collider*  itemColliders  = nullptr;
+						cm::item*      items          = nullptr;
+						switch( arch->mask ) {
+						case arch::inventoryComponentMask:
+							itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
+							itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
+							itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
+							itemColliders  = static_cast<arch::ItemArchetype*>( arch )->colliders;
+							items          = static_cast<arch::ItemArchetype*>( arch )->items;
+							break;
+						}
+
+						for ( unsigned int a = 0; a < arch->entityCount; ++a ) {
+							vulkanRenderer->items.Push({});
+							cm::item* itemComponent = &items[a];
 			
-				unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(itemEntity)->handle.id;
-				unsigned int diffuseTexureID = componentManager->GetComponent<ecs::components::material>(itemEntity)->diffuseTextureID_.id;
-				vulkanRenderer->items[i].meshID          = meshID;
-				vulkanRenderer->items[i].diffuseTexureID = diffuseTexureID;
-				cm::transform* itemTransformComponent = componentManager->GetComponent<cm::transform>(itemEntity);
-				cm::collider* itemColliderComponent = componentManager->GetComponent<cm::collider>(itemEntity);
+							unsigned int meshID = itemMeshes[a].handle.id;
+							unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
+							vulkanRenderer->items[a].meshID          = meshID;
+							vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
+							cm::transform* itemTransformComponent    = &itemTransforms[a];
+							cm::collider* itemColliderComponent      = &itemColliders[a];
 
-				if ( itemTransformComponent == nullptr )
-					std::cout << "NULL POINTER" << std::endl;
+							if ( itemTransformComponent == nullptr )
+								std::cout << "NULL POINTER" << std::endl;
 
-				vulkanRenderer->items[i].model = updateDataUBO_IconsUI(itemTransformComponent,
-																	   itemColliderComponent,
-																	   itemComponent,
-																	   inventoryComponent->row,
-																	   inventoryComponent->col,
-																	   inventoryTransformComponent,
-																	   itemEntity);
+							uint32_t itemEntity = arch->entities[a];
+							vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
+																				   itemColliderComponent,
+																				   itemComponent,
+																				   inventoryComponent->row,
+																				   inventoryComponent->col,
+																				   inventoryTransformComponent,
+																				   &itemMeshes[a],
+																				   itemEntity);
+						}
+					}
+				}
 			}
 		}
 
@@ -851,26 +942,124 @@ namespace GLVM::core
 			vulkanRenderer->crosshairs[i].model  = updateDataHudScreenUBO( cursorTransform );
 		}
 		
-		core::vector<Entity> linkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::material,
-																						   cm::mesh,
-																						   cm::actor>();
 		vulkanRenderer->actors.clear();
-		for ( unsigned int i = 0; i < linkedEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = linkedEntities[i];
-			vulkanRenderer->actors.Push({});
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			cm::material*  materialComponent  = componentManager->GetComponent<cm::material>(uiEntity);
-			unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-			vulkanRenderer->actors[i].modelMatrix   = computeModelMatrix(transformComponent);
-			vulkanRenderer->actors[i].jointMatrices = updateAnimationFrames(transformComponent, meshID);
-			vulkanRenderer->actors[i].meshID        = meshID;
-			vulkanRenderer->actors[i].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-			vulkanRenderer->actors[i].specularTextureIndex = materialComponent->specularTextureID_.id;
-			vulkanRenderer->actors[i].ambient   = materialComponent->ambient;
-			vulkanRenderer->actors[i].shininess = materialComponent->shininess;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedAnimationActorsArchetypes[animationActorsArchetypesNumber] = arch;
+				++animationActorsArchetypesNumber;
+			}
 		}
 
+		uint32_t animationActorsCounter = 0;
+		for( uint32_t x = 0; x < animationActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedAnimationActorsArchetypes[x];
+			cm::transform* actorTransforms = nullptr;
+			cm::material*  actorMaterials  = nullptr;
+			cm::mesh*      actorMeshes     = nullptr;
+			cm::animation* actorAnimations = nullptr;
+			cm::rotation*  actorRotations  = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				actorTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				actorMaterials  = static_cast<arch::PlayerArchetype*>( arch )->materials;
+				actorMeshes     = static_cast<arch::PlayerArchetype*>( arch )->meshes;
+				actorAnimations = static_cast<arch::PlayerArchetype*>( arch )->animations;
+				actorRotations  = static_cast<arch::PlayerArchetype*>( arch )->rotations;
+				break;
+			case arch::enemyComponentMask:
+				actorTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
+				actorMaterials  = static_cast<arch::EnemyArchetype*>( arch )->materials;
+				actorMeshes     = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+				actorAnimations = static_cast<arch::EnemyArchetype*>( arch )->animations;
+				actorRotations  = static_cast<arch::EnemyArchetype*>( arch )->rotations;
+				break;
+			// case arch::staticMeshComponentMask:
+			// 	actorTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
+			// 	actorMaterials  = static_cast<arch::StaticMeshArchetype*>( arch )->materials;
+			// 	actorMeshes     = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
+			// 	break;
+			}
+
+			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->actors.Push({});
+				cm::transform* transformComponent = &actorTransforms[n];
+				cm::material*  materialComponent  = &actorMaterials[n];
+				cm::animation* animationComponent = &actorAnimations[n];
+				cm::rotation*  rotationComponent  = &actorRotations[n];
+				unsigned int meshID               = actorMeshes[n].handle.id;
+				vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+				vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
+				vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
+				vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+				vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+				vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
+				vulkanRenderer->actors[animationActorsCounter].shininess = materialComponent->shininess;
+				++animationActorsCounter;
+			}
+		}
+
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ul << arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedStaticActorsArchetypes[staticActorsArchetypesNumber] = arch;
+				++staticActorsArchetypesNumber;
+			}
+		}
+
+		uint32_t staticActorsCounter = 0;
+		for( uint32_t x = 0; x < staticActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedStaticActorsArchetypes[x];
+			cm::transform* actorTransforms = nullptr;
+			cm::material*  actorMaterials  = nullptr;
+			cm::rotation*  actorRotations  = nullptr;
+			cm::mesh*      actorMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::staticMeshComponentMask:
+				actorTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
+				actorMaterials  = static_cast<arch::StaticMeshArchetype*>( arch )->materials;
+				actorRotations  = static_cast<arch::StaticMeshArchetype*>( arch )->rotations;
+				actorMeshes     = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
+				break;
+			}
+
+			core::vector<mat4> jointMatrices;
+			jointMatrices.Resize(MAX_JOINTS_NUMBER);
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatrices[i] = unitMatrix;
+			}
+			
+			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->actors.Push({});
+				cm::transform* transformComponent = &actorTransforms[n];
+				cm::material*  materialComponent  = &actorMaterials[n];
+				cm::rotation*  rotationComponent  = &actorRotations[n];
+				unsigned int meshID               = actorMeshes[n].handle.id;
+				vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+				vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
+				vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
+				vulkanRenderer->actors[staticActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+				vulkanRenderer->actors[staticActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+				vulkanRenderer->actors[staticActorsCounter].ambient   = materialComponent->ambient;
+				vulkanRenderer->actors[staticActorsCounter].shininess = materialComponent->shininess;
+				++staticActorsCounter;
+			}
+		}
+
+		
 		core::vector<Entity> playerEntities = componentManager->collectLinkedEntities<cm::beholder, cm::transform>();
 		vulkanRenderer->players.clear();
 		for( unsigned int i = 0; i < playerEntities.GetSize(); ++i ) {
@@ -1130,7 +1319,7 @@ namespace GLVM::core
 			}
 	}
 
-	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent) {
+	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation) {
 		mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);
@@ -1144,10 +1333,10 @@ namespace GLVM::core
 		translationMatrix[3][2] = _transformComponent->position[2];
 		translationMatrix[3][3] = 1.0f;
 
-		float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		float sinYaw = std::sin(Radians((_transformComponent->yaw)  / 2));
-		float cosYaw = std::cos(Radians((_transformComponent->yaw)  / 2));
+		float sinPitch = std::sin(Radians(-rotation->pitch / 2));
+		float cosPitch = std::cos(Radians(-rotation->pitch / 2));
+		float sinYaw = std::sin(Radians((rotation->yaw)  / 2));
+		float cosYaw = std::cos(Radians((rotation->yaw)  / 2));
 		
 		Quaternion pitchQuat;
 		Quaternion yawQuat;

@@ -162,7 +162,7 @@ int main()
 	std::mt19937 mersenne(rd());
     std::uniform_int_distribution<int> dist(0, 3);
 	
-	for ( u32 i = 0; i < 100; ++i ) {
+	for ( u32 i = 0; i < 80; ++i ) {
 	arch::entity enemy = archEntityManager->createEntity();
 	arch::world.addEntityToArchetype( enemy, arch::world.archetypes[2] );
 	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];
@@ -224,7 +224,7 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	
 	arch::entity crosshair = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( cube, arch::world.archetypes[5] );
+	arch::world.addEntityToArchetype( crosshair, arch::world.archetypes[5] );
 	arch::EntityLocation crosshairLocation = arch::world.entityLocations[arch::getId( crosshair )];
 	arch::CrosshairArchetype* crosshairArch = static_cast<arch::CrosshairArchetype*>(crosshairLocation.arch);
 	const uint32_t crosshairIndex = cubeLocation.index;
