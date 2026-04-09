@@ -118,6 +118,15 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::MESH_COMPONENT) |
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 		(1ull << ComponentsIndices::POINT_LIGHT_COMPONENT);
+
+	constexpr componentMask levelChunkComponentMask =
+		(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
+		(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
 };
 
 

@@ -266,18 +266,18 @@ int main()
 			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}
 
-	// arch::entity directionalLight = archEntityManager->createEntity();
-	// arch::world.addEntityToArchetype( directionalLight, arch::world.archetypes[8] );
-	// arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
-	// arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
-	// const uint32_t directionalLightIndex = directionalLightLocation.index;
-	// directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 10.0f, -15.0f },
-	// 	.direction = { 1.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
-	// 	.specular = {1.0f, 1.0f, 1.0f}};
-	// directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 10.0f, -15.0f }, .scale = 0.1f };
-	// directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;
-	// directionalLightArch->materials[directionalLightIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
-	// 	.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+	arch::entity directionalLight = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( directionalLight, arch::world.archetypes[8] );
+	arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
+	arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
+	const uint32_t directionalLightIndex = directionalLightLocation.index;
+	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 10.0f, -15.0f },
+		.direction = { 1.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
+		.specular = {1.0f, 1.0f, 1.0f}};
+	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 10.0f, -15.0f }, .scale = 0.1f };
+	directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;
+	directionalLightArch->materials[directionalLightIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 	
 	
 	arch::entity pointLight = archEntityManager->createEntity();
@@ -294,18 +294,18 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 	
 	
-	// arch::entity spotLight = archEntityManager->createEntity();
-	// arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
-	// arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
-	// arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
-	// const uint32_t spotLightIndex = spotLightLocation.index;
-	// spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f },
-	// 	.direction = { 0.0f, -1.0f, 2.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-	// 	.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
-	// 	.quadratic = 0.032f };
-	// spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f }, .scale = 0.2f };
-	// spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
-	// spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
+	arch::entity spotLight = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
+	arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
+	arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
+	const uint32_t spotLightIndex = spotLightLocation.index;
+	spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f },
+		.direction = { 0.0f, -1.0f, 2.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
+		.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
+		.quadratic = 0.032f };
+	spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f }, .scale = 0.2f };
+	spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
+	spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
 	
 	
     ///< Game rendering loop

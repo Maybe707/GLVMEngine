@@ -1,9 +1,11 @@
 #ifndef LEVEL_CHUNK_ARCHETYPE
 #define LEVEL_CHUNK_ARCHETYPE
 
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/MaterialComponent.hpp"
+#include "Components/RotationComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "TagComponents/LevelChunkTagComponent.hpp"
@@ -18,6 +20,7 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::mesh) +
 		 sizeof(components::collider) +
 		 sizeof(components::colliderFlags) +
+		 sizeof(components::rotation) +
 		 sizeof(tagComponents::levelChunkTagComponent));
 	
 	struct LevelChunkArchetype : Archetype {
@@ -26,6 +29,7 @@ namespace GLVM::ecs::arch {
 		components::mesh                      meshes[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 		components::collider                  colliders[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 		components::colliderFlags             colliderFlags[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
+		components::rotation                  rotations[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 		tagComponents::levelChunkTagComponent levelChunkTagComponents[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 
 		LevelChunkArchetype() {
@@ -34,6 +38,7 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
+			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
 			components[ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT] = levelChunkTagComponents;
 
 			mask =
@@ -42,6 +47,7 @@ namespace GLVM::ecs::arch {
 				(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
 				(1ull << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT) |
 				(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ull << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
 				(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
@@ -49,8 +55,9 @@ namespace GLVM::ecs::arch {
 			componentIds[2] = ComponentsIndices::MESH_COMPONENT;
 			componentIds[3] = ComponentsIndices::COLLIDER_COMPONENT;
 			componentIds[4] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[5] = ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT;
-			componentCount = 6;
+			componentIds[5] = ComponentsIndices::ROTATION_COMPONENT;
+			componentIds[6] = ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT;
+			componentCount = 7;
 
 		}
 	};
