@@ -16,7 +16,8 @@ namespace GLVM::ecs
 {
 	void DamageSystem::Update() {
 		namespace cm = GLVM::ecs::components;
-		
+
+		cachedArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
 			arch::Archetype* arch = arch::world.archetypes[i];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ATTACK_COMPONENT) |
@@ -29,6 +30,7 @@ namespace GLVM::ecs
 			}
 		}
 
+		cachedFontArchetypesNumber = 0;
 		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedArchetypes[x];
 			components::attack* attackView = nullptr;
