@@ -127,6 +127,14 @@ namespace GLVM::ecs::arch {
 		(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 		(1ull << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
 		(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
+
+	constexpr componentMask projectileComponentMask =
+		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+		(1ull << ComponentsIndices::MESH_COMPONENT) |
+		(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
+		(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
+		(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
 };
 
 

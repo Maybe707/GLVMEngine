@@ -13,7 +13,9 @@
 #include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
 #include "Archetypes/StaticMeshArchetype.hpp"
+#include "Components/ProjectileBundle.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/DirectionalLightComponent.hpp"
@@ -1206,10 +1208,6 @@ namespace GLVM::core
 				}
 			}
 		}
-		
-
-
-		
 
 		animationActorsArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
@@ -1335,6 +1333,62 @@ namespace GLVM::core
 			}
 		}
 
+		projectileActorsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedProjectileActorsArchetypes[projectileActorsArchetypesNumber] = arch;
+				++projectileActorsArchetypesNumber;
+			}
+		}
+
+		uint32_t projectileActorsCounter = staticActorsCounter;
+		for( uint32_t x = 0; x < projectileActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedProjectileActorsArchetypes[x];
+			cm::transform*           actorTransforms         = nullptr;
+			arch::ProjectileBundle*  actorProjectileBundles  = nullptr;
+			cm::rotation*            actorRotations          = nullptr;
+			cm::mesh*                actorMeshes             = nullptr;
+			switch( arch->mask ) {
+			case arch::projectileComponentMask:
+				actorTransforms         = static_cast<arch::ProjectileArchetype*>( arch )->transforms;
+				actorProjectileBundles  = static_cast<arch::ProjectileArchetype*>( arch )->projectileBundles;
+				actorRotations          = static_cast<arch::ProjectileArchetype*>( arch )->rotations;
+				actorMeshes             = static_cast<arch::ProjectileArchetype*>( arch )->meshes;
+				break;
+			}
+
+			core::vector<mat4> jointMatrices;
+			jointMatrices.Resize(MAX_JOINTS_NUMBER);
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatrices[i] = unitMatrix;
+			}
+			
+			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->actors.Push({});
+				cm::transform* transformComponent = &actorTransforms[n];
+				cm::material*  materialComponent  = &actorProjectileBundles[n].material;
+				cm::rotation*  rotationComponent  = &actorRotations[n];
+				if( actorTransforms && actorProjectileBundles &&
+					actorRotations && actorMeshes ) {
+					unsigned int meshID = actorMeshes[n].handle.id;
+					vulkanRenderer->actors[projectileActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->actors[projectileActorsCounter].jointMatrices = jointMatrices;
+					vulkanRenderer->actors[projectileActorsCounter].meshID        = meshID;
+					vulkanRenderer->actors[projectileActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+					vulkanRenderer->actors[projectileActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+					vulkanRenderer->actors[projectileActorsCounter].ambient   = materialComponent->ambient;
+					vulkanRenderer->actors[projectileActorsCounter].shininess = materialComponent->shininess;
+					++projectileActorsCounter;
+				}
+			}
+		}
 
 
 
