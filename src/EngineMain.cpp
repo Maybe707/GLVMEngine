@@ -152,7 +152,7 @@ int main()
 	playerArch->transforms[playerIndex]  = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f };
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 0.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
-	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, 1.0f } };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = monkeyHandle_OBJ, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 

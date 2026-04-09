@@ -518,7 +518,7 @@ namespace GLVM::core
 					// delta_x *= kSensitivity;
 					// delta_y *= kSensitivity;
 		
-					const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, 1.0f, 0.0) );
+					const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
 					const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
 					/*
 					 * 1. The mouse direction determines the "intended direction of rotation" for the object.
@@ -558,7 +558,7 @@ namespace GLVM::core
 					_Player->forward = cameraComponent->forward;
 					mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
 											cameraComponent->Position + _Player->position + cameraComponent->forward,
-											vec3( 0.0f, 1.0f, 0.0) );
+											vec3( 0.0f, -1.0f, 0.0) );
 					for ( unsigned int i = 0; i < 4; ++i )
 						for ( unsigned int j = 0; j < 4; ++j )
 							viewMatrix_[i][j] = view[i][j];
