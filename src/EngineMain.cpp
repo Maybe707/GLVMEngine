@@ -294,18 +294,18 @@ int main()
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 	
 	
-	arch::entity spotLight = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
-	arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
-	arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
-	const uint32_t spotLightIndex = spotLightLocation.index;
-	spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f },
-		.direction = { 0.0f, -1.0f, 2.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-		.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
-		.quadratic = 0.032f };
-	spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f }, .scale = 0.2f };
-	spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
-	spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
+	// arch::entity spotLight = archEntityManager->createEntity();
+	// arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
+	// arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
+	// arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
+	// const uint32_t spotLightIndex = spotLightLocation.index;
+	// spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f },
+	// 	.direction = { 0.0f, -1.0f, 2.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
+	// 	.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
+	// 	.quadratic = 0.032f };
+	// spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f }, .scale = 0.2f };
+	// spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
+	// spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
 	
 	
     ///< Game rendering loop

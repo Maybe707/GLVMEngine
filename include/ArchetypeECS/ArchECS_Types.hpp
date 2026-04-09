@@ -112,6 +112,12 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::MESH_COMPONENT) |
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 		(1ull << ComponentsIndices::SPOT_LIGHT_COMPONENT);
+
+	constexpr componentMask pointLightComponentMask =
+		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+		(1ull << ComponentsIndices::MESH_COMPONENT) |
+		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+		(1ull << ComponentsIndices::POINT_LIGHT_COMPONENT);
 };
 
 

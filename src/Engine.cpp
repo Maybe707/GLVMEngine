@@ -220,7 +220,22 @@ namespace GLVM::core
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::mesh>();
-		vulkanRenderer->pointLightNumber = pointLightLinkedEntities.GetSize();
+
+		pointLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedPointLigthArchetypes[pointLightArchetypesNumber] = arch;
+				++pointLightArchetypesNumber;
+			}
+		}
+
+		vulkanRenderer->pointLightNumber = pointLightArchetypesNumber;
+//		vulkanRenderer->pointLightNumber = pointLightLinkedEntities.GetSize();
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							cm::material,
 																							cm::mesh>();
@@ -923,24 +938,53 @@ namespace GLVM::core
 																						  cm::actor>();
 
 		vulkanRenderer->pointLights.clear();
-		for ( uint32_t pointLightCounter = 0; pointLightCounter < pointLightEntities.GetSize(); ++pointLightCounter ) {
-			unsigned int pointLightEntity = pointLightEntities[pointLightCounter];
-			vulkanRenderer->pointLights.Push({});
-			cm::pointLight* pointLightComponent = componentManager->GetComponent<cm::pointLight>(pointLightEntity);
-			uint32_t maxCubeMapLayers = 6;
-			for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
-				vulkanRenderer->pointLights[pointLightCounter].pointLightSpaceMatrix[cubeMapLayerCounter] =
-					updatePointLightSpaceMatrixShadowMapUBO( pointLightComponent, cubeMapLayerCounter );
+		pointLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedPointLigthArchetypes[pointLightArchetypesNumber] = arch;
+				++pointLightArchetypesNumber;
 			}
-			vulkanRenderer->pointLights[pointLightCounter].position  = pointLightComponent->position;
-			vulkanRenderer->pointLights[pointLightCounter].ambient   = pointLightComponent->ambient;
-			vulkanRenderer->pointLights[pointLightCounter].diffuse   = pointLightComponent->diffuse;
-			vulkanRenderer->pointLights[pointLightCounter].specular  = pointLightComponent->specular;
-			vulkanRenderer->pointLights[pointLightCounter].constant  = pointLightComponent->constant;
-			vulkanRenderer->pointLights[pointLightCounter].linear    = pointLightComponent->linear;
-			vulkanRenderer->pointLights[pointLightCounter].quadratic = pointLightComponent->quadratic;
 		}
 
+		uint32_t pointLightCounter = 0;
+		for( uint32_t x = 0; x < pointLightArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedPointLigthArchetypes[x];
+//				cm::transform*         directionalLightTransforms = nullptr;
+			cm::pointLight* pointLights  = nullptr;
+//				cm::mesh*              directionalLightMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::pointLightComponentMask:
+//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
+				pointLights = static_cast<arch::PointLightArchetype*>( arch )->pointLights;
+//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
+				break;
+			}
+
+			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
+				if( pointLights ) {
+					vulkanRenderer->pointLights.Push({});
+					cm::pointLight* pointLightComponent = &pointLights[x1];
+					uint32_t maxCubeMapLayers = 6;
+					for ( uint32_t cubeMapLayerCounter = 0; cubeMapLayerCounter < maxCubeMapLayers; ++cubeMapLayerCounter ) {                      ///< 6 is a number of cube map layers.
+						vulkanRenderer->pointLights[pointLightCounter].pointLightSpaceMatrix[cubeMapLayerCounter] =
+							updatePointLightSpaceMatrixShadowMapUBO( pointLightComponent, cubeMapLayerCounter );
+					}
+					vulkanRenderer->pointLights[pointLightCounter].position  = pointLightComponent->position;
+					vulkanRenderer->pointLights[pointLightCounter].ambient   = pointLightComponent->ambient;
+					vulkanRenderer->pointLights[pointLightCounter].diffuse   = pointLightComponent->diffuse;
+					vulkanRenderer->pointLights[pointLightCounter].specular  = pointLightComponent->specular;
+					vulkanRenderer->pointLights[pointLightCounter].constant  = pointLightComponent->constant;
+					vulkanRenderer->pointLights[pointLightCounter].linear    = pointLightComponent->linear;
+					vulkanRenderer->pointLights[pointLightCounter].quadratic = pointLightComponent->quadratic;
+				}
+			}
+		}
+		
 		namespace cm = GLVM::ecs::components;
 		core::vector<Entity> healthEntities = componentManager->collectLinkedEntities<cm::transform,
 																					  cm::health>();

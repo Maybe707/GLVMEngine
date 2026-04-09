@@ -1,5 +1,5 @@
-#ifndef INVENTORY_SYSTEM
-#define INVENTORY_SYSTEM
+#ifndef INVENTORY_SYSTEM_HPP
+#define INVENTORY_SYSTEM_HPP
 
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "ISystem.hpp"
