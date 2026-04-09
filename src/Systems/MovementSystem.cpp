@@ -116,7 +116,7 @@ namespace GLVM::ecs
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
-        Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, vec3{ 0.0f, 1.0f, 0.0 }));
+        Vector<float, 3> normalizedVector = Normalize(Cross(beholder.forward, vec3{ 0.0f, -1.0f, 0.0 }));
         return normalizedVector;
     }
 
@@ -148,7 +148,7 @@ namespace GLVM::ecs
 		// if ( delta_x < 0.0001 )
 		// 	delta_x = prev_delta_x;
 
-		const vec3 rotateAxis = { 0.0, 1.0, 0.0 };
+		const vec3 rotateAxis = { 0.0, -1.0, 0.0 };
 		float rotationAngle = delta_x;
 		constexpr float angleScale = 0.1f;
 		rotationAngle = Radians(rotationAngle * angleScale);

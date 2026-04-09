@@ -84,12 +84,12 @@ namespace GLVM::ecs
 						move.gravity = 0;
 						transformComponent.gravityAccumulator = 0.0f;
 					}
-					uint8_t isWallCollisionMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-					if( colliderFlags.flags & isWallCollisionMask ) {
-						move.frameMovement = 0;
-						uint8_t wallCollisionTurnOffMask = (0u << 0) | (1u << 1) | (1u << 2) | (1u << 3);
-						colliderFlags.flags &= wallCollisionTurnOffMask;
-					}
+					// uint8_t isWallCollisionMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+					// if( colliderFlags.flags & isWallCollisionMask ) {
+					// 	move.frameMovement = 0;
+					// 	uint8_t wallCollisionTurnOffMask = (0u << 0) | (1u << 1) | (1u << 2) | (1u << 3);
+					// 	colliderFlags.flags &= wallCollisionTurnOffMask;
+					// }
 					transformComponent.position += move.frameMovement;
 					transformComponent.position += move.gravity;
 					move.gravity       = 0.0f;
