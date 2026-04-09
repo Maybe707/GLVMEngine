@@ -95,6 +95,12 @@ namespace GLVM::core
 		ProceduralLevelGeneratingSystem * procuduralLevelGeneratingSystem;
 		ecs::InventorySystem            * inventorySystem;
 
+		ecs::arch::Archetype* cachedDirectionalLigthArchetypes[32];
+		uint32_t directionalLightArchetypesNumber = 0;
+		// ecs::arch::Archetype* cachedSpotLigthArchetypes[32];
+		// uint32_t spotLightArchetypesNumber = 0;
+		// ecs::arch::Archetype* cachedPointLigthArchetypes[32];
+		// uint32_t pointLightArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedPlayerArchetypes[32];
 		uint32_t playerArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];

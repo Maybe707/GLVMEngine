@@ -7,6 +7,7 @@
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/DirectionalLightArchetype.hpp"
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/InventoryArchetype.hpp"
 #include "Archetypes/ItemArchetype.hpp"
@@ -14,6 +15,7 @@
 #include "Archetypes/StaticMeshArchetype.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
+#include "Components/DirectionalLightComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
@@ -180,7 +182,22 @@ namespace GLVM::core
 		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																									  cm::directionalLight,
 																									  cm::mesh>();
-		vulkanRenderer->directionalLightNumber = directionalLightLinkedEntities.GetSize();
+
+		directionalLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedDirectionalLigthArchetypes[directionalLightArchetypesNumber] = arch;
+				++directionalLightArchetypesNumber;
+			}
+		}
+
+		vulkanRenderer->directionalLightNumber = directionalLightArchetypesNumber;
+//		vulkanRenderer->directionalLightNumber = directionalLightLinkedEntities.GetSize();
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::mesh>();
@@ -782,32 +799,59 @@ namespace GLVM::core
 		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
-		core::vector<Entity> directionalLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																									 cm::directionalLight,
-																									 cm::mesh,
-																									 cm::actor>();
+		
 		vulkanRenderer->directionalLights.clear();
-		for ( uint32_t directionalLightCounter = 0; directionalLightCounter < directionalLightEntities.GetSize(); ++ directionalLightCounter ) {
-			unsigned int directionalLightEntity = directionalLightEntities[directionalLightCounter];
-			vulkanRenderer->directionalLights.Push({});
-			cm::directionalLight* directionalLightComponent = componentManager->GetComponent<cm::directionalLight>( directionalLightEntity );
-			vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
-				updateDirectionalLightSpaceMatrixShadowMapUBO( directionalLightComponent );
-			vulkanRenderer->directionalLights[directionalLightCounter].position = vec4(directionalLightComponent->position[0],
-																					   directionalLightComponent->position[1],
-																					   directionalLightComponent->position[2], 0.0);
-			vulkanRenderer->directionalLights[directionalLightCounter].direction = vec4(directionalLightComponent->direction[0],
-																						directionalLightComponent->direction[1],
-																						directionalLightComponent->direction[2], 0.0);
-			vulkanRenderer->directionalLights[directionalLightCounter].ambient = vec4(directionalLightComponent->ambient[0],
-																					  directionalLightComponent->ambient[1],
-																					  directionalLightComponent->ambient[2], 0.0);
-			vulkanRenderer->directionalLights[directionalLightCounter].diffuse = vec4(directionalLightComponent->diffuse[0],
-																					  directionalLightComponent->diffuse[1],
-																					  directionalLightComponent->diffuse[2], 0.0);
-			vulkanRenderer->directionalLights[directionalLightCounter].specular = vec4(directionalLightComponent->specular[0],
-																					   directionalLightComponent->specular[1],
-																					   directionalLightComponent->specular[2], 0.0);
+		directionalLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedDirectionalLigthArchetypes[directionalLightArchetypesNumber] = arch;
+				++directionalLightArchetypesNumber;
+			}
+		}
+
+		uint32_t directionalLightCounter = 0;
+		for( uint32_t x = 0; x < directionalLightArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedDirectionalLigthArchetypes[x];
+//				cm::transform*         directionalLightTransforms = nullptr;
+			cm::directionalLight*  directionalLights          = nullptr;
+//				cm::mesh*              directionalLightMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::directionalLightComponentMask:
+//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
+				directionalLights          = static_cast<arch::DirectionalLightArchetype*>( arch )->directionalLights;
+//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
+				break;
+			}
+
+			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
+				vulkanRenderer->directionalLights.Push({});
+				if( directionalLights ) {
+					cm::directionalLight* directionalLightComponent = &directionalLights[x1];
+					vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
+						updateDirectionalLightSpaceMatrixShadowMapUBO( directionalLightComponent );
+					vulkanRenderer->directionalLights[directionalLightCounter].position = vec4(directionalLightComponent->position[0],
+																							   directionalLightComponent->position[1],
+																							   directionalLightComponent->position[2], 0.0);
+					vulkanRenderer->directionalLights[directionalLightCounter].direction = vec4(directionalLightComponent->direction[0],
+																								directionalLightComponent->direction[1],
+																								directionalLightComponent->direction[2], 0.0);
+					vulkanRenderer->directionalLights[directionalLightCounter].ambient = vec4(directionalLightComponent->ambient[0],
+																							  directionalLightComponent->ambient[1],
+																							  directionalLightComponent->ambient[2], 0.0);
+					vulkanRenderer->directionalLights[directionalLightCounter].diffuse = vec4(directionalLightComponent->diffuse[0],
+																							  directionalLightComponent->diffuse[1],
+																							  directionalLightComponent->diffuse[2], 0.0);
+					vulkanRenderer->directionalLights[directionalLightCounter].specular = vec4(directionalLightComponent->specular[0],
+																							   directionalLightComponent->specular[1],
+																							   directionalLightComponent->specular[2], 0.0);
+					++directionalLightCounter;
+				}
+			}
 		}
 
 		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,

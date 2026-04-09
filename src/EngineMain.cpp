@@ -150,9 +150,9 @@ int main()
 	const uint32_t playerIndex = playerLocation.index;
 
 	playerArch->transforms[playerIndex]  = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f };
-	playerArch->rigidBodies[playerIndex] = { .fMass_ = 5.0f };
+	playerArch->rigidBodies[playerIndex] = { .fMass_ = 0.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
-	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, 1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = monkeyHandle_OBJ, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
@@ -188,7 +188,7 @@ int main()
 
 	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 5, 5.0f, 0.0f ) + randomDirection }, .scale = 1.2f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
-	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 6.0f };
+	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
 	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];

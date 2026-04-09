@@ -100,6 +100,12 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
 		(1ull << ComponentsIndices::INVENTORY_COMPONENT) |
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT);
+
+	constexpr componentMask directionalLightComponentMask =
+		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+		(1ull << ComponentsIndices::MESH_COMPONENT) |
+		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+		(1ull << ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT);
 };
 
 
