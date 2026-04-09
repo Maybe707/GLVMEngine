@@ -8,6 +8,7 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include <cstdint>
 #include <unistd.h>
 
 namespace GLVM::ecs
@@ -83,10 +84,14 @@ namespace GLVM::ecs
 			}
 
 			components::inventory*                inventory_inventoriesView   = nullptr;
-			switch( cachedInventoryArchetype->mask ) {
-			case arch::inventoryComponentMask:
-				inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->invetories;
-				break;
+			uint32_t inventoryEntityCount = 0;
+			if( cachedInventoryArchetype != nullptr ) {
+				inventoryEntityCount = cachedInventoryArchetype->entityCount;
+				switch( cachedInventoryArchetype->mask ) {
+				case arch::inventoryComponentMask:
+					inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->invetories;
+					break;
+				}
 			}
 
 			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
@@ -103,17 +108,22 @@ namespace GLVM::ecs
 				}
 			}
 
+
 			components::collider*      itemColliderComponentView      = nullptr;
-			switch( cachedCrosshairArchetype->mask ) {
-			case arch::crosshairComponentMask:
-				itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedCrosshairArchetype )->colliders;
-				break;
+			uint32_t crosshairEntityCount = 0;
+			if( cachedCrosshairArchetype != nullptr ) {
+				crosshairEntityCount = cachedCrosshairArchetype->entityCount;
+				switch( cachedCrosshairArchetype->mask ) {
+				case arch::crosshairComponentMask:
+					itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedCrosshairArchetype )->colliders;
+					break;
+				}
 			}
 			
-			for ( unsigned int m = 0; m < cachedInventoryArchetype->entityCount; ++m ) {
+			for ( unsigned int m = 0; m < inventoryEntityCount; ++m ) {
 				cm::inventory* inventoryComponent = &inventory_inventoriesView[m];
 
-				for ( unsigned int i = 0; i < cachedItemArchetype->entityCount; ++i ) {
+				for ( unsigned int i = 0; i < crosshairEntityCount; ++i ) {
 					unsigned int itemEntity = cachedItemArchetype->entities[i];
 					cm::collider* itemColliderComponent = &itemColliderComponentView[i];
 

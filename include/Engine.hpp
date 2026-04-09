@@ -95,6 +95,8 @@ namespace GLVM::core
 		ProceduralLevelGeneratingSystem * procuduralLevelGeneratingSystem;
 		ecs::InventorySystem            * inventorySystem;
 
+		ecs::arch::Archetype* cachedPlayerArchetypes[32];
+		uint32_t playerArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];
 		uint32_t animationArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedStaticActorsArchetypes[32];
