@@ -201,7 +201,22 @@ namespace GLVM::core
 		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							   cm::spotLight,
 																							   cm::mesh>();
-		vulkanRenderer->spotLightNumber = spotLightLinkedEntities.GetSize();
+
+		spotLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedSpotLigthArchetypes[spotLightArchetypesNumber] = arch;
+				++spotLightArchetypesNumber;
+			}
+		}
+		
+		vulkanRenderer->spotLightNumber = spotLightArchetypesNumber;
+//		vulkanRenderer->spotLightNumber = spotLightLinkedEntities.GetSize();
 		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																								cm::pointLight,
 																								cm::mesh>();
@@ -829,8 +844,8 @@ namespace GLVM::core
 			}
 
 			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
-				vulkanRenderer->directionalLights.Push({});
 				if( directionalLights ) {
+					vulkanRenderer->directionalLights.Push({});
 					cm::directionalLight* directionalLightComponent = &directionalLights[x1];
 					vulkanRenderer->directionalLights[directionalLightCounter].DirectionalLightSpaceMatrix =
 						updateDirectionalLightSpaceMatrixShadowMapUBO( directionalLightComponent );
@@ -854,29 +869,54 @@ namespace GLVM::core
 			}
 		}
 
-		core::vector<Entity> spotLightEntities      = componentManager->collectLinkedEntities<cm::transform,
-																							  cm::spotLight,
-																							  cm::mesh,
-																							  cm::actor>();
 		vulkanRenderer->spotLights.clear();
-		for ( uint32_t spotLightCounter = 0; spotLightCounter < spotLightEntities.GetSize(); ++ spotLightCounter ) {
-			unsigned int spotLightEntity = spotLightEntities[spotLightCounter];
-			vulkanRenderer->spotLights.Push({});
-			cm::spotLight* spotLightComponent = componentManager->GetComponent<cm::spotLight>( spotLightEntity );
-			vulkanRenderer->spotLights[spotLightCounter].SpotLigthSpaceMatrix =
-				updateSpotLightSpaceMatrixShadowMapUBO( spotLightComponent );
-			vulkanRenderer->spotLights[spotLightCounter].position    = spotLightComponent->position;
-			vulkanRenderer->spotLights[spotLightCounter].direction   = spotLightComponent->direction;
-			vulkanRenderer->spotLights[spotLightCounter].cutOff      = spotLightComponent->cutOff;
-			vulkanRenderer->spotLights[spotLightCounter].outerCutOff = spotLightComponent->outerCutOff;
-			vulkanRenderer->spotLights[spotLightCounter].ambient     = spotLightComponent->ambient;
-			vulkanRenderer->spotLights[spotLightCounter].diffuse     = spotLightComponent->diffuse;
-			vulkanRenderer->spotLights[spotLightCounter].specular    = spotLightComponent->specular;
-			vulkanRenderer->spotLights[spotLightCounter].constant    = spotLightComponent->constant;
-			vulkanRenderer->spotLights[spotLightCounter].linear      = spotLightComponent->linear;
-			vulkanRenderer->spotLights[spotLightCounter].quadratic   = spotLightComponent->quadratic;
+		spotLightArchetypesNumber = 0;
+		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
+			arch::Archetype* arch = arch::world.archetypes[n];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedSpotLigthArchetypes[spotLightArchetypesNumber] = arch;
+				++spotLightArchetypesNumber;
+			}
 		}
 
+		uint32_t spotLightCounter = 0;
+		for( uint32_t x = 0; x < spotLightArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedSpotLigthArchetypes[x];
+//				cm::transform*         directionalLightTransforms = nullptr;
+			cm::spotLight*  spotLights          = nullptr;
+//				cm::mesh*              directionalLightMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::spotLightComponentMask:
+//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
+				spotLights          = static_cast<arch::SpotLightArchetype*>( arch )->spotLights;
+//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
+				break;
+			}
+
+			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
+				if( spotLights ) {
+					vulkanRenderer->spotLights.Push({});
+					cm::spotLight* spotLightComponent = &spotLights[x1];
+					vulkanRenderer->spotLights[spotLightCounter].SpotLigthSpaceMatrix =
+						updateSpotLightSpaceMatrixShadowMapUBO( spotLightComponent );
+					vulkanRenderer->spotLights[spotLightCounter].position    = spotLightComponent->position;
+					vulkanRenderer->spotLights[spotLightCounter].direction   = spotLightComponent->direction;
+					vulkanRenderer->spotLights[spotLightCounter].cutOff      = spotLightComponent->cutOff;
+					vulkanRenderer->spotLights[spotLightCounter].outerCutOff = spotLightComponent->outerCutOff;
+					vulkanRenderer->spotLights[spotLightCounter].ambient     = spotLightComponent->ambient;
+					vulkanRenderer->spotLights[spotLightCounter].diffuse     = spotLightComponent->diffuse;
+					vulkanRenderer->spotLights[spotLightCounter].specular    = spotLightComponent->specular;
+					vulkanRenderer->spotLights[spotLightCounter].constant    = spotLightComponent->constant;
+					vulkanRenderer->spotLights[spotLightCounter].linear      = spotLightComponent->linear;
+					vulkanRenderer->spotLights[spotLightCounter].quadratic   = spotLightComponent->quadratic;
+				}
+			}
+		}
+		
 		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
 																						  cm::pointLight,
 																						  cm::mesh,
