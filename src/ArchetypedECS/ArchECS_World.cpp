@@ -1,6 +1,8 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 
 namespace GLVM::ecs::arch {
+	World world = {};
+	
 	void World::addEntityToArchetype(entity entity_, Archetype* arch) {
         id id_ = getId(entity_);
 

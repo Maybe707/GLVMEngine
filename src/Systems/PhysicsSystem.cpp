@@ -72,32 +72,35 @@ namespace GLVM::ecs
 		
 			float deltaTime = 5.5f * fDelta_Time_;
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
-				cm::transform& transformComponent = transformsView[i];
-				cm::move& move = movesView[i];
+				if( &transformsView[i] != nullptr && &colliderFlagsView[i] != nullptr &&
+					&movesView[i] != nullptr && &rigidBodiesView[i] != nullptr ) {
+					cm::transform& transformComponent = transformsView[i];
+					cm::move& move = movesView[i];
 //				cm::collider& collider = collidersView[i];
-				cm::colliderFlags& colliderFlags = colliderFlagsView[i];
-				uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-                if( colliderFlags.flags & isGroudCollisionMask ) {
-					move.gravity = 0;
-					transformComponent.gravityAccumulator = 0.0f;
-                }
-				uint8_t isWallCollisionMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-                if( colliderFlags.flags & isWallCollisionMask ) {
-					move.frameMovement = 0;
-					uint8_t wallCollisionTurnOffMask = (0u << 0) | (1u << 1) | (1u << 2) | (1u << 3);
-                    colliderFlags.flags &= wallCollisionTurnOffMask;
-                }
-				transformComponent.position += move.frameMovement;
-				transformComponent.position += move.gravity;
-				move.gravity       = 0.0f;
-				move.frameMovement = 0.0f;
+					cm::colliderFlags& colliderFlags = colliderFlagsView[i];
+					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+					if( colliderFlags.flags & isGroudCollisionMask ) {
+						move.gravity = 0;
+						transformComponent.gravityAccumulator = 0.0f;
+					}
+					uint8_t isWallCollisionMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+					if( colliderFlags.flags & isWallCollisionMask ) {
+						move.frameMovement = 0;
+						uint8_t wallCollisionTurnOffMask = (0u << 0) | (1u << 1) | (1u << 2) | (1u << 3);
+						colliderFlags.flags &= wallCollisionTurnOffMask;
+					}
+					transformComponent.position += move.frameMovement;
+					transformComponent.position += move.gravity;
+					move.gravity       = 0.0f;
+					move.frameMovement = 0.0f;
 //				componentManager->RemoveComponent<cm::move>(entityRefMove);
 
-				cm::rigidBody& rigidBody = rigidBodiesView[i];
-				if ( rigidBody.jumpAccumulator > 0.0f ) {
-					rigidBody.jumpAccumulator -= deltaTime;
-					vec3 jump = vec3{ 0.0f, 5.0f, 0.0f } * deltaTime;
-					transformComponent.position += jump;
+					cm::rigidBody& rigidBody = rigidBodiesView[i];
+					if ( rigidBody.jumpAccumulator > 0.0f ) {
+						rigidBody.jumpAccumulator -= deltaTime;
+						vec3 jump = vec3{ 0.0f, 5.0f, 0.0f } * deltaTime;
+						transformComponent.position += jump;
+					}
 				}
 			}
 		}

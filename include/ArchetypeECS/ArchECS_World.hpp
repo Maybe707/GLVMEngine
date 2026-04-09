@@ -14,7 +14,7 @@ namespace GLVM::ecs::arch {
 		void removeEntity(entity entity_);
 	};
 
-	static World world;
+	extern World world;
 }; // namespace GLVM::ecs::arch
 
 

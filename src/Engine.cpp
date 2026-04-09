@@ -152,6 +152,8 @@ namespace GLVM::core
 	}
 	
 	void Engine::RenderVulkan() {
+		namespace arch = GLVM::ecs::arch;
+		std::cout << "INNER CALL ARCHETYPES NUMBER: " << arch::world.archetypes.GetSize() << std::endl;
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 		bool bGame_Loop_Active = true;
 
@@ -166,7 +168,7 @@ namespace GLVM::core
 
 		inventorySystem->isItemDraged     = &dragedItemEntity;
 		itemSystem->dragedItemEntity      = &dragedItemEntity;
-		
+
 		vulkanRenderer = new CVulkanRenderer();
 		vulkanRenderer->initializeTextureData_ = textureVector;
 		vulkanRenderer->pathsArray_            = pathsArray_;
@@ -190,7 +192,47 @@ namespace GLVM::core
 		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
 																							cm::material,
 																							cm::mesh>();
-		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
+//		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
+
+
+		uint32_t actorsNumber = 0;
+		animationActorsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedAnimationActorsArchetypes[animationActorsArchetypesNumber] = arch;
+				actorsNumber += cachedAnimationActorsArchetypes[animationActorsArchetypesNumber]->entityCount;
+				++animationActorsArchetypesNumber;
+				std::cout << "FOUND ANIMATED ACTOR" << std::endl;
+			}
+		}
+
+		staticActorsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
+				(1ul << arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedStaticActorsArchetypes[staticActorsArchetypesNumber] = arch;
+				actorsNumber += cachedStaticActorsArchetypes[staticActorsArchetypesNumber]->entityCount;
+				++staticActorsArchetypesNumber;
+				std::cout << "FOUND STATIC ACTOR" << std::endl;
+			}
+		}
+
+		vulkanRenderer->actorsNumber = actorsNumber;
+		std::cout << "ACTORS NUMBER: " << vulkanRenderer->actorsNumber << std::endl;
+		
 		loadWavefrontObj();
 		initializeGLTF();
 		initializeFontData();
@@ -316,13 +358,14 @@ namespace GLVM::core
 	void Engine::EnlargeFrameAccumulator(float value) {
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
+		animationArchetypesNumber = 0;
 		for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
 			arch::Archetype* arch = arch::world.archetypes[m];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MESH_COMPONENT) |
 				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT);
 
 			if( arch::matchesRequiredMask( arch->mask, requiredMask ) ) {
-				cachedAnimationArchetypes[m] = arch;
+				cachedAnimationArchetypes[animationArchetypesNumber] = arch;
 				++animationArchetypesNumber;
 			}
 		}
@@ -331,17 +374,25 @@ namespace GLVM::core
 			arch::Archetype* arch = cachedAnimationArchetypes[n];
 			cm::animation* animationView  = nullptr;
 			cm::mesh*      meshView       = nullptr;
-			switch( arch->mask ) {
-			case arch::enemyComponentMask:
-				animationView   = static_cast<arch::EnemyArchetype*>( arch )->animations;
-				meshView        = static_cast<arch::EnemyArchetype*>( arch )->meshes;
-				break;
-			}
+			if( arch != nullptr ) {
+				switch( arch->mask ) {
+				case arch::enemyComponentMask:
+					animationView   = static_cast<arch::EnemyArchetype*>( arch )->animations;
+					meshView        = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+					break;
+				case arch::playerComponentMask:
+					animationView   = static_cast<arch::PlayerArchetype*>( arch )->animations;
+					meshView        = static_cast<arch::PlayerArchetype*>( arch )->meshes;
+					break;
+				}
 		
-			for(unsigned int i = 0; i < cachedAnimationArchetypes[n]->entityCount; ++i) {
-				unsigned int mesh_id                = meshView[i].handle.id;
-				if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[mesh_id].GetSize() > 0 )
-					animationView[i].frameAccumulator += value;
+				for(unsigned int i = 0; i < cachedAnimationArchetypes[n]->entityCount; ++i) {
+					if( &meshView[i] != nullptr && &animationView[i] != nullptr ) {
+						unsigned int mesh_id = meshView[i].handle.id;
+						if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+							animationView[i].frameAccumulator += value;
+					}
+				}
 			}
 		}
 	}
@@ -351,6 +402,7 @@ namespace GLVM::core
 		namespace cm = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 
+		playerArchetypesNumber = 0;
 		for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
 			arch::Archetype* arch = arch::world.archetypes[m];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
@@ -365,102 +417,108 @@ namespace GLVM::core
 
 		for( uint32_t n = 0; n < playerArchetypesNumber; ++n ) {
 			arch::Archetype* arch = cachedPlayerArchetypes[n];
-			cm::beholder* cameraComponent   = nullptr;
-			cm::transform* _Player          = nullptr;
+			cm::beholder*  views      = nullptr;
+			cm::transform* transfroms = nullptr;
 			switch( arch->mask ) {
 			case arch::playerComponentMask:
-				cameraComponent   = static_cast<arch::PlayerArchetype*>( arch )->beholders;
-				_Player           = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				views      = static_cast<arch::PlayerArchetype*>( arch )->beholders;
+				transfroms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
 				break;
 			}
 
-			Matrix<float, 4> viewMatrix_(1.0f);
-			const float kSensitivity = 0.1f;
+			for( uint32_t x = 0; x < arch->entityCount; ++x ) {
+				cm::beholder* cameraComponent   = &views[x];
+				cm::transform* _Player          = &transfroms[x];
 
+				if( cameraComponent != nullptr && _Player != nullptr ) {
+					Matrix<float, 4> viewMatrix_(1.0f);
+					const float kSensitivity = 0.1f;
 
-			// if ( hud_screen_x > 1.0f )
-			// 	hud_screen_x = 1.0f;
-			// else if ( hud_screen_x < -1.0f )
-			// 	hud_screen_x = -1.0f;
+					// if ( hud_screen_x > 1.0f )
+					// 	hud_screen_x = 1.0f;
+					// else if ( hud_screen_x < -1.0f )
+					// 	hud_screen_x = -1.0f;
 		
-			// if ( hud_screen_y > 1.0f )
-			// 	hud_screen_y = 1.0f;
-			// else if ( hud_screen_y < -1.0f )
-			// 	hud_screen_y = -1.0f;
+					// if ( hud_screen_y > 1.0f )
+					// 	hud_screen_y = 1.0f;
+					// else if ( hud_screen_y < -1.0f )
+					// 	hud_screen_y = -1.0f;
 		
-			fYaw = g_eEvent.mousePointerPosition.offset_X;
-			fPitch = g_eEvent.mousePointerPosition.offset_Y;
-			fYaw *= kSensitivity;
-			fPitch *= kSensitivity;
+					fYaw = g_eEvent.mousePointerPosition.offset_X;
+					fPitch = g_eEvent.mousePointerPosition.offset_Y;
+					fYaw *= kSensitivity;
+					fPitch *= kSensitivity;
 
-			g_eEvent.mousePointerPosition.pitch = fPitch;
-			g_eEvent.mousePointerPosition.yaw = fYaw;
+					g_eEvent.mousePointerPosition.pitch = fPitch;
+					g_eEvent.mousePointerPosition.yaw = fYaw;
 
-			vulkanRenderer->current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-			vulkanRenderer->current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-			float delta_x = 0.0f;
-			float delta_y = 0.0f;
+					vulkanRenderer->current_X = (float)g_eEvent.mousePointerPosition.offset_X;
+					vulkanRenderer->current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+					float delta_x = 0.0f;
+					float delta_y = 0.0f;
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-			delta_x = vulkanRenderer->current_X;
-			delta_y = vulkanRenderer->current_Y;
+					delta_x = vulkanRenderer->current_X;
+					delta_y = vulkanRenderer->current_Y;
 #else
-			delta_x = current_X - prev_X;
-			delta_y = current_Y - prev_Y;
-			delta_y *= -1.0f;
+					delta_x = current_X - prev_X;
+					delta_y = current_Y - prev_Y;
+					delta_y *= -1.0f;
 #endif
-			// delta_x *= kSensitivity;
-			// delta_y *= kSensitivity;
+					// delta_x *= kSensitivity;
+					// delta_y *= kSensitivity;
 		
-			const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, 1.0f, 0.0) );
-			const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
-			/*
-			 * 1. The mouse direction determines the "intended direction of rotation" for the object.
-			 * 2. The camera is "looking forward."
-			 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
-			 */
-			const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
+					const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, 1.0f, 0.0) );
+					const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
+					/*
+					 * 1. The mouse direction determines the "intended direction of rotation" for the object.
+					 * 2. The camera is "looking forward."
+					 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
+					 */
+					const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
 
-			if ( VecLength(rotateAxis) >= 0.001f ) {
-				/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
-				float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
-				constexpr float angleScale = 0.1f;                                                                                     
-				rotationAngle = Radians(rotationAngle * angleScale);
-				constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-				[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-				// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-				// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-				// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-				// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
-				// // 													conjugate(rotationQuat));
+					if ( VecLength(rotateAxis) >= 0.001f ) {
+						/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
+						float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
+						constexpr float angleScale = 0.1f;                                                                                     
+						rotationAngle = Radians(rotationAngle * angleScale);
+						constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
+						[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+						// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+						// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+						// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+						// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
+						// // 													conjugate(rotationQuat));
 
-				// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
-				// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
+						// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
+						// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
 
 			
-				// forward[0] = appliedRotationQuat.x;
-				// forward[1] = appliedRotationQuat.y;
-				// forward[2] = appliedRotationQuat.z;
-				pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
-						.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->forward[0],
-						.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
-				vulkanRenderer->forward[0] = appliedRotationPoint.x;
-				vulkanRenderer->forward[1] = appliedRotationPoint.y;
-				vulkanRenderer->forward[2] = appliedRotationPoint.z;
-			}
-			cameraComponent->forward = Normalize(vulkanRenderer->forward);
-			_Player->forward = cameraComponent->forward;
-			mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
-									cameraComponent->Position + _Player->position + cameraComponent->forward,
-									vec3( 0.0f, 1.0f, 0.0) );
-			for ( unsigned int i = 0; i < 4; ++i )
-				for ( unsigned int j = 0; j < 4; ++j )
-					viewMatrix_[i][j] = view[i][j];
+						// forward[0] = appliedRotationQuat.x;
+						// forward[1] = appliedRotationQuat.y;
+						// forward[2] = appliedRotationQuat.z;
+						pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
+								.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->forward[0],
+								.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
+						vulkanRenderer->forward[0] = appliedRotationPoint.x;
+						vulkanRenderer->forward[1] = appliedRotationPoint.y;
+						vulkanRenderer->forward[2] = appliedRotationPoint.z;
+					}
+					cameraComponent->forward = Normalize(vulkanRenderer->forward);
+					_Player->forward = cameraComponent->forward;
+					mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
+											cameraComponent->Position + _Player->position + cameraComponent->forward,
+											vec3( 0.0f, 1.0f, 0.0) );
+					for ( unsigned int i = 0; i < 4; ++i )
+						for ( unsigned int j = 0; j < 4; ++j )
+							viewMatrix_[i][j] = view[i][j];
 		
-			if ( !vulkanRenderer->isInventoryOpened )
-				vulkanRenderer->viewMatrix = viewMatrix_;
+					if ( !vulkanRenderer->isInventoryOpened )
+						vulkanRenderer->viewMatrix = viewMatrix_;
 
-			vulkanRenderer->prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-			vulkanRenderer->prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
+					vulkanRenderer->prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+					vulkanRenderer->prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
+				}
+			}
 		}
     }
 	
@@ -958,6 +1016,7 @@ namespace GLVM::core
 		}
 		
 		vulkanRenderer->actors.clear();
+		animationActorsArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
 			arch::Archetype* arch = arch::world.archetypes[i];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
@@ -1008,18 +1067,22 @@ namespace GLVM::core
 				cm::material*  materialComponent  = &actorMaterials[n];
 				cm::animation* animationComponent = &actorAnimations[n];
 				cm::rotation*  rotationComponent  = &actorRotations[n];
-				unsigned int meshID               = actorMeshes[n].handle.id;
-				vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-				vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
-				vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
-				vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-				vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-				vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
-				vulkanRenderer->actors[animationActorsCounter].shininess = materialComponent->shininess;
-				++animationActorsCounter;
+				if( actorTransforms && actorMaterials &&
+					actorAnimations && actorRotations ) {
+					unsigned int meshID               = actorMeshes[n].handle.id;
+					vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
+					vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
+					vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+					vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+					vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
+					vulkanRenderer->actors[animationActorsCounter].shininess = materialComponent->shininess;
+					++animationActorsCounter;
+				}
 			}
 		}
 
+		staticActorsArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
 			arch::Archetype* arch = arch::world.archetypes[i];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
@@ -1034,7 +1097,7 @@ namespace GLVM::core
 			}
 		}
 
-		uint32_t staticActorsCounter = 0;
+		uint32_t staticActorsCounter = animationActorsCounter;
 		for( uint32_t x = 0; x < staticActorsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedStaticActorsArchetypes[x];
 			cm::transform* actorTransforms = nullptr;
@@ -1062,27 +1125,55 @@ namespace GLVM::core
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorMaterials[n];
 				cm::rotation*  rotationComponent  = &actorRotations[n];
-				unsigned int meshID               = actorMeshes[n].handle.id;
-				vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-				vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
-				vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
-				vulkanRenderer->actors[staticActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-				vulkanRenderer->actors[staticActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-				vulkanRenderer->actors[staticActorsCounter].ambient   = materialComponent->ambient;
-				vulkanRenderer->actors[staticActorsCounter].shininess = materialComponent->shininess;
-				++staticActorsCounter;
+				if( actorTransforms && actorMaterials &&
+					actorRotations && actorMeshes ) {
+					unsigned int meshID               = actorMeshes[n].handle.id;
+					vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
+					vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
+					vulkanRenderer->actors[staticActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+					vulkanRenderer->actors[staticActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+					vulkanRenderer->actors[staticActorsCounter].ambient   = materialComponent->ambient;
+					vulkanRenderer->actors[staticActorsCounter].shininess = materialComponent->shininess;
+					++staticActorsCounter;
+				}
 			}
 		}
 
-		
-		core::vector<Entity> playerEntities = componentManager->collectLinkedEntities<cm::beholder, cm::transform>();
+
+
+
 		vulkanRenderer->players.clear();
-		for( unsigned int i = 0; i < playerEntities.GetSize(); ++i ) {
-			unsigned int entityID = playerEntities[i];
-			vulkanRenderer->players.Push({});
-			cm::transform* playerTransformComponent = componentManager->GetComponent<cm::transform>(entityID);
-			vulkanRenderer->players[i].position = playerTransformComponent->position;
-			vulkanRenderer->players[i].forward  = playerTransformComponent->forward;
+		playerArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedPlayerArchetypes[playerArchetypesNumber] = arch;
+				++playerArchetypesNumber;
+			}
+		}
+
+		uint32_t playerEntityCount = 0;
+		for( uint32_t x = 0; x < staticActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedPlayerArchetypes[x];
+			cm::transform* playerTransforms = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				playerTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				break;
+			}
+
+			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->players.Push({});
+				cm::transform* playerTransformComponent = &playerTransforms[n];
+				if( &playerTransforms[n] != nullptr ) {
+					vulkanRenderer->players[playerEntityCount].position = playerTransformComponent->position;
+					vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
+				}
+			}
 		}
 	}
 

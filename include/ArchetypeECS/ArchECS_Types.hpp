@@ -59,6 +59,9 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 		(1ull << ComponentsIndices::MOVE_COMPONENT) |
 		(1ull << ComponentsIndices::ATTACK_COMPONENT) |
+		(1ull << ComponentsIndices::ANIMATION_COMPONENT) |
+		(1ull << ComponentsIndices::FONT_COMPONENT) |
+		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
 		(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
 
 	constexpr componentMask enemyComponentMask =
@@ -74,6 +77,7 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::HEALTH_COMPONENT) |
 		(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
 		(1ull << ComponentsIndices::ATTACK_COMPONENT) |
+		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
 		(1ull << ComponentsIndices::MOVE_COMPONENT);
 
 	constexpr componentMask staticMeshComponentMask =
@@ -82,7 +86,9 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 		(1ull << ComponentsIndices::MESH_COMPONENT) |
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-		(1ull << ComponentsIndices::FONT_COMPONENT);
+		(1ull << ComponentsIndices::FONT_COMPONENT) |
+		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
+		(1ull << ComponentsIndices::STATIC_MESH_TAG_COMPONENT);
 
 	constexpr componentMask crosshairComponentMask =
 		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |

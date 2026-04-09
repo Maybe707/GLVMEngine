@@ -163,7 +163,7 @@ namespace GLVM::core
 		pipelineBuilder();
 		renderPassesBuilder();
 		for( int i = 0; i < 20; ++i ) {
-			std::cout << "descriptor offset: " << descriptorBindingsConfig[i].globalDescriptorOffset << std::endl;
+//			std::cout << "descriptor offset: " << descriptorBindingsConfig[i].globalDescriptorOffset << std::endl;
 		}
 
 		renderThreadPool = new ThreadPool(3);
@@ -779,7 +779,7 @@ namespace GLVM::core
 			renderPassInfo.pSubpasses = &subpass;
 			renderPassInfo.dependencyCount = renderPassConfigs[j].actualSubpassDependencyNumber;
 			renderPassInfo.pDependencies = renderPassConfigs[j].subpassDependencies;
-			std::cout << "PIPELINE NUMBER: " << j << std::endl;
+//			std::cout << "PIPELINE NUMBER: " << j << std::endl;
 			if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPasses[j]) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create render pass!");
 			}
@@ -791,12 +791,12 @@ namespace GLVM::core
 		for ( int descriptorSetCounter = 0; descriptorSetCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetCounter ) {
 			DescriptorSet& descriptorSet = descriptorSetsConfig[descriptorSetCounter];
 			std::vector<VkDescriptorSetLayoutBinding> bindings;
-			std::cout << "NEXT DS" << std::endl;
-			std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
+//			std::cout << "NEXT DS" << std::endl;
+//			std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
 			for ( u32 j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
 				u32 currentDescriptorBindingID = descriptorSet.descriptorsBindingsIDs[j];
 //			u32 currentDescriptorBindingID = j;
-				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
+//				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
 				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 				modelMatrixUboLayout.binding = descriptorBindingsConfig[currentDescriptorBindingID].binding;
 				modelMatrixUboLayout.descriptorCount = descriptorBindingsConfig[currentDescriptorBindingID].shaderDescriptorsNumber;
@@ -812,7 +812,7 @@ namespace GLVM::core
 			layoutInfo.flags = 0;
 			layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 			layoutInfo.pBindings = bindings.data();
-			std::cout << "NUMBER OF BINDINGS: " << static_cast<uint32_t>(bindings.size()) << std::endl;
+//			std::cout << "NUMBER OF BINDINGS: " << static_cast<uint32_t>(bindings.size()) << std::endl;
 			if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSet.setLayout) != VK_SUCCESS) {
 				throw std::runtime_error("failed to create descriptor set layout!");
 			}
@@ -925,7 +925,7 @@ namespace GLVM::core
 			unsigned int descriptorLayoutsNumber = pipeline.actualLinkedDescriptorSetsNumber;
 			core::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 			for ( unsigned i = 0; i < descriptorLayoutsNumber; ++i ) {
-				std::cout << "ds inside pipeline: " << pipeline.linkedDescriptorSetIDs[i] << std::endl;
+//				std::cout << "ds inside pipeline: " << pipeline.linkedDescriptorSetIDs[i] << std::endl;
 				descriptorSetLayouts.Push( descriptorSetsConfig[pipeline.linkedDescriptorSetIDs[i]].setLayout );
 			}
 		

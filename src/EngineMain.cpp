@@ -121,7 +121,7 @@ int main()
 		arch::world.archetypes.Push( pointLightArch );
 		arch::world.archetypes.Push( spotLightArch );
 	}
-	
+
 	/// Loading method with stb_image
 	// [[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromFile("../textures/chelik.h");
 	// [[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromFile("../textures/witch.h");
@@ -310,6 +310,7 @@ int main()
 	
     ///< Game rendering loop
 //	Glvm->GameLoop(GLVM::core::OPENGL_RENDERER);
+	std::cout << "ARCHETYPES NUMBER: " << arch::world.archetypes.GetSize() << std::endl;
 	GLVM->GameLoop();
 
 	GLVM->GameKill();

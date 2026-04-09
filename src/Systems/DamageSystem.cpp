@@ -49,23 +49,25 @@ namespace GLVM::ecs
 
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 //				unsigned int entity = linkedEntities[i];
-				cm::health& healthComponent = healthView[i];
-				cm::attack& attackComponent = attackView[i];
+				if( &healthView[i] != nullptr && &attackView[i] != nullptr ) {
+					cm::health& healthComponent = healthView[i];
+					cm::attack& attackComponent = attackView[i];
 				
-				healthComponent.currentHealth -= attackComponent.damage;
-				std::cout << "current health: " << healthComponent.currentHealth << std::endl;
+					healthComponent.currentHealth -= attackComponent.damage;
+//					std::cout << "current health: " << healthComponent.currentHealth << std::endl;
 //				componentManager->RemoveComponent<cm::attack>(entity);
-				if ( healthComponent.currentHealth <= 0 ) {
+					if ( healthComponent.currentHealth <= 0 ) {
 //					std::cout << "remove entity: " << entity << std::endl;
 //					entityManager->RemoveEntity(entity, componentManager);
-				}
+					}
 
-				cm::font& fontComponent = fontView[i];
-				fontComponent.font_string.clear();
-				fontComponent.font_string.Push('4');
-				fontComponent.font_string.Push('0');
-				fontComponent.lifeTime = 0;
-				fontComponent.removeble = true;
+					cm::font& fontComponent = fontView[i];
+					fontComponent.font_string.clear();
+					fontComponent.font_string.Push('4');
+					fontComponent.font_string.Push('0');
+					fontComponent.lifeTime = 0;
+					fontComponent.removeble = true;
+				}
 			}
 		}
 
@@ -89,13 +91,15 @@ namespace GLVM::ecs
 			}
 
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
-				cm::font& fontComponent = fontView[i];
-				if ( fontComponent.removeble )
-					fontComponent.lifeTime += deltaTime;
+				if( fontView ) {
+					cm::font& fontComponent = fontView[i];
+					if ( fontComponent.removeble )
+						fontComponent.lifeTime += deltaTime;
 //			std::cout << "lifeTime" << fontComponent->lifeTime << std::endl;
-				if ( fontComponent.lifeTime >= 1.5 ) {
+					if ( fontComponent.lifeTime >= 1.5 ) {
 //				std::cout << "lifetime: " << fontComponent->lifeTime << std::endl;
 //					componentManager->RemoveComponent<cm::font>(entity);
+					}
 				}
 			}
 		}

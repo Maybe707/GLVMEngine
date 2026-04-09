@@ -130,6 +130,7 @@ namespace GLVM::ecs
 		namespace arch = GLVM::ecs::arch;
 
 //		arch::EntityLocation collidedEntityLocation = arch::world.archetypes
+		cachedArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
 			arch::Archetype* arch = arch::world.archetypes[i];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
@@ -173,118 +174,127 @@ namespace GLVM::ecs
 			
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
 				uint8_t groudCollisionTurnOffMask = (1u << 0) | (0u << 1) | (1u << 2) | (1u << 3);
-				backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags & groudCollisionTurnOffMask;
-				backtrackingColliders[i].colliders.clear();
-				components::mesh backtrackinEntityMesh = backtrackingMeshes[i];
-				components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
-				float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
+				if( backtrackingColliderFlags && backtrackingColliders &&
+					backtrackingMeshes && backtrackingTransforms ) {
 				
-				components::transform backtrackingTransformComponent = backtrackingTransforms[i];
-				vec3 backtrackingTransform = backtrackingTransformComponent.position;
-				float backtrackingScale = backtrackingTransformComponent.scale;
+					backtrackingColliderFlags[i].flags = backtrackingColliderFlags[i].flags & groudCollisionTurnOffMask;
+					backtrackingColliders[i].colliders.clear();
+					components::mesh backtrackinEntityMesh = backtrackingMeshes[i];
+					components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
+					float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
+				
+					components::transform backtrackingTransformComponent = backtrackingTransforms[i];
+					vec3 backtrackingTransform = backtrackingTransformComponent.position;
+					float backtrackingScale = backtrackingTransformComponent.scale;
 
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-				if ( (arch->mask & requiredMask) == requiredMask  ) {
-					components::move* backtrackingMove = nullptr;
-					switch( arch->mask ) {
-					case arch::playerComponentMask:
-						backtrackingMove = static_cast<arch::PlayerArchetype*>( arch )->moves;
-						break;
-					case arch::enemyComponentMask:
-						backtrackingMove = static_cast<arch::EnemyArchetype*>( arch )->moves;
-						break;
-					}
+					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+					if ( (arch->mask & requiredMask) == requiredMask  ) {
+						components::move* backtrackingMove = nullptr;
+						switch( arch->mask ) {
+						case arch::playerComponentMask:
+							backtrackingMove = static_cast<arch::PlayerArchetype*>( arch )->moves;
+							break;
+						case arch::enemyComponentMask:
+							backtrackingMove = static_cast<arch::EnemyArchetype*>( arch )->moves;
+							break;
+						}
 					
-					backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
-					backtrackingTransform += backtrackingMove->gravity;
-				}
-
-				for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
-					arch::Archetype* comparedArch = cachedArchetypes[i1];
-					components::transform* comparedTransforms = nullptr;
-					components::mesh*      comparedMeshes     = nullptr;
-					switch( arch->mask ) {
-					case arch::playerComponentMask:
-						comparedTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-						comparedMeshes = static_cast<arch::PlayerArchetype*>( arch )->meshes;
-						break;
-					case arch::enemyComponentMask:
-						comparedTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-						comparedMeshes = static_cast<arch::EnemyArchetype*>( arch )->meshes;
-						break;
-					case arch::staticMeshComponentMask:
-						comparedTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
-						comparedMeshes = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
-						break;
+						backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
+						backtrackingTransform += backtrackingMove->gravity;
 					}
 
-					for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
-						if ( i == j )
+					for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
+						if ( i == i1 )
 							continue;
-				
-						components::mesh comparedEntityMesh = comparedMeshes[j];
-						components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
-						float comparedGltfFlag  = comparedEntityMesh.gltf;
+
+						arch::Archetype* comparedArch = cachedArchetypes[i1];
+						components::transform* comparedTransforms = nullptr;
+						components::mesh*      comparedMeshes     = nullptr;
+						switch( comparedArch->mask ) {
+						case arch::playerComponentMask:
+							comparedTransforms = static_cast<arch::PlayerArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::PlayerArchetype*>( comparedArch )->meshes;
+							break;
+						case arch::enemyComponentMask:
+							comparedTransforms = static_cast<arch::EnemyArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::EnemyArchetype*>( comparedArch )->meshes;
+							break;
+						case arch::staticMeshComponentMask:
+							comparedTransforms = static_cast<arch::StaticMeshArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::StaticMeshArchetype*>( comparedArch )->meshes;
+							break;
+						}
+
+						for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
+							if( comparedMeshes && comparedTransforms ) {
+							
+								components::mesh comparedEntityMesh = comparedMeshes[j];
+								components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
+								float comparedGltfFlag  = comparedEntityMesh.gltf;
 						
-						components::transform comparedTransformComponent = comparedTransforms[j];
-						vec3  comparedTransform = comparedTransformComponent.position;
-						float comparedScale     = comparedTransformComponent.scale;
+								components::transform comparedTransformComponent = comparedTransforms[j];
+								vec3  comparedTransform = comparedTransformComponent.position;
+								float comparedScale     = comparedTransformComponent.scale;
 
-						arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-						if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
-							components::move* comparedMove = nullptr;
-							switch( arch->mask ) {
-							case arch::playerComponentMask:
-								comparedMove = static_cast<arch::PlayerArchetype*>( comparedArch )->moves;
-								break;
-							case arch::enemyComponentMask:
-								comparedMove = static_cast<arch::EnemyArchetype*>( comparedArch )->moves;
-								break;
-							}
-					
-							comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
-							comparedTransform += comparedMove->gravity;
-						}
+								arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+								if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
+									components::move* comparedMove = nullptr;
+									switch( arch->mask ) {
+									case arch::playerComponentMask:
+										comparedMove = static_cast<arch::PlayerArchetype*>( comparedArch )->moves;
+										break;
+									case arch::enemyComponentMask:
+										comparedMove = static_cast<arch::EnemyArchetype*>( comparedArch )->moves;
+										break;
+									}
 
-						if ( !backtrackingGltfFlag ) {
-							backtrackingScale /= 2;
-						}
+									if( comparedMove ) {
+										comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
+										comparedTransform += comparedMove->gravity;
+									}
+								}
 
-						if ( !comparedGltfFlag ) {
-							comparedScale /= 2;
-						}
+								if ( !backtrackingGltfFlag ) {
+									backtrackingScale /= 2;
+								}
+
+								if ( !comparedGltfFlag ) {
+									comparedScale /= 2;
+								}
 				
-						bool boxColliderFlag = false;
-						bool upperActorCheckFlag = false;
-						boxColliderFlag = BoxCollider(backtrackingTransform,
-													  comparedTransform,
-													  backtrackingScale,
-													  comparedScale,
-													  backtrackingEntityMeshHandle,
-													  comparedEntityMeshHandle);
-						if ( boxColliderFlag ) {
-							upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
-																  comparedTransform,
-																  backtrackingScale,
-																  comparedScale,
-																  backtrackingEntityMeshHandle,
-																  comparedEntityMeshHandle);
-						}
+								bool boxColliderFlag = false;
+								bool upperActorCheckFlag = false;
+								boxColliderFlag = BoxCollider(backtrackingTransform,
+															  comparedTransform,
+															  backtrackingScale,
+															  comparedScale,
+															  backtrackingEntityMeshHandle,
+															  comparedEntityMeshHandle);
+								if ( boxColliderFlag ) {
+									upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
+																		  comparedTransform,
+																		  backtrackingScale,
+																		  comparedScale,
+																		  backtrackingEntityMeshHandle,
+																		  comparedEntityMeshHandle);
+								}
 				
-						if(upperActorCheckFlag && boxColliderFlag) {
-							uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-							backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | groudCollisionTurnOffMask;
-							backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
+								if(upperActorCheckFlag && boxColliderFlag) {
+									uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | groudCollisionTurnOffMask;
+									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
 							
-							continue;
-						}
+									continue;
+								}
                     
-						if(boxColliderFlag) {
-							uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-							backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
-							backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
+								if(boxColliderFlag) {
+									uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
+									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
 							
-							continue;
+									continue;
+								}
+							}
 						}
 					}
 				}
