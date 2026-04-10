@@ -71,7 +71,8 @@ namespace GLVM::ecs
                     break;
                 case core::EEvents::eJUMP:
 				{
-					if ( playerArch->colliderFlags[i].flags & 1 ) {
+					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+					if ( playerArch->colliderFlags[i].flags & isGroudCollisionMask ) {
 						playerArch->rigidBodies[i].jumpAccumulator = 1.5f;
 					}
 				}
