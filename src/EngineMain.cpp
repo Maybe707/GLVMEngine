@@ -150,7 +150,7 @@ int main()
 	const uint32_t playerIndex = playerLocation.index;
 
 	playerArch->transforms[playerIndex]  = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f };
-	playerArch->rigidBodies[playerIndex] = { .fMass_ = 0.0f };
+	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = monkeyHandle_OBJ, .gltf = true };
@@ -162,7 +162,7 @@ int main()
 	std::mt19937 mersenne(rd());
     std::uniform_int_distribution<int> dist(0, 3);
 	
-	for ( u32 i = 0; i < 80; ++i ) {
+	for ( u32 i = 0; i < 0; ++i ) {
 	arch::entity enemy = archEntityManager->createEntity();
 	arch::world.addEntityToArchetype( enemy, arch::world.archetypes[2] );
 	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];

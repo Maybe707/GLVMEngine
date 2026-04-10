@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/CollisionSystem.hpp"
+#include "Archetypes/LevelChunkArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -170,9 +171,17 @@ namespace GLVM::ecs
 				backtrackingColliderFlags = static_cast<arch::StaticMeshArchetype*>( arch )->colliderFlags;
 				backtrackingMeshes = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
 				break;
+			case arch::levelChunkComponentMask:
+				backtrackingTransforms = static_cast<arch::LevelChunkArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::LevelChunkArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::LevelChunkArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::LevelChunkArchetype*>( arch )->meshes;
+				break;
 			}
 			
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
+				[[maybe_unused]] uint32_t backtrackingEntityID = arch->entities[i];
+				
 				uint8_t groudCollisionTurnOffMask = (1u << 0) | (0u << 1) | (1u << 2) | (1u << 3);
 				if( backtrackingColliderFlags && backtrackingColliders &&
 					backtrackingMeshes && backtrackingTransforms ) {
@@ -204,8 +213,8 @@ namespace GLVM::ecs
 					}
 
 					for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
-						if ( i == i1 )
-							continue;
+						// if ( i == i1 )
+						// 	continue;
 
 						arch::Archetype* comparedArch = cachedArchetypes[i1];
 						components::transform* comparedTransforms = nullptr;
@@ -223,9 +232,18 @@ namespace GLVM::ecs
 							comparedTransforms = static_cast<arch::StaticMeshArchetype*>( comparedArch )->transforms;
 							comparedMeshes = static_cast<arch::StaticMeshArchetype*>( comparedArch )->meshes;
 							break;
+						case arch::levelChunkComponentMask:
+							comparedTransforms = static_cast<arch::LevelChunkArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::LevelChunkArchetype*>( comparedArch )->meshes;
+							break;
 						}
 
 						for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
+							[[maybe_unused]] uint32_t comparedEntityID = comparedArch->entities[j];
+							if( backtrackingEntityID == comparedEntityID ) {
+								continue;
+							}
+							
 							if( comparedMeshes && comparedTransforms ) {
 							
 								components::mesh comparedEntityMesh = comparedMeshes[j];
@@ -239,7 +257,7 @@ namespace GLVM::ecs
 								arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 								if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
 									components::move* comparedMove = nullptr;
-									switch( arch->mask ) {
+									switch( comparedArch->mask ) {
 									case arch::playerComponentMask:
 										comparedMove = static_cast<arch::PlayerArchetype*>( comparedArch )->moves;
 										break;
@@ -270,6 +288,20 @@ namespace GLVM::ecs
 															  comparedScale,
 															  backtrackingEntityMeshHandle,
 															  comparedEntityMeshHandle);
+
+//								std::cout << "BOX COLLIDER FALSE: " << boxColliderFlag << std::endl;
+								if( boxColliderFlag ) {
+									std::cout << "BOX COLLIDER TRUE: " << boxColliderFlag << std::endl;
+									std::cout << "back transform: " << " x: " << backtrackingTransform[0] <<
+										" y: " << backtrackingTransform[1] << " z: " << backtrackingTransform[2] << std::endl;
+									std::cout << "comp transform: " << " x: " << comparedTransform[0] <<
+										" y: " << comparedTransform[1] << " z: " << comparedTransform[2] << std::endl;
+									std::cout << "back scale: " << backtrackingScale << std::endl;
+									std::cout << "comp scale: " << comparedScale << std::endl;
+									std::cout << "back mesh handle id: " << backtrackingEntityMeshHandle.id << std::endl;
+									std::cout << "comp mesh hadnle id: " << comparedEntityMeshHandle.id << std::endl;
+									
+								}
 								if ( boxColliderFlag ) {
 									upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
 																		  comparedTransform,
