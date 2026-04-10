@@ -289,19 +289,6 @@ namespace GLVM::ecs
 															  backtrackingEntityMeshHandle,
 															  comparedEntityMeshHandle);
 
-//								std::cout << "BOX COLLIDER FALSE: " << boxColliderFlag << std::endl;
-								if( boxColliderFlag ) {
-									std::cout << "BOX COLLIDER TRUE: " << boxColliderFlag << std::endl;
-									std::cout << "back transform: " << " x: " << backtrackingTransform[0] <<
-										" y: " << backtrackingTransform[1] << " z: " << backtrackingTransform[2] << std::endl;
-									std::cout << "comp transform: " << " x: " << comparedTransform[0] <<
-										" y: " << comparedTransform[1] << " z: " << comparedTransform[2] << std::endl;
-									std::cout << "back scale: " << backtrackingScale << std::endl;
-									std::cout << "comp scale: " << comparedScale << std::endl;
-									std::cout << "back mesh handle id: " << backtrackingEntityMeshHandle.id << std::endl;
-									std::cout << "comp mesh hadnle id: " << comparedEntityMeshHandle.id << std::endl;
-									
-								}
 								if ( boxColliderFlag ) {
 									upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
 																		  comparedTransform,

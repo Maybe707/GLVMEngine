@@ -1021,6 +1021,7 @@ namespace GLVM::core
 
 		if ( vulkanRenderer->isInventoryOpened ) {
 			vulkanRenderer->inventories.clear();
+			inventoryArchetypesNumber = 0;
 			for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
 				arch::Archetype* arch = arch::world.archetypes[n];
 				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::INVENTORY_COMPONENT) |
@@ -1049,87 +1050,90 @@ namespace GLVM::core
 					break;
 				}
 
-				for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
-					vulkanRenderer->inventories.Push({});
-					cm::inventory* inventoryComponent = &inventory[i];
-					unsigned int inventoryTextureID   = inventoryMaterials[i].diffuseTextureID_.id;
-					unsigned int meshID           = inventoryComponent->slotMeshID.id;
-					vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
-					vulkanRenderer->inventories[i].meshID             = meshID;
-					vulkanRenderer->inventories[i].row                = inventoryComponent->row;
-					vulkanRenderer->inventories[i].col                = inventoryComponent->col;
-					vulkanRenderer->inventories[i].slotData.clear();
-					for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
-						for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
-							cm::transform* slotTransformComponent     = &inventoryTransforms[i];
-							vulkanRenderer->inventories[i].slotData.Push({});
-							vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
-								updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent, &inventoryMeshes[i] );
+				if( inventoryTransforms && inventoryMaterials && inventory && inventoryMeshes ) {
+				
+					for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+						vulkanRenderer->inventories.Push({});
+						cm::inventory* inventoryComponent = &inventory[i];
+						unsigned int inventoryTextureID   = inventoryMaterials[i].diffuseTextureID_.id;
+						unsigned int meshID           = inventoryComponent->slotMeshID.id;
+						vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
+						vulkanRenderer->inventories[i].meshID             = meshID;
+						vulkanRenderer->inventories[i].row                = inventoryComponent->row;
+						vulkanRenderer->inventories[i].col                = inventoryComponent->col;
+						vulkanRenderer->inventories[i].slotData.clear();
+						for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
+							for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
+								cm::transform* slotTransformComponent     = &inventoryTransforms[i];
+								vulkanRenderer->inventories[i].slotData.Push({});
+								vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
+									updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent, &inventoryMeshes[i] );
+							}
 						}
 					}
-				}
 
-				for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
-					cm::inventory* inventoryComponent          = &inventory[i];
-					cm::transform* inventoryTransformComponent = &inventoryTransforms[i];
+					for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+						cm::inventory* inventoryComponent          = &inventory[i];
+						cm::transform* inventoryTransformComponent = &inventoryTransforms[i];
 		
-					core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
-					vulkanRenderer->items.clear();
-					for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
-						arch::Archetype* arch = arch::world.archetypes[m];
-						arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
-							(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-							(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-							(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
-							(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-							(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
+						core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
+						vulkanRenderer->items.clear();
+						for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
+							arch::Archetype* arch = arch::world.archetypes[m];
+							arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
+								(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+								(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+								(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+								(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+								(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
 
-						if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-							cachedItemArchetypes[itemArchetypesNumber] = arch;
-							++itemArchetypesNumber;
-						}
-					}
-
-					for( uint32_t c = 0; c < itemArchetypesNumber; ++c ) {
-						arch::Archetype* arch = cachedItemArchetypes[c];
-						cm::transform* itemTransforms = nullptr;
-						cm::material*  itemMaterials  = nullptr;
-						cm::mesh*      itemMeshes     = nullptr;
-						cm::collider*  itemColliders  = nullptr;
-						cm::item*      items          = nullptr;
-						switch( arch->mask ) {
-						case arch::inventoryComponentMask:
-							itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
-							itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
-							itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
-							itemColliders  = static_cast<arch::ItemArchetype*>( arch )->colliders;
-							items          = static_cast<arch::ItemArchetype*>( arch )->items;
-							break;
+							if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+								cachedItemArchetypes[itemArchetypesNumber] = arch;
+								++itemArchetypesNumber;
+							}
 						}
 
-						for ( unsigned int a = 0; a < arch->entityCount; ++a ) {
-							vulkanRenderer->items.Push({});
-							cm::item* itemComponent = &items[a];
+						for( uint32_t c = 0; c < itemArchetypesNumber; ++c ) {
+							arch::Archetype* arch = cachedItemArchetypes[c];
+							cm::transform* itemTransforms = nullptr;
+							cm::material*  itemMaterials  = nullptr;
+							cm::mesh*      itemMeshes     = nullptr;
+							cm::collider*  itemColliders  = nullptr;
+							cm::item*      items          = nullptr;
+							switch( arch->mask ) {
+							case arch::inventoryComponentMask:
+								itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
+								itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
+								itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
+								itemColliders  = static_cast<arch::ItemArchetype*>( arch )->colliders;
+								items          = static_cast<arch::ItemArchetype*>( arch )->items;
+								break;
+							}
+
+							for ( unsigned int a = 0; a < arch->entityCount; ++a ) {
+								vulkanRenderer->items.Push({});
+								cm::item* itemComponent = &items[a];
 			
-							unsigned int meshID = itemMeshes[a].handle.id;
-							unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
-							vulkanRenderer->items[a].meshID          = meshID;
-							vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
-							cm::transform* itemTransformComponent    = &itemTransforms[a];
-							cm::collider* itemColliderComponent      = &itemColliders[a];
+								unsigned int meshID = itemMeshes[a].handle.id;
+								unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
+								vulkanRenderer->items[a].meshID          = meshID;
+								vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
+								cm::transform* itemTransformComponent    = &itemTransforms[a];
+								cm::collider* itemColliderComponent      = &itemColliders[a];
 
-							if ( itemTransformComponent == nullptr )
-								std::cout << "NULL POINTER" << std::endl;
+								if ( itemTransformComponent == nullptr )
+									std::cout << "NULL POINTER" << std::endl;
 
-							uint32_t itemEntity = arch->entities[a];
-							vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
-																				   itemColliderComponent,
-																				   itemComponent,
-																				   inventoryComponent->row,
-																				   inventoryComponent->col,
-																				   inventoryTransformComponent,
-																				   &itemMeshes[a],
-																				   itemEntity);
+								uint32_t itemEntity = arch->entities[a];
+								vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
+																					   itemColliderComponent,
+																					   itemComponent,
+																					   inventoryComponent->row,
+																					   inventoryComponent->col,
+																					   inventoryTransformComponent,
+																					   &itemMeshes[a],
+																					   itemEntity);
+							}
 						}
 					}
 				}
