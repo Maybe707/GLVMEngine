@@ -197,11 +197,11 @@ namespace GLVM::ecs
 					backtrackingColliders[i].colliders.clear();
 					components::mesh backtrackinEntityMesh = backtrackingMeshes[i];
 					components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
-					float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
+//					[[maybe_unused]] float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
 				
 					components::transform backtrackingTransformComponent = backtrackingTransforms[i];
 					vec3 backtrackingTransform = backtrackingTransformComponent.position;
-					float backtrackingScale = backtrackingTransformComponent.scale;
+					[[maybe_unused]] float backtrackingScale = backtrackingTransformComponent.scale;
 
 					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 					if ( (arch->mask & requiredMask) == requiredMask  ) {
@@ -262,11 +262,11 @@ namespace GLVM::ecs
 							
 								components::mesh comparedEntityMesh = comparedMeshes[j];
 								components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
-								float comparedGltfFlag  = comparedEntityMesh.gltf;
+//								[[maybe_unused]] float comparedGltfFlag  = comparedEntityMesh.gltf;
 						
 								components::transform comparedTransformComponent = comparedTransforms[j];
 								vec3  comparedTransform = comparedTransformComponent.position;
-								float comparedScale     = comparedTransformComponent.scale;
+								[[maybe_unused]] float comparedScale     = comparedTransformComponent.scale;
 
 								arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 								if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
@@ -289,13 +289,13 @@ namespace GLVM::ecs
 									}
 								}
 
-								if ( !backtrackingGltfFlag ) {
-									backtrackingScale /= 2;
-								}
+								// if ( !backtrackingGltfFlag ) {
+								// 	backtrackingScale /= 2;
+								// }
 
-								if ( !comparedGltfFlag ) {
-									comparedScale /= 2;
-								}
+								// if ( !comparedGltfFlag ) {
+								// 	comparedScale /= 2;
+								// }
 				
 								bool boxColliderFlag = false;
 								bool upperActorCheckFlag = false;

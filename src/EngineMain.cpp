@@ -153,7 +153,7 @@ int main()
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
-	playerArch->meshes[playerIndex]      = { .handle = monkeyHandle_OBJ, .gltf = true };
+	playerArch->meshes[playerIndex]      = { .handle = cubeHandle_OBJ, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
@@ -255,8 +255,8 @@ int main()
 		const uint32_t itemIndex = itemLocation.index;
 		unsigned int row = i + 1;
 		itemArch->items[itemIndex].itemSlotType = { 2, row };
-		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 3.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
-		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 0.0f };
+		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 10.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
+		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 1.0f };
 		if ( i % 2 == 0 )
 			itemArch->meshes[itemIndex].handle = hyperCubeHandle_GLTF;
 		else
