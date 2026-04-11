@@ -37,6 +37,8 @@ namespace GLVM::ecs
 		float prev_X             = 0.0f;
 		float current_X          = 0.0f;
 		vec3  prev_forward;
+		arch::Archetype* rigidBodyContainedArchetypesCache[32];
+		uint32_t rigidBodyContainedArchetypesNumber = 0;
 //		arch::componentMask mask = 
 			
         

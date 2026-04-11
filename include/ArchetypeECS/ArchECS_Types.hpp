@@ -103,6 +103,8 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::MESH_COMPONENT) |
 		(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
+		(1ull << ComponentsIndices::MOVE_COMPONENT) |
 		(1ull << ComponentsIndices::ITEM_COMPONENT);
 	
 	constexpr componentMask inventoryComponentMask =

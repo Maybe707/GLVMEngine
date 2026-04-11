@@ -22,6 +22,7 @@
 #include "Components/InventoryComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
+#include "Components/RotationComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Event.hpp"
@@ -1422,7 +1423,73 @@ namespace GLVM::core
 		}
 
 
+		/*
+		 ===========
+		 Item actors
+		 ===========
+		 */
+		
+		itemActorsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+				(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
 
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedItemActorsArchetypes[itemActorsArchetypesNumber] = arch;
+				++itemActorsArchetypesNumber;
+			}
+		}
+
+		uint32_t itemActorsCounter = projectileActorsCounter;
+		for( uint32_t x = 0; x < itemActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedItemActorsArchetypes[x];
+			cm::transform* itemTransforms = nullptr;
+			cm::material*  itemMaterials  = nullptr;
+			cm::mesh*      itemMeshes     = nullptr;
+			cm::rotation*  itemRotations  = nullptr;
+			switch( arch->mask ) {
+			case arch::itemComponentMask:
+				itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
+				itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
+				itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
+				itemRotations  = static_cast<arch::ItemArchetype*>( arch )->rotations;
+				break;
+			}
+
+			core::vector<mat4> jointMatrices;
+			jointMatrices.Resize(MAX_JOINTS_NUMBER);
+			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+				mat4 unitMatrix(1.0f);
+				jointMatrices[i] = unitMatrix;
+			}
+			
+			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->actors.Push({});
+				cm::transform* transformComponent = &itemTransforms[n];
+				cm::material*  materialComponent  = &itemMaterials[n];
+				cm::rotation*  rotationComponent  = &itemRotations[n];
+				if( itemTransforms && itemMaterials &&
+					itemRotations && itemMeshes ) {
+					unsigned int meshID = itemMeshes[n].handle.id;
+					vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
+					vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
+					vulkanRenderer->actors[itemActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+					vulkanRenderer->actors[itemActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+					vulkanRenderer->actors[itemActorsCounter].ambient   = materialComponent->ambient;
+					vulkanRenderer->actors[itemActorsCounter].shininess = materialComponent->shininess;
+					++itemActorsCounter;
+				}
+			}
+		}
+
+		
 		vulkanRenderer->players.clear();
 		playerArchetypesNumber = 0;
 		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {

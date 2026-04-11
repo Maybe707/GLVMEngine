@@ -4,7 +4,11 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/MovementSystem.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/EnemyArchetype.hpp"
+#include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -27,6 +31,7 @@
 #include "VertexMath.hpp"
 #include <cstdint>
 #include <cstdio>
+#include <sys/types.h>
 
 namespace GLVM::ecs
 {
@@ -83,37 +88,90 @@ namespace GLVM::ecs
             }
         }
 
-		for(unsigned int n = 0; n < entityCount; ++n) {
-			cm::transform* rTransform_Component = &playerArch->transforms[n];
-			cm::rigidBody* rigidBodyComponennt  = &playerArch->rigidBodies[n];
-			cm::move* moveComponent             = &playerArch->moves[n];
-			rTransform_Component->gravityAccumulator += deltaFrameTime;
-			float gravity = 9.8f * rTransform_Component->gravityAccumulator
-				* rigidBodyComponennt->fMass_ * 0.0005;
-			if ( gravity > 0.2f )
-				gravity = 0.2;
+		rigidBodyContainedArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+				(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 
-			moveComponent->gravity[1] -= gravity;
-        }
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				rigidBodyContainedArchetypesCache[rigidBodyContainedArchetypesNumber] = arch;
+				++rigidBodyContainedArchetypesNumber;
+			}
 
-		arch::EnemyArchetype* enemyArch = {};
-		entityCount = 0;
-		if( arch::world.archetypes.GetSize() > 2 ) {
-			enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
-			entityCount = enemyArch->entityCount;
+			for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
+				arch::Archetype* currentArch = rigidBodyContainedArchetypesCache[i0];
+				cm::transform* transforms   = nullptr;
+				cm::rigidBody* rigidBodies  = nullptr;
+				cm::move*      moves        = nullptr;
+				switch( arch->mask ) {
+				case arch::playerComponentMask:
+					transforms  = static_cast<arch::PlayerArchetype*>( currentArch )->transforms;
+					rigidBodies = static_cast<arch::PlayerArchetype*>( currentArch )->rigidBodies;
+					moves       = static_cast<arch::PlayerArchetype*>( currentArch )->moves;
+					break;
+				case arch::enemyComponentMask:
+					transforms  = static_cast<arch::EnemyArchetype*>( currentArch )->transforms;
+					rigidBodies = static_cast<arch::EnemyArchetype*>( currentArch )->rigidBodies;
+					moves       = static_cast<arch::EnemyArchetype*>( currentArch )->moves;
+					break;
+				case arch::itemComponentMask:
+					transforms  = static_cast<arch::ItemArchetype*>( currentArch )->transforms;
+					rigidBodies = static_cast<arch::ItemArchetype*>( currentArch )->rigidBodies;
+					moves       = static_cast<arch::ItemArchetype*>( currentArch )->moves;
+					break;
+				}
+
+				if( transforms && rigidBodies && moves ) {
+					for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
+						cm::transform* rTransform_Component = &transforms[i1];
+						cm::rigidBody* rigidBodyComponennt  = &rigidBodies[i1];
+						cm::move*      moveComponent        = &moves[i1];
+						rTransform_Component->gravityAccumulator += deltaFrameTime;
+						float gravity = 9.8f * rTransform_Component->gravityAccumulator
+							* rigidBodyComponennt->fMass_ * 0.0005;
+						if ( gravity > 0.2f )
+							gravity = 0.2;
+
+						moveComponent->gravity[1] -= gravity;
+					}
+				}
+			}
 		}
-		for(unsigned int n = 0; n < entityCount; ++n) {
-			cm::transform* rTransform_Component = &enemyArch->transforms[n];
-			cm::rigidBody* rigidBodyComponennt  = &enemyArch->rigidBodies[n];
-			cm::move* moveComponent             = &enemyArch->moves[n];
-			rTransform_Component->gravityAccumulator += deltaFrameTime;
-			float gravity = 9.8f * rTransform_Component->gravityAccumulator
-				* rigidBodyComponennt->fMass_ * 0.0005;
-			if ( gravity > 0.2f )
-				gravity = 0.2;
+		
+		
+		// for(unsigned int n = 0; n < entityCount; ++n) {
+		// 	cm::transform* rTransform_Component = &playerArch->transforms[n];
+		// 	cm::rigidBody* rigidBodyComponennt  = &playerArch->rigidBodies[n];
+		// 	cm::move* moveComponent             = &playerArch->moves[n];
+		// 	rTransform_Component->gravityAccumulator += deltaFrameTime;
+		// 	float gravity = 9.8f * rTransform_Component->gravityAccumulator
+		// 		* rigidBodyComponennt->fMass_ * 0.0005;
+		// 	if ( gravity > 0.2f )
+		// 		gravity = 0.2;
 
-			moveComponent->gravity[1] -= gravity;
-        }
+		// 	moveComponent->gravity[1] -= gravity;
+        // }
+
+		// arch::EnemyArchetype* enemyArch = {};
+		// entityCount = 0;
+		// if( arch::world.archetypes.GetSize() > 2 ) {
+		// 	enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
+		// 	entityCount = enemyArch->entityCount;
+		// }
+		// for(unsigned int n = 0; n < entityCount; ++n) {
+		// 	cm::transform* rTransform_Component = &enemyArch->transforms[n];
+		// 	cm::rigidBody* rigidBodyComponennt  = &enemyArch->rigidBodies[n];
+		// 	cm::move* moveComponent             = &enemyArch->moves[n];
+		// 	rTransform_Component->gravityAccumulator += deltaFrameTime;
+		// 	float gravity = 9.8f * rTransform_Component->gravityAccumulator
+		// 		* rigidBodyComponennt->fMass_ * 0.0005;
+		// 	if ( gravity > 0.2f )
+		// 		gravity = 0.2;
+
+		// 	moveComponent->gravity[1] -= gravity;
+        // }
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {

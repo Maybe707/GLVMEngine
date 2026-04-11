@@ -5,6 +5,7 @@
 
 #include "Systems/PhysicsSystem.hpp"
 #include "ArchetypeECS/ArchECS_Types.hpp"
+#include "Archetypes/ItemArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
@@ -69,12 +70,18 @@ namespace GLVM::ecs
 				rigidBodiesView   = static_cast<arch::EnemyArchetype*>( arch )->rigidBodies;
 				colliderFlagsView = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
 				break;
+			case arch::itemComponentMask:
+				transformsView    = static_cast<arch::ItemArchetype*>( arch )->transforms;
+				movesView         = static_cast<arch::ItemArchetype*>( arch )->moves;
+				rigidBodiesView   = static_cast<arch::ItemArchetype*>( arch )->rigidBodies;
+				colliderFlagsView = static_cast<arch::ItemArchetype*>( arch )->colliderFlags;
+				break;
 			}
 		
 			float deltaTime = 5.5f * fDelta_Time_;
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
-				if( &transformsView[i] != nullptr && &colliderFlagsView[i] != nullptr &&
-					&movesView[i] != nullptr && &rigidBodiesView[i] != nullptr ) {
+				if( transformsView && colliderFlagsView &&
+					movesView && rigidBodiesView ) {
 					cm::transform& transformComponent = transformsView[i];
 					cm::move& move = movesView[i];
 //				cm::collider& collider = collidersView[i];

@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/CollisionSystem.hpp"
+#include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "Components/ActorComponent.hpp"
@@ -177,6 +178,12 @@ namespace GLVM::ecs
 				backtrackingColliderFlags = static_cast<arch::LevelChunkArchetype*>( arch )->colliderFlags;
 				backtrackingMeshes = static_cast<arch::LevelChunkArchetype*>( arch )->meshes;
 				break;
+			case arch::itemComponentMask:
+				backtrackingTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::ItemArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::ItemArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::ItemArchetype*>( arch )->meshes;
+				break;
 			}
 			
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
@@ -205,6 +212,9 @@ namespace GLVM::ecs
 							break;
 						case arch::enemyComponentMask:
 							backtrackingMove = static_cast<arch::EnemyArchetype*>( arch )->moves;
+							break;
+						case arch::itemComponentMask:
+							backtrackingMove = static_cast<arch::ItemArchetype*>( arch )->moves;
 							break;
 						}
 					
@@ -236,6 +246,10 @@ namespace GLVM::ecs
 							comparedTransforms = static_cast<arch::LevelChunkArchetype*>( comparedArch )->transforms;
 							comparedMeshes = static_cast<arch::LevelChunkArchetype*>( comparedArch )->meshes;
 							break;
+						case arch::itemComponentMask:
+							comparedTransforms = static_cast<arch::ItemArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::ItemArchetype*>( comparedArch )->meshes;
+							break;
 						}
 
 						for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
@@ -263,6 +277,9 @@ namespace GLVM::ecs
 										break;
 									case arch::enemyComponentMask:
 										comparedMove = static_cast<arch::EnemyArchetype*>( comparedArch )->moves;
+										break;
+									case arch::itemComponentMask:
+										comparedMove = static_cast<arch::ItemArchetype*>( comparedArch )->moves;
 										break;
 									}
 

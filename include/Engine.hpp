@@ -115,6 +115,8 @@ namespace GLVM::core
 		uint32_t animationActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedProjectileActorsArchetypes[32];
 		uint32_t projectileActorsArchetypesNumber = 0;
+		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
+		uint32_t itemActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedInventoryArchetypes[32];
 		uint32_t inventoryArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedItemArchetypes[32];
