@@ -1144,15 +1144,38 @@ namespace GLVM::core
 			}
 		}
 
-		core::vector<Entity> crosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
 		vulkanRenderer->crosshairs.clear();
-		for ( unsigned int i = 0; i < crosshairEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = crosshairEntities[i];
-			vulkanRenderer->crosshairs.Push({});
-			cm::transform* cursorTransform = componentManager->GetComponent<ecs::components::transform>(uiEntity);
-			unsigned int meshID = componentManager->GetComponent<ecs::components::mesh>(uiEntity)->handle.id;
-			vulkanRenderer->crosshairs[i].meshID = meshID;
-			vulkanRenderer->crosshairs[i].model  = updateDataHudScreenUBO( cursorTransform );
+		crosshairActorsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedCrosshairActorsArchetypes[crosshairActorsArchetypesNumber] = arch;
+				++crosshairActorsArchetypesNumber;
+			}
+		}
+
+		for( uint32_t x = 0; x < crosshairActorsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedCrosshairActorsArchetypes[x];
+			cm::transform* actorTransforms = nullptr;
+			cm::mesh*      actorMeshes     = nullptr;
+			switch( arch->mask ) {
+			case arch::crosshairComponentMask:
+				actorTransforms = static_cast<arch::LevelChunkArchetype*>( arch )->transforms;
+				actorMeshes     = static_cast<arch::LevelChunkArchetype*>( arch )->meshes;
+				break;
+			}
+
+			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+				vulkanRenderer->crosshairs.Push({});
+				cm::transform* cursorTransform = &actorTransforms[i];
+				unsigned int meshID            = actorMeshes[i].handle.id;
+				vulkanRenderer->crosshairs[i].meshID = meshID;
+				vulkanRenderer->crosshairs[i].model  = updateDataHudScreenUBO( cursorTransform );
+			}
 		}
 
 
