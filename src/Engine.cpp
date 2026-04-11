@@ -1102,7 +1102,7 @@ namespace GLVM::core
 							cm::collider*  itemColliders  = nullptr;
 							cm::item*      items          = nullptr;
 							switch( arch->mask ) {
-							case arch::inventoryComponentMask:
+							case arch::itemComponentMask:
 								itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
 								itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
 								itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;

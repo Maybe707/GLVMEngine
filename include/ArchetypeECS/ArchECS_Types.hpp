@@ -96,6 +96,15 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 		(1ull << ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
 
+	constexpr componentMask itemComponentMask =
+		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
+		(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
+		(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+		(1ull << ComponentsIndices::MESH_COMPONENT) |
+		(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
+		(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
+		(1ull << ComponentsIndices::ITEM_COMPONENT);
+	
 	constexpr componentMask inventoryComponentMask =
 		(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
 		(1ull << ComponentsIndices::MESH_COMPONENT) |

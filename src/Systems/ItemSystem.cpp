@@ -1,4 +1,5 @@
 #include "Systems/ItemSystem.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Archetypes/ItemArchetype.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
@@ -89,7 +90,7 @@ namespace GLVM::ecs
 				inventoryEntityCount = cachedInventoryArchetype->entityCount;
 				switch( cachedInventoryArchetype->mask ) {
 				case arch::inventoryComponentMask:
-					inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->invetories;
+					inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->invetories;
 					break;
 				}
 			}
@@ -110,12 +111,12 @@ namespace GLVM::ecs
 
 
 			components::collider*      itemColliderComponentView      = nullptr;
-			uint32_t crosshairEntityCount = 0;
-			if( cachedCrosshairArchetype != nullptr ) {
-				crosshairEntityCount = cachedCrosshairArchetype->entityCount;
-				switch( cachedCrosshairArchetype->mask ) {
-				case arch::crosshairComponentMask:
-					itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedCrosshairArchetype )->colliders;
+			uint32_t itemEntityCount = 0;
+			if( cachedItemArchetype != nullptr ) {
+				itemEntityCount = cachedItemArchetype->entityCount;
+				switch( cachedItemArchetype->mask ) {
+				case arch::itemComponentMask:
+					itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->colliders;
 					break;
 				}
 			}
@@ -123,7 +124,7 @@ namespace GLVM::ecs
 			for ( unsigned int m = 0; m < inventoryEntityCount; ++m ) {
 				cm::inventory* inventoryComponent = &inventory_inventoriesView[m];
 
-				for ( unsigned int i = 0; i < crosshairEntityCount; ++i ) {
+				for ( unsigned int i = 0; i < itemEntityCount; ++i ) {
 					unsigned int itemEntity = cachedItemArchetype->entities[i];
 					cm::collider* itemColliderComponent = &itemColliderComponentView[i];
 
