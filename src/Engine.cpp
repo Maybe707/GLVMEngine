@@ -1115,28 +1115,31 @@ namespace GLVM::core
 							if( itemTransforms && itemMaterials && itemMeshes &&
 								itemColliders && items) {
 								for ( unsigned int a = 0; a < arch->entityCount; ++a ) {
-									vulkanRenderer->items.Push({});
 									cm::item* itemComponent = &items[a];
+									if( !itemComponent->isActor ) {
+										vulkanRenderer->items.Push({});
+
 			
-									unsigned int meshID = itemMeshes[a].handle.id;
-									unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
-									vulkanRenderer->items[a].meshID          = meshID;
-									vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
-									cm::transform* itemTransformComponent    = &itemTransforms[a];
-									cm::collider* itemColliderComponent      = &itemColliders[a];
+										unsigned int meshID = itemMeshes[a].handle.id;
+										unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
+										vulkanRenderer->items[a].meshID          = meshID;
+										vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
+										cm::transform* itemTransformComponent    = &itemTransforms[a];
+										cm::collider* itemColliderComponent      = &itemColliders[a];
 
-									if ( itemTransformComponent == nullptr )
-										std::cout << "NULL POINTER" << std::endl;
+										if ( itemTransformComponent == nullptr )
+											std::cout << "NULL POINTER" << std::endl;
 
-									uint32_t itemEntity = arch->entities[a];
-									vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
-																						   itemColliderComponent,
-																						   itemComponent,
-																						   inventoryComponent->row,
-																						   inventoryComponent->col,
-																						   inventoryTransformComponent,
-																						   &itemMeshes[a],
-																						   itemEntity);
+										uint32_t itemEntity = arch->entities[a];
+										vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
+																							   itemColliderComponent,
+																							   itemComponent,
+																							   inventoryComponent->row,
+																							   inventoryComponent->col,
+																							   inventoryTransformComponent,
+																							   &itemMeshes[a],
+																							   itemEntity);
+									}
 								}
 							}
 						}

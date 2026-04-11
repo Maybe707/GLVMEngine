@@ -255,6 +255,7 @@ int main()
 		const uint32_t itemIndex = itemLocation.index;
 		unsigned int row = i + 1;
 		itemArch->items[itemIndex].itemSlotType = { 2, row };
+		itemArch->items[itemIndex].isActor      = true;
 		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 10.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
 		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 1.0f };
 		if ( i % 2 == 0 )

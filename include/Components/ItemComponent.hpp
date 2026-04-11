@@ -13,6 +13,7 @@ namespace GLVM::ecs::components
 	struct item {
 		core::vector<unsigned int> occupiedSlots; ///< Array that contain entities with inventorySlotComponent
 		ItemSlotType itemSlotType;
+	    bool isActor;
 	};
 } // namespace GLVM::ecs::components
 

@@ -110,13 +110,15 @@ namespace GLVM::ecs
 			}
 
 
-			components::collider*      itemColliderComponentView      = nullptr;
+			components::collider* itemColliderComponentView = nullptr;
+			components::item*     itemsView                 = nullptr;                      
 			uint32_t itemEntityCount = 0;
 			if( cachedItemArchetype != nullptr ) {
 				itemEntityCount = cachedItemArchetype->entityCount;
 				switch( cachedItemArchetype->mask ) {
 				case arch::itemComponentMask:
-					itemColliderComponentView      = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->colliders;
+					itemColliderComponentView = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->colliders;
+					itemsView                 = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->items;
 					break;
 				}
 			}
@@ -131,6 +133,7 @@ namespace GLVM::ecs
 					for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
 						if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner ) {
 							if ( putItem2x2(inventoryComponent, itemEntity) ) {
+								itemsView[i].isActor = false;
 //								componentManager->RemoveComponent<cm::actor>(itemEntity);
 //								componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
 							} else {
