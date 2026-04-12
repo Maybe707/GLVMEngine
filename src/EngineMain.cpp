@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/CrosshairArchetype.hpp"
 #include "Archetypes/InventoryArchetype.hpp"
@@ -144,6 +145,7 @@ int main()
 	// }
 	
 	arch::entity player = archEntityManager->createEntity();
+//	std::cout << "player: " << ecs::arch::getId(player) << std::endl;
 	arch::world.addEntityToArchetype( player, arch::world.archetypes[1] );
 	arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
 	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
@@ -249,6 +251,7 @@ int main()
 	
 	for ( unsigned int i = 0; i < 5; ++i ) {
 		arch::entity item = archEntityManager->createEntity();
+//		std::cout << "item: " << ecs::arch::getId(item) << " i: " << i << std::endl;
 		arch::world.addEntityToArchetype( item, arch::world.archetypes[7] );
 		arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( item )];
 		arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);

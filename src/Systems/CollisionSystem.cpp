@@ -316,6 +316,13 @@ namespace GLVM::ecs
 								}
 				
 								if(upperActorCheckFlag && boxColliderFlag) {
+									if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
+																	  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
+																	  == 58) ) {
+										std::cout << "ground collisiton between player: " << backtrackingEntityID << " and item: " <<
+											comparedEntityID << std::endl;
+									}
+									
 									uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
 									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | groudCollisionTurnOffMask;
 									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
@@ -324,6 +331,13 @@ namespace GLVM::ecs
 								}
                     
 								if(boxColliderFlag) {
+									if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
+																	  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
+																	  == 58) ) {
+										std::cout << "wall collisiton between player: " << backtrackingEntityID << " and item: " <<
+											comparedEntityID << std::endl;
+									}
+									
 									uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
 									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
 									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);

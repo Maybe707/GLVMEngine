@@ -99,51 +99,52 @@ namespace GLVM::ecs
 				rigidBodyContainedArchetypesCache[rigidBodyContainedArchetypesNumber] = arch;
 				++rigidBodyContainedArchetypesNumber;
 			}
+		}
 
-			for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
-				arch::Archetype* currentArch = rigidBodyContainedArchetypesCache[i0];
-				cm::transform* transforms   = nullptr;
-				cm::rigidBody* rigidBodies  = nullptr;
-				cm::move*      moves        = nullptr;
-				cm::item*      items        = nullptr;
-				switch( currentArch->mask ) {
-				case arch::playerComponentMask:
-					transforms  = static_cast<arch::PlayerArchetype*>( currentArch )->transforms;
-					rigidBodies = static_cast<arch::PlayerArchetype*>( currentArch )->rigidBodies;
-					moves       = static_cast<arch::PlayerArchetype*>( currentArch )->moves;
-					break;
-				case arch::enemyComponentMask:
-					transforms  = static_cast<arch::EnemyArchetype*>( currentArch )->transforms;
-					rigidBodies = static_cast<arch::EnemyArchetype*>( currentArch )->rigidBodies;
-					moves       = static_cast<arch::EnemyArchetype*>( currentArch )->moves;
-					break;
-				case arch::itemComponentMask:
-					transforms  = static_cast<arch::ItemArchetype*>( currentArch )->transforms;
-					rigidBodies = static_cast<arch::ItemArchetype*>( currentArch )->rigidBodies;
-					moves       = static_cast<arch::ItemArchetype*>( currentArch )->moves;
-					items       = static_cast<arch::ItemArchetype*>( currentArch )->items;
-					break;
-				}
+		for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
+			arch::Archetype* currentArch = rigidBodyContainedArchetypesCache[i0];
+			cm::transform* transforms   = nullptr;
+			cm::rigidBody* rigidBodies  = nullptr;
+			cm::move*      moves        = nullptr;
+			cm::item*      items        = nullptr;
+			switch( currentArch->mask ) {
+			case arch::playerComponentMask:
+				transforms  = static_cast<arch::PlayerArchetype*>( currentArch )->transforms;
+				rigidBodies = static_cast<arch::PlayerArchetype*>( currentArch )->rigidBodies;
+				moves       = static_cast<arch::PlayerArchetype*>( currentArch )->moves;
+				break;
+			case arch::enemyComponentMask:
+				transforms  = static_cast<arch::EnemyArchetype*>( currentArch )->transforms;
+				rigidBodies = static_cast<arch::EnemyArchetype*>( currentArch )->rigidBodies;
+				moves       = static_cast<arch::EnemyArchetype*>( currentArch )->moves;
+				break;
+			case arch::itemComponentMask:
+				transforms  = static_cast<arch::ItemArchetype*>( currentArch )->transforms;
+				rigidBodies = static_cast<arch::ItemArchetype*>( currentArch )->rigidBodies;
+				moves       = static_cast<arch::ItemArchetype*>( currentArch )->moves;
+				items       = static_cast<arch::ItemArchetype*>( currentArch )->items;
+				break;
+			}
 
-				if( transforms && rigidBodies && moves ) {
-					for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
-						if( items && !items[i1].isActor )
-							continue;
+			if( transforms && rigidBodies && moves ) {
+				for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
+					if( items && !items[i1].isActor )
+						continue;
 						
-						cm::transform* rTransform_Component = &transforms[i1];
-						cm::rigidBody* rigidBodyComponennt  = &rigidBodies[i1];
-						cm::move*      moveComponent        = &moves[i1];
-						rTransform_Component->gravityAccumulator += deltaFrameTime;
-						float gravity = 9.8f * rTransform_Component->gravityAccumulator
-							* rigidBodyComponennt->fMass_ * 0.0005;
-						if ( gravity > 0.2f )
-							gravity = 0.2;
+					cm::transform* rTransform_Component = &transforms[i1];
+					cm::rigidBody* rigidBodyComponennt  = &rigidBodies[i1];
+					cm::move*      moveComponent        = &moves[i1];
+					rTransform_Component->gravityAccumulator += deltaFrameTime;
+					float gravity = 9.8f * rTransform_Component->gravityAccumulator
+						* rigidBodyComponennt->fMass_ * 0.0005;
+					if ( gravity > 0.2f )
+						gravity = 0.2;
 
-						moveComponent->gravity[1] -= gravity;
-					}
+					moveComponent->gravity[1] -= gravity;
 				}
 			}
 		}
+//		}
 		
 		
 		// for(unsigned int n = 0; n < entityCount; ++n) {
