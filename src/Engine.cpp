@@ -1118,8 +1118,6 @@ namespace GLVM::core
 									cm::item* itemComponent = &items[a];
 									if( !itemComponent->isActor ) {
 										vulkanRenderer->items.Push({});
-
-			
 										unsigned int meshID = itemMeshes[a].handle.id;
 										unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
 										vulkanRenderer->items[a].meshID          = meshID;
@@ -1130,6 +1128,8 @@ namespace GLVM::core
 										if ( itemTransformComponent == nullptr )
 											std::cout << "NULL POINTER" << std::endl;
 
+										std::cout << "item rendering in inventory: " << a << std::endl;
+										std::cout << "item transform: " << itemTransformComponent->position << std::endl;
 										uint32_t itemEntity = arch->entities[a];
 										vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
 																							   itemColliderComponent,
@@ -1427,9 +1427,9 @@ namespace GLVM::core
 
 
 		/*
-		 ===========
-		 Item actors
-		 ===========
+		 =====================================
+		 Item actors renders in the game world
+		 =====================================
 		 */
 		
 		itemActorsArchetypesNumber = 0;
@@ -1456,12 +1456,14 @@ namespace GLVM::core
 			cm::material*  itemMaterials  = nullptr;
 			cm::mesh*      itemMeshes     = nullptr;
 			cm::rotation*  itemRotations  = nullptr;
+			cm::item*      items          = nullptr;
 			switch( arch->mask ) {
 			case arch::itemComponentMask:
 				itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
 				itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
 				itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
 				itemRotations  = static_cast<arch::ItemArchetype*>( arch )->rotations;
+				items          = static_cast<arch::ItemArchetype*>( arch )->items;
 				break;
 			}
 
@@ -1473,21 +1475,23 @@ namespace GLVM::core
 			}
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
-				vulkanRenderer->actors.Push({});
-				cm::transform* transformComponent = &itemTransforms[n];
-				cm::material*  materialComponent  = &itemMaterials[n];
-				cm::rotation*  rotationComponent  = &itemRotations[n];
-				if( itemTransforms && itemMaterials &&
-					itemRotations && itemMeshes ) {
-					unsigned int meshID = itemMeshes[n].handle.id;
-					vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
-					vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
-					vulkanRenderer->actors[itemActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-					vulkanRenderer->actors[itemActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-					vulkanRenderer->actors[itemActorsCounter].ambient   = materialComponent->ambient;
-					vulkanRenderer->actors[itemActorsCounter].shininess = materialComponent->shininess;
-					++itemActorsCounter;
+				if( items[n].isActor ) {
+					vulkanRenderer->actors.Push({});
+					cm::transform* transformComponent = &itemTransforms[n];
+					cm::material*  materialComponent  = &itemMaterials[n];
+					cm::rotation*  rotationComponent  = &itemRotations[n];
+					if( itemTransforms && itemMaterials &&
+						itemRotations && itemMeshes ) {
+						unsigned int meshID = itemMeshes[n].handle.id;
+						vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
+						vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[itemActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+						vulkanRenderer->actors[itemActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+						vulkanRenderer->actors[itemActorsCounter].ambient   = materialComponent->ambient;
+						vulkanRenderer->actors[itemActorsCounter].shininess = materialComponent->shininess;
+						++itemActorsCounter;
+					}
 				}
 			}
 		}

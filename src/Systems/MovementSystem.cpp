@@ -105,7 +105,8 @@ namespace GLVM::ecs
 				cm::transform* transforms   = nullptr;
 				cm::rigidBody* rigidBodies  = nullptr;
 				cm::move*      moves        = nullptr;
-				switch( arch->mask ) {
+				cm::item*      items        = nullptr;
+				switch( currentArch->mask ) {
 				case arch::playerComponentMask:
 					transforms  = static_cast<arch::PlayerArchetype*>( currentArch )->transforms;
 					rigidBodies = static_cast<arch::PlayerArchetype*>( currentArch )->rigidBodies;
@@ -120,11 +121,15 @@ namespace GLVM::ecs
 					transforms  = static_cast<arch::ItemArchetype*>( currentArch )->transforms;
 					rigidBodies = static_cast<arch::ItemArchetype*>( currentArch )->rigidBodies;
 					moves       = static_cast<arch::ItemArchetype*>( currentArch )->moves;
+					items       = static_cast<arch::ItemArchetype*>( currentArch )->items;
 					break;
 				}
 
 				if( transforms && rigidBodies && moves ) {
 					for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
+						if( items && !items[i1].isActor )
+							continue;
+						
 						cm::transform* rTransform_Component = &transforms[i1];
 						cm::rigidBody* rigidBodyComponennt  = &rigidBodies[i1];
 						cm::move*      moveComponent        = &moves[i1];

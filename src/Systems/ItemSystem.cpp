@@ -36,6 +36,9 @@ namespace GLVM::ecs
 
 		unsigned int item_width = itemComponent->itemSlotType.width;
 		unsigned int item_height = itemComponent->itemSlotType.height;
+
+		std::cout << "item width: " << item_width << std::endl;
+		std::cout << "item height: " << item_height << std::endl;
 		for ( unsigned int i = 0; i < row - item_height + 1; ++i )
 			for ( unsigned int j = 0; j < col - item_width + 1; ++j ) {
 				core::vector<unsigned int> maybeAvailabeSlots;
@@ -49,11 +52,14 @@ namespace GLVM::ecs
 				unsigned int isAllSlotsAvailable = 0;
 				for ( unsigned int v = 0; v < maybeAvailabeSlots.GetSize(); ++v ) {
 					if ( maybeAvailabeSlots[v] == UINT_MAX ) {
+//						std::cout << "inc" << std::endl;
 						++isAllSlotsAvailable;
 					} else {
+//						std::cout << "dec" << std::endl;
 						--isAllSlotsAvailable;
 					}
 				}
+//				std::cout << "all slots: " << isAllSlotsAvailable << std::endl;
 				if ( maybeAvailabeSlots.GetSize() == isAllSlotsAvailable ) {
 					for ( unsigned int w = 0; w < maybeAvailabeSlots.GetSize(); ++w ) {
 						unsigned int row_index = indicesOfMaybeAvailableSlots[w] / row;
@@ -131,7 +137,8 @@ namespace GLVM::ecs
 					cm::collider* itemColliderComponent = &itemColliderComponentView[i];
 
 					for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
-						if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner ) {
+						if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner &&
+							itemsView[i].isActor ) {
 							if ( putItem2x2(inventoryComponent, itemEntity) ) {
 								itemsView[i].isActor = false;
 //								componentManager->RemoveComponent<cm::actor>(itemEntity);
