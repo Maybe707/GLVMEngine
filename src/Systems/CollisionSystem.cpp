@@ -199,9 +199,9 @@ namespace GLVM::ecs
 					components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
 //					[[maybe_unused]] float backtrackingGltfFlag = backtrackinEntityMesh.gltf;
 				
-					components::transform backtrackingTransformComponent = backtrackingTransforms[i];
-					vec3 backtrackingTransform = backtrackingTransformComponent.position;
-					[[maybe_unused]] float backtrackingScale = backtrackingTransformComponent.scale;
+					components::transform* backtrackingTransformComponent = &backtrackingTransforms[i];
+					vec3 backtrackingTransform = backtrackingTransformComponent->position;
+					[[maybe_unused]] float backtrackingScale = backtrackingTransformComponent->scale;
 
 					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 					if ( (arch->mask & requiredMask) == requiredMask  ) {
@@ -218,8 +218,8 @@ namespace GLVM::ecs
 							break;
 						}
 					
-						backtrackingTransform += Normalize(backtrackingMove->frameMovement) * cameraSpeed;
-						backtrackingTransform += backtrackingMove->gravity;
+						backtrackingTransform += Normalize(backtrackingMove[i].frameMovement) * cameraSpeed;
+						backtrackingTransform += backtrackingMove[i].gravity;
 					}
 
 					for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
@@ -264,11 +264,12 @@ namespace GLVM::ecs
 								components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
 //								[[maybe_unused]] float comparedGltfFlag  = comparedEntityMesh.gltf;
 						
-								components::transform comparedTransformComponent = comparedTransforms[j];
-								vec3  comparedTransform = comparedTransformComponent.position;
-								[[maybe_unused]] float comparedScale     = comparedTransformComponent.scale;
+								components::transform* comparedTransformComponent = &comparedTransforms[j];
+								vec3  comparedTransform = comparedTransformComponent->position;
+								[[maybe_unused]] float comparedScale     = comparedTransformComponent->scale;
 
 								arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+								vec3 gravityTest{};
 								if ( (comparedArch->mask & requiredMask) == requiredMask  ) {
 									components::move* comparedMove = nullptr;
 									switch( comparedArch->mask ) {
@@ -284,8 +285,9 @@ namespace GLVM::ecs
 									}
 
 									if( comparedMove ) {
-										comparedTransform += Normalize(comparedMove->frameMovement) * cameraSpeed;
-										comparedTransform += comparedMove->gravity;
+										comparedTransform += Normalize(comparedMove[j].frameMovement) * cameraSpeed;
+										comparedTransform += comparedMove[j].gravity;
+										gravityTest = comparedMove[j].gravity;
 									}
 								}
 
@@ -314,13 +316,39 @@ namespace GLVM::ecs
 																		  backtrackingEntityMeshHandle,
 																		  comparedEntityMeshHandle);
 								}
-				
+
+								if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
+																  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
+																  == 58) ) {
+									std::cout << "COLLISION BETWEEN PLAYER: " << backtrackingEntityID << " AND ITEM: " <<
+										comparedEntityID << std::endl;
+									std::cout << "box: " << boxColliderFlag << std::endl;
+									std::cout << "upper: " << upperActorCheckFlag << std::endl;
+									std::cout << "back position: " << "x: " << backtrackingTransform[0] << " y: " << backtrackingTransform[1] <<
+										" z: " << backtrackingTransform[2] << std::endl;
+									std::cout << "back scale: " << backtrackingScale << std::endl;
+									std::cout << "comp position: " << "x: " << comparedTransform[0] << " y: " << comparedTransform[1] <<
+										" z: " << comparedTransform[2] << std::endl;
+									std::cout << "comp scale: " << comparedScale << std::endl;
+									std::cout << "comp gravity: " << "x: " << gravityTest[0] << " y: " << gravityTest[1] <<
+										" z: " << gravityTest[2] << std::endl;
+								}
+
+								
 								if(upperActorCheckFlag && boxColliderFlag) {
 									if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
 																	  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
 																	  == 58) ) {
 										std::cout << "ground collisiton between player: " << backtrackingEntityID << " and item: " <<
 											comparedEntityID << std::endl;
+										// std::cout << "box: " << boxColliderFlag << std::endl;
+										// std::cout << "upper: " << upperActorCheckFlag << std::endl;
+										// std::cout << "back position: " << "x: " << backtrackingTransform[0] << " y: " << backtrackingTransform[1] <<
+										// 	" z: " << backtrackingTransform[2] << std::endl;
+										// std::cout << "back scale: " << backtrackingScale << std::endl;
+										// std::cout << "comp position: " << "x: " << comparedTransform[0] << " y: " << comparedTransform[1] <<
+										// 	" z: " << comparedTransform[2] << std::endl;
+										// std::cout << "comp scale: " << comparedScale << std::endl;
 									}
 									
 									uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
