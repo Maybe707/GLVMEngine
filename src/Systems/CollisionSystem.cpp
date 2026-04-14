@@ -320,18 +320,18 @@ namespace GLVM::ecs
 								if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
 																  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
 																  == 58) ) {
-									std::cout << "COLLISION BETWEEN PLAYER: " << backtrackingEntityID << " AND ITEM: " <<
-										comparedEntityID << std::endl;
-									std::cout << "box: " << boxColliderFlag << std::endl;
-									std::cout << "upper: " << upperActorCheckFlag << std::endl;
-									std::cout << "back position: " << "x: " << backtrackingTransform[0] << " y: " << backtrackingTransform[1] <<
-										" z: " << backtrackingTransform[2] << std::endl;
-									std::cout << "back scale: " << backtrackingScale << std::endl;
-									std::cout << "comp position: " << "x: " << comparedTransform[0] << " y: " << comparedTransform[1] <<
-										" z: " << comparedTransform[2] << std::endl;
-									std::cout << "comp scale: " << comparedScale << std::endl;
-									std::cout << "comp gravity: " << "x: " << gravityTest[0] << " y: " << gravityTest[1] <<
-										" z: " << gravityTest[2] << std::endl;
+									// std::cout << "COLLISION BETWEEN PLAYER: " << backtrackingEntityID << " AND ITEM: " <<
+									// 	comparedEntityID << std::endl;
+									// std::cout << "box: " << boxColliderFlag << std::endl;
+									// std::cout << "upper: " << upperActorCheckFlag << std::endl;
+									// std::cout << "back position: " << "x: " << backtrackingTransform[0] << " y: " << backtrackingTransform[1] <<
+									// 	" z: " << backtrackingTransform[2] << std::endl;
+									// std::cout << "back scale: " << backtrackingScale << std::endl;
+									// std::cout << "comp position: " << "x: " << comparedTransform[0] << " y: " << comparedTransform[1] <<
+									// 	" z: " << comparedTransform[2] << std::endl;
+									// std::cout << "comp scale: " << comparedScale << std::endl;
+									// std::cout << "comp gravity: " << "x: " << gravityTest[0] << " y: " << gravityTest[1] <<
+									// 	" z: " << gravityTest[2] << std::endl;
 								}
 
 								
@@ -339,8 +339,8 @@ namespace GLVM::ecs
 									if( backtrackingEntityID == 0 && (comparedEntityID == 54 || comparedEntityID == 55 ||
 																	  comparedEntityID == 56 || comparedEntityID == 57 || comparedEntityID
 																	  == 58) ) {
-										std::cout << "ground collisiton between player: " << backtrackingEntityID << " and item: " <<
-											comparedEntityID << std::endl;
+//										std::cout << "ground collisiton between player: " << backtrackingEntityID << " and item: " <<
+//											comparedEntityID << std::endl;
 										// std::cout << "box: " << boxColliderFlag << std::endl;
 										// std::cout << "upper: " << upperActorCheckFlag << std::endl;
 										// std::cout << "back position: " << "x: " << backtrackingTransform[0] << " y: " << backtrackingTransform[1] <<

@@ -1022,6 +1022,7 @@ namespace GLVM::core
 
 		if ( vulkanRenderer->isInventoryOpened ) {
 			vulkanRenderer->inventories.clear();
+			uint32_t inventoryCounter = 0;
 			inventoryArchetypesNumber = 0;
 			for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
 				arch::Archetype* arch = arch::world.archetypes[n];
@@ -1058,16 +1059,16 @@ namespace GLVM::core
 						cm::inventory* inventoryComponent = &inventory[i];
 						unsigned int inventoryTextureID   = inventoryMaterials[i].diffuseTextureID_.id;
 						unsigned int meshID           = inventoryComponent->slotMeshID.id;
-						vulkanRenderer->inventories[i].inventoryTextureID = inventoryTextureID;
-						vulkanRenderer->inventories[i].meshID             = meshID;
-						vulkanRenderer->inventories[i].row                = inventoryComponent->row;
-						vulkanRenderer->inventories[i].col                = inventoryComponent->col;
-						vulkanRenderer->inventories[i].slotData.clear();
+						vulkanRenderer->inventories[inventoryCounter].inventoryTextureID = inventoryTextureID;
+						vulkanRenderer->inventories[inventoryCounter].meshID             = meshID;
+						vulkanRenderer->inventories[inventoryCounter].row                = inventoryComponent->row;
+						vulkanRenderer->inventories[inventoryCounter].col                = inventoryComponent->col;
+						vulkanRenderer->inventories[inventoryCounter].slotData.clear();
 						for ( unsigned int j = 0; j < inventoryComponent->row; ++j ) {
 							for ( unsigned int m = 0; m < inventoryComponent->col; ++m ) {
 								cm::transform* slotTransformComponent     = &inventoryTransforms[i];
-								vulkanRenderer->inventories[i].slotData.Push({});
-								vulkanRenderer->inventories[i].slotData[j * inventoryComponent->col + m] =
+								vulkanRenderer->inventories[inventoryCounter].slotData.Push({});
+								vulkanRenderer->inventories[inventoryCounter].slotData[j * inventoryComponent->col + m] =
 									updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent, &inventoryMeshes[i] );
 							}
 						}
@@ -1079,6 +1080,7 @@ namespace GLVM::core
 		
 						core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
 						vulkanRenderer->items.clear();
+						uint32_t itemCounter = 0;
 						itemArchetypesNumber = 0;
 						for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
 							arch::Archetype* arch = arch::world.archetypes[m];
@@ -1120,8 +1122,8 @@ namespace GLVM::core
 										vulkanRenderer->items.Push({});
 										unsigned int meshID = itemMeshes[a].handle.id;
 										unsigned int diffuseTexureID = itemMaterials[a].diffuseTextureID_.id;
-										vulkanRenderer->items[a].meshID          = meshID;
-										vulkanRenderer->items[a].diffuseTexureID = diffuseTexureID;
+										vulkanRenderer->items[itemCounter].meshID          = meshID;
+										vulkanRenderer->items[itemCounter].diffuseTexureID = diffuseTexureID;
 										cm::transform* itemTransformComponent    = &itemTransforms[a];
 										cm::collider* itemColliderComponent      = &itemColliders[a];
 
@@ -1131,7 +1133,7 @@ namespace GLVM::core
 										std::cout << "item rendering in inventory: " << a << std::endl;
 										std::cout << "item transform: " << itemTransformComponent->position << std::endl;
 										uint32_t itemEntity = arch->entities[a];
-										vulkanRenderer->items[a].model = updateDataUBO_IconsUI(itemTransformComponent,
+										vulkanRenderer->items[itemCounter].model = updateDataUBO_IconsUI(itemTransformComponent,
 																							   itemColliderComponent,
 																							   itemComponent,
 																							   inventoryComponent->row,
@@ -1139,6 +1141,7 @@ namespace GLVM::core
 																							   inventoryTransformComponent,
 																							   &itemMeshes[a],
 																							   itemEntity);
+										++itemCounter;
 									}
 								}
 							}
