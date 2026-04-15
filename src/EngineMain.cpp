@@ -244,6 +244,8 @@ int main()
 	inventoryComponent->entityOwner = player;
 	inventoryComponent->slotMeshID  = inventory_Handle_GLTF;
 	inventoryComponent->slotScale   = 0.05;
+	cm::mesh* inventoryMesh = &inventoryArch->meshes[inventoryIndex];
+	inventoryMesh->gltf = true;
 	inventoryArch->transforms[inventoryIndex] = { .position = { 0.0f, -0.5f, 0.0f }, .scale = 1.0f };
 	inventoryArch->materials[inventoryIndex]  = { .diffuseTextureID_ = inventoryTexturehandle, .specularTextureID_ = inventoryTexturehandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
