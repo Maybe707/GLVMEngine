@@ -2,6 +2,7 @@
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Archetypes/ItemArchetype.hpp"
 #include "Components/InventoryComponent.hpp"
+#include "Components/ItemComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "VertexMath.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
@@ -174,6 +175,8 @@ namespace GLVM::ecs
 						const uint32_t itemIndex = itemLocation.index;
 						itemArch->rigidBodies[itemIndex] = { .fMass_ = 2.0f };
 						cm::transform* itemTransform = &itemArch->transforms[itemIndex];
+						cm::item*      item          = &itemArch->items[itemIndex];
+						item->isActor = true;
 					
 						const uint32_t player = 0;                          ///< REMOVE THIS CRINGE
 						arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
