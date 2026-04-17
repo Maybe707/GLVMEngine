@@ -50,8 +50,8 @@ namespace GLVM::ecs
 			components::mesh*                     inventory_meshview          = nullptr;
 			switch( cachedInventoryArchetype->mask ) {
 			case arch::inventoryComponentMask:
-				inventory_transformsView    = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->transforms;
-				inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedCrosshairArchetype )->invetories;
+				inventory_transformsView    = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->transforms;
+				inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->invetories;
 				inventory_meshview          = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->meshes;
 				break;
 			}

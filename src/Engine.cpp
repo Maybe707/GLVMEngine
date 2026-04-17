@@ -1130,8 +1130,6 @@ namespace GLVM::core
 										if ( itemTransformComponent == nullptr )
 											std::cout << "NULL POINTER" << std::endl;
 
-										std::cout << "item rendering in inventory: " << a << std::endl;
-										std::cout << "item transform: " << itemTransformComponent->position << std::endl;
 										uint32_t itemEntity = arch->entities[a];
 										vulkanRenderer->items[itemCounter].model = updateDataUBO_IconsUI(itemTransformComponent,
 																							   itemColliderComponent,
