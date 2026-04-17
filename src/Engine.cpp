@@ -15,6 +15,7 @@
 #include "Archetypes/PlayerArchetype.hpp"
 #include "Archetypes/ProjectileArchetype.hpp"
 #include "Archetypes/StaticMeshArchetype.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -990,22 +991,56 @@ namespace GLVM::core
 			}
 		}
 		
-		namespace cm = GLVM::ecs::components;
-		core::vector<Entity> healthEntities = componentManager->collectLinkedEntities<cm::transform,
-																					  cm::health>();
+//		namespace cm = GLVM::ecs::components;
+//		core::vector<Entity> healthEntities = componentManager->collectLinkedEntities<cm::transform,
+//																					  cm::health>();
 
+//		vulkanRenderer->crosshairs.clear();
 		vulkanRenderer->healthBars.clear();
-		for ( unsigned int i = 0; i < healthEntities.GetSize(); ++i ) {
-			unsigned int uiEntity = healthEntities[i];
-			vulkanRenderer->healthBars.Push({});
-			unsigned int uiVertexId = componentManager->GetComponent<ecs::components::mesh>(0)->handle.id;
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(uiEntity);
-			cm::health* healthComponent = componentManager->GetComponent<cm::health>(uiEntity);
-			vulkanRenderer->healthBars[i].meshID        = uiVertexId;
-			vulkanRenderer->healthBars[i].position      = transformComponent->position;
-			vulkanRenderer->healthBars[i].maxHealth     = healthComponent->maxHealth;
-			vulkanRenderer->healthBars[i].currentHealth = healthComponent->currentHealth;
+		healthBarsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedHealthBarsArchetypes[healthBarsArchetypesNumber] = arch;
+				++healthBarsArchetypesNumber;
+			}
 		}
+
+		for( uint32_t x = 0; x < healthBarsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedHealthBarsArchetypes[x];
+			cm::transform* healthBarTransforms = nullptr;
+			cm::mesh*      healthBarMeshes     = nullptr;
+			cm::health*    healthBars          = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				healthBarTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				healthBarMeshes     = static_cast<arch::PlayerArchetype*>( arch )->meshes;
+				healthBars          = static_cast<arch::PlayerArchetype*>( arch )->health;
+				break;
+			case arch::enemyComponentMask:
+				healthBarTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
+				healthBarMeshes     = static_cast<arch::EnemyArchetype*>( arch )->meshes;
+				healthBars          = static_cast<arch::EnemyArchetype*>( arch )->health;
+				break;
+			}
+
+			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+				vulkanRenderer->healthBars.Push({});
+				unsigned int uiVertexId           = healthBarMeshes[i].handle.id;
+				cm::transform* transformComponent = &healthBarTransforms[i];
+				cm::health* healthComponent       = &healthBars[i];
+				vulkanRenderer->healthBars[i].meshID        = uiVertexId;
+				vulkanRenderer->healthBars[i].position      = transformComponent->position;
+				vulkanRenderer->healthBars[i].maxHealth     = healthComponent->maxHealth;
+				vulkanRenderer->healthBars[i].currentHealth = healthComponent->currentHealth;
+			}
+		}
+		
+
 
 		core::vector<Entity> fontEntities      = componentManager->collectLinkedEntities<cm::transform,
 																						   cm::font>();

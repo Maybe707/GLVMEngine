@@ -121,6 +121,9 @@ namespace GLVM::core
 		uint32_t inventoryArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedItemArchetypes[32];
 		uint32_t itemArchetypesNumber = 0;
+		ecs::arch::Archetype* cachedHealthBarsArchetypes[32];
+		uint32_t healthBarsArchetypesNumber = 0;
+
 
 		
 		/// For FPS counting
