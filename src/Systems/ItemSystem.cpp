@@ -185,15 +185,15 @@ namespace GLVM::ecs
 			}
 
 			components::transform* itemTransformComponentView = nullptr;
-			switch( cachedCrosshairArchetype->mask ) {
-			case arch::crosshairComponentMask:
-				itemTransformComponentView = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
+			switch( cachedItemArchetype->mask ) {
+			case arch::itemComponentMask:
+				itemTransformComponentView = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->transforms;
 				break;
 			}
 
 			components::transform* crosshairTransformComponent = &crosshairTransformComponentView[0];
 			for ( unsigned int i = 0; i < cachedItemArchetype->entityCount; ++i ) {
-				int entityItemContaining = cachedItemArchetype->entities[i];
+				uint32_t entityItemContaining = cachedItemArchetype->entities[i];
 				cm::transform* itemTransformComponent = &itemTransformComponentView[i];
 
 				// bool isCrosshairCollided = false;
@@ -209,7 +209,8 @@ namespace GLVM::ecs
 				// 	itemColliderComponent->itemDrag = true;
 				// 	isItemDraged = true;
 				// }
-				if ( *dragedItemEntity >= 0 && *dragedItemEntity == entityItemContaining ) {
+				
+				if ( *dragedItemEntity >= 0 && *dragedItemEntity == (int)entityItemContaining ) {
 					itemTransformComponent->position = crosshairTransformComponent->position;                 ///< Set crosshair position to draged itemx
 				}
 			}
