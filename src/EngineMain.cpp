@@ -220,10 +220,11 @@ int main()
 	arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
 	arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
 	const uint32_t cubeIndex = cubeLocation.index;
-	cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 3.0f, 0.0f }, .scale = 4.0f };
+	cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 10.0f, 0.0f }, .scale = 4.0f };
 	cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
 	cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	cubeArch->fonts[cubeIndex].font_string.Push('R');
 	
 	arch::entity crosshair = archEntityManager->createEntity();
 	arch::world.addEntityToArchetype( crosshair, arch::world.archetypes[5] );

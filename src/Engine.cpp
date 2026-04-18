@@ -1010,6 +1010,7 @@ namespace GLVM::core
 			}
 		}
 
+		uint32_t healthBarCounter = 0;
 		for( uint32_t x = 0; x < healthBarsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedHealthBarsArchetypes[x];
 			cm::transform* healthBarTransforms = nullptr;
@@ -1033,10 +1034,11 @@ namespace GLVM::core
 				unsigned int uiVertexId           = healthBarMeshes[i].handle.id;
 				cm::transform* transformComponent = &healthBarTransforms[i];
 				cm::health* healthComponent       = &healthBars[i];
-				vulkanRenderer->healthBars[i].meshID        = uiVertexId;
-				vulkanRenderer->healthBars[i].position      = transformComponent->position;
-				vulkanRenderer->healthBars[i].maxHealth     = healthComponent->maxHealth;
-				vulkanRenderer->healthBars[i].currentHealth = healthComponent->currentHealth;
+				vulkanRenderer->healthBars[healthBarCounter].meshID        = uiVertexId;
+				vulkanRenderer->healthBars[healthBarCounter].position      = transformComponent->position;
+				vulkanRenderer->healthBars[healthBarCounter].maxHealth     = healthComponent->maxHealth;
+				vulkanRenderer->healthBars[healthBarCounter].currentHealth = healthComponent->currentHealth;
+				++healthBarCounter;
 			}
 		}
 		
@@ -1059,6 +1061,7 @@ namespace GLVM::core
 			}
 		}
 
+		uint32_t fontCounter = 0;
 		for( uint32_t x = 0; x < fontsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedFontsArchetypes[x];
 			cm::transform* fontTransforms = nullptr;
@@ -1081,9 +1084,10 @@ namespace GLVM::core
 				vulkanRenderer->fonts.Push({});
 				cm::font* fontComponent           = &fonts[i];
 				cm::transform* transformComponent = &fontTransforms[i];
-				vulkanRenderer->fonts[i].position    = transformComponent->position;
-				vulkanRenderer->fonts[i].font_string = fontComponent->font_string;
-				vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
+				vulkanRenderer->fonts[fontCounter].position    = transformComponent->position;
+				vulkanRenderer->fonts[fontCounter].font_string = fontComponent->font_string;
+				vulkanRenderer->fonts[fontCounter].lifeTime    = fontComponent->lifeTime;
+				++fontCounter;
 			}
 		}
 		
