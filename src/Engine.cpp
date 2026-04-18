@@ -1029,9 +1029,14 @@ namespace GLVM::core
 				break;
 			}
 
+			unsigned int uiVertexId = 0;
+			if( ecs::arch::matchesRequiredMask( arch->mask, arch::playerComponentMask ) ) {
+				uiVertexId = healthBarMeshes[0].handle.id;
+			}
+			
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 				vulkanRenderer->healthBars.Push({});
-				unsigned int uiVertexId           = healthBarMeshes[i].handle.id;
+//				unsigned int uiVertexId           = healthBarMeshes[i].handle.id;
 				cm::transform* transformComponent = &healthBarTransforms[i];
 				cm::health* healthComponent       = &healthBars[i];
 				vulkanRenderer->healthBars[healthBarCounter].meshID        = uiVertexId;
