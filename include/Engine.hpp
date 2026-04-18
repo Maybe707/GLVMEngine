@@ -123,8 +123,8 @@ namespace GLVM::core
 		uint32_t itemArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedHealthBarsArchetypes[32];
 		uint32_t healthBarsArchetypesNumber = 0;
-
-
+		ecs::arch::Archetype* cachedFontsArchetypes[32];
+		uint32_t fontsArchetypesNumber = 0;
 		
 		/// For FPS counting
 		unsigned int fpsCounter = 0;

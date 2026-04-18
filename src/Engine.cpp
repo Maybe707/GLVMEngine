@@ -1042,19 +1042,51 @@ namespace GLVM::core
 		
 
 
-		core::vector<Entity> fontEntities      = componentManager->collectLinkedEntities<cm::transform,
-																						   cm::font>();
+		// core::vector<Entity> fontEntities      = componentManager->collectLinkedEntities<cm::transform,
+		// 																				   cm::font>();
+		// vulkanRenderer->fonts.clear();
+
 		vulkanRenderer->fonts.clear();
-		for ( unsigned int i = 0; i < fontEntities.GetSize(); ++i ) {
-			unsigned int entity = fontEntities[i];
-			vulkanRenderer->fonts.Push({});
-			cm::font* fontComponent = componentManager->GetComponent<cm::font>(entity);
-			cm::transform* transformComponent = componentManager->GetComponent<cm::transform>(entity);
-			vulkanRenderer->fonts[i].position    = transformComponent->position;
-			vulkanRenderer->fonts[i].font_string = fontComponent->font_string;
-			vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
+		fontsArchetypesNumber = 0;
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::FONT_COMPONENT) |
+				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
+				cachedFontsArchetypes[fontsArchetypesNumber] = arch;
+				++fontsArchetypesNumber;
+			}
 		}
 
+		for( uint32_t x = 0; x < fontsArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedFontsArchetypes[x];
+			cm::transform* fontTransforms = nullptr;
+			cm::font*      fonts          = nullptr;
+			switch( arch->mask ) {
+			case arch::playerComponentMask:
+				fontTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
+				fonts          = static_cast<arch::PlayerArchetype*>( arch )->fonts;
+				break;
+			case arch::enemyComponentMask:
+				fontTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
+				fonts          = static_cast<arch::EnemyArchetype*>( arch )->fonts;
+				break;
+			case arch::staticMeshComponentMask:
+				fontTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
+				fonts          = static_cast<arch::StaticMeshArchetype*>( arch )->fonts;
+			}
+
+			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+				vulkanRenderer->fonts.Push({});
+				cm::font* fontComponent           = &fonts[i];
+				cm::transform* transformComponent = &fontTransforms[i];
+				vulkanRenderer->fonts[i].position    = transformComponent->position;
+				vulkanRenderer->fonts[i].font_string = fontComponent->font_string;
+				vulkanRenderer->fonts[i].lifeTime    = fontComponent->lifeTime;
+			}
+		}
+		
 		if ( vulkanRenderer->isInventoryOpened ) {
 			vulkanRenderer->inventories.clear();
 			uint32_t inventoryCounter = 0;
