@@ -54,7 +54,8 @@ namespace GLVM::ecs
 				if( &healthView[i] != nullptr && &attackView[i] != nullptr ) {
 					cm::health& healthComponent = healthView[i];
 					cm::attack& attackComponent = attackView[i];
-				
+
+					std::cout << "damage: " << attackComponent.damage << std::endl;
 					healthComponent.currentHealth -= attackComponent.damage;
 //					std::cout << "current health: " << healthComponent.currentHealth << std::endl;
 //				componentManager->RemoveComponent<cm::attack>(entity);

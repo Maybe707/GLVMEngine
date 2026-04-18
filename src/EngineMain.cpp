@@ -210,7 +210,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = megaChelHandle_GLTF, .gltf = false };
+	enemyArch->meshes[enemyIndex]    = { .handle = hyperCubeHandle2_GLTF, .gltf = false };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}

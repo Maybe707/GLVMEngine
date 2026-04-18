@@ -184,6 +184,12 @@ namespace GLVM::ecs
 				backtrackingColliderFlags = static_cast<arch::ItemArchetype*>( arch )->colliderFlags;
 				backtrackingMeshes = static_cast<arch::ItemArchetype*>( arch )->meshes;
 				break;
+			case arch::projectileComponentMask:
+				backtrackingTransforms = static_cast<arch::ProjectileArchetype*>( arch )->transforms;
+				backtrackingColliders = static_cast<arch::ProjectileArchetype*>( arch )->colliders;
+				backtrackingColliderFlags = static_cast<arch::ProjectileArchetype*>( arch )->colliderFlags;
+				backtrackingMeshes = static_cast<arch::ProjectileArchetype*>( arch )->meshes;
+				break;
 			}
 			
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
@@ -249,6 +255,10 @@ namespace GLVM::ecs
 						case arch::itemComponentMask:
 							comparedTransforms = static_cast<arch::ItemArchetype*>( comparedArch )->transforms;
 							comparedMeshes = static_cast<arch::ItemArchetype*>( comparedArch )->meshes;
+							break;
+						case arch::projectileComponentMask:
+							comparedTransforms = static_cast<arch::ProjectileArchetype*>( comparedArch )->transforms;
+							comparedMeshes = static_cast<arch::ProjectileArchetype*>( comparedArch )->meshes;
 							break;
 						}
 
@@ -365,7 +375,10 @@ namespace GLVM::ecs
 										std::cout << "wall collisiton between player: " << backtrackingEntityID << " and item: " <<
 											comparedEntityID << std::endl;
 									}
-									
+
+									if( backtrackingEntityID > 71 || comparedEntityID > 71 ) {
+//										std::cout << "COLLISION" << std::endl;
+									}
 									uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
 									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
 									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);

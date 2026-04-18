@@ -131,6 +131,8 @@ namespace GLVM::ecs
 		arch::EntityLocation projectileLocation = arch::world.entityLocations[arch::getId( projectileEntity )];
 		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
 		const uint32_t projectileIndex = projectileLocation.index;
+
+		std::cout << "projectile entity id: " << arch::getId( projectileEntity ) << std::endl;
 		
         core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
         pSound_Sample->kPath_to_File_ = "../laser2.wav";
