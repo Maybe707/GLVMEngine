@@ -119,7 +119,8 @@ namespace GLVM::ecs
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
 
-        if((backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + 1.7f >
+		constexpr float epsilon = 0.15f;
+        if((backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + epsilon >
 		   (comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale))) {
             return true;
         }
@@ -361,8 +362,8 @@ namespace GLVM::ecs
 										// std::cout << "comp scale: " << comparedScale << std::endl;
 									}
 									
-									uint8_t groudCollisionTurnOffMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | groudCollisionTurnOffMask;
+									uint8_t groudCollisionTurnOnMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+									backtrackingColliderFlags[i].flags = backtrackingColliderFlags[i].flags | groudCollisionTurnOnMask;
 									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
 							
 									continue;
@@ -379,8 +380,8 @@ namespace GLVM::ecs
 									if( backtrackingEntityID > 71 || comparedEntityID > 71 ) {
 //										std::cout << "COLLISION" << std::endl;
 									}
-									uint8_t wallCollisionTurnOffMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-									backtrackingColliderFlags[i].flags = backtrackingColliderFlags->flags | wallCollisionTurnOffMask;
+									uint8_t wallCollisionTurnOnMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+									backtrackingColliderFlags[i].flags = backtrackingColliderFlags[i].flags | wallCollisionTurnOnMask;
 									backtrackingColliders[i].colliders.Push(comparedArch->entities[j]);
 							
 									continue;

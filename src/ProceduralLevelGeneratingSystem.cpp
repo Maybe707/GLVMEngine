@@ -36,7 +36,7 @@ namespace GLVM::core
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int half_y_rand = distCurrentLevel_y(mersenne);
-				std::uniform_int_distribution<int> distCurrentLevel_x_z(4, 8);
+				std::uniform_int_distribution<int> distCurrentLevel_x_z(32, 32);
 				unsigned int half_x_rand = distCurrentLevel_x_z(mersenne);
 				unsigned int half_z_rand = distCurrentLevel_x_z(mersenne);
 
