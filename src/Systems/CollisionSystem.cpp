@@ -119,7 +119,7 @@ namespace GLVM::ecs
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
 
-		constexpr float epsilon = 0.15f;
+		constexpr float epsilon = 1.0f;
         if((backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + epsilon >
 		   (comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale))) {
             return true;
@@ -265,7 +265,7 @@ namespace GLVM::ecs
 
 						for(unsigned int j = 0; j < comparedArch->entityCount; ++j) {
 							[[maybe_unused]] uint32_t comparedEntityID = comparedArch->entities[j];
-							if( backtrackingEntityID == comparedEntityID ) {
+							if( backtrackingEntityID == comparedEntityID && i == j ) {
 								continue;
 							}
 							
