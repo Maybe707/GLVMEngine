@@ -12,6 +12,10 @@ namespace GLVM::core
 		float absolute_x = 0.0f;
 		float absolute_y = 0.0f;
 		float absolute_z = 0.0f;
+
+		float origin_offset_x = 0.0f;
+		float origin_offset_y = 0.0f;
+		float origin_offset_z = 0.0f;
 	};
 
 	struct MeshAxisLimitingValues {

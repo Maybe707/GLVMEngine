@@ -86,6 +86,7 @@ int main()
 	[[maybe_unused]] cm::MeshHandle simpleCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/simpleCube2.gltf");
 	[[maybe_unused]] cm::MeshHandle crosshair_001_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/crosshair_001.gltf");
 	[[maybe_unused]] cm::MeshHandle inventory_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/inventory.gltf");
+	[[maybe_unused]] cm::MeshHandle cyborg_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/cyborg2.gltf");
 
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
@@ -151,11 +152,11 @@ int main()
 	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
 	const uint32_t playerIndex = playerLocation.index;
 
-	playerArch->transforms[playerIndex]  = { .position = { 5.0f, 5.0f, 15.0f }, .scale = 1.0f };
+	playerArch->transforms[playerIndex]  = { .position = { 15.0f, 5.0f, 15.0f }, .scale = 1.0f };
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
-	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 0.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
-	playerArch->meshes[playerIndex]      = { .handle = cubeHandle_OBJ, .gltf = true };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 2.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
+	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
@@ -188,9 +189,9 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 5, 5.0f, 0.0f ) + randomDirection }, .scale = 1.0f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 5, 35.0f, 0.0f ) + randomDirection }, .scale = 1.0f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
-	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 1.0f };
+	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 1.5f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
 	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
@@ -210,7 +211,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = megaChelHandle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}

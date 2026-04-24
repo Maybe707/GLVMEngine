@@ -57,18 +57,18 @@ namespace GLVM::ecs
 		// }
 
 		//std::cout << "absolute x: " << backtrackingMeshAxisMaxAbsoluteValues.absolute_x << std::endl;
-        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
-		   comparedPosition[0] - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[0] - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
-		   comparedPosition[1] - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
-		   comparedPosition[2] - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
-           backtrackingPosition[2] - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
+        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
+		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
+		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
+           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
+		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
+           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
+		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
+           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
+		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
+           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
+		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
 				return true;
 		}
         
@@ -119,9 +119,9 @@ namespace GLVM::ecs
 		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
 		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
 
-		constexpr float epsilon = 1.0f;
-        if((backtrackingPosition[1] - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + epsilon >
-		   (comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale))) {
+		constexpr float epsilon = 0.15f;
+        if((backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale) + epsilon >
+		   (comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y + (comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale))) {
             return true;
         }
 
