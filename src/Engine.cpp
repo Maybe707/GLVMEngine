@@ -1690,6 +1690,11 @@ namespace GLVM::core
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
 			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
+
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (vulkanRenderer->meshAxisLimitingValues.highest_x + vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (vulkanRenderer->meshAxisLimitingValues.highest_y + vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
+			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (vulkanRenderer->meshAxisLimitingValues.highest_z + vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
+			
 			++wavefrontObjCounter;
 			// std::cout << "WAVEFRONT" << std::endl;
 			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
