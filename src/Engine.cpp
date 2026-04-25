@@ -7,6 +7,7 @@
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Archetypes/CrosshairArchetype.hpp"
 #include "Archetypes/DirectionalLightArchetype.hpp"
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/InventoryArchetype.hpp"
@@ -1245,8 +1246,8 @@ namespace GLVM::core
 			cm::mesh*      actorMeshes     = nullptr;
 			switch( arch->mask ) {
 			case arch::crosshairComponentMask:
-				actorTransforms = static_cast<arch::LevelChunkArchetype*>( arch )->transforms;
-				actorMeshes     = static_cast<arch::LevelChunkArchetype*>( arch )->meshes;
+				actorTransforms = static_cast<arch::CrosshairArchetype*>( arch )->transforms;
+				actorMeshes     = static_cast<arch::CrosshairArchetype*>( arch )->meshes;
 				break;
 			}
 
