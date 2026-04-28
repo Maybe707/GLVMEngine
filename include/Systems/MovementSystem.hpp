@@ -53,7 +53,8 @@ namespace GLVM::ecs
 			ecs::components::beholder*      playerViews         = nullptr;
 			ecs::components::colliderFlags* playerColliderFlags = nullptr;
 			ecs::components::rigidBody*     playerRigidBody     = nullptr;
-			
+
+			/// Components related to archetypes contains Rigis
 			ecs::components::transform* transforms   = nullptr;
 			ecs::components::rigidBody* rigidBodies  = nullptr;
 			ecs::components::move*      moves        = nullptr;
@@ -62,7 +63,8 @@ namespace GLVM::ecs
 		
 		arch::componentMask playerRequiredMask =
 			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
-		arch::componentMask rigidBodyRequiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+		arch::componentMask rigidBodyRequiredMask =
+			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
 			(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
         

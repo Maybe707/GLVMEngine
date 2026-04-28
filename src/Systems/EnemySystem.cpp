@@ -10,6 +10,7 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include "Components/ProjectileBundle.hpp"
 #include <cstdint>
 
 namespace GLVM::ecs
@@ -17,35 +18,35 @@ namespace GLVM::ecs
 	void EnemySystem::Update() {
 		namespace arch = GLVM::ecs::arch;
 
-		uint32_t playerEntityCount = 0;
-		arch::PlayerArchetype* playerArch = {};
-		if( arch::world.archetypes.GetSize() > 1 ) {
-			playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
-			playerEntityCount = playerArch->entityCount;
-		}
-		uint32_t enemyEntityCount = 0;
-		arch::EnemyArchetype*  enemyArch = {};
-		if( arch::world.archetypes.GetSize() > 2 ) {
-			enemyArch  = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
-			enemyEntityCount = enemyArch->entityCount;
-		}
-		for( uint32_t j = 0; j < playerEntityCount; ++j ) {
-			components::transform* playerTransformComponent = &playerArch->transforms[j];
-			for ( unsigned int i = 0; i < enemyEntityCount; ++i ) {
-				components::transform* enemyTransformComponent = &enemyArch->transforms[i];
-				components::state* stateEnemyComponent         = &enemyArch->states[i];
-				components::enemy* enemyComponent              = &enemyArch->enemies[i];
+		playerArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		componentsView.playerTransforms = (ecs::components::transform*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+
+		enemyArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( enemyRequiredMask, &archView.enemyCachedArchetype, enemyArchetypesNumber );
+		componentsView.enemyTransforms = (ecs::components::transform*)archView.enemyCachedArchetype->
+			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+		componentsView.enemyStates     = (ecs::components::state*)archView.enemyCachedArchetype->
+			components[arch::ComponentsIndices::STATE_COMPONENT];
+		componentsView.enemies         = (ecs::components::enemy*)archView.enemyCachedArchetype->
+			components[arch::ComponentsIndices::ENEMY_COMPONENT];
+		
+		for( uint32_t j = 0; j < archView.playerCachedArchetype->entityCount; ++j ) {
+			components::transform* playerTransformComponent = &componentsView.playerTransforms[j];
+			for ( unsigned int i = 0; i < archView.enemyCachedArchetype->entityCount; ++i ) {
+				components::transform* enemyTransformComponent = &componentsView.enemyTransforms[i];
+				components::state*     stateEnemyComponent     = &componentsView.enemyStates[i];
+				components::enemy*     enemyComponent          = &componentsView.enemies[i];
 
 				vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
-			
-				float cameraSpeed = 5.5f * deltaFrameTime;            
-
-
+				float cameraSpeed = 5.5f * deltaFrameTime;
+				
 				if(projectileCooldown > 0)
 					projectileCooldown -= cameraSpeed;
 				if ( distance.Length() > enemyComponent->detectRadius && stateEnemyComponent->state == core::States::ATTACK ) {
-					float deltaLenth = distance.Length() - enemyComponent->detectRadius;
-					vec3 enemyMove = distance * (deltaLenth / distance.Length());
+					float deltaLength = distance.Length() - enemyComponent->detectRadius;
+					vec3 enemyMove = distance * (deltaLength / distance.Length());
 
 					enemyTransformComponent->position += enemyMove;
 				}
@@ -65,7 +66,9 @@ namespace GLVM::ecs
 	void EnemySystem::CalculateProjectile(components::transform* playerTransformComponent, components::transform* enemyTransformComponent) {
 		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
 		arch::entity projectileEntity = archEntityManager->createEntity();
-		arch::world.addEntityToArchetype( projectileEntity, arch::world.archetypes[3] );
+		projectileArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
+		arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
 		arch::EntityLocation projectileLocation = arch::world.entityLocations[arch::getId( projectileEntity )];
 		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
 		const uint32_t projectileIndex = projectileLocation.index;
@@ -80,25 +83,22 @@ namespace GLVM::ecs
 		if ( meshHandlers.GetSize() > 0 )
 			meshHandle = meshHandlers[0];
 
-		projectileArch->meshes[projectileIndex].handle = meshHandle;
+		ecs::components::mesh* projectileMesh = &projectileArch->meshes[projectileIndex];
+		projectileMesh->handle = meshHandle;
 		ecs::TextureHandle textureHandle{};
 		if ( textureHandlers.GetSize() > 0 )
 			textureHandle = textureHandlers[0];
 
-		projectileArch->projectileBundles[projectileIndex].material  = { .diffuseTextureID_ = textureHandle,
+		arch::ProjectileBundle* projectileBundle = &projectileArch->projectileBundles[projectileIndex];
+		projectileBundle->material  = { .diffuseTextureID_ = textureHandle,
 			.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 			.shininess = 128.0f * 0.078125f };
 		components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
 		rTransformProjectile->scale = 0.1f;
-
 		rTransformProjectile->position = enemyTransformComponent->position;
 		rTransformProjectile->forward   = playerTransformComponent->position - enemyTransformComponent->position;
 		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
 		
-		// *(componentManager->GetComponent<cm::pointLight>(uiEntity_Projectile)) = { .position = rTransformProjectile->position,
-		// 	.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse = { 0.5f, 0.5f, 0.5f }, .specular = { 1.1f, 1.2f, 1.3f },
-		// 	.constant = 1.4f, .linear = 0.1f, .quadratic = 0.128f };
-
 		components::damage* damageComponent = &projectileArch->projectileBundles[projectileIndex].damage;
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;

@@ -11,6 +11,6 @@ namespace GLVM::ecs::arch {
 		components::damage     damage;
 		components::material   material;
 	};
-}; // namespace GLVM::ecs::components
+}; // namespace GLVM::ecs::arch
 
 #endif

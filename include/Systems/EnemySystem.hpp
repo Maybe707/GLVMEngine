@@ -6,6 +6,8 @@
 #ifndef ENEMY_SYSTEM
 #define ENEMY_SYSTEM
 
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "ISystem.hpp"
 #include "EntityManager.hpp"
 #include "Vector.hpp"
@@ -21,6 +23,34 @@ namespace GLVM::ecs
 	class EnemySystem : public ISystem
 	{
 	public:
+		uint32_t playerArchetypesNumber      = 0;
+		uint32_t enemyArchetypesNumber       = 0;
+		uint32_t projectileArchetypesNumber  = 0;
+		struct ArchView {
+			arch::Archetype* playerCachedArchetype = nullptr;
+			arch::Archetype* enemyCachedArchetype  = nullptr;
+			arch::Archetype* projectileArchetype   = nullptr;
+		} archView;
+		
+		struct ComponentsView {
+			ecs::components::transform* playerTransforms = nullptr;
+
+			ecs::components::transform* enemyTransforms  = nullptr;
+			ecs::components::state*     enemyStates      = nullptr;
+			ecs::components::enemy*     enemies          = nullptr;
+		} componentsView;
+
+		arch::componentMask playerRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
+
+		arch::componentMask enemyRequiredMask  =
+			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
+			(1ul << arch::ComponentsIndices::STATE_COMPONENT) |
+			(1ul << arch::ComponentsIndices::ENEMY_COMPONENT);
+
+		arch::componentMask projectileRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+		
 		void Update() override;
 		void CalculateProjectile(components::transform* playerTransformComponent, components::transform* enemyTransformComponent);
 
