@@ -37,4 +37,15 @@ namespace GLVM::ecs::arch {
 
         location.arch = nullptr;
     }
+
+	void World::searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber ) {
+		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = arch::world.archetypes[i];
+
+			if( (arch->mask & requiredMask) == requiredMask ) {
+				cachedArchetypes[cachedArchetypesNumber] = arch;
+				++cachedArchetypesNumber;
+			}
+		}
+	}
 }; // namespace GLVM::ecs::arch

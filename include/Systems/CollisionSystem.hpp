@@ -7,29 +7,22 @@
 #define COLLISION_SYSTEM
 
 #include "ArchetypeECS/ArchetypeInterface.hpp"
-#include "Components/ItemComponent.hpp"
-#include "Vector.hpp"
-#include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "ISystem.hpp"
 #include "Event.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
-#include "Vector.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
 #include "VertexMath.hpp"
-#include "Components/ViewComponent.hpp"
 #include <cstdint>
-#include <mutex>
 #include "Globals.hpp"
-#include "GraphicAPI/Vulkan.hpp"
 
 namespace GLVM::ecs
 {
 	class CCollisionSystem : public ISystem
 	{   
 	public:
-        
 		float fDelta_Time_;
 		float gravity;
 		bool isInventoryOpened;
@@ -39,33 +32,38 @@ namespace GLVM::ecs
         core::CStack& Input_Stack_;
 		arch::Archetype* cachedArchetypes[32];
 		uint32_t cachedArchetypesNumber = 0;
+		
+		struct CollisionView {
+			components::transform* backtrackingTransforms        = nullptr;
+			components::collider*  backtrackingColliders         = nullptr;
+			components::colliderFlags* backtrackingColliderFlags = nullptr;
+			components::mesh* backtrackingMeshes                 = nullptr;
+			components::move* backtrackingMove = nullptr;
+			components::transform* comparedTransforms            = nullptr;
+			components::mesh*      comparedMeshes                = nullptr;
+			components::move* comparedMove     = nullptr;
+		} view;
+		
+		arch::componentMask	requiredMask = (1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+			(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
-		void Repel(components::transform& _transform_Component,
-                   components::move& _move_Component,
-				   float& _fDelta_Time,
-				   components::beholder& _view_Component,
-				   core::CEvent& _event);
-        bool Gravity(components::transform& _transform_Component);
-		bool BoxCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-		                 float backtrackingScale, float comparedScale,
-						 components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
-		bool SquareCollider(vec3 backtrackingPosition, vec3 comparedPosition,
-							float backtrackingScale, float comparedScale_X, float comparedScale_Y,
-							components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
-		bool DotCollider(vec3 backtrackingPosition, vec3 comparedPosition, float comparedScale,
+		bool BoxCollider(vec3 backtrackingPosition,
+						 vec3 comparedPosition,
+		                 float backtrackingScale,
+						 float comparedScale,
+						 components::MeshHandle backtrackingMeshHandle,
 						 components::MeshHandle comparedMeshHandle);
+		
 		void Update() override;
-		static core::vector<unsigned int> searchItemSlots(components::ItemSlotType itemSlotType, vec3 itemPosition, const core::vector<unsigned int>& collidedInventorySlotEntities,
-													  const core::vector<vec3>& collidedInventorySlotTransforms);
-		int slotsAvailabilityState(const core::vector<unsigned int>& slots_);
-		unsigned int searchMinimumValueIndex(core::vector<float> vector);
-		void bubbleSortVector(core::vector<unsigned int>& vector_);
-        bool UpperActorCheck(vec3 backtrackingPosition, vec3 comparedPosition,
-							 float backtrackingScale, float comparedScale,
-							 components::MeshHandle backtrackingMeshHandle, components::MeshHandle comparedMeshHandle);
-		bool RayCast(vec3 rayCasterPosition, vec3 receiverPosition,
-					 float rayCasterScale, float receiverScale);
+        bool UpperActorCheck(vec3 backtrackingPosition,
+							 vec3 comparedPosition,
+							 float backtrackingScale,
+							 float comparedScale,
+							 components::MeshHandle backtrackingMeshHandle,
+							 components::MeshHandle comparedMeshHandle);
     };
 }
 	

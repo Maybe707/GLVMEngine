@@ -12,6 +12,7 @@ namespace GLVM::ecs::arch {
 
 		void addEntityToArchetype(entity entity_, Archetype* arch);
 		void removeEntity(entity entity_);
+		void searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber );
 	};
 
 	extern World world;
