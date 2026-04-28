@@ -33,7 +33,7 @@ namespace GLVM::ecs
 		arch::Archetype* cachedArchetypes[32];
 		uint32_t cachedArchetypesNumber = 0;
 		
-		struct CollisionView {
+		struct CollisionComponentsView {
 			components::transform* backtrackingTransforms        = nullptr;
 			components::collider*  backtrackingColliders         = nullptr;
 			components::colliderFlags* backtrackingColliderFlags = nullptr;

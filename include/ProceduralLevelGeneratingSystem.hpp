@@ -25,8 +25,13 @@ namespace GLVM::core
 		vec3 transitionBridgePosition     = { 0.0f, 0.0f, 0.0f };
 		unsigned int nextLevelTransitionDirection = 0;
 		unsigned int previousIterationTransitionBridgeDirection = 0;
-		core::vector<ecs::arch::Archetype*> cachedArchetypes;
-		ecs::arch::componentMask mask     =
+
+		u32 cachedLevelChunkArchNumber = 0;
+		struct ProceduralLevelArchView {
+			ecs::arch::Archetype* cachedLevelChunkArch = nullptr;
+		} archView;
+			
+		ecs::arch::componentMask requiredMask     =
 			(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ull << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
 			(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT) |

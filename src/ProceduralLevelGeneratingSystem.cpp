@@ -36,7 +36,7 @@ namespace GLVM::core
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int half_y_rand = distCurrentLevel_y(mersenne);
-				std::uniform_int_distribution<int> distCurrentLevel_x_z(32, 32);
+				std::uniform_int_distribution<int> distCurrentLevel_x_z(8, 16);
 				unsigned int half_x_rand = distCurrentLevel_x_z(mersenne);
 				unsigned int half_z_rand = distCurrentLevel_x_z(mersenne);
 
@@ -69,35 +69,22 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
 				
 
-				// Entity gameLevelEntity = EntityManager->CreateEntity();
-				// ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(gameLevelEntity);
-				// *ComponentManager->GetComponent<cm::transform>(gameLevelEntity) = { .position = currentLevelPosition, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
-				// ComponentManager->GetComponent<cm::mesh>(gameLevelEntity)->handle = gameLevelMeshHandle;
-//				cm::material* gameLevelMaterial  = ComponentManager->GetComponent<cm::material>(gameLevelEntity);
-//				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
-				// *gameLevelMaterial = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f },
-				// 	.shininess = 128.0f * 0.078125f };
-
-				/// New arch ECS
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				arch::entity gameLevelChunkEntity = archEntityManager->createEntity();
+
+				cachedLevelChunkArchNumber = 0;
+				/// Search and cache one time for LevelChunkArch
+				arch::world.searchCacheArchetypes( requiredMask, &archView.cachedLevelChunkArch, cachedLevelChunkArchNumber );
 				
-				if( arch::world.archetypes.GetSize() > 0 && arch::world.archetypes[0] != nullptr ) {
-					arch::world.addEntityToArchetype( gameLevelChunkEntity, arch::world.archetypes[0] );
-				}
-				arch::EntityLocation gameLevelChunkLocation = {};
-				if( arch::world.entityLocations.GetSize() > 0 ) {
-					gameLevelChunkLocation = arch::world.entityLocations[arch::getId( gameLevelChunkEntity )];
-				}
+				arch::world.addEntityToArchetype( gameLevelChunkEntity, archView.cachedLevelChunkArch );
+				arch::EntityLocation gameLevelChunkLocation = arch::world.entityLocations[arch::getId( gameLevelChunkEntity )];
 				
 				arch::LevelChunkArchetype* levelChunkArch = static_cast<arch::LevelChunkArchetype*>(gameLevelChunkLocation.arch);
 				const uint32_t gameLevelChunkIndex = gameLevelChunkLocation.index;
 				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
-				if( levelChunkArch != nullptr ) {
-					levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
-					levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
-					levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
-				}
+				levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
+				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+				levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
 				
 				for ( unsigned int i = 0; i < 36; ++i )
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
@@ -122,32 +109,18 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
 				
 
-//				Entity transitionBridgeEntity = EntityManager->CreateEntity();
-//				ComponentManager->CreateComponent<cm::material, cm::collider, cm::mesh, cm::transform, cm::actor>(transitionBridgeEntity);
-//				*ComponentManager->GetComponent<cm::transform>(transitionBridgeEntity) = { .position = transitionBridgePosition, .yaw = 0.0f, .pitch = 0.0f, .scale = 1.0f, .gltf = true };
-//				ComponentManager->GetComponent<cm::mesh>(transitionBridgeEntity)->handle = transitionBridgeMeshHandle;
-//				cm::material* transitionBridgeMaterial  = ComponentManager->GetComponent<cm::material>(transitionBridgeEntity);
-//				ecs::TextureHandle transitionBridgeTexture = textureHandlers[3];
-//				*transitionBridgeMaterial = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f },
-//					.shininess = 128.0f * 0.078125f };
-
 				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = GLVM->LoadMesh();
 				arch::entity transitionBridgeEntity = archEntityManager->createEntity();
-				if( arch::world.archetypes.GetSize() > 0 && arch::world.archetypes[0] != nullptr ) {
-					arch::world.addEntityToArchetype( transitionBridgeEntity, arch::world.archetypes[0] );
-				}
-				arch::EntityLocation transitionBridgeLocation = {};
-				if( arch::world.entityLocations.GetSize() > 0 ) {
-					transitionBridgeLocation = arch::world.entityLocations[arch::getId( transitionBridgeEntity )];
-				}
+				arch::world.addEntityToArchetype( transitionBridgeEntity, archView.cachedLevelChunkArch );
+
+				arch::EntityLocation transitionBridgeLocation = arch::world.entityLocations[arch::getId( transitionBridgeEntity )];
+
 				arch::LevelChunkArchetype* transitionBridgeArch = static_cast<arch::LevelChunkArchetype*>(transitionBridgeLocation.arch);
 				const uint32_t transitionBridgeIndex = transitionBridgeLocation.index;
 				ecs::TextureHandle transitionBridgeTexture = textureHandlers[3];
-				if( transitionBridgeArch != nullptr ) {
-					transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
-					transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
-					transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
-				}
+				transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
+				transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+				transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
 				
 				++levelNubmer;
 			}
@@ -207,18 +180,6 @@ namespace GLVM::core
 			break;
 			}
 
-			// std::cout << "next level position: " << "x: " << currentLevelPosition[0] << " y: " << currentLevelPosition[1] << " z: " << currentLevelPosition[2] << std::endl;
-			// std::cout << "half x: " << half_x_rand << std::endl;
-			// std::cout << "half y: " << half_y_rand << std::endl;
-			// std::cout << "half z: " << half_z_rand << std::endl;
-
-			// std::cout << "lowest x: " << coordinateMaximumValuePerDirection.lowest_x << std::endl;
-			// std::cout << "highest x: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
-			// std::cout << "lowest y: " << coordinateMaximumValuePerDirection.lowest_y << std::endl;
-			// std::cout << "highest y: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
-			// std::cout << "lowest z: " << coordinateMaximumValuePerDirection.lowest_z << std::endl;
-			// std::cout << "highest z: " << coordinateMaximumValuePerDirection.highest_x << std::endl;
-			
 			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
 				std::cout << "LEVEL COLLITION DETECTED" << std::endl;
 				previousIterationTransitionBridgeDirection = (4 + previousIterationTransitionBridgeDirection) % 4 + 1;
