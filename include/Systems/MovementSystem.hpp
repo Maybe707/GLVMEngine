@@ -6,6 +6,8 @@
 #ifndef MOVEMENT_SYSTEM_HPP
 #define MOVEMENT_SYSTEM_HPP
 
+#include "Components/ColliderFlagsComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Event.hpp"
 #include "Components/TransformComponent.hpp"
 #include "ISoundEngine.hpp"
@@ -22,6 +24,7 @@
 #include "ISoundEngine.hpp"
 #include "Components/SpotLightComponent.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Components/ItemComponent.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 
@@ -37,10 +40,31 @@ namespace GLVM::ecs
 		float prev_X             = 0.0f;
 		float current_X          = 0.0f;
 		vec3  prev_forward;
-		arch::Archetype* rigidBodyContainedArchetypesCache[32];
+
+		uint32_t playerArchetypesNumber = 0;
 		uint32_t rigidBodyContainedArchetypesNumber = 0;
-//		arch::componentMask mask = 
+		struct MovementArchView {
+			arch::Archetype* playerCachedArchetype = nullptr;
+			arch::Archetype* rigidBodyContainedArchetypesCache[32];
+		} archView;
+
+		struct MovementComponentsView {
+			ecs::components::move*          playerMoves         = nullptr;
+			ecs::components::beholder*      playerViews         = nullptr;
+			ecs::components::colliderFlags* playerColliderFlags = nullptr;
+			ecs::components::rigidBody*     playerRigidBody     = nullptr;
 			
+			ecs::components::transform* transforms   = nullptr;
+			ecs::components::rigidBody* rigidBodies  = nullptr;
+			ecs::components::move*      moves        = nullptr;
+			ecs::components::item*      items        = nullptr;
+		} componentsView;
+		
+		arch::componentMask playerRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
+		arch::componentMask rigidBodyRequiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
+			(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
         
         CMovementSystem( core::CStack& inputStack );
 

@@ -10,27 +10,14 @@
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
-#include "ComponentManager.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/ControllerComponent.hpp"
-#include "Components/DirectionalLightComponent.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
 #include "Components/MoveComponent.hpp"
-#include "Components/MaterialComponent.hpp"
-#include "Components/PointLightComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
-#include "Components/SpotLightComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Components/VertexComponent.hpp"
-#include "Components/ProjectileComponent.hpp"
 #include "Components/ViewComponent.hpp"
-#include "Engine.hpp"
-#include "EntityManager.hpp"
 #include "Event.hpp"
-#include "ISoundEngine.hpp"
-#include "Vector.hpp"
 #include "VertexMath.hpp"
 #include <cstdint>
-#include <cstdio>
 #include <sys/types.h>
 
 namespace GLVM::ecs
@@ -43,42 +30,48 @@ namespace GLVM::ecs
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 
-		arch::PlayerArchetype* playerArch = {};
-		uint32_t entityCount = 0;
-		if( arch::world.archetypes.GetSize() > 1 ) {
-			playerArch = static_cast<arch::PlayerArchetype*>(arch::world.archetypes[1]);
-			entityCount = playerArch->entityCount;
-		}
+		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		componentsView.playerMoves         = (ecs::components::move*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::MOVE_COMPONENT];
+		componentsView.playerViews         = (ecs::components::beholder*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::VIEW_COMPONENT];
+		componentsView.playerColliderFlags = (ecs::components::colliderFlags*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT];
+		componentsView.playerRigidBody     = (ecs::components::rigidBody*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
+		
         const float cameraSpeed = 1.0f * deltaFrameTime;            
-
-        for(unsigned int i = 0; i < entityCount; ++i) {
-			cm::beholder* beholderComponent     = &playerArch->beholders[i];
+        for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
+			cm::beholder*      playerView          = &componentsView.playerViews[i];
+			cm::move*          playerMove          = &componentsView.playerMoves[i];
+			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
+			cm::rigidBody*     playerRigidBody     = &componentsView.playerRigidBody[i];
             for(int n = 0; n < 6; ++n) {
 				vec3 right;
 				vec3 forward;
                 switch(inputStack[n])
                 {
                 case core::EEvents::eMOVE_LEFT:
-					right = CalculateVectorRL(*beholderComponent);
-					playerArch->moves[i].frameMovement -= right * cameraSpeed;
+					right = CalculateVectorRL(*playerView);
+					playerMove->frameMovement -= right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
-					right = CalculateVectorRL(*beholderComponent);
-					playerArch->moves[i].frameMovement += right * cameraSpeed;
+					right = CalculateVectorRL(*playerView);
+					playerMove->frameMovement += right * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
-                    forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					playerArch->moves[i].frameMovement -= forward * cameraSpeed;
+                    forward = CalculateVectorFB(*playerView, g_eEvent);
+					playerMove->frameMovement -= forward * cameraSpeed;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
-					forward = CalculateVectorFB(*beholderComponent, g_eEvent);
-					playerArch->moves[i].frameMovement += forward * cameraSpeed;
+					forward = CalculateVectorFB(*playerView, g_eEvent);
+					playerMove->frameMovement += forward * cameraSpeed;
                     break;
                 case core::EEvents::eJUMP:
 				{
 					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-					if ( playerArch->colliderFlags[i].flags & isGroudCollisionMask ) {
-						playerArch->rigidBodies[i].jumpAccumulator = 1.5f;
+					if ( playerColliderFlags->flags & isGroudCollisionMask ) {
+						playerRigidBody->jumpAccumulator = 1.5f;
 					}
 				}
                     break;
@@ -89,95 +82,31 @@ namespace GLVM::ecs
         }
 
 		rigidBodyContainedArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				rigidBodyContainedArchetypesCache[rigidBodyContainedArchetypesNumber] = arch;
-				++rigidBodyContainedArchetypesNumber;
-			}
-		}
+		arch::world.searchCacheArchetypes( rigidBodyRequiredMask, archView.rigidBodyContainedArchetypesCache , rigidBodyContainedArchetypesNumber );
 
 		for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
-			arch::Archetype* currentArch = rigidBodyContainedArchetypesCache[i0];
-			cm::transform* transforms   = nullptr;
-			cm::rigidBody* rigidBodies  = nullptr;
-			cm::move*      moves        = nullptr;
-			cm::item*      items        = nullptr;
-			switch( currentArch->mask ) {
-			case arch::playerComponentMask:
-				transforms  = static_cast<arch::PlayerArchetype*>( currentArch )->transforms;
-				rigidBodies = static_cast<arch::PlayerArchetype*>( currentArch )->rigidBodies;
-				moves       = static_cast<arch::PlayerArchetype*>( currentArch )->moves;
-				break;
-			case arch::enemyComponentMask:
-				transforms  = static_cast<arch::EnemyArchetype*>( currentArch )->transforms;
-				rigidBodies = static_cast<arch::EnemyArchetype*>( currentArch )->rigidBodies;
-				moves       = static_cast<arch::EnemyArchetype*>( currentArch )->moves;
-				break;
-			case arch::itemComponentMask:
-				transforms  = static_cast<arch::ItemArchetype*>( currentArch )->transforms;
-				rigidBodies = static_cast<arch::ItemArchetype*>( currentArch )->rigidBodies;
-				moves       = static_cast<arch::ItemArchetype*>( currentArch )->moves;
-				items       = static_cast<arch::ItemArchetype*>( currentArch )->items;
-				break;
-			}
+			arch::Archetype* currentArch = archView.rigidBodyContainedArchetypesCache[i0];
+			componentsView.transforms  = (ecs::components::transform*)currentArch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			componentsView.rigidBodies = (ecs::components::rigidBody*)currentArch->components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
+			componentsView.moves       = (ecs::components::move*)currentArch->components[arch::ComponentsIndices::MOVE_COMPONENT];
+			componentsView.items       = (ecs::components::item*)currentArch->components[arch::ComponentsIndices::ITEM_COMPONENT];
 
-			if( transforms && rigidBodies && moves ) {
-				for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
-					if( items && !items[i1].isActor )
-						continue;
+			for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
+				if( componentsView.items && !componentsView.items[i1].isActor )
+					continue;
 						
-					cm::transform* rTransform_Component = &transforms[i1];
-					cm::rigidBody* rigidBodyComponennt  = &rigidBodies[i1];
-					cm::move*      moveComponent        = &moves[i1];
-					rTransform_Component->gravityAccumulator += deltaFrameTime;
-					float gravity = 9.8f * rTransform_Component->gravityAccumulator
-						* rigidBodyComponennt->fMass_ * 0.0005;
-					if ( gravity > 0.2f )
-						gravity = 0.2;
+				cm::transform* rTransform_Component = &componentsView.transforms[i1];
+				cm::rigidBody* rigidBodyComponennt  = &componentsView.rigidBodies[i1];
+				cm::move*      moveComponent        = &componentsView.moves[i1];
+				rTransform_Component->gravityAccumulator += deltaFrameTime;
+				float gravity = 9.8f * rTransform_Component->gravityAccumulator
+					* rigidBodyComponennt->fMass_ * 0.0005;
+				if ( gravity > 0.2f )
+					gravity = 0.2;
 
-					moveComponent->gravity[1] -= gravity;
-				}
+				moveComponent->gravity[1] -= gravity;
 			}
 		}
-//		}
-		
-		
-		// for(unsigned int n = 0; n < entityCount; ++n) {
-		// 	cm::transform* rTransform_Component = &playerArch->transforms[n];
-		// 	cm::rigidBody* rigidBodyComponennt  = &playerArch->rigidBodies[n];
-		// 	cm::move* moveComponent             = &playerArch->moves[n];
-		// 	rTransform_Component->gravityAccumulator += deltaFrameTime;
-		// 	float gravity = 9.8f * rTransform_Component->gravityAccumulator
-		// 		* rigidBodyComponennt->fMass_ * 0.0005;
-		// 	if ( gravity > 0.2f )
-		// 		gravity = 0.2;
-
-		// 	moveComponent->gravity[1] -= gravity;
-        // }
-
-		// arch::EnemyArchetype* enemyArch = {};
-		// entityCount = 0;
-		// if( arch::world.archetypes.GetSize() > 2 ) {
-		// 	enemyArch = static_cast<arch::EnemyArchetype*>(arch::world.archetypes[2]);
-		// 	entityCount = enemyArch->entityCount;
-		// }
-		// for(unsigned int n = 0; n < entityCount; ++n) {
-		// 	cm::transform* rTransform_Component = &enemyArch->transforms[n];
-		// 	cm::rigidBody* rigidBodyComponennt  = &enemyArch->rigidBodies[n];
-		// 	cm::move* moveComponent             = &enemyArch->moves[n];
-		// 	rTransform_Component->gravityAccumulator += deltaFrameTime;
-		// 	float gravity = 9.8f * rTransform_Component->gravityAccumulator
-		// 		* rigidBodyComponennt->fMass_ * 0.0005;
-		// 	if ( gravity > 0.2f )
-		// 		gravity = 0.2;
-
-		// 	moveComponent->gravity[1] -= gravity;
-        // }
     }
 
     Vector<float, 3> CMovementSystem::CalculateVectorRL(components::beholder& beholder) {
