@@ -17,43 +17,20 @@ namespace GLVM::ecs
 	void DamageSystem::Update() {
 		namespace cm = GLVM::ecs::components;
 
-		cachedArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ATTACK_COMPONENT) |
-				(1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::FONT_COMPONENT);
+		cachedAttackableArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( attackableRequiredMask, archView.cachedAttackableArchetypes, cachedAttackableArchetypesNumber );
 
-			if( (arch->mask & requiredMask) == requiredMask ) {
-				cachedArchetypes[cachedArchetypesNumber] = arch;
-				++cachedArchetypesNumber;
-			}
-		}
-
-		cachedFontArchetypesNumber = 0;
-		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
-			arch::Archetype* arch = cachedArchetypes[x];
-			components::attack* attackView = nullptr;
-			components::health* healthView = nullptr;
-			components::font*   fontView   = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				attackView = static_cast<arch::PlayerArchetype*>( arch )->attacks;
-				healthView = static_cast<arch::PlayerArchetype*>( arch )->health;
-				fontView   = static_cast<arch::PlayerArchetype*>( arch )->fonts;
-				break;
-			case arch::enemyComponentMask:
-				attackView = static_cast<arch::EnemyArchetype*>( arch )->attacks;
-				healthView = static_cast<arch::EnemyArchetype*>( arch )->health;
-				fontView   = static_cast<arch::EnemyArchetype*>( arch )->fonts;
-				break;
-			}
-
+		for( uint32_t x = 0; x < cachedAttackableArchetypesNumber; ++x ) {
+			arch::Archetype* arch = archView.cachedAttackableArchetypes[x];
+			componentsView.attackableAttacks = (ecs::components::attack*)arch->components[arch::ComponentsIndices::ATTACK_COMPONENT];
+			componentsView.attackableHealth  = (ecs::components::health*)arch->components[arch::ComponentsIndices::HEALTH_COMPONENT];
+			componentsView.attackableFonts   = (ecs::components::font*)arch->components[arch::ComponentsIndices::FONT_COMPONENT];
+			
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 //				unsigned int entity = linkedEntities[i];
-				if( &healthView[i] != nullptr && &attackView[i] != nullptr ) {
-					cm::health& healthComponent = healthView[i];
-					cm::attack& attackComponent = attackView[i];
+				if( &componentsView.attackableHealth[i] != nullptr && &componentsView.attackableAttacks[i] != nullptr ) {
+					cm::health& healthComponent = componentsView.attackableHealth[i];
+					cm::attack& attackComponent = componentsView.attackableAttacks[i];
 
 //					std::cout << "damage: " << attackComponent.damage << std::endl;
 					healthComponent.currentHealth -= attackComponent.damage;
@@ -64,7 +41,7 @@ namespace GLVM::ecs
 //					entityManager->RemoveEntity(entity, componentManager);
 					}
 
-					cm::font& fontComponent = fontView[i];
+					cm::font& fontComponent = componentsView.attackableFonts[i];
 					fontComponent.font_string.clear();
 					fontComponent.font_string.Push('4');
 					fontComponent.font_string.Push('0');
@@ -74,28 +51,16 @@ namespace GLVM::ecs
 			}
 		}
 
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::FONT_COMPONENT);
-
-			if( (arch->mask & requiredMask) == requiredMask ) {
-				cachedFontArchetypes[cachedFontArchetypesNumber] = arch;
-				++cachedFontArchetypesNumber;
-			}
-		}
-
+		cachedFontArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( fontRequiredMask, archView.cachedFontArchetypes, cachedFontArchetypesNumber );
+		
 		for( uint32_t x = 0; x < cachedFontArchetypesNumber; ++x ) {
-			arch::Archetype* arch = cachedFontArchetypes[x];
-			components::font* fontView = nullptr;
-			switch( arch->mask ) {
-			case arch::enemyComponentMask:
-				fontView = static_cast<arch::EnemyArchetype*>( arch )->fonts;
-				break;
-			}
+			arch::Archetype* arch = archView.cachedFontArchetypes[x];
+			componentsView.fonts = (ecs::components::font*)arch->components[arch::ComponentsIndices::FONT_COMPONENT];
 
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
-				if( fontView ) {
-					cm::font& fontComponent = fontView[i];
+				if( componentsView.fonts ) {
+					cm::font& fontComponent = componentsView.fonts[i];
 					if ( fontComponent.removeble )
 						fontComponent.lifeTime += deltaTime;
 //			std::cout << "lifeTime" << fontComponent->lifeTime << std::endl;
