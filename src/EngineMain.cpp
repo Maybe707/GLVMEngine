@@ -193,7 +193,7 @@ int main()
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 1.5f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
-	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
+	enemyArch->health[enemyIndex]      = { .maxHealth = 10000, .currentHealth = 10000 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
 	
 	if ( i < 3 ) {
@@ -212,7 +212,7 @@ int main()
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
 	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
-	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = chelikTextureHandle, .specularTextureID_ = chelikTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}
 

@@ -8,6 +8,8 @@
 
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
+#include "Components/ColliderFlagsComponent.hpp"
+#include "Components/ProjectileBundle.hpp"
 #include "ISystem.hpp"
 #include "Vector.hpp"
 #include "ComponentManager.hpp"
@@ -52,6 +54,29 @@ namespace GLVM::ecs
 		float                      deltaFrameTime;
 		bool                       isInventoryOpened;
 
+		uint32_t playerArchetypesNumber      = 0;
+		uint32_t projectileArchetypesNumber  = 0;
+		struct ArchView {
+			arch::Archetype* playerCachedArchetype = nullptr;
+			arch::Archetype* projectileArchetype   = nullptr;
+		} archView;
+		
+		struct ComponentsView {
+			ecs::components::transform* playerTransforms = nullptr;
+			ecs::components::beholder*  playerViews      = nullptr;
+
+			ecs::components::transform*         projectileTransforms    = nullptr;
+			ecs::components::colliderFlags*     projectileColliderFlags = nullptr;
+			ecs::components::collider*          projectileColliders     = nullptr;
+			arch::ProjectileBundle*             projectileBundles       = nullptr;
+		} componentsView;
+
+		arch::componentMask playerRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
+
+		arch::componentMask projectileRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+		
         CProjectileSystem(core::CStack& inputStack);
         void Update() override;
 		template< typename T >

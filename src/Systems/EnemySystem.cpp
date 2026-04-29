@@ -81,7 +81,7 @@ namespace GLVM::ecs
 
 		ecs::components::MeshHandle meshHandle{};
 		if ( meshHandlers.GetSize() > 0 )
-			meshHandle = meshHandlers[0];
+			meshHandle = meshHandlers[2];
 
 		ecs::components::mesh* projectileMesh = &projectileArch->meshes[projectileIndex];
 		projectileMesh->handle = meshHandle;
@@ -93,13 +93,14 @@ namespace GLVM::ecs
 		projectileBundle->material  = { .diffuseTextureID_ = textureHandle,
 			.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
 			.shininess = 128.0f * 0.078125f };
+		
 		components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
 		rTransformProjectile->scale = 0.1f;
 		rTransformProjectile->position = enemyTransformComponent->position;
 		rTransformProjectile->forward   = playerTransformComponent->position - enemyTransformComponent->position;
 		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
 		
-		components::damage* damageComponent = &projectileArch->projectileBundles[projectileIndex].damage;
+		components::damage* damageComponent = &projectileBundle->damage;
 		damageComponent->maximumDamage = 40;
 		damageComponent->minimumDamage = 20;
 	}
