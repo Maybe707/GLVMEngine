@@ -38,54 +38,28 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 
 		cachedArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MOVE_COMPONENT) |
-				(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
-				(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT);
-
-			if( (arch->mask & requiredMask) == requiredMask ) {
-				cachedArchetypes[cachedArchetypesNumber] = arch;
-				++cachedArchetypesNumber;
-			}
-		}
+		arch::world.searchCacheArchetypes( requiredMask, archView.cachedArchetypes, cachedArchetypesNumber );
 
 		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
-			arch::Archetype* arch = cachedArchetypes[x];
-			components::transform*     transformsView    = nullptr;
-			components::move*          movesView         = nullptr;
-			components::rigidBody*     rigidBodiesView   = nullptr;
-			components::colliderFlags* colliderFlagsView = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				transformsView    = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-				movesView         = static_cast<arch::PlayerArchetype*>( arch )->moves;
-				rigidBodiesView   = static_cast<arch::PlayerArchetype*>( arch )->rigidBodies;
-				colliderFlagsView = static_cast<arch::PlayerArchetype*>( arch )->colliderFlags;
-				break;
-			case arch::enemyComponentMask:
-				transformsView    = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-				movesView         = static_cast<arch::EnemyArchetype*>( arch )->moves;
-				rigidBodiesView   = static_cast<arch::EnemyArchetype*>( arch )->rigidBodies;
-				colliderFlagsView = static_cast<arch::EnemyArchetype*>( arch )->colliderFlags;
-				break;
-			case arch::itemComponentMask:
-				transformsView    = static_cast<arch::ItemArchetype*>( arch )->transforms;
-				movesView         = static_cast<arch::ItemArchetype*>( arch )->moves;
-				rigidBodiesView   = static_cast<arch::ItemArchetype*>( arch )->rigidBodies;
-				colliderFlagsView = static_cast<arch::ItemArchetype*>( arch )->colliderFlags;
-				break;
-			}
-		
+			arch::Archetype* arch = archView.cachedArchetypes[x];
+
+			componentsView.transformsView    = (ecs::components::transform*)archView.cachedArchetypes[x]->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			componentsView.movesView         = (ecs::components::move*)archView.cachedArchetypes[x]->
+				components[arch::ComponentsIndices::MOVE_COMPONENT];
+			componentsView.rigidBodiesView   = (ecs::components::rigidBody*)archView.cachedArchetypes[x]->
+				components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
+			componentsView.colliderFlagsView = (ecs::components::colliderFlags*)archView.cachedArchetypes[x]->
+				components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT];
+
 			float deltaTime = 5.5f * fDelta_Time_;
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
-				if( transformsView && colliderFlagsView &&
-					movesView && rigidBodiesView ) {
-					cm::transform& transformComponent = transformsView[i];
-					cm::move& move = movesView[i];
+				if( componentsView.transformsView && componentsView.colliderFlagsView &&
+					componentsView.movesView && componentsView.rigidBodiesView ) {
+					cm::transform& transformComponent = componentsView.transformsView[i];
+					cm::move& move = componentsView.movesView[i];
 //				cm::collider& collider = collidersView[i];
-					cm::colliderFlags& colliderFlags = colliderFlagsView[i];
+					cm::colliderFlags& colliderFlags = componentsView.colliderFlagsView[i];
 					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
 					if( colliderFlags.flags & isGroudCollisionMask ) {
 						move.gravity = 0;
@@ -103,7 +77,7 @@ namespace GLVM::ecs
 					move.frameMovement = 0.0f;
 //				componentManager->RemoveComponent<cm::move>(entityRefMove);
 
-					cm::rigidBody& rigidBody = rigidBodiesView[i];
+					cm::rigidBody& rigidBody = componentsView.rigidBodiesView[i];
 					if ( rigidBody.jumpAccumulator > 0.0f ) {
 						rigidBody.jumpAccumulator -= deltaTime;
 						vec3 jump = vec3{ 0.0f, 5.0f, 0.0f } * deltaTime;
