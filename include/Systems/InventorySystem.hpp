@@ -1,6 +1,7 @@
 #ifndef INVENTORY_SYSTEM_HPP
 #define INVENTORY_SYSTEM_HPP
 
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "ISystem.hpp"
 #include "Components/ItemComponent.hpp"
@@ -15,6 +16,30 @@ namespace GLVM::ecs
 {
 	class InventorySystem : public ecs::ISystem {
 	public:
+		uint32_t crosshairArchetypesNumber   = 0;
+		uint32_t inventoryArchetypesNumber  = 0;
+		struct ArchView {
+			arch::Archetype* crosshairCachedArchetype = nullptr;
+			arch::Archetype* inventoryCachedArchetype = nullptr;
+		} archView;
+		
+		struct ComponentsView {
+			ecs::components::transform* crosshairTransformsView    = nullptr;
+			
+			ecs::components::transform* inventoryTransformsView = nullptr;
+			ecs::components::inventory* inventoryView           = nullptr;
+			ecs::components::mesh*      inventoryMeshesView     = nullptr;
+		} componentsView;
+
+		arch::componentMask crosshairRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
+
+		arch::componentMask inventoryRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::INVENTORY_COMPONENT) |
+			(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+		
 		void Update() override;
 		int determineSwappableStatusAndSlots( components::item* itemComponent, components::transform* inventoryTransformComponent,
 											  core::vector<unsigned int>& potentialOccupiedSlots, components::transform* crosshairTransformComponent,

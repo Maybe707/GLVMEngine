@@ -1,6 +1,7 @@
 #include "Systems/InventorySystem.hpp"
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Archetypes/ItemArchetype.hpp"
+#include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/TransformComponent.hpp"
@@ -19,56 +20,28 @@ namespace GLVM::ecs
 		if ( isInventoryOpened ) {
 			namespace cm = GLVM::ecs::components;
 
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
-
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedCrosshairArchetype = arch;
-				}
-			}
-
-			components::transform*                crosshair_transformsView    = nullptr;
-			switch( cachedCrosshairArchetype->mask ) {
-			case arch::crosshairComponentMask:
-				crosshair_transformsView    = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
-				break;
-			}
+			crosshairArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( crosshairRequiredMask, &archView.crosshairCachedArchetype, crosshairArchetypesNumber );
+			componentsView.crosshairTransformsView = (ecs::components::transform*)archView.crosshairCachedArchetype->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 			
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::INVENTORY_COMPONENT);
+			inventoryArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( inventoryRequiredMask, &archView.inventoryCachedArchetype, inventoryArchetypesNumber );
 
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedInventoryArchetype = arch;
-				}
-			}
-
-			components::transform*                inventory_transformsView    = nullptr;
-			components::inventory*                inventory_inventoriesView   = nullptr;
-			components::mesh*                     inventory_meshview          = nullptr;
-			switch( cachedInventoryArchetype->mask ) {
-			case arch::inventoryComponentMask:
-				inventory_transformsView    = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->transforms;
-				inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->invetories;
-				inventory_meshview          = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->meshes;
-				break;
-			}
+			componentsView.inventoryTransformsView = (ecs::components::transform*)archView.inventoryCachedArchetype->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			componentsView.inventoryView           = (ecs::components::inventory*)archView.inventoryCachedArchetype->
+				components[arch::ComponentsIndices::INVENTORY_COMPONENT];
+			componentsView.inventoryMeshesView     = (ecs::components::mesh*)archView.inventoryCachedArchetype->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+						
+			if( componentsView.crosshairTransformsView && componentsView.inventoryTransformsView &&
+				componentsView.inventoryView && componentsView.inventoryMeshesView ) {
+				cm::transform* crosshairTransformComponent = &componentsView.crosshairTransformsView[0];
 			
-			// core::vector<Entity> linkedCrosshairEntities = componentManager->collectLinkedEntities<cm::crosshair, cm::transform>();
-			// cm::transform* crosshairTransformComponent = componentManager->GetComponent<cm::transform>(linkedCrosshairEntities[0]);
-
-			// core::vector<Entity> linkedInventoryEntities = componentManager->collectLinkedEntities<cm::transform, cm::inventory>();
-			// cm::transform* inventoryTransformComponent = componentManager->GetComponent<cm::transform>(linkedInventoryEntities[0]);
-			// cm::inventory* inventoryComponent = componentManager->GetComponent<cm::inventory>(linkedInventoryEntities[0]);
-			if( crosshair_transformsView && inventory_transformsView && inventory_inventoriesView && inventory_meshview ) {
-				cm::transform* crosshairTransformComponent = &crosshair_transformsView[0];
-			
-				cm::transform* inventoryTransformComponent = &inventory_transformsView[0];
-				cm::inventory* inventoryComponent          = &inventory_inventoriesView[0];
-				cm::mesh*      inventoryMeshComponent      = &inventory_meshview[0];
+				cm::transform* inventoryTransformComponent = &componentsView.inventoryTransformsView[0];
+				cm::inventory* inventoryComponent          = &componentsView.inventoryView[0];
+				cm::mesh*      inventoryMeshComponent      = &componentsView.inventoryMeshesView[0];
 			
 				const float inventorySlotScale = inventoryMeshComponent->gltf ? inventoryComponent->slotScale * 2.0f : inventoryComponent->slotScale;
 				const float inventorySlotHalfScale = inventoryMeshComponent->gltf ? inventoryComponent->slotScale : inventoryComponent->slotScale * 0.5f;
