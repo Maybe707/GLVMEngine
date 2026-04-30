@@ -80,67 +80,31 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 
 		if (!isInventoryOpened) {
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::INVENTORY_COMPONENT);
+			inventoryArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( inventoryRequiredMask, &archView.inventoryCachedArchetype, inventoryArchetypesNumber );
+			componentsView.inventoriesView = (ecs::components::inventory*)archView.inventoryCachedArchetype->
+				components[arch::ComponentsIndices::INVENTORY_COMPONENT];
 
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedInventoryArchetype = arch;
-				}
-			}
-
-			components::inventory*                inventory_inventoriesView   = nullptr;
-			uint32_t inventoryEntityCount = 0;
-			if( cachedInventoryArchetype != nullptr ) {
-				inventoryEntityCount = cachedInventoryArchetype->entityCount;
-				switch( cachedInventoryArchetype->mask ) {
-				case arch::inventoryComponentMask:
-					inventory_inventoriesView   = static_cast<arch::InventoryArchetype*>( cachedInventoryArchetype )->invetories;
-					break;
-				}
-			}
-
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-					(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
-					(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT);
-
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedItemArchetype = arch;
-				}
-			}
-
-
-			components::collider* itemColliderComponentView = nullptr;
-			components::item*     itemsView                 = nullptr;                      
-			uint32_t itemEntityCount = 0;
-			if( cachedItemArchetype != nullptr ) {
-				itemEntityCount = cachedItemArchetype->entityCount;
-				switch( cachedItemArchetype->mask ) {
-				case arch::itemComponentMask:
-					itemColliderComponentView = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->colliders;
-					itemsView                 = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->items;
-					break;
-				}
-			}
+			itemArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( itemRequiredMask, &archView.itemArchetype, itemArchetypesNumber );
+			componentsView.itemsView         = (ecs::components::item*)archView.itemArchetype->
+				components[arch::ComponentsIndices::ITEM_COMPONENT];
+			componentsView.itemCollidersView = (ecs::components::collider*)archView.itemArchetype->
+				components[arch::ComponentsIndices::COLLIDER_COMPONENT];
 			
-			for ( unsigned int m = 0; m < inventoryEntityCount; ++m ) {
-				cm::inventory* inventoryComponent = &inventory_inventoriesView[m];
+			
+			for ( unsigned int m = 0; m < archView.inventoryCachedArchetype->entityCount; ++m ) {
+				cm::inventory* inventoryComponent = &componentsView.inventoriesView[m];
 
-				for ( unsigned int i = 0; i < itemEntityCount; ++i ) {
-					unsigned int itemEntity = cachedItemArchetype->entities[i];
-					cm::collider* itemColliderComponent = &itemColliderComponentView[i];
+				for ( unsigned int i = 0; i < archView.itemArchetype->entityCount; ++i ) {
+					unsigned int itemEntity = archView.itemArchetype->entities[i];
+					cm::collider* itemColliderComponent = &componentsView.itemCollidersView[i];
 
 					for ( unsigned int j = 0; j < itemColliderComponent->colliders.GetSize(); ++j ) {
 						if ( itemColliderComponent->colliders[j] == inventoryComponent->entityOwner &&
-							itemsView[i].isActor ) {
+							componentsView.itemsView[i].isActor ) {
 							if ( putItem2x2(inventoryComponent, itemEntity) ) {
-								itemsView[i].isActor = false;
+								componentsView.itemsView[i].isActor = false;
 //								componentManager->RemoveComponent<cm::actor>(itemEntity);
 //								componentManager->RemoveComponent<cm::rigidBody>(itemEntity);
 							} else {
@@ -153,48 +117,20 @@ namespace GLVM::ecs
 		}
 
 		if(isInventoryOpened) {
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
+			crosshairArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( crosshairRequiredMask, &archView.crosshairArchetype, crosshairArchetypesNumber );
+			componentsView.crosshairTransforms = (ecs::components::transform*)archView.crosshairArchetype->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedCrosshairArchetype = arch;
-				}
-			}
+			itemArchetypesNumber = 0;
+			arch::world.searchCacheArchetypes( itemRequiredMask, &archView.itemArchetype, itemArchetypesNumber );
+			componentsView.itemTransformsView = (ecs::components::transform*)archView.itemArchetype->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 
-			components::transform* crosshairTransformComponentView = nullptr;
-			switch( cachedCrosshairArchetype->mask ) {
-			case arch::crosshairComponentMask:
-				crosshairTransformComponentView = static_cast<arch::CrosshairArchetype*>( cachedCrosshairArchetype )->transforms;
-				break;
-			}
-
-			for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-				arch::Archetype* arch = arch::world.archetypes[i];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-					(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
-					(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT);
-
-				if( (arch->mask & requiredMask) == requiredMask ) {
-					cachedItemArchetype = arch;
-				}
-			}
-
-			components::transform* itemTransformComponentView = nullptr;
-			switch( cachedItemArchetype->mask ) {
-			case arch::itemComponentMask:
-				itemTransformComponentView = static_cast<arch::ItemArchetype*>( cachedItemArchetype )->transforms;
-				break;
-			}
-
-			components::transform* crosshairTransformComponent = &crosshairTransformComponentView[0];
-			for ( unsigned int i = 0; i < cachedItemArchetype->entityCount; ++i ) {
-				uint32_t entityItemContaining = cachedItemArchetype->entities[i];
-				cm::transform* itemTransformComponent = &itemTransformComponentView[i];
+			components::transform* crosshairTransformComponent = &componentsView.crosshairTransforms[0];
+			for ( unsigned int i = 0; i < archView.itemArchetype->entityCount; ++i ) {
+				uint32_t entityItemContaining = archView.itemArchetype->entities[i];
+				cm::transform* itemTransformComponent = &componentsView.itemTransformsView[i];
 
 				// bool isCrosshairCollided = false;
 				// for ( unsigned int n = 0; n < itemColliderComponent->colliders.GetSize(); ++n ) {
