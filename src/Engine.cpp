@@ -27,6 +27,7 @@
 #include "Components/RotationComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
+#include "Components/ViewComponent.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -374,121 +375,105 @@ namespace GLVM::core
 		namespace arch = GLVM::ecs::arch;
 
 		playerArchetypesNumber = 0;
-		for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
-			arch::Archetype* arch = arch::world.archetypes[m];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::VIEW_COMPONENT);
-
-			if( arch::matchesRequiredMask( arch->mask, requiredMask ) ) {
-				cachedPlayerArchetypes[m] = arch;
-				++playerArchetypesNumber;
-			}
-		}
+		arch::world.searchCacheArchetypes( playerRequiredMask, cachedPlayerArchetypes, playerArchetypesNumber );
 
 		for( uint32_t n = 0; n < playerArchetypesNumber; ++n ) {
 			arch::Archetype* arch = cachedPlayerArchetypes[n];
-			cm::beholder*  views      = nullptr;
-			cm::transform* transfroms = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				views      = static_cast<arch::PlayerArchetype*>( arch )->beholders;
-				transfroms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-				break;
-			}
+			cm::beholder*  views      = (ecs::components::beholder*)arch->
+				components[arch::ComponentsIndices::VIEW_COMPONENT];
+			cm::transform* transfroms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 
 			for( uint32_t x = 0; x < arch->entityCount; ++x ) {
 				cm::beholder* cameraComponent   = &views[x];
 				cm::transform* _Player          = &transfroms[x];
 
-				if( cameraComponent != nullptr && _Player != nullptr ) {
-					Matrix<float, 4> viewMatrix_(1.0f);
-					const float kSensitivity = 0.1f;
+				Matrix<float, 4> viewMatrix_(1.0f);
+				const float kSensitivity = 0.1f;
 
-					// if ( hud_screen_x > 1.0f )
-					// 	hud_screen_x = 1.0f;
-					// else if ( hud_screen_x < -1.0f )
-					// 	hud_screen_x = -1.0f;
+				// if ( hud_screen_x > 1.0f )
+				// 	hud_screen_x = 1.0f;
+				// else if ( hud_screen_x < -1.0f )
+				// 	hud_screen_x = -1.0f;
 		
-					// if ( hud_screen_y > 1.0f )
-					// 	hud_screen_y = 1.0f;
-					// else if ( hud_screen_y < -1.0f )
-					// 	hud_screen_y = -1.0f;
+				// if ( hud_screen_y > 1.0f )
+				// 	hud_screen_y = 1.0f;
+				// else if ( hud_screen_y < -1.0f )
+				// 	hud_screen_y = -1.0f;
 		
-					fYaw = g_eEvent.mousePointerPosition.offset_X;
-					fPitch = g_eEvent.mousePointerPosition.offset_Y;
-					fYaw *= kSensitivity;
-					fPitch *= kSensitivity;
+				fYaw = g_eEvent.mousePointerPosition.offset_X;
+				fPitch = g_eEvent.mousePointerPosition.offset_Y;
+				fYaw *= kSensitivity;
+				fPitch *= kSensitivity;
 
-					g_eEvent.mousePointerPosition.pitch = fPitch;
-					g_eEvent.mousePointerPosition.yaw = fYaw;
+				g_eEvent.mousePointerPosition.pitch = fPitch;
+				g_eEvent.mousePointerPosition.yaw = fYaw;
 
-					vulkanRenderer->current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-					vulkanRenderer->current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-					float delta_x = 0.0f;
-					float delta_y = 0.0f;
+				vulkanRenderer->current_X = (float)g_eEvent.mousePointerPosition.offset_X;
+				vulkanRenderer->current_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+				float delta_x = 0.0f;
+				float delta_y = 0.0f;
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-					delta_x = vulkanRenderer->current_X;
-					delta_y = vulkanRenderer->current_Y;
+				delta_x = vulkanRenderer->current_X;
+				delta_y = vulkanRenderer->current_Y;
 #else
-					delta_x = current_X - prev_X;
-					delta_y = current_Y - prev_Y;
-					delta_y *= -1.0f;
+				delta_x = current_X - prev_X;
+				delta_y = current_Y - prev_Y;
+				delta_y *= -1.0f;
 #endif
-					// delta_x *= kSensitivity;
-					// delta_y *= kSensitivity;
+				// delta_x *= kSensitivity;
+				// delta_y *= kSensitivity;
 		
-					const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
-					const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
-					/*
-					 * 1. The mouse direction determines the "intended direction of rotation" for the object.
-					 * 2. The camera is "looking forward."
-					 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
-					 */
-					const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
+				const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
+				const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
+				/*
+				 * 1. The mouse direction determines the "intended direction of rotation" for the object.
+				 * 2. The camera is "looking forward."
+				 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
+				 */
+				const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
 
-					if ( VecLength(rotateAxis) >= 0.001f ) {
-						/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
-						float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
-						constexpr float angleScale = 0.1f;                                                                                     
-						rotationAngle = Radians(rotationAngle * angleScale);
-						constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-						[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-						// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-						// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-						// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-						// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
-						// // 													conjugate(rotationQuat));
+				if ( VecLength(rotateAxis) >= 0.001f ) {
+					/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
+					float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
+					constexpr float angleScale = 0.1f;                                                                                     
+					rotationAngle = Radians(rotationAngle * angleScale);
+					constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
+					[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+					// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+					// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+					// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+					// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
+					// // 													conjugate(rotationQuat));
 
-						// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
-						// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
+					// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
+					// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
 
 			
-						// forward[0] = appliedRotationQuat.x;
-						// forward[1] = appliedRotationQuat.y;
-						// forward[2] = appliedRotationQuat.z;
-						pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
-								.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->forward[0],
-								.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
-						vulkanRenderer->forward[0] = appliedRotationPoint.x;
-						vulkanRenderer->forward[1] = appliedRotationPoint.y;
-						vulkanRenderer->forward[2] = appliedRotationPoint.z;
-					}
-					cameraComponent->forward = Normalize(vulkanRenderer->forward);
-					_Player->forward = cameraComponent->forward;
-					mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
-											cameraComponent->Position + _Player->position + cameraComponent->forward,
-											vec3( 0.0f, -1.0f, 0.0) );
-					for ( unsigned int i = 0; i < 4; ++i )
-						for ( unsigned int j = 0; j < 4; ++j )
-							viewMatrix_[i][j] = view[i][j];
-		
-					if ( !vulkanRenderer->isInventoryOpened )
-						vulkanRenderer->viewMatrix = viewMatrix_;
-
-					vulkanRenderer->prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
-					vulkanRenderer->prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
+					// forward[0] = appliedRotationQuat.x;
+					// forward[1] = appliedRotationQuat.y;
+					// forward[2] = appliedRotationQuat.z;
+					pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
+							.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->forward[0],
+							.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
+					vulkanRenderer->forward[0] = appliedRotationPoint.x;
+					vulkanRenderer->forward[1] = appliedRotationPoint.y;
+					vulkanRenderer->forward[2] = appliedRotationPoint.z;
 				}
+				cameraComponent->forward = Normalize(vulkanRenderer->forward);
+				_Player->forward = cameraComponent->forward;
+				mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
+										cameraComponent->Position + _Player->position + cameraComponent->forward,
+										vec3( 0.0f, -1.0f, 0.0) );
+				for ( unsigned int i = 0; i < 4; ++i )
+					for ( unsigned int j = 0; j < 4; ++j )
+						viewMatrix_[i][j] = view[i][j];
+		
+				if ( !vulkanRenderer->isInventoryOpened )
+					vulkanRenderer->viewMatrix = viewMatrix_;
+
+				vulkanRenderer->prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
+				vulkanRenderer->prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
 			}
 		}
     }

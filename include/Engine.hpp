@@ -111,20 +111,20 @@ namespace GLVM::core
 		uint32_t spotLightArchetypesNumber = 0;
 		ecs::arch::componentMask spotLightRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)       |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
 		ecs::arch::Archetype* cachedPointLigthArchetypes[32];
 		uint32_t pointLightArchetypesNumber = 0;
 		ecs::arch::componentMask pointLightRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
 		ecs::arch::Archetype* cachedAnimationActorsArchetypes[32];
 		uint32_t animationActorsArchetypesNumber = 0;
 		ecs::arch::componentMask animatedActorsRequiredMask =
-			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)  |
 			(1ul << ecs::arch::ComponentsIndices::ANIMATION_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)  |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -133,10 +133,10 @@ namespace GLVM::core
 		ecs::arch::Archetype* cachedStaticActorsArchetypes[32];
 		uint32_t staticActorsArchetypesNumber = 0;
 		ecs::arch::componentMask staticActorsRequiredMask =
-			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)       |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
 
@@ -145,6 +145,13 @@ namespace GLVM::core
 		
 		ecs::arch::Archetype* cachedPlayerArchetypes[32];
 		uint32_t playerArchetypesNumber = 0;
+		ecs::arch::componentMask playerRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
+			(1ul << ecs::arch::ComponentsIndices::VIEW_COMPONENT);
+
+
+		
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];
 		uint32_t animationArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
