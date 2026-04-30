@@ -185,108 +185,25 @@ namespace GLVM::core
 		GLVM::core::MeshManager*   meshManager = GLVM::core::MeshManager::GetInstance();
 		vulkanRenderer->SetMeshData(meshManager->pathsArray_, meshManager->pathsGLTF_);
 		namespace cm = GLVM::ecs::components;
-		ecs::ComponentManager* componentManager   = ecs::ComponentManager::GetInstance();
-		core::vector<Entity> directionalLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																									  cm::directionalLight,
-																									  cm::mesh>();
 
 		directionalLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedDirectionalLigthArchetypes[directionalLightArchetypesNumber] = arch;
-				++directionalLightArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( directionalLightRequiredMask, cachedDirectionalLigthArchetypes, directionalLightArchetypesNumber );
 		vulkanRenderer->directionalLightNumber = directionalLightArchetypesNumber;
-//		vulkanRenderer->directionalLightNumber = directionalLightLinkedEntities.GetSize();
-		core::vector<Entity> spotLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							   cm::spotLight,
-																							   cm::mesh>();
 
 		spotLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedSpotLigthArchetypes[spotLightArchetypesNumber] = arch;
-				++spotLightArchetypesNumber;
-			}
-		}
-		
+		arch::world.searchCacheArchetypes( spotLightRequiredMask, cachedSpotLigthArchetypes, spotLightArchetypesNumber );
 		vulkanRenderer->spotLightNumber = spotLightArchetypesNumber;
-//		vulkanRenderer->spotLightNumber = spotLightLinkedEntities.GetSize();
-		core::vector<Entity> pointLightLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																								cm::pointLight,
-																								cm::mesh>();
 
 		pointLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedPointLigthArchetypes[pointLightArchetypesNumber] = arch;
-				++pointLightArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( pointLightRequiredMask, cachedPointLigthArchetypes, pointLightArchetypesNumber );
 		vulkanRenderer->pointLightNumber = pointLightArchetypesNumber;
-//		vulkanRenderer->pointLightNumber = pointLightLinkedEntities.GetSize();
-		core::vector<Entity> actorsLinkedEntities = componentManager->collectLinkedEntities<cm::transform,
-																							cm::material,
-																							cm::mesh>();
-//		vulkanRenderer->actorsNumber = actorsLinkedEntities.GetSize();
 
-
-		[[maybe_unused]] uint32_t actorsNumber = 0;
 		animationActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedAnimationActorsArchetypes[animationActorsArchetypesNumber] = arch;
-				actorsNumber += cachedAnimationActorsArchetypes[animationActorsArchetypesNumber]->entityCount;
-				++animationActorsArchetypesNumber;
-				std::cout << "FOUND ANIMATED ACTOR" << std::endl;
-			}
-		}
+		arch::world.searchCacheArchetypes( animatedActorsRequiredMask, cachedAnimationActorsArchetypes, animationActorsArchetypesNumber );
 
 		staticActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ul << arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
+		arch::world.searchCacheArchetypes( staticActorsRequiredMask, cachedStaticActorsArchetypes, staticActorsArchetypesNumber );
 
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedStaticActorsArchetypes[staticActorsArchetypesNumber] = arch;
-				actorsNumber += cachedStaticActorsArchetypes[staticActorsArchetypesNumber]->entityCount;
-				++staticActorsArchetypesNumber;
-				std::cout << "FOUND STATIC ACTOR" << std::endl;
-			}
-		}
-
-		vulkanRenderer->actorsNumber = 0;
-		std::cout << "ACTORS NUMBER: " << vulkanRenderer->actorsNumber << std::endl;
-		
 		loadWavefrontObj();
 		initializeGLTF();
 		initializeFontData();

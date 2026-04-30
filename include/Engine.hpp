@@ -95,24 +95,62 @@ namespace GLVM::core
 		ProceduralLevelGeneratingSystem * procuduralLevelGeneratingSystem;
 		ecs::InventorySystem            * inventorySystem;
 
+		// struct PreinitializedRenderData {
+			
+		// } preinitializedRenderData;
+
+		/// PreinitializedRenderData
 		ecs::arch::Archetype* cachedDirectionalLigthArchetypes[32];
 		uint32_t directionalLightArchetypesNumber = 0;
+		ecs::arch::componentMask directionalLightRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)              |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
 		ecs::arch::Archetype* cachedSpotLigthArchetypes[32];
 		uint32_t spotLightArchetypesNumber = 0;
+		ecs::arch::componentMask spotLightRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
 		ecs::arch::Archetype* cachedPointLigthArchetypes[32];
 		uint32_t pointLightArchetypesNumber = 0;
+		ecs::arch::componentMask pointLightRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
+		ecs::arch::Archetype* cachedAnimationActorsArchetypes[32];
+		uint32_t animationActorsArchetypesNumber = 0;
+		ecs::arch::componentMask animatedActorsRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ANIMATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)  |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
+		ecs::arch::Archetype* cachedStaticActorsArchetypes[32];
+		uint32_t staticActorsArchetypesNumber = 0;
+		ecs::arch::componentMask staticActorsRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
+
+
+		
+		
 		ecs::arch::Archetype* cachedPlayerArchetypes[32];
 		uint32_t playerArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];
 		uint32_t animationArchetypesNumber = 0;
-		ecs::arch::Archetype* cachedStaticActorsArchetypes[32];
-		uint32_t staticActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
 		uint32_t crosshairActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedLevelChunkActorsArchetypes[32];
 		uint32_t levelChunkActorsArchetypesNumber = 0;
-		ecs::arch::Archetype* cachedAnimationActorsArchetypes[32];
-		uint32_t animationActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedProjectileActorsArchetypes[32];
 		uint32_t projectileActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
