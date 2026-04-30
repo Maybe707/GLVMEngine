@@ -741,31 +741,13 @@ namespace GLVM::core
 		
 		vulkanRenderer->directionalLights.clear();
 		directionalLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedDirectionalLigthArchetypes[directionalLightArchetypesNumber] = arch;
-				++directionalLightArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( directionalLightRequiredMask, cachedDirectionalLigthArchetypes, directionalLightArchetypesNumber );
+		
 		uint32_t directionalLightCounter = 0;
 		for( uint32_t x = 0; x < directionalLightArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedDirectionalLigthArchetypes[x];
-//				cm::transform*         directionalLightTransforms = nullptr;
-			cm::directionalLight*  directionalLights          = nullptr;
-//				cm::mesh*              directionalLightMeshes     = nullptr;
-			switch( arch->mask ) {
-			case arch::directionalLightComponentMask:
-//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
-				directionalLights          = static_cast<arch::DirectionalLightArchetype*>( arch )->directionalLights;
-//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
-				break;
-			}
+			cm::directionalLight*  directionalLights = (ecs::components::directionalLight*)arch->
+				components[arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT];
 
 			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
 				if( directionalLights ) {
@@ -795,32 +777,14 @@ namespace GLVM::core
 
 		vulkanRenderer->spotLights.clear();
 		spotLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedSpotLigthArchetypes[spotLightArchetypesNumber] = arch;
-				++spotLightArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( spotLightRequiredMask, cachedSpotLigthArchetypes, spotLightArchetypesNumber );
+		
 		uint32_t spotLightCounter = 0;
 		for( uint32_t x = 0; x < spotLightArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedSpotLigthArchetypes[x];
-//				cm::transform*         directionalLightTransforms = nullptr;
-			cm::spotLight*  spotLights          = nullptr;
-//				cm::mesh*              directionalLightMeshes     = nullptr;
-			switch( arch->mask ) {
-			case arch::spotLightComponentMask:
-//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
-				spotLights          = static_cast<arch::SpotLightArchetype*>( arch )->spotLights;
-//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
-				break;
-			}
-
+			cm::spotLight*  spotLights = (ecs::components::spotLight*)arch->
+				components[arch::ComponentsIndices::SPOT_LIGHT_COMPONENT];
+			
 			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
 				if( spotLights ) {
 					vulkanRenderer->spotLights.Push({});
@@ -841,39 +805,16 @@ namespace GLVM::core
 			}
 		}
 		
-		core::vector<Entity> pointLightEntities = componentManager->collectLinkedEntities<cm::transform,
-																						  cm::pointLight,
-																						  cm::mesh,
-																						  cm::actor>();
-
 		vulkanRenderer->pointLights.clear();
 		pointLightArchetypesNumber = 0;
-		for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-			arch::Archetype* arch = arch::world.archetypes[n];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedPointLigthArchetypes[pointLightArchetypesNumber] = arch;
-				++pointLightArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( pointLightRequiredMask, cachedPointLigthArchetypes, pointLightArchetypesNumber );
+		
 		uint32_t pointLightCounter = 0;
 		for( uint32_t x = 0; x < pointLightArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedPointLigthArchetypes[x];
-//				cm::transform*         directionalLightTransforms = nullptr;
-			cm::pointLight* pointLights  = nullptr;
-//				cm::mesh*              directionalLightMeshes     = nullptr;
-			switch( arch->mask ) {
-			case arch::pointLightComponentMask:
-//					directionalLightTransforms = static_cast<arch::DirectionalLightArchetype*>( arch )->transforms;
-				pointLights = static_cast<arch::PointLightArchetype*>( arch )->pointLights;
-//					directionalLightMeshes     = static_cast<arch::DirectionalLightArchetype*>( arch )->meshes;
-				break;
-			}
-
+			cm::pointLight* pointLights = (ecs::components::pointLight*)arch->
+				components[arch::ComponentsIndices::POINT_LIGHT_COMPONENT];
+			
 			for( uint32_t x1 = 0; x1 < arch->entityCount; ++x1 ) {
 				if( pointLights ) {
 					vulkanRenderer->pointLights.Push({});
