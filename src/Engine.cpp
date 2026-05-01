@@ -735,7 +735,6 @@ namespace GLVM::core
 	}
 	
 	void Engine::setFrameData() {
-		ecs::ComponentManager* componentManager  = ecs::ComponentManager::GetInstance();
 		namespace cm = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 		
@@ -835,43 +834,19 @@ namespace GLVM::core
 			}
 		}
 		
-//		namespace cm = GLVM::ecs::components;
-//		core::vector<Entity> healthEntities = componentManager->collectLinkedEntities<cm::transform,
-//																					  cm::health>();
-
-//		vulkanRenderer->crosshairs.clear();
 		vulkanRenderer->healthBars.clear();
 		healthBarsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedHealthBarsArchetypes[healthBarsArchetypesNumber] = arch;
-				++healthBarsArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( healthBarsRequiredMask, cachedHealthBarsArchetypes, healthBarsArchetypesNumber );
+		
 		uint32_t healthBarCounter = 0;
 		for( uint32_t x = 0; x < healthBarsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedHealthBarsArchetypes[x];
-			cm::transform* healthBarTransforms = nullptr;
-			cm::mesh*      healthBarMeshes     = nullptr;
-			cm::health*    healthBars          = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				healthBarTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-				healthBarMeshes     = static_cast<arch::PlayerArchetype*>( arch )->meshes;
-				healthBars          = static_cast<arch::PlayerArchetype*>( arch )->health;
-				break;
-			case arch::enemyComponentMask:
-				healthBarTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-				healthBarMeshes     = static_cast<arch::EnemyArchetype*>( arch )->meshes;
-				healthBars          = static_cast<arch::EnemyArchetype*>( arch )->health;
-				break;
-			}
+			cm::transform* healthBarTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+		 	cm::mesh*      healthBarMeshes     = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::health*    healthBars          = (ecs::components::health*)arch->
+				components[arch::ComponentsIndices::HEALTH_COMPONENT];
 
 			unsigned int uiVertexId = 0;
 			if( ecs::arch::matchesRequiredMask( arch->mask, arch::playerComponentMask ) ) {
@@ -891,43 +866,17 @@ namespace GLVM::core
 			}
 		}
 		
-
-
-		// core::vector<Entity> fontEntities      = componentManager->collectLinkedEntities<cm::transform,
-		// 																				   cm::font>();
-		// vulkanRenderer->fonts.clear();
-
 		vulkanRenderer->fonts.clear();
 		fontsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::FONT_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedFontsArchetypes[fontsArchetypesNumber] = arch;
-				++fontsArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( fontRequiredMask, cachedFontsArchetypes, fontsArchetypesNumber );
+		
 		uint32_t fontCounter = 0;
 		for( uint32_t x = 0; x < fontsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedFontsArchetypes[x];
-			cm::transform* fontTransforms = nullptr;
-			cm::font*      fonts          = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				fontTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-				fonts          = static_cast<arch::PlayerArchetype*>( arch )->fonts;
-				break;
-			case arch::enemyComponentMask:
-				fontTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-				fonts          = static_cast<arch::EnemyArchetype*>( arch )->fonts;
-				break;
-			case arch::staticMeshComponentMask:
-				fontTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
-				fonts          = static_cast<arch::StaticMeshArchetype*>( arch )->fonts;
-			}
+			cm::transform* fontTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+		 	cm::font*      fonts          = (ecs::components::font*)arch->
+				components[arch::ComponentsIndices::FONT_COMPONENT];
 
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 				vulkanRenderer->fonts.Push({});
@@ -944,34 +893,19 @@ namespace GLVM::core
 			vulkanRenderer->inventories.clear();
 			uint32_t inventoryCounter = 0;
 			inventoryArchetypesNumber = 0;
-			for( uint32_t n = 0; n < arch::world.archetypes.GetSize(); ++n ) {
-				arch::Archetype* arch = arch::world.archetypes[n];
-				arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::INVENTORY_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-					(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-					(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
-
-				if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-					cachedInventoryArchetypes[inventoryArchetypesNumber] = arch;
-					++inventoryArchetypesNumber;
-				}
-			}
-
+			arch::world.searchCacheArchetypes( inventoryRequiredMask, cachedInventoryArchetypes, inventoryArchetypesNumber );
+			
 			for( uint32_t x = 0; x < inventoryArchetypesNumber; ++x ) {
 				arch::Archetype* arch = cachedInventoryArchetypes[x];
-				cm::transform* inventoryTransforms = nullptr;
-				cm::material*  inventoryMaterials  = nullptr;
-				cm::inventory* inventory           = nullptr;
-				cm::mesh*      inventoryMeshes     = nullptr;
-				switch( arch->mask ) {
-				case arch::inventoryComponentMask:
-					inventoryTransforms = static_cast<arch::InventoryArchetype*>( arch )->transforms;
-					inventoryMaterials  = static_cast<arch::InventoryArchetype*>( arch )->materials;
-					inventory           = static_cast<arch::InventoryArchetype*>( arch )->invetories;
-					inventoryMeshes     = static_cast<arch::InventoryArchetype*>( arch )->meshes;
-					break;
-				}
-
+				cm::transform* inventoryTransforms = (ecs::components::transform*)arch->
+					components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+				cm::inventory* inventory          = (ecs::components::inventory*)arch->
+					components[arch::ComponentsIndices::INVENTORY_COMPONENT];
+				cm::material*  inventoryMaterials = (ecs::components::material*)arch->
+					components[arch::ComponentsIndices::MATERIAL_COMPONENT];
+				cm::mesh*      inventoryMeshes    = (ecs::components::mesh*)arch->
+					components[arch::ComponentsIndices::MESH_COMPONENT];
+				
 				if( inventoryTransforms && inventoryMaterials && inventory && inventoryMeshes ) {
 				
 					for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
@@ -998,41 +932,23 @@ namespace GLVM::core
 						cm::inventory* inventoryComponent          = &inventory[i];
 						cm::transform* inventoryTransformComponent = &inventoryTransforms[i];
 		
-						core::vector<Entity> itemEntities = componentManager->collectLinkedEntities<cm::mesh, cm::material, cm::transform, cm::collider, cm::item>();
 						vulkanRenderer->items.clear();
 						uint32_t itemCounter = 0;
 						itemArchetypesNumber = 0;
-						for( uint32_t m = 0; m < arch::world.archetypes.GetSize(); ++m ) {
-							arch::Archetype* arch = arch::world.archetypes[m];
-							arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::ITEM_COMPONENT) |
-								(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-								(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-								(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
-								(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-								(1ul << arch::ComponentsIndices::MATERIAL_COMPONENT);
-
-							if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-								cachedItemArchetypes[itemArchetypesNumber] = arch;
-								++itemArchetypesNumber;
-							}
-						}
-
+						arch::world.searchCacheArchetypes( itemRequiredMask, cachedItemArchetypes, itemArchetypesNumber );
+						
 						for( uint32_t c = 0; c < itemArchetypesNumber; ++c ) {
 							arch::Archetype* arch = cachedItemArchetypes[c];
-							cm::transform* itemTransforms = nullptr;
-							cm::material*  itemMaterials  = nullptr;
-							cm::mesh*      itemMeshes     = nullptr;
-							cm::collider*  itemColliders  = nullptr;
-							cm::item*      items          = nullptr;
-							switch( arch->mask ) {
-							case arch::itemComponentMask:
-								itemTransforms = static_cast<arch::ItemArchetype*>( arch )->transforms;
-								itemMaterials  = static_cast<arch::ItemArchetype*>( arch )->materials;
-								itemMeshes     = static_cast<arch::ItemArchetype*>( arch )->meshes;
-								itemColliders  = static_cast<arch::ItemArchetype*>( arch )->colliders;
-								items          = static_cast<arch::ItemArchetype*>( arch )->items;
-								break;
-							}
+							cm::transform* itemTransforms = (ecs::components::transform*)arch->
+								components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+							cm::item*      items          = (ecs::components::item*)arch->
+								components[arch::ComponentsIndices::ITEM_COMPONENT];
+							cm::material*  itemMaterials  = (ecs::components::material*)arch->
+								components[arch::ComponentsIndices::MATERIAL_COMPONENT];
+							cm::mesh*      itemMeshes     = (ecs::components::mesh*)arch->
+								components[arch::ComponentsIndices::MESH_COMPONENT];
+							cm::collider*  itemColliders  = (ecs::components::collider*)arch->
+								components[arch::ComponentsIndices::COLLIDER_COMPONENT];
 
 							if( itemTransforms && itemMaterials && itemMeshes &&
 								itemColliders && items) {

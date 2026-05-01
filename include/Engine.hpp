@@ -162,14 +162,38 @@ namespace GLVM::core
 		uint32_t projectileActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
 		uint32_t itemActorsArchetypesNumber = 0;
+		ecs::arch::componentMask itemRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::ITEM_COMPONENT)           |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)           |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)      |
+			(1ul << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT)       |
+			(1ul << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
+
 		ecs::arch::Archetype* cachedInventoryArchetypes[32];
 		uint32_t inventoryArchetypesNumber = 0;
+		ecs::arch::componentMask inventoryRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::INVENTORY_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)      |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
+
+		
 		ecs::arch::Archetype* cachedItemArchetypes[32];
 		uint32_t itemArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedHealthBarsArchetypes[32];
 		uint32_t healthBarsArchetypesNumber = 0;
+		ecs::arch::componentMask healthBarsRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::HEALTH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)   |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
 		ecs::arch::Archetype* cachedFontsArchetypes[32];
 		uint32_t fontsArchetypesNumber = 0;
+		ecs::arch::componentMask fontRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::FONT_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
 		
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
