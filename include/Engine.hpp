@@ -166,30 +166,39 @@ namespace GLVM::core
 		uint32_t crosshairActorsArchetypesNumber = 0;
 		ecs::arch::componentMask crosshairRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)          |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
 		ecs::arch::Archetype* cachedLevelChunkActorsArchetypes[32];
 		uint32_t levelChunkActorsArchetypesNumber = 0;
 		ecs::arch::componentMask levelChunkRequiredMask =
-			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)       |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
 		
 		ecs::arch::Archetype* cachedProjectileActorsArchetypes[32];
 		uint32_t projectileActorsArchetypesNumber = 0;
+		ecs::arch::componentMask projectileRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)         |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)          |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
+		
 		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
 		uint32_t itemActorsArchetypesNumber = 0;
-		ecs::arch::componentMask itemRequiredMask =
+		ecs::arch::componentMask rotationItemRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::ITEM_COMPONENT)           |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)           |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)      |
 			(1ul << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT)       |
 			(1ul << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)       |
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
+
 
 		ecs::arch::Archetype* cachedInventoryArchetypes[32];
 		uint32_t inventoryArchetypesNumber = 0;
@@ -202,6 +211,14 @@ namespace GLVM::core
 		
 		ecs::arch::Archetype* cachedItemArchetypes[32];
 		uint32_t itemArchetypesNumber = 0;
+		ecs::arch::componentMask itemRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::ITEM_COMPONENT)           |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)           |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)      |
+			(1ul << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT)       |
+			(1ul << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
+		
 		ecs::arch::Archetype* cachedHealthBarsArchetypes[32];
 		uint32_t healthBarsArchetypesNumber = 0;
 		ecs::arch::componentMask healthBarsRequiredMask =
