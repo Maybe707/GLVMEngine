@@ -9,6 +9,7 @@
 #include "Constants.hpp"
 #include "IContainer.hpp"
 #include <cstddef>
+#include <cstdint>
 #include <iostream>
 #include "VertexMath.hpp"
 #include <assert.h>
@@ -57,7 +58,8 @@ namespace GLVM::core
 	{
 		unsigned int size = 0;
 		unsigned int capacity = 0;
-		static constexpr int expander = 10;
+		uint32_t expander = 8;
+		static constexpr uint32_t expanderMultiplayer = 8;
 		unsigned char* rowInnerData = nullptr;
 	public:
         vector() = default;
@@ -168,6 +170,7 @@ namespace GLVM::core
 				rowInnerData = aTemp_Vector_Container;
 
 				capacity += expander;
+				expander *= expanderMultiplayer;
 			}
 
 		if( rowInnerData == nullptr ) {
