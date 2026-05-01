@@ -1052,49 +1052,21 @@ namespace GLVM::core
 		}
 
 		animationActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedAnimationActorsArchetypes[animationActorsArchetypesNumber] = arch;
-				++animationActorsArchetypesNumber;
-			}
-		}
+		arch::world.searchCacheArchetypes( animationRequiredMask, cachedAnimationArchetypes, animationActorsArchetypesNumber );
 
 		uint32_t animationActorsCounter = levelChunkActorsCounter;
 		for( uint32_t x = 0; x < animationActorsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedAnimationActorsArchetypes[x];
-			cm::transform* actorTransforms = nullptr;
-			cm::material*  actorMaterials  = nullptr;
-			cm::mesh*      actorMeshes     = nullptr;
-			cm::animation* actorAnimations = nullptr;
-			cm::rotation*  actorRotations  = nullptr;
-			switch( arch->mask ) {
-			case arch::playerComponentMask:
-				actorTransforms = static_cast<arch::PlayerArchetype*>( arch )->transforms;
-				actorMaterials  = static_cast<arch::PlayerArchetype*>( arch )->materials;
-				actorMeshes     = static_cast<arch::PlayerArchetype*>( arch )->meshes;
-				actorAnimations = static_cast<arch::PlayerArchetype*>( arch )->animations;
-				actorRotations  = static_cast<arch::PlayerArchetype*>( arch )->rotations;
-				break;
-			case arch::enemyComponentMask:
-				actorTransforms = static_cast<arch::EnemyArchetype*>( arch )->transforms;
-				actorMaterials  = static_cast<arch::EnemyArchetype*>( arch )->materials;
-				actorMeshes     = static_cast<arch::EnemyArchetype*>( arch )->meshes;
-				actorAnimations = static_cast<arch::EnemyArchetype*>( arch )->animations;
-				actorRotations  = static_cast<arch::EnemyArchetype*>( arch )->rotations;
-				break;
-			// case arch::staticMeshComponentMask:
-			// 	actorTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
-			// 	actorMaterials  = static_cast<arch::StaticMeshArchetype*>( arch )->materials;
-			// 	actorMeshes     = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
-			// 	break;
-			}
+			cm::transform* actorTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::mesh*      actorMeshes     = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::material*  actorMaterials  = (ecs::components::material*)arch->
+				components[arch::ComponentsIndices::MATERIAL_COMPONENT];
+			cm::rotation*  actorRotations  = (ecs::components::rotation*)arch->
+				components[arch::ComponentsIndices::ROTATION_COMPONENT];
+			cm::animation* actorAnimations = (ecs::components::animation*)arch->
+				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
@@ -1118,36 +1090,20 @@ namespace GLVM::core
 		}
 
 		staticActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ul << arch::ComponentsIndices::STATIC_MESH_TAG_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedStaticActorsArchetypes[staticActorsArchetypesNumber] = arch;
-				++staticActorsArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( staticActorsRequiredMask, cachedStaticActorsArchetypes, staticActorsArchetypesNumber );
+		
 		uint32_t staticActorsCounter = animationActorsCounter;
 		for( uint32_t x = 0; x < staticActorsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedStaticActorsArchetypes[x];
-			cm::transform* actorTransforms = nullptr;
-			cm::material*  actorMaterials  = nullptr;
-			cm::rotation*  actorRotations  = nullptr;
-			cm::mesh*      actorMeshes     = nullptr;
-			switch( arch->mask ) {
-			case arch::staticMeshComponentMask:
-				actorTransforms = static_cast<arch::StaticMeshArchetype*>( arch )->transforms;
-				actorMaterials  = static_cast<arch::StaticMeshArchetype*>( arch )->materials;
-				actorRotations  = static_cast<arch::StaticMeshArchetype*>( arch )->rotations;
-				actorMeshes     = static_cast<arch::StaticMeshArchetype*>( arch )->meshes;
-				break;
-			}
-
+			cm::transform* staticActorTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::mesh*      staticActorMeshes     = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::material*  staticActorMaterials  = (ecs::components::material*)arch->
+				components[arch::ComponentsIndices::MATERIAL_COMPONENT];
+			cm::rotation*  staticActorRotations  = (ecs::components::rotation*)arch->
+				components[arch::ComponentsIndices::ROTATION_COMPONENT];
+			
 			core::vector<mat4> jointMatrices;
 			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
@@ -1157,12 +1113,12 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
-				cm::transform* transformComponent = &actorTransforms[n];
-				cm::material*  materialComponent  = &actorMaterials[n];
-				cm::rotation*  rotationComponent  = &actorRotations[n];
-				if( actorTransforms && actorMaterials &&
-					actorRotations && actorMeshes ) {
-					unsigned int meshID               = actorMeshes[n].handle.id;
+				cm::transform* transformComponent = &staticActorTransforms[n];
+				cm::material*  materialComponent  = &staticActorMaterials[n];
+				cm::rotation*  rotationComponent  = &staticActorRotations[n];
+				if( staticActorTransforms && staticActorMaterials &&
+					staticActorRotations && staticActorMeshes ) {
+					unsigned int meshID               = staticActorMeshes[n].handle.id;
 					vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
 					vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;

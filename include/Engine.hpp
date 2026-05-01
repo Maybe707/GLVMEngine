@@ -154,6 +154,14 @@ namespace GLVM::core
 		
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];
 		uint32_t animationArchetypesNumber = 0;
+		ecs::arch::componentMask animationRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)  |
+			(1ul << ecs::arch::ComponentsIndices::ANIMATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)  |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
+		
 		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
 		uint32_t crosshairActorsArchetypesNumber = 0;
 		ecs::arch::componentMask crosshairRequiredMask =
