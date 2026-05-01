@@ -987,33 +987,19 @@ namespace GLVM::core
 
 		vulkanRenderer->crosshairs.clear();
 		crosshairActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedCrosshairActorsArchetypes[crosshairActorsArchetypesNumber] = arch;
-				++crosshairActorsArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( crosshairRequiredMask, cachedCrosshairActorsArchetypes, crosshairActorsArchetypesNumber );
+		
 		for( uint32_t x = 0; x < crosshairActorsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedCrosshairActorsArchetypes[x];
-			cm::transform* actorTransforms = nullptr;
-			cm::mesh*      actorMeshes     = nullptr;
-			switch( arch->mask ) {
-			case arch::crosshairComponentMask:
-				actorTransforms = static_cast<arch::CrosshairArchetype*>( arch )->transforms;
-				actorMeshes     = static_cast<arch::CrosshairArchetype*>( arch )->meshes;
-				break;
-			}
+			cm::transform* crosshairTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::mesh*      crosshairMeshes     = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
 
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 				vulkanRenderer->crosshairs.Push({});
-				cm::transform* cursorTransform = &actorTransforms[i];
-				unsigned int meshID            = actorMeshes[i].handle.id;
+				cm::transform* cursorTransform = &crosshairTransforms[i];
+				unsigned int meshID            = crosshairMeshes[i].handle.id;
 				vulkanRenderer->crosshairs[i].meshID = meshID;
 				vulkanRenderer->crosshairs[i].model  = updateDataHudScreenUBO( cursorTransform );
 			}
@@ -1022,38 +1008,22 @@ namespace GLVM::core
 
 		vulkanRenderer->actors.clear();		
 		levelChunkActorsArchetypesNumber = 0;
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ul << arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT) |
-				(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ul << arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ul << arch::ComponentsIndices::MESH_COMPONENT);
-
-			if( arch::matchesRequiredMask(arch->mask, requiredMask) ) {
-				cachedLevelChunkActorsArchetypes[levelChunkActorsArchetypesNumber] = arch;
-				++levelChunkActorsArchetypesNumber;
-			}
-		}
-
+		arch::world.searchCacheArchetypes( levelChunkRequiredMask, cachedLevelChunkActorsArchetypes, levelChunkActorsArchetypesNumber );
+		
 		uint32_t levelChunkActorsCounter = 0;
 		for( uint32_t x = 0; x < levelChunkActorsArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedLevelChunkActorsArchetypes[x];
-			cm::transform* actorTransforms = nullptr;
-			cm::material*  actorMaterials  = nullptr;
-			cm::rotation*  actorRotations  = nullptr;
-			cm::mesh*      actorMeshes     = nullptr;
-			ecs::tagComponents::levelChunkTagComponent* levelChunks = nullptr;
-			switch( arch->mask ) {
-			case arch::levelChunkComponentMask:
-				actorTransforms = static_cast<arch::LevelChunkArchetype*>( arch )->transforms;
-				actorMaterials  = static_cast<arch::LevelChunkArchetype*>( arch )->materials;
-				actorRotations  = static_cast<arch::LevelChunkArchetype*>( arch )->rotations;
-				actorMeshes     = static_cast<arch::LevelChunkArchetype*>( arch )->meshes;
-				levelChunks     = static_cast<arch::LevelChunkArchetype*>( arch )->levelChunkTagComponents;
-				break;
-			}
-
+			cm::transform* levelChunkTransforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::mesh*      levelChunkMeshes     = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::material*  levelChunkMaterials  = (ecs::components::material*)arch->
+				components[arch::ComponentsIndices::MATERIAL_COMPONENT];
+			cm::rotation*  levelChunkRotations  = (ecs::components::rotation*)arch->
+				components[arch::ComponentsIndices::ROTATION_COMPONENT];
+			ecs::tagComponents::levelChunkTagComponent* levelChunks = (ecs::tagComponents::levelChunkTagComponent*)arch->
+				components[arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT];
+			
 			core::vector<mat4> jointMatrices;
 			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
@@ -1063,12 +1033,12 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
-				cm::transform* transformComponent = &actorTransforms[n];
-				cm::material*  materialComponent  = &actorMaterials[n];
-				cm::rotation*  rotationComponent  = &actorRotations[n];
-				if( actorTransforms && actorMaterials && levelChunks &&
-					actorRotations && actorMeshes ) {
-					unsigned int meshID               = actorMeshes[n].handle.id;
+				cm::transform* transformComponent = &levelChunkTransforms[n];
+				cm::material*  materialComponent  = &levelChunkMaterials[n];
+				cm::rotation*  rotationComponent  = &levelChunkRotations[n];
+				if( levelChunkTransforms && levelChunkMaterials && levelChunks &&
+					levelChunkRotations && levelChunkMeshes ) {
+					unsigned int meshID = levelChunkMeshes[n].handle.id;
 					vulkanRenderer->actors[levelChunkActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					vulkanRenderer->actors[levelChunkActorsCounter].jointMatrices = jointMatrices;
 					vulkanRenderer->actors[levelChunkActorsCounter].meshID        = meshID;

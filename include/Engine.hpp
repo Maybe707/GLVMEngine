@@ -156,8 +156,21 @@ namespace GLVM::core
 		uint32_t animationArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
 		uint32_t crosshairActorsArchetypesNumber = 0;
+		ecs::arch::componentMask crosshairRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
+
 		ecs::arch::Archetype* cachedLevelChunkActorsArchetypes[32];
 		uint32_t levelChunkActorsArchetypesNumber = 0;
+		ecs::arch::componentMask levelChunkRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
+		
 		ecs::arch::Archetype* cachedProjectileActorsArchetypes[32];
 		uint32_t projectileActorsArchetypesNumber = 0;
 		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
