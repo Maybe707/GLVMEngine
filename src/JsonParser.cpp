@@ -401,12 +401,11 @@ namespace GLVM::Core
 		return resultVector;
 	}
 
-	void calculateElementsMemorySizeAndStep(
+	void calculateElementsMemorySize(
 		unsigned int indices_elements_count,
 		std::string* indices_element_type,
 		unsigned int indices_componet_type,
-		unsigned int* indices_buffer_view_byte_length,
-		unsigned int* step) {
+		unsigned int* indices_buffer_view_byte_length ) {
 		if( *indices_element_type == "VEC3" ) {
 			*indices_buffer_view_byte_length = indices_elements_count * 12;
 		} else if( *indices_element_type == "VEC4" ) {
@@ -414,11 +413,19 @@ namespace GLVM::Core
 		} else if( *indices_element_type == "SCALAR" ) {
 			if( indices_componet_type == 5123 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 2;
-				*step = 2;
 			} else if( indices_componet_type == 5125 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 4;
-				*step = 4;
 			}
+		}
+	}
+
+	void calculateByteStep( unsigned int indices_componet_type, unsigned int* byte_step ) {
+		if( indices_componet_type == 5123 ) {
+			*byte_step = 2;
+		} else if( indices_componet_type == 5125 ) {
+			*byte_step = 4;
+		} else if( indices_componet_type == 5126 ) {
+			*byte_step = 4;
 		}
 	}
 	
@@ -451,21 +458,9 @@ namespace GLVM::Core
 		std::cout << "indices component type: " << indices_componet_type << std::endl;
 		std::cout << "indices elements count: " << indices_elements_count << std::endl;
 		unsigned int indices_buffer_view_byte_length = 0;
-		unsigned int step = 0;
-		calculateElementsMemorySizeAndStep( indices_elements_count, indices_element_type, indices_componet_type, &indices_buffer_view_byte_length, &step );
-		// if( *indices_element_type == "VEC3" ) {
-		// 	indices_buffer_view_byte_length = indices_elements_count * 12;
-		// } else if( *indices_element_type == "VEC4" ) {
-		// 	indices_buffer_view_byte_length = indices_elements_count * 16;
-		// } else if( *indices_element_type == "SCALAR" ) {
-		// 	if( indices_componet_type == 5123 ) {
-		// 		indices_buffer_view_byte_length = indices_elements_count * 2;
-		// 		step = 2;
-		// 	} else if( indices_componet_type == 5125 ) {
-		// 		indices_buffer_view_byte_length = indices_elements_count * 4;
-		// 		step = 4;
-		// 	}
-		// }
+		unsigned int indices_byte_step = 0;
+		calculateElementsMemorySize( indices_elements_count, indices_element_type, indices_componet_type, &indices_buffer_view_byte_length );
+		calculateByteStep( indices_componet_type, &indices_byte_step );
 		
 		[[maybe_unused]] int indices_buffer_view_byte_offset = 0;
 		if( (*gltf)["accessors"][indices_index].isObject() == JSON_OBJECT ) {
@@ -481,7 +476,7 @@ namespace GLVM::Core
 		core::vector<unsigned int> indices;
 		std::cout << "indices buffer view byte offset: " << indices_buffer_view_byte_offset << std::endl;
 		std::cout << "indices buffer view byte length: " << indices_buffer_view_byte_length << std::endl;
-		for ( unsigned int i = indices_byte_offset + indices_buffer_view_byte_offset; i < indices_byte_offset + indices_buffer_view_byte_offset + indices_buffer_view_byte_length; i += step ) {
+		for ( unsigned int i = indices_byte_offset + indices_buffer_view_byte_offset; i < indices_byte_offset + indices_buffer_view_byte_offset + indices_buffer_view_byte_length; i += indices_byte_step ) {
 			if( indices_componet_type == 5123 ) {
 				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
 			} else if( indices_componet_type == 5125 ) {
@@ -495,6 +490,16 @@ namespace GLVM::Core
 		int vertices_position_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["POSITION"].value.iNumber;
 		int vertices_buffer_view_index = (*gltf)["accessors"][vertices_position_index]["bufferView"].value.iNumber;
 
+		unsigned int vertices_elements_count = (*gltf)["accessors"][vertices_position_index]["count"].value.iNumber;
+		std::string* vertices_element_type   = (*gltf)["accessors"][vertices_position_index]["type"].value.string;
+		unsigned int vertices_componet_type  = (*gltf)["accessors"][vertices_position_index]["componentType"].value.iNumber;
+		std::cout << "vertices component type: " << vertices_componet_type << std::endl;
+		std::cout << "vertices elements count: " << vertices_elements_count << std::endl;
+		unsigned int vertices_buffer_view_byte_length = 0;
+		unsigned int vertices_byte_step = 0;
+		calculateElementsMemorySize( vertices_elements_count, vertices_element_type, vertices_componet_type, &vertices_buffer_view_byte_length );
+		calculateByteStep( vertices_componet_type, &vertices_byte_step );
+
 		[[maybe_unused]] int vertices_buffer_view_byte_offset = 0;
 		if( (*gltf)["accessors"][vertices_position_index].isObject() == JSON_OBJECT ) {
 			HashMap<JsonValue>* ptr = (*gltf)["accessors"][vertices_position_index].value.object;
@@ -503,11 +508,11 @@ namespace GLVM::Core
 			}
 		}
 
-		int vertices_byte_length = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteLength"].value.iNumber;
+		[[maybe_unused]] int vertices_byte_length = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteLength"].value.iNumber;
 		int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> vertices_position;
-		for ( int i = vertices_byte_offset; i < vertices_byte_offset + vertices_byte_length; i += 4 )
+		for ( unsigned int i = vertices_byte_offset + vertices_buffer_view_byte_offset; i < vertices_byte_offset + vertices_buffer_view_byte_offset + vertices_buffer_view_byte_length; i += vertices_byte_step )
 			vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
 
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
