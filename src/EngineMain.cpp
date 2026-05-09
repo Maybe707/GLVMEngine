@@ -86,7 +86,8 @@ int main()
 	[[maybe_unused]] cm::MeshHandle simpleCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/simpleCube2.gltf");
 	[[maybe_unused]] cm::MeshHandle crosshair_001_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/crosshair_001.gltf");
 	[[maybe_unused]] cm::MeshHandle inventory_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/inventory.gltf");
-	[[maybe_unused]] cm::MeshHandle cyborg_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/cyborg2.gltf");
+	[[maybe_unused]] cm::MeshHandle cyborg_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/cyborg11.gltf");
+	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/robot0.gltf");
 
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);

@@ -233,12 +233,13 @@ namespace GLVM::Core
 	    std::string lastKey_ = "";
 		std::string bufferString_ = "";
 
-		void SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_,
-								core::vector<JsonValue>& resultVector) const;
 		void SearchInJsonArray(core::vector<JsonValue>* arrayValue, const char* key_,
 							   core::vector<JsonValue>& resultVector) const;
 
     public:
+		void SearchInJsonObject(HashMap<JsonValue>* mapValue, const char* key_,
+								core::vector<JsonValue>& resultVector) const;
+		
 		~CJsonParser();
 		JsonValue* GetRoot() { return root_; }
         void ReadFile(const char* _filePath);
