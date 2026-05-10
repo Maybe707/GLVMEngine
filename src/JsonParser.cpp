@@ -418,6 +418,8 @@ namespace GLVM::Core
 			} else if( indices_componet_type == 5125 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 4;
 			}
+		} else if( *indices_element_type == "MAT4" ) {
+			*indices_buffer_view_byte_length = indices_elements_count * 64;
 		}
 	}
 
@@ -669,19 +671,30 @@ namespace GLVM::Core
 			unsigned int inverseBindMatricesIndex = (*gltf)["skins"][0]["inverseBindMatrices"].value.iNumber;
 			unsigned int bufferView = (*gltf)["accessors"][inverseBindMatricesIndex]["bufferView"].value.iNumber;
 
-			[[maybe_unused]] int inverseBindMatricesIndex_byte_offset = 0;
+			unsigned int inverse_bind_matrices_elements_count = (*gltf)["accessors"][inverseBindMatricesIndex]["count"].value.iNumber;
+			std::string* inverse_bind_matrices_element_type   = (*gltf)["accessors"][inverseBindMatricesIndex]["type"].value.string;
+			unsigned int inverse_bind_matrices_componet_type  = (*gltf)["accessors"][inverseBindMatricesIndex]["componentType"].value.iNumber;
+			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+			unsigned int inverse_bind_matrices_buffer_view_byte_length = 0;
+			unsigned int inverse_bind_matrices_byte_step = 0;
+			calculateElementsMemorySize( inverse_bind_matrices_elements_count, inverse_bind_matrices_element_type,
+										 inverse_bind_matrices_componet_type, &inverse_bind_matrices_buffer_view_byte_length );
+			calculateByteStep( inverse_bind_matrices_componet_type, &inverse_bind_matrices_byte_step );
+
+			[[maybe_unused]] int inverse_bind_matrices_buffer_view_byte_offset = 0;
 			if( (*gltf)["accessors"][inverseBindMatricesIndex].isObject() == JSON_OBJECT ) {
 				HashMap<JsonValue>* ptr = (*gltf)["accessors"][inverseBindMatricesIndex].value.object;
 				if( ptr->Contain("byteOffset") ) {
-					inverseBindMatricesIndex_byte_offset = (*gltf)["accessors"][inverseBindMatricesIndex]["byteOffset"].value.iNumber;
+					inverse_bind_matrices_buffer_view_byte_offset = (*gltf)["accessors"][inverseBindMatricesIndex]["byteOffset"].value.iNumber;
 				}
 			}
 
-			unsigned int byteLengthInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteLength"].value.iNumber;
+			[[maybe_unused]] unsigned int byteLengthInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteLength"].value.iNumber;
 			unsigned int byteOffsetInverseBindMatrices = (*gltf)["bufferViews"][bufferView]["byteOffset"].value.iNumber;
 
 			core::vector<float> inverseBindMatricesData;
-			for ( unsigned int i = byteOffsetInverseBindMatrices; i < byteOffsetInverseBindMatrices + byteLengthInverseBindMatrices; i += 4 )
+			for ( unsigned int i = byteOffsetInverseBindMatrices + inverse_bind_matrices_buffer_view_byte_offset; i < byteOffsetInverseBindMatrices + inverse_bind_matrices_buffer_view_byte_offset + inverse_bind_matrices_buffer_view_byte_length; i += inverse_bind_matrices_byte_step )
 				inverseBindMatricesData.Push(reinterpret_cast<float &>(buffer[i]));
 
 			mat4 inverseBindMatrix(0.0f);
