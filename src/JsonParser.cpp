@@ -406,7 +406,9 @@ namespace GLVM::Core
 		std::string* indices_element_type,
 		unsigned int indices_componet_type,
 		unsigned int* indices_buffer_view_byte_length ) {
-		if( *indices_element_type == "VEC3" ) {
+		if( *indices_element_type == "VEC2" ) {
+			*indices_buffer_view_byte_length = indices_elements_count * 8;
+		} else if( *indices_element_type == "VEC3" ) {
 			*indices_buffer_view_byte_length = indices_elements_count * 12;
 		} else if( *indices_element_type == "VEC4" ) {
 			*indices_buffer_view_byte_length = indices_elements_count * 16;
@@ -518,6 +520,16 @@ namespace GLVM::Core
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
 		int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;
 
+		unsigned int texture_elements_count = (*gltf)["accessors"][texture_coordinates_index]["count"].value.iNumber;
+		std::string* texture_element_type   = (*gltf)["accessors"][texture_coordinates_index]["type"].value.string;
+		unsigned int texture_componet_type  = (*gltf)["accessors"][texture_coordinates_index]["componentType"].value.iNumber;
+		std::cout << "vertices component type: " << vertices_componet_type << std::endl;
+		std::cout << "vertices elements count: " << vertices_elements_count << std::endl;
+		unsigned int texture_buffer_view_byte_length = 0;
+		unsigned int texture_byte_step = 0;
+		calculateElementsMemorySize( texture_elements_count, texture_element_type, texture_componet_type, &texture_buffer_view_byte_length );
+		calculateByteStep( texture_componet_type, &texture_byte_step );
+		
 		[[maybe_unused]] int texture_buffer_view_byte_offset = 0;
 		if( (*gltf)["accessors"][texture_coordinates_index].isObject() == JSON_OBJECT ) {
 			HashMap<JsonValue>* ptr = (*gltf)["accessors"][texture_coordinates_index].value.object;
@@ -526,11 +538,11 @@ namespace GLVM::Core
 			}
 		}
 
-		int texture_byte_length = (*gltf)["bufferViews"][texture_buffer_view_index]["byteLength"].value.iNumber;
+		[[maybe_unused]] int texture_byte_length = (*gltf)["bufferViews"][texture_buffer_view_index]["byteLength"].value.iNumber;
 		int texture_byte_offset = (*gltf)["bufferViews"][texture_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> texture_coordinates;
-		for ( int i = texture_byte_offset; i < texture_byte_offset + texture_byte_length; i += 4 )
+		for ( unsigned int i = texture_byte_offset + texture_buffer_view_byte_offset; i < texture_byte_offset + texture_buffer_view_byte_offset + texture_buffer_view_byte_length; i += texture_byte_step )
 			texture_coordinates.Push(reinterpret_cast<float &>(buffer[i]));
 
 		int normals_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["NORMAL"].value.iNumber;
