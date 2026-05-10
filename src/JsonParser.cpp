@@ -523,8 +523,8 @@ namespace GLVM::Core
 		unsigned int texture_elements_count = (*gltf)["accessors"][texture_coordinates_index]["count"].value.iNumber;
 		std::string* texture_element_type   = (*gltf)["accessors"][texture_coordinates_index]["type"].value.string;
 		unsigned int texture_componet_type  = (*gltf)["accessors"][texture_coordinates_index]["componentType"].value.iNumber;
-		std::cout << "vertices component type: " << vertices_componet_type << std::endl;
-		std::cout << "vertices elements count: " << vertices_elements_count << std::endl;
+		std::cout << "texture component type: " << texture_componet_type << std::endl;
+		std::cout << "texture elements count: " << texture_elements_count << std::endl;
 		unsigned int texture_buffer_view_byte_length = 0;
 		unsigned int texture_byte_step = 0;
 		calculateElementsMemorySize( texture_elements_count, texture_element_type, texture_componet_type, &texture_buffer_view_byte_length );
@@ -548,6 +548,16 @@ namespace GLVM::Core
 		int normals_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["NORMAL"].value.iNumber;
 		int normals_buffer_view_index = (*gltf)["accessors"][normals_index]["bufferView"].value.iNumber;
 
+		unsigned int normals_elements_count = (*gltf)["accessors"][normals_index]["count"].value.iNumber;
+		std::string* normals_element_type   = (*gltf)["accessors"][normals_index]["type"].value.string;
+		unsigned int normals_componet_type  = (*gltf)["accessors"][normals_index]["componentType"].value.iNumber;
+		std::cout << "normals component type: " << normals_componet_type << std::endl;
+		std::cout << "normals elements count: " << normals_elements_count << std::endl;
+		unsigned int normals_buffer_view_byte_length = 0;
+		unsigned int normals_byte_step = 0;
+		calculateElementsMemorySize( normals_elements_count, normals_element_type, normals_componet_type, &normals_buffer_view_byte_length );
+		calculateByteStep( normals_componet_type, &normals_byte_step );
+
 		[[maybe_unused]] int normals_buffer_view_byte_offset = 0;
 		if( (*gltf)["accessors"][normals_index].isObject() == JSON_OBJECT ) {
 			HashMap<JsonValue>* ptr = (*gltf)["accessors"][normals_index].value.object;
@@ -556,11 +566,11 @@ namespace GLVM::Core
 			}
 		}
 
-		int normals_byte_length = (*gltf)["bufferViews"][normals_buffer_view_index]["byteLength"].value.iNumber;
+		[[maybe_unused]] int normals_byte_length = (*gltf)["bufferViews"][normals_buffer_view_index]["byteLength"].value.iNumber;
 		int normals_byte_offset = (*gltf)["bufferViews"][normals_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> normals;
-		for ( int i = normals_byte_offset; i < normals_byte_offset + normals_byte_length; i += 4 )
+		for ( unsigned int i = normals_byte_offset + normals_buffer_view_byte_offset; i < normals_byte_offset + normals_buffer_view_byte_offset + normals_buffer_view_byte_length; i += normals_byte_step )
 			normals.Push(reinterpret_cast<float &>(buffer[i]));
 
 		core::vector<Core::JsonValue> skins = Search("skins");
