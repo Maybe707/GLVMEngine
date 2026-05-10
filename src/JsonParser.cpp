@@ -407,15 +407,35 @@ namespace GLVM::Core
 		unsigned int indices_componet_type,
 		unsigned int* indices_buffer_view_byte_length ) {
 		if( *indices_element_type == "VEC2" ) {
-			*indices_buffer_view_byte_length = indices_elements_count * 8;
-		} else if( *indices_element_type == "VEC3" ) {
-			*indices_buffer_view_byte_length = indices_elements_count * 12;
-		} else if( *indices_element_type == "VEC4" ) {
-			*indices_buffer_view_byte_length = indices_elements_count * 16;
-		} else if( *indices_element_type == "SCALAR" ) {
-			if( indices_componet_type == 5123 ) {
+			if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 2;
-			} else if( indices_componet_type == 5125 ) {
+			} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 4;
+			} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 8;
+			}
+		} else if( *indices_element_type == "VEC3" ) {
+			if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 3;
+			} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 6;
+			} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 12;
+			}
+		} else if( *indices_element_type == "VEC4" ) {
+			if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 4;
+			} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 8;
+			} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 16;
+			}
+		} else if( *indices_element_type == "SCALAR" ) {
+			if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
+				*indices_buffer_view_byte_length = indices_elements_count;
+			} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
+				*indices_buffer_view_byte_length = indices_elements_count * 2;
+			} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 4;
 			}
 		} else if( *indices_element_type == "MAT4" ) {
@@ -424,11 +444,11 @@ namespace GLVM::Core
 	}
 
 	void calculateByteStep( unsigned int indices_componet_type, unsigned int* byte_step ) {
-		if( indices_componet_type == 5123 ) {
+		if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
+			*byte_step = 1;
+		} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
 			*byte_step = 2;
-		} else if( indices_componet_type == 5125 ) {
-			*byte_step = 4;
-		} else if( indices_componet_type == 5126 ) {
+		} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
 			*byte_step = 4;
 		}
 	}
@@ -709,6 +729,17 @@ namespace GLVM::Core
 			unsigned int joints_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["JOINTS_0"].value.iNumber;
 			unsigned int joints_buffer_view_index = (*gltf)["accessors"][joints_index]["bufferView"].value.iNumber;
 
+			unsigned int joints_elements_count = (*gltf)["accessors"][joints_index]["count"].value.iNumber;
+			std::string* joints_element_type   = (*gltf)["accessors"][joints_index]["type"].value.string;
+			unsigned int joints_componet_type  = (*gltf)["accessors"][joints_index]["componentType"].value.iNumber;
+			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+			unsigned int joints_buffer_view_byte_length = 0;
+			unsigned int joints_byte_step = 0;
+			calculateElementsMemorySize( joints_elements_count, joints_element_type,
+										 joints_componet_type, &joints_buffer_view_byte_length );
+			calculateByteStep( joints_componet_type, &joints_byte_step );
+			
 			[[maybe_unused]] unsigned int joints_buffer_view_byte_offset = 0;
 			if( (*gltf)["accessors"][joints_index].isObject() == JSON_OBJECT ) {
 				HashMap<JsonValue>* ptr = (*gltf)["accessors"][joints_index].value.object;
@@ -731,7 +762,7 @@ namespace GLVM::Core
 			std::cout << "joints byte length: " << joints_byte_length << std::endl;
 			std::cout << "joints byte offset: " << joints_byte_offset << std::endl;
 			
-			for ( unsigned int i = joints_byte_offset; i < joints_byte_offset + joints_byte_length; ++i )
+			for ( unsigned int i = joints_byte_offset + joints_buffer_view_byte_offset; i < joints_byte_offset + joints_buffer_view_byte_offset + joints_buffer_view_byte_length; ++i )
 				jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
 
 			unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
