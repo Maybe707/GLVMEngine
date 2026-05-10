@@ -855,23 +855,15 @@ namespace GLVM::Core
 				std::cout << "input buffer view index: " << frameBufferViewIndex << std::endl;
 
 				unsigned int elements_count = (*gltf)["accessors"][translationInputs[i]]["count"].value.iNumber;
-				std::string* element_type   = (*gltf)["accessors"][translationInputs[i]]["type"].value.string;
-				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][translationInputs[i]]["comonentType"].value.iNumber;
+				[[maybe_unused]] std::string* element_type   = (*gltf)["accessors"][translationInputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][translationInputs[i]]["componentType"].value.iNumber;
 				std::cout << "elements count: " << elements_count << std::endl;
 				unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					// if( componet_type == 5123 ) {
-					// 	buffer_view_byte_length = elements_count * 2;
-					// } else if( componet_type == 5125 ) {
-					// 	buffer_view_byte_length = elements_count * 4;
-					// }
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int frameBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][translationInputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][translationInputs[i]].value.object;
@@ -889,7 +881,7 @@ namespace GLVM::Core
 				std::cout << "translation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
 				std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
 				std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
-				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 ) {
+				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
 					std::cout << "translation inputs index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
@@ -912,15 +904,13 @@ namespace GLVM::Core
 
 				unsigned int elements_count = (*gltf)["accessors"][translationOutputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][translationOutputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][translationOutputs[i]]["componentType"].value.iNumber;
 				unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int outputBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][translationOutputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][translationOutputs[i]].value.object;
@@ -938,7 +928,7 @@ namespace GLVM::Core
 				std::cout << "translation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
 				std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
 				std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
-				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 ) {
+				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
 					std::cout << "translation ouputs index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
@@ -976,15 +966,13 @@ namespace GLVM::Core
 
 				unsigned int elements_count = (*gltf)["accessors"][rotationInputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][rotationInputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][rotationInputs[i]]["componentType"].value.iNumber;
 				unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int frameBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][rotationInputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][rotationInputs[i]].value.object;
@@ -1002,7 +990,7 @@ namespace GLVM::Core
 				std::cout << "rotation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
 				std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
 				std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
-				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 ) {
+				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
 					std::cout << "rotation input index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
@@ -1025,15 +1013,13 @@ namespace GLVM::Core
 
 				unsigned int elements_count = (*gltf)["accessors"][rotationOutputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][rotationOutputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][rotationOutputs[i]]["componentType"].value.iNumber;
 				unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int outputBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][rotationOutputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][rotationOutputs[i]].value.object;
@@ -1051,7 +1037,7 @@ namespace GLVM::Core
 				std::cout << "rotation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
 				std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
 				std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
-				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 ) {
+				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
 					std::cout << "rotation output index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
@@ -1080,15 +1066,13 @@ namespace GLVM::Core
 
 				unsigned int elements_count = (*gltf)["accessors"][scaleInputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][scaleInputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][scaleInputs[i]]["componentType"].value.iNumber;
 				[[maybe_unused]] unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int frameBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][scaleInputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][scaleInputs[i]].value.object;
@@ -1103,7 +1087,7 @@ namespace GLVM::Core
 					(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
 
 				core::vector<float> temp;
-				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 )
+				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step )
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 
 				// for ( unsigned int i = frameByteOffset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + frameByteLength; i += 4 )
@@ -1119,15 +1103,13 @@ namespace GLVM::Core
 
 				unsigned int elements_count = (*gltf)["accessors"][scaleOutputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][scaleOutputs[i]]["type"].value.string;
+				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][scaleOutputs[i]]["componentType"].value.iNumber;
 				[[maybe_unused]] unsigned int buffer_view_byte_length = 0;
-				if( *element_type == "VEC3" ) {
-					buffer_view_byte_length = elements_count * 12;
-				} else if( *element_type == "VEC4" ) {
-					buffer_view_byte_length = elements_count * 16;
-				} else if( *element_type == "SCALAR" ) {
-					buffer_view_byte_length = elements_count * 4;
-				}
-				
+				unsigned int byte_step = 0;
+				calculateElementsMemorySize( elements_count, element_type,
+											 componet_type, &buffer_view_byte_length );
+				calculateByteStep( componet_type, &byte_step );
+
 				int outputBufferView_buffer_view_byte_offset = 0;
 				if( (*gltf)["accessors"][scaleOutputs[i]].isObject() == JSON_OBJECT ) {
 					HashMap<JsonValue>* ptr = (*gltf)["accessors"][scaleOutputs[i]].value.object;
@@ -1145,7 +1127,7 @@ namespace GLVM::Core
 				// for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 )
 				// 	temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-				for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + outputByteLength; i += 4 )
+				for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + outputByteLength; i += byte_step )
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				
 				scales.Push(temp);
