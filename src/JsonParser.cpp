@@ -768,6 +768,17 @@ namespace GLVM::Core
 			unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
 			unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
 
+			unsigned int weights_elements_count = (*gltf)["accessors"][weights_index]["count"].value.iNumber;
+			std::string* weights_element_type   = (*gltf)["accessors"][weights_index]["type"].value.string;
+			unsigned int weights_componet_type  = (*gltf)["accessors"][weights_index]["componentType"].value.iNumber;
+			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+			unsigned int weights_buffer_view_byte_length = 0;
+			unsigned int weights_byte_step = 0;
+			calculateElementsMemorySize( weights_elements_count, weights_element_type,
+										 weights_componet_type, &weights_buffer_view_byte_length );
+			calculateByteStep( weights_componet_type, &weights_byte_step );
+
 			[[maybe_unused]] int weights_buffer_view_byte_offset = 0;
 			if( (*gltf)["accessors"][weights_index].isObject() == JSON_OBJECT ) {
 				HashMap<JsonValue>* ptr = (*gltf)["accessors"][weights_index].value.object;
@@ -776,10 +787,10 @@ namespace GLVM::Core
 				}
 			}
 
-			unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
+			[[maybe_unused]] unsigned int weights_byte_length = (*gltf)["bufferViews"][weights_buffer_view_index]["byteLength"].value.iNumber;
 			unsigned int weights_byte_offset = (*gltf)["bufferViews"][weights_buffer_view_index]["byteOffset"].value.iNumber;
 
-			for ( unsigned int i = weights_byte_offset; i < weights_byte_offset + weights_byte_length; i += 4 )
+			for ( unsigned int i = weights_byte_offset + weights_buffer_view_byte_offset; i < weights_byte_offset + weights_buffer_view_byte_offset + weights_buffer_view_byte_length; i += weights_byte_step )
 				weightsContainer.Push(reinterpret_cast<float &>(buffer[i]));
 		} else {
 			noAnimations = true;
