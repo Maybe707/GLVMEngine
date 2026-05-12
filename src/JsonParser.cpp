@@ -33,7 +33,7 @@ namespace GLVM::Core
 
         pJsonFileData_ = sJsonFileData_.c_str();
     }
-
+	
     void CJsonParser::Parse() {
 		currentChar_ = pJsonFileData_[globalFileCounter_];
 		
@@ -500,6 +500,7 @@ namespace GLVM::Core
 		core::vector<unsigned int> indices;
 		std::cout << "indices buffer view byte offset: " << indices_buffer_view_byte_offset << std::endl;
 		std::cout << "indices buffer view byte length: " << indices_buffer_view_byte_length << std::endl;
+		std::string str = pathsGLTF_;
 		for ( unsigned int i = indices_byte_offset + indices_buffer_view_byte_offset; i < indices_byte_offset + indices_buffer_view_byte_offset + indices_buffer_view_byte_length; i += indices_byte_step ) {
 			if( indices_componet_type == 5123 ) {
 				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
@@ -536,9 +537,26 @@ namespace GLVM::Core
 		int vertices_byte_offset = (*gltf)["bufferViews"][vertices_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> vertices_position;
-		for ( unsigned int i = vertices_byte_offset + vertices_buffer_view_byte_offset; i < vertices_byte_offset + vertices_buffer_view_byte_offset + vertices_buffer_view_byte_length; i += vertices_byte_step )
+		for ( unsigned int i = vertices_byte_offset + vertices_buffer_view_byte_offset; i < vertices_byte_offset + vertices_buffer_view_byte_offset + vertices_buffer_view_byte_length; i += vertices_byte_step ) {
+			std::cout << "value: " << reinterpret_cast<float&>(buffer[i]) << std::endl;
+			printf("%02x ", (unsigned char)buffer[i]);
 			vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
+			if( i % 3 == 0 ) {
+				std::cout << "next vertex" << std::endl;
+			}
+		}
 
+		str = pathsGLTF_;
+		if( str == "../gltf/scene.gltf" ) {
+			std::cout << "verices position index: " << vertices_position_index << std::endl;
+			std::cout << "verices buffer view index: " << vertices_buffer_view_index << std::endl;
+			std::cout << "vertices byte offset: " << vertices_byte_offset << std::endl;
+			std::cout << "vertices buffer view byte offset: " << vertices_buffer_view_byte_offset << std::endl;
+			std::cout << "vertices buffer view byte length: " << vertices_buffer_view_byte_length << std::endl;
+
+//			throw("asdf");
+		}
+		
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
 		int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;
 
@@ -592,9 +610,24 @@ namespace GLVM::Core
 		int normals_byte_offset = (*gltf)["bufferViews"][normals_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<float> normals;
-		for ( unsigned int i = normals_byte_offset + normals_buffer_view_byte_offset; i < normals_byte_offset + normals_buffer_view_byte_offset + normals_buffer_view_byte_length; i += normals_byte_step )
+		for ( unsigned int i = normals_byte_offset + normals_buffer_view_byte_offset; i < normals_byte_offset + normals_buffer_view_byte_offset + normals_buffer_view_byte_length; i += normals_byte_step ) {
+			std::cout << reinterpret_cast<float&>(buffer[i]) << std::endl;
 			normals.Push(reinterpret_cast<float &>(buffer[i]));
+			if( i % 3 == 0 ) {
+				std::cout << "next normal" << std::endl;
+			}
+		}
 
+		if( str == "../gltf/robot0.gltf" ) {
+			std::cout << "normals position index: " << normals_index << std::endl;
+			std::cout << "normals buffer view index: " << normals_buffer_view_index << std::endl;
+			std::cout << "normals byte offset: " << normals_byte_offset << std::endl;
+			std::cout << "normals buffer view byte offset: " << normals_buffer_view_byte_offset << std::endl;
+			std::cout << "normals buffer view byte length: " << normals_buffer_view_byte_length << std::endl;
+		
+//			throw("asdf");
+		}
+		
 		core::vector<Core::JsonValue> skins = Search("skins");
 		Core::JsonValue joints;
 		core::vector<mat4> globalTransformJointNode;
@@ -626,25 +659,30 @@ namespace GLVM::Core
 								rotationQuaternion.x = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
 								rotationQuaternion.x = array[i].value.fNumber;
+							break;
 						case 1:
 							if ( array[i].isInterger() )
 								rotationQuaternion.y = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
 								rotationQuaternion.y = array[i].value.fNumber;
+							break;
 						case 2:
 							if ( array[i].isInterger() )
 								rotationQuaternion.z = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
 								rotationQuaternion.z = array[i].value.fNumber;
+							break;
 						case 3:
 							if ( array[i].isInterger() )
 								rotationQuaternion.w = array[i].value.iNumber;
 							else if ( array[i].isFloat() )
 								rotationQuaternion.w = array[i].value.fNumber;
+							break;
 						}
 					}
 
 					rotation = rotateQuaternion<float, 4>(rotationQuaternion);
+					rotation.SelfTensorTranspose();
 				}
 
 				core::vector<int> local_children;
@@ -720,8 +758,10 @@ namespace GLVM::Core
 			mat4 inverseBindMatrix(0.0f);
 			for ( unsigned int n = 0; n < joints.value.array->GetSize(); ++n ) {
 				for ( unsigned int g = 0; g < 4; ++g )
-					for ( unsigned int j = 0; j < 4; ++j )
+					for ( unsigned int j = 0; j < 4; ++j ) {
 						inverseBindMatrix[g][j] = inverseBindMatricesData[n * 16 + g * 4 + j];
+//						inverseBindMatrix[j][g] = inverseBindMatricesData[n * 16 + g * 4 + j];
+					}
 
 				inverseBindMatrixSet.Push(inverseBindMatrix);
 			}
@@ -762,8 +802,14 @@ namespace GLVM::Core
 			std::cout << "joints byte length: " << joints_byte_length << std::endl;
 			std::cout << "joints byte offset: " << joints_byte_offset << std::endl;
 			
-			for ( unsigned int i = joints_byte_offset + joints_buffer_view_byte_offset; i < joints_byte_offset + joints_buffer_view_byte_offset + joints_buffer_view_byte_length; ++i )
-				jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
+			for ( unsigned int i = joints_byte_offset + joints_buffer_view_byte_offset; i < joints_byte_offset + joints_buffer_view_byte_offset + joints_buffer_view_byte_length; i += joints_byte_step ) {
+				if ( joints_componet_type == 5121 ) {  // UNSIGNED_BYTE
+					jointsIndices.Push(reinterpret_cast<unsigned char &>(buffer[i]));
+				} else if ( joints_componet_type == 5123 ) {  // UNSIGNED_SHORT
+					jointsIndices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
+				}
+//				jointsIndices.Push(reinterpret_cast<char &>(buffer[i]));
+			}
 
 			unsigned int weights_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["WEIGHTS_0"].value.iNumber;
 			unsigned int weights_buffer_view_index = (*gltf)["accessors"][weights_index]["bufferView"].value.iNumber;
@@ -1127,7 +1173,7 @@ namespace GLVM::Core
 				// for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += 4 )
 				// 	temp.Push(reinterpret_cast<float &>(buffer[i]));
 
-				for ( unsigned int i = outputByteOffset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + outputByteLength; i += byte_step )
+				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step )
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				
 				scales.Push(temp);
@@ -1183,12 +1229,24 @@ namespace GLVM::Core
 //						std::cout << "bone translation array size: " << boneAllFrameTranslations.GetSize() << std::endl;
 //						std::cout << "index: " << i * 3 + q << std::endl;
 						frameTranslation[3][q] = boneAllFrameTranslations[i * 3 + q];
-						if ( scales.GetSize() > 0 )
-						frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
+						if ( scales.GetSize() > 0 ) {
+							while( i * 3 + q >= boneAllFrameScales.GetSize() ) {
+								boneAllFrameScales.Push( 1.0f );
+							}
+							frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
+						}
 					}
 
 					Quaternion frameRotationQuaternion;
 					mat4 frameRotation(1.0f);
+
+					if( boneAllFrameRotations.GetSize() == i * 4 ) {
+						boneAllFrameRotations.Push( 0.0f );
+						boneAllFrameRotations.Push( 0.0f );
+						boneAllFrameRotations.Push( 0.0f );
+						boneAllFrameRotations.Push( 1.0f );
+					}
+					
 					frameRotationQuaternion.x = boneAllFrameRotations[i * 4];
 					frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
 					frameRotationQuaternion.z = boneAllFrameRotations[i * 4 + 2];
@@ -1202,35 +1260,77 @@ namespace GLVM::Core
 				}
 				jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 			}
-			
+
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<mat4>  globalAllFrameNodeMatrix;
+
+				// Guard before the inner loop
+				// if ( j >= inverseBindMatrixSet.GetSize() ) {
+				// 	jointMatrices.Push(globalAllFrameNodeMatrix);
+				// 	continue;
+				// }
 				
 				for ( unsigned int i = 0; i < frameInputsTranslation[j].GetSize(); ++i ) {
 					mat4 rootTransform(1.0f);
 					for ( unsigned int b = 0; b < joints_bones[j].GetSize() - 1; ++b ) {
+						const u32 innerIndex = joints_bones[j][b];
+						while( jointMatricesAccumulator.GetSize() <= innerIndex ) {
+							jointMatricesAccumulator.Push( {} );
+						}
+
+						while( jointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
+							mat4 unit(1.0f);
+							jointMatricesAccumulator[joints_bones[j][b]].Push( unit );
+						}
+						
 						rootTransform = jointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
 					}
+					// if ( j >= jointMatricesAccumulator.GetSize() || i >= jointMatricesAccumulator[j].GetSize() ) {
+					// 	mat4 unit(1.0f);
+					// 	globalAllFrameNodeMatrix.Push(unit);
+					// 	continue;
+					// }
+
 					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * jointMatricesAccumulator[j][i] * rootTransform);
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
-			int maximumJoints     = 6;
-			int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
-			if ( unitMatricesSize > 0 ) {
-				for ( int i = 0; i < unitMatricesSize; ++i) {
-					core::vector<mat4>  globalAllFrameNodeMatrix;
-					for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
-						mat4 unitMatrix(1.0f);
-						globalAllFrameNodeMatrix.Push(unitMatrix);
+			
+			for( unsigned int z = 0; z < frameInputsTranslation.GetSize(); ++z ) {
+				int maximumJoints    = 64;
+				int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
+
+				if ( unitMatricesSize > 0 ) {
+					for ( int i = 0; i < unitMatricesSize; ++i) {
+						core::vector<mat4>  globalAllFrameNodeMatrix;
+						for ( unsigned int j = 0; j < frameInputsTranslation[z].GetSize(); ++j ) {
+							mat4 unitMatrix(1.0f);
+							globalAllFrameNodeMatrix.Push(unitMatrix);
+						}
+
+						jointMatrices.Push(globalAllFrameNodeMatrix);
 					}
-
-					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
 			}
 		}
 
+		// while( jointMatrices.GetSize() < 256 ) {
+		// 	mat4 unit(1.0f);
+		// 	core::vector<mat4> vec;
+		// 	for( int i = 0; i < 64; ++i ) {
+		// 		vec.Push( unit );
+		// 	}
+		// 	jointMatrices.Push( vec );
+		// }
+
+		/// VONUCHI KOSTIL! UBIRAI!!!
+		for( unsigned int i = 0; i < jointMatrices.GetSize(); ++i ) {
+			for( unsigned int j = 0; j < 1024; ++j ) {
+				jointMatrices[i].Push( mat4( 1.0f ) );
+			}
+		}
+		
 		jointMatricesPerMesh = jointMatrices;
 		topY = -999.999f;
 		for ( uint32_t i = 0; i < indices.GetSize(); ++i ) {

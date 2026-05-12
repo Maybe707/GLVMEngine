@@ -485,7 +485,7 @@ namespace GLVM::core
 		vulkanRenderer->projectionMatrix[1][1] *= 1.0f;
 	}
 	
-	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames(ecs::components::animation* animationComponent, unsigned int meshID) {
+	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames([[maybe_unused]] ecs::components::animation* animationComponent, [[maybe_unused]] unsigned int meshID) {
 		if ( vulkanRenderer->jointMatricesPerMesh.GetSize() > 0 && vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() > 0 &&
 			 animationComponent->frameAccumulator >= vulkanRenderer->frames[meshID][animationComponent->currentAnimationFrame] * 1.0f ) {
 			++animationComponent->currentAnimationFrame;
@@ -510,15 +510,31 @@ namespace GLVM::core
 		} else {
 			jointMatrices.Resize(MAX_JOINTS_NUMBER);
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
+				// if( meshID >= vulkanRenderer->jointMatricesPerMesh.GetSize() ) {
+				// 	std::cout << "OUTER ARRAY OVERFLOW" << std::endl;
+				// 	throw("sdfsdf");
+				// } else if( i >= vulkanRenderer->jointMatricesPerMesh[meshID].GetSize() ) {
+				// 	std::cout << "MIDDLE ARRAY OVERFLOW" << std::endl;
+				// 	throw("sdfsdf");
+				// } else if( animationComponent->currentAnimationFrame >= vulkanRenderer->jointMatricesPerMesh[meshID][i].GetSize() ) {
+				// 	std::cout << "INNER ARRAY OVERFLOW" << std::endl;
+				// 	throw("sdfsdf");
+				// }
 				jointMatrices[i] = vulkanRenderer->jointMatricesPerMesh[meshID][i][animationComponent->currentAnimationFrame];
 			}
-
+			
 			for ( u32 j = joinMatricesDataSize; j < MAX_JOINTS_NUMBER; ++j ) {
 				mat4 unitMatrix(1.0f);
 				jointMatrices[j] = unitMatrix;
 			}
 		}
-
+		// core::vector<mat4> jointMatrices;
+		// jointMatrices.Resize( MAX_JOINTS_NUMBER );
+		// for ( unsigned int i = 0; i < MAX_JOINTS_NUMBER; ++i ) {
+		// 	mat4 unitMatrix(1.0f);
+		// 	jointMatrices[i] = unitMatrix;
+		// }
+		
 		return jointMatrices;
 	}
 

@@ -87,7 +87,8 @@ int main()
 	[[maybe_unused]] cm::MeshHandle crosshair_001_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/crosshair_001.gltf");
 	[[maybe_unused]] cm::MeshHandle inventory_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/inventory.gltf");
 	[[maybe_unused]] cm::MeshHandle cyborg_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/cyborg11.gltf");
-//	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/robot0.gltf");
+//	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/robot3.gltf");
+	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/scene.gltf");
 
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
@@ -190,9 +191,9 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 5, 35.0f, 0.0f ) + randomDirection }, .scale = 1.0f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 10, 3.0f, 0.0f ) + randomDirection }, .scale = 0.05f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
-	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 1.5f };
+	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
 	enemyArch->health[enemyIndex]      = { .maxHealth = 10000, .currentHealth = 10000 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
@@ -212,7 +213,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = chelikTextureHandle, .specularTextureID_ = chelikTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	}

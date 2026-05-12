@@ -228,14 +228,14 @@ namespace GLVM::core
 			aIndices_.push_back(levelGeneratedIndices[m]);
 			jointMatricesPerMesh.Push({});
 			frames.Push({});
-			for( int i = 0; i < 30; ++i ) {
+			for( int i = 0; i < 64; ++i ) {
 				frames[frames.GetSize() - 1].Push(0.0f);
 			}
-			int maximumJoints     = 6;
+			int maximumJoints     = 64;
 			core::vector<core::vector<mat4>> jointMatrices;
 			for ( int i = 0; i < maximumJoints; ++i) {
 				core::vector<mat4>  globalAllFrameNodeMatrix;
-				int numberOfFrames = 30;
+				int numberOfFrames = 64;
 				for ( int j = 0; j < numberOfFrames; ++j ) {
 					mat4 unitMatrix(1.0f);
 					globalAllFrameNodeMatrix.Push(unitMatrix);

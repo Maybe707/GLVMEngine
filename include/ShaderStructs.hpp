@@ -17,7 +17,7 @@ namespace GLVM::core {
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER 8
 
-#define MAX_JOINTS_NUMBER 18
+#define MAX_JOINTS_NUMBER 64
 
 #define INDIRECT_TEXTURE_WIDTH 7
 #define INDIRECT_TEXTURE_HEIGHT 5
@@ -51,7 +51,7 @@ namespace GLVM::core {
 	struct alignas(16) ShadowMapMatrixUBO {
 		mat4 model;
 		mat4 lightSpaceMatrix;
-		mat4 jointMatrices[30];
+		mat4 jointMatrices[MAX_JOINTS_NUMBER];
 	};
 
 	struct alignas(16) SpotLightShadowMapMatrixUBO {

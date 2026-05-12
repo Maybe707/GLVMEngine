@@ -2,6 +2,7 @@
 
 #extension GL_EXT_debug_printf : enable
 
+#define MAX_JOINTS_NUMBER 64
 #define SPOT_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 8
 #define DIRECTIONAL_LIGHT_SPACE_MATRIX_CONTAINER_SIZE 4
 
@@ -9,7 +10,7 @@ layout(set = 0, binding = 0) uniform UniformBufferObject {
     mat4 model;
     mat4 view;
     mat4 proj;
-	mat4 jointMatrices[18];
+	mat4 jointMatrices[MAX_JOINTS_NUMBER];
 
 	vec3      ambient;
     float     shininess;

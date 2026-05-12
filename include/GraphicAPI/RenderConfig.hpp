@@ -4,6 +4,7 @@
 #include "GraphicAPI/RenderData.hpp"
 #include "ShaderStructs.hpp"
 #include "VkStructs.hpp"
+#include <cstdint>
 #include <vulkan/vulkan_core.h>
 
 namespace GLVM::core
@@ -12,6 +13,7 @@ namespace GLVM::core
 	inline DescriptorBinding descriptorBindingsConfig[32];
 	inline Pipeline pipelineConfigs[32];
 	inline RenderPass renderPassConfigs[32];
+	constexpr uint32_t MAX_TEXTURES = 18;
 	
 	inline void VkConfigInitializer() {
 		/// ======================= DESCRIPTOR SETS AND ITS BINDINGS ============================ ///
@@ -79,7 +81,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 		
 		descriptorSetsConfig[FONT_RENDER_SAMPLER].actualLinkedDescriptorBindingsNumber          = 1;
-		descriptorSetsConfig[FONT_RENDER_SAMPLER].hostDescriptorNumber                          = 18;
+		descriptorSetsConfig[FONT_RENDER_SAMPLER].hostDescriptorNumber                          = MAX_TEXTURES;
 		descriptorSetsConfig[FONT_RENDER_SAMPLER].isTexture                                     = true;
 
 		descriptorBindingsConfig[5].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -114,7 +116,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[UI_SAMPLERS].actualLinkedDescriptorBindingsNumber                  = 1;
-		descriptorSetsConfig[UI_SAMPLERS].hostDescriptorNumber                                  = 18;
+		descriptorSetsConfig[UI_SAMPLERS].hostDescriptorNumber                                  = MAX_TEXTURES;
 		descriptorSetsConfig[UI_SAMPLERS].isTexture                                             = true;
 
 		descriptorBindingsConfig[8].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -137,7 +139,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[UI_ICONS_SAMPLERS].actualLinkedDescriptorBindingsNumber            = 1;
-		descriptorSetsConfig[UI_ICONS_SAMPLERS].hostDescriptorNumber                            = 18;
+		descriptorSetsConfig[UI_ICONS_SAMPLERS].hostDescriptorNumber                            = MAX_TEXTURES;
 		descriptorSetsConfig[UI_ICONS_SAMPLERS].isTexture                                       = true;
 
 		descriptorBindingsConfig[10].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -160,7 +162,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].actualLinkedDescriptorBindingsNumber     = 1;
-		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].hostDescriptorNumber                     = 18;
+		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].hostDescriptorNumber                     = MAX_TEXTURES;
 		descriptorSetsConfig[VIRTUAL_TEXTURES_TILESET].isTexture                                = true;
 
 		descriptorBindingsConfig[12].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -210,7 +212,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].actualLinkedDescriptorBindingsNumber = 1;
-		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].hostDescriptorNumber                 = 18;
+		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].hostDescriptorNumber                 = MAX_TEXTURES;
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].isTexture                            = true;
 
 		descriptorBindingsConfig[18].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -221,7 +223,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 		
 		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].actualLinkedDescriptorBindingsNumber  = 1;
-		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].hostDescriptorNumber                  = 18;
+		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].hostDescriptorNumber                  = MAX_TEXTURES;
 		descriptorSetsConfig[MAIN_RENDER_DIFFUSE_SAMPLER].isTexture                             = true;
 
 		descriptorBindingsConfig[19].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -232,13 +234,13 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[RIDABLE_TEXTURES].actualLinkedDescriptorBindingsNumber  = 1;
-		descriptorSetsConfig[RIDABLE_TEXTURES].hostDescriptorNumber                  = 18;
+		descriptorSetsConfig[RIDABLE_TEXTURES].hostDescriptorNumber                  = MAX_TEXTURES;
 		descriptorSetsConfig[RIDABLE_TEXTURES].isTexture                             = true;
 
 		descriptorBindingsConfig[20].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorBindingsConfig[20].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
 		descriptorBindingsConfig[20].binding                 = 0;
-		descriptorBindingsConfig[20].shaderDescriptorsNumber = 18;
+		descriptorBindingsConfig[20].shaderDescriptorsNumber = MAX_TEXTURES;
 		
 		/// ===================================================================================== ///
 
