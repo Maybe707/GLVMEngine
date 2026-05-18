@@ -642,9 +642,9 @@ namespace GLVM::Core
 			joints = (*gltf)["skins"][0]["joints"];
 
 			Core::JsonValue nodes = (*gltf)["nodes"];
-			for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {
-				unsigned int index = (*joints.value.array)[i].value.iNumber;
-				Core::JsonValue node = nodes[index];
+			for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {                  ///< Loop on joints
+				unsigned int jointIndexMapToNode = (*joints.value.array)[i].value.iNumber;
+				Core::JsonValue node = nodes[jointIndexMapToNode];
 				Quaternion rotationQuaternion;
 				mat4 rotation(1.0f);
 				mat4 scale(1.0f);
@@ -686,18 +686,18 @@ namespace GLVM::Core
 				}
 
 				core::vector<int> local_children;
-				if ( node.value.object->Contain("children") ) {
+				if ( node.value.object->Contain("children") ) {                             ///< Coollect children indices
 					Core::JsonValue array = (*node.value.object)["children"];
 					for ( unsigned int i = 0; i < array.value.array->GetSize(); ++i ) {
 						local_children.Push(array[i].value.iNumber);
 					}
 
-					children.Push(local_children);
+					children.Push(local_children);                                          ///< Linearly put all children to every root joint
 				}
 				else {
 					core::vector<int> emptyChildren;
 //					emptyChildren.Push(-1);
-					children.Push(emptyChildren);
+					children.Push(emptyChildren);                                           ///< Put emptry pack of children if can find a one
 				}
 				
 				if ( node.value.object->Contain("scale") ) {
@@ -722,11 +722,11 @@ namespace GLVM::Core
 
 				}
 				
-				mat4 model = translation * scale * rotation;
+				mat4 model = translation * scale * rotation;                                 ///< Compute model matrix
 				globalTransformJointNode.Push(model);
 			}
 
-			unsigned int inverseBindMatricesIndex = (*gltf)["skins"][0]["inverseBindMatrices"].value.iNumber;
+			unsigned int inverseBindMatricesIndex = (*gltf)["skins"][0]["inverseBindMatrices"].value.iNumber;      ///< Get the inverse bind matrices accessor index
 			unsigned int bufferView = (*gltf)["accessors"][inverseBindMatricesIndex]["bufferView"].value.iNumber;
 
 			unsigned int inverse_bind_matrices_elements_count = (*gltf)["accessors"][inverseBindMatricesIndex]["count"].value.iNumber;
@@ -759,7 +759,7 @@ namespace GLVM::Core
 			for ( unsigned int n = 0; n < joints.value.array->GetSize(); ++n ) {
 				for ( unsigned int g = 0; g < 4; ++g )
 					for ( unsigned int j = 0; j < 4; ++j ) {
-						inverseBindMatrix[g][j] = inverseBindMatricesData[n * 16 + g * 4 + j];
+						inverseBindMatrix[g][j] = inverseBindMatricesData[n * 16 + g * 4 + j];            ///< Put row float data into mat4
 //						inverseBindMatrix[j][g] = inverseBindMatricesData[n * 16 + g * 4 + j];
 					}
 
@@ -1179,8 +1179,8 @@ namespace GLVM::Core
 				scales.Push(temp);
 			}
 
-			/// Searching for parent joins WITH GOAT GOTO OPERATOR!!!
-			core::vector<int> parent_joins;
+			/// Searching for root joins WITH GOAT GOTO OPERATOR!!!
+			core::vector<int> root_joins;
 			for ( unsigned int s = 0; s < joints.value.array->GetSize(); ++s ) {
 				int current_joint = (*joints.value.array)[s].value.iNumber;
 
@@ -1190,23 +1190,28 @@ namespace GLVM::Core
 							goto most_scary_operator_of_all_time;                                        ///< Yes. This is what we all deserve
 					}
 				}
-				parent_joins.Push(current_joint);
+				root_joins.Push(current_joint);     ///< If we execute this line then this joint index ectualy the root
 				
 			  most_scary_operator_of_all_time:                                                           ///< Not so scary at all. Am i right?
 				continue;
 			}
 
+			for( unsigned int i = 0; i < root_joins.GetSize(); ++i ) {
+				std::cout << "root joint: " << root_joins[i] << std::endl;
+			}
+			
 			frames = frameInputsTranslation[0];
 			core::vector<core::vector<mat4>> jointMatricesAccumulator;        ///< Delete this sheet!
 
 			core::vector<core::vector<unsigned int>> joints_bones;
-			for ( unsigned int w = 0; w < parent_joins.GetSize(); ++w ) {
+			for ( unsigned int w = 0; w < root_joins.GetSize(); ++w ) {     ///< Loop on parent joints
 				core::vector<core::vector<unsigned int>> nodes_bones;
-				unsigned int currentNode = parent_joins[w];
+				unsigned int currentRoot = root_joins[w];
 				core::stack<u32> node_stack;
-				node_stack.push(currentNode);
+				node_stack.push(currentRoot);                               ///< Start from root joint
 
 				core::stack<u32> deepness_stack;
+				std::cout << "file path: " << pathsGLTF_ << std::endl;
 				traversalBones(children, joints, node_stack, deepness_stack, nodes_bones);
 
 				for ( unsigned int e = 0; e < nodes_bones.GetSize(); ++e ) {
@@ -1214,6 +1219,13 @@ namespace GLVM::Core
 				}
 			}
 
+			for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+				std::cout << "next node" << std::endl;
+				for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
+					std::cout << "joint: " << joints_bones[i][j] << std::endl;
+				}
+			}
+			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
@@ -1386,6 +1398,18 @@ namespace GLVM::Core
 		buffer = nullptr;
 	}
 
+	/*
+	========================================================================================
+	@brief Collect all branches on every dipness level and put it in a row
+
+	@param children       Contain all children of every root node
+	@param joints         Use for access to main array of joints in "skins"
+	@param node_stack     Keep all joints in current branch and has most deep as last elemnt
+	@param deepness_stack Hold current deepness level of child tree in branch as element and
+	                      value of an element is children counter
+	========================================================================================
+	*/
+	
 	void CJsonParser::traversalBones( core::vector<core::vector<int>> children,
 									  Core::JsonValue joints,
 									  core::stack<u32> node_stack,
@@ -1393,27 +1417,27 @@ namespace GLVM::Core
 									  core::vector<core::vector<u32>>& result ) {
 		u32 topJointIndex = 0;
 		if ( !node_stack.empty() ) {
-			topJointIndex = getJointIndex(joints, node_stack.top());
+			topJointIndex = getJointIndex(joints, node_stack.top());      ///< Pass array of all joints and root joint and return index of root joint in array
 		}
 		
 		if ( node_stack.size() > deepness_stack.size() ) {
-			u32 firstChild = 0;
+			u32 firstChild = 0;                                           ///< First 0 level start from
 			deepness_stack.push(firstChild);
 		}
 
-		if ( deepness_stack.empty() )
+		if ( deepness_stack.empty() )                                     ///< Main exit check
 			return;
 
 		u32 nextNodeIndex = 0;
-		if ( !children[topJointIndex].empty() ) {
-			if ( deepness_stack.top() > 0 && deepness_stack.top() == children[topJointIndex].GetSize() ) {
+		if ( !children[topJointIndex].empty() ) {      ///< Check current root joint has any children. Children maps linearly with root joint array index
+			if ( deepness_stack.top() > 0 && deepness_stack.top() == children[topJointIndex].GetSize() ) {   ///< Check if on last child level
 				deepness_stack.pop();
 				node_stack.pop();
 				traversalBones( children, joints, node_stack, deepness_stack, result );
 				return;
 			}
 
-			if ( deepness_stack.top() > 0 && deepness_stack.top() < children[topJointIndex].GetSize() ) {
+			if ( deepness_stack.top() > 0 && deepness_stack.top() < children[topJointIndex].GetSize() ) {    ///< Check if not on last child level
 				nextNodeIndex = children[topJointIndex][deepness_stack.top()];
 				node_stack.push(nextNodeIndex);
 
@@ -1423,6 +1447,8 @@ namespace GLVM::Core
 					current_node_indices.Push(currentJoinIndex);
 				}
 
+				/* result.Push(current_node_indices); *///< Maybe this line has to be here
+				
 				++deepness_stack.top();
 				traversalBones( children, joints, node_stack, deepness_stack, result );
 				return;
@@ -1441,7 +1467,7 @@ namespace GLVM::Core
 				traversalBones( children, joints, node_stack, deepness_stack, result );
 				return;
 			}
-		} else {
+		} else {                                                
 			core::vector<u32> current_node_indices;
 			for ( u32 i = 0; i < node_stack.size(); ++i ) {
 				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);

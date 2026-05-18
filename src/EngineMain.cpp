@@ -214,8 +214,8 @@ int main()
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
 	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
-	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = chelikTextureHandle, .specularTextureID_ = chelikTextureHandle,
-		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 32.0f * 0.078125f };
 	}
 
 	arch::entity cube = archEntityManager->createEntity();
@@ -281,8 +281,8 @@ int main()
 	arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
 	arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
 	const uint32_t directionalLightIndex = directionalLightLocation.index;
-	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 10.0f, -15.0f },
-		.direction = { 1.0f, -3.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
+	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 25.0f, 15.0f },
+		.direction = { 1.0f, 10.0f, 0.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
 		.specular = {1.0f, 1.0f, 1.0f}};
 	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 10.0f, -15.0f }, .scale = 0.1f };
 	directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;

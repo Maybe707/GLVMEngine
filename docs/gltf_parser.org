@@ -1,0 +1,211 @@
+#+title: Common info about gltf parser
+#+author: Scream
+
+* Skin logic 0. Collect inverseBindMatrices and modelMatrices
+
+    "Skins" : [ { Skin }, ... ]
+                /  | \
+              /    |   \ 
+            /      |     \
+ "name" :"Arm"     |     "invBindMat" : 6 ---------------------------------------------------
+                   |                                                                        |
+                   v                                                                        |
+        "joints" : [ 6, 5, 0, 2, 1, 4, 3 ]                                                  |
+                     |                                                                      |
+                     |                                                                      |
+                     v                                                                      |
+"nodes":[0,1,2,3,4,5,6, ...]                                                                |
+		     |                                                                      |
+                     |                                                                      |
+                     v                                                                      |
+                     {                                                                      |
+                         if(Contain("rot")),   -> compute mat \                             |
+                         if(Contain("tran"),   -> compute mat -> mat4 model = tranMat *     |
+                         if(Contain("scale"),  -> compute mat /       scaleMat * rotMat     |
+                         if(Contain("chil")                                                 |
+                     }           |                                                          |
+                                 |                                                          |
+                                 |                                                          |
+                                 v                                                          |
+		mat4 model = tranMat * scaleMat * rotMat;                                   |
+		globalTransformJointNode.Push(model);                                       |
+		                                                                            |
+                                                                                            v
+						                   "accessors":[0,1,2,3,4,5,6,...]
+								                            |
+                                                                                            |
+                                                                                            |
+                                                                                            v
+											    {
+		       						        		  	"bufferView":6,---------|
+                                                                        			"componentType":5126,   |
+                                                                        			"count":7,              |
+                                                                        			"type":"MAT4"           |
+											    }                           |
+                                              			|-------------------------------------------------------|
+                                                                |
+                                                                |
+                                                                v
+                                               "bufferViews":[0,1,2,3,4,5,6,...]             
+	                                                                  |
+                                                                          |
+                                                                          v
+									  {
+							  			"buffer":0,      -----> collect all invBindMat to an array
+                                                        			"byteLength":448,       with byteOffset and byteLength
+                                                        			"byteOffset":9432                       |
+									  }                                             |
+                                                                                                                        |
+                                                                                                                        v
+														   put row float
+														   data into mat4
+
+* Skin logic 1. Collect joints and weights data 
+
+            "meshes" : [ { mesh }, ...]
+                            |
+                            |
+                            v
+		"primitives" : [
+				 "name":"Cube",
+		                 {
+				   "attributes":{
+				   "POSITION":0,
+				   "NORMAL":1,
+				   "TEXCOORD_0":2,
+				   "JOINTS_0":3,  -----|
+				   "WEIGHTS_0":4       |
+				   },                  |
+				   "indices":5,        |
+				   "material":0        |
+		                 }                     |
+			       ]                       |
+                                                       v
+ 			            "accessors":[0,1,2,3,4,5,6,...]
+				                       |
+                                                       |
+                                                       |
+                                                       v
+				                       {
+		       		                          "bufferView":3,---------|
+                                                          "componentType":5121,   |
+                                         		  "count":168,            |
+                                                          "type":"VEC4"           |
+					               }                          |
+                                                                |-----------------|
+                                                                |
+                                                                |
+                                                                v
+                                               "bufferViews":[0,1,2,3,4,5,6,...]             
+	                                                                  |
+                                                                          |
+                                                                          v
+									  {
+							  			"buffer":0,      -----> collect joint indices
+                                                        			"byteLength":672,                       
+                                                        			"byteOffset":5376                       
+										"target":34962                          
+									  }                                             
+
+
+
+* Collect data in nodes
+
+
+
+                    "animations":[
+			"channels":[
+			    {
+			        "sampler":0,    ----------------|
+				"target":{                      |
+		---------------	    "node":6,                   |
+		|      |-------	    "path":"translation"        |
+		|      |	}                               |
+		|      |     },                                 |
+                |      |     .                                  |
+                |      |     .                                  |
+                |      |     .                                  |
+		|      |     ]                                  |
+                |      |                                        |
+                v      |		                        v
+	     collect   |				      collect
+	      node     |				      sampler
+             indices   |			              indices
+	     to array  |				      to array
+                       |                                        |
+                       |                                        |
+                       v                                        |
+		     collect                                    |
+		     pathes                                     |
+		     (data                                      |
+		     types)                                     |
+		     in array                                   |
+                       |                      |------------------                
+                       |                      |
+                       |                      |
+                       |                      v
+		       | check pathes	loop on samper
+		       ------------>	indices while
+					check pathes
+					 to separate
+					on 3 different
+					array of indices
+					(sampler indices)
+                                              |
+                                              |
+                                              |
+                                              v
+					"samplers":[
+					    {
+					"input":7,      -------------|
+					"interpolation":"LINEAR",    |
+			|-----------	"output":8                   |
+			|		    },                       |
+			|		    .                        |
+			|		    .                        |
+			|		    .                        |
+			|		]                            |
+                        |                                            |
+                        |                                            |
+                        v                                            v
+		    collect output                            collect intput
+		   indices into array                       indices into array
+                        |
+                        |
+                        |
+                        v
+	          "accessros":[
+		      {
+	|------------     "bufferView":0,
+	|     |------	  # "byteOffset": 256,     this field optional
+	|     |		  "componentType":5126, ------------------|
+	|     |		  "count":168,          --------          |
+	|     |		  "max":[                      |          |
+	|     |		      4.946267127990723,       |          |
+	|     |  	      12.360977172851562,      |          |
+	|     |		      1                        |          |
+	|     |		  ],                           |          |
+	|     |		  "min":[                      |          |
+	|     |		      -4.244399070739746,      |          |
+	|     |		      0.2148876190185547,      |          |
+	|     |		      -1                       |          |
+	|     |		  ],                           |          |
+	|     |		  "type":"VEC3"                |          |
+	|     |       },                               |          |
+	|     |	  ]                                    |          |
+        |     |                                        |-->  * <--|
+        |     v                                              |
+        |   inner offset                                     v
+	|   for bufferView				  multiply
+	v						  size of
+   "bufferViews":[					  componentType
+        {       					  (basic type
+	    "buffer":0,					  like int or float)
+	    "byteLength":2016,				  on constant depends
+	    "byteOffset":0,				  on type ("VEC4")
+	    "target":34962				  and on elements
+        },						  count
+        .
+	.
+	.
+   ]
