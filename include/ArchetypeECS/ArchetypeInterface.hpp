@@ -6,6 +6,8 @@
 
 namespace GLVM::ecs::arch {
 	struct Archetype {
+		virtual ~Archetype() = default;
+		
 		static constexpr uint32_t CAPACITY = 1024;
 		
 		entity entities[CAPACITY];
