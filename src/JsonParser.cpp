@@ -642,9 +642,13 @@ namespace GLVM::Core
 			joints = (*gltf)["skins"][0]["joints"];
 
 			Core::JsonValue nodes = (*gltf)["nodes"];
-			for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {                  ///< Loop on joints
-				unsigned int jointIndexMapToNode = (*joints.value.array)[i].value.iNumber;
-				Core::JsonValue node = nodes[jointIndexMapToNode];
+//			for ( unsigned int i = 0; i < joints.value.array->GetSize(); ++i ) {                  ///< Loop on joints
+			for ( unsigned int i = 0; i < nodes.value.array->GetSize(); ++i ) {                  ///< Loop on nodes
+//				unsigned int jointIndexMapToNode = (*joints.value.array)[i].value.iNumber;
+//				unsigned int jointIndexMapToNode = (*nodes.value.array)[i].value.iNumber;
+//				Core::JsonValue node = nodes[jointIndexMapToNode];
+				Core::JsonValue node = nodes[i];
+				std::cout << "NODE: " << i << std::endl;
 				Quaternion rotationQuaternion;
 				mat4 rotation(1.0f);
 				mat4 scale(1.0f);
@@ -788,7 +792,7 @@ namespace GLVM::Core
 				}
 			}
 
-			unsigned int joints_byte_length = (*gltf)["bufferViews"][joints_buffer_view_index]["byteLength"].value.iNumber;
+			[[maybe_unused]] unsigned int joints_byte_length = (*gltf)["bufferViews"][joints_buffer_view_index]["byteLength"].value.iNumber;
 			[[maybe_unused]] unsigned int joints_byte_offset = 0;
 			if( (*gltf)["bufferViews"][joints_buffer_view_index].isObject() == JSON_OBJECT ) {
 				HashMap<JsonValue>* ptr = (*gltf)["bufferViews"][joints_buffer_view_index].value.object;
@@ -797,10 +801,10 @@ namespace GLVM::Core
 				}
 			}
 			
-			std::cout << "joints index: " << joints_index << std::endl;
-			std::cout << "joints buffer view index: " << joints_buffer_view_index << std::endl;
-			std::cout << "joints byte length: " << joints_byte_length << std::endl;
-			std::cout << "joints byte offset: " << joints_byte_offset << std::endl;
+			// std::cout << "joints index: " << joints_index << std::endl;
+			// std::cout << "joints buffer view index: " << joints_buffer_view_index << std::endl;
+			// std::cout << "joints byte length: " << joints_byte_length << std::endl;
+			// std::cout << "joints byte offset: " << joints_byte_offset << std::endl;
 			
 			for ( unsigned int i = joints_byte_offset + joints_buffer_view_byte_offset; i < joints_byte_offset + joints_buffer_view_byte_offset + joints_buffer_view_byte_length; i += joints_byte_step ) {
 				if ( joints_componet_type == 5121 ) {  // UNSIGNED_BYTE
@@ -863,13 +867,13 @@ namespace GLVM::Core
 			core::vector<unsigned int> scaleSamplerIndices;
 			for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
 				if ( *targetPaths[i].value.string == "translation" ) {
-					std::cout << "translation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
+//					std::cout << "translation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
 				} else if ( *targetPaths[i].value.string == "rotation" ) {
-					std::cout << "rotation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
+//					std::cout << "rotation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
 				} else if ( *targetPaths[i].value.string == "scale" ) {
-					std::cout << "scale sampler index: " << samplerIndices[i].value.iNumber << std::endl;
+//					std::cout << "scale sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
 				}
 			}
@@ -880,30 +884,30 @@ namespace GLVM::Core
 			core::vector<unsigned int> translationOutputs;
 				
 			for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i) {
-				std::cout << "translation input index: " << samplers[translationSamplerIndices[i]]["input"].value.iNumber << std::endl;
-				std::cout << "i: " << i << std::endl;
+				// std::cout << "translation input index: " << samplers[translationSamplerIndices[i]]["input"].value.iNumber << std::endl;
+				// std::cout << "i: " << i << std::endl;
 				translationInputs.Push(samplers[translationSamplerIndices[i]]["input"].value.iNumber);
 			}
 
 			for ( unsigned int i = 0; i < translationSamplerIndices.GetSize(); ++i) {
-				std::cout << "translation output index: " << samplers[translationSamplerIndices[i]]["output"].value.iNumber << std::endl;
-				std::cout << "i: " << i << std::endl;
+				// std::cout << "translation output index: " << samplers[translationSamplerIndices[i]]["output"].value.iNumber << std::endl;
+				// std::cout << "i: " << i << std::endl;
 				translationOutputs.Push(samplers[translationSamplerIndices[i]]["output"].value.iNumber);
 			}
 
 			core::vector<core::vector<float>> frameInputsTranslation;
 			for ( unsigned int i = 0; i < translationInputs.GetSize(); ++i) {
-				std::cout << "input accessor index: " << translationInputs[i] << std::endl;
+//				std::cout << "input accessor index: " << translationInputs[i] << std::endl;
 				
 				unsigned int frameBufferViewIndex =
 					(*gltf)["accessors"][translationInputs[i]]["bufferView"].value.iNumber;
 				
-				std::cout << "input buffer view index: " << frameBufferViewIndex << std::endl;
+//				std::cout << "input buffer view index: " << frameBufferViewIndex << std::endl;
 
 				unsigned int elements_count = (*gltf)["accessors"][translationInputs[i]]["count"].value.iNumber;
 				[[maybe_unused]] std::string* element_type   = (*gltf)["accessors"][translationInputs[i]]["type"].value.string;
 				[[maybe_unused]] unsigned int componet_type  = (*gltf)["accessors"][translationInputs[i]]["componentType"].value.iNumber;
-				std::cout << "elements count: " << elements_count << std::endl;
+//				std::cout << "elements count: " << elements_count << std::endl;
 				unsigned int buffer_view_byte_length = 0;
 				unsigned int byte_step = 0;
 				calculateElementsMemorySize( elements_count, element_type,
@@ -924,11 +928,11 @@ namespace GLVM::Core
 					(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
 
 				core::vector<float> temp;
-				std::cout << "translation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
-				std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
-				std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
+				// std::cout << "translation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
+				// std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
+				// std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
 				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
-					std::cout << "translation inputs index: " << i << std::endl;
+//					std::cout << "translation inputs index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
 
@@ -942,11 +946,11 @@ namespace GLVM::Core
 
 			core::vector<core::vector<float>> translations;
 			for ( unsigned int i = 0; i < translationOutputs.GetSize(); ++i) {
-				std::cout << "ouput accessor index: " << translationOutputs[i] << std::endl;
+//				std::cout << "ouput accessor index: " << translationOutputs[i] << std::endl;
 				unsigned int outputBufferViewIndex =
 					(*gltf)["accessors"][translationOutputs[i]]["bufferView"].value.iNumber;
 
-				std::cout << "output buffer view index: " << outputBufferViewIndex << std::endl;
+//				std::cout << "output buffer view index: " << outputBufferViewIndex << std::endl;
 
 				unsigned int elements_count = (*gltf)["accessors"][translationOutputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][translationOutputs[i]]["type"].value.string;
@@ -971,11 +975,11 @@ namespace GLVM::Core
 					(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
 
 				core::vector<float> temp;
-				std::cout << "translation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
-				std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
-				std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
+				// std::cout << "translation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
+				// std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
+				// std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
 				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
-					std::cout << "translation ouputs index: " << i << std::endl;
+//					std::cout << "translation ouputs index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
 
@@ -991,24 +995,24 @@ namespace GLVM::Core
 			core::vector<unsigned int> rotationOutputs;
 				
 			for ( unsigned int i = 0; i < rotationSamplerIndices.GetSize(); ++i) {
-				std::cout << "rotation input sampler index: " << rotationSamplerIndices[i] << std::endl;
-				std::cout << "rotation input index: " << samplers[rotationSamplerIndices[i]]["input"].value.iNumber << std::endl;	
+				// std::cout << "rotation input sampler index: " << rotationSamplerIndices[i] << std::endl;
+				// std::cout << "rotation input index: " << samplers[rotationSamplerIndices[i]]["input"].value.iNumber << std::endl;	
 				rotationInputs.Push(samplers[rotationSamplerIndices[i]]["input"].value.iNumber);
 			}
 
 			for ( unsigned int i = 0; i < rotationSamplerIndices.GetSize(); ++i) {
-				std::cout << "rotation output sampler index: " << rotationSamplerIndices[i] << std::endl;
-				std::cout << "rotation output index: " << samplers[rotationSamplerIndices[i]]["output"].value.iNumber << std::endl;	
+				// std::cout << "rotation output sampler index: " << rotationSamplerIndices[i] << std::endl;
+				// std::cout << "rotation output index: " << samplers[rotationSamplerIndices[i]]["output"].value.iNumber << std::endl;	
 				rotationOutputs.Push(samplers[rotationSamplerIndices[i]]["output"].value.iNumber);
 			}
 
 			core::vector<core::vector<float>> frameInputsRotation;
 			for ( unsigned int i = 0; i < rotationInputs.GetSize(); ++i) {
-				std::cout << "input accessor index: " << rotationInputs[i] << std::endl;
+//				std::cout << "input accessor index: " << rotationInputs[i] << std::endl;
 				unsigned int frameBufferViewIndex =
 					(*gltf)["accessors"][rotationInputs[i]]["bufferView"].value.iNumber;
 
-				std::cout << "input buffer view index: " << frameBufferViewIndex << std::endl;
+//				std::cout << "input buffer view index: " << frameBufferViewIndex << std::endl;
 
 				unsigned int elements_count = (*gltf)["accessors"][rotationInputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][rotationInputs[i]]["type"].value.string;
@@ -1033,11 +1037,11 @@ namespace GLVM::Core
 					(*gltf)["bufferViews"][frameBufferViewIndex]["byteOffset"].value.iNumber;
 
 				core::vector<float> temp;
-				std::cout << "rotation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
-				std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
-				std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
+				// std::cout << "rotation inputs buffer view byte length: " << buffer_view_byte_length << std::endl;
+				// std::cout << "buffer view inner offset: " << frameBufferView_buffer_view_byte_offset << std::endl;
+				// std::cout << "buffer view outer offset: " << frameByteOffset << std::endl;
 				for ( unsigned int i = frameByteOffset + frameBufferView_buffer_view_byte_offset; i < frameByteOffset + frameBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
-					std::cout << "rotation input index: " << i << std::endl;
+//					std::cout << "rotation input index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
 
@@ -1051,11 +1055,11 @@ namespace GLVM::Core
 
 			core::vector<core::vector<float>> rotations;
 			for ( unsigned int i = 0; i < rotationOutputs.GetSize(); ++i) {
-				std::cout << "output accessor index: " << rotationOutputs[i] << std::endl;
+//				std::cout << "output accessor index: " << rotationOutputs[i] << std::endl;
 				unsigned int outputBufferViewIndex =
 					(*gltf)["accessors"][rotationOutputs[i]]["bufferView"].value.iNumber;
 
-				std::cout << "output buffer view index: " << outputBufferViewIndex << std::endl;
+//				std::cout << "output buffer view index: " << outputBufferViewIndex << std::endl;
 
 				unsigned int elements_count = (*gltf)["accessors"][rotationOutputs[i]]["count"].value.iNumber;
 				std::string* element_type   = (*gltf)["accessors"][rotationOutputs[i]]["type"].value.string;
@@ -1073,18 +1077,18 @@ namespace GLVM::Core
 						outputBufferView_buffer_view_byte_offset = (*gltf)["accessors"][rotationOutputs[i]]["byteOffset"].value.iNumber;
 					}
 				}
-				std::cout << "OFFSETISHEE!!" << outputBufferView_buffer_view_byte_offset << std::endl;
+//				std::cout << "OFFSETISHEE!!" << outputBufferView_buffer_view_byte_offset << std::endl;
 				[[maybe_unused]] unsigned int outputByteLength      =
 					(*gltf)["bufferViews"][outputBufferViewIndex]["byteLength"].value.iNumber;
 				unsigned int outputByteOffset      =
 					(*gltf)["bufferViews"][outputBufferViewIndex]["byteOffset"].value.iNumber;
 
 				core::vector<float> temp;
-				std::cout << "rotation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
-				std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
-				std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
+				// std::cout << "rotation outputs buffer view byte length: " << buffer_view_byte_length << std::endl;
+				// std::cout << "buffer view inner offset: " << outputBufferView_buffer_view_byte_offset << std::endl;
+				// std::cout << "buffer view outer offset: " << outputByteOffset << std::endl;
 				for ( unsigned int i = outputByteOffset + outputBufferView_buffer_view_byte_offset; i < outputByteOffset + outputBufferView_buffer_view_byte_offset + buffer_view_byte_length; i += byte_step ) {
-					std::cout << "rotation output index: " << i << std::endl;
+//					std::cout << "rotation output index: " << i << std::endl;
 					temp.Push(reinterpret_cast<float &>(buffer[i]));
 				}
 
@@ -1181,9 +1185,13 @@ namespace GLVM::Core
 
 			/// Searching for root joins WITH GOAT GOTO OPERATOR!!!
 			core::vector<int> root_joins;
-			for ( unsigned int s = 0; s < joints.value.array->GetSize(); ++s ) {
-				int current_joint = (*joints.value.array)[s].value.iNumber;
+//			for ( unsigned int s = 0; s < joints.value.array->GetSize(); ++s ) {
+//				int current_joint = (*joints.value.array)[s].value.iNumber;
 
+			Core::JsonValue nodes = (*gltf)["nodes"];
+			for ( unsigned int s = 0; s < nodes.value.array->GetSize(); ++s ) {
+				int current_joint = s;
+				
 				for ( unsigned w = 0; w < children.GetSize(); ++w ) {
 					for ( unsigned q = 0; q < children[w].GetSize(); ++q ) {
 						if ( children[w][q] == current_joint )
@@ -1225,6 +1233,8 @@ namespace GLVM::Core
 					std::cout << "joint: " << joints_bones[i][j] << std::endl;
 				}
 			}
+
+			std::cout << "size of translations: " << translations.GetSize() << std::endl;
 			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
@@ -1284,9 +1294,17 @@ namespace GLVM::Core
 				
 				for ( unsigned int i = 0; i < frameInputsTranslation[j].GetSize(); ++i ) {
 					mat4 rootTransform(1.0f);
+					while( joints_bones.GetSize() <= j ) {
+						joints_bones.Push( {} );
+					}
+					
 					for ( unsigned int b = 0; b < joints_bones[j].GetSize() - 1; ++b ) {
+ 						while( joints_bones[j].GetSize() <= b ) {
+							joints_bones[j].Push( {} );
+						}
+						
 						const u32 innerIndex = joints_bones[j][b];
-						while( jointMatricesAccumulator.GetSize() <= innerIndex ) {
+ 						while( jointMatricesAccumulator.GetSize() <= innerIndex ) {
 							jointMatricesAccumulator.Push( {} );
 						}
 
@@ -1429,7 +1447,7 @@ namespace GLVM::Core
 			return;
 
 		u32 nextNodeIndex = 0;
-		if ( !children[topJointIndex].empty() ) {      ///< Check current root joint has any children. Children maps linearly with root joint array index
+		if ( topJointIndex != UINT32_MAX && !children[topJointIndex].empty() ) {      ///< Check current root joint has any children. Children maps linearly with root joint array index
 			if ( deepness_stack.top() > 0 && deepness_stack.top() == children[topJointIndex].GetSize() ) {   ///< Check if on last child level
 				deepness_stack.pop();
 				node_stack.pop();
@@ -1467,8 +1485,14 @@ namespace GLVM::Core
 				traversalBones( children, joints, node_stack, deepness_stack, result );
 				return;
 			}
-		} else {                                                
+		} else {
 			core::vector<u32> current_node_indices;
+			if( topJointIndex == UINT32_MAX ) {
+				current_node_indices.Push( node_stack.top() );
+				result.Push(current_node_indices);
+				return;
+			}
+			
 			for ( u32 i = 0; i < node_stack.size(); ++i ) {
 				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
 				current_node_indices.Push(currentJoinIndex);

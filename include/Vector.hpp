@@ -327,9 +327,15 @@ namespace GLVM::core
 	template<typename T>
 	int vector<T>::GetCapacity() { return capacity; }
 	template<typename T>
-	const T& vector<T>::operator[](const unsigned int _iIndex) const { return reinterpret_cast<const T*>(rowInnerData)[_iIndex]; }
+	const T& vector<T>::operator[](const unsigned int _iIndex) const {
+		assert( _iIndex < size );
+		return reinterpret_cast<const T*>(rowInnerData)[_iIndex];
+	}
 	template<typename T>
-	T& vector<T>::operator[](const unsigned int _iIndex) { return reinterpret_cast<T*>(rowInnerData)[_iIndex]; }
+	T& vector<T>::operator[](const unsigned int _iIndex) {
+		assert( _iIndex < size );
+		return reinterpret_cast<T*>(rowInnerData)[_iIndex];
+	}
 
 	template<typename T>
 	void vector<T>::clear() {
