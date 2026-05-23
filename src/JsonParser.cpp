@@ -479,8 +479,8 @@ namespace GLVM::Core
 		unsigned int indices_elements_count = (*gltf)["accessors"][indices_index]["count"].value.iNumber;
 		std::string* indices_element_type   = (*gltf)["accessors"][indices_index]["type"].value.string;
 		unsigned int indices_componet_type  = (*gltf)["accessors"][indices_index]["componentType"].value.iNumber;
-		std::cout << "indices component type: " << indices_componet_type << std::endl;
-		std::cout << "indices elements count: " << indices_elements_count << std::endl;
+//		std::cout << "indices component type: " << indices_componet_type << std::endl;
+//		std::cout << "indices elements count: " << indices_elements_count << std::endl;
 		unsigned int indices_buffer_view_byte_length = 0;
 		unsigned int indices_byte_step = 0;
 		calculateElementsMemorySize( indices_elements_count, indices_element_type, indices_componet_type, &indices_buffer_view_byte_length );
@@ -498,8 +498,8 @@ namespace GLVM::Core
 		unsigned int indices_byte_offset = (*gltf)["bufferViews"][indices_buffer_view_index]["byteOffset"].value.iNumber;
 
 		core::vector<unsigned int> indices;
-		std::cout << "indices buffer view byte offset: " << indices_buffer_view_byte_offset << std::endl;
-		std::cout << "indices buffer view byte length: " << indices_buffer_view_byte_length << std::endl;
+//		std::cout << "indices buffer view byte offset: " << indices_buffer_view_byte_offset << std::endl;
+//		std::cout << "indices buffer view byte length: " << indices_buffer_view_byte_length << std::endl;
 		std::string str = pathsGLTF_;
 		for ( unsigned int i = indices_byte_offset + indices_buffer_view_byte_offset; i < indices_byte_offset + indices_buffer_view_byte_offset + indices_buffer_view_byte_length; i += indices_byte_step ) {
 			if( indices_componet_type == 5123 ) {
@@ -518,8 +518,8 @@ namespace GLVM::Core
 		unsigned int vertices_elements_count = (*gltf)["accessors"][vertices_position_index]["count"].value.iNumber;
 		std::string* vertices_element_type   = (*gltf)["accessors"][vertices_position_index]["type"].value.string;
 		unsigned int vertices_componet_type  = (*gltf)["accessors"][vertices_position_index]["componentType"].value.iNumber;
-		std::cout << "vertices component type: " << vertices_componet_type << std::endl;
-		std::cout << "vertices elements count: " << vertices_elements_count << std::endl;
+//		std::cout << "vertices component type: " << vertices_componet_type << std::endl;
+//		std::cout << "vertices elements count: " << vertices_elements_count << std::endl;
 		unsigned int vertices_buffer_view_byte_length = 0;
 		unsigned int vertices_byte_step = 0;
 		calculateElementsMemorySize( vertices_elements_count, vertices_element_type, vertices_componet_type, &vertices_buffer_view_byte_length );
@@ -538,24 +538,24 @@ namespace GLVM::Core
 
 		core::vector<float> vertices_position;
 		for ( unsigned int i = vertices_byte_offset + vertices_buffer_view_byte_offset; i < vertices_byte_offset + vertices_buffer_view_byte_offset + vertices_buffer_view_byte_length; i += vertices_byte_step ) {
-			std::cout << "value: " << reinterpret_cast<float&>(buffer[i]) << std::endl;
-			printf("%02x ", (unsigned char)buffer[i]);
+//			std::cout << "value: " << reinterpret_cast<float&>(buffer[i]) << std::endl;
+//			printf("%02x ", (unsigned char)buffer[i]);
 			vertices_position.Push(reinterpret_cast<float &>(buffer[i]));
-			if( i % 3 == 0 ) {
-				std::cout << "next vertex" << std::endl;
-			}
+			// if( i % 3 == 0 ) {
+			// 	std::cout << "next vertex" << std::endl;
+			// }
 		}
 
-		str = pathsGLTF_;
-		if( str == "../gltf/scene.gltf" ) {
-			std::cout << "verices position index: " << vertices_position_index << std::endl;
-			std::cout << "verices buffer view index: " << vertices_buffer_view_index << std::endl;
-			std::cout << "vertices byte offset: " << vertices_byte_offset << std::endl;
-			std::cout << "vertices buffer view byte offset: " << vertices_buffer_view_byte_offset << std::endl;
-			std::cout << "vertices buffer view byte length: " << vertices_buffer_view_byte_length << std::endl;
+// 		str = pathsGLTF_;
+// 		if( str == "../gltf/scene.gltf" ) {
+// 			std::cout << "verices position index: " << vertices_position_index << std::endl;
+// 			std::cout << "verices buffer view index: " << vertices_buffer_view_index << std::endl;
+// 			std::cout << "vertices byte offset: " << vertices_byte_offset << std::endl;
+// 			std::cout << "vertices buffer view byte offset: " << vertices_buffer_view_byte_offset << std::endl;
+// 			std::cout << "vertices buffer view byte length: " << vertices_buffer_view_byte_length << std::endl;
 
-//			throw("asdf");
-		}
+// //			throw("asdf");
+// 		}
 		
 		int texture_coordinates_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["TEXCOORD_0"].value.iNumber;
 		int texture_buffer_view_index = (*gltf)["accessors"][texture_coordinates_index]["bufferView"].value.iNumber;
@@ -563,8 +563,8 @@ namespace GLVM::Core
 		unsigned int texture_elements_count = (*gltf)["accessors"][texture_coordinates_index]["count"].value.iNumber;
 		std::string* texture_element_type   = (*gltf)["accessors"][texture_coordinates_index]["type"].value.string;
 		unsigned int texture_componet_type  = (*gltf)["accessors"][texture_coordinates_index]["componentType"].value.iNumber;
-		std::cout << "texture component type: " << texture_componet_type << std::endl;
-		std::cout << "texture elements count: " << texture_elements_count << std::endl;
+//		std::cout << "texture component type: " << texture_componet_type << std::endl;
+//		std::cout << "texture elements count: " << texture_elements_count << std::endl;
 		unsigned int texture_buffer_view_byte_length = 0;
 		unsigned int texture_byte_step = 0;
 		calculateElementsMemorySize( texture_elements_count, texture_element_type, texture_componet_type, &texture_buffer_view_byte_length );
@@ -591,8 +591,8 @@ namespace GLVM::Core
 		unsigned int normals_elements_count = (*gltf)["accessors"][normals_index]["count"].value.iNumber;
 		std::string* normals_element_type   = (*gltf)["accessors"][normals_index]["type"].value.string;
 		unsigned int normals_componet_type  = (*gltf)["accessors"][normals_index]["componentType"].value.iNumber;
-		std::cout << "normals component type: " << normals_componet_type << std::endl;
-		std::cout << "normals elements count: " << normals_elements_count << std::endl;
+//		std::cout << "normals component type: " << normals_componet_type << std::endl;
+//		std::cout << "normals elements count: " << normals_elements_count << std::endl;
 		unsigned int normals_buffer_view_byte_length = 0;
 		unsigned int normals_byte_step = 0;
 		calculateElementsMemorySize( normals_elements_count, normals_element_type, normals_componet_type, &normals_buffer_view_byte_length );
@@ -611,22 +611,22 @@ namespace GLVM::Core
 
 		core::vector<float> normals;
 		for ( unsigned int i = normals_byte_offset + normals_buffer_view_byte_offset; i < normals_byte_offset + normals_buffer_view_byte_offset + normals_buffer_view_byte_length; i += normals_byte_step ) {
-			std::cout << reinterpret_cast<float&>(buffer[i]) << std::endl;
+//			std::cout << reinterpret_cast<float&>(buffer[i]) << std::endl;
 			normals.Push(reinterpret_cast<float &>(buffer[i]));
-			if( i % 3 == 0 ) {
-				std::cout << "next normal" << std::endl;
-			}
+			// if( i % 3 == 0 ) {
+			// 	std::cout << "next normal" << std::endl;
+			// }
 		}
 
-		if( str == "../gltf/robot0.gltf" ) {
-			std::cout << "normals position index: " << normals_index << std::endl;
-			std::cout << "normals buffer view index: " << normals_buffer_view_index << std::endl;
-			std::cout << "normals byte offset: " << normals_byte_offset << std::endl;
-			std::cout << "normals buffer view byte offset: " << normals_buffer_view_byte_offset << std::endl;
-			std::cout << "normals buffer view byte length: " << normals_buffer_view_byte_length << std::endl;
+// 		if( str == "../gltf/robot0.gltf" ) {
+// 			std::cout << "normals position index: " << normals_index << std::endl;
+// 			std::cout << "normals buffer view index: " << normals_buffer_view_index << std::endl;
+// 			std::cout << "normals byte offset: " << normals_byte_offset << std::endl;
+// 			std::cout << "normals buffer view byte offset: " << normals_buffer_view_byte_offset << std::endl;
+// 			std::cout << "normals buffer view byte length: " << normals_buffer_view_byte_length << std::endl;
 		
-//			throw("asdf");
-		}
+// //			throw("asdf");
+// 		}
 		
 		core::vector<Core::JsonValue> skins = Search("skins");
 		Core::JsonValue joints;
@@ -648,7 +648,7 @@ namespace GLVM::Core
 //				unsigned int jointIndexMapToNode = (*nodes.value.array)[i].value.iNumber;
 //				Core::JsonValue node = nodes[jointIndexMapToNode];
 				Core::JsonValue node = nodes[i];
-				std::cout << "NODE: " << i << std::endl;
+//				std::cout << "NODE: " << i << std::endl;
 				Quaternion rotationQuaternion;
 				mat4 rotation(1.0f);
 				mat4 scale(1.0f);
@@ -736,8 +736,8 @@ namespace GLVM::Core
 			unsigned int inverse_bind_matrices_elements_count = (*gltf)["accessors"][inverseBindMatricesIndex]["count"].value.iNumber;
 			std::string* inverse_bind_matrices_element_type   = (*gltf)["accessors"][inverseBindMatricesIndex]["type"].value.string;
 			unsigned int inverse_bind_matrices_componet_type  = (*gltf)["accessors"][inverseBindMatricesIndex]["componentType"].value.iNumber;
-			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
-			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+//			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+//			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
 			unsigned int inverse_bind_matrices_buffer_view_byte_length = 0;
 			unsigned int inverse_bind_matrices_byte_step = 0;
 			calculateElementsMemorySize( inverse_bind_matrices_elements_count, inverse_bind_matrices_element_type,
@@ -776,8 +776,8 @@ namespace GLVM::Core
 			unsigned int joints_elements_count = (*gltf)["accessors"][joints_index]["count"].value.iNumber;
 			std::string* joints_element_type   = (*gltf)["accessors"][joints_index]["type"].value.string;
 			unsigned int joints_componet_type  = (*gltf)["accessors"][joints_index]["componentType"].value.iNumber;
-			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
-			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+//			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+//			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
 			unsigned int joints_buffer_view_byte_length = 0;
 			unsigned int joints_byte_step = 0;
 			calculateElementsMemorySize( joints_elements_count, joints_element_type,
@@ -821,8 +821,8 @@ namespace GLVM::Core
 			unsigned int weights_elements_count = (*gltf)["accessors"][weights_index]["count"].value.iNumber;
 			std::string* weights_element_type   = (*gltf)["accessors"][weights_index]["type"].value.string;
 			unsigned int weights_componet_type  = (*gltf)["accessors"][weights_index]["componentType"].value.iNumber;
-			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
-			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
+//			std::cout << "inverse bind matrix component type: " << inverse_bind_matrices_componet_type << std::endl;
+//			std::cout << "inverse bind matrix elements count: " << inverse_bind_matrices_elements_count << std::endl;
 			unsigned int weights_buffer_view_byte_length = 0;
 			unsigned int weights_byte_step = 0;
 			calculateElementsMemorySize( weights_elements_count, weights_element_type,
@@ -1219,7 +1219,7 @@ namespace GLVM::Core
 				node_stack.push(currentRoot);                               ///< Start from root joint
 
 				core::stack<u32> deepness_stack;
-				std::cout << "file path: " << pathsGLTF_ << std::endl;
+//				std::cout << "file path: " << pathsGLTF_ << std::endl;
 				traversalBones(children, joints, node_stack, deepness_stack, nodes_bones);
 
 				for ( unsigned int e = 0; e < nodes_bones.GetSize(); ++e ) {
@@ -1234,7 +1234,7 @@ namespace GLVM::Core
 				}
 			}
 
-			std::cout << "size of translations: " << translations.GetSize() << std::endl;
+//			std::cout << "size of translations: " << translations.GetSize() << std::endl;
 			
 			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];

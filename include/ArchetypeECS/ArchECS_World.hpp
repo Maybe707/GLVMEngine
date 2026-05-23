@@ -7,6 +7,8 @@
 
 namespace GLVM::ecs::arch {
 	struct World {
+		~World();
+		
 		core::vector<Archetype*> archetypes;
 		core::vector<EntityLocation> entityLocations;
 
