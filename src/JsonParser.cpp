@@ -1435,7 +1435,8 @@ namespace GLVM::Core
 									  core::vector<core::vector<u32>>& result ) {
 		u32 topJointIndex = 0;
 		if ( !node_stack.empty() ) {
-			topJointIndex = getJointIndex(joints, node_stack.top());      ///< Pass array of all joints and root joint and return index of root joint in array
+//			topJointIndex = getJointIndex(joints, node_stack.top());      ///< Pass array of all joints and root joint and return index of root joint in array
+			topJointIndex = node_stack.top();
 		}
 		
 		if ( node_stack.size() > deepness_stack.size() ) {
@@ -1461,8 +1462,8 @@ namespace GLVM::Core
 
 				core::vector<u32> current_node_indices;
 				for ( u32 i = 0; i < node_stack.size(); ++i ) {
-					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-					current_node_indices.Push(currentJoinIndex);
+//					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+					current_node_indices.Push(node_stack[i]);
 				}
 
 				/* result.Push(current_node_indices); *///< Maybe this line has to be here
@@ -1473,8 +1474,8 @@ namespace GLVM::Core
 			} else {
 				core::vector<u32> current_node_indices;
 				for ( u32 i = 0; i < node_stack.size(); ++i ) {
-					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-					current_node_indices.Push(currentJoinIndex);
+//					u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+					current_node_indices.Push(node_stack[i]);
 				}
 		
 				result.Push(current_node_indices);
@@ -1494,8 +1495,8 @@ namespace GLVM::Core
 			}
 			
 			for ( u32 i = 0; i < node_stack.size(); ++i ) {
-				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
-				current_node_indices.Push(currentJoinIndex);
+//				u32 currentJoinIndex = getJointIndex(joints, node_stack[i]);
+				current_node_indices.Push(node_stack[i]);
 			}
 
 			result.Push(current_node_indices);
