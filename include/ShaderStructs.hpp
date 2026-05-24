@@ -17,7 +17,7 @@ namespace GLVM::core {
 #define POINT_LIGHTS_NUMBER                                32
 #define SPOT_LIGHTS_NUMBER 8
 
-#define MAX_JOINTS_NUMBER 64
+#define MAX_JOINTS_NUMBER 128
 
 #define INDIRECT_TEXTURE_WIDTH 7
 #define INDIRECT_TEXTURE_HEIGHT 5

@@ -1453,7 +1453,7 @@ namespace GLVM::Core
 
 		/// VONUCHI KOSTIL! UBIRAI!!!
 		for( unsigned int i = 0; i < jointMatrices.GetSize(); ++i ) {
-			for( unsigned int j = 0; j < 1024; ++j ) {
+			for( unsigned int j = 0; j < 100000; ++j ) {
 				jointMatrices[i].Push( mat4( 1.0f ) );
 			}
 		}
