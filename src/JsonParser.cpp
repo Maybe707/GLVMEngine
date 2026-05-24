@@ -1359,6 +1359,16 @@ namespace GLVM::Core
 					}
 				}
 			}
+
+			for ( unsigned int j = 0; j < joints_bones.GetSize(); ++j ) {
+				const u32 currentJoint = joints_bones[j][0];
+				const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
+
+				if( isExists == UINT32_MAX ) {
+					mat4 unit( 1.0f );
+					inverseBindMatrixSet.Push( unit );
+				}
+			}
 			
 			for ( unsigned int j = 0; j < nodes.value.array->GetSize(); ++j ) {
 //			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
@@ -1407,37 +1417,24 @@ namespace GLVM::Core
 					// std::cout << "res acum size outer: " << resultJointMatricesAccumulator.GetSize() << std::endl;
 					// std::cout << "res acum size inner: " << resultJointMatricesAccumulator[j].GetSize() << std::endl;
 
-					const u32 currentJoint = joints_bones[j][0];
-					const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
-
-					mat4 invenseBindMatrix;
-					if( isExists == UINT32_MAX ) {
-						mat4 unit( 1.0f );
-						invenseBindMatrix = unit;
-					} else {
-						invenseBindMatrix = inverseBindMatrixSet[j];
-					}
-					
-					globalAllFrameNodeMatrix.Push(invenseBindMatrix * resultJointMatricesAccumulator[j][i] * rootTransform);
+					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * resultJointMatricesAccumulator[j][i] * rootTransform);
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
 
 			
-			for( unsigned int z = 0; z < frameInputsTranslation.GetSize(); ++z ) {
-				int maximumJoints    = 64;
-				int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
+			int maximumJoints    = 128;
+			int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
-				if ( unitMatricesSize > 0 ) {
-					for ( int i = 0; i < unitMatricesSize; ++i) {
-						core::vector<mat4>  globalAllFrameNodeMatrix;
-						for ( unsigned int j = 0; j < frameInputsTranslation[z].GetSize(); ++j ) {
-							mat4 unitMatrix(1.0f);
-							globalAllFrameNodeMatrix.Push(unitMatrix);
-						}
-
-						jointMatrices.Push(globalAllFrameNodeMatrix);
+			if ( unitMatricesSize > 0 ) {
+				for ( int i = 0; i < unitMatricesSize; ++i) {
+					core::vector<mat4>  globalAllFrameNodeMatrix;
+					for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
+						mat4 unitMatrix(1.0f);
+						globalAllFrameNodeMatrix.Push(unitMatrix);
 					}
+
+					jointMatrices.Push(globalAllFrameNodeMatrix);
 				}
 			}
 		}
@@ -1451,13 +1448,6 @@ namespace GLVM::Core
 		// 	jointMatrices.Push( vec );
 		// }
 
-		/// VONUCHI KOSTIL! UBIRAI!!!
-		for( unsigned int i = 0; i < jointMatrices.GetSize(); ++i ) {
-			for( unsigned int j = 0; j < 100000; ++j ) {
-				jointMatrices[i].Push( mat4( 1.0f ) );
-			}
-		}
-		
 		jointMatricesPerMesh = jointMatrices;
 		topY = -999.999f;
 		for ( uint32_t i = 0; i < indices.GetSize(); ++i ) {
