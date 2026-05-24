@@ -1252,7 +1252,46 @@ namespace GLVM::Core
 				 ? translations.GetSize() : rotations.GetSize()) :
 				(scales.GetSize() > rotations.GetSize() ? scales.GetSize() : rotations.GetSize());
 
-//			std::cout << "tranformations max: " << transformationsMax << std::endl;
+			[[maybe_unused]] const u32 framesMax = frameInputsTranslation.GetSize() > frameInputsScale.GetSize() ?
+				(frameInputsTranslation.GetSize() > frameInputsRotation.GetSize()
+				 ? frameInputsTranslation.GetSize() : frameInputsRotation.GetSize()) :
+				(frameInputsScale.GetSize() > frameInputsRotation.GetSize() ? frameInputsScale.GetSize() : frameInputsRotation.GetSize());
+			
+			std::cout << "tranformations max: " << transformationsMax << std::endl;
+
+			const u32 translationsSize = translations.GetSize();
+			const u32 rotationsSize    = rotations.GetSize();
+			const u32 scalesSize       = scales.GetSize();
+			for( unsigned int i = 0; i < transformationsMax; ++i ) {
+				if( i >= translationsSize ) {
+					core::vector<float> temp;
+					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+						temp.Push( 0.0f );
+						temp.Push( 0.0f );
+						temp.Push( 0.0f );
+					}
+					translations.Push( temp );
+				}
+
+				if( i >= rotationsSize ) {
+					core::vector<float> temp;
+					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+						temp.Push( 0.0f );
+						temp.Push( 0.0f );
+						temp.Push( 0.0f );
+						temp.Push( 1.0f );
+					}
+					rotations.Push( temp );
+				}
+
+				if( i >= scalesSize ) {
+					core::vector<float> temp;
+					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+						temp.Push( 1.0f );
+					}
+					scales.Push( temp );
+				}
+			}
 			
 			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
@@ -1262,7 +1301,7 @@ namespace GLVM::Core
 					boneAllFrameScales       = scales[j];
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
-				for ( unsigned int i = 0; i < transformationsMax; ++i ) {
+				for ( unsigned int i = 0; i < framesMax; ++i ) {
 					mat4 frameTranslation(1.0f);
 					mat4 frameScale(1.0f);
 					for ( unsigned int q = 0; q < 3; ++q ) {
@@ -1307,9 +1346,9 @@ namespace GLVM::Core
 					const u32 currentJoint = joints_bones[i][j];
 					const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
 
-					if( isExists == UINT32_MAX ) {
+					if( isExists == UINT32_MAX || isExists >= animatedJointMatricesAccumulator.GetSize() ) {
 						core::vector<mat4> temp;
-						for( unsigned int v = 0; v < transformationsMax; ++v ) {
+						for( unsigned int v = 0; v < framesMax; ++v ) {
 							mat4 unit;
 							temp.Push( unit );
 						}
@@ -1331,7 +1370,7 @@ namespace GLVM::Core
 				// 	continue;
 				// }
 				
-				for ( unsigned int i = 0; i < transformationsMax; ++i ) {
+				for ( unsigned int i = 0; i < framesMax; ++i ) {
 					mat4 rootTransform(1.0f);
 					while( joints_bones.GetSize() <= j ) {
 						joints_bones.Push( {} );
@@ -1362,24 +1401,24 @@ namespace GLVM::Core
 
 //					const u32 isJointExist = getJointIndex(joints, 
 
-					std::cout << "j: " << j << std::endl;
-					std::cout << "i: " << i << std::endl;
-					std::cout << "inv mat size: " << inverseBindMatrixSet.GetSize() << std::endl;
-					std::cout << "res acum size outer: " << resultJointMatricesAccumulator.GetSize() << std::endl;
-					std::cout << "res acum size inner: " << resultJointMatricesAccumulator[j].GetSize() << std::endl;
+					// std::cout << "j: " << j << std::endl;
+					// std::cout << "i: " << i << std::endl;
+					// std::cout << "inv mat size: " << inverseBindMatrixSet.GetSize() << std::endl;
+					// std::cout << "res acum size outer: " << resultJointMatricesAccumulator.GetSize() << std::endl;
+					// std::cout << "res acum size inner: " << resultJointMatricesAccumulator[j].GetSize() << std::endl;
 
-					// const u32 currentJoint = joints_bones[j][i];
-					// const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
+					const u32 currentJoint = joints_bones[j][0];
+					const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
 
-					// mat4 invenseBindMatrix;
-					// if( isExists == UINT32_MAX ) {
-					// 	mat4 unit( 1.0f );
-					// 	invenseBindMatrix = unit;
-					// } else {
-					// 	invenseBindMatrix = inverseBindMatrixSet[j];
-					// }
+					mat4 invenseBindMatrix;
+					if( isExists == UINT32_MAX ) {
+						mat4 unit( 1.0f );
+						invenseBindMatrix = unit;
+					} else {
+						invenseBindMatrix = inverseBindMatrixSet[j];
+					}
 					
-					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * resultJointMatricesAccumulator[j][i] * rootTransform);
+					globalAllFrameNodeMatrix.Push(invenseBindMatrix * resultJointMatricesAccumulator[j][i] * rootTransform);
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
