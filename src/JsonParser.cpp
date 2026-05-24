@@ -1209,7 +1209,7 @@ namespace GLVM::Core
 			}
 			
 			frames = frameInputsTranslation[0];
-			core::vector<core::vector<mat4>> jointMatricesAccumulator;        ///< Delete this sheet!
+			core::vector<core::vector<mat4>> animatedJointMatricesAccumulator;        ///< Delete this sheet!
 
 			core::vector<core::vector<unsigned int>> joints_bones;
 			for ( unsigned int w = 0; w < root_joins.GetSize(); ++w ) {     ///< Loop on parent joints
@@ -1227,16 +1227,34 @@ namespace GLVM::Core
 				}
 			}
 
-			for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
-				std::cout << "next node" << std::endl;
-				for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
-					std::cout << "joint: " << joints_bones[i][j] << std::endl;
-				}
-			}
+			// for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+			// 	std::cout << "next node" << std::endl;
+			// 	for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
+			// 		std::cout << "joint: " << joints_bones[i][j] << std::endl;
+			// 	}
+			// }
 
-//			std::cout << "size of translations: " << translations.GetSize() << std::endl;
+//			std::cout << "size of joints_bones: " << joints_bones.GetSize() << std::endl;
+
+
+			/*
+			  ================================================================
+			  This logic related to joints that has inverseBindMatrices
+			  ================================================================
+			*/
+
+			// std::cout << "size of translations: " << translations.GetSize() << std::endl;
+			// std::cout << "size of rotations: " << rotations.GetSize() << std::endl;
+			// std::cout << "size of scales: " << scales.GetSize() << std::endl;
 			
-			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
+			[[maybe_unused]] const u32 transformationsMax = translations.GetSize() > scales.GetSize() ?
+				(translations.GetSize() > rotations.GetSize()
+				 ? translations.GetSize() : rotations.GetSize()) :
+				(scales.GetSize() > rotations.GetSize() ? scales.GetSize() : rotations.GetSize());
+
+//			std::cout << "tranformations max: " << transformationsMax << std::endl;
+			
+			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
 				core::vector<float> boneAllFrameScales;
@@ -1244,7 +1262,7 @@ namespace GLVM::Core
 					boneAllFrameScales       = scales[j];
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
-				for ( unsigned int i = 0; i < frameInputsTranslation[j].GetSize(); ++i ) {
+				for ( unsigned int i = 0; i < transformationsMax; ++i ) {
 					mat4 frameTranslation(1.0f);
 					mat4 frameScale(1.0f);
 					for ( unsigned int q = 0; q < 3; ++q ) {
@@ -1280,10 +1298,31 @@ namespace GLVM::Core
 					mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
 					globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
 				}
-				jointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
+				animatedJointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 			}
 
-			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
+			core::vector<core::vector<mat4>> resultJointMatricesAccumulator;
+			for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+				for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
+					const u32 currentJoint = joints_bones[i][j];
+					const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
+
+					if( isExists == UINT32_MAX ) {
+						core::vector<mat4> temp;
+						for( unsigned int v = 0; v < transformationsMax; ++v ) {
+							mat4 unit;
+							temp.Push( unit );
+						}
+
+						resultJointMatricesAccumulator.Push( temp );
+					} else {
+						resultJointMatricesAccumulator.Push( animatedJointMatricesAccumulator[isExists] );
+					}
+				}
+			}
+			
+			for ( unsigned int j = 0; j < nodes.value.array->GetSize(); ++j ) {
+//			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 
 				// Guard before the inner loop
@@ -1292,7 +1331,7 @@ namespace GLVM::Core
 				// 	continue;
 				// }
 				
-				for ( unsigned int i = 0; i < frameInputsTranslation[j].GetSize(); ++i ) {
+				for ( unsigned int i = 0; i < transformationsMax; ++i ) {
 					mat4 rootTransform(1.0f);
 					while( joints_bones.GetSize() <= j ) {
 						joints_bones.Push( {} );
@@ -1304,16 +1343,16 @@ namespace GLVM::Core
 						}
 						
 						const u32 innerIndex = joints_bones[j][b];
- 						while( jointMatricesAccumulator.GetSize() <= innerIndex ) {
-							jointMatricesAccumulator.Push( {} );
+ 						while( resultJointMatricesAccumulator.GetSize() <= innerIndex ) {
+							resultJointMatricesAccumulator.Push( {} );
 						}
 
-						while( jointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
+						while( resultJointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
 							mat4 unit(1.0f);
-							jointMatricesAccumulator[joints_bones[j][b]].Push( unit );
+							resultJointMatricesAccumulator[joints_bones[j][b]].Push( unit );
 						}
 						
-						rootTransform = jointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
+						rootTransform = resultJointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
 					}
 					// if ( j >= jointMatricesAccumulator.GetSize() || i >= jointMatricesAccumulator[j].GetSize() ) {
 					// 	mat4 unit(1.0f);
@@ -1321,7 +1360,26 @@ namespace GLVM::Core
 					// 	continue;
 					// }
 
-					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * jointMatricesAccumulator[j][i] * rootTransform);
+//					const u32 isJointExist = getJointIndex(joints, 
+
+					std::cout << "j: " << j << std::endl;
+					std::cout << "i: " << i << std::endl;
+					std::cout << "inv mat size: " << inverseBindMatrixSet.GetSize() << std::endl;
+					std::cout << "res acum size outer: " << resultJointMatricesAccumulator.GetSize() << std::endl;
+					std::cout << "res acum size inner: " << resultJointMatricesAccumulator[j].GetSize() << std::endl;
+
+					// const u32 currentJoint = joints_bones[j][i];
+					// const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
+
+					// mat4 invenseBindMatrix;
+					// if( isExists == UINT32_MAX ) {
+					// 	mat4 unit( 1.0f );
+					// 	invenseBindMatrix = unit;
+					// } else {
+					// 	invenseBindMatrix = inverseBindMatrixSet[j];
+					// }
+					
+					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * resultJointMatricesAccumulator[j][i] * rootTransform);
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
