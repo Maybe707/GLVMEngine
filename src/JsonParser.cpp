@@ -1208,7 +1208,7 @@ namespace GLVM::Core
 				std::cout << "root joint: " << root_joins[i] << std::endl;
 			}
 			
-			frames = frameInputsTranslation[0];
+//			frames = frameInputsTranslation[0];
 			core::vector<core::vector<mat4>> animatedJointMatricesAccumulator;        ///< Delete this sheet!
 
 			core::vector<core::vector<unsigned int>> joints_bones;
@@ -1252,13 +1252,36 @@ namespace GLVM::Core
 				 ? translations.GetSize() : rotations.GetSize()) :
 				(scales.GetSize() > rotations.GetSize() ? scales.GetSize() : rotations.GetSize());
 
-			[[maybe_unused]] const u32 framesMax = frameInputsTranslation.GetSize() > frameInputsScale.GetSize() ?
-				(frameInputsTranslation.GetSize() > frameInputsRotation.GetSize()
-				 ? frameInputsTranslation.GetSize() : frameInputsRotation.GetSize()) :
-				(frameInputsScale.GetSize() > frameInputsRotation.GetSize() ? frameInputsScale.GetSize() : frameInputsRotation.GetSize());
+			u32 translationFramesNumber = 0;
+			if( frameInputsTranslation.GetSize() > 0 ) {
+				translationFramesNumber = frameInputsTranslation[0].GetSize();
+			}
+
+			u32 rotationFramesNumber = 0;
+			if( frameInputsRotation.GetSize() > 0 ) {
+				rotationFramesNumber = frameInputsRotation[0].GetSize();
+			}
+
+			u32 scaleFramesNumber = 0;
+			if( frameInputsScale.GetSize() > 0 ) {
+				scaleFramesNumber = frameInputsScale[0].GetSize();
+			}
+
+			const u32 framesMax = translationFramesNumber > scaleFramesNumber ?
+				(translationFramesNumber > rotationFramesNumber
+				 ? translationFramesNumber : rotationFramesNumber) :
+				(scaleFramesNumber > rotationFramesNumber ? scaleFramesNumber : rotationFramesNumber);
+			
+			// [[maybe_unused]] const u32 framesMax = frameInputsTranslation[0].GetSize() > frameInputsScale[0].GetSize() ?
+			// 	(frameInputsTranslation[0].GetSize() > frameInputsRotation[0].GetSize()
+			// 	 ? frameInputsTranslation[0].GetSize() : frameInputsRotation[0].GetSize()) :
+			// 	(frameInputsScale[0].GetSize() > frameInputsRotation[0].GetSize() ? frameInputsScale[0].GetSize() : frameInputsRotation[0].GetSize());
 			
 			std::cout << "tranformations max: " << transformationsMax << std::endl;
+			std::cout << "frames max: " << framesMax << std::endl;
 
+//			frames = framesMax;
+			
 			const u32 translationsSize = translations.GetSize();
 			const u32 rotationsSize    = rotations.GetSize();
 			const u32 scalesSize       = scales.GetSize();
@@ -1291,8 +1314,26 @@ namespace GLVM::Core
 					}
 					scales.Push( temp );
 				}
+
+				while( translations[i].GetSize() < framesMax * 3 ) {
+					translations[i].Push( 0.0f );
+					translations[i].Push( 0.0f );
+					translations[i].Push( 0.0f );
+				}
+
+				while( rotations[i].GetSize() < framesMax * 4 ) {
+					rotations[i].Push( 0.0f );
+					rotations[i].Push( 0.0f );
+					rotations[i].Push( 0.0f );
+					rotations[i].Push( 1.0f );
+				}
+
+				while( scales[i].GetSize() < framesMax ) {
+					scales[i].Push( 1.0f );
+				}
 			}
-			
+
+			frames = frameInputsRotation[0];
 			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
@@ -1319,12 +1360,12 @@ namespace GLVM::Core
 					Quaternion frameRotationQuaternion;
 					mat4 frameRotation(1.0f);
 
-					if( boneAllFrameRotations.GetSize() == i * 4 ) {
-						boneAllFrameRotations.Push( 0.0f );
-						boneAllFrameRotations.Push( 0.0f );
-						boneAllFrameRotations.Push( 0.0f );
-						boneAllFrameRotations.Push( 1.0f );
-					}
+					// if( boneAllFrameRotations.GetSize() == i * 4 ) {
+					// 	boneAllFrameRotations.Push( 0.0f );
+					// 	boneAllFrameRotations.Push( 0.0f );
+					// 	boneAllFrameRotations.Push( 0.0f );
+					// 	boneAllFrameRotations.Push( 1.0f );
+					// }
 					
 					frameRotationQuaternion.x = boneAllFrameRotations[i * 4];
 					frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
@@ -1382,24 +1423,24 @@ namespace GLVM::Core
 				
 				for ( unsigned int i = 0; i < framesMax; ++i ) {
 					mat4 rootTransform(1.0f);
-					while( joints_bones.GetSize() <= j ) {
-						joints_bones.Push( {} );
-					}
+					// while( joints_bones.GetSize() <= j ) {
+					// 	joints_bones.Push( {} );
+					// }
 					
 					for ( unsigned int b = 0; b < joints_bones[j].GetSize() - 1; ++b ) {
- 						while( joints_bones[j].GetSize() <= b ) {
-							joints_bones[j].Push( {} );
-						}
+ 						// while( joints_bones[j].GetSize() <= b ) {
+						// 	joints_bones[j].Push( {} );
+						// }
 						
-						const u32 innerIndex = joints_bones[j][b];
- 						while( resultJointMatricesAccumulator.GetSize() <= innerIndex ) {
-							resultJointMatricesAccumulator.Push( {} );
-						}
+						// const u32 innerIndex = joints_bones[j][b];
+ 						// while( resultJointMatricesAccumulator.GetSize() <= innerIndex ) {
+						// 	resultJointMatricesAccumulator.Push( {} );
+						// }
 
-						while( resultJointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
-							mat4 unit(1.0f);
-							resultJointMatricesAccumulator[joints_bones[j][b]].Push( unit );
-						}
+						// while( resultJointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
+						// 	mat4 unit(1.0f);
+						// 	resultJointMatricesAccumulator[joints_bones[j][b]].Push( unit );
+						// }
 						
 						rootTransform = resultJointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
 					}
@@ -1423,20 +1464,20 @@ namespace GLVM::Core
 			}
 
 			
-			int maximumJoints    = 128;
-			int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
+			// int maximumJoints    = 128;
+			// int unitMatricesSize = maximumJoints - jointMatrices.GetSize();
 
-			if ( unitMatricesSize > 0 ) {
-				for ( int i = 0; i < unitMatricesSize; ++i) {
-					core::vector<mat4>  globalAllFrameNodeMatrix;
-					for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
-						mat4 unitMatrix(1.0f);
-						globalAllFrameNodeMatrix.Push(unitMatrix);
-					}
+			// if ( unitMatricesSize > 0 ) {
+			// 	for ( int i = 0; i < unitMatricesSize; ++i) {
+			// 		core::vector<mat4>  globalAllFrameNodeMatrix;
+			// 		for ( unsigned int j = 0; j < frameInputsTranslation[0].GetSize(); ++j ) {
+			// 			mat4 unitMatrix(1.0f);
+			// 			globalAllFrameNodeMatrix.Push(unitMatrix);
+			// 		}
 
-					jointMatrices.Push(globalAllFrameNodeMatrix);
-				}
-			}
+			// 		jointMatrices.Push(globalAllFrameNodeMatrix);
+			// 	}
+			// }
 		}
 
 		// while( jointMatrices.GetSize() < 256 ) {

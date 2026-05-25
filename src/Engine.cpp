@@ -509,7 +509,6 @@ namespace GLVM::core
 				
 		} else {
 			jointMatrices.Resize(MAX_JOINTS_NUMBER);
-			std::cout << "joint matrices size: " << joinMatricesDataSize << std::endl;
 			for ( unsigned int i = 0; i < joinMatricesDataSize; ++i ) {
 				if( meshID >= vulkanRenderer->jointMatricesPerMesh.GetSize() ) {
 					std::cout << "OUTER ARRAY OVERFLOW" << std::endl;
@@ -518,6 +517,9 @@ namespace GLVM::core
 					std::cout << "MIDDLE ARRAY OVERFLOW" << std::endl;
 					throw("sdfsdf");
 				} else if( animationComponent->currentAnimationFrame >= vulkanRenderer->jointMatricesPerMesh[meshID][i].GetSize() ) {
+					std::cout << "frame: " << animationComponent->currentAnimationFrame << std::endl;
+					std::cout << "array size: " << vulkanRenderer->jointMatricesPerMesh[meshID][i].GetSize() << std::endl;
+					std::cout << "frames number: " << vulkanRenderer->frames[meshID].GetSize() << std::endl;
 					std::cout << "INNER ARRAY OVERFLOW" << std::endl;
 					throw("sdfsdf");
 				}
