@@ -1190,7 +1190,7 @@ namespace GLVM::Core
 			}
 
 			/// Searching for root joins WITH GOAT GOTO OPERATOR!!!
-			core::vector<int> root_joins;
+			core::vector<int> rootNodes;
 //			for ( unsigned int s = 0; s < joints.value.array->GetSize(); ++s ) {
 //				int current_joint = (*joints.value.array)[s].value.iNumber;
 
@@ -1204,23 +1204,23 @@ namespace GLVM::Core
 							goto most_scary_operator_of_all_time;                                        ///< Yes. This is what we all deserve
 					}
 				}
-				root_joins.Push(current_joint);     ///< If we execute this line then this joint index ectualy the root
+				rootNodes.Push(current_joint);     ///< If we execute this line then this joint index ectualy the root
 				
 			  most_scary_operator_of_all_time:                                                           ///< Not so scary at all. Am i right?
 				continue;
 			}
 
-			for( unsigned int i = 0; i < root_joins.GetSize(); ++i ) {
-				std::cout << "root joint: " << root_joins[i] << std::endl;
+			for( unsigned int i = 0; i < rootNodes.GetSize(); ++i ) {
+				std::cout << "root joint: " << rootNodes[i] << std::endl;
 			}
 			
 //			frames = frameInputsTranslation[0];
-			core::vector<core::vector<mat4>> animatedJointMatricesAccumulator;        ///< Delete this sheet!
+			core::vector<core::vector<mat4>> animatedNodesMatricesAccumulator;        ///< Delete this sheet!
 
-			core::vector<core::vector<unsigned int>> joints_bones;
-			for ( unsigned int w = 0; w < root_joins.GetSize(); ++w ) {     ///< Loop on parent joints
+			core::vector<core::vector<unsigned int>> nodesHierarchy;
+			for ( unsigned int w = 0; w < rootNodes.GetSize(); ++w ) {     ///< Loop on parent joints
 				core::vector<core::vector<unsigned int>> nodes_bones;
-				unsigned int currentRoot = root_joins[w];
+				unsigned int currentRoot = rootNodes[w];
 				core::stack<u32> node_stack;
 				node_stack.push(currentRoot);                               ///< Start from root joint
 
@@ -1229,18 +1229,18 @@ namespace GLVM::Core
 				traversalBones(children, joints, node_stack, deepness_stack, nodes_bones);
 
 				for ( unsigned int e = 0; e < nodes_bones.GetSize(); ++e ) {
-					joints_bones.Push(nodes_bones[e]);
+					nodesHierarchy.Push(nodes_bones[e]);
 				}
 			}
 
-			// for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
+			// for( unsigned int i = 0; i < nodesHierarchy.GetSize(); ++i ) {
 			// 	std::cout << "next node" << std::endl;
-			// 	for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
-			// 		std::cout << "joint: " << joints_bones[i][j] << std::endl;
+			// 	for( unsigned int j = 0; j < nodesHierarchy[i].GetSize(); ++j ) {
+			// 		std::cout << "joint: " << nodesHierarchy[i][j] << std::endl;
 			// 	}
 			// }
 
-//			std::cout << "size of joints_bones: " << joints_bones.GetSize() << std::endl;
+//			std::cout << "size of nodesHierarchy: " << nodesHierarchy.GetSize() << std::endl;
 
 
 			/*
@@ -1384,16 +1384,16 @@ namespace GLVM::Core
 					mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
 					globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
 				}
-				animatedJointMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
+				animatedNodesMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 			}
 
 			core::vector<core::vector<mat4>> resultJointMatricesAccumulator;
-			for( unsigned int i = 0; i < joints_bones.GetSize(); ++i ) {
-				for( unsigned int j = 0; j < joints_bones[i].GetSize(); ++j ) {
-					const u32 currentJoint = joints_bones[i][j];
+			for( unsigned int i = 0; i < nodesHierarchy.GetSize(); ++i ) {
+				for( unsigned int j = 0; j < nodesHierarchy[i].GetSize(); ++j ) {
+					const u32 currentJoint = nodesHierarchy[i][j];
 					const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
 
-					if( isExists == UINT32_MAX || isExists >= animatedJointMatricesAccumulator.GetSize() ) {
+					if( isExists == UINT32_MAX || isExists >= animatedNodesMatricesAccumulator.GetSize() ) {
 						core::vector<mat4> temp;
 						for( unsigned int v = 0; v < framesMax; ++v ) {
 							mat4 unit;
@@ -1402,13 +1402,13 @@ namespace GLVM::Core
 
 						resultJointMatricesAccumulator.Push( temp );
 					} else {
-						resultJointMatricesAccumulator.Push( animatedJointMatricesAccumulator[isExists] );
+						resultJointMatricesAccumulator.Push( animatedNodesMatricesAccumulator[isExists] );
 					}
 				}
 			}
 
-			for ( unsigned int j = 0; j < joints_bones.GetSize(); ++j ) {
-				const u32 currentJoint = joints_bones[j][0];
+			for ( unsigned int j = 0; j < nodesHierarchy.GetSize(); ++j ) {
+				const u32 currentJoint = nodesHierarchy[j][0];
 				const u32 isExists     = getJointIndex(joints, currentJoint); ///< Is currentJoint exists in array related to frame animations
 
 				if( isExists == UINT32_MAX ) {
@@ -1429,26 +1429,26 @@ namespace GLVM::Core
 				
 				for ( unsigned int i = 0; i < framesMax; ++i ) {
 					mat4 rootTransform(1.0f);
-					// while( joints_bones.GetSize() <= j ) {
-					// 	joints_bones.Push( {} );
+					// while( nodesHierarchy.GetSize() <= j ) {
+					// 	nodesHierarchy.Push( {} );
 					// }
 					
-					for ( unsigned int b = 0; b < joints_bones[j].GetSize() - 1; ++b ) {
- 						// while( joints_bones[j].GetSize() <= b ) {
-						// 	joints_bones[j].Push( {} );
+					for ( unsigned int b = 0; b < nodesHierarchy[j].GetSize() - 1; ++b ) {
+ 						// while( nodesHierarchy[j].GetSize() <= b ) {
+						// 	nodesHierarchy[j].Push( {} );
 						// }
 						
-						// const u32 innerIndex = joints_bones[j][b];
+						// const u32 innerIndex = nodesHierarchy[j][b];
  						// while( resultJointMatricesAccumulator.GetSize() <= innerIndex ) {
 						// 	resultJointMatricesAccumulator.Push( {} );
 						// }
 
-						// while( resultJointMatricesAccumulator[joints_bones[j][b]].GetSize() <= i ) {
+						// while( resultJointMatricesAccumulator[nodesHierarchy[j][b]].GetSize() <= i ) {
 						// 	mat4 unit(1.0f);
-						// 	resultJointMatricesAccumulator[joints_bones[j][b]].Push( unit );
+						// 	resultJointMatricesAccumulator[nodesHierarchy[j][b]].Push( unit );
 						// }
 						
-						rootTransform = resultJointMatricesAccumulator[joints_bones[j][b]][i] * rootTransform;
+						rootTransform = resultJointMatricesAccumulator[nodesHierarchy[j][b]][i] * rootTransform;
 					}
 					// if ( j >= jointMatricesAccumulator.GetSize() || i >= jointMatricesAccumulator[j].GetSize() ) {
 					// 	mat4 unit(1.0f);
