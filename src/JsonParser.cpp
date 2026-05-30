@@ -865,16 +865,22 @@ namespace GLVM::Core
 			core::vector<unsigned int> translationSamplerIndices;
 			core::vector<unsigned int> rotationSamplerIndices;
 			core::vector<unsigned int> scaleSamplerIndices;
+			core::vector<u32> nodesMapTranslations;
+			core::vector<u32> nodesMapRotations;
+			core::vector<u32> nodesMapScales;
 			for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
 				if ( *targetPaths[i].value.string == "translation" ) {
 //					std::cout << "translation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapTranslations.Push( samplerIndices[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "rotation" ) {
 //					std::cout << "rotation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapRotations.Push( samplerIndices[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "scale" ) {
 //					std::cout << "scale sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapScales.Push( samplerIndices[i].value.iNumber );
 				}
 			}
 
