@@ -726,7 +726,7 @@ namespace GLVM::Core
 
 				}
 				
-				mat4 model = translation * scale * rotation;                                 ///< Compute model matrix
+				mat4 model = scale * rotation * translation;                                 ///< Compute model matrix
 				globalTransformJointNode.Push(model);
 			}
 
@@ -872,15 +872,15 @@ namespace GLVM::Core
 				if ( *targetPaths[i].value.string == "translation" ) {
 //					std::cout << "translation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapTranslations.Push( samplerIndices[i].value.iNumber );
+					nodesMapTranslations.Push( targetNodes[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "rotation" ) {
 //					std::cout << "rotation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapRotations.Push( samplerIndices[i].value.iNumber );
+					nodesMapRotations.Push( targetNodes[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "scale" ) {
 //					std::cout << "scale sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapScales.Push( samplerIndices[i].value.iNumber );
+					nodesMapScales.Push( targetNodes[i].value.iNumber );
 				}
 			}
 
@@ -1339,33 +1339,33 @@ namespace GLVM::Core
 				}
 			}
 
-			std::string path = pathsGLTF_;
-			if( path == "../gltf/scene.gltf" ) {
-				core::vector<core::vector<float>> tempTranslations;
-				core::vector<core::vector<float>> tempRotations;
-				core::vector<core::vector<float>> tempScales;
+			// std::string path = pathsGLTF_;
+			// if( path == "../gltf/scene.gltf" ) {
+			// 	core::vector<core::vector<float>> tempTranslations;
+			// 	core::vector<core::vector<float>> tempRotations;
+			// 	core::vector<core::vector<float>> tempScales;
 
-				for( u32 i = 9; i < transformationsMax; ++i ) {
-					std::cout << "CHECK" << std::endl;
-					tempTranslations.Push( translations[i] );
-					tempRotations.Push( rotations[i] );
-					tempScales.Push( scales[i] );
-				}
+			// 	for( u32 i = 9; i < transformationsMax; ++i ) {
+			// 		std::cout << "CHECK" << std::endl;
+			// 		tempTranslations.Push( translations[i] );
+			// 		tempRotations.Push( rotations[i] );
+			// 		tempScales.Push( scales[i] );
+			// 	}
 
-				translations.clear();
-				rotations.clear();
-				scales.clear();
+			// 	translations.clear();
+			// 	rotations.clear();
+			// 	scales.clear();
 
-				for( u32 i = 0; i < tempTranslations.GetSize(); ++i ) {
-					std::cout << "CHECK 2" << std::endl;
-					translations.Push( tempTranslations[i] );
-					rotations.Push( tempRotations[i] );
-					scales.Push( tempScales[i] );
-				}
+			// 	for( u32 i = 0; i < tempTranslations.GetSize(); ++i ) {
+			// 		std::cout << "CHECK 2" << std::endl;
+			// 		translations.Push( tempTranslations[i] );
+			// 		rotations.Push( tempRotations[i] );
+			// 		scales.Push( tempScales[i] );
+			// 	}
 
-				transformationsMax -= 9;
-				std::cout << "transformations max: " << transformationsMax << std::endl;
-			}
+			// 	transformationsMax -= 9;
+			// 	std::cout << "transformations max: " << transformationsMax << std::endl;
+			// }
 			
 			frames = frameInputsRotation[0];
 			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
