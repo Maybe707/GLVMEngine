@@ -11,6 +11,7 @@
 #include <ostream>
 #include <pthread.h>
 #include <cassert>
+#include <limits>
 
 namespace GLVM::Core
 {    
@@ -401,6 +402,28 @@ namespace GLVM::Core
 		return resultVector;
 	}
 
+	template<typename T>
+	bool isElementExist( const T element, const core::vector<T>& array ) {
+		for( u32 n = 0; n < array.GetSize(); ++n ) {
+			if( element == array[n] ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<typename T>
+	T getElementIndex( const T element, const core::vector<T>& array ) {
+		for( u32 n = 0; n < array.GetSize(); ++n ) {
+			if( element == array[n] ) {
+				return n;
+			}
+		}
+
+		return std::numeric_limits<T>::max();
+	}
+	
 	void calculateElementsMemorySize(
 		unsigned int indices_elements_count,
 		std::string* indices_element_type,
@@ -865,25 +888,31 @@ namespace GLVM::Core
 			core::vector<unsigned int> translationSamplerIndices;
 			core::vector<unsigned int> rotationSamplerIndices;
 			core::vector<unsigned int> scaleSamplerIndices;
-			core::vector<u32> nodesMapTranslations;
-			core::vector<u32> nodesMapRotations;
-			core::vector<u32> nodesMapScales;
+			core::vector<u32> nodesMapTransformations;
 			for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
+
+				const u32 nodeIndex = targetNodes[i].value.iNumber;
+				bool isExist = isElementExist( nodeIndex, nodesMapTransformations );
+
+				if( !isExist )
+					nodesMapTransformations.Push( nodeIndex );
+				
 				if ( *targetPaths[i].value.string == "translation" ) {
 //					std::cout << "translation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapTranslations.Push( targetNodes[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "rotation" ) {
 //					std::cout << "rotation sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapRotations.Push( targetNodes[i].value.iNumber );
 				} else if ( *targetPaths[i].value.string == "scale" ) {
 //					std::cout << "scale sampler index: " << samplerIndices[i].value.iNumber << std::endl;
 					scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
-					nodesMapScales.Push( targetNodes[i].value.iNumber );
 				}
 			}
 
+			for( u32 i = 0; i < nodesMapTransformations.GetSize(); ++i ) {
+				std::cout << "animated node index: " << nodesMapTransformations[i] << std::endl;
+			}
+			
 			Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				
 			core::vector<unsigned int> translationInputs;
@@ -1369,10 +1398,6 @@ namespace GLVM::Core
 			
 			frames = frameInputsRotation[0];
 			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
-
-				std::cout << "array size: " << translations.GetSize() << std::endl;
-				std::cout << "index: " << j << std::endl;
-				
 				core::vector<float> boneAllFrameTranslations = translations[j];
 				core::vector<float> boneAllFrameRotations    = rotations[j];
 				core::vector<float> boneAllFrameScales;
@@ -1419,6 +1444,16 @@ namespace GLVM::Core
 				animatedNodesMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
 			}
 
+			while( animatedNodesMatricesAccumulator.GetSize() < joints.value.array->GetSize() ) {
+				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
+				mat4 unit( 1.0f );
+				for ( unsigned int i = 0; i < framesMax; ++i ) {
+					globalAllFrameNodeMatrixAccumulator.Push( unit );
+				}
+
+				animatedNodesMatricesAccumulator.Push( globalAllFrameNodeMatrixAccumulator );
+			}
+			
 			// core::vector<core::vector<mat4>> resultJointMatricesAccumulator;
 			// for( unsigned int i = 0; i < nodesHierarchy.GetSize(); ++i ) {
 			// 	for( unsigned int j = 0; j < nodesHierarchy[i].GetSize(); ++j ) {
@@ -1450,8 +1485,9 @@ namespace GLVM::Core
 			// }
 			
 //			for ( unsigned int j = 0; j < nodes.value.array->GetSize(); ++j ) {
-			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
+//			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
 //			for ( unsigned int j = 0; j < translations.GetSize(); ++j ) {
+			for ( unsigned int j = 0; j < joints.value.array->GetSize(); ++j ) {
 				core::vector<mat4>  globalAllFrameNodeMatrix;
 
 				// Guard before the inner loop
@@ -1465,7 +1501,7 @@ namespace GLVM::Core
 					// while( nodesHierarchy.GetSize() <= j ) {
 					// 	nodesHierarchy.Push( {} );
 					// }
-					
+					bool isExist = false;
 					for ( unsigned int b = 0; b < nodesHierarchy[j].GetSize() - 1; ++b ) {
  						// while( nodesHierarchy[j].GetSize() <= b ) {
 						// 	nodesHierarchy[j].Push( {} );
@@ -1480,8 +1516,17 @@ namespace GLVM::Core
 						// 	mat4 unit(1.0f);
 						// 	resultJointMatricesAccumulator[nodesHierarchy[j][b]].Push( unit );
 						// }
+
+						const u32 jointArrayIndex = nodesHierarchy[j][b];
+						const u32 jointNodeIndex  = (*joints.value.array)[jointArrayIndex].value.iNumber;
+						isExist = isElementExist( jointNodeIndex, nodesMapTransformations );
+						const u32 jointIndexInMapTransformations = getElementIndex( jointNodeIndex, nodesMapTransformations );
 						
-						rootTransform = animatedNodesMatricesAccumulator[nodesHierarchy[j][b]][i] * rootTransform;
+						if( isExist ) {
+							rootTransform = animatedNodesMatricesAccumulator[jointIndexInMapTransformations][i] * rootTransform;
+						} else {
+							rootTransform = globalTransformJointNode[jointNodeIndex] * rootTransform;
+						}
 					}
 					// if ( j >= jointMatricesAccumulator.GetSize() || i >= jointMatricesAccumulator[j].GetSize() ) {
 					// 	mat4 unit(1.0f);
@@ -1497,7 +1542,12 @@ namespace GLVM::Core
 					// std::cout << "res acum size outer: " << resultJointMatricesAccumulator.GetSize() << std::endl;
 					// std::cout << "res acum size inner: " << resultJointMatricesAccumulator[j].GetSize() << std::endl;
 
-					globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * animatedNodesMatricesAccumulator[j][i] * rootTransform);
+					if( isExist ) {
+						globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * animatedNodesMatricesAccumulator[j][i] * rootTransform);
+					} else {
+						const u32 jointNodeIndex  = (*joints.value.array)[j].value.iNumber;
+						globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformJointNode[jointNodeIndex] * rootTransform);
+					}
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
