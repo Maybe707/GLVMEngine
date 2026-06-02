@@ -827,28 +827,22 @@ namespace GLVM::Core
 			core::vector<unsigned int> translationSamplerIndices;
 			core::vector<unsigned int> rotationSamplerIndices;
 			core::vector<unsigned int> scaleSamplerIndices;
-			core::vector<u32> nodesMapTransformations;
+			core::vector<u32> nodesMapTranslations;
+			core::vector<u32> nodesMapRotations;
+			core::vector<u32> nodesMapScales;
 			for ( unsigned int i = 0; i < samplerIndices.GetSize(); ++i ) {
-
-				const u32 nodeIndex = targetNodes[i].value.iNumber;
-				bool isExist = isElementExist( nodeIndex, nodesMapTransformations );
-
-				if( !isExist )
-					nodesMapTransformations.Push( nodeIndex );
-				
 				if ( *targetPaths[i].value.string == "translation" ) {
 					translationSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapTranslations.Push(targetNodes[i].value.iNumber);
 				} else if ( *targetPaths[i].value.string == "rotation" ) {
 					rotationSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapRotations.Push(targetNodes[i].value.iNumber);
 				} else if ( *targetPaths[i].value.string == "scale" ) {
 					scaleSamplerIndices.Push(samplerIndices[i].value.iNumber);
+					nodesMapScales.Push(targetNodes[i].value.iNumber);
 				}
 			}
 
-			for( u32 i = 0; i < nodesMapTransformations.GetSize(); ++i ) {
-				std::cout << "animated node index: " << nodesMapTransformations[i] << std::endl;
-			}
-			
 			Core::JsonValue samplers = (*gltf)["animations"][0]["samplers"];
 				
 			core::vector<unsigned int> translationInputs;
@@ -1112,7 +1106,6 @@ namespace GLVM::Core
 				std::cout << "root joint: " << rootNodes[i] << std::endl;
 			}
 			
-			core::vector<core::vector<mat4>> animatedNodesMatricesAccumulator;        ///< Delete this sheet!
 			core::vector<core::vector<unsigned int>> nodesHierarchy;
 			for ( unsigned int w = 0; w < rootNodes.GetSize(); ++w ) {     ///< Loop on parent joints
 				core::vector<core::vector<unsigned int>> nodes_bones;
@@ -1139,152 +1132,353 @@ namespace GLVM::Core
 				 ? translations.GetSize() : rotations.GetSize()) :
 				(scales.GetSize() > rotations.GetSize() ? scales.GetSize() : rotations.GetSize());
 
+			const u32 numJoints = joints.value.array->GetSize();
 			u32 translationFramesNumber = 0;
-			if( frameInputsTranslation.GetSize() > 0 ) {
-				translationFramesNumber = frameInputsTranslation[0].GetSize();
+			for (u32 k = 0; k < frameInputsTranslation.GetSize(); ++k) {
+				if (frameInputsTranslation[k].GetSize() > translationFramesNumber) {
+					translationFramesNumber = frameInputsTranslation[k].GetSize();
+				}
 			}
-
 			u32 rotationFramesNumber = 0;
-			if( frameInputsRotation.GetSize() > 0 ) {
-				rotationFramesNumber = frameInputsRotation[0].GetSize();
+			for (u32 k = 0; k < frameInputsRotation.GetSize(); ++k) {
+				if (frameInputsRotation[k].GetSize() > rotationFramesNumber) {
+					rotationFramesNumber = frameInputsRotation[k].GetSize();
+				}
 			}
-
 			u32 scaleFramesNumber = 0;
-			if( frameInputsScale.GetSize() > 0 ) {
-				scaleFramesNumber = frameInputsScale[0].GetSize();
+			for (u32 k = 0; k < frameInputsScale.GetSize(); ++k) {
+				if (frameInputsScale[k].GetSize() > scaleFramesNumber) {
+					scaleFramesNumber = frameInputsScale[k].GetSize();
+				}
 			}
-
+			
 			const u32 framesMax = translationFramesNumber > scaleFramesNumber ?
 				(translationFramesNumber > rotationFramesNumber
 				 ? translationFramesNumber : rotationFramesNumber) :
 				(scaleFramesNumber > rotationFramesNumber ? scaleFramesNumber : rotationFramesNumber);
 			
-			const u32 translationsSize = translations.GetSize();
-			const u32 rotationsSize    = rotations.GetSize();
-			const u32 scalesSize       = scales.GetSize();
-			for( unsigned int i = 0; i < transformationsMax; ++i ) {
-				if( i >= translationsSize ) {
-					core::vector<float> temp;
-					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
-						temp.Push( 0.0f );
-						temp.Push( 0.0f );
-						temp.Push( 0.0f );
-					}
-					translations.Push( temp );
-				}
+			// const u32 translationsSize = translations.GetSize();
+			// const u32 rotationsSize    = rotations.GetSize();
+			// const u32 scalesSize       = scales.GetSize();
+			// for( unsigned int i = 0; i < transformationsMax; ++i ) {
+			// 	if( i >= translationsSize ) {
+			// 		core::vector<float> temp;
+			// 		for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+			// 			temp.Push( 0.0f );
+			// 			temp.Push( 0.0f );
+			// 			temp.Push( 0.0f );
+			// 		}
+			// 		translations.Push( temp );
+			// 	}
 
-				if( i >= rotationsSize ) {
-					core::vector<float> temp;
-					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
-						temp.Push( 0.0f );
-						temp.Push( 0.0f );
-						temp.Push( 0.0f );
-						temp.Push( 1.0f );
-					}
-					rotations.Push( temp );
-				}
+			// 	if( i >= rotationsSize ) {
+			// 		core::vector<float> temp;
+			// 		for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+			// 			temp.Push( 0.0f );
+			// 			temp.Push( 0.0f );
+			// 			temp.Push( 0.0f );
+			// 			temp.Push( 1.0f );
+			// 		}
+			// 		rotations.Push( temp );
+			// 	}
 
-				if( i >= scalesSize ) {
-					core::vector<float> temp;
-					for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
-						temp.Push( 1.0f );
-					}
-					scales.Push( temp );
-				}
+			// 	if( i >= scalesSize ) {
+			// 		core::vector<float> temp;
+			// 		for( u32 i1 = 0; i1 < framesMax; ++i1 ) {
+			// 			temp.Push( 1.0f );
+			// 		}
+			// 		scales.Push( temp );
+			// 	}
 
-				while( translations[i].GetSize() < framesMax * 3 ) {
-					translations[i].Push( 0.0f );
-					translations[i].Push( 0.0f );
-					translations[i].Push( 0.0f );
-				}
+			// 	while( translations[i].GetSize() < framesMax * 3 ) {
+			// 		translations[i].Push( 0.0f );
+			// 		translations[i].Push( 0.0f );
+			// 		translations[i].Push( 0.0f );
+			// 	}
 
-				while( rotations[i].GetSize() < framesMax * 4 ) {
-					rotations[i].Push( 0.0f );
-					rotations[i].Push( 0.0f );
-					rotations[i].Push( 0.0f );
-					rotations[i].Push( 1.0f );
-				}
+			// 	while( rotations[i].GetSize() < framesMax * 4 ) {
+			// 		rotations[i].Push( 0.0f );
+			// 		rotations[i].Push( 0.0f );
+			// 		rotations[i].Push( 0.0f );
+			// 		rotations[i].Push( 1.0f );
+			// 	}
 
-				while( scales[i].GetSize() < framesMax ) {
-					scales[i].Push( 1.0f );
+			// 	while( scales[i].GetSize() < framesMax ) {
+			// 		scales[i].Push( 1.0f );
+			// 	}
+			// }
+
+//			frames = frameInputsRotation[0];
+			// Replace the single assignment with this:
+			for (u32 k = 0; k < frameInputsTranslation.GetSize(); ++k) {
+				if (frameInputsTranslation[k].GetSize() > frames.GetSize())
+					frames = frameInputsTranslation[k];
+			}
+			for (u32 k = 0; k < frameInputsRotation.GetSize(); ++k) {
+				if (frameInputsRotation[k].GetSize() > frames.GetSize())
+					frames = frameInputsRotation[k];
+			}
+			for (u32 k = 0; k < frameInputsScale.GetSize(); ++k) {
+				if (frameInputsScale[k].GetSize() > frames.GetSize())
+					frames = frameInputsScale[k];
+			}
+
+			// for ( unsigned int j = 0; j < transformationsMax; ++j ) {
+			// 	core::vector<float> boneAllFrameTranslations = translations[j];
+			// 	core::vector<float> boneAllFrameRotations    = rotations[j];
+			// 	core::vector<float> boneAllFrameScales;
+			// 	if ( scales.GetSize() > 0 )
+			// 		boneAllFrameScales       = scales[j];
+			// 	core::vector<mat4>  globalAllFrameNodeMatrix;
+			// 	core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
+			// 	for ( unsigned int i = 0; i < framesMax; ++i ) {
+			// 		mat4 frameTranslation(1.0f);
+			// 		mat4 frameScale(1.0f);
+			// 		for ( unsigned int q = 0; q < 3; ++q ) {
+			// 			frameTranslation[3][q] = boneAllFrameTranslations[i * 3 + q];
+			// 			if ( scales.GetSize() > 0 ) {
+			// 				while( i * 3 + q >= boneAllFrameScales.GetSize() ) {
+			// 					boneAllFrameScales.Push( 1.0f );
+			// 				}
+			// 				frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
+			// 			}
+			// 		}
+
+			// 		Quaternion frameRotationQuaternion;
+			// 		mat4 frameRotation(1.0f);
+
+			// 		frameRotationQuaternion.x = boneAllFrameRotations[i * 4];
+			// 		frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
+			// 		frameRotationQuaternion.z = boneAllFrameRotations[i * 4 + 2];
+			// 		frameRotationQuaternion.w = boneAllFrameRotations[i * 4 + 3];
+
+			// 		frameRotation = rotateQuaternion<float, 4>(frameRotationQuaternion);
+			// 		frameRotation.SelfTensorTranspose();
+
+			// 		mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
+			// 		globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
+			// 	}
+			// 	animatedNodesMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
+			// }
+
+			// while( animatedNodesMatricesAccumulator.GetSize() < joints.value.array->GetSize() ) {
+			// 	core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
+			// 	mat4 unit( 1.0f );
+			// 	for ( unsigned int i = 0; i < framesMax; ++i ) {
+			// 		globalAllFrameNodeMatrixAccumulator.Push( unit );
+			// 	}
+
+			// 	animatedNodesMatricesAccumulator.Push( globalAllFrameNodeMatrixAccumulator );
+			// }
+			
+			// for ( unsigned int j = 0; j < joints.value.array->GetSize(); ++j ) {
+			// 	core::vector<mat4>  globalAllFrameNodeMatrix;
+
+			// 	for ( unsigned int i = 0; i < framesMax; ++i ) {
+			// 		mat4 rootTransform(1.0f);
+			// 		bool isExist = false;
+			// 		for ( unsigned int b = 0; b < nodesHierarchy[j].GetSize() - 1; ++b ) {
+
+			// 			const u32 jointArrayIndex = nodesHierarchy[j][b];
+			// 			const u32 jointNodeIndex  = (*joints.value.array)[jointArrayIndex].value.iNumber;
+			// 			isExist = isElementExist( jointNodeIndex, nodesMapTransformations );
+			// 			const u32 jointIndexInMapTransformations = getElementIndex( jointNodeIndex, nodesMapTransformations );
+						
+			// 			if( isExist ) {
+			// 				rootTransform = animatedNodesMatricesAccumulator[jointIndexInMapTransformations][i] * rootTransform;
+			// 			} else {
+			// 				rootTransform = globalTransformJointNode[jointNodeIndex] * rootTransform;
+			// 			}
+			// 		}
+
+			// 		if( isExist ) {
+			// 			globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * animatedNodesMatricesAccumulator[j][i] * rootTransform);
+			// 		} else {
+			// 			const u32 jointNodeIndex  = (*joints.value.array)[j].value.iNumber;
+			// 			globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformJointNode[jointNodeIndex] * rootTransform);
+			// 		}
+			// 	}
+			// 	jointMatrices.Push(globalAllFrameNodeMatrix);
+			// }
+
+			/*
+			  ================================================================
+			  Mapping joint_index -> channel_index for every TRS-type.
+			  
+			  core::vector<u32> nodesMapTranslations;
+			  core::vector<u32> nodesMapRotations;
+			  core::vector<u32> nodesMapScales;
+			  are required (nodesMap keeps node index).
+			  ================================================================
+			*/
+			core::vector<int> jointToTranslationCh;
+			core::vector<int> jointToRotationCh;
+			core::vector<int> jointToScaleCh;
+			for (u32 k = 0; k < numJoints; ++k) {
+				jointToTranslationCh.Push(-1);
+				jointToRotationCh.Push(-1);
+				jointToScaleCh.Push(-1);
+			}
+			for (u32 k = 0; k < nodesMapTranslations.GetSize(); ++k) {
+				u32 jIdx = getJointIndex(joints, (i32)nodesMapTranslations[k]);
+				if (jIdx != UINT32_MAX) {
+					jointToTranslationCh[jIdx] = (int)k;
+				}
+			}
+			for (u32 k = 0; k < nodesMapRotations.GetSize(); ++k) {
+				u32 jIdx = getJointIndex(joints, (i32)nodesMapRotations[k]);
+				if (jIdx != UINT32_MAX) {
+					jointToRotationCh[jIdx] = (int)k;
+				}
+			}
+			for (u32 k = 0; k < nodesMapScales.GetSize(); ++k) {
+				u32 jIdx = getJointIndex(joints, (i32)nodesMapScales[k]);
+				if (jIdx != UINT32_MAX) {
+					jointToScaleCh[jIdx] = (int)k;
 				}
 			}
 
-			frames = frameInputsRotation[0];
-			for ( unsigned int j = 0; j < transformationsMax; ++j ) {
-				core::vector<float> boneAllFrameTranslations = translations[j];
-				core::vector<float> boneAllFrameRotations    = rotations[j];
-				core::vector<float> boneAllFrameScales;
-				if ( scales.GetSize() > 0 )
-					boneAllFrameScales       = scales[j];
-				core::vector<mat4>  globalAllFrameNodeMatrix;
-				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
-				for ( unsigned int i = 0; i < framesMax; ++i ) {
+			/*
+			  =======================================================
+			  Build animatedNodesMatricesAccumulator indexed
+			  by joint-index (0..numJoints-1)
+			  =======================================================
+			*/
+			core::vector<core::vector<mat4>> animatedNodesMatricesAccumulator;
+			for (unsigned int j = 0; j < numJoints; ++j) {
+				int tIdx = jointToTranslationCh[j];
+				int rIdx = jointToRotationCh[j];
+				int sIdx = jointToScaleCh[j];
+
+				/*
+				  ============================================================
+				  Local defaults fresh on every joint, for not make possible
+				  to collect data from previous iterations.
+				  ============================================================
+				*/
+				core::vector<float> defaultTranslations;
+				core::vector<float> defaultRotations;
+				core::vector<float> defaultScales;
+ 
+				/// Static TRS from node. Using if chennel not exists.
+				i32 nodeIdx = (i32)(*joints.value.array)[j].value.iNumber;
+				float sTx = 0.f, sTy = 0.f, sTz = 0.f;
+				float sRx = 0.f, sRy = 0.f, sRz = 0.f, sRw = 1.f;
+				float sSx = 1.f, sSy = 1.f, sSz = 1.f;
+				if ((*gltf)["nodes"][nodeIdx].isObject() == JSON_OBJECT) {
+					auto* nd = (*gltf)["nodes"][nodeIdx].value.object;
+					if (nd->Contain("translation")) {
+						sTx = (*gltf)["nodes"][nodeIdx]["translation"][0].value.fNumber;
+						sTy = (*gltf)["nodes"][nodeIdx]["translation"][1].value.fNumber;
+						sTz = (*gltf)["nodes"][nodeIdx]["translation"][2].value.fNumber;
+					}
+					if (nd->Contain("rotation")) {
+						sRx = (*gltf)["nodes"][nodeIdx]["rotation"][0].value.fNumber;
+						sRy = (*gltf)["nodes"][nodeIdx]["rotation"][1].value.fNumber;
+						sRz = (*gltf)["nodes"][nodeIdx]["rotation"][2].value.fNumber;
+						sRw = (*gltf)["nodes"][nodeIdx]["rotation"][3].value.fNumber;
+					}
+					if (nd->Contain("scale")) {
+						sSx = (*gltf)["nodes"][nodeIdx]["scale"][0].value.fNumber;
+						sSy = (*gltf)["nodes"][nodeIdx]["scale"][1].value.fNumber;
+						sSz = (*gltf)["nodes"][nodeIdx]["scale"][2].value.fNumber;
+					}
+				}
+ 
+				if (tIdx < 0) {
+					for (u32 f = 0; f < framesMax; ++f) {
+						defaultTranslations.Push(sTx);
+						defaultTranslations.Push(sTy);
+						defaultTranslations.Push(sTz);
+					}
+				}
+				if (rIdx < 0) {
+					for (u32 f = 0; f < framesMax; ++f) {
+						defaultRotations.Push(sRx);
+						defaultRotations.Push(sRy);
+						defaultRotations.Push(sRz);
+						defaultRotations.Push(sRw);
+					}
+				}
+				if (sIdx < 0) {
+					for (u32 f = 0; f < framesMax; ++f) {
+						defaultScales.Push(sSx);
+						defaultScales.Push(sSy);
+						defaultScales.Push(sSz);
+					}
+				}
+ 
+				core::vector<float>& boneT =
+					(tIdx >= 0) ? translations[tIdx] : defaultTranslations;
+				core::vector<float>& boneR =
+					(rIdx >= 0) ? rotations[rIdx] : defaultRotations;
+				core::vector<float>& boneS =
+					(sIdx >= 0) ? scales[sIdx] : defaultScales;
+				
+				/*
+				  ===============================================================
+				  Chennels can has verious number of frames; framesMax - gloabal
+				  maximum. Clamp index to last valid chennel frame, for not run
+				  out after vectors bounds.
+				  ===============================================================
+				*/
+				const u32 tFrames = boneT.GetSize() / 3;
+				const u32 rFrames = boneR.GetSize() / 4;
+				const u32 sFrames = boneS.GetSize() / 3;
+				core::vector<mat4> perFrameMatrices;
+				for (unsigned int i = 0; i < framesMax; ++i) {
+					if (tFrames == 0 || rFrames == 0 || sFrames == 0) {
+						/// malformed data; skip joint
+						core::vector<mat4> empty;
+						animatedNodesMatricesAccumulator.Push(empty);
+						continue;
+					}
+				
+					const u32 ti = (i < tFrames) ? i : tFrames - 1;
+					const u32 ri = (i < rFrames) ? i : rFrames - 1;
+					const u32 si = (i < sFrames) ? i : sFrames - 1;
 					mat4 frameTranslation(1.0f);
 					mat4 frameScale(1.0f);
-					for ( unsigned int q = 0; q < 3; ++q ) {
-						frameTranslation[3][q] = boneAllFrameTranslations[i * 3 + q];
-						if ( scales.GetSize() > 0 ) {
-							while( i * 3 + q >= boneAllFrameScales.GetSize() ) {
-								boneAllFrameScales.Push( 1.0f );
-							}
-							frameScale[q][q]       = boneAllFrameScales[i * 3 + q];
-						}
+					for (unsigned int q = 0; q < 3; ++q) {
+						frameTranslation[3][q] = boneT[ti * 3 + q];
+						frameScale[q][q] = boneS[si * 3 + q];
 					}
-
 					Quaternion frameRotationQuaternion;
 					mat4 frameRotation(1.0f);
-
-					frameRotationQuaternion.x = boneAllFrameRotations[i * 4];
-					frameRotationQuaternion.y = boneAllFrameRotations[i * 4 + 1];
-					frameRotationQuaternion.z = boneAllFrameRotations[i * 4 + 2];
-					frameRotationQuaternion.w = boneAllFrameRotations[i * 4 + 3];
-
-					frameRotation = rotateQuaternion<float, 4>(frameRotationQuaternion);
+					frameRotationQuaternion.x = boneR[ri * 4];
+					frameRotationQuaternion.y = boneR[ri * 4 + 1];
+					frameRotationQuaternion.z = boneR[ri * 4 + 2];
+					frameRotationQuaternion.w = boneR[ri * 4 + 3];
+					frameRotation =
+						rotateQuaternion<float, 4>(frameRotationQuaternion);
 					frameRotation.SelfTensorTranspose();
-
-					mat4 globalTransformNodeMatrix = frameScale * frameRotation * frameTranslation;
-					globalAllFrameNodeMatrixAccumulator.Push(globalTransformNodeMatrix);
+					mat4 localTransform = frameScale * frameRotation * frameTranslation;
+					perFrameMatrices.Push(localTransform);
 				}
-				animatedNodesMatricesAccumulator.Push(globalAllFrameNodeMatrixAccumulator);
-			}
-
-			while( animatedNodesMatricesAccumulator.GetSize() < joints.value.array->GetSize() ) {
-				core::vector<mat4>  globalAllFrameNodeMatrixAccumulator;
-				mat4 unit( 1.0f );
-				for ( unsigned int i = 0; i < framesMax; ++i ) {
-					globalAllFrameNodeMatrixAccumulator.Push( unit );
-				}
-
-				animatedNodesMatricesAccumulator.Push( globalAllFrameNodeMatrixAccumulator );
+				animatedNodesMatricesAccumulator.Push(perFrameMatrices);
 			}
 			
-			for ( unsigned int j = 0; j < joints.value.array->GetSize(); ++j ) {
-				core::vector<mat4>  globalAllFrameNodeMatrix;
-
-				for ( unsigned int i = 0; i < framesMax; ++i ) {
+			/*
+			  =============================================================
+			  Final comstruction of joint-matrices.
+			  Both arrays indexed by joint-index now,
+			  that's why nodesHierarchy[j][b] address accumulator correctly
+			  =============================================================
+			*/
+			for (unsigned int j = 0; j < numJoints; ++j) {
+				core::vector<mat4> globalAllFrameNodeMatrix;
+				for (unsigned int i = 0; i < framesMax; ++i) {
 					mat4 rootTransform(1.0f);
-					bool isExist = false;
-					for ( unsigned int b = 0; b < nodesHierarchy[j].GetSize() - 1; ++b ) {
-
-						const u32 jointArrayIndex = nodesHierarchy[j][b];
-						const u32 jointNodeIndex  = (*joints.value.array)[jointArrayIndex].value.iNumber;
-						isExist = isElementExist( jointNodeIndex, nodesMapTransformations );
-						const u32 jointIndexInMapTransformations = getElementIndex( jointNodeIndex, nodesMapTransformations );
-						
-						if( isExist ) {
-							rootTransform = animatedNodesMatricesAccumulator[jointIndexInMapTransformations][i] * rootTransform;
-						} else {
-							rootTransform = globalTransformJointNode[jointNodeIndex] * rootTransform;
-						}
+					for (unsigned int b = 0; b < nodesHierarchy[j].GetSize() - 1;
+						 ++b) {
+						rootTransform =
+							animatedNodesMatricesAccumulator[nodesHierarchy[j][b]][i]
+							* rootTransform;
 					}
-
-					if( isExist ) {
-						globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * animatedNodesMatricesAccumulator[j][i] * rootTransform);
-					} else {
-						const u32 jointNodeIndex  = (*joints.value.array)[j].value.iNumber;
-						globalAllFrameNodeMatrix.Push(inverseBindMatrixSet[j] * globalTransformJointNode[jointNodeIndex] * rootTransform);
-					}
+					globalAllFrameNodeMatrix.Push(
+						inverseBindMatrixSet[j] 
+						* animatedNodesMatricesAccumulator[j][i] * rootTransform
+						);
 				}
 				jointMatrices.Push(globalAllFrameNodeMatrix);
 			}
