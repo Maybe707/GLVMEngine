@@ -425,10 +425,10 @@ namespace GLVM::Core
 	}
 	
 	void calculateElementsMemorySize(
-		unsigned int indices_elements_count,
-		std::string* indices_element_type,
-		unsigned int indices_componet_type,
-		unsigned int* indices_buffer_view_byte_length ) {
+		const u32     indices_elements_count,
+		std::string*   indices_element_type,
+		const u32     indices_componet_type,
+		u32*          indices_buffer_view_byte_length ) {
 		if( *indices_element_type == "VEC2" ) {
 			if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
 				*indices_buffer_view_byte_length = indices_elements_count * 2;
@@ -466,13 +466,89 @@ namespace GLVM::Core
 		}
 	}
 
-	void calculateByteStep( unsigned int indices_componet_type, unsigned int* byte_step ) {
-		if( indices_componet_type == 5120 || indices_componet_type == 5121 ) {
-			*byte_step = 1;
-		} else if( indices_componet_type == 5122 || indices_componet_type == 5123 ) {
-			*byte_step = 2;
-		} else if( indices_componet_type == 5125 || indices_componet_type == 5126 ) {
-			*byte_step = 4;
+	struct ComponentType {
+		enum Type {
+			I8  = 5120,
+			U8  = 5121,
+			I16 = 5122,
+			U16 = 5123,
+			U32 = 5125,
+			F32 = 5126
+		};
+	};
+
+	void calculateByteStep( u32 componetType, unsigned int* byteStep ) {
+		if( componetType == ComponentType::I8 || componetType == ComponentType::U8 ) {
+			*byteStep = 1;
+		} else if( componetType == ComponentType::I16 || componetType == ComponentType::U16 ) {
+			*byteStep = 2;
+		} else if( componetType == ComponentType::U32 || componetType == ComponentType::F32 ) {
+			*byteStep = 4;
+		}
+	}
+
+	/*
+	  ===================================================
+	  Meta data structs to binary buffer with actual data
+	  ===================================================
+	*/
+	struct AccessorMetaData {
+		u32 bufferView;
+		u32 byteOffset;
+		u32 componentType;
+		u32 count;
+		std::string type;
+	};
+
+	struct BufferViewMetaData {
+        u32 byteLength;
+        u32 byteOffset;
+	};
+
+	[[nodiscard]] AccessorMetaData readAccessorMetaData( Core::JsonValue* gltf, const u32 accessorIndex ) {
+		AccessorMetaData bufferMetaData;
+		bufferMetaData.bufferView      = (*gltf)["accessors"][accessorIndex]["bufferView"].value.iNumber;
+		bufferMetaData.count           = (*gltf)["accessors"][accessorIndex]["count"].value.iNumber;
+		bufferMetaData.type            = *(*gltf)["accessors"][accessorIndex]["type"].value.string;
+		bufferMetaData.componentType   = (*gltf)["accessors"][accessorIndex]["componentType"].value.iNumber;
+
+		if( (*gltf)["accessors"][accessorIndex].isObject() == JSON_OBJECT ) {
+			HashMap<JsonValue>* ptr = (*gltf)["accessors"][accessorIndex].value.object;
+			if( ptr->Contain("byteOffset") ) {
+				bufferMetaData.byteOffset = (*gltf)["accessors"][accessorIndex]["byteOffset"].value.iNumber;
+			}
+		}
+
+		return bufferMetaData;
+	}
+
+	[[nodiscard]] BufferViewMetaData readBufferViewMetaData( Core::JsonValue* gltf, const u32 bufferViewIndex ) {
+		BufferViewMetaData bufferViewMetaData;
+		bufferViewMetaData.byteLength = (*gltf)["bufferViews"][bufferViewIndex]["byteLength"].value.iNumber;
+		bufferViewMetaData.byteOffset = (*gltf)["bufferViews"][bufferViewIndex]["byteOffset"].value.iNumber;
+
+		return bufferViewMetaData;
+	}
+
+	void readBinaryBufferData( char* buffer, AccessorMetaData accessorMetaData, BufferViewMetaData bufferViewMetaData, core::vector<unsigned int>& outputData ) {
+		u32 indicesByteStep = 0;
+		calculateByteStep( accessorMetaData.componentType, &indicesByteStep );
+		
+		for ( unsigned int i = bufferViewMetaData.byteOffset + accessorMetaData.byteOffset; i < bufferViewMetaData.byteOffset + accessorMetaData.byteOffset + bufferViewMetaData.byteLength - accessorMetaData.byteOffset; i += indicesByteStep ) {
+			switch( accessorMetaData.componentType ) {
+			case 5121:
+				outputData.Push(reinterpret_cast<char&>(buffer[i]));
+				break;
+			case 5123:
+				outputData.Push(reinterpret_cast<unsigned short&>(buffer[i]));
+				break;
+			case 5125:
+				outputData.Push(reinterpret_cast<unsigned int&>(buffer[i]));
+				break;
+			case 5126:
+				outputData.Push(reinterpret_cast<float&>(buffer[i]));
+				break;
+			}
 		}
 	}
 	
@@ -496,38 +572,12 @@ namespace GLVM::Core
 		in_stream.read(buffer, full_byte_size);
 		in_stream.close();
 
-		int indices_index = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
-		int indices_buffer_view_index = (*gltf)["accessors"][indices_index]["bufferView"].value.iNumber;
-
-		unsigned int indices_elements_count = (*gltf)["accessors"][indices_index]["count"].value.iNumber;
-		std::string* indices_element_type   = (*gltf)["accessors"][indices_index]["type"].value.string;
-		unsigned int indices_componet_type  = (*gltf)["accessors"][indices_index]["componentType"].value.iNumber;
-		unsigned int indices_buffer_view_byte_length = 0;
-		unsigned int indices_byte_step = 0;
-		calculateElementsMemorySize( indices_elements_count, indices_element_type, indices_componet_type, &indices_buffer_view_byte_length );
-		calculateByteStep( indices_componet_type, &indices_byte_step );
+		const u32 indicesAccessorIndex = (*gltf)["meshes"][0]["primitives"][0]["indices"].value.iNumber;
+		AccessorMetaData   indicesAccessorMetaData   = readAccessorMetaData( gltf, indicesAccessorIndex );
+		BufferViewMetaData indicesBufferViewMetaData = readBufferViewMetaData( gltf, indicesAccessorMetaData.bufferView );
+		core::vector<u32> indices;
+		readBinaryBufferData( buffer, indicesAccessorMetaData, indicesBufferViewMetaData, indices );
 		
-		[[maybe_unused]] int indices_buffer_view_byte_offset = 0;
-		if( (*gltf)["accessors"][indices_index].isObject() == JSON_OBJECT ) {
-			HashMap<JsonValue>* ptr = (*gltf)["accessors"][indices_index].value.object;
-			if( ptr->Contain("byteOffset") ) {
-				indices_buffer_view_byte_offset = (*gltf)["accessors"][indices_index]["byteOffset"].value.iNumber;
-			}
-		}
- 
-		[[maybe_unused]] unsigned int indices_byte_length = (*gltf)["bufferViews"][indices_buffer_view_index]["byteLength"].value.iNumber;
-		unsigned int indices_byte_offset = (*gltf)["bufferViews"][indices_buffer_view_index]["byteOffset"].value.iNumber;
-
-		core::vector<unsigned int> indices;
-		std::string str = pathsGLTF_;
-		for ( unsigned int i = indices_byte_offset + indices_buffer_view_byte_offset; i < indices_byte_offset + indices_buffer_view_byte_offset + indices_buffer_view_byte_length; i += indices_byte_step ) {
-			if( indices_componet_type == 5123 ) {
-				indices.Push(reinterpret_cast<unsigned short &>(buffer[i]));
-			} else if( indices_componet_type == 5125 ) {
-				indices.Push(reinterpret_cast<unsigned int &>(buffer[i]));
-			}
-		}
-
 		int vertices_position_index = (*gltf)["meshes"][0]["primitives"][0]["attributes"]["POSITION"].value.iNumber;
 		int vertices_buffer_view_index = (*gltf)["accessors"][vertices_position_index]["bufferView"].value.iNumber;
 
