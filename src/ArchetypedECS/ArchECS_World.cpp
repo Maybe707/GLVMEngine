@@ -15,18 +15,18 @@ namespace GLVM::ecs::arch {
 	World world = {};
 
 	World::World() {
-		assert( spetialGrid.width > 0 && spetialGrid.height > 0 && spetialGrid.depth > 0 );
+		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
 		
-		const float chunkSize       = spetialGrid.grid[0][0][0].size;
-		const float halfWorldWidth  = spetialGrid.width * chunkSize * 0.5f;
-		const float halfWorldHeight = spetialGrid.height * chunkSize * 0.5f;
-		const float halfWorldDepth  = spetialGrid.depth * chunkSize * 0.5f;
+		const float chunkSize       = spatialGrid.grid[0][0][0].size;
+		const float halfWorldWidth  = spatialGrid.width * chunkSize * 0.5f;
+		const float halfWorldHeight = spatialGrid.height * chunkSize * 0.5f;
+		const float halfWorldDepth  = spatialGrid.depth * chunkSize * 0.5f;
 		const float halfChunkSize   = chunkSize * 0.5f;
 		const vec3 pivot = vec3( -halfWorldWidth + halfChunkSize, -halfWorldHeight + halfChunkSize, -halfWorldDepth + halfChunkSize );
-		for( u32 i0 = 0; i0 < spetialGrid.depth; ++i0 ) {
-			for( u32 i1 = 0; i1 < spetialGrid.height; ++i1 ) {
-				for( u32 i2 = 0; i2 < spetialGrid.width; ++i2 ) {
-					spetialGrid.grid[i0][i1][i2].position = vec3( i2 * chunkSize, i1 * chunkSize, i0 * chunkSize ) + pivot;
+		for( u32 i0 = 0; i0 < spatialGrid.depth; ++i0 ) {
+			for( u32 i1 = 0; i1 < spatialGrid.height; ++i1 ) {
+				for( u32 i2 = 0; i2 < spatialGrid.width; ++i2 ) {
+					spatialGrid.grid[i0][i1][i2].position = vec3( i2 * chunkSize, i1 * chunkSize, i0 * chunkSize ) + pivot;
 				}
 			}
 		}

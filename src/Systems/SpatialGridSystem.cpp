@@ -1,16 +1,16 @@
-#include "Systems/SpetialGridSystem.hpp"
+#include "Systems/SpatialGridSystem.hpp"
 
 namespace GLVM::ecs {
-	void SpecialGridSystem::Update() {
+	void SpatialGridSystem::Update() {
 		namespace arch = GLVM::ecs::arch;
 		
-		arch::SpecialGrid spetialGrid = arch::world.spetialGrid;
-		assert( spetialGrid.width > 0 && spetialGrid.height > 0 && spetialGrid.depth > 0 );
-		const float chunkSize = spetialGrid.grid[0][0][0].size;
+		arch::SpatialGrid spatialGrid = arch::world.spatialGrid;
+		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
+		const float chunkSize = spatialGrid.grid[0][0][0].size;
 
-		const float halfWidth  = spetialGrid.width * chunkSize * 0.5f;
-		const float halfHeight = spetialGrid.height * chunkSize * 0.5f;
-		const float halfDepth  = spetialGrid.depth * chunkSize * 0.5f;
+		const float halfWidth  = spatialGrid.width * chunkSize * 0.5f;
+		const float halfHeight = spatialGrid.height * chunkSize * 0.5f;
+		const float halfDepth  = spatialGrid.depth * chunkSize * 0.5f;
 
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
@@ -25,10 +25,10 @@ namespace GLVM::ecs {
 				const u32 index_Y = (transform.position[1] + halfHeight) / chunkSize;
 				const u32 index_Z = (transform.position[2] + halfDepth) / chunkSize;
 
-				assert( index_X < spetialGrid.width && index_Y < spetialGrid.height && index_Z < spetialGrid.depth );
+				assert( index_X < spatialGrid.width && index_Y < spatialGrid.height && index_Z < spatialGrid.depth );
 				
 				const arch::entity entity = arch->entities[i1];
-				spetialGrid.grid[index_Z][index_Y][index_X].entities.Push( entity );
+				spatialGrid.grid[index_Z][index_Y][index_X].entities.Push( entity );
 			}
 		}
 	}

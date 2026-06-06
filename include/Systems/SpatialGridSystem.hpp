@@ -1,5 +1,5 @@
-#ifndef SPETIAL_GRID_SYSTEM_HPP
-#define SPETIAL_GRID_SYSTEM_HPP
+#ifndef SPATIAL_GRID_SYSTEM_HPP
+#define SPATIAL_GRID_SYSTEM_HPP
 
 #include "ISystem.hpp"
 #include "VertexMath.hpp"
@@ -8,11 +8,11 @@
 
 namespace GLVM::ecs {
 
-	class SpecialGridSystem : public ISystem {
+	class SpatialGridSystem : public ISystem {
 		arch::Archetype* cachedArchetypes[32];
 		uint32_t cachedArchetypesNumber = 0;
 		
-		struct SpecialGridComponentsView {
+		struct SpatialGridComponentsView {
 			components::transform* transforms = nullptr;
 		} view;
 		

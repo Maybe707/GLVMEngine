@@ -15,7 +15,7 @@
 #include "Systems/EnemySystem.hpp"
 #include "Systems/InventorySystem.hpp"
 #include "Systems/ItemSystem.hpp"
-#include "Systems/SpetialGridSystem.hpp"
+#include "Systems/SpatialGridSystem.hpp"
 #include "SystemsFullSet.hpp"
 #include "IChrono.hpp"
 #include "IWindow.hpp"
@@ -86,7 +86,7 @@ namespace GLVM::core
 
 //		ecs::CSystemManager* pSystem_Manager;
 
-		ecs::SpecialGridSystem          * spetialGridSystem;
+		ecs::SpatialGridSystem          * spatialGridSystem;
         ecs::CCollisionSystem           * collisionSystem;
 		ecs::CMovementSystem            * movementSystem;
         ecs::CPhysicsSystem             * physicsSystem;

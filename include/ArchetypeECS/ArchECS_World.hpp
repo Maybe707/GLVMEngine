@@ -13,7 +13,7 @@ namespace GLVM::ecs::arch {
 		core::vector<u32> entities;
 	};
 
-	struct SpecialGrid {
+	struct SpatialGrid {
 		static const u32 width  = 32;
 		static const u32 height = 32;
 		static const u32 depth  = 32;
@@ -24,7 +24,7 @@ namespace GLVM::ecs::arch {
 		World();
 		~World();
 
-		SpecialGrid spetialGrid;
+		SpatialGrid spatialGrid;
 		core::vector<Archetype*> archetypes;
 		core::vector<EntityLocation> entityLocations;
 
