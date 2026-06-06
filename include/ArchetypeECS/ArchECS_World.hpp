@@ -9,13 +9,14 @@
 namespace GLVM::ecs::arch {
 	struct GridChunk {
 		vec3 position;
-		float size = 8;
+		constexpr static float size = 8;
+		core::vector<u32> entities;
 	};
 
 	struct SpecialGrid {
-		static const u32 width  = 2;
-		static const u32 height = 2;
-		static const u32 depth  = 2;
+		static const u32 width  = 32;
+		static const u32 height = 32;
+		static const u32 depth  = 32;
 		GridChunk grid[width][height][depth];
 	};
 	

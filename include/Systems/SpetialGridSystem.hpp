@@ -3,10 +3,22 @@
 
 #include "ISystem.hpp"
 #include "VertexMath.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "ArchetypeECS/ArchetypeInterface.hpp"
 
-namespace GLVM::core {
+namespace GLVM::ecs {
 
-	class SpecialGridUpdateSystem : public ecs::ISystem {
+	class SpecialGridSystem : public ISystem {
+		arch::Archetype* cachedArchetypes[32];
+		uint32_t cachedArchetypesNumber = 0;
+		
+		struct SpecialGridComponentsView {
+			components::transform* transforms = nullptr;
+		} view;
+		
+		arch::componentMask requiredMask =
+			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT);
+		
 		void Update() override;
 	};
 	

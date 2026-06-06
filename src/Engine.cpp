@@ -44,6 +44,7 @@
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/ProjectileSystem.hpp"
+#include "Systems/SpetialGridSystem.hpp"
 #include "TagComponents/LevelChunkTagComponent.hpp"
 #include "Texture.hpp"
 #include "VkStructs.hpp"
@@ -113,7 +114,8 @@ namespace GLVM::core
     Engine::Engine() {
 		chrono                          = Time::CTimerCreator().Create();
 		soundEngine                     = Sound::CSoundEngineFactory().CreateSoundEngine();
-								        
+
+		spetialGridSystem               = new ecs::SpecialGridSystem();
 		collisionSystem                 = new ecs::CCollisionSystem(Input_Stack_);
 		movementSystem                  = new ecs::CMovementSystem(Input_Stack_);
 		physicsSystem                   = new ecs::CPhysicsSystem(gravity, Input_Stack_);
@@ -130,6 +132,7 @@ namespace GLVM::core
 		ecs::CSystemManager* pSystem_Manager = ecs::CSystemManager::GetInstance();
 
 		///< Call of ActivateSystem function must be in this order.
+		pSystem_Manager->ActivateSystem(spetialGridSystem);
 		pSystem_Manager->ActivateSystem(procuduralLevelGeneratingSystem);
 		pSystem_Manager->ActivateSystem(movementSystem);
 		pSystem_Manager->ActivateSystem(enemySytem);

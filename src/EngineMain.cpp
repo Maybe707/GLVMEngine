@@ -167,7 +167,7 @@ int main()
 	std::mt19937 mersenne(rd());
     std::uniform_int_distribution<int> dist(0, 3);
 	
-	for ( u32 i = 0; i < 50; ++i ) {
+	for ( u32 i = 0; i < 5; ++i ) {
 	arch::entity enemy = archEntityManager->createEntity();
 	arch::world.addEntityToArchetype( enemy, arch::world.archetypes[2] );
 	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];
