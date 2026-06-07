@@ -28,6 +28,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	  ./src/ThreadPool.cpp ./src/ArchetypedECS/ArchECS_Utils.cpp \
 	  ./src/ArchetypedECS/ArchECS_World.cpp ./src/ArchetypedECS/ArchetypeEntityManager.cpp \
 	  ./src/ArchetypedECS/ArchetypeInterface.cpp ./src/Systems/SpatialGridSystem.cpp \
+	  ./src/Common/CommonFunctions.cpp \
 
 SOURCES_C = xdg-shell-protocol.c pointer-constraints-unstable-v1-protocol.c relative-pointer-unstable-v1-protocol.c
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)

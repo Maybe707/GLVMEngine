@@ -16,6 +16,7 @@
 #include "Components/ColliderFlagsComponent.hpp"
 #include "VertexMath.hpp"
 #include <cstdint>
+#include "Common/CommonFunctions.hpp"
 #include "Globals.hpp"
 
 namespace GLVM::ecs
@@ -50,13 +51,6 @@ namespace GLVM::ecs
 			(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
         CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
-		bool BoxCollider(vec3 backtrackingPosition,
-						 vec3 comparedPosition,
-		                 float backtrackingScale,
-						 float comparedScale,
-						 components::MeshHandle backtrackingMeshHandle,
-						 components::MeshHandle comparedMeshHandle);
-		
 		void Update() override;
         bool UpperActorCheck(vec3 backtrackingPosition,
 							 vec3 comparedPosition,

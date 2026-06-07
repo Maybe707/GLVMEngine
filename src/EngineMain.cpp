@@ -158,7 +158,7 @@ int main()
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 2.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
-	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
+	playerArch->meshes[playerIndex]      = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
@@ -173,7 +173,7 @@ int main()
 	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];
 	arch::EnemyArchetype* enemyArch = static_cast<arch::EnemyArchetype*>(enemyLocation.arch);
 	const uint32_t enemyIndex = enemyLocation.index;
-	
+
 	unsigned int random = dist(mersenne);
 	vec3 randomDirection = {};
 	switch( random ) {
@@ -191,7 +191,7 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, 0.0f ) + randomDirection }, .scale = 0.05f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, 0.0f ) + randomDirection }, .scale = 2.0f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
@@ -213,7 +213,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 32.0f * 0.078125f };
 	}

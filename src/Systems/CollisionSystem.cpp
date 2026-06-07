@@ -110,12 +110,16 @@ namespace GLVM::ecs
 
 								bool boxColliderFlag = false;
 								bool upperActorCheckFlag = false;
-								boxColliderFlag = BoxCollider(backtrackingTransform,
+
+								core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
+								core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedEntityMeshHandle.id];
+								
+								boxColliderFlag = core::BoxCollider(backtrackingTransform,
 															  comparedTransform,
 															  backtrackingScale,
 															  comparedScale,
-															  backtrackingEntityMeshHandle,
-															  comparedEntityMeshHandle);
+															  backtrackingMeshAxisMaxAbsoluteValues,
+															  comparedMeshAxisMaxAbsoluteValues);
 
 								if ( boxColliderFlag ) {
 									upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
@@ -148,34 +152,6 @@ namespace GLVM::ecs
 			}
 		}
 		cachedArchetypesNumber = 0;
-	}
-
-	bool CCollisionSystem::BoxCollider(vec3 backtrackingPosition,
-									   vec3 comparedPosition,
-		                               float backtrackingScale,
-									   float comparedScale,
-									   components::MeshHandle backtrackingMeshHandle,
-									   components::MeshHandle comparedMeshHandle)
-	{
-		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
-		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
-		
-        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
-				return true;
-		}
-        
-		return false;
 	}
 
     bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition,
