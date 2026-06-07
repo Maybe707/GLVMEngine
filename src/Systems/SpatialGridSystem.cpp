@@ -4,6 +4,8 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/SpatialGridSystem.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
+#include "Common/CommonFunctions.hpp"
 #include "Vector.hpp"
 
 namespace GLVM::ecs {
@@ -31,7 +33,7 @@ namespace GLVM::ecs {
 	void SpatialGridSystem::Update() {
 		namespace arch = GLVM::ecs::arch;
 		
-		arch::SpatialGrid spatialGrid = arch::world.spatialGrid;
+		arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
 		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
 		const float chunkSize = spatialGrid.grid[0][0][0].size;
 
@@ -79,7 +81,12 @@ namespace GLVM::ecs {
 					assert( index_X < spatialGrid.width && index_Y < spatialGrid.height && index_Z < spatialGrid.depth );
 				
 					const arch::entity entity = arch->entities[i1];
-					spatialGrid.grid[index_Z][index_Y][index_X].entities.Push( entity );
+					core::vector<u32>& chunkEntities = spatialGrid.grid[index_Z][index_Y][index_X].entities;
+					if( !core::isExist<u32>( chunkEntities, entity ) ) {
+						chunkEntities.Push( entity );
+					} else {
+						continue;
+					}
 				}
 			}
 		}

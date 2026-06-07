@@ -9,6 +9,7 @@
 #include "VertexMath.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Globals.hpp"
+#include "typenames.hpp"
 
 namespace GLVM::core {
 	bool BoxCollider(
@@ -18,6 +19,16 @@ namespace GLVM::core {
 		const float comparedScale,
 		const core::MeshAxisMaxAbsoluteValues& backtrackingMeshAxisMaxAbsoluteValues,
 		const core::MeshAxisMaxAbsoluteValues& comparedMeshAxisMaxAbsoluteValues);
+
+	template< typename T >
+	bool isExist( const core::vector<T>& array, const T& element ) {
+		for( u32 i0 = 0; i0 < array.GetSize(); ++i0 ) {
+			if( element == array[i0] )
+				return true;
+		}
+
+		return false;
+	}
 }; ///< namespace GLVM::core
 
 #endif

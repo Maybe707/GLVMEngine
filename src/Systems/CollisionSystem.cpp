@@ -37,6 +37,8 @@ namespace GLVM::ecs
 		namespace arch = GLVM::ecs::arch;
 		namespace cm   = GLVM::ecs::components;
 
+//		const arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
+		
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
 			
