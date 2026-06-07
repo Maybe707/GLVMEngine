@@ -30,4 +30,25 @@ namespace GLVM::core {
         
 		return false;
 	}
+
+	core::vector<vec3> computeBoxCornerBoundPoints(
+		const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
+		vec3 entityPosition,
+		const float scale ) {
+		const float halfWidht  = entityChunkBounds.absolute_x * scale * 0.5f;
+		const float halfHeight = entityChunkBounds.absolute_y * scale * 0.5f;
+		const float halfDepth  = entityChunkBounds.absolute_z * scale * 0.5f;
+
+		core::vector<vec3> result;
+		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, -halfDepth ) );  ///< left bottom back
+		result.Push( entityPosition + vec3( halfWidht, -halfHeight, -halfDepth ) );   ///< right bottom back
+		result.Push( entityPosition + vec3( halfWidht, halfHeight, -halfDepth ) );    ///< right upper back
+		result.Push( entityPosition + vec3( -halfWidht, halfHeight, -halfDepth ) );   ///< left upper back
+		result.Push( entityPosition + vec3( -halfWidht, halfHeight, halfDepth ) );    ///< left upper front
+		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, halfDepth ) );   ///< left bottom front
+		result.Push( entityPosition + vec3( halfWidht, -halfHeight, halfDepth ) );    ///< right botoom front
+		result.Push( entityPosition + vec3( halfWidht, halfHeight, halfDepth ) );     ///< right upper front
+
+		return result;
+	}
 }; ///< namespace GLVM::core

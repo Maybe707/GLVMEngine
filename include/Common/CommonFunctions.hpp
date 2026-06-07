@@ -20,6 +20,11 @@ namespace GLVM::core {
 		const core::MeshAxisMaxAbsoluteValues& backtrackingMeshAxisMaxAbsoluteValues,
 		const core::MeshAxisMaxAbsoluteValues& comparedMeshAxisMaxAbsoluteValues);
 
+	core::vector<vec3> computeBoxCornerBoundPoints(
+		const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
+		vec3 entityPosition,
+		const float scale );
+	
 	template< typename T >
 	bool isExist( const core::vector<T>& array, const T& element ) {
 		for( u32 i0 = 0; i0 < array.GetSize(); ++i0 ) {

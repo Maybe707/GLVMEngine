@@ -6,6 +6,7 @@
 #include "Systems/CollisionSystem.hpp"
 #include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
+#include "Common/CommonFunctions.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/MoveComponent.hpp"
@@ -37,7 +38,15 @@ namespace GLVM::ecs
 		namespace arch = GLVM::ecs::arch;
 		namespace cm   = GLVM::ecs::components;
 
-//		const arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
+		/// Spatial grid common data
+		const arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
+		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
+		const float chunkSize = spatialGrid.grid[0][0][0].size;
+
+		const float chunkHalfWidth  = spatialGrid.width * chunkSize * 0.5f;
+		const float chunkHalfHeight = spatialGrid.height * chunkSize * 0.5f;
+		const float chunkHalfDepth  = spatialGrid.depth * chunkSize * 0.5f;
+
 		
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
@@ -75,6 +84,30 @@ namespace GLVM::ecs
 						backtrackingTransform += view.backtrackingMove[i].gravity;
 					}
 
+					///< Collect entities from grid chunks
+					core::MeshAxisMaxAbsoluteValues entityChunkBounds = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
+					core::vector<vec3> entityBoxCornerBoundPoints = computeBoxCornerBoundPoints(
+						entityChunkBounds,
+						backtrackingTransformComponent->position,
+						backtrackingTransformComponent->scale );
+
+					core::vector<u32> collectedEntities;                                   ///< Result array with collected entities
+					for( u32 i2 = 0; i2 < entityBoxCornerBoundPoints.GetSize(); ++i2 ) {
+						const vec3 entityPosition = entityBoxCornerBoundPoints[i2];
+					
+						const u32 index_X = (entityPosition[0] + chunkHalfWidth) / chunkSize;
+						const u32 index_Y = (entityPosition[1] + chunkHalfHeight) / chunkSize;
+						const u32 index_Z = (entityPosition[2] + chunkHalfDepth) / chunkSize;
+
+						assert( index_X < spatialGrid.width && index_Y < spatialGrid.height && index_Z < spatialGrid.depth );
+						const core::vector<u32>& chunkEntities = spatialGrid.grid[index_Z][index_Y][index_X].entities;
+						for( u32 i3 = 0; i3 < chunkEntities.GetSize(); ++i3 ) {
+							const u32 entity = chunkEntities[i3];
+							if( !core::isExist( collectedEntities, entity ) )
+								collectedEntities.Push( entity );
+						}
+					}
+					
 					/// Inner cycle on every archetype
 					for( uint32_t i1 = 0; i1 < cachedArchetypesNumber; ++i1 ) {
 						arch::Archetype* comparedArch = cachedArchetypes[i1];

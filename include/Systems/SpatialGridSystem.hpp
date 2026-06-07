@@ -29,10 +29,6 @@ namespace GLVM::ecs {
 			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
-		core::vector<vec3> computeBoxCornerBoundPoints(
-			const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
-			vec3 entityPosition,
-			const float scale );
 		void Update() override;
 	};
 	
