@@ -47,7 +47,7 @@ int main()
 	// std::cout << typeid(a).name() << std::endl;
 	// std::cout << point.y << std::endl;
 	// std::cout << !plane.x << std::endl;
-	
+
 	using namespace GLVM;
 	namespace cm   = GLVM::ecs::components;
 	namespace pga  = GLVM::core::pga;
@@ -266,7 +266,7 @@ int main()
 		itemArch->items[itemIndex].itemSlotType = { 2, row };
 		itemArch->items[itemIndex].isActor      = true;
 		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 5.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
-		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 1.0f };
+		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 0.0f };
 		if ( i % 2 == 0 )
 			itemArch->meshes[itemIndex].handle = hyperCubeHandle_GLTF;
 		else
