@@ -130,135 +130,82 @@ namespace GLVM::ecs
 					}
 					
 					/// Inner cycle on every archetype
-					for( uint32_t i1 = 0; i1 < 1; ++i1 ) {
-						// arch::Archetype* comparedArch = cachedArchetypes[i1];
-						// view.comparedTransforms = (cm::transform*)comparedArch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
-						// view.comparedMeshes     = (cm::mesh*)comparedArch->components[arch::ComponentsIndices::MESH_COMPONENT];
+					/// Count on every entity in current inner archetype
+					for(unsigned int j = 0; j < collectedEntities.GetSize(); ++j) {
+						/// Check for same entityID and iteration
+						uint32_t comparedEntityID = collectedEntities[j];
+						if( backtrackingEntityID == comparedEntityID ) {
+							continue;
+						}
 
-						/// Count on every entity in current inner archetype
-						for(unsigned int j = 0; j < collectedEntities.GetSize(); ++j) {
-							/// Check for same entityID and iteration
-							uint32_t comparedEntityID = collectedEntities[j];
-							if( backtrackingEntityID == comparedEntityID ) {
-								continue;
-							}
+						arch::EntityLocation comparedEntityLocation = arch::world.entityLocations[arch::getId( comparedEntityID )];
+						const uint32_t comparedEntityIndex = comparedEntityLocation.index;
 
-							// if( backtrackingEntityID == 0 ) {
-							// 	std::cout << "COMPARED ENTITY: " << comparedEntityID << std::endl;
-							// }
-							
-							arch::EntityLocation comparedEntityLocation = arch::world.entityLocations[arch::getId( comparedEntityID )];
-							const uint32_t comparedEntityIndex = comparedEntityLocation.index;
-
-							components::MeshHandle comparedEntityMeshHandle;
-							if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
-								arch::Archetype* arch = comparedEntityLocation.arch;
-								view.comparedTransforms = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
-								view.comparedMeshes     = &((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];
-								comparedEntityMeshHandle = view.comparedMeshes->handle;
+						components::MeshHandle comparedEntityMeshHandle;
+						if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
+							arch::Archetype* arch = comparedEntityLocation.arch;
+							view.comparedTransforms = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
+							view.comparedMeshes     = &((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];
+							comparedEntityMeshHandle = view.comparedMeshes->handle;
 								
-								arch::componentMask	moveRequiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-								if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, moveRequiredMask ) ) {
-									view.comparedMove = &((ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT])[comparedEntityIndex];
-								}
+							arch::componentMask	moveRequiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
+							if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, moveRequiredMask ) ) {
+								view.comparedMove = &((ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT])[comparedEntityIndex];
 							}
+						}
 							
-//							if( view.comparedMeshes && view.comparedTransforms ) {
-								// components::mesh comparedEntityMesh = view.comparedMeshes[j];
-								// components::MeshHandle comparedEntityMeshHandle = comparedEntityMesh.handle;
-						
-								// components::transform* comparedTransformComponent = &view.comparedTransforms[j];
-								// components::mesh comparedEntityMesh               = comparedEntityArch->meshes[comparedEntityIndex];
-								// components::MeshHandle comparedEntityMeshHandle   = comparedEntityMesh.handle;
-								// components::transform* comparedTransformComponent = &comparedEntityArch->transforms[comparedEntityIndex];
-								// components::move* comparedMoveComponent           = &comparedEntityArch->moves[comparedEntityIndex];
-
-							components::transform* comparedTransformComponent = view.comparedTransforms;
-							components::move* comparedMoveComponent           = view.comparedMove;
+						components::transform* comparedTransformComponent = view.comparedTransforms;
+						components::move* comparedMoveComponent           = view.comparedMove;
 							
-							vec3  comparedTransform = vec3( 0.0f, 0.0f, 0.0f );
-							float comparedScale = 0.0f;
-							comparedTransform = comparedTransformComponent->position;
-							comparedScale     = comparedTransformComponent->scale;
+						vec3  comparedTransform = vec3( 0.0f, 0.0f, 0.0f );
+						float comparedScale = 0.0f;
+						comparedTransform = comparedTransformComponent->position;
+						comparedScale     = comparedTransformComponent->scale;
 							
-								vec3 gravityTest{};
-								if( comparedMoveComponent != nullptr ) {
-									comparedTransform += Normalize(comparedMoveComponent->frameMovement) * cameraSpeed;
-									comparedTransform += comparedMoveComponent->gravity;
-									gravityTest = comparedMoveComponent->gravity;
-								}
+						vec3 gravityTest{};
+						if( comparedMoveComponent != nullptr ) {
+							comparedTransform += Normalize(comparedMoveComponent->frameMovement) * cameraSpeed;
+							comparedTransform += comparedMoveComponent->gravity;
+							gravityTest = comparedMoveComponent->gravity;
+						}
 
-								// arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-								// vec3 gravityTest{};
-								// /// Check if inner current archetype has move component
-								// if ( arch::matchesRequiredMask( comparedEntityArch->mask, requiredMask) ) {
-								// 	view.comparedMove = (cm::move*)comparedEntityArch->components[arch::ComponentsIndices::MOVE_COMPONENT];
+						bool boxColliderFlag = false;
+						bool upperActorCheckFlag = false;
 
-								// 	if( view.comparedMove ) {
-								// 		comparedTransform += Normalize(view.comparedMove[j].frameMovement) * cameraSpeed;
-								// 		comparedTransform += view.comparedMove[j].gravity;
-								// 		gravityTest = view.comparedMove[j].gravity;
-								// 	}
-								// }
-
-								bool boxColliderFlag = false;
-								bool upperActorCheckFlag = false;
-
-								core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
-								core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedEntityMeshHandle.id];
+						core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
+						core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedEntityMeshHandle.id];
 								
-								boxColliderFlag = core::BoxCollider(backtrackingTransform,
-															  comparedTransform,
-															  backtrackingScale,
-															  comparedScale,
-															  backtrackingMeshAxisMaxAbsoluteValues,
-															  comparedMeshAxisMaxAbsoluteValues);
+						boxColliderFlag = core::BoxCollider(backtrackingTransform,
+															comparedTransform,
+															backtrackingScale,
+															comparedScale,
+															backtrackingMeshAxisMaxAbsoluteValues,
+															comparedMeshAxisMaxAbsoluteValues);
 
-								if ( boxColliderFlag ) {
-									upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
-																		  comparedTransform,
-																		  backtrackingScale,
-																		  comparedScale,
-																		  backtrackingEntityMeshHandle,
-																		  comparedEntityMeshHandle);
-								}
+						if ( boxColliderFlag ) {
+							upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
+																  comparedTransform,
+																  backtrackingScale,
+																  comparedScale,
+																  backtrackingEntityMeshHandle,
+																  comparedEntityMeshHandle);
+						}
 
-								if(upperActorCheckFlag && boxColliderFlag) {
+						if(upperActorCheckFlag && boxColliderFlag) {
 									
-									uint8_t groudCollisionTurnOnMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-									view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | groudCollisionTurnOnMask;
-									view.backtrackingColliders[i].colliders.Push(comparedEntityID);
+							uint8_t groudCollisionTurnOnMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
+							view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | groudCollisionTurnOnMask;
+							view.backtrackingColliders[i].colliders.Push(comparedEntityID);
 
-
-									if( backtrackingEntityID == 0 ) {
-										std::cout << "groud collision" << std::endl;
-									}
-// 										std::cout << "backtracking position: " << backtrackingTransform << std::endl;
-// 										std::cout << "backtracking scale: " << backtrackingScale << std::endl;
-										
-// 										for( u32 i10 = 0; i10 < view.backtrackingColliders[i].colliders.GetSize(); ++i10 ) {
-// 											std::cout << "backtracking collidable entity: " << view.backtrackingColliders[i].colliders[i10] << std::endl;
-// 										}
-
-// //										std::cout << "backtracking collidable entity: " << comparedEntityID << std::endl;
-// 									}
-
-							
-									continue;
-								}
+							continue;
+						}
                     
-								if(boxColliderFlag) {
-									if( backtrackingEntityID == 0 ) {
-										std::cout << "wall collision with: " << comparedEntityID << std::endl;
-									}
-									
-									uint8_t wallCollisionTurnOnMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-									view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | wallCollisionTurnOnMask;
-									view.backtrackingColliders[i].colliders.Push(comparedEntityID);
+						if(boxColliderFlag) {
+							uint8_t wallCollisionTurnOnMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
+							view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | wallCollisionTurnOnMask;
+							view.backtrackingColliders[i].colliders.Push(comparedEntityID);
 							
-									continue;
-								}
-//							}
+							continue;
 						}
 					}
 				}
