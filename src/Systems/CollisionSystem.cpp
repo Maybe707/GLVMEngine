@@ -97,8 +97,12 @@ namespace GLVM::ecs
 						backtrackingTransformComponent->scale );
 
 					core::vector<u32> collectedEntities;                                   ///< Result array with collected entities
+					/*
+					  Need only left bottom back cornder point and right upper front
+					  conrner point to obtain all box bounds
+					*/
 					const vec3 minEntityPosition = entityBoxCornerBoundPoints[0];
-					const vec3 maxEntityPosition = entityBoxCornerBoundPoints[entityBoxCornerBoundPoints.GetSize() - 1];
+					const vec3 maxEntityPosition = entityBoxCornerBoundPoints[1];
 					
 					const u32 indexMinX = (minEntityPosition[0] + chunkHalfWidth) / chunkSize;
 					const u32 indexMinY = (minEntityPosition[1] + chunkHalfHeight) / chunkSize;
@@ -146,130 +150,18 @@ namespace GLVM::ecs
 							arch::EntityLocation comparedEntityLocation = arch::world.entityLocations[arch::getId( comparedEntityID )];
 							const uint32_t comparedEntityIndex = comparedEntityLocation.index;
 
-							components::mesh comparedEntityMesh;
 							components::MeshHandle comparedEntityMeshHandle;
-							components::transform* comparedTransformComponent = nullptr;
-							components::move* comparedMoveComponent = nullptr;
-
 							if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
 								arch::Archetype* arch = comparedEntityLocation.arch;
-								comparedTransformComponent = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
-								comparedEntityMesh         = ((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];
-								comparedEntityMeshHandle = comparedEntityMesh.handle;
+								view.comparedTransforms = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
+								view.comparedMeshes     = &((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];
+								comparedEntityMeshHandle = view.comparedMeshes->handle;
 								
 								arch::componentMask	moveRequiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
 								if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, moveRequiredMask ) ) {
-									comparedMoveComponent = &((ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT])[comparedEntityIndex];
+									view.comparedMove = &((ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT])[comparedEntityIndex];
 								}
 							}
-							
-							// arch::PlayerArchetype* playerArch = nullptr;
-							// arch::EnemyArchetype* enemyArch   = nullptr;
-							// arch::StaticMeshArchetype* staticMeshArch = nullptr;
-							// arch::CrosshairArchetype* crosshairArch = nullptr;
-							// arch::ItemArchetype* itemArch     = nullptr;
-							// arch::InventoryArchetype* inventoryArch = nullptr;
-							// arch::DirectionalLightArchetype* directionalLightArch = nullptr;
-							// arch::SpotLightArchetype* spotLightArch = nullptr;
-							// arch::PointLightArchetype* pointLightArch = nullptr;
-							// arch::LevelChunkArchetype* levelChunkArch = nullptr;
-							// arch::ProjectileArchetype* projectileArch = nullptr;
-							// switch( comparedEntityLocation.arch->mask ) {
-							// case arch::playerComponentMask:
-							// 	playerArch = static_cast<arch::PlayerArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::enemyComponentMask:
-							// 	enemyArch = static_cast<arch::EnemyArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::staticMeshComponentMask:
-							// 	staticMeshArch = static_cast<arch::StaticMeshArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::crosshairComponentMask:
-							// 	crosshairArch = static_cast<arch::CrosshairArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::itemComponentMask:
-							// 	itemArch = static_cast<arch::ItemArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::inventoryComponentMask:
-							// 	inventoryArch = static_cast<arch::InventoryArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::directionalLightComponentMask:
-							// 	directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::spotLightComponentMask:
-							// 	spotLightArch = static_cast<arch::SpotLightArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::pointLightComponentMask:
-							// 	pointLightArch = static_cast<arch::PointLightArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::levelChunkComponentMask:
-							// 	levelChunkArch = static_cast<arch::LevelChunkArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// case arch::projectileComponentMask:
-							// 	projectileArch = static_cast<arch::ProjectileArchetype*>(comparedEntityLocation.arch);
-							// 	break;
-							// }
-
-							// components::mesh comparedEntityMesh;
-							// components::MeshHandle comparedEntityMeshHandle;
-							// components::transform* comparedTransformComponent = nullptr;
-							// components::move* comparedMoveComponent = nullptr;
-							// if( playerArch != nullptr ) {
-							// 	comparedEntityMesh = playerArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &playerArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = &playerArch->moves[comparedEntityIndex];
-							// } else if( enemyArch != nullptr ) {
-							// 	comparedEntityMesh = enemyArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &enemyArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = &enemyArch->moves[comparedEntityIndex];
-							// } else if( staticMeshArch != nullptr ) {
-							// 	comparedEntityMesh = staticMeshArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &staticMeshArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( crosshairArch != nullptr ) {
-							// 	comparedEntityMesh = crosshairArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &crosshairArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( itemArch != nullptr ) {
-							// 	comparedEntityMesh = itemArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &itemArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = &itemArch->moves[comparedEntityIndex];
-							// }else if( inventoryArch != nullptr ) {
-							// 	comparedEntityMesh = inventoryArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &inventoryArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( directionalLightArch != nullptr ) {
-							// 	comparedEntityMesh = directionalLightArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &directionalLightArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( spotLightArch != nullptr ) {
-							// 	comparedEntityMesh = spotLightArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &spotLightArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( pointLightArch != nullptr ) {
-							// 	comparedEntityMesh = pointLightArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &pointLightArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( levelChunkArch != nullptr ) {
-							// 	comparedEntityMesh = levelChunkArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &levelChunkArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }else if( projectileArch != nullptr ) {
-							// 	comparedEntityMesh = projectileArch->meshes[comparedEntityIndex];
-							// 	comparedEntityMeshHandle = comparedEntityMesh.handle;
-							// 	comparedTransformComponent = &projectileArch->transforms[comparedEntityIndex];
-							// 	comparedMoveComponent = nullptr;
-							// }
 							
 //							if( view.comparedMeshes && view.comparedTransforms ) {
 								// components::mesh comparedEntityMesh = view.comparedMeshes[j];
@@ -280,12 +172,14 @@ namespace GLVM::ecs
 								// components::MeshHandle comparedEntityMeshHandle   = comparedEntityMesh.handle;
 								// components::transform* comparedTransformComponent = &comparedEntityArch->transforms[comparedEntityIndex];
 								// components::move* comparedMoveComponent           = &comparedEntityArch->moves[comparedEntityIndex];
+
+							components::transform* comparedTransformComponent = view.comparedTransforms;
+							components::move* comparedMoveComponent           = view.comparedMove;
+							
 							vec3  comparedTransform = vec3( 0.0f, 0.0f, 0.0f );
 							float comparedScale = 0.0f;
-							if( comparedTransformComponent != nullptr ) {
-								comparedTransform = comparedTransformComponent->position;
-								comparedScale     = comparedTransformComponent->scale;
-							}
+							comparedTransform = comparedTransformComponent->position;
+							comparedScale     = comparedTransformComponent->scale;
 							
 								vec3 gravityTest{};
 								if( comparedMoveComponent != nullptr ) {

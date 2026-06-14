@@ -41,12 +41,6 @@ namespace GLVM::core {
 
 		core::vector<vec3> result;
 		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, -halfDepth ) );  ///< left bottom back
-		result.Push( entityPosition + vec3( halfWidht, -halfHeight, -halfDepth ) );   ///< right bottom back
-		result.Push( entityPosition + vec3( halfWidht, halfHeight, -halfDepth ) );    ///< right upper back
-		result.Push( entityPosition + vec3( -halfWidht, halfHeight, -halfDepth ) );   ///< left upper back
-		result.Push( entityPosition + vec3( -halfWidht, halfHeight, halfDepth ) );    ///< left upper front
-		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, halfDepth ) );   ///< left bottom front
-		result.Push( entityPosition + vec3( halfWidht, -halfHeight, halfDepth ) );    ///< right botoom front
 		result.Push( entityPosition + vec3( halfWidht, halfHeight, halfDepth ) );     ///< right upper front
 
 		return result;

@@ -43,8 +43,12 @@ namespace GLVM::ecs {
 				core::MeshAxisMaxAbsoluteValues entityChunkBounds = allMeshMaxAbsoluteValues[entityMeshHandle.id];
 				core::vector<vec3> entityBoxCornerBoundPoints = computeBoxCornerBoundPoints( entityChunkBounds, transform.position, transform.scale );
 
+				/*
+				  Need only left bottom back cornder point and right upper front
+				  conrner point to obtain all box bounds
+				*/
 				const vec3 minEntityPosition = entityBoxCornerBoundPoints[0];
-				const vec3 maxEntityPosition = entityBoxCornerBoundPoints[entityBoxCornerBoundPoints.GetSize() - 1];
+				const vec3 maxEntityPosition = entityBoxCornerBoundPoints[1];
 					
 				const u32 indexMinX = (minEntityPosition[0] + halfWidth) / chunkSize;
 				const u32 indexMinY = (minEntityPosition[1] + halfHeight) / chunkSize;
