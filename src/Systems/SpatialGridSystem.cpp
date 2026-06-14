@@ -22,12 +22,6 @@ namespace GLVM::ecs {
 
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
-
-		// for( u32 i0 = 0; i0 < spatialGrid.depth; ++i0 )
-		// 	for( u32 i1 = 0; i1 < spatialGrid.height; ++i1 )
-		// 		for( u32 i2 = 0; i2 < spatialGrid.width; ++i2 ) {
-		// 			spatialGrid.grid[i0][i1][i2].entities.clear();
-		// 		}
 		
 		for( uint32_t i0 = 0; i0 < cachedArchetypesNumber; ++i0 ) {
 			arch::Archetype* arch = cachedArchetypes[i0];
@@ -58,29 +52,6 @@ namespace GLVM::ecs {
 				const u32 indexMaxY = (maxEntityPosition[1] + halfHeight) / chunkSize;
 				const u32 indexMaxZ = (maxEntityPosition[2] + halfDepth) / chunkSize;
 				
-				// std::cout << "min x: " << indexMinX << std::endl;
-				// std::cout << "max x: " << indexMaxX << std::endl;
-				
-				// if( arch::getId( arch->entities[i1] ) == 0 ) {
-				// 	// if( i2 == 0 ) {
-				// 	// 	std::cout << "0 iter" << std::endl;
-				// 	// }
-
-				// 	std::cout << "entity position: " << transform.position << std::endl;
-						
-				// 	std::cout << "entity corner position: " << minEntityPosition << std::endl;
-				// 	std::cout << "index min x: " << indexMinX << std::endl;
-				// 	std::cout << "index min y: " << indexMinY << std::endl;
-				// 	std::cout << "index min z: " << indexMinZ << std::endl;
-
-				// 	std::cout << "entity position: " << transform.position << std::endl;
-						
-				// 	std::cout << "entity corner position: " << maxEntityPosition << std::endl;
-				// 	std::cout << "index max x: " << indexMaxX << std::endl;
-				// 	std::cout << "index max y: " << indexMaxY << std::endl;
-				// 	std::cout << "index max z: " << indexMaxZ << std::endl;
-				// }
-
 				assert( indexMinX <= indexMaxX && indexMinY <= indexMaxY && indexMinZ <= indexMaxZ );
 				assert( indexMinX < spatialGrid.width && indexMinY < spatialGrid.height && indexMinZ < spatialGrid.depth );
 				assert( indexMaxX < spatialGrid.width && indexMaxY < spatialGrid.height && indexMaxZ < spatialGrid.depth );
