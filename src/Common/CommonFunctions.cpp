@@ -35,9 +35,9 @@ namespace GLVM::core {
 		const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
 		vec3 entityPosition,
 		const float scale ) {
-		const float halfWidht  = entityChunkBounds.absolute_x * scale * 0.5f;
-		const float halfHeight = entityChunkBounds.absolute_y * scale * 0.5f;
-		const float halfDepth  = entityChunkBounds.absolute_z * scale * 0.5f;
+		const float halfWidht  = entityChunkBounds.absolute_x * scale;
+		const float halfHeight = entityChunkBounds.absolute_y * scale;
+		const float halfDepth  = entityChunkBounds.absolute_z * scale;
 
 		core::vector<vec3> result;
 		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, -halfDepth ) );  ///< left bottom back

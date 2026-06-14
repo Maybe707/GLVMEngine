@@ -14,9 +14,9 @@ namespace GLVM::ecs::arch {
 	};
 
 	struct SpatialGrid {
-		static const u32 width  = 32;
-		static const u32 height = 32;
-		static const u32 depth  = 32;
+		static const u32 width  = 64;
+		static const u32 height = 64;
+		static const u32 depth  = 64;
 		GridChunk grid[width][height][depth];
 	};
 	

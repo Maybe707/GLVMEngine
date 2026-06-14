@@ -191,7 +191,7 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, 0.0f ) + randomDirection }, .scale = 2.0f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, 0.0f ) + randomDirection }, .scale = 0.05f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
@@ -213,27 +213,29 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 32.0f * 0.078125f };
 	}
 
-	arch::entity cube = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
-	arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
-	arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
-	const uint32_t cubeIndex = cubeLocation.index;
-	cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 10.0f, 0.0f }, .scale = 4.0f };
-	cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
-	cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
-		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
-	cubeArch->fonts[cubeIndex].font_string.Push('R');
+	for( u32 i = 0; i < 5; ++i ) {
+		arch::entity cube = archEntityManager->createEntity();
+		arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
+		arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
+		arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
+		const uint32_t cubeIndex = cubeLocation.index;
+		cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 2.0f, 10.0f + i * 2.0f }, .scale = 1.0f };
+		cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
+		cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
+			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+		cubeArch->fonts[cubeIndex].font_string.Push('R');
+	}
 	
 	arch::entity crosshair = archEntityManager->createEntity();
 	arch::world.addEntityToArchetype( crosshair, arch::world.archetypes[5] );
 	arch::EntityLocation crosshairLocation = arch::world.entityLocations[arch::getId( crosshair )];
 	arch::CrosshairArchetype* crosshairArch = static_cast<arch::CrosshairArchetype*>(crosshairLocation.arch);
-	const uint32_t crosshairIndex = cubeLocation.index;
+	const uint32_t crosshairIndex = crosshairLocation.index;
 	crosshairArch->transforms[crosshairIndex]    = { .scale = 0.01f };
 	crosshairArch->meshes[crosshairIndex].handle = crosshair_001_Handle_GLTF;
 	crosshairArch->materials[crosshairIndex]     = { .diffuseTextureID_ = container2Texturehandle,

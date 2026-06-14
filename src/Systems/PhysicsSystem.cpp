@@ -71,6 +71,13 @@ namespace GLVM::ecs
 						uint8_t wallCollisionTurnOffMask = (0u << 0) | (1u << 1) | (1u << 2) | (1u << 3);
 						colliderFlags.flags &= wallCollisionTurnOffMask;
 					}
+
+					// u32 entity = arch->entities[i];
+					// if( entity == 0 ) {
+					// 	std::cout << "frame move: " << "x: " << move.frameMovement[0] << " y: " << move.frameMovement[1] <<
+					// 		" z: " << move.frameMovement << std::endl;
+					// }
+					
 					transformComponent.position += move.frameMovement;
 					transformComponent.position += move.gravity;
 					move.gravity       = 0.0f;

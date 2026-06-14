@@ -97,19 +97,31 @@ namespace GLVM::ecs
 						backtrackingTransformComponent->scale );
 
 					core::vector<u32> collectedEntities;                                   ///< Result array with collected entities
-					for( u32 i2 = 0; i2 < entityBoxCornerBoundPoints.GetSize(); ++i2 ) {
-						const vec3 entityPosition = entityBoxCornerBoundPoints[i2];
+					const vec3 minEntityPosition = entityBoxCornerBoundPoints[0];
+					const vec3 maxEntityPosition = entityBoxCornerBoundPoints[entityBoxCornerBoundPoints.GetSize() - 1];
 					
-						const u32 index_X = (entityPosition[0] + chunkHalfWidth) / chunkSize;
-						const u32 index_Y = (entityPosition[1] + chunkHalfHeight) / chunkSize;
-						const u32 index_Z = (entityPosition[2] + chunkHalfDepth) / chunkSize;
+					const u32 indexMinX = (minEntityPosition[0] + chunkHalfWidth) / chunkSize;
+					const u32 indexMinY = (minEntityPosition[1] + chunkHalfHeight) / chunkSize;
+					const u32 indexMinZ = (minEntityPosition[2] + chunkHalfDepth) / chunkSize;
 
-						assert( index_X < spatialGrid.width && index_Y < spatialGrid.height && index_Z < spatialGrid.depth );
-						const core::vector<u32>& chunkEntities = spatialGrid.grid[index_Z][index_Y][index_X].entities;
-						for( u32 i3 = 0; i3 < chunkEntities.GetSize(); ++i3 ) {
-							const u32 entity = chunkEntities[i3];
-							if( !core::isExist( collectedEntities, entity ) )
-								collectedEntities.Push( entity );
+					const u32 indexMaxX = (maxEntityPosition[0] + chunkHalfWidth) / chunkSize;
+					const u32 indexMaxY = (maxEntityPosition[1] + chunkHalfHeight) / chunkSize;
+					const u32 indexMaxZ = (maxEntityPosition[2] + chunkHalfDepth) / chunkSize;
+
+					assert( indexMinX <= indexMaxX && indexMinY <= indexMaxY && indexMinZ <= indexMaxZ );
+					assert( indexMinX < spatialGrid.width && indexMinY < spatialGrid.height && indexMinZ < spatialGrid.depth );
+					assert( indexMaxX < spatialGrid.width && indexMaxY < spatialGrid.height && indexMaxZ < spatialGrid.depth );
+
+					for( u32 i2 = indexMinZ; i2 <= indexMaxZ; ++i2 ) {
+						for( u32 i3 = indexMinY; i3 <= indexMaxY; ++i3 ) {
+							for( u32 i4 = indexMinX; i4 <= indexMaxX; ++i4 ) {
+								const core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
+								for( u32 i5 = 0; i5 < chunkEntities.GetSize(); ++i5 ) {
+									const u32 entity = chunkEntities[i5];
+									if( !core::isExist( collectedEntities, entity ) )
+										collectedEntities.Push( entity );
+								}
+							}
 						}
 					}
 					
@@ -123,11 +135,14 @@ namespace GLVM::ecs
 						for(unsigned int j = 0; j < collectedEntities.GetSize(); ++j) {
 							/// Check for same entityID and iteration
 							uint32_t comparedEntityID = collectedEntities[j];
-//							std::cout << "COMPARED ENTITY: " << comparedEntityID << std::endl;
-							if( backtrackingEntityID == comparedEntityID && i == j ) {
+							if( backtrackingEntityID == comparedEntityID ) {
 								continue;
 							}
 
+							// if( backtrackingEntityID == 0 ) {
+							// 	std::cout << "COMPARED ENTITY: " << comparedEntityID << std::endl;
+							// }
+							
 							arch::EntityLocation comparedEntityLocation = arch::world.entityLocations[arch::getId( comparedEntityID )];
 							const uint32_t comparedEntityIndex = comparedEntityLocation.index;
 
@@ -298,14 +313,34 @@ namespace GLVM::ecs
 								}
 
 								if(upperActorCheckFlag && boxColliderFlag) {
+									
 									uint8_t groudCollisionTurnOnMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
 									view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | groudCollisionTurnOnMask;
 									view.backtrackingColliders[i].colliders.Push(comparedEntityID);
+
+
+									if( backtrackingEntityID == 0 ) {
+										std::cout << "groud collision" << std::endl;
+									}
+// 										std::cout << "backtracking position: " << backtrackingTransform << std::endl;
+// 										std::cout << "backtracking scale: " << backtrackingScale << std::endl;
+										
+// 										for( u32 i10 = 0; i10 < view.backtrackingColliders[i].colliders.GetSize(); ++i10 ) {
+// 											std::cout << "backtracking collidable entity: " << view.backtrackingColliders[i].colliders[i10] << std::endl;
+// 										}
+
+// //										std::cout << "backtracking collidable entity: " << comparedEntityID << std::endl;
+// 									}
+
 							
 									continue;
 								}
                     
 								if(boxColliderFlag) {
+									if( backtrackingEntityID == 0 ) {
+										std::cout << "wall collision with: " << comparedEntityID << std::endl;
+									}
+									
 									uint8_t wallCollisionTurnOnMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
 									view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | wallCollisionTurnOnMask;
 									view.backtrackingColliders[i].colliders.Push(comparedEntityID);
