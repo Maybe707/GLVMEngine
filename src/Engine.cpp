@@ -319,8 +319,10 @@ namespace GLVM::core
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
 			setFrameData();
-			SetViewMatrix();
-			SetProjectionMatrix();
+			if( !vulkanRenderer->isInventoryOpened ) {
+				SetViewMatrix();
+				SetProjectionMatrix();
+			} 
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
 		}
@@ -471,8 +473,7 @@ namespace GLVM::core
 					for ( unsigned int j = 0; j < 4; ++j )
 						viewMatrix_[i][j] = view[i][j];
 		
-				if ( !vulkanRenderer->isInventoryOpened )
-					vulkanRenderer->viewMatrix = viewMatrix_;
+				vulkanRenderer->viewMatrix = viewMatrix_;
 
 				vulkanRenderer->prev_Y = (float)g_eEvent.mousePointerPosition.offset_Y;
 				vulkanRenderer->prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
