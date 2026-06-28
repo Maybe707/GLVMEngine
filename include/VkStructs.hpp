@@ -78,6 +78,7 @@ namespace GLVM::core
 	};
 	
 	enum DescriptorSetDataLink {
+		/// Pipelines related values
 		SHADOW_MAP_DIRECTIONAL_LIGHT,
 		SHADOW_MAP_SPOT_LIGHT,
 		SHADOW_MAP_POINT_LIGHT,
@@ -96,6 +97,7 @@ namespace GLVM::core
 		MAIN_RENDER_SPECULAR_SAMPLER,
 		MAIN_RENDER_DIFFUSE_SAMPLER,
 		SDF_DATA,
+		/// Not related to any pipeline values
 		RIDABLE_TEXTURES,
 		DESCRIPTOR_CHUNKS_NUMBER
 	};

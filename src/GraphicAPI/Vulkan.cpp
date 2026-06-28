@@ -791,12 +791,12 @@ namespace GLVM::core
 		for ( int descriptorSetCounter = 0; descriptorSetCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetCounter ) {
 			DescriptorSet& descriptorSet = descriptorSetsConfig[descriptorSetCounter];
 			std::vector<VkDescriptorSetLayoutBinding> bindings;
-			std::cout << "NEXT DS" << std::endl;
-			std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
+			// std::cout << "NEXT DS" << std::endl;
+			// std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
 			for ( u32 j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
 				u32 currentDescriptorBindingID = descriptorSet.descriptorsBindingsIDs[j];
 //			u32 currentDescriptorBindingID = j;
-				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
+//				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
 				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 				modelMatrixUboLayout.binding = descriptorBindingsConfig[currentDescriptorBindingID].binding;
 				modelMatrixUboLayout.descriptorCount = descriptorBindingsConfig[currentDescriptorBindingID].shaderDescriptorsNumber;
@@ -1544,13 +1544,13 @@ namespace GLVM::core
 	// }
 	
     void CVulkanRenderer::createMainRenderUniformBuffers() {
-		for( unsigned int i = 0; i < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++i ) {
-			for( unsigned int j = 0; j < descriptorSetsConfig[i].actualLinkedDescriptorBindingsNumber; ++j ) {
-				unsigned int descriptorBindingIndex = descriptorSetsConfig[i].descriptorsBindingsIDs[j];
+		for( unsigned int descriptorSetConfigCounter = 0; descriptorSetConfigCounter <
+				 DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetConfigCounter ) {
+			for( unsigned int j = 0; j < descriptorSetsConfig[descriptorSetConfigCounter].actualLinkedDescriptorBindingsNumber; ++j ) {
+				unsigned int descriptorBindingIndex = descriptorSetsConfig[descriptorSetConfigCounter].descriptorsBindingsIDs[j];
 				VkDescriptorType descriptorType = descriptorBindingsConfig[descriptorBindingIndex].vkType;
 				if( descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-					///< TODO: Have to look into work with enum DescriptorSetDataLink indices
-					u32 memory = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize * descriptorSetsConfig[i].hostDescriptorNumber;
+					u32 memory = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize * descriptorSetsConfig[descriptorSetConfigCounter].hostDescriptorNumber;
 					// std::cout << "ds binding index: " << descriptorBindingIndex << std::endl;
 					// std::cout << "host ds number: " << descriptorSetsConfig[descriptorBindingIndex].hostDescriptorNumber << std::endl;
 					// std::cout << "chunk size: " << descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize << std::endl;

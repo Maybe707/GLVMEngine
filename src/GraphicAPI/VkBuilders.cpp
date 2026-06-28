@@ -1,50 +1,54 @@
 #include "GraphicAPI/RenderData.hpp"
 #include "GraphicAPI/RenderConfig.hpp"
 #include "VkStructs.hpp"
+#include "typenames.hpp"
 
 namespace GLVM::core {
 	void descriptorSetBuilder() {
-		static unsigned int descriptorBindingsIdCounter = 0;              ///< Counts ds bindings indexes inside ds
-		static unsigned int descriptorSetsBindigOffsetCounter = 0;        ///< Counts host data ds
+		static unsigned int DS_globalBindingsCounter = 0;                 ///< Counts ds bindings indexes inside ds
+		static unsigned int DS_hostNumber = 0;        ///< Counts host data ds
 		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
 		
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
-//			std::cout << "ENUM NUM: " << dsCounter << std::endl;
-			descriptorSetsConfig[dsCounter].descriptorSetOffset = descriptorSetsBindigOffsetCounter;                  ///< Offset for indexing inside descriptorSetsChunks
-			descriptorSetsBindigOffsetCounter += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
-//			std::cout << "pravilni idealni offset: " << descriptorSetsConfig[dsCounter].descriptorSetOffset << std::endl;
-			for( unsigned int bindingsIdCounter = 0; bindingsIdCounter < descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++bindingsIdCounter ) {
-				descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].globalDescriptorOffset = globalDescriptorsOffset;     ///< Global offset for discriptors inside ds binding
-				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[bindingsIdCounter] = descriptorBindingsIdCounter + bindingsIdCounter;    ///< Index for ds bindings inside ds
-				if( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
-//						std::cout << "allocate ubo" << std::endl;
+			/// Offset for indexing inside descriptorSetsChunks
+			descriptorSetsConfig[dsCounter].descriptorSetOffset = DS_hostNumber;  
+			DS_hostNumber += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
+			
+			for( unsigned int DS_localBindingsCounter = 0; DS_localBindingsCounter <
+					 descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++DS_localBindingsCounter ) {
+				const u32 DS_sumBindingsCounter = DS_globalBindingsCounter + DS_localBindingsCounter;
+				/// Global offset for discriptors inside ds binding
+				descriptorBindingsConfig[DS_sumBindingsCounter].globalDescriptorOffset = globalDescriptorsOffset;
+					
+				/// Index for ds bindings inside ds
+				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[DS_localBindingsCounter] = DS_sumBindingsCounter;    
+				if( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+					for( unsigned int descriptorCounter = 0; descriptorCounter <
+							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
 						++globalDescriptorsOffset;
 					}
-				} else if ( descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
-					for( unsigned int descriptorCounter = 0; descriptorCounter < descriptorBindingsConfig[descriptorBindingsIdCounter + bindingsIdCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
-//						std::cout << "allocate texture" << std::endl;
+				} else if ( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+					for( unsigned int descriptorCounter = 0; descriptorCounter <
+							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
 						++globalDescriptorsOffset;
 					}
 				}
 			}
-			descriptorBindingsIdCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
+			DS_globalBindingsCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
 		}
-		descriptorSetsChunks.Resize( descriptorSetsBindigOffsetCounter );
+		descriptorSetsChunks.Resize( DS_hostNumber );
 	}
 
 	void pipelineBuilder() {
 		static unsigned int descriptorSetsLayoutIdCounter = 0;
-
 		for( unsigned int pipelineCounter = 0; pipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++pipelineCounter ) {
-//			std::cout << "number of ds: " << pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber << std::endl;
-			for( unsigned int linkedDSLayoutConter = 0; linkedDSLayoutConter < pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++linkedDSLayoutConter ) {
-//				std::cout << "next id: " << descriptorSetsLayoutIdCounter + linkedDSLayoutConter << std::endl;
-				pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[linkedDSLayoutConter] = descriptorSetsLayoutIdCounter + linkedDSLayoutConter;
+			for( unsigned int linkedDSLayoutCounter = 0; linkedDSLayoutCounter <
+					 pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++linkedDSLayoutCounter ) {
+				pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[linkedDSLayoutCounter] = descriptorSetsLayoutIdCounter + linkedDSLayoutCounter;
 			}
 			descriptorSetsLayoutIdCounter += pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber;
 		}
