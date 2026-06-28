@@ -791,12 +791,12 @@ namespace GLVM::core
 		for ( int descriptorSetCounter = 0; descriptorSetCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++descriptorSetCounter ) {
 			DescriptorSet& descriptorSet = descriptorSetsConfig[descriptorSetCounter];
 			std::vector<VkDescriptorSetLayoutBinding> bindings;
-//			std::cout << "NEXT DS" << std::endl;
-//			std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
+			std::cout << "NEXT DS" << std::endl;
+			std::cout << "binding count: " << descriptorSet.actualLinkedDescriptorBindingsNumber << std::endl;
 			for ( u32 j = 0; j < descriptorSet.actualLinkedDescriptorBindingsNumber; ++j ) {
 				u32 currentDescriptorBindingID = descriptorSet.descriptorsBindingsIDs[j];
 //			u32 currentDescriptorBindingID = j;
-//				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
+				std::cout << "DS ID: " << currentDescriptorBindingID << std::endl;
 				VkDescriptorSetLayoutBinding modelMatrixUboLayout{};
 				modelMatrixUboLayout.binding = descriptorBindingsConfig[currentDescriptorBindingID].binding;
 				modelMatrixUboLayout.descriptorCount = descriptorBindingsConfig[currentDescriptorBindingID].shaderDescriptorsNumber;
@@ -827,6 +827,7 @@ namespace GLVM::core
 
 			VkShaderModule vertShaderModule;
 			VkShaderModule fragShaderModule;
+//			std::cout << "shader: " << pipeline.vertShader << std::endl;
 			if (pipeline.vertShader != nullptr) {
 				std::vector<char> vertShaderCode = readFile(pipeline.vertShader);
 				vertShaderModule = createShaderModule(vertShaderCode);
@@ -1548,7 +1549,12 @@ namespace GLVM::core
 				unsigned int descriptorBindingIndex = descriptorSetsConfig[i].descriptorsBindingsIDs[j];
 				VkDescriptorType descriptorType = descriptorBindingsConfig[descriptorBindingIndex].vkType;
 				if( descriptorType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-					u32 memory = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize * descriptorSetsConfig[descriptorBindingIndex].hostDescriptorNumber;
+					///< TODO: Have to look into work with enum DescriptorSetDataLink indices
+					u32 memory = descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize * descriptorSetsConfig[i].hostDescriptorNumber;
+					// std::cout << "ds binding index: " << descriptorBindingIndex << std::endl;
+					// std::cout << "host ds number: " << descriptorSetsConfig[descriptorBindingIndex].hostDescriptorNumber << std::endl;
+					// std::cout << "chunk size: " << descriptorBindingsConfig[descriptorBindingIndex].uboChunkSize << std::endl;
+					// std::cout << "MEMORY: " << memory << std::endl;
 					createBuffer(memory, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
 								 GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUBuffer->buffer,
 								 GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
