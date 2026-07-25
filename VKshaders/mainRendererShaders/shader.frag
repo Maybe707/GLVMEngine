@@ -272,6 +272,7 @@ void main()
 			shadow = 0.0;
 	}
 
+	result = pow( clamp(result, 0.0, 1.0), vec3(0.9) );
 	outColor = vec4(result, 1.0);
 }
 

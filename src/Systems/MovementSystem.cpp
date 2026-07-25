@@ -40,7 +40,7 @@ namespace GLVM::ecs
 		componentsView.playerRigidBody     = (ecs::components::rigidBody*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
 		
-        const float cameraSpeed = 1.0f * deltaFrameTime;            
+        const float cameraSpeed = 3.0f * deltaFrameTime;            
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
 			cm::beholder*      playerView          = &componentsView.playerViews[i];
 			cm::move*          playerMove          = &componentsView.playerMoves[i];

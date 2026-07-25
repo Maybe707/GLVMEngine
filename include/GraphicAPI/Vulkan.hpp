@@ -144,6 +144,7 @@ namespace GLVM::core
 			0, 1, 2,
 			2, 1, 3
 		};
+		std::chrono::steady_clock::time_point startTime;
 
         std::vector<ecs::Texture> initializeTextureData_;
         std::vector<const char*> pathsArray_;
@@ -472,12 +473,14 @@ namespace GLVM::core
 											VkCommandBuffer primaryCommandBuffer, VkCommandBuffer secondaryCommandBuffer );
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO( uint32_t offset, uint32_t crosshair );
+		void updateSdfUBO(uint32_t offset, uint32_t crosshair);
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
 		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,

@@ -165,6 +165,12 @@ namespace GLVM::core {
 	struct alignas(64) VIRTUAL_TEXTURE_UBO {
 		
 	};
+
+	struct alignas(64) SDF_UBO {
+		mat4 model;
+		float iTime;
+	};
+
 } // namespace GLVM::core
 
 #endif

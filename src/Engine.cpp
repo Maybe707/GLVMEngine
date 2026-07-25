@@ -322,7 +322,7 @@ namespace GLVM::core
 			if( !vulkanRenderer->isInventoryOpened ) {
 				SetViewMatrix();
 				SetProjectionMatrix();
-			} 
+			}
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
 		}

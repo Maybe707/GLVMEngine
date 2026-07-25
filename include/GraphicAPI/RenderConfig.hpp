@@ -627,7 +627,7 @@ namespace GLVM::core
 		descriptorBindingsConfig[20].shaderStageFlag         = VK_SHADER_STAGE_VERTEX_BIT;
 		descriptorBindingsConfig[20].binding                 = 0;
 		descriptorBindingsConfig[20].shaderDescriptorsNumber = 1;
-		descriptorBindingsConfig[20].uboChunkSize            = sizeof(HUD_SCREEN_UBO);
+		descriptorBindingsConfig[20].uboChunkSize            = sizeof(SDF_UBO);
 		
 		pipelineConfigs[SDF_PIPELINE].vertShader                       = "../VKshaders/sdf/sdf_vert.spv";
 		pipelineConfigs[SDF_PIPELINE].fragShader                       = "../VKshaders/sdf/sdf_frag.spv";

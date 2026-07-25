@@ -167,6 +167,7 @@ namespace GLVM::core
 		}
 
 		renderThreadPool = new ThreadPool(3);
+		startTime = std::chrono::steady_clock::now();
 		
         initWindow();
         initVulkan();
@@ -1880,6 +1881,21 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
+	void CVulkanRenderer::updateSdfUBO(uint32_t offset, uint32_t crosshair) {
+		SDF_UBO hudUBO{};
+		hudUBO.model = crosshairs[crosshair].model;
+
+		float currentTime = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count() * 0.001;
+		hudUBO.iTime = currentTime;
+		
+		void* hudMatrixData;
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SDF_DATA].descriptorsBindingsIDs[0];		
+        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(SDF_UBO) * offset,
+					sizeof(SDF_UBO), 0, &hudMatrixData);
+        memcpy(hudMatrixData, &hudUBO, sizeof(SDF_UBO));
+        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+	}
+	
 	void CVulkanRenderer::updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset ) {
 		UI_UBO hudUBO{};
 
@@ -2198,6 +2214,79 @@ namespace GLVM::core
 			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+
+    void CVulkanRenderer::sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::SDF_PIPELINE];
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SDF_PIPELINE].pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		for ( unsigned int i = 0; i < crosshairs.GetSize(); ++i ) {
+			RenderCrosshair crosshair = crosshairs[i];
+			unsigned int uiVertexId = crosshair.meshID;
+
+			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
+			updateSdfUBO(uboIndex, i);
+			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SDF_PIPELINE].linkedDescriptorSetIDs[0];
+  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SDF_PIPELINE].pipelineLayout,
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+//			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+//			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -2701,6 +2790,7 @@ namespace GLVM::core
 		}
 		
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+//		sdfRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
