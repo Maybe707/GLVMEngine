@@ -74,6 +74,7 @@ namespace GLVM::core
 		std::vector<const char*> pathsArray_;
 		core::vector<const char*> pathsGLTF_;
 		uint32_t meshID = 0;
+		bool isAlreadyCached;
 		float hud_screen_x = 0.0f;
 		float hud_screen_y;
 		int                  dragedItemEntity = -1;             ///< If dont have any draged item then this variable have value of -1
@@ -278,6 +279,8 @@ namespace GLVM::core
 		void setFrameData();
 		void loadWavefrontObj();
 		void calculateMeshBounds(const vec4& animatedVertex);
+		bool isModelCacheExists( const std::string& modelFilePath );
+		void writeModelsCache( const std::string& modelFilePath );
 		void initializeGLTF();
 		void initializeFontData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation);

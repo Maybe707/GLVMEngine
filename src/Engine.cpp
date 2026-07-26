@@ -53,6 +53,7 @@
 #include <sys/types.h>
 #include <thread>
 #include <wayland-client-core.h>
+#include <fstream>
 
 
 /*******************************************************************
@@ -1393,6 +1394,69 @@ namespace GLVM::core
 			vulkanRenderer->meshAxisLimitingValues.highest_z = animatedVertex[2];
 		}
 	}
+
+	bool Engine::isModelCacheExists( const std::string& modelFilePath ) {
+		std::ofstream modelsCache("../cache/models/cache", std::ios::app);
+
+		if( !modelsCache.is_open() ) {
+			std::cerr << "Error opening the models cache file" << std::endl;
+			throw std::runtime_error("Failed to load mesh cache");
+		}
+
+		std::ifstream file("../cache/models/cache");
+
+		std::string line;
+		while (std::getline(file, line)) {
+			if (line.find(modelFilePath) != std::string::npos) {
+				std::cout << "Model with pafile path: " << modelFilePath << " is already exists in cache" << std::endl;
+
+				std::istringstream iss(line);
+
+				std::string keyword;
+				float highest_x, lowest_x, highest_y, lowest_y, highest_z, lowest_z;
+
+				iss >> keyword >> highest_x >> lowest_x >> highest_y >> lowest_y >> highest_z >> lowest_z;
+				vulkanRenderer->meshAxisLimitingValues.highest_x = highest_x;
+				vulkanRenderer->meshAxisLimitingValues.lowest_x  = lowest_x;
+				vulkanRenderer->meshAxisLimitingValues.highest_y = highest_y;
+				vulkanRenderer->meshAxisLimitingValues.lowest_y  = lowest_y;
+				vulkanRenderer->meshAxisLimitingValues.highest_z = highest_z;
+				vulkanRenderer->meshAxisLimitingValues.lowest_z  = lowest_z;
+
+				isAlreadyCached = true;
+				
+				modelsCache.close();
+				return true;
+			}
+		}
+
+		modelsCache.close();
+		return false;
+	}
+	
+	void Engine::writeModelsCache( const std::string& modelFilePath ) {
+		std::ofstream modelsCache("../cache/models/cache", std::ios::app);
+
+		if( !modelsCache.is_open() ) {
+			std::cerr << "Error opening the models cache file" << std::endl;
+			throw std::runtime_error("Failed to load mesh cache");
+		}
+
+		std::size_t pos = modelFilePath.find(' ');
+		std::string firstPart = (pos == std::string::npos)
+			? modelFilePath
+			: modelFilePath.substr(0, pos);
+		
+		modelsCache << modelFilePath;
+		modelsCache << " " << vulkanRenderer->meshAxisLimitingValues.highest_x << " " <<
+			vulkanRenderer->meshAxisLimitingValues.lowest_x << " " <<
+			vulkanRenderer->meshAxisLimitingValues.highest_y << " " <<
+			vulkanRenderer->meshAxisLimitingValues.lowest_y << " " <<
+			vulkanRenderer->meshAxisLimitingValues.highest_z << " " <<
+			vulkanRenderer->meshAxisLimitingValues.lowest_z << std::endl;
+
+		modelsCache.close();
+	}
 	
 	void Engine::initializeGLTF() {
 		core::vector<bool> animationFlags;
@@ -1422,12 +1486,16 @@ namespace GLVM::core
 			vulkanRenderer->meshAxisLimitingValues.lowest_y  = MAXFLOAT;
 			vulkanRenderer->meshAxisLimitingValues.highest_z = -MAXFLOAT;
 			vulkanRenderer->meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+
+			isAlreadyCached = false;
+			isModelCacheExists( pathsGLTF_[m] );
 			
 			int stepOffset = 0;
 			if ( animationFlags[m] )
 				stepOffset = 8;
 			else
 				stepOffset = 16;
+			
 			for ( unsigned int n = 0; n < vulkanRenderer->aVertexesTemp_[m].size(); n += stepOffset ) {
 				SVertex vertex;
 				vertex[0] = vulkanRenderer->aVertexesTemp_[m][n];
@@ -1467,6 +1535,16 @@ namespace GLVM::core
 				}
 
 				uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+				vulkanRenderer->aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
+										 {normal[0], normal[1], normal[2]},
+										 {texture[0], texture[1]},
+										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
+										 {weights[0], weights[1], weights[2], weights[3]}});
+
+				if( isAlreadyCached ) {
+					continue;
+				}
+							
 				vec4 animatedVertex = vec4(vertex[0], vertex[1], vertex[2], 1.0);
 				if( !animationFlags[m] && vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF].GetSize() > 0 ) {
 					for( unsigned int frame = 0; frame < vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][0].GetSize(); ++frame ) {
@@ -1482,21 +1560,19 @@ namespace GLVM::core
 				} else {
 					calculateMeshBounds( animatedVertex );
 				}
-				
-				vulkanRenderer->aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
-										 {normal[0], normal[1], normal[2]},
-										 {texture[0], texture[1]},
-										 {joinIndices[0], joinIndices[1], joinIndices[2], joinIndices[3]},
-										 {weights[0], weights[1], weights[2], weights[3]}});
+			}
+
+			if( !isAlreadyCached ) {
+				writeModelsCache( pathsGLTF_[m] );
 			}
 //			uint32_t nextIndexGLTF = vulkanRenderer->wavefrontObjCounter + m;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
 
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (vulkanRenderer->meshAxisLimitingValues.highest_x + vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (vulkanRenderer->meshAxisLimitingValues.highest_y + vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (vulkanRenderer->meshAxisLimitingValues.highest_z + vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (vulkanRenderer->meshAxisLimitingValues.highest_x + vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (vulkanRenderer->meshAxisLimitingValues.highest_y + vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
+				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (vulkanRenderer->meshAxisLimitingValues.highest_z + vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
 			
 			// std::cout << "GLTF" << std::endl;
 			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
