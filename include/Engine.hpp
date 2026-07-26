@@ -277,6 +277,7 @@ namespace GLVM::core
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
 		void setFrameData();
 		void loadWavefrontObj();
+		void calculateMeshBounds(const vec4& animatedVertex);
 		void initializeGLTF();
 		void initializeFontData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation);

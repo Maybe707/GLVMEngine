@@ -1374,6 +1374,26 @@ namespace GLVM::core
         }
     }
 
+	void Engine::calculateMeshBounds(const vec4& animatedVertex) {
+		if ( animatedVertex[0] < vulkanRenderer->meshAxisLimitingValues.lowest_x ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_x = animatedVertex[0];
+		} else if ( animatedVertex[0] > vulkanRenderer->meshAxisLimitingValues.highest_x ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_x = animatedVertex[0];
+		}
+
+		if ( animatedVertex[1] < vulkanRenderer->meshAxisLimitingValues.lowest_y ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_y = animatedVertex[1];
+		} else if ( animatedVertex[1] > vulkanRenderer->meshAxisLimitingValues.highest_y ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_y = animatedVertex[1];
+		}
+
+		if ( animatedVertex[2] < vulkanRenderer->meshAxisLimitingValues.lowest_z ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_z = animatedVertex[2];
+		} else if ( animatedVertex[2] > vulkanRenderer->meshAxisLimitingValues.highest_z ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_z = animatedVertex[2];
+		}
+	}
+	
 	void Engine::initializeGLTF() {
 		core::vector<bool> animationFlags;
 		for (unsigned int m = 0; m < pathsGLTF_.GetSize(); ++m) {
@@ -1420,24 +1440,6 @@ namespace GLVM::core
 				SVertex texture;
 				texture[0] = vulkanRenderer->aVertexesTemp_[m][n + 6];
 				texture[1] = vulkanRenderer->aVertexesTemp_[m][n + 7];
-
-				if ( vertex[0] < vulkanRenderer->meshAxisLimitingValues.lowest_x ) {
-					vulkanRenderer->meshAxisLimitingValues.lowest_x = vertex[0];
-				} else if ( vertex[0] > vulkanRenderer->meshAxisLimitingValues.highest_x ) {
-					vulkanRenderer->meshAxisLimitingValues.highest_x = vertex[0];
-				}
-
-				if ( vertex[1] < vulkanRenderer->meshAxisLimitingValues.lowest_y ) {
-					vulkanRenderer->meshAxisLimitingValues.lowest_y = vertex[1];
-				} else if ( vertex[1] > vulkanRenderer->meshAxisLimitingValues.highest_y ) {
-					vulkanRenderer->meshAxisLimitingValues.highest_y = vertex[1];
-				}
-
-				if ( vertex[2] < vulkanRenderer->meshAxisLimitingValues.lowest_z ) {
-					vulkanRenderer->meshAxisLimitingValues.lowest_z = vertex[2];
-				} else if ( vertex[2] > vulkanRenderer->meshAxisLimitingValues.highest_z ) {
-					vulkanRenderer->meshAxisLimitingValues.highest_z = vertex[2];
-				}
 				
 				vec4 joinIndices;
 				vec4 weights;
@@ -1465,6 +1467,22 @@ namespace GLVM::core
 				}
 
 				uint32_t nextIndexGLTF = wavefrontObjCounter + m;
+				vec4 animatedVertex = vec4(vertex[0], vertex[1], vertex[2], 1.0);
+				if( !animationFlags[m] && vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF].GetSize() > 0 ) {
+					for( unsigned int frame = 0; frame < vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][0].GetSize(); ++frame ) {
+						mat4 skinMatrix =
+							(vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][int(joinIndices[0])][frame] * weights[0]) +
+							(vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][int(joinIndices[1])][frame] * weights[1]) +
+							(vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][int(joinIndices[2])][frame] * weights[2]) +
+							(vulkanRenderer->jointMatricesPerMesh[nextIndexGLTF][int(joinIndices[3])][frame] * weights[3]);
+
+						animatedVertex = vec4(vertex[0], vertex[1], vertex[2], 1.0) * skinMatrix;
+						calculateMeshBounds( animatedVertex );
+					}
+				} else {
+					calculateMeshBounds( animatedVertex );
+				}
+				
 				vulkanRenderer->aVertices_[nextIndexGLTF].Push({{vertex[0], vertex[1], vertex[2]},
 										 {normal[0], normal[1], normal[2]},
 										 {texture[0], texture[1]},
