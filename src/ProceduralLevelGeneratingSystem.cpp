@@ -99,13 +99,7 @@ namespace GLVM::core
 				float half_x = 0.0f;
 				float half_y = levelHalfY;
 				float half_z = 0.0f;
-				if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
-					half_x = transitionBridgeHalfWidth;
-					half_z = transitionBridgeHalfHeight;
-				} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-					half_x = transitionBridgeHalfHeight;
-					half_z = transitionBridgeHalfWidth;
-				}
+				setHalfExtentsFromDirection( half_x, half_z, transitionBridgeHalfWidth, transitionBridgeHalfHeight, nextLevelTransitionDirection );
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x, half_y, half_z, transitionBridgeVertices );
 
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
@@ -142,6 +136,19 @@ namespace GLVM::core
 		}
 	}
 
+	void ProceduralLevelGeneratingSystem::setHalfExtentsFromDirection( float& halfX, float& halfZ,
+																	   const float& transitionBridgeHalfWidth,
+																	   const float& transitionBridgeHalfHeight,
+																	   const float& nextLevelTransitionDirection ) {
+		if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
+			halfX = transitionBridgeHalfWidth;
+			halfZ = transitionBridgeHalfHeight;
+		} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
+			halfX = transitionBridgeHalfHeight;
+			halfZ = transitionBridgeHalfWidth;
+		}
+	}
+	
 	void ProceduralLevelGeneratingSystem::generateLevel( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 														 const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight ) {
 		std::random_device rd;
@@ -243,16 +250,8 @@ namespace GLVM::core
 			float width = 0;
 			float height = 0;
 			/// chose transitionBridgeHalfWidth as X and transitionBridgeHalfHeight as Z
-			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) { 
-				width = transitionBridgeHalfWidth;
-				height = transitionBridgeHalfHeight;
-			}
-			/// chose transitionBridgeHalfWidth as Z and transitionBridgeHalfHeight as X
-			if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-				width = transitionBridgeHalfHeight;
-				height = transitionBridgeHalfWidth;
-			}
-					
+			setHalfExtentsFromDirection( width, height, transitionBridgeHalfWidth, transitionBridgeHalfHeight, nextLevelTransitionDirection );
+			
 			if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, levelHalfY, height ) ) {
 				/// Need to choose another direction if we got collided with level
 				nextLevelTransitionDirection = (4 + nextLevelTransitionDirection) % 4 + 1;
