@@ -35,26 +35,26 @@ namespace GLVM::core
 				std::random_device rd;
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
-				unsigned int half_y_rand = distCurrentLevel_y(mersenne);
+				unsigned int levelHalfY = distCurrentLevel_y(mersenne);
 				std::uniform_int_distribution<int> distCurrentLevel_x_z(8, 16);
-				unsigned int half_x_rand = distCurrentLevel_x_z(mersenne);
-				unsigned int half_z_rand = distCurrentLevel_x_z(mersenne);
+				unsigned int levelHalfX = distCurrentLevel_x_z(mersenne);
+				unsigned int levelHalfZ = distCurrentLevel_x_z(mersenne);
 
 				constexpr float transitionBridgeHalfWidth  = 0.5f;              ///< Need to move on half
 				constexpr float transitionBridgeHalfHeight = 1.0f;
 				if ( levelNubmer != 0 ) {                                               ///< On first iteration we dont need to define where locate current level depends on previousTransitionBridge
-					generateLevel( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
+					generateLevel( levelHalfX, levelHalfY, levelHalfZ, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
 				} else {
 					// Set to first level maximum values
-					coordinateMaximumValuePerDirection.lowest_x  = currentLevelPosition[0] - half_x_rand;
-					coordinateMaximumValuePerDirection.highest_x = currentLevelPosition[0] + half_x_rand;
-					coordinateMaximumValuePerDirection.lowest_y  = currentLevelPosition[1] - half_y_rand;
-					coordinateMaximumValuePerDirection.highest_y = currentLevelPosition[1] + half_y_rand;
-					coordinateMaximumValuePerDirection.lowest_z  = currentLevelPosition[2] - half_z_rand;
-					coordinateMaximumValuePerDirection.highest_z = currentLevelPosition[2] + half_z_rand;
+					coordinateMaximumValuePerDirection.lowest_x  = currentLevelPosition[0] - levelHalfX;
+					coordinateMaximumValuePerDirection.highest_x = currentLevelPosition[0] + levelHalfX;
+					coordinateMaximumValuePerDirection.lowest_y  = currentLevelPosition[1] - levelHalfY;
+					coordinateMaximumValuePerDirection.highest_y = currentLevelPosition[1] + levelHalfY;
+					coordinateMaximumValuePerDirection.lowest_z  = currentLevelPosition[2] - levelHalfZ;
+					coordinateMaximumValuePerDirection.highest_z = currentLevelPosition[2] + levelHalfZ;
 				}
 				
-				generateTransitionBridge( half_x_rand, half_y_rand, half_z_rand, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
+				generateTransitionBridge( levelHalfX, levelHalfY, levelHalfZ, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
 
 				for ( unsigned int i = 0; i < 36; ++i )
 					indices.push_back(boxIndicesForIndexBuffer[i]);
@@ -62,7 +62,7 @@ namespace GLVM::core
 				allMeshMaxAbsoluteValues.Push({});
 				meshAxisLimitingValues.setToDefaultValues();
 
-				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x_rand, half_y_rand, half_z_rand, nextLevel );
+				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, levelHalfX, levelHalfY, levelHalfZ, nextLevel );
 
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
 				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
@@ -97,7 +97,7 @@ namespace GLVM::core
 				meshAxisLimitingValues.setToDefaultValues();
 
 				float half_x = 0.0f;
-				float half_y = half_y_rand;
+				float half_y = levelHalfY;
 				float half_z = 0.0f;
 				if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
 					half_x = transitionBridgeHalfWidth;
@@ -142,7 +142,7 @@ namespace GLVM::core
 		}
 	}
 
-	void ProceduralLevelGeneratingSystem::generateLevel( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
+	void ProceduralLevelGeneratingSystem::generateLevel( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 														 const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight ) {
 		std::random_device rd;
 		std::mt19937 mersenne(rd());
@@ -152,47 +152,47 @@ namespace GLVM::core
 			switch( previousIterationTransitionBridgeDirection ) {
 			case 1:
 			{
-				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
+				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, levelHalfX * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-				currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
+				currentLevelPosition[0] = transitionBridgePosition[0] - levelHalfX + transitionBridgeHalfWidth
 					+ previousTransitionBridgeAnchorPoint;
-				currentLevelPosition[2] = transitionBridgePosition[2] + half_z_rand + transitionBridgeHalfHeight;
+				currentLevelPosition[2] = transitionBridgePosition[2] + levelHalfZ + transitionBridgeHalfHeight;
 			}
 			break;
 			case 2:
 			{
-				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );
+				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, levelHalfZ * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-				currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
+				currentLevelPosition[2] = transitionBridgePosition[2] - levelHalfZ + transitionBridgeHalfWidth
 					+ previousTransitionBridgeAnchorPoint;
-				currentLevelPosition[0] = transitionBridgePosition[0] + half_x_rand + transitionBridgeHalfHeight;
+				currentLevelPosition[0] = transitionBridgePosition[0] + levelHalfX + transitionBridgeHalfHeight;
 			}
 			break;
 			case 3:
 			{
-				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );
+				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, levelHalfX * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-				currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand + transitionBridgeHalfWidth
+				currentLevelPosition[0] = transitionBridgePosition[0] - levelHalfX + transitionBridgeHalfWidth
 					+ previousTransitionBridgeAnchorPoint;
-				currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand - transitionBridgeHalfHeight;
+				currentLevelPosition[2] = transitionBridgePosition[2] - levelHalfZ - transitionBridgeHalfHeight;
 			}
 			break;
 			case 4:
 			{
-				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );
+				std::uniform_int_distribution<int> distPreviousTransitionBridgeAnchorPoint( 0, levelHalfZ * 2 - 1 );
 				previousTransitionBridgeAnchorPoint = distPreviousTransitionBridgeAnchorPoint(mersenne);
-				currentLevelPosition[2] = transitionBridgePosition[2] - half_z_rand + transitionBridgeHalfWidth
+				currentLevelPosition[2] = transitionBridgePosition[2] - levelHalfZ + transitionBridgeHalfWidth
 					+ previousTransitionBridgeAnchorPoint;
-				currentLevelPosition[0] = transitionBridgePosition[0] - half_x_rand - transitionBridgeHalfHeight;
+				currentLevelPosition[0] = transitionBridgePosition[0] - levelHalfX - transitionBridgeHalfHeight;
 			}
 			break;
 			}
 
-			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, half_x_rand, half_y_rand, half_z_rand ) ) {
+			if ( checkCollisionIntersectionWithMaximumCoordinates(currentLevelPosition, levelHalfX, levelHalfY, levelHalfZ ) ) {
 				std::cout << "LEVEL COLLITION DETECTED" << std::endl;
 				previousIterationTransitionBridgeDirection = (4 + previousIterationTransitionBridgeDirection) % 4 + 1;
 			} else {
-				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( currentLevelPosition, (float)half_x_rand, (float)half_y_rand, (float)half_z_rand );
+				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( currentLevelPosition, (float)levelHalfX, (float)levelHalfY, (float)levelHalfZ );
 				validLevel = true;
 			}
 		}

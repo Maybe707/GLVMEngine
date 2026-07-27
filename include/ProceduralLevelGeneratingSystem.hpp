@@ -48,7 +48,7 @@ namespace GLVM::core
 		MeshAxisLimitingValues coordinateMaximumValuePerDirection;             ///< contain maximum coordinate value in every direction for all generated levels
 		
 		void Update();
-		void generateLevel( const unsigned int half_x_rand, const unsigned int half_z_rand, const unsigned int half_y_rand,
+		void generateLevel( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
 		void generateTransitionBridge( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 									   const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
