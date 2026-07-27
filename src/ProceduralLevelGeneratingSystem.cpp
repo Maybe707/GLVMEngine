@@ -199,7 +199,7 @@ namespace GLVM::core
 		currentLevelPosition[1] = 0.0f;
 	}
 
-	void ProceduralLevelGeneratingSystem::generateTransitionBridge( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
+	void ProceduralLevelGeneratingSystem::generateTransitionBridge( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 																	const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight ) {
 		std::random_device rd;
 		std::mt19937 mersenne(rd());
@@ -210,53 +210,59 @@ namespace GLVM::core
 		float transitionBridgeOffset_z  = 0.0f;
 		bool validTransitionBridge = false;
 		while ( !validTransitionBridge ) {
-			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
-				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_x_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
+			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {     ///< Choose up (1) or down (3) insert point direction
+				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, levelHalfX * 2 - 1 );    ///< In what point we connect next transition bridge to current level
 				transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
-				transitionBridgeOffset_x = -(float)half_x_rand + (float)transitionBridgeAnchorPoint;
+				/// Summarize most left position with random value of point where transition bridge will be insert
+				transitionBridgeOffset_x = -(float)levelHalfX + (float)transitionBridgeAnchorPoint; 
 				if ( nextLevelTransitionDirection == 1 ) {
-					transitionBridgeOffset_z = half_z_rand;
-					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
+					transitionBridgeOffset_z = levelHalfZ;            ///< Move to the bottom level edge
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)levelHalfY,
 						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfHeight };
 				} else {
-					transitionBridgeOffset_z = -(float)half_z_rand;
-					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)half_y_rand,
+					transitionBridgeOffset_z = -(float)levelHalfZ;    ///< Move to the upper level edge
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfWidth, (float)levelHalfY,
 						currentLevelPosition[2] + transitionBridgeOffset_z - transitionBridgeHalfHeight };
 				}
-			} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
-				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, half_z_rand * 2 - 1 );    ///< In what point we connect next transition bridge to current level
+			} else if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {   ///< Choose left (2) or right (4) insert point direction
+				std::uniform_int_distribution<int> distTransitionBridgeAnchorPoint( 0, levelHalfZ * 2 - 1 );    ///< In what point we connect next transition bridge to current level
 				transitionBridgeAnchorPoint = distTransitionBridgeAnchorPoint(mersenne);
-				transitionBridgeOffset_z    = -(float)half_z_rand + (float)transitionBridgeAnchorPoint;
+				/// Summarize forwardmost position with random value of point where transition bridge will be insert
+				transitionBridgeOffset_z    = -(float)levelHalfZ + (float)transitionBridgeAnchorPoint;
 				if ( nextLevelTransitionDirection == 2 ) {
-					transitionBridgeOffset_x = half_x_rand;
-					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfHeight, (float)half_y_rand,
+					transitionBridgeOffset_x = levelHalfX;            ///< Move to the right level edge
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x + transitionBridgeHalfHeight, (float)levelHalfY,
 						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
 				} else {
-					transitionBridgeOffset_x = -(float)half_x_rand;
-					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x - transitionBridgeHalfHeight, (float)half_y_rand,
+					transitionBridgeOffset_x = -(float)levelHalfX;    ///< Move to the left level edge
+					transitionBridgePosition = { currentLevelPosition[0] + transitionBridgeOffset_x - transitionBridgeHalfHeight, (float)levelHalfY,
 						currentLevelPosition[2] + transitionBridgeOffset_z + transitionBridgeHalfWidth };
 				}
 			}
 
 			float width = 0;
 			float height = 0;
-			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) {
+			/// chose transitionBridgeHalfWidth as X and transitionBridgeHalfHeight as Z
+			if ( nextLevelTransitionDirection == 1 || nextLevelTransitionDirection == 3 ) { 
 				width = transitionBridgeHalfWidth;
 				height = transitionBridgeHalfHeight;
 			}
+			/// chose transitionBridgeHalfWidth as Z and transitionBridgeHalfHeight as X
 			if ( nextLevelTransitionDirection == 2 || nextLevelTransitionDirection == 4 ) {
 				width = transitionBridgeHalfHeight;
 				height = transitionBridgeHalfWidth;
 			}
 					
-			if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, half_y_rand, height ) ) {
+			if ( checkCollisionIntersectionWithMaximumCoordinates(transitionBridgePosition, width, levelHalfY, height ) ) {
+				/// Need to choose another direction if we got collided with level
 				nextLevelTransitionDirection = (4 + nextLevelTransitionDirection) % 4 + 1;
 			} else {
-				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( transitionBridgePosition, (float)width, (float)half_y_rand, (float)height );
+				/// Setting up bounds for all levels
+				coordinateMaximumValuePerDirection.comparePerDirectionAndSetToMaximumValueByModule( transitionBridgePosition, (float)width, (float)levelHalfY, (float)height );
 				validTransitionBridge = true;
 			}
 		}
-		transitionBridgePosition[1]         = currentLevelPosition[1];
+		transitionBridgePosition[1]                = currentLevelPosition[1];
 		previousIterationTransitionBridgeDirection = nextLevelTransitionDirection;
 	}
 

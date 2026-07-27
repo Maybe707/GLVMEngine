@@ -45,12 +45,12 @@ namespace GLVM::core
         std::vector<core::vector<core::Vertex>> levelGeneratedVertices;
         std::vector<std::vector<uint32_t>> levelGeneratedIndices;              ///< wavefront.obj indices
 		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
-		MeshAxisLimitingValues coordinateMaximumValuePerDirection;             ///< contain maximum coordinate value in every direction
+		MeshAxisLimitingValues coordinateMaximumValuePerDirection;             ///< contain maximum coordinate value in every direction for all generated levels
 		
 		void Update();
 		void generateLevel( const unsigned int half_x_rand, const unsigned int half_z_rand, const unsigned int half_y_rand,
 							const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
-		void generateTransitionBridge( const unsigned int half_x_rand, const unsigned int half_y_rand, const unsigned int half_z_rand,
+		void generateTransitionBridge( const unsigned int levelHalfX, const unsigned int levelHalfY, const unsigned int levelHalfZ,
 									   const float transitionBridgeHalfWidth, const float transitionBridgeHalfHeight );
 		void makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
 									 core::vector<core::Vertex>& destinationVerticesContainer );
