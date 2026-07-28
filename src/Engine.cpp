@@ -16,6 +16,7 @@
 #include "Archetypes/PlayerArchetype.hpp"
 #include "Archetypes/ProjectileArchetype.hpp"
 #include "Archetypes/StaticMeshArchetype.hpp"
+#include "Common/CommonFunctions.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
 #include "Components/AnimationComponent.hpp"
@@ -1288,19 +1289,12 @@ namespace GLVM::core
 
 			vulkanRenderer->frames.Push({});
 			vulkanRenderer->jointMatricesPerMesh.Push({});
-			allMeshMaxAbsoluteValues.Push({});
             
             unsigned int vertexIndex  = 0;
             unsigned int textureIndex = 0;
 			unsigned int normalIndex  = 0;
             unsigned int faceVerticesSize = wavefrontObjParser->getFaces().GetSize();
-
-			vulkanRenderer->meshAxisLimitingValues.highest_x = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.highest_y = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.highest_z = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.setToDefaultValues();
 			
             for (unsigned int i = 0; i < faceVerticesSize; ++i)
                 for (int j = 0; j < 3; ++j) {
@@ -1352,26 +1346,8 @@ namespace GLVM::core
 										{jointIndices[0], jointIndices[1], jointIndices[2]},
 										{weights[0], weights[1], weights[2]}});
                 }
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
-
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (vulkanRenderer->meshAxisLimitingValues.highest_x + vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (vulkanRenderer->meshAxisLimitingValues.highest_y + vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-			allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (vulkanRenderer->meshAxisLimitingValues.highest_z + vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
-			
+			setMeshBounds( vulkanRenderer->meshAxisLimitingValues );
 			++wavefrontObjCounter;
-			// std::cout << "WAVEFRONT" << std::endl;
-			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-			// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-			// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-			// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-			// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-			// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-			// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-			// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
         }
     }
 
@@ -1478,14 +1454,7 @@ namespace GLVM::core
 //            aIndices_.emplace_back();
 //            aVertices_.emplace_back();
 			vulkanRenderer->aVertices_.emplace_back();
-			allMeshMaxAbsoluteValues.Push({});
-
-			vulkanRenderer->meshAxisLimitingValues.highest_x = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_x  = MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.highest_y = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_y  = MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.highest_z = -MAXFLOAT;
-			vulkanRenderer->meshAxisLimitingValues.lowest_z  = MAXFLOAT;
+			vulkanRenderer->meshAxisLimitingValues.setToDefaultValues();
 
 			isAlreadyCached = false;
 			isModelCacheExists( pathsGLTF_[m] );
@@ -1565,26 +1534,7 @@ namespace GLVM::core
 			if( !isAlreadyCached ) {
 				writeModelsCache( pathsGLTF_[m] );
 			}
-//			uint32_t nextIndexGLTF = vulkanRenderer->wavefrontObjCounter + m;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (vulkanRenderer->meshAxisLimitingValues.highest_x - vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (vulkanRenderer->meshAxisLimitingValues.highest_y - vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (vulkanRenderer->meshAxisLimitingValues.highest_z - vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
-
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (vulkanRenderer->meshAxisLimitingValues.highest_x + vulkanRenderer->meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (vulkanRenderer->meshAxisLimitingValues.highest_y + vulkanRenderer->meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (vulkanRenderer->meshAxisLimitingValues.highest_z + vulkanRenderer->meshAxisLimitingValues.lowest_z) / 2.0f;
-			
-			// std::cout << "GLTF" << std::endl;
-			// std::cout << "max width: " << meshAxisLimitingValues.highest_x << std::endl;
-			// std::cout << "min width: " << meshAxisLimitingValues.lowest_x << std::endl;
-			// std::cout << "max height: " << meshAxisLimitingValues.highest_y << std::endl;
-			// std::cout << "min height: " << meshAxisLimitingValues.lowest_y << std::endl;
-			// std::cout << "max deep: " << meshAxisLimitingValues.highest_z << std::endl;
-			// std::cout << "min deep: " << meshAxisLimitingValues.lowest_z << std::endl;
-			
-			// std::cout << "half width: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x << std::endl;
-			// std::cout << "half height: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y << std::endl;
-			// std::cout << "half deep: " << allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z << std::endl;
+			setMeshBounds( vulkanRenderer->meshAxisLimitingValues );
 		}
 	}
 

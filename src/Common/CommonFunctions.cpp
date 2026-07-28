@@ -45,4 +45,16 @@ namespace GLVM::core {
 
 		return result;
 	}
+
+	void setMeshBounds( MeshAxisLimitingValues meshAxisLimitingValues ) {
+		allMeshMaxAbsoluteValues.Push({});
+		
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
+
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (meshAxisLimitingValues.highest_x + meshAxisLimitingValues.lowest_x) / 2.0f;
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (meshAxisLimitingValues.highest_y + meshAxisLimitingValues.lowest_y) / 2.0f;
+		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (meshAxisLimitingValues.highest_z + meshAxisLimitingValues.lowest_z) / 2.0f;
+	}
 }; ///< namespace GLVM::core

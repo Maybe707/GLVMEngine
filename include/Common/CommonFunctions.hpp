@@ -34,6 +34,8 @@ namespace GLVM::core {
 
 		return false;
 	}
+
+	void setMeshBounds( MeshAxisLimitingValues meshAxisLimitingValues );
 }; ///< namespace GLVM::core
 
 #endif

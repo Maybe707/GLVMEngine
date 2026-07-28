@@ -7,6 +7,7 @@
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
+#include "Common/CommonFunctions.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Constants.hpp"
@@ -59,19 +60,10 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < 36; ++i )
 					indices.push_back(boxIndicesForIndexBuffer[i]);
 
-				allMeshMaxAbsoluteValues.Push({});
 				meshAxisLimitingValues.setToDefaultValues();
 
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, levelHalfX, levelHalfY, levelHalfZ, nextLevel );
-
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (meshAxisLimitingValues.highest_x + meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (meshAxisLimitingValues.highest_y + meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (meshAxisLimitingValues.highest_z + meshAxisLimitingValues.lowest_z) / 2.0f;
-				
+				setMeshBounds( meshAxisLimitingValues );
 
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
 				arch::entity gameLevelChunkEntity = archEntityManager->createEntity();
@@ -93,7 +85,6 @@ namespace GLVM::core
 				for ( unsigned int i = 0; i < 36; ++i )
 					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
 
-				allMeshMaxAbsoluteValues.Push({});
 				meshAxisLimitingValues.setToDefaultValues();
 
 				float half_x = 0.0f;
@@ -101,15 +92,7 @@ namespace GLVM::core
 				float half_z = 0.0f;
 				setHalfExtentsFromDirection( half_x, half_z, transitionBridgeHalfWidth, transitionBridgeHalfHeight, nextLevelTransitionDirection );
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x, half_y, half_z, transitionBridgeVertices );
-
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (meshAxisLimitingValues.highest_x + meshAxisLimitingValues.lowest_x) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (meshAxisLimitingValues.highest_y + meshAxisLimitingValues.lowest_y) / 2.0f;
-				allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (meshAxisLimitingValues.highest_z + meshAxisLimitingValues.lowest_z) / 2.0f;
-
+				setMeshBounds( meshAxisLimitingValues );
 
 				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = GLVM->LoadMesh();
 				arch::entity transitionBridgeEntity = archEntityManager->createEntity();
