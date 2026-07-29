@@ -26,6 +26,8 @@ namespace GLVM::ecs {
 		} view;
 		
 		arch::componentMask requiredMask =
+			(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+			(1ul << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
