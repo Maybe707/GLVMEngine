@@ -106,8 +106,9 @@ namespace GLVM::core
     Engine* Engine::pInstance_ = nullptr;
     std::mutex Engine::Mutex_;
 
-    void PlaybackSound(Sound::ISoundEngine* _sound_Engine) {
-        while(1) {
+    void PlaybackSound(Sound::ISoundEngine* _sound_Engine, std::atomic<bool>& runningSound) {
+		runningSound = true;
+        while( runningSound ) {
 			_sound_Engine->SoundStream();
 		}
     }
@@ -144,8 +145,10 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(inventorySystem);
 		pSystem_Manager->ActivateSystem(itemSystem);
 
-		// std::thread sound_thread(PlaybackSound, std::ref(soundEngine));
-		// sound_thread.detach();
+		sound_thread = std::thread(PlaybackSound, std::ref(soundEngine), std::ref(runningSound));
+//		sound_thread.detach();
+		soundEngine->OpenDevice( "default" );
+//		soundEngine->SetMasterVolume( 10 );
     }
 	
     Engine::~Engine() {}
@@ -1703,8 +1706,17 @@ namespace GLVM::core
 	
     void Engine::GameKill()
     {
+		runningSound = false;
+		soundEngine->CloseDevice();
+		
+		if (sound_thread.joinable())
+		{
+			sound_thread.join();
+		}
+		
 		delete soundEngine;
 		soundEngine = nullptr;
+		
 		delete chrono;
 		chrono = nullptr;
 		delete collisionSystem;

@@ -52,7 +52,11 @@ namespace GLVM::ecs
 			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
 		
 		void Update() override;
-		void CalculateProjectile(components::transform* playerTransformComponent, components::transform* enemyTransformComponent);
+		void CalculateProjectile(const vec3& projectilePosition,
+								 const vec3& projectileForward,
+								 const ecs::components::MeshHandle& meshHandle,
+								 const components::material& material,
+								 const components::damage& damage);
 
 		core::Sound::ISoundEngine* soundEngine;
 		core::vector<ecs::TextureHandle> textureHandlers;

@@ -82,8 +82,11 @@ namespace GLVM::ecs
 		template< typename T >
 	    requires UnitOrEnemy<T> && HasAttack<T>
 		static void markAsAttacked( T* arch, components::damage* projectileDamage, uint32_t entityIndex );
-        void CalculateProjectile(components::transform* playerTransform,
-                                 components::beholder* beholder);
+        void CalculateProjectile(const vec3& projectilePosition,
+								 const vec3& projectileForward,
+								 const ecs::components::MeshHandle& meshHandle,
+								 const components::material& material,
+								 const components::damage& damage);
     };
 
 	

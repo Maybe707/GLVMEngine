@@ -10,7 +10,10 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include "Components/DamageComponent.hpp"
+#include "Components/MaterialComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
+#include "Texture.hpp"
 #include <cstdint>
 
 namespace GLVM::ecs
@@ -53,7 +56,37 @@ namespace GLVM::ecs
 			
 				if ( distance.Length() <= enemyComponent->detectRadius ) {
 					if(projectileCooldown <= 0) {
-						CalculateProjectile(playerTransformComponent, enemyTransformComponent);
+						ecs::components::MeshHandle meshHandle{};
+						const u32 sphereMeshHandleIndex = 2;
+						if ( meshHandlers.GetSize() > 2 )
+							meshHandle = meshHandlers[sphereMeshHandleIndex];
+
+						ecs::TextureHandle textureHandle{};
+						const u32 grayTextureHandle = 2;
+						if ( textureHandlers.GetSize() > 2 )
+							textureHandle = textureHandlers[grayTextureHandle];
+
+						const components::material material = { .diffuseTextureID_ = textureHandle,
+							.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
+							.shininess = 128.0f * 0.078125f };
+
+						const components::damage damage = { .maximumDamage = 40, .minimumDamage = 20, .criticalHitRate = 0, .criticalModifier = 0 };
+						
+						CalculateProjectile(enemyTransformComponent->position,
+											playerTransformComponent->position - enemyTransformComponent->position,
+											meshHandle,
+											material,
+											damage);
+
+						// core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+						// pSound_Sample->kPath_to_File_ = "../laser2.wav";
+						// pSound_Sample->uiDuration_ = 5;
+						// pSound_Sample->uiRate_ = 22050;
+						// pSound_Sample->volume  = 0.05;
+						// soundEngine->GetSoundContainer().Push(pSound_Sample);
+
+						soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
+						
 						projectileCooldown = 5.0;
 					}
 
@@ -63,7 +96,11 @@ namespace GLVM::ecs
 		}
 	}
 
-	void EnemySystem::CalculateProjectile(components::transform* playerTransformComponent, components::transform* enemyTransformComponent) {
+	void EnemySystem::CalculateProjectile(const vec3& projectilePosition,
+										  const vec3& projectileForward,
+										  const ecs::components::MeshHandle& meshHandle,
+										  const components::material& material,
+										  const components::damage& damage) {
 		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
 		arch::entity projectileEntity = archEntityManager->createEntity();
 		projectileArchetypesNumber = 0;
@@ -73,35 +110,24 @@ namespace GLVM::ecs
 		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
 		const uint32_t projectileIndex = projectileLocation.index;
 		
-		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-		pSound_Sample->kPath_to_File_ = "../laser2.wav";
-		pSound_Sample->uiDuration_ = 5;
-		pSound_Sample->uiRate_ = 22050;
-		soundEngine->GetSoundContainer().Push(pSound_Sample);
-
-		ecs::components::MeshHandle meshHandle{};
-		if ( meshHandlers.GetSize() > 0 )
-			meshHandle = meshHandlers[2];
+		// core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+		// pSound_Sample->kPath_to_File_ = "../laser2.wav";
+		// pSound_Sample->uiDuration_ = 5;
+		// pSound_Sample->uiRate_ = 22050;
+		// soundEngine->GetSoundContainer().Push(pSound_Sample);
 
 		ecs::components::mesh* projectileMesh = &projectileArch->meshes[projectileIndex];
 		projectileMesh->handle = meshHandle;
-		ecs::TextureHandle textureHandle{};
-		if ( textureHandlers.GetSize() > 0 )
-			textureHandle = textureHandlers[0];
 
 		arch::ProjectileBundle* projectileBundle = &projectileArch->projectileBundles[projectileIndex];
-		projectileBundle->material  = { .diffuseTextureID_ = textureHandle,
-			.specularTextureID_ = textureHandle, .ambient = { 0.05f, 0.05f, 0.05f },
-			.shininess = 128.0f * 0.078125f };
+		projectileBundle->material  = material;
 		
 		components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
 		rTransformProjectile->scale = 0.1f;
-		rTransformProjectile->position = enemyTransformComponent->position;
-		rTransformProjectile->forward   = playerTransformComponent->position - enemyTransformComponent->position;
+		rTransformProjectile->position = projectilePosition;
+		rTransformProjectile->forward   = projectileForward;
 		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
 		
-		components::damage* damageComponent = &projectileBundle->damage;
-		damageComponent->maximumDamage = 40;
-		damageComponent->minimumDamage = 20;
+		projectileBundle->damage = damage;
 	}
 } // namespace GLVM::ecs

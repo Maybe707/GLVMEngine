@@ -66,6 +66,8 @@ namespace GLVM::core
         
 		Time::IChrono       * chrono;
         Sound::ISoundEngine * soundEngine;
+		std::thread          sound_thread;
+		std::atomic<bool>    runningSound{ false };
 		float                deltaFrameTime;
 		float                gravity;
 //		CStack               Input_Stack_;
