@@ -58,7 +58,8 @@ namespace GLVM::ecs
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
 			cm::beholder*  playerView      = &componentsView.playerViews[i];
 			cm::transform* playerTransform = &componentsView.playerTransforms[i];
-            for(int n = 0; n < 6; ++n) {
+			const u32 maxEventNumber = 6;
+            for(u32 n = 0; n < maxEventNumber; ++n) {
                 if(!isInventoryOpened && inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                     if(projectileCooldown <= 0) {
 						ecs::components::MeshHandle meshHandle{};
@@ -114,7 +115,9 @@ namespace GLVM::ecs
 		/// Iterate every projectile, check for collistions with another entities and update damage info if collided entity has attack component
         for(unsigned int i = 0; i < archView.projectileArchetype->entityCount; ++i) {
 			cm::colliderFlags* projectileColliderFlags = &componentsView.projectileColliderFlags[i];
-            if((projectileColliderFlags->flags & 1) || (projectileColliderFlags->flags & (1 << 1))) {
+			const u8 wallCollisionBit    = 1;
+			const u8 groundCollistionBit = (1 << 1);
+            if((projectileColliderFlags->flags & wallCollisionBit) || (projectileColliderFlags->flags & groundCollistionBit)) {
 				cm::damage* projectileDamage = &componentsView.projectileBundles[i].damage;
 				cm::collider* projectileCollider = &componentsView.projectileColliders[i];
 				for ( unsigned int j = 0; j < projectileCollider->colliders.GetSize(); ++j ) {
