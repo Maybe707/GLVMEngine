@@ -17,6 +17,7 @@
 #include "Components/DamageComponent.hpp"
 #include "Components/StateComponent.hpp"
 #include "ISoundEngine.hpp"
+#include "Common/CommonFunctions.hpp"
 
 namespace GLVM::ecs
 {
@@ -49,14 +50,14 @@ namespace GLVM::ecs
 			(1ul << arch::ComponentsIndices::ENEMY_COMPONENT);
 
 		arch::componentMask projectileRequiredMask =
-			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 		
 		void Update() override;
-		void CalculateProjectile(const vec3& projectilePosition,
-								 const vec3& projectileForward,
-								 const ecs::components::MeshHandle& meshHandle,
-								 const components::material& material,
-								 const components::damage& damage);
+		// void CalculateProjectile(const vec3& projectilePosition,
+		// 						 const vec3& projectileForward,
+		// 						 const ecs::components::MeshHandle& meshHandle,
+		// 						 const components::material& material,
+		// 						 const components::damage& damage);
 
 		core::Sound::ISoundEngine* soundEngine;
 		core::vector<ecs::TextureHandle> textureHandlers;

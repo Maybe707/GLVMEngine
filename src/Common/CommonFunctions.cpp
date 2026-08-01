@@ -57,4 +57,28 @@ namespace GLVM::core {
 		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (meshAxisLimitingValues.highest_y + meshAxisLimitingValues.lowest_y) / 2.0f;
 		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (meshAxisLimitingValues.highest_z + meshAxisLimitingValues.lowest_z) / 2.0f;
 	}
+
+	void CreateProjectile(const vec3& projectilePosition,
+							 const vec3& projectileForward,
+							 const ecs::components::MeshHandle& meshHandle,
+							 const ecs::components::material& material,
+							 const ecs::components::damage& damage,
+							 const ecs::arch::EntityLocation& projectileLocation) {
+		ecs::arch::ProjectileArchetype* projectileArch = static_cast<ecs::arch::ProjectileArchetype*>(projectileLocation.arch);
+		const uint32_t projectileIndex = projectileLocation.index;
+		
+		ecs::components::mesh* projectileMesh = &projectileArch->meshes[projectileIndex];
+		projectileMesh->handle = meshHandle;
+
+		ecs::arch::ProjectileBundle* projectileBundle = &projectileArch->projectileBundles[projectileIndex];
+		projectileBundle->material  = material;
+		
+		ecs::components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
+		rTransformProjectile->scale = 0.1f;
+		rTransformProjectile->position = projectilePosition;
+		rTransformProjectile->forward   = projectileForward;
+		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
+		
+		projectileBundle->damage = damage;
+	}
 }; ///< namespace GLVM::core

@@ -27,6 +27,7 @@
 #include "ISoundEngine.hpp"
 #include "ArchetypeECS/ArchECS_Utils.hpp"
 #include <cstdint>
+#include "Common/CommonFunctions.hpp"
 
 namespace GLVM::ecs
 {
@@ -75,18 +76,18 @@ namespace GLVM::ecs
 			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
 
 		arch::componentMask projectileRequiredMask =
-			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 		
         CProjectileSystem(core::CStack& inputStack);
         void Update() override;
 		template< typename T >
 	    requires UnitOrEnemy<T> && HasAttack<T>
 		static void markAsAttacked( T* arch, components::damage* projectileDamage, uint32_t entityIndex );
-        void CalculateProjectile(const vec3& projectilePosition,
-								 const vec3& projectileForward,
-								 const ecs::components::MeshHandle& meshHandle,
-								 const components::material& material,
-								 const components::damage& damage);
+        // void CalculateProjectile(const vec3& projectilePosition,
+		// 						 const vec3& projectileForward,
+		// 						 const ecs::components::MeshHandle& meshHandle,
+		// 						 const components::material& material,
+		// 						 const components::damage& damage);
     };
 
 	

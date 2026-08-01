@@ -10,6 +10,11 @@
 #include "Components/VertexComponent.hpp"
 #include "Globals.hpp"
 #include "typenames.hpp"
+#include "ComponentsFullSet.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "Archetypes/ProjectileArchetype.hpp"
+#include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include "ArchetypeECS/ArchECS_World.hpp"
 
 namespace GLVM::core {
 	bool BoxCollider(
@@ -36,6 +41,12 @@ namespace GLVM::core {
 	}
 
 	void setMeshBounds( MeshAxisLimitingValues meshAxisLimitingValues );
+	void CreateProjectile(const vec3& projectilePosition,
+							 const vec3& projectileForward,
+							 const ecs::components::MeshHandle& meshHandle,
+							 const ecs::components::material& material,
+							 const ecs::components::damage& damage,
+							 const ecs::arch::EntityLocation& projectileLocation);
 }; ///< namespace GLVM::core
 
 #endif

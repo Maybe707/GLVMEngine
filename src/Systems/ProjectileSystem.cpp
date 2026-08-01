@@ -73,21 +73,21 @@ namespace GLVM::ecs
 
 						const components::damage damage = { .maximumDamage = 40, .minimumDamage = 20, .criticalHitRate = 0, .criticalModifier = 0 };
 
-                        CalculateProjectile(playerTransform->position,
-                                            playerView->forward,
-											meshHandle,
-											material,
-											damage);
-
-						// core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-						// pSound_Sample->kPath_to_File_ = "../laser2.wav";
-						// pSound_Sample->uiDuration_ = 5;
-						// pSound_Sample->uiRate_ = 22050;
-						// pSound_Sample->volume  = 0.05;
-						// soundEngine->GetSoundContainer().Push(pSound_Sample);
+						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
+						projectileArchetypesNumber = 0;
+						ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
+						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
+						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
+						
+						core::CreateProjectile(playerTransform->position,
+											   playerView->forward,
+											   meshHandle,
+											   material,
+											   damage,
+											   projectileLocation);
 
 						soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
-						
                         projectileCooldown = 2.0;
                     }
                 }
@@ -131,43 +131,5 @@ namespace GLVM::ecs
 //                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
             }
         }
-    }
-
-    void CProjectileSystem::CalculateProjectile(const vec3& projectilePosition,
-												const vec3& projectileForward,
-												const ecs::components::MeshHandle& meshHandle,
-												const components::material& material,
-												const components::damage& damage) {
-		namespace cm = GLVM::ecs::components;
-
-		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
-		arch::entity projectileEntity = archEntityManager->createEntity();
-		projectileArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
-		arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
-		arch::EntityLocation projectileLocation = arch::world.entityLocations[arch::getId( projectileEntity )];
-		arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
-		const uint32_t projectileIndex = projectileLocation.index;
-
-        // core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-        // pSound_Sample->kPath_to_File_ = "../laser2.wav";
-        // pSound_Sample->uiDuration_ = 5;
-        // pSound_Sample->uiRate_ = 22050;
-        // soundEngine->GetSoundContainer().Push(pSound_Sample);
-
-		ecs::components::mesh* projectileMesh = &projectileArch->meshes[projectileIndex];
-		projectileMesh->handle = meshHandle;
-
-		arch::ProjectileBundle* projectileBundle = &projectileArch->projectileBundles[projectileIndex];
-		projectileBundle->material  = material;
-		components::transform* projectileTransform = &projectileArch->transforms[projectileIndex];
-		projectileTransform->scale = 0.1f;
-		
-		projectileTransform->position = projectilePosition;
-
-        projectileTransform->forward   = projectileForward;
-		projectileTransform->position  += projectileTransform->forward * 2.0f;
-
-		projectileBundle->damage = damage;
     }
 }

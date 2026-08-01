@@ -43,6 +43,7 @@ namespace GLVM::ecs::arch {
 			PLAYER_TAG_COMPONENT,
 			CROSSHAIR_TAG_COMPONENT,
 			STATIC_MESH_TAG_COMPONENT,
+			PROJECTILE_TAG_COMPONENT,
 			
 			COMPONENTS_COUNT
 		};
@@ -146,7 +147,8 @@ namespace GLVM::ecs::arch {
 		(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
 		(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 		(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-		(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+		(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
+		(1ull << ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 };
 
 

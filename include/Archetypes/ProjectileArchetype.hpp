@@ -13,6 +13,7 @@
 #include "Globals.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Components/ProjectileBundle.hpp"
+#include "TagComponents/ProjectileTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	constexpr uint32_t PROJECTILE_ARCH_CHUNK_SIZE =
@@ -22,7 +23,8 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::collider) +
 		 sizeof(components::colliderFlags) +
 		 sizeof(components::rotation) +
-		 sizeof(ProjectileBundle));
+		 sizeof(ProjectileBundle) +
+		 sizeof(tagComponents::projectileTagComponent));
 	
 	struct ProjectileArchetype : Archetype {
 		components::transform     transforms[PROJECTILE_ARCH_CHUNK_SIZE];
@@ -31,6 +33,7 @@ namespace GLVM::ecs::arch {
 		components::colliderFlags colliderFlags[PROJECTILE_ARCH_CHUNK_SIZE];
 		components::rotation      rotations[PROJECTILE_ARCH_CHUNK_SIZE];
 		ProjectileBundle          projectileBundles[PROJECTILE_ARCH_CHUNK_SIZE];
+		tagComponents::projectileTagComponent projectileTagComponents[PROJECTILE_ARCH_CHUNK_SIZE];
 
 		ProjectileArchetype() {
 			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
@@ -39,6 +42,7 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]    = colliderFlags;
 			components[ComponentsIndices::ROTATION_COMPONENT]          = rotations;
 			components[ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT] = projectileBundles;
+			components[ComponentsIndices::PROJECTILE_TAG_COMPONENT]    = projectileTagComponents;
 
 			mask =
 				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
@@ -46,7 +50,8 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
 				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT);
+				(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
+				(1ull << ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
 			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
@@ -54,7 +59,8 @@ namespace GLVM::ecs::arch {
 			componentIds[3] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
 			componentIds[4] = ComponentsIndices::ROTATION_COMPONENT;
 			componentIds[5] = ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT;
-			componentCount = 6;
+			componentIds[6] = ComponentsIndices::PLAYER_TAG_COMPONENT;
+			componentCount = 7;
 		}
 	};
 };
