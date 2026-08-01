@@ -13,6 +13,7 @@
 #include <bits/types/FILE.h>
 #include "ISoundEngine.hpp"
 #include "typenames.hpp"
+#include <algorithm>
 
 namespace GLVM::core::Sound
 {

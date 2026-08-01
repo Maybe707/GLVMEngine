@@ -21,28 +21,20 @@ namespace GLVM::core::Sound
     {
         for(unsigned int i = 0; i < tSound_Contaier.GetSize(); ++i)
         {
-            // std::cout << (*tSound_Contaier[i]).kPath_to_File_ << std::endl;
-            // std::cout << (*tSound_Contaier[i]).uiDuration_ << std::endl;
-            // std::cout << (*tSound_Contaier[i]).uiRate_ << std::endl;
             PlaybackSoundSample(*tSound_Contaier[i]);
 			tSound_Contaier.Remove(i);
-//            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
         }
     }
 
     void CSoundEngineAlsa::PlaybackSoundSample(CSoundSample& _sound_sample)
     {
-//        const char *kDevice = "default";
         snd_pcm_format_t format = SND_PCM_FORMAT_S16_LE;
-//            snd_pcm_format_t format = SND_PCM_FORMAT_S24_LE;
         snd_pcm_access_t access = SND_PCM_ACCESS_RW_INTERLEAVED;
         unsigned int uiChannels = 2, uiRate;
         unsigned int uiLatency = 500000; /* 0.5 s */
-//        snd_pcm_t *pPcm;
         unsigned int uiFrame_Size = uiChannels * 2;
 
         uiRate = _sound_sample.uiRate_;
-//        (snd_pcm_open(&pPcm, kDevice, SND_PCM_STREAM_PLAYBACK, 0));
         (snd_pcm_set_params(pPcm, format, access, uiChannels, uiRate, 1, uiLatency));
 
 #define FRAMES 32
@@ -67,7 +59,7 @@ namespace GLVM::core::Sound
 			{
 				int32_t s = static_cast<int32_t>(samples[i] * _sound_sample.volume);
 
-//					s = std::clamp(s, -32768, 32767);
+				s = std::clamp(s, -32768, 32767);
 
 				samples[i] = static_cast<int16_t>(s);
 			}
@@ -84,9 +76,6 @@ namespace GLVM::core::Sound
             }
         }
         free(buf);
-
-//        snd_pcm_drain(pPcm);
-//        snd_pcm_close(pPcm);
     }
 
     void CSoundEngineAlsa::SetMasterVolume(long _lVolume)

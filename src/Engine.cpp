@@ -146,9 +146,7 @@ namespace GLVM::core
 		pSystem_Manager->ActivateSystem(itemSystem);
 
 		sound_thread = std::thread(PlaybackSound, std::ref(soundEngine), std::ref(runningSound));
-//		sound_thread.detach();
 		soundEngine->OpenDevice( "default" );
-//		soundEngine->SetMasterVolume( 10 );
     }
 	
     Engine::~Engine() {}
