@@ -47,10 +47,14 @@ namespace GLVM::ecs
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.playerViews      = (ecs::components::beholder*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::VIEW_COMPONENT];
+
+		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
+		projectileArchetypesNumber = 0;
 		
         if(projectileCooldown > 0)
             projectileCooldown -= cameraSpeed;
 
+		/// Iterate on every player and create projectile if "LMB pressed" event found 
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
 			cm::beholder*  playerView      = &componentsView.playerViews[i];
 			cm::transform* playerTransform = &componentsView.playerTransforms[i];
@@ -75,8 +79,6 @@ namespace GLVM::ecs
 
 						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
-						projectileArchetypesNumber = 0;
-						ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
 						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
 						
@@ -94,8 +96,6 @@ namespace GLVM::ecs
             }
         }
 
-		projectileArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 		componentsView.projectileTransforms    = (ecs::components::transform*)archView.projectileArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.projectileColliderFlags = (ecs::components::colliderFlags*)archView.projectileArchetype->
@@ -105,11 +105,13 @@ namespace GLVM::ecs
 		componentsView.projectileBundles     = (arch::ProjectileBundle*)archView.projectileArchetype->
 			components[arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT];
 
+		/// Update position of every projectile
         for(unsigned int x = 0; x < archView.projectileArchetype->entityCount; ++x) {
             cm::transform* projectileTransform = &componentsView.projectileTransforms[x];
 			projectileTransform->position += Normalize(projectileTransform->forward) * cameraSpeed * 2.5;
 		}
 
+		/// Iterate every projectile, check for collistions with another entities and update damage info if collided entity has attack component
         for(unsigned int i = 0; i < archView.projectileArchetype->entityCount; ++i) {
 			cm::colliderFlags* projectileColliderFlags = &componentsView.projectileColliderFlags[i];
             if((projectileColliderFlags->flags & 1) || (projectileColliderFlags->flags & (1 << 1))) {

@@ -34,6 +34,9 @@ namespace GLVM::ecs
 			components[arch::ComponentsIndices::STATE_COMPONENT];
 		componentsView.enemies         = (ecs::components::enemy*)archView.enemyCachedArchetype->
 			components[arch::ComponentsIndices::ENEMY_COMPONENT];
+
+		projectileArchetypesNumber = 0;
+		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 		
 		for( uint32_t j = 0; j < archView.playerCachedArchetype->entityCount; ++j ) {
 			components::transform* playerTransformComponent = &componentsView.playerTransforms[j];
@@ -74,8 +77,6 @@ namespace GLVM::ecs
 
 						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
-						projectileArchetypesNumber = 0;
-						ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
 						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
 						
