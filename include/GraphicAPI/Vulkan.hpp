@@ -175,6 +175,7 @@ namespace GLVM::core
 		core::vector<RenderItem> items;
 		core::vector<RenderCrosshair> crosshairs;
 		core::vector<RenderPlayer> players;
+		RenderPlayer player;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;

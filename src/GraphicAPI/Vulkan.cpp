@@ -2339,8 +2339,10 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
+//		RenderPlayer player = {};
 		for( unsigned int playerCounter = 0; playerCounter < players.GetSize(); ++playerCounter ) {
-			RenderPlayer player = players[playerCounter];
+			player = players[playerCounter];
+		}
 			unsigned int currentActorMemoryOffset = 0;
 			for ( unsigned int i = 0; i < fonts.GetSize(); ++i ) {
 				RenderFont font = fonts[i];
@@ -2398,7 +2400,7 @@ namespace GLVM::core
 				}
 				currentActorMemoryOffset += currentFrame * fontUboDescriptorNumber + font.font_string.GetSize();
 			}
-		}
+//		}
 
         vkCmdEndRenderPass(commandBuffer);
 
@@ -2426,8 +2428,16 @@ namespace GLVM::core
         renderPassInfo.renderArea.extent.height = swapChainExtent.height;
 		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
 
+		for( unsigned int player = 0; player < players.GetSize(); ++player ) {
+			updateViewPositionUniformBuffer(currentFrame, player);
+		}
+		
         std::array<VkClearValue, 2> clearValues{};
-        clearValues[0].color = {{0.2f, 0.2f, 0.2f, 1.0f}};
+		if( players.GetSize() == 0 ) {
+			clearValues[0].color = {{0.7f, 0.2f, 0.2f, 1.0f}};   ///< Player death screen
+		} else {
+			clearValues[0].color = {{0.2f, 0.2f, 0.2f, 1.0f}};
+		}
         clearValues[1].depthStencil = {1.0f, 0};
 
         renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
@@ -2450,47 +2460,45 @@ namespace GLVM::core
         scissor.offset = {0, 0};
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
-
-		for( unsigned int player = 0; player < players.GetSize(); ++player ) {
-			for ( unsigned int i = 0; i < actors.GetSize(); ++i ) {
-				RenderActor actor = actors[i];
-				unsigned int uiVertexId = actor.meshID;
-				unsigned int diffuseTextureIndex = actor.diffuseTextureIndex;
-				unsigned int specularTextureIndex = actor.specularTextureIndex;
+		
+		for ( unsigned int i = 0; i < actors.GetSize(); ++i ) {
+			RenderActor actor = actors[i];
+			unsigned int uiVertexId = actor.meshID;
+			unsigned int diffuseTextureIndex = actor.diffuseTextureIndex;
+			unsigned int specularTextureIndex = actor.specularTextureIndex;
 				
-				unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
-				updateMatrixUniformBuffer(uboIndex, i);
-				const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
-				const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-										0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+			unsigned int uboIndex = currentFrame * matrixUboDescriptorsNumber + i;
+			updateMatrixUniformBuffer(uboIndex, i);
+			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[0];
+			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
-				updateViewPositionUniformBuffer(currentFrame, player);
-				const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
-				const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
-										1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
+			const unsigned int linkedDescriptorSetID1 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[1];
+			const DescriptorSet& currentDescriptorSet1 = descriptorSetsConfig[linkedDescriptorSetID1];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout,
+									1, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet1.descriptorSetOffset + currentFrame)), 0, nullptr);
 
-				VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
-				VkDeviceSize offsets[] = {0};
-				vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-				vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-				unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-				const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
-				const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame)), 0, nullptr);
-				const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
-				const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
-				vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
-										&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame)), 0, nullptr);
+			const unsigned int linkedDescriptorSetID2 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[2];
+			const DescriptorSet& currentDescriptorSet2 = descriptorSetsConfig[linkedDescriptorSetID2];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 2, 1,
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet2.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * specularTextureIndex + currentFrame)), 0, nullptr);
+			const unsigned int linkedDescriptorSetID3 = pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].linkedDescriptorSetIDs[3];
+			const DescriptorSet& currentDescriptorSet3 = descriptorSetsConfig[linkedDescriptorSetID3];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MAIN_RENDER_PIPELINE].pipelineLayout, 3, 1,
+									&(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet3.descriptorSetOffset + MAX_FRAMES_IN_FLIGHT * diffuseTextureIndex + currentFrame)), 0, nullptr);
 			
-				vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-			}
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
+//		}
 
         vkCmdEndRenderPass(commandBuffer);
 

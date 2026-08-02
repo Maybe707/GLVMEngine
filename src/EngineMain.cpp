@@ -191,7 +191,7 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, -3.0f ) + randomDirection }, .scale = 0.05f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 25, 3.0f, -3.0f ) + randomDirection }, .scale = 1.0f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
@@ -213,7 +213,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 32.0f * 0.078125f };
 	}

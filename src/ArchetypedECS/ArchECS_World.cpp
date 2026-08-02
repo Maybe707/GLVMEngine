@@ -71,7 +71,7 @@ namespace GLVM::ecs::arch {
             entityLocations[movedId].index = index;
         }
 
-        location.arch = nullptr;
+//        location.arch = nullptr;
     }
 
 	void World::searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber ) {

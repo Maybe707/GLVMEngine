@@ -77,7 +77,7 @@ namespace GLVM::core {
 		rTransformProjectile->scale = 0.1f;
 		rTransformProjectile->position = projectilePosition;
 		rTransformProjectile->forward   = projectileForward;
-		rTransformProjectile->position += rTransformProjectile->forward * 0.3;
+		rTransformProjectile->position += rTransformProjectile->forward;
 		
 		projectileBundle->damage = damage;
 	}
