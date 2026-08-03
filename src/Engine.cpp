@@ -826,6 +826,7 @@ namespace GLVM::core
 					vulkanRenderer->spotLights[spotLightCounter].constant    = spotLightComponent->constant;
 					vulkanRenderer->spotLights[spotLightCounter].linear      = spotLightComponent->linear;
 					vulkanRenderer->spotLights[spotLightCounter].quadratic   = spotLightComponent->quadratic;
+					++spotLightCounter;
 				}
 			}
 		}
@@ -856,6 +857,7 @@ namespace GLVM::core
 					vulkanRenderer->pointLights[pointLightCounter].constant  = pointLightComponent->constant;
 					vulkanRenderer->pointLights[pointLightCounter].linear    = pointLightComponent->linear;
 					vulkanRenderer->pointLights[pointLightCounter].quadratic = pointLightComponent->quadratic;
+					++pointLightCounter;
 				}
 			}
 		}
@@ -952,6 +954,7 @@ namespace GLVM::core
 									updateDataUBO_UI( j, m, inventoryComponent, slotTransformComponent, &inventoryMeshes[i] );
 							}
 						}
+						++inventoryCounter;
 					}
 
 					for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
@@ -1259,7 +1262,7 @@ namespace GLVM::core
 		arch::world.searchCacheArchetypes( playerRequiredMask, cachedPlayerArchetypes, playerArchetypesNumber );
 		
 		uint32_t playerEntityCount = 0;
-		for( uint32_t x = 0; x < staticActorsArchetypesNumber; ++x ) {
+		for( uint32_t x = 0; x < playerArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedPlayerArchetypes[x];
 			cm::transform*   playerTransforms = (ecs::components::transform*)arch->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
@@ -1272,6 +1275,7 @@ namespace GLVM::core
 					vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
 				}
 			}
+			++playerEntityCount;
 		}
 	}
 
