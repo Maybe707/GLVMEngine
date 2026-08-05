@@ -12,6 +12,7 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/PointLightComponent.hpp"
+#include "Components/ProjectileBundle.hpp"
 #include "Components/ProjectileComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SpotLightComponent.hpp"
@@ -22,6 +23,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/StateComponent.hpp"
 #include "Components/MoveComponent.hpp"
+#include "TagComponents/ProjectileTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	uint32_t Archetype::addEntity( entity entity_ ) {
@@ -101,10 +103,12 @@ namespace GLVM::ecs::arch {
 				static_cast<components::move*>(components[componentId])[index] = static_cast<components::move*>(components[componentId])[last];
 				break;
 			case ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT:
-				static_cast<components::projectile*>(components[componentId])[index] = static_cast<components::projectile*>(components[componentId])[last];
+				static_cast<ProjectileBundle*>(components[componentId])[index] = static_cast<ProjectileBundle*>(components[componentId])[last];
 				break;
 			case ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT:
 				static_cast<tagComponents::levelChunkTagComponent*>(components[componentId])[index] = static_cast<tagComponents::levelChunkTagComponent*>(components[componentId])[last];
+			case ComponentsIndices::PROJECTILE_TAG_COMPONENT:
+				static_cast<tagComponents::projectileTagComponent*>(components[componentId])[index] = static_cast<tagComponents::projectileTagComponent*>(components[componentId])[last];
 				break;
 			case ComponentsIndices::PLAYER_TAG_COMPONENT:
 				static_cast<tagComponents::playerTagComponent*>(components[componentId])[index] = static_cast<tagComponents::playerTagComponent*>(components[componentId])[last];
