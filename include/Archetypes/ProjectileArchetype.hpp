@@ -13,6 +13,9 @@
 #include "Globals.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Components/ProjectileBundle.hpp"
+#include "Components/HealthComponent.hpp"
+#include "Components/AttackComponent.hpp"
+#include "Components/FontComponent.hpp"
 #include "TagComponents/ProjectileTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
@@ -24,6 +27,9 @@ namespace GLVM::ecs::arch {
 		 sizeof(components::colliderFlags) +
 		 sizeof(components::rotation) +
 		 sizeof(ProjectileBundle) +
+		 sizeof(components::health) +
+		 sizeof(components::attack) +
+		 sizeof(components::font) +
 		 sizeof(tagComponents::projectileTagComponent));
 	
 	struct ProjectileArchetype : Archetype {
@@ -33,6 +39,9 @@ namespace GLVM::ecs::arch {
 		components::colliderFlags colliderFlags[PROJECTILE_ARCH_CHUNK_SIZE];
 		components::rotation      rotations[PROJECTILE_ARCH_CHUNK_SIZE];
 		ProjectileBundle          projectileBundles[PROJECTILE_ARCH_CHUNK_SIZE];
+		components::health        heath[PROJECTILE_ARCH_CHUNK_SIZE];
+		components::attack        attacks[PROJECTILE_ARCH_CHUNK_SIZE];
+		components::font          fonts[PROJECTILE_ARCH_CHUNK_SIZE];
 		tagComponents::projectileTagComponent projectileTagComponents[PROJECTILE_ARCH_CHUNK_SIZE];
 
 		ProjectileArchetype() {
@@ -42,6 +51,9 @@ namespace GLVM::ecs::arch {
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]    = colliderFlags;
 			components[ComponentsIndices::ROTATION_COMPONENT]          = rotations;
 			components[ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT] = projectileBundles;
+			components[ComponentsIndices::HEALTH_COMPONENT]            = heath;
+			components[ComponentsIndices::ATTACK_COMPONENT]            = attacks;
+			components[ComponentsIndices::FONT_COMPONENT]              = fonts;
 			components[ComponentsIndices::PROJECTILE_TAG_COMPONENT]    = projectileTagComponents;
 
 			mask =
@@ -51,6 +63,9 @@ namespace GLVM::ecs::arch {
 				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
 				(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
+				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
+				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
+				(1ull << ComponentsIndices::FONT_COMPONENT) |
 				(1ull << ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
@@ -59,8 +74,11 @@ namespace GLVM::ecs::arch {
 			componentIds[3] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
 			componentIds[4] = ComponentsIndices::ROTATION_COMPONENT;
 			componentIds[5] = ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT;
-			componentIds[6] = ComponentsIndices::PLAYER_TAG_COMPONENT;
-			componentCount = 7;
+			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
+			componentIds[7] = ComponentsIndices::ATTACK_COMPONENT;
+			componentIds[8] = ComponentsIndices::FONT_COMPONENT;
+			componentIds[9] = ComponentsIndices::PROJECTILE_TAG_COMPONENT;
+			componentCount = 10;
 		}
 	};
 };

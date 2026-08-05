@@ -195,7 +195,7 @@ int main()
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
-	enemyArch->health[enemyIndex]      = { .maxHealth = 10000, .currentHealth = 10000 };
+	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
 	
 	if ( i < 3 ) {

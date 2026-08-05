@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Common/CommonFunctions.hpp"
+#include "Components/ColliderComponent.hpp"
 
 namespace GLVM::core {
 	bool BoxCollider(const vec3 backtrackingPosition,
@@ -74,6 +75,12 @@ namespace GLVM::core {
 		projectileBundle->material  = material;
 		
 		ecs::components::transform* rTransformProjectile = &projectileArch->transforms[projectileIndex];
+		ecs::components::health*    projectileHealth     = &projectileArch->heath[projectileIndex];
+		projectileHealth->maxHealth     = 100;
+		projectileHealth->currentHealth = 100;
+
+		projectileArch->colliders[projectileIndex].colliders.clear();
+
 		rTransformProjectile->scale = 0.1f;
 		rTransformProjectile->position = projectilePosition;
 		rTransformProjectile->forward   = projectileForward;

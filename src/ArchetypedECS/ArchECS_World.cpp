@@ -47,9 +47,9 @@ namespace GLVM::ecs::arch {
 
         EntityLocation& location = entityLocations[id_];
 
-        // if (location.arch != nullptr) {
-        //     assert(false && "Entity already assigned to archetype");
-        // }
+        if (location.arch != nullptr) {
+            assert(false && "Entity already assigned to archetype");
+        }
 
         uint32_t index = arch->addEntity(entity_);
 
@@ -69,9 +69,10 @@ namespace GLVM::ecs::arch {
         if (moved != entity_) {
             id movedId = getId(moved);
             entityLocations[movedId].index = index;
+			entityLocations[movedId].arch  = arch;
         }
-
-//        location.arch = nullptr;
+		std::cout << "remove entity with id: " << id_ << std::endl;
+        location.arch = nullptr;
     }
 
 	void World::searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber ) {

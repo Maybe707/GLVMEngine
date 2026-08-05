@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/DamageSystem.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/FontComponent.hpp"
@@ -29,13 +30,14 @@ namespace GLVM::ecs
 			
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
 //				unsigned int entity = linkedEntities[i];
-				u32 entity = arch->entities[i];
+				arch::entity entity = arch->entities[i];
 				if( &componentsView.attackableHealth[i] != nullptr && &componentsView.attackableAttacks[i] != nullptr ) {
 					cm::health& healthComponent = componentsView.attackableHealth[i];
 					cm::attack& attackComponent = componentsView.attackableAttacks[i];
 
 //					std::cout << "damage: " << attackComponent.damage << std::endl;
 					healthComponent.currentHealth -= attackComponent.damage;
+					attackComponent.damage = 0;
 //					std::cout << "current health: " << healthComponent.currentHealth << std::endl;
 //				componentManager->RemoveComponent<cm::attack>(entity);
 					if ( healthComponent.currentHealth <= 0 ) {

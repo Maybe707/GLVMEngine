@@ -33,9 +33,9 @@ namespace GLVM::ecs::arch {
 
 	void ArchetypeEntityManager::removeEntity( entity entity_ ) {
 		id id_ = getId( entity_ );
-		
+
 		if ( !isAlive( entity_ ) ) return;
-		
+
 		generations[id_]++;
 		freeList.Push( id_ );
     }
@@ -43,6 +43,17 @@ namespace GLVM::ecs::arch {
 	bool ArchetypeEntityManager::isAlive( entity entity_ ) const {
 		id id_ = getId( entity_ );
 
+		if( !(id_ < generations.GetSize()) ) {
+			std::cout << "id < getSize protuh" << std::endl;
+		}
+
+		if( !(generations[id_] == getGen( entity_ )) ) {
+			std::cout << "gen == getGen protuh" << std::endl;
+			std::cout << "generation[id_]: " << generations[id_] << std::endl;
+			std::cout << "genGet( entity_ ): " << getGen( entity_ ) << std::endl;
+			std::cout << "entity: " << entity_ << std::endl;
+		}
+		
 		return id_ < generations.GetSize() && generations[id_] == getGen( entity_ );
 	}
 }; // namespace GLVM::ecs::arch

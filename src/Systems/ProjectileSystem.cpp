@@ -48,8 +48,8 @@ namespace GLVM::ecs
 		componentsView.playerViews      = (ecs::components::beholder*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::VIEW_COMPONENT];
 
-		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 		projectileArchetypesNumber = 0;
+		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
 		
         if(projectileCooldown > 0)
             projectileCooldown -= cameraSpeed;
@@ -97,6 +97,9 @@ namespace GLVM::ecs
             }
         }
 
+		projectileArchetypesNumber = 0;
+		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
+		
 		componentsView.projectileTransforms    = (ecs::components::transform*)archView.projectileArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.projectileColliderFlags = (ecs::components::colliderFlags*)archView.projectileArchetype->
@@ -105,6 +108,10 @@ namespace GLVM::ecs
 			components[arch::ComponentsIndices::COLLIDER_COMPONENT];
 		componentsView.projectileBundles     = (arch::ProjectileBundle*)archView.projectileArchetype->
 			components[arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT];
+		componentsView.projectileHealth     = (ecs::components::health*)archView.projectileArchetype->
+			components[arch::ComponentsIndices::HEALTH_COMPONENT];
+		componentsView.projectileAttacks     = (ecs::components::attack*)archView.projectileArchetype->
+			components[arch::ComponentsIndices::ATTACK_COMPONENT];
 
 		/// Update position of every projectile
         for(unsigned int x = 0; x < archView.projectileArchetype->entityCount; ++x) {
@@ -114,7 +121,10 @@ namespace GLVM::ecs
 
 		/// Iterate every projectile, check for collistions with another entities and update damage info if collided entity has attack component
         for(unsigned int i = 0; i < archView.projectileArchetype->entityCount; ++i) {
+//			const u32 entity = archView.projectileArchetype->entities[i];
 			cm::colliderFlags* projectileColliderFlags = &componentsView.projectileColliderFlags[i];
+			cm::health*        projectileHealth        = &componentsView.projectileHealth[i];
+			[[maybe_unused]] cm::attack*        projectileAttack        = &componentsView.projectileAttacks[i];
 			const u8 wallCollisionBit    = 1;
 			const u8 groundCollistionBit = (1 << 1);
             if((projectileColliderFlags->flags & wallCollisionBit) || (projectileColliderFlags->flags & groundCollistionBit)) {
@@ -127,10 +137,16 @@ namespace GLVM::ecs
 					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
 						(1ul << arch::ComponentsIndices::ATTACK_COMPONENT);
 
-					if( (collidedEntityLocation.arch->mask & requiredMask) == requiredMask ) {
+					if( (collidedEntityLocation.arch != nullptr) && (collidedEntityLocation.arch->mask & requiredMask) == requiredMask ) {
 						ecs::components::attack* attacks = (ecs::components::attack*)collidedEntityLocation.arch->
 			components[arch::ComponentsIndices::ATTACK_COMPONENT];
 						attacks[collidedEntityLocation.index].damage = projectileDamage->maximumDamage;
+
+						projectileHealth->currentHealth = 0;
+//						projectileAttack->damage = 100;
+						// ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						// archEntityManager->removeEntity( entity );
+						// arch::world.removeEntity( entity );
 					}
 				}
 //                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);

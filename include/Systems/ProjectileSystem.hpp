@@ -8,7 +8,9 @@
 
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
+#include "Components/AttackComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
 #include "ISystem.hpp"
 #include "Vector.hpp"
@@ -70,6 +72,8 @@ namespace GLVM::ecs
 			ecs::components::colliderFlags*     projectileColliderFlags = nullptr;
 			ecs::components::collider*          projectileColliders     = nullptr;
 			arch::ProjectileBundle*             projectileBundles       = nullptr;
+			ecs::components::health*            projectileHealth        = nullptr;
+			ecs::components::attack*            projectileAttacks       = nullptr;
 		} componentsView;
 
 		arch::componentMask playerRequiredMask =
