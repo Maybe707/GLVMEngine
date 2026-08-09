@@ -42,6 +42,8 @@ namespace GLVM::ecs
 		
         const float cameraSpeed = 3.0f * deltaFrameTime;            
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
+			const arch::entity entity = archView.playerCachedArchetype->entities[i];
+			ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
 			cm::beholder*      playerView          = &componentsView.playerViews[i];
 			cm::move*          playerMove          = &componentsView.playerMoves[i];
 			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
@@ -54,21 +56,26 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement -= right * cameraSpeed;
+					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement += right * cameraSpeed;
+					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement -= forward * cameraSpeed;
+					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
 					forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement += forward * cameraSpeed;
+					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eJUMP:
 				{
+					entityLocation.isDirty = true;
 					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
 					if ( playerColliderFlags->flags & isGroudCollisionMask ) {
 						playerRigidBody->jumpAccumulator = 1.5f;
@@ -92,6 +99,10 @@ namespace GLVM::ecs
 			componentsView.items       = (ecs::components::item*)currentArch->components[arch::ComponentsIndices::ITEM_COMPONENT];
 
 			for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
+				// const arch::entity entity = currentArch->entities[i1];
+				// ecs::arch::EntityLocation entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+				// entityLocation.isDirty = true;
+
 				if( componentsView.items && !componentsView.items[i1].isActor )
 					continue;
 						

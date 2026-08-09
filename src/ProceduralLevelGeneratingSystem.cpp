@@ -9,6 +9,7 @@
 #include "Archetypes/LevelChunkArchetype.hpp"
 #include "Common/CommonFunctions.hpp"
 #include "Components/ColliderComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Constants.hpp"
 #include "Engine.hpp"
@@ -25,6 +26,10 @@ namespace GLVM::core
 
 		/// New arch ECS
 		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+
+		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.cachedPlayerArch, cachedPlayerArchNumber );
+		componentsView.playerTransforms         = (ecs::components::transform*)archView.cachedPlayerArch->
+			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		
 		while ( levelNubmer < 5 ) {
 			core::vector<core::Vertex> nextLevel;
@@ -78,6 +83,11 @@ namespace GLVM::core
 				arch::LevelChunkArchetype* levelChunkArch = static_cast<arch::LevelChunkArchetype*>(gameLevelChunkLocation.arch);
 				const uint32_t gameLevelChunkIndex = gameLevelChunkLocation.index;
 				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
+				if( levelNubmer == 0 ) {
+					/// Set up current level position to player position
+					componentsView.playerTransforms->position =
+						vec3( currentLevelPosition[0], componentsView.playerTransforms->position[1], currentLevelPosition[2] );
+				}
 				levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
 				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 				levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;

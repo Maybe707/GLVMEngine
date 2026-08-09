@@ -142,7 +142,7 @@ namespace GLVM::ecs
 						const uint32_t comparedEntityIndex = comparedEntityLocation.index;
 
 						components::MeshHandle comparedEntityMeshHandle;
-						if( comparedEntityLocation.arch != nullptr && arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
+						if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
 							arch::Archetype* arch = comparedEntityLocation.arch;
 							view.comparedTransforms = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
 							view.comparedMeshes     = &((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];

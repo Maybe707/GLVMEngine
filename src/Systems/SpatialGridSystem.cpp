@@ -22,13 +22,31 @@ namespace GLVM::ecs {
 
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
-		
+
+		for( int i5 = 0; i5 < 1; ++i5 ) {
 		for( uint32_t i0 = 0; i0 < cachedArchetypesNumber; ++i0 ) {
 			arch::Archetype* arch = cachedArchetypes[i0];
 			view.transforms = (ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 			view.meshes     = (ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT];
 			
 			for( u32 i1 = 0; i1 < arch->entityCount; ++i1 ) {
+				const arch::entity entity = arch->entities[i1];
+				ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+				if( !entityLocation.isDirty && isInitialized ) {
+					continue;
+				} else {
+					if( entityLocation.gridCellCounter > 0 ) {
+						for( u32 i2 = 0; i2 < entityLocation.maxGridCellNumber; ++i2 ) {
+							u32 z = entityLocation.gridCellIndicies[i2][0];
+							u32 y = entityLocation.gridCellIndicies[i2][1];
+							u32 x = entityLocation.gridCellIndicies[i2][2];
+							u32 cellEntityIndex = entityLocation.cellEntityIndices[i2];
+							spatialGrid.grid[z][y][x].entities.Remove( cellEntityIndex );
+						}
+						entityLocation.gridCellCounter = 0;
+					}
+				}
+//				std::cout << "TEST" << std::endl;				
 				const components::transform& transform = view.transforms[i1];
 
 				const components::mesh& mesh           = view.meshes[i1];
@@ -56,13 +74,18 @@ namespace GLVM::ecs {
 				assert( indexMinX < spatialGrid.width && indexMinY < spatialGrid.height && indexMinZ < spatialGrid.depth );
 				assert( indexMaxX < spatialGrid.width && indexMaxY < spatialGrid.height && indexMaxZ < spatialGrid.depth );
 				
-				const arch::entity entity = arch->entities[i1];
 				for( u32 i2 = indexMinZ; i2 <= indexMaxZ; ++i2 ) {
 					for( u32 i3 = indexMinY; i3 <= indexMaxY; ++i3 ) {
 						for( u32 i4 = indexMinX; i4 <= indexMaxX; ++i4 ) {
 							core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
 							if( !core::isExist<u32>( chunkEntities, entity ) ) {
 								chunkEntities.Push( entity );
+								const u32 currentGridCell = entityLocation.gridCellCounter;
+								assert( currentGridCell < 8 );                  ///< 8 is a maximum number for 1 entity to exist in grid cell
+								entityLocation.gridCellIndicies[currentGridCell]  = vec3( i2, i3, i4 );
+								entityLocation.cellEntityIndices[currentGridCell] = chunkEntities.GetSize() - 1;
+								entityLocation.isDirty = false;
+								++entityLocation.gridCellCounter;
 							} else {
 								continue;
 							}
@@ -70,6 +93,10 @@ namespace GLVM::ecs {
 					}
 				}
 			}
+			if( !isInitialized ) {
+				isInitialized = true;
+			}
+		}
 		}
 	}
 	

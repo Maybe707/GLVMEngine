@@ -2,6 +2,7 @@
 #define PROCEDURAL_LEVEL_GENEGRATING_SYSTEM
 
 #include "ComponentManager.hpp"
+#include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
 #include "ISystem.hpp"
 #include <cmath>
@@ -27,10 +28,19 @@ namespace GLVM::core
 		unsigned int previousIterationTransitionBridgeDirection = 0;
 
 		u32 cachedLevelChunkArchNumber = 0;
+		u32 cachedPlayerArchNumber     = 0;
 		struct ProceduralLevelArchView {
-			ecs::arch::Archetype* cachedLevelChunkArch = nullptr;
+			ecs::arch::Archetype* cachedLevelChunkArch  = nullptr;
+			ecs::arch::Archetype* cachedPlayerArch      = nullptr;
 		} archView;
-			
+
+		struct ComponentsView {
+			ecs::components::transform* playerTransforms = nullptr;
+		} componentsView;
+		
+		ecs::arch::componentMask playerRequiredMask =
+			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
+		
 		ecs::arch::componentMask requiredMask     =
 			(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ull << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |

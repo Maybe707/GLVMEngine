@@ -9,7 +9,7 @@
 namespace GLVM::ecs::arch {
 	struct GridChunk {
 		vec3 position;
-		constexpr static float size = 8;
+		constexpr static float size = 32;
 		core::vector<u32> entities;
 	};
 

@@ -282,7 +282,7 @@ namespace GLVM::core
 			// std::cout << "lmb released " << g_eEvent.isLeftMouseButtonReleased << std::endl;
 			// std::cout << "lmb pressed " << isLeftMouseButtonPressed << std::endl;
 			// std::cout << "item draged " << itemSystem->isItemDraged << std::endl;
-
+			FPScounter();
 			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;

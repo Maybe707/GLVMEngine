@@ -19,6 +19,7 @@ namespace GLVM::ecs {
 	class SpatialGridSystem : public ISystem {
 		arch::Archetype* cachedArchetypes[32];
 		uint32_t cachedArchetypesNumber = 0;
+		bool isInitialized = false;
 		
 		struct SpatialGridComponentsView {
 			components::transform* transforms = nullptr;

@@ -3,6 +3,7 @@
 
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Vector.hpp"
+#include "typenames.hpp"
 
 namespace GLVM::ecs::arch {
 	struct Archetype {
@@ -24,6 +25,11 @@ namespace GLVM::ecs::arch {
 	struct EntityLocation {
 		Archetype* arch;
 		uint32_t   index;
+		static const u8 maxGridCellNumber = 8;
+		u8 gridCellCounter = 0;
+		vec3 gridCellIndicies[maxGridCellNumber];
+		u32  cellEntityIndices[maxGridCellNumber];
+		bool isDirty = false; ///< Is entity has been moved or removed
 	};
 }; // namespace GLVM::ecs::arch
 
