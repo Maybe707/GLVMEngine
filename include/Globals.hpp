@@ -39,5 +39,5 @@ extern int x_pointer;
 extern int y_pointer;
 extern int keys_pressed[6];
 
-#define ARCHETYPE_CHUNK_SIZE 32768
+#define ARCHETYPE_CHUNK_SIZE 16384
 

@@ -121,7 +121,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].actualLinkedDescriptorBindingsNumber       = 1;
-		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].hostDescriptorNumber                       = 2048;
+		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].hostDescriptorNumber                       = 512;
 		descriptorSetsConfig[SHADOW_MAP_POINT_LIGHT].isTexture                                  = false;
 
 		descriptorBindingsConfig[2].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -223,7 +223,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[FONT_RENDER_UBO].actualLinkedDescriptorBindingsNumber              = 1;
-		descriptorSetsConfig[FONT_RENDER_UBO].hostDescriptorNumber                              = 16196;
+		descriptorSetsConfig[FONT_RENDER_UBO].hostDescriptorNumber                              = 4096;
 		descriptorSetsConfig[FONT_RENDER_UBO].isTexture                                         = false;
 
 		descriptorBindingsConfig[4].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;

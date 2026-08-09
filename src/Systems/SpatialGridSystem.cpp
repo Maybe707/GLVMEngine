@@ -23,7 +23,6 @@ namespace GLVM::ecs {
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
 
-		for( int i5 = 0; i5 < 1; ++i5 ) {
 		for( uint32_t i0 = 0; i0 < cachedArchetypesNumber; ++i0 ) {
 			arch::Archetype* arch = cachedArchetypes[i0];
 			view.transforms = (ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
@@ -34,8 +33,9 @@ namespace GLVM::ecs {
 				ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
 				if( !entityLocation.isDirty && isInitialized ) {
 					continue;
-				} else {
-					if( entityLocation.gridCellCounter > 0 ) {
+				}
+				
+				if( entityLocation.gridCellCounter > 0 ) {
 						for( u32 i2 = 0; i2 < entityLocation.maxGridCellNumber; ++i2 ) {
 							u32 z = entityLocation.gridCellIndicies[i2][0];
 							u32 y = entityLocation.gridCellIndicies[i2][1];
@@ -44,11 +44,9 @@ namespace GLVM::ecs {
 							spatialGrid.grid[z][y][x].entities.Remove( cellEntityIndex );
 						}
 						entityLocation.gridCellCounter = 0;
-					}
 				}
-//				std::cout << "TEST" << std::endl;				
-				const components::transform& transform = view.transforms[i1];
 
+				const components::transform& transform = view.transforms[i1];
 				const components::mesh& mesh           = view.meshes[i1];
 
 				components::MeshHandle entityMeshHandle = mesh.handle;
@@ -86,17 +84,14 @@ namespace GLVM::ecs {
 								entityLocation.cellEntityIndices[currentGridCell] = chunkEntities.GetSize() - 1;
 								entityLocation.isDirty = false;
 								++entityLocation.gridCellCounter;
-							} else {
-								continue;
 							}
 						}
 					}
 				}
 			}
-			if( !isInitialized ) {
-				isInitialized = true;
-			}
 		}
+		if( !isInitialized ) {
+			isInitialized = true;
 		}
 	}
 	

@@ -220,6 +220,7 @@ int main()
 
 	for( u32 i = 0; i < 5; ++i ) {
 		arch::entity cube = archEntityManager->createEntity();
+		std::cout << "Cube: " << arch::getId( cube ) << std::endl;
 		arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
 		arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
 		arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
