@@ -1,6 +1,7 @@
 # Game Loop Versatile Modules (GLVM)
 
-This is my simple game engine for Linux and Windows OS's with both Vulkan and Opengl support. Its based on entity component system (ECS) with user friendly C++ interface. Also it has partial support of GLTf and wavefront.obj 3D model formats. With GLVM you can make simple phong light of three types (directional, spot, point). Very basic physics included (collitions, gravity). 
+This is my simple game engine for Linux and Windows OS's with both Vulkan and Opengl support. Its based on entity component system (ECS) with user friendly C++ interface. Also it has partial support of GLTf and wavefront.obj 3D model formats. With GLVM you can make simple phong light of three types (directional, spot, point). Very basic physics included (collitions, gravity).
+Updated version 2.0 with: new Archetype ECS (SOA powered), Vulkan config, read-only render objects, VK command sub-buffers. Refactored: inventory system, gltf parser...
 
 ## Linux
     
