@@ -35,17 +35,6 @@ namespace GLVM::ecs {
 					continue;
 				}
 				
-				if( entityLocation.gridCellCounter > 0 ) {
-						for( u32 i2 = 0; i2 < entityLocation.maxGridCellNumber; ++i2 ) {
-							u32 z = entityLocation.gridCellIndicies[i2][0];
-							u32 y = entityLocation.gridCellIndicies[i2][1];
-							u32 x = entityLocation.gridCellIndicies[i2][2];
-							u32 cellEntityIndex = entityLocation.cellEntityIndices[i2];
-							spatialGrid.grid[z][y][x].entities.Remove( cellEntityIndex );
-						}
-						entityLocation.gridCellCounter = 0;
-				}
-
 				const components::transform& transform = view.transforms[i1];
 				const components::mesh& mesh           = view.meshes[i1];
 
@@ -76,8 +65,8 @@ namespace GLVM::ecs {
 					for( u32 i3 = indexMinY; i3 <= indexMaxY; ++i3 ) {
 						for( u32 i4 = indexMinX; i4 <= indexMaxX; ++i4 ) {
 							core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
-							if( !core::isExist<u32>( chunkEntities, entity ) ) {
-								chunkEntities.Push( entity );
+							if( !core::isExist<u32>( chunkEntities, ecs::arch::getId(entity) ) ) {
+								chunkEntities.Push( ecs::arch::getId(entity) );
 								const u32 currentGridCell = entityLocation.gridCellCounter;
 								assert( currentGridCell < 8 );                  ///< 8 is a maximum number for 1 entity to exist in grid cell
 								entityLocation.gridCellIndicies[currentGridCell]  = vec3( i2, i3, i4 );

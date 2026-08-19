@@ -1,4 +1,5 @@
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/AttackComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -107,12 +108,12 @@ namespace GLVM::ecs::arch {
 				break;
 			case ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT:
 				static_cast<tagComponents::levelChunkTagComponent*>(components[componentId])[index] = static_cast<tagComponents::levelChunkTagComponent*>(components[componentId])[last];
+				break;
 			case ComponentsIndices::PROJECTILE_TAG_COMPONENT:
 				static_cast<tagComponents::projectileTagComponent*>(components[componentId])[index] = static_cast<tagComponents::projectileTagComponent*>(components[componentId])[last];
 				break;
 			case ComponentsIndices::PLAYER_TAG_COMPONENT:
 				static_cast<tagComponents::playerTagComponent*>(components[componentId])[index] = static_cast<tagComponents::playerTagComponent*>(components[componentId])[last];
-				break;
 			}
 		}
 		

@@ -224,7 +224,15 @@ public:
     Vector<T2, dim> operator*(const T2& _scalar);
 	Vector<T2, dim> operator-();
 	T2 Length() const;
+	bool operator==(const Vector<T2, dim> vector) const;
 };
+
+template <class T2, int dim>
+bool Vector<T2, dim>::operator==(const Vector<T2, dim> vector) const {
+	if( dim == 3 ) {
+		return this->m_vector[0] == vector.m_vector[0] && this->m_vector[1] == vector.m_vector[1] && this->m_vector[2] == vector.m_vector[2];
+	}
+}
 
 template <class T2, int var2>
 T2 Vector<T2, var2>::Length() const { 

@@ -19,6 +19,8 @@ namespace GLVM::ecs
 	void DamageSystem::Update() {
 		namespace cm = GLVM::ecs::components;
 
+		arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
+		
 		cachedAttackableArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( attackableRequiredMask, archView.cachedAttackableArchetypes, cachedAttackableArchetypesNumber );
 
@@ -44,6 +46,41 @@ namespace GLVM::ecs
 //					std::cout << "remove entity: " << entity << std::endl;
 //					entityManager->RemoveEntity(entity, componentManager);
 						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+						if( entityLocation.gridCellCounter > 0 ) {
+							for( u32 i2 = 0; i2 < entityLocation.maxGridCellNumber; ++i2 ) {
+								const vec3 entityCurrentGridCell = entityLocation.gridCellIndicies[i2];
+								u32 z = entityCurrentGridCell[0];
+								u32 y = entityCurrentGridCell[1];
+								u32 x = entityCurrentGridCell[2];
+								u32 cellEntityIndex = entityLocation.cellEntityIndices[i2];
+//								spatialGrid.grid[z][y][x].entities.Remove( cellEntityIndex );
+								u32 lastElementIndex = 0;
+								if( spatialGrid.grid[z][y][x].entities.GetSize() > 0 ) {
+									lastElementIndex = spatialGrid.grid[z][y][x].entities.GetSize() - 1;
+								}
+
+//								std::cout << "last elem: " << lastElementIndex << std::endl;
+								if( lastElementIndex > cellEntityIndex ) {       ///< Swap case
+									const u32 swapedEntity = spatialGrid.grid[z][y][x].entities[lastElementIndex];
+									spatialGrid.grid[z][y][x].entities[cellEntityIndex] = swapedEntity;
+									spatialGrid.grid[z][y][x].entities.Remove( lastElementIndex );
+
+									ecs::arch::EntityLocation& swapedEntityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( swapedEntity )];
+									for( u32 i3 = 0; i3 < swapedEntityLocation.gridCellCounter; ++i3 ) {
+										const vec3 swapedEntityCurrentGridCell = swapedEntityLocation.gridCellIndicies[i3];
+										if( swapedEntityCurrentGridCell == entityCurrentGridCell ) {
+											swapedEntityLocation.cellEntityIndices[i3] = cellEntityIndex;
+										}
+									}
+								} else {   ///< Remove last case
+									spatialGrid.grid[z][y][x].entities.Remove( cellEntityIndex );
+								}
+							}
+							entityLocation.gridCellCounter = 0;
+//							entityLocation.isDirty         = true;     TODO: Have to make it work
+						}
+
 						archEntityManager->removeEntity( entity );
 						arch::world.removeEntity( entity );
 					}

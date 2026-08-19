@@ -2120,7 +2120,7 @@ namespace GLVM::core
 			RenderItem item = items[i];
 			unsigned int uiVertexId = item.meshID;
 			unsigned int diffuseTexureID = item.diffuseTexureID;
-			unsigned int uboIndex = currentFrame * MAX_FRAMES_IN_FLIGHT + i;
+			unsigned int uboIndex = currentFrame * items.GetSize() + i;
 			
 			updateUBO_IconsUI(uboIndex, i);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].linkedDescriptorSetIDs[0];
