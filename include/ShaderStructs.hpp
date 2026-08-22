@@ -171,6 +171,12 @@ namespace GLVM::core {
 		float iTime;
 	};
 
+	struct alignas(64) COLLISIONS_DEBUG_UBO {
+		mat4 model;
+		mat4 view;
+		mat4 projection;
+	};
+
 } // namespace GLVM::core
 
 #endif

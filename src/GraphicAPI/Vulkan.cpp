@@ -877,7 +877,7 @@ namespace GLVM::core
 			rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
 			rasterizer.depthClampEnable = VK_FALSE;
 			rasterizer.rasterizerDiscardEnable = VK_FALSE;
-			rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+			rasterizer.polygonMode = pipeline.polygonMode;
 			rasterizer.lineWidth = 1.0f;
 			rasterizer.cullMode = 0;
 			rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
@@ -1895,6 +1895,23 @@ namespace GLVM::core
         memcpy(hudMatrixData, &hudUBO, sizeof(SDF_UBO));
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
+
+	void CVulkanRenderer::updateCollisionsDebugUBO(uint32_t offset, [[maybe_unused]] uint32_t actor) {
+		COLLISIONS_DEBUG_UBO collisionsDebugUBO{};
+		collisionsDebugUBO.model      = collisionsWireframes[actor].model;
+//		collisionsDebugUBO.model      = collisionsWireframes[crosshair].model;
+		collisionsDebugUBO.view       = viewMatrix;
+		collisionsDebugUBO.projection = projectionMatrix;
+
+//		std::cout << "model: " << collisionsDebugUBO.model << std::endl;
+		
+		void* collisionsDebugData;
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::COLLISIONS_DEBUG_DATA].descriptorsBindingsIDs[0];		
+        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(COLLISIONS_DEBUG_UBO) * offset,
+					sizeof(COLLISIONS_DEBUG_UBO), 0, &collisionsDebugData);
+        memcpy(collisionsDebugData, &collisionsDebugUBO, sizeof(COLLISIONS_DEBUG_UBO));
+        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+	}
 	
 	void CVulkanRenderer::updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset ) {
 		UI_UBO hudUBO{};
@@ -2218,9 +2235,9 @@ namespace GLVM::core
 
         vkCmdEndRenderPass(commandBuffer);
 
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
     }
 
     void CVulkanRenderer::sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -2287,6 +2304,173 @@ namespace GLVM::core
 
 //			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+
+    void CVulkanRenderer::collisionsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE];
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+//		std::cout << "FRAME" << std::endl;
+		for ( unsigned int i = 0; i < collisionsWireframes.GetSize(); ++i ) {
+			RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
+//			RenderCrosshair crosshair = crosshairs[i];
+//			unsigned int uiVertexId = crosshair.meshID;
+
+			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
+			updateCollisionsDebugUBO(uboIndex, i);
+			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].linkedDescriptorSetIDs[0];
+  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].pipelineLayout,
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+
+			core::vector<core::Vertex> vertices;
+			unsigned int cube_vertices = 8;
+
+			const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = collisionWireframe.meshAxisMaxAbsoluteValues;
+//			const float scale   = collisionWireframe.scale;
+			const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
+			const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
+			const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
+
+			const float bottom_half_x = meshAxisMaxAbsoluteValues.origin_offset_x - meshAxisMaxAbsoluteValues.absolute_x;
+			const float bottom_half_y = meshAxisMaxAbsoluteValues.origin_offset_y - meshAxisMaxAbsoluteValues.absolute_y;
+			const float bottom_half_z = meshAxisMaxAbsoluteValues.origin_offset_z - meshAxisMaxAbsoluteValues.absolute_z;
+			
+			for ( unsigned int i = 0; i < cube_vertices; ++i ) {
+				SVertex vertex;
+ 				switch( i ) {
+				case 0:
+					vertex[0] = half_x;
+					vertex[1] = half_y;
+					vertex[2] = half_z;
+					break;
+				case 1:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = half_y;
+					vertex[2] = half_z;
+					break;			
+				case 2:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = half_z;
+					break;			
+				case 3:
+					vertex[0] = half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = half_z;
+					break;
+				case 4:
+					vertex[0] = half_x;
+					vertex[1] = half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;
+				case 5:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				case 6:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				case 7:
+					vertex[0] = half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				}
+
+				SVertex normal;
+				normal[0] = 0;
+				normal[1] = 1;
+				normal[2] = 0;
+				SVertex texture;
+				texture[0] = 0;
+				texture[1] = 1;
+
+				vertices.Push({{vertex[0], vertex[1], vertex[2]},
+							   {normal[0], normal[1], normal[2]},
+							   {texture[0], texture[1]},
+							   { -1, -1, -1, -1 },
+							   { 1, 1, 1, 1 }});
+			}			
+
+			VkBuffer vertexBuffer;
+			VkDeviceMemory vertexDeviceMemory;
+			createVertexBuffer(vertexBuffer, vertexDeviceMemory, vertices);
+
+			constexpr int boxIndicesForIndexBuffer[36] =
+				{ 0, 1, 2, 3, 0, 2,
+				  4, 0, 3, 7, 4, 3,
+				  4, 5, 1, 0, 4, 1,
+				  1, 5, 6, 2, 1, 6,
+				  5, 4, 7, 6, 5, 7,
+				  3, 2, 6, 7, 3, 6 };
+
+			std::vector<uint32_t> indices;
+			for ( unsigned int i = 0; i < 36; ++i )
+				indices.push_back(boxIndicesForIndexBuffer[i]);
+			
+			VkBuffer indexBuffer;
+			VkDeviceMemory indexDeviceMemory;
+			createIndexBuffer(indexBuffer, indexDeviceMemory, indices);
+			
+			VkBuffer vertexBuffers[] = {vertexBuffer};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+
+			unsigned int indicesContainerSize = indices.size();
+
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+//			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -2799,6 +2983,7 @@ namespace GLVM::core
 		
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 //		sdfRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		collisionsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

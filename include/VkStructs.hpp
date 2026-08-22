@@ -97,6 +97,7 @@ namespace GLVM::core
 		MAIN_RENDER_SPECULAR_SAMPLER,
 		MAIN_RENDER_DIFFUSE_SAMPLER,
 		SDF_DATA,
+		COLLISIONS_DEBUG_DATA,
 		/// Not related to any pipeline values
 		RIDABLE_TEXTURES,
 		DESCRIPTOR_CHUNKS_NUMBER
@@ -114,6 +115,7 @@ namespace GLVM::core
 		VIRTUAL_TEXTURES_PIPELINE,
 		MAIN_RENDER_PIPELINE,
 		SDF_PIPELINE,
+		COLLISIONS_DEBUG_PIPELINE,
 		PIPELINES_NUMBER
 	};
 
@@ -171,6 +173,7 @@ namespace GLVM::core
 		VkPipelineLayout pipelineLayout;
 		const char* vertShader = nullptr;
 		const char* fragShader = nullptr;
+		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 		unsigned int                    actualLinkedDescriptorSetsNumber;
@@ -332,6 +335,13 @@ struct RenderItem {
 struct RenderCrosshair {
 	mat4 model;
 	unsigned int meshID;
+};
+
+struct RenderCollisionWireframe {
+	mat4 model;
+	vec3 position;
+	float scale;
+	GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues;
 };
 
 #endif

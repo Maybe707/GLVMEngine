@@ -175,6 +175,7 @@ namespace GLVM::core
 		core::vector<RenderItem> items;
 		core::vector<RenderCrosshair> crosshairs;
 		core::vector<RenderPlayer> players;
+		core::vector<RenderCollisionWireframe> collisionsWireframes;
 		RenderPlayer player;
 
 		float fYaw   = -90.0f;
@@ -475,6 +476,7 @@ namespace GLVM::core
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO( uint32_t offset, uint32_t crosshair );
 		void updateSdfUBO(uint32_t offset, uint32_t crosshair);
+		void updateCollisionsDebugUBO(uint32_t offset, uint32_t actor);
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
 		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
@@ -482,6 +484,7 @@ namespace GLVM::core
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void collisionsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,

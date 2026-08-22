@@ -81,7 +81,7 @@ namespace GLVM::core {
 
 		projectileArch->colliders[projectileIndex].colliders.clear();
 
-		rTransformProjectile->scale = 0.1f;
+		rTransformProjectile->scale = 0.3f;
 		rTransformProjectile->position = projectilePosition;
 		rTransformProjectile->forward   = projectileForward;
 		rTransformProjectile->position += rTransformProjectile->forward;

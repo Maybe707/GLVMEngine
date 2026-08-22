@@ -1035,7 +1035,10 @@ namespace GLVM::core
 		}
 
 
-		vulkanRenderer->actors.clear();		
+		
+		vulkanRenderer->actors.clear();
+		vulkanRenderer->collisionsWireframes.clear();
+		uint32_t collisionsWireframesCounter = 0;
 		levelChunkActorsArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( levelChunkRequiredMask, cachedLevelChunkActorsArchetypes, levelChunkActorsArchetypesNumber );
 		
@@ -1062,13 +1065,24 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
+				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &levelChunkTransforms[n];
 				cm::material*  materialComponent  = &levelChunkMaterials[n];
 				cm::rotation*  rotationComponent  = &levelChunkRotations[n];
 				if( levelChunkTransforms && levelChunkMaterials && levelChunks &&
 					levelChunkRotations && levelChunkMeshes ) {
-					unsigned int meshID = levelChunkMeshes[n].handle.id;
-					vulkanRenderer->actors[levelChunkActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+					const unsigned int meshID = levelChunkMeshes[n].handle.id;
+//					cm::transform playerTransform = *transformComponent;
+//					playerTransform.position += vec3(0.0f, 2.0f, -3.0f);
+//					cm::rotation  playerRotation  = *rotationComponent;
+					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					++collisionsWireframesCounter;
+					
+					vulkanRenderer->actors[levelChunkActorsCounter].modelMatrix   = model;
 					vulkanRenderer->actors[levelChunkActorsCounter].jointMatrices = jointMatrices;
 					vulkanRenderer->actors[levelChunkActorsCounter].meshID        = meshID;
 					vulkanRenderer->actors[levelChunkActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
@@ -1099,13 +1113,22 @@ namespace GLVM::core
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
+				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorMaterials[n];
+				cm::mesh*      meshComponent      = &actorMeshes[n];
 				[[maybe_unused]] cm::animation* animationComponent = &actorAnimations[n];
 				cm::rotation*  rotationComponent  = &actorRotations[n];
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
-					unsigned int meshID               = actorMeshes[n].handle.id;
+					unsigned int meshID               = meshComponent->handle.id;
+					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					++collisionsWireframesCounter;
+					
 					vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
 					vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
@@ -1142,12 +1165,20 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
+				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &staticActorTransforms[n];
 				cm::material*  materialComponent  = &staticActorMaterials[n];
 				cm::rotation*  rotationComponent  = &staticActorRotations[n];
 				if( staticActorTransforms && staticActorMaterials &&
 					staticActorRotations && staticActorMeshes ) {
 					unsigned int meshID = staticActorMeshes[n].handle.id;
+					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					++collisionsWireframesCounter;
+					
 					vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
 					vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
@@ -1184,12 +1215,20 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->actors.Push({});
+				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorProjectileBundles[n].material;
 				cm::rotation*  rotationComponent  = &actorRotations[n];
 				if( actorTransforms && actorProjectileBundles &&
 					actorRotations && actorMeshes ) {
 					unsigned int meshID = actorMeshes[n].handle.id;
+					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					++collisionsWireframesCounter;
+					
 					vulkanRenderer->actors[projectileActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					vulkanRenderer->actors[projectileActorsCounter].jointMatrices = jointMatrices;
 					vulkanRenderer->actors[projectileActorsCounter].meshID        = meshID;
@@ -1237,12 +1276,20 @@ namespace GLVM::core
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				if( items[n].isActor ) {
 					vulkanRenderer->actors.Push({});
+					vulkanRenderer->collisionsWireframes.Push({});
 					cm::transform* transformComponent = &itemTransforms[n];
 					cm::material*  materialComponent  = &itemMaterials[n];
 					cm::rotation*  rotationComponent  = &itemRotations[n];
 					if( itemTransforms && itemMaterials &&
 						itemRotations && itemMeshes ) {
 						unsigned int meshID = itemMeshes[n].handle.id;
+						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
+						
 						vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 						vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
 						vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
@@ -1266,11 +1313,25 @@ namespace GLVM::core
 			arch::Archetype* arch = cachedPlayerArchetypes[x];
 			cm::transform*   playerTransforms = (ecs::components::transform*)arch->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
-
+			cm::rotation*    playerRotations = (ecs::components::rotation*)arch->
+				components[arch::ComponentsIndices::ROTATION_COMPONENT];
+			cm::mesh*        playerMeshes    = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			
 			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->players.Push({});
+				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* playerTransformComponent = &playerTransforms[n];
+				cm::rotation*  playerRotationComponent  = &playerRotations[n];
 				if( &playerTransforms[n] != nullptr ) {
+					const unsigned int meshID = playerMeshes[n].handle.id;
+					const mat4 model = computeModelMatrix(playerTransformComponent, playerRotationComponent);
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = playerTransformComponent->scale;
+					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					++collisionsWireframesCounter;
+					
 					vulkanRenderer->players[playerEntityCount].position = playerTransformComponent->position;
 					vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
 				}

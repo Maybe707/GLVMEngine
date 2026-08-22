@@ -670,6 +670,60 @@ namespace GLVM::core
 		renderPassConfigs[SDF_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 		renderPassConfigs[SDF_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
 
+		/// ===================================================================================== ///
+
+		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].actualLinkedDescriptorBindingsNumber                   = 1;
+		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].hostDescriptorNumber                                   = 64;
+		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].isTexture                                              = false;
+
+		descriptorBindingsConfig[21].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorBindingsConfig[21].shaderStageFlag         = VK_SHADER_STAGE_VERTEX_BIT;
+		descriptorBindingsConfig[21].binding                 = 0;
+		descriptorBindingsConfig[21].shaderDescriptorsNumber = 1;
+		descriptorBindingsConfig[21].uboChunkSize            = sizeof(COLLISIONS_DEBUG_UBO);
+		
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].vertShader                       = "../VKshaders/debug/collisions/vertDebug.spv";
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].fragShader                       = "../VKshaders/debug/collisions/fragDebug.spv";
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].polygonMode                      = VK_POLYGON_MODE_LINE;
+
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].actualAttachmentDescriptionNumber        = 2;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].flags          = 0;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].loadOp         = VK_ATTACHMENT_LOAD_OP_LOAD;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].initialLayout  = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].flags          = 0;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].samples        = VK_SAMPLE_COUNT_1_BIT;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].storeOp        = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[1].finalLayout    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].actualAttachmentReferenceNumber          = 2;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentReferences[0].attachment       = 0;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentReferences[0].layout           = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentReferences[1].attachment       = 1;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentReferences[1].layout           = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].actualSubpassDependencyNumber            = 1;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].srcSubpass        = 0;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].dstSubpass        = VK_SUBPASS_EXTERNAL;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].srcStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].dstStageMask      = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].srcAccessMask     = {};
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].dstAccessMask     = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].subpassDependencies[0].dependencyFlags   = {};
+		
 		/*
 		=====================================================================================
                     NOT RELATED TO ANY PIPELINE DESCRIPTOR SETS AND ITS BINDINGS
@@ -680,10 +734,10 @@ namespace GLVM::core
 		descriptorSetsConfig[RIDABLE_TEXTURES].hostDescriptorNumber                  = MAX_TEXTURES;
 		descriptorSetsConfig[RIDABLE_TEXTURES].isTexture                             = true;
 
-		descriptorBindingsConfig[21].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorBindingsConfig[21].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
-		descriptorBindingsConfig[21].binding                 = 0;
-		descriptorBindingsConfig[21].shaderDescriptorsNumber = MAX_TEXTURES;
+		descriptorBindingsConfig[22].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorBindingsConfig[22].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
+		descriptorBindingsConfig[22].binding                 = 0;
+		descriptorBindingsConfig[22].shaderDescriptorsNumber = MAX_TEXTURES;
 	}
 	// inline DescriptorSet directionalLightDescriptorSet0{ {}, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
 	// 			VK_SHADER_STAGE_VERTEX_BIT, 0, 1}}, 512};
