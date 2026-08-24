@@ -2357,8 +2357,114 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 //		std::cout << "FRAME" << std::endl;
+
+		if( !isCollisionsWireframeBuffersInitialized ) {
+			collisionsWireframesVKBuffers.clear();
+			collisionsWireframesVKDeviceMemory.clear();
+			collisionsWireframesIndicesVKBuffers.clear();
+			collisionsWireframesIndicesVKDeviceMemory.clear();
+			collisionsWireframeIndices.clear();
+
+			constexpr int boxIndicesForIndexBuffer[36] =
+				{ 0, 1, 2, 3, 0, 2,
+				  4, 0, 3, 7, 4, 3,
+				  4, 5, 1, 0, 4, 1,
+				  1, 5, 6, 2, 1, 6,
+				  5, 4, 7, 6, 5, 7,
+				  3, 2, 6, 7, 3, 6 };
+
+			for ( unsigned int i = 0; i < 36; ++i )
+				collisionsWireframeIndices.push_back(boxIndicesForIndexBuffer[i]);
+			
+			for ( unsigned int i = 0; i < collisionsWireframes.GetSize(); ++i ) {
+				RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
+
+				core::vector<core::Vertex> vertices;
+				unsigned int cube_vertices = 8;
+
+				const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = collisionWireframe.meshAxisMaxAbsoluteValues;
+//			const float scale   = collisionWireframe.scale;
+				const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
+				const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
+				const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
+
+				const float bottom_half_x = meshAxisMaxAbsoluteValues.origin_offset_x - meshAxisMaxAbsoluteValues.absolute_x;
+				const float bottom_half_y = meshAxisMaxAbsoluteValues.origin_offset_y - meshAxisMaxAbsoluteValues.absolute_y;
+				const float bottom_half_z = meshAxisMaxAbsoluteValues.origin_offset_z - meshAxisMaxAbsoluteValues.absolute_z;
+			
+				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
+					SVertex vertex;
+					switch( i ) {
+					case 0:
+						vertex[0] = half_x;
+						vertex[1] = half_y;
+						vertex[2] = half_z;
+						break;
+					case 1:
+						vertex[0] = (float)bottom_half_x;
+						vertex[1] = half_y;
+						vertex[2] = half_z;
+						break;			
+					case 2:
+						vertex[0] = (float)bottom_half_x;
+						vertex[1] = (float)bottom_half_y;
+						vertex[2] = half_z;
+						break;			
+					case 3:
+						vertex[0] = half_x;
+						vertex[1] = (float)bottom_half_y;
+						vertex[2] = half_z;
+						break;
+					case 4:
+						vertex[0] = half_x;
+						vertex[1] = half_y;
+						vertex[2] = (float)bottom_half_z;
+						break;
+					case 5:
+						vertex[0] = (float)bottom_half_x;
+						vertex[1] = half_y;
+						vertex[2] = (float)bottom_half_z;
+						break;			
+					case 6:
+						vertex[0] = (float)bottom_half_x;
+						vertex[1] = (float)bottom_half_y;
+						vertex[2] = (float)bottom_half_z;
+						break;			
+					case 7:
+						vertex[0] = half_x;
+						vertex[1] = (float)bottom_half_y;
+						vertex[2] = (float)bottom_half_z;
+						break;			
+					}
+
+					SVertex normal;
+					normal[0] = 0;
+					normal[1] = 1;
+					normal[2] = 0;
+					SVertex texture;
+					texture[0] = 0;
+					texture[1] = 1;
+
+					vertices.Push({{vertex[0], vertex[1], vertex[2]},
+								   {normal[0], normal[1], normal[2]},
+								   {texture[0], texture[1]},
+								   { -1, -1, -1, -1 },
+								   { 1, 1, 1, 1 }});
+				}			
+
+				collisionsWireframesVKBuffers.Push({});;
+				collisionsWireframesVKDeviceMemory.Push({});
+				createVertexBuffer(collisionsWireframesVKBuffers[i], collisionsWireframesVKDeviceMemory[i], vertices);
+
+				collisionsWireframesIndicesVKBuffers.Push({});
+				collisionsWireframesIndicesVKDeviceMemory.Push({});
+				createIndexBuffer(collisionsWireframesIndicesVKBuffers[i], collisionsWireframesIndicesVKDeviceMemory[i], collisionsWireframeIndices);
+			}
+			isCollisionsWireframeBuffersInitialized = true;
+		}
+		
 		for ( unsigned int i = 0; i < collisionsWireframes.GetSize(); ++i ) {
-			RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
+			[[maybe_unused]] RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
 //			RenderCrosshair crosshair = crosshairs[i];
 //			unsigned int uiVertexId = crosshair.meshID;
 
@@ -2369,106 +2475,14 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].pipelineLayout,
 									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
-			core::vector<core::Vertex> vertices;
-			unsigned int cube_vertices = 8;
-
-			const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = collisionWireframe.meshAxisMaxAbsoluteValues;
-//			const float scale   = collisionWireframe.scale;
-			const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
-			const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
-			const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
-
-			const float bottom_half_x = meshAxisMaxAbsoluteValues.origin_offset_x - meshAxisMaxAbsoluteValues.absolute_x;
-			const float bottom_half_y = meshAxisMaxAbsoluteValues.origin_offset_y - meshAxisMaxAbsoluteValues.absolute_y;
-			const float bottom_half_z = meshAxisMaxAbsoluteValues.origin_offset_z - meshAxisMaxAbsoluteValues.absolute_z;
 			
-			for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-				SVertex vertex;
- 				switch( i ) {
-				case 0:
-					vertex[0] = half_x;
-					vertex[1] = half_y;
-					vertex[2] = half_z;
-					break;
-				case 1:
-					vertex[0] = (float)bottom_half_x;
-					vertex[1] = half_y;
-					vertex[2] = half_z;
-					break;			
-				case 2:
-					vertex[0] = (float)bottom_half_x;
-					vertex[1] = (float)bottom_half_y;
-					vertex[2] = half_z;
-					break;			
-				case 3:
-					vertex[0] = half_x;
-					vertex[1] = (float)bottom_half_y;
-					vertex[2] = half_z;
-					break;
-				case 4:
-					vertex[0] = half_x;
-					vertex[1] = half_y;
-					vertex[2] = (float)bottom_half_z;
-					break;
-				case 5:
-					vertex[0] = (float)bottom_half_x;
-					vertex[1] = half_y;
-					vertex[2] = (float)bottom_half_z;
-					break;			
-				case 6:
-					vertex[0] = (float)bottom_half_x;
-					vertex[1] = (float)bottom_half_y;
-					vertex[2] = (float)bottom_half_z;
-					break;			
-				case 7:
-					vertex[0] = half_x;
-					vertex[1] = (float)bottom_half_y;
-					vertex[2] = (float)bottom_half_z;
-					break;			
-				}
-
-				SVertex normal;
-				normal[0] = 0;
-				normal[1] = 1;
-				normal[2] = 0;
-				SVertex texture;
-				texture[0] = 0;
-				texture[1] = 1;
-
-				vertices.Push({{vertex[0], vertex[1], vertex[2]},
-							   {normal[0], normal[1], normal[2]},
-							   {texture[0], texture[1]},
-							   { -1, -1, -1, -1 },
-							   { 1, 1, 1, 1 }});
-			}			
-
-			VkBuffer vertexBuffer;
-			VkDeviceMemory vertexDeviceMemory;
-			createVertexBuffer(vertexBuffer, vertexDeviceMemory, vertices);
-
-			constexpr int boxIndicesForIndexBuffer[36] =
-				{ 0, 1, 2, 3, 0, 2,
-				  4, 0, 3, 7, 4, 3,
-				  4, 5, 1, 0, 4, 1,
-				  1, 5, 6, 2, 1, 6,
-				  5, 4, 7, 6, 5, 7,
-				  3, 2, 6, 7, 3, 6 };
-
-			std::vector<uint32_t> indices;
-			for ( unsigned int i = 0; i < 36; ++i )
-				indices.push_back(boxIndicesForIndexBuffer[i]);
-			
-			VkBuffer indexBuffer;
-			VkDeviceMemory indexDeviceMemory;
-			createIndexBuffer(indexBuffer, indexDeviceMemory, indices);
-			
-			VkBuffer vertexBuffers[] = {vertexBuffer};
+			VkBuffer vertexBuffers[] = {collisionsWireframesVKBuffers[i]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, collisionsWireframesIndicesVKBuffers[i], 0, VK_INDEX_TYPE_UINT32);
 
-			unsigned int indicesContainerSize = indices.size();
+			unsigned int indicesContainerSize = collisionsWireframeIndices.size();
 
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 //			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);

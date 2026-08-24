@@ -176,6 +176,12 @@ namespace GLVM::core
 		core::vector<RenderCrosshair> crosshairs;
 		core::vector<RenderPlayer> players;
 		core::vector<RenderCollisionWireframe> collisionsWireframes;
+		core::vector<VkBuffer> collisionsWireframesVKBuffers;
+		core::vector<VkDeviceMemory> collisionsWireframesVKDeviceMemory;
+		core::vector<VkBuffer> collisionsWireframesIndicesVKBuffers;
+		core::vector<VkDeviceMemory> collisionsWireframesIndicesVKDeviceMemory;
+		std::vector<uint32_t> collisionsWireframeIndices;
+		bool isCollisionsWireframeBuffersInitialized = false;
 		RenderPlayer player;
 
 		float fYaw   = -90.0f;
