@@ -416,6 +416,13 @@ namespace GLVM::core
 			}
 			i = i + descriptorBindingsConfig[j].shaderDescriptorsNumber;
 		}
+
+		for( size_t i = 0; i < collisionsWireframes.GetSize(); ++i ) {
+			vkDestroyBuffer(device, collisionsWireframesVKBuffers[i], nullptr);
+			vkFreeMemory(device, collisionsWireframesVKDeviceMemory[i], nullptr);
+			vkDestroyBuffer(device, collisionsWireframesIndicesVKBuffers[i], nullptr);
+			vkFreeMemory(device, collisionsWireframesIndicesVKDeviceMemory[i], nullptr);
+		}
 		
 		vkDestroyBuffer(device, hudUniformBuffer, nullptr);
 		vkFreeMemory(device, hudUniformBuffersMemory, nullptr);
