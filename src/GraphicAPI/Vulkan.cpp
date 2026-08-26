@@ -417,7 +417,7 @@ namespace GLVM::core
 			i = i + descriptorBindingsConfig[j].shaderDescriptorsNumber;
 		}
 
-		for( size_t i = 0; i < collisionsWireframes.GetSize(); ++i ) {
+		for( size_t i = 0; i < collisionsWireframesVKBuffers.GetSize(); ++i ) {
 			vkDestroyBuffer(device, collisionsWireframesVKBuffers[i], nullptr);
 			vkFreeMemory(device, collisionsWireframesVKDeviceMemory[i], nullptr);
 			vkDestroyBuffer(device, collisionsWireframesIndicesVKBuffers[i], nullptr);
@@ -2365,7 +2365,15 @@ namespace GLVM::core
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 //		std::cout << "FRAME" << std::endl;
 
-		if( !isCollisionsWireframeBuffersInitialized ) {
+		if( collisionsWireframes.GetSize() != collisionsWireframesVKBuffers.GetSize() ) {
+			vkDeviceWaitIdle(device);
+			for( size_t i = 0; i < collisionsWireframesVKBuffers.GetSize(); ++i ) {
+				vkDestroyBuffer(device, collisionsWireframesVKBuffers[i], nullptr);
+				vkFreeMemory(device, collisionsWireframesVKDeviceMemory[i], nullptr);
+				vkDestroyBuffer(device, collisionsWireframesIndicesVKBuffers[i], nullptr);
+				vkFreeMemory(device, collisionsWireframesIndicesVKDeviceMemory[i], nullptr);
+			}
+			vkDeviceWaitIdle(device);
 			collisionsWireframesVKBuffers.clear();
 			collisionsWireframesVKDeviceMemory.clear();
 			collisionsWireframesIndicesVKBuffers.clear();

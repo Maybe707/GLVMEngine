@@ -1214,6 +1214,7 @@ namespace GLVM::core
 			}
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->isCollisionsWireframeBuffersInitialized = false;
 				vulkanRenderer->actors.Push({});
 				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];

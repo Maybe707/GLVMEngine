@@ -673,7 +673,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].actualLinkedDescriptorBindingsNumber                   = 1;
-		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].hostDescriptorNumber                                   = 64;
+		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].hostDescriptorNumber                                   = 128;
 		descriptorSetsConfig[COLLISIONS_DEBUG_DATA].isTexture                                              = false;
 
 		descriptorBindingsConfig[21].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
