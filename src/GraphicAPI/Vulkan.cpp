@@ -550,8 +550,9 @@ namespace GLVM::core
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
         if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
+//            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+//            createInfo.ppEnabledLayerNames = validationLayers.data();
+			createInfo.enabledLayerCount = 0;
 			
             populateDebugMessengerCreateInfo(debugCreateInfo);
             createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
@@ -671,8 +672,9 @@ namespace GLVM::core
         createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
         if (enableValidationLayers) {
-            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-            createInfo.ppEnabledLayerNames = validationLayers.data();
+//            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+//            createInfo.ppEnabledLayerNames = validationLayers.data();
+			createInfo.enabledLayerCount = 0;
         } else {
             createInfo.enabledLayerCount = 0;
         }
@@ -3580,7 +3582,7 @@ namespace GLVM::core
 #ifdef VK_USE_PLATFORM_XLIB_KHR
         std::vector<const char*> pRequiredExtentions = {"VK_KHR_xlib_surface",
             "VK_EXT_acquire_xlib_display", "VK_KHR_display", "VK_KHR_surface",
-            "VK_EXT_direct_mode_display"};
+            "VK_EXT_direct_mode_display", "VK_LAYER_KHRONOS_validation"};
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR

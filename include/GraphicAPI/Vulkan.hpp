@@ -92,7 +92,7 @@ namespace GLVM::core
     const int MAX_FRAMES_IN_FLIGHT = 2;
 //#define NDEBUG
     const std::vector<const char*> validationLayers = {
-        "VK_LAYER_KHRONOS_validation"
+//        "VK_LAYER_KHRONOS_validation"
     };
 
     const std::vector<const char*> deviceExtensions = {
