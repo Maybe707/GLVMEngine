@@ -1416,6 +1416,15 @@ namespace GLVM::core
 			setMeshBounds( vulkanRenderer->meshAxisLimitingValues );
 			++wavefrontObjCounter;
         }
+
+		ecs::arch::SpatialGrid& spatialGrid = ecs::arch::world.spatialGrid;
+		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
+		const float chunkSize = spatialGrid.grid[0][0][0].size;
+
+		vulkanRenderer->renderSpacialGrid.chunkSize  = chunkSize;
+		vulkanRenderer->renderSpacialGrid.halfWidth  = spatialGrid.width;
+		vulkanRenderer->renderSpacialGrid.halfHeight = spatialGrid.height;
+		vulkanRenderer->renderSpacialGrid.halfDepth  = spatialGrid.depth;
     }
 
 	void Engine::calculateMeshBounds(const vec4& animatedVertex) {

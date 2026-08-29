@@ -98,6 +98,7 @@ namespace GLVM::core
 		MAIN_RENDER_DIFFUSE_SAMPLER,
 		SDF_DATA,
 		COLLISIONS_DEBUG_DATA,
+		SPACIAL_GRID_DEBUG_DATA,
 		/// Not related to any pipeline values
 		RIDABLE_TEXTURES,
 		DESCRIPTOR_CHUNKS_NUMBER
@@ -116,6 +117,7 @@ namespace GLVM::core
 		MAIN_RENDER_PIPELINE,
 		SDF_PIPELINE,
 		COLLISIONS_DEBUG_PIPELINE,
+		SPACIAL_GRID_DEBUG_PIPELINE,
 		PIPELINES_NUMBER
 	};
 
@@ -342,6 +344,13 @@ struct RenderCollisionWireframe {
 	vec3 position;
 	float scale;
 	GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues;
+};
+
+struct RenderSpacialGrid {
+	float chunkSize;
+	float halfWidth;
+	float halfHeight;
+	float halfDepth;
 };
 
 #endif

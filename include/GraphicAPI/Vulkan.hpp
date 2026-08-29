@@ -183,6 +183,10 @@ namespace GLVM::core
 		std::vector<uint32_t> collisionsWireframeIndices;
 		bool isCollisionsWireframeBuffersInitialized = false;
 		RenderPlayer player;
+		bool isSpacialGridWireframeBuffersInitialized = false;
+		RenderSpacialGrid renderSpacialGrid;
+		core::vector<VkBuffer> spacialGridWireframesVKBuffers;
+		core::vector<VkDeviceMemory> spacialGridWireframesVKDeviceMemory;
 
 		float fYaw   = -90.0f;
         float fPitch = 0.0f;
@@ -352,6 +356,7 @@ namespace GLVM::core
 		const unsigned int hudUboDescriptorNumber = 500;
 		const unsigned int fontUboDescriptorNumber = 128;
 		const unsigned int hudScreenUboDescriptorNumber = 32;
+		const u32          spacialGridWireFrameUboNumber = 8192;
 		const unsigned int uiUboDescriptorsNumber = 64;
 //		const unsigned int uiIconsDescriptorsNumber = 64;
 		[[maybe_unused]] const unsigned int virtualTexturesDescriptorsNumber= 64;
@@ -482,7 +487,7 @@ namespace GLVM::core
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO( uint32_t offset, uint32_t crosshair );
 		void updateSdfUBO(uint32_t offset, uint32_t crosshair);
-		void updateCollisionsDebugUBO(uint32_t offset, uint32_t actor);
+		void updateCollisionsDebugUBO(uint32_t offset, mat4 model, DescriptorSetDataLink descriptorSetLink);
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
 		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
 		void hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
@@ -491,6 +496,7 @@ namespace GLVM::core
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void collisionsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void spacialGridDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void recordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
         void createSyncObjects(std::vector<VkSemaphore>& imageAvailableSemaphores,

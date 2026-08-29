@@ -1579,7 +1579,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 10000;
+		uint32_t descriptorCount = 32768;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -1755,7 +1755,7 @@ namespace GLVM::core
 
 		i32 result = vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory);
         if (result != VK_SUCCESS) {
-//			std::cout << "result" << result << std::endl;
+			std::cout << "result" << result << std::endl;
             throw std::runtime_error("failed to allocate buffer memory!");
         }
 
@@ -1906,9 +1906,9 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-	void CVulkanRenderer::updateCollisionsDebugUBO(uint32_t offset, [[maybe_unused]] uint32_t actor) {
+	void CVulkanRenderer::updateCollisionsDebugUBO(uint32_t offset, mat4 model, DescriptorSetDataLink descriptorSetLink) {
 		COLLISIONS_DEBUG_UBO collisionsDebugUBO{};
-		collisionsDebugUBO.model      = collisionsWireframes[actor].model;
+		collisionsDebugUBO.model      = model;
 //		collisionsDebugUBO.model      = collisionsWireframes[crosshair].model;
 		collisionsDebugUBO.view       = viewMatrix;
 		collisionsDebugUBO.projection = projectionMatrix;
@@ -1916,7 +1916,7 @@ namespace GLVM::core
 //		std::cout << "model: " << collisionsDebugUBO.model << std::endl;
 		
 		void* collisionsDebugData;
-		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::COLLISIONS_DEBUG_DATA].descriptorsBindingsIDs[0];		
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[descriptorSetLink].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(COLLISIONS_DEBUG_UBO) * offset,
 					sizeof(COLLISIONS_DEBUG_UBO), 0, &collisionsDebugData);
         memcpy(collisionsDebugData, &collisionsDebugUBO, sizeof(COLLISIONS_DEBUG_UBO));
@@ -2486,7 +2486,7 @@ namespace GLVM::core
 //			unsigned int uiVertexId = crosshair.meshID;
 
 			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
-			updateCollisionsDebugUBO(uboIndex, i);
+			updateCollisionsDebugUBO(uboIndex, collisionWireframe.model, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].linkedDescriptorSetIDs[0];
   			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].pipelineLayout,
@@ -2503,6 +2503,191 @@ namespace GLVM::core
 
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 //			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
+    }
+
+    void CVulkanRenderer::spacialGridDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::SPACIAL_GRID_DEBUG_PIPELINE];
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPACIAL_GRID_DEBUG_PIPELINE].pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+//		std::cout << "FRAME" << std::endl;
+
+		const float chunkSize = renderSpacialGrid.chunkSize;
+		
+		const u32 spacialGridDepth  = renderSpacialGrid.halfDepth;
+		const u32 spacialGridHeight = renderSpacialGrid.halfHeight;
+		const u32 spacialGridWidth  = renderSpacialGrid.halfWidth;
+		
+		if( !isSpacialGridWireframeBuffersInitialized ) {
+			// vkDeviceWaitIdle(device);
+			// for( size_t i = 0; i < spacialGridWireframesVKBuffers.GetSize(); ++i ) {
+			// 	vkDestroyBuffer(device, spacialGridWireframesVKBuffers[i], nullptr);
+			// 	vkFreeMemory(device, spacialGridWireframesVKDeviceMemory[i], nullptr);
+			// }
+			// vkDeviceWaitIdle(device);
+			// spacialGridWireframesVKBuffers.clear();
+			// spacialGridWireframesVKDeviceMemory.clear();
+
+			for( u32 i2 = 0; i2 < spacialGridDepth; ++i2 ) {
+				for( u32 i3 = 0; i3 < spacialGridHeight; ++i3 ) {
+					for( u32 i4 = 0; i4 < spacialGridWidth; ++i4 ) {
+						core::vector<core::Vertex> vertices;
+						unsigned int cube_vertices = 8;
+
+						const float chunkHalfSize = chunkSize * 0.5f;
+						
+						const float half_x = chunkHalfSize;
+						const float half_y = chunkHalfSize;
+						const float half_z = chunkHalfSize;
+
+						for ( unsigned int i = 0; i < cube_vertices; ++i ) {
+							SVertex vertex;
+							switch( i ) {
+							case 0:
+								vertex[0] = half_x;
+								vertex[1] = half_y;
+								vertex[2] = half_z;
+								break;
+							case 1:
+								vertex[0] = -(float)half_x;
+								vertex[1] = half_y;
+								vertex[2] = half_z;
+								break;			
+							case 2:
+								vertex[0] = -(float)half_x;
+								vertex[1] = -(float)half_y;
+								vertex[2] = half_z;
+								break;			
+							case 3:
+								vertex[0] = half_x;
+								vertex[1] = -(float)half_y;
+								vertex[2] = half_z;
+								break;
+							case 4:
+								vertex[0] = half_x;
+								vertex[1] = half_y;
+								vertex[2] = -(float)half_z;
+								break;
+							case 5:
+								vertex[0] = -(float)half_x;
+								vertex[1] = half_y;
+								vertex[2] = -(float)half_z;
+								break;			
+							case 6:
+								vertex[0] = -(float)half_x;
+								vertex[1] = -(float)half_y;
+								vertex[2] = -(float)half_z;
+								break;			
+							case 7:
+								vertex[0] = half_x;
+								vertex[1] = -(float)half_y;
+								vertex[2] = -(float)half_z;
+								break;			
+							}
+
+							SVertex normal;
+							normal[0] = 0;
+							normal[1] = 1;
+							normal[2] = 0;
+							SVertex texture;
+							texture[0] = 0;
+							texture[1] = 1;
+
+							vertices.Push({{vertex[0], vertex[1], vertex[2]},
+										   {normal[0], normal[1], normal[2]},
+										   {texture[0], texture[1]},
+										   { -1, -1, -1, -1 },
+										   { 1, 1, 1, 1 }});
+						}
+
+						const u32 index = i2 * spacialGridHeight * spacialGridWidth + i3 * spacialGridWidth + i4;
+						
+						spacialGridWireframesVKBuffers.Push({});;
+						spacialGridWireframesVKDeviceMemory.Push({});
+						createVertexBuffer(spacialGridWireframesVKBuffers[index], spacialGridWireframesVKDeviceMemory[index], vertices);
+					}
+				}
+			}
+			isSpacialGridWireframeBuffersInitialized = true;
+		}
+		
+		for( u32 i2 = 0; i2 < spacialGridDepth; ++i2 ) {
+			for( u32 i3 = 0; i3 < spacialGridHeight; ++i3 ) {
+				for( u32 i4 = 0; i4 < spacialGridWidth; ++i4 ) {
+					const u32 index = i2 * spacialGridHeight * spacialGridWidth + i3 * spacialGridWidth + i4;
+
+					mat4 scale(1.0f);
+					mat4 translation(1.0f);
+					
+					translation[3][0] = i4 * chunkSize;
+					translation[3][1] = i3 * chunkSize;
+					translation[3][2] = i2 * chunkSize;
+					translation[3][3] = 1.0f;
+
+					unsigned int uboIndex = currentFrame * spacialGridWireFrameUboNumber + index;
+					updateCollisionsDebugUBO(uboIndex, scale * translation, DescriptorSetDataLink::SPACIAL_GRID_DEBUG_DATA);
+					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::SPACIAL_GRID_DEBUG_PIPELINE].linkedDescriptorSetIDs[0];
+					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+					vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::SPACIAL_GRID_DEBUG_PIPELINE].pipelineLayout,
+											0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+
+			
+					VkBuffer vertexBuffers[] = {spacialGridWireframesVKBuffers[index]};
+					VkDeviceSize offsets[] = {0};
+					vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+					vkCmdBindIndexBuffer(commandBuffer, collisionsWireframesIndicesVKBuffers[0], 0, VK_INDEX_TYPE_UINT32);
+
+					unsigned int indicesContainerSize = collisionsWireframeIndices.size();
+
+					vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+//			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
+				}
+			}
 		}
 
         vkCmdEndRenderPass(commandBuffer);
@@ -3016,6 +3201,7 @@ namespace GLVM::core
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 //		sdfRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		collisionsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		spacialGridDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
