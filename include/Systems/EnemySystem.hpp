@@ -8,6 +8,7 @@
 
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
+#include "Components/AnimationComponent.hpp"
 #include "ISystem.hpp"
 #include "EntityManager.hpp"
 #include "Vector.hpp"
@@ -38,6 +39,7 @@ namespace GLVM::ecs
 
 			ecs::components::transform* enemyTransforms  = nullptr;
 			ecs::components::state*     enemyStates      = nullptr;
+			ecs::components::animation* enemyAnimation   = nullptr;
 			ecs::components::enemy*     enemies          = nullptr;
 		} componentsView;
 
@@ -47,6 +49,7 @@ namespace GLVM::ecs
 		arch::componentMask enemyRequiredMask  =
 			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
 			(1ul << arch::ComponentsIndices::STATE_COMPONENT) |
+			(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT)  |
 			(1ul << arch::ComponentsIndices::ENEMY_COMPONENT);
 
 		arch::componentMask projectileRequiredMask =

@@ -10,7 +10,7 @@ namespace GLVM::ecs::components
 	{
 		uint32_t currentAnimationFrame = 0;
 		float frameAccumulator = 0.0f;
-		bool isAnimatedOnFrame = false;
+		bool isAnimatedOnFrame = true;
 		GLVM::core::vector<mat4> jointMatrices;
 	};
 } // namespace GLVM::ecs::components

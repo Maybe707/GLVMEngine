@@ -10,6 +10,7 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
+#include "Components/AnimationComponent.hpp"
 #include "Components/DamageComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
@@ -32,6 +33,8 @@ namespace GLVM::ecs
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.enemyStates     = (ecs::components::state*)archView.enemyCachedArchetype->
 			components[arch::ComponentsIndices::STATE_COMPONENT];
+		componentsView.enemyAnimation  = (ecs::components::animation*)archView.enemyCachedArchetype->
+			components[arch::ComponentsIndices::ANIMATION_COMPONENT];
 		componentsView.enemies         = (ecs::components::enemy*)archView.enemyCachedArchetype->
 			components[arch::ComponentsIndices::ENEMY_COMPONENT];
 
@@ -43,8 +46,11 @@ namespace GLVM::ecs
 			for ( unsigned int i = 0; i < archView.enemyCachedArchetype->entityCount; ++i ) {
 				components::transform* enemyTransformComponent = &componentsView.enemyTransforms[i];
 				components::state*     stateEnemyComponent     = &componentsView.enemyStates[i];
+				components::animation* enemyAnimatin           = &componentsView.enemyAnimation[i];
 				components::enemy*     enemyComponent          = &componentsView.enemies[i];
 
+				enemyAnimatin->isAnimatedOnFrame = true;       ///< FIXME: DELETE CRINGE
+				
 				vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
 				float cameraSpeed = 5.5f * deltaFrameTime;
 				
