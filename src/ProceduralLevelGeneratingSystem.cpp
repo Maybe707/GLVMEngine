@@ -42,7 +42,7 @@ namespace GLVM::core
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int levelHalfY = distCurrentLevel_y(mersenne);
-				std::uniform_int_distribution<int> distCurrentLevel_x_z(8, 16);
+				std::uniform_int_distribution<int> distCurrentLevel_x_z(16, 16);
 				unsigned int levelHalfX = distCurrentLevel_x_z(mersenne);
 				unsigned int levelHalfZ = distCurrentLevel_x_z(mersenne);
 
@@ -85,8 +85,8 @@ namespace GLVM::core
 				ecs::TextureHandle gameLevelTexture = textureHandlers[2];
 				if( levelNubmer == 0 ) {
 					/// Set up current level position to player position
-					componentsView.playerTransforms->position =
-						vec3( currentLevelPosition[0], componentsView.playerTransforms->position[1], currentLevelPosition[2] );
+					// componentsView.playerTransforms->position =
+					// 	vec3( currentLevelPosition[0], componentsView.playerTransforms->position[1], currentLevelPosition[2] );
 				}
 				levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
 				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };

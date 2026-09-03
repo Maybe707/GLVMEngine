@@ -113,6 +113,12 @@ namespace GLVM::core
 			case eINVENTORY:
 				Push(eINVENTORY);
 				break;
+			case eDEBUG_COLLISIONS_ACTIVE:
+				Push(eDEBUG_COLLISIONS_ACTIVE);
+				break;
+			case eDEBUG_COLLISIONS_INACTIVE:
+				Push(eDEBUG_COLLISIONS_INACTIVE);
+				break;
             case eMOUSE_LEFT_BUTTON:
                 Push(eMOUSE_LEFT_BUTTON);
                 break;

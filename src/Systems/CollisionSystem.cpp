@@ -122,6 +122,9 @@ namespace GLVM::ecs
 								const core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
 								for( u32 i5 = 0; i5 < chunkEntities.GetSize(); ++i5 ) {
 									const u32 entity = chunkEntities[i5];
+									if( entity == 0 ) {
+//										std::cout << "x grid demantion: " << i4 << std::endl;
+									}
 									if( !core::isExist( collectedEntities, entity ) )
 										collectedEntities.Push( entity );
 								}

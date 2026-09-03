@@ -47,6 +47,7 @@
 #include "Systems/ProjectileSystem.hpp"
 #include "TagComponents/LevelChunkTagComponent.hpp"
 #include "Texture.hpp"
+#include "VertexMath.hpp"
 #include "VkStructs.hpp"
 #include <cstdint>
 #include <limits>
@@ -270,6 +271,12 @@ namespace GLVM::core
 					pSystem_Manager->ReturnSystemToActivatedState(ecs::DeactivatedSystems::DEACTIVATED_MOVEMENT_SYSTEM);
 //				bGame_Loop_Active = false;
 			}
+
+			if((Input_Stack_.SearchElement(EEvents::eDEBUG_COLLISIONS_ACTIVE)) == EEvents::eDEBUG_COLLISIONS_ACTIVE) {
+				vulkanRenderer->isDebugCollisitionsActive = !vulkanRenderer->isDebugCollisitionsActive;
+				Input_Stack_.Remove(EEvents::eDEBUG_COLLISIONS_ACTIVE);
+			}
+			
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
 
@@ -282,7 +289,7 @@ namespace GLVM::core
 			// std::cout << "lmb released " << g_eEvent.isLeftMouseButtonReleased << std::endl;
 			// std::cout << "lmb pressed " << isLeftMouseButtonPressed << std::endl;
 			// std::cout << "item draged " << itemSystem->isItemDraged << std::endl;
-			FPScounter();
+//			FPScounter();
 			damageSystem->deltaTime                   = deltaFrameTime;
 			movementSystem->deltaFrameTime            = deltaFrameTime;
 			movementSystem->gravity                   = gravity;
@@ -422,7 +429,7 @@ namespace GLVM::core
 				float delta_y = 0.0f;
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
 				delta_x = vulkanRenderer->current_X;
-				delta_y = vulkanRenderer->current_Y;
+				delta_y = -vulkanRenderer->current_Y;
 #else
 				delta_x = current_X - prev_X;
 				delta_y = current_Y - prev_Y;
@@ -431,15 +438,21 @@ namespace GLVM::core
 				// delta_x *= kSensitivity;
 				// delta_y *= kSensitivity;
 		
-				const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
-				const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
+//				const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
+//				[[maybe_unused]] const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
+
+				const vec3 rightVec = Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0) );
+				[[maybe_unused]] const vec3 newUpVec = Cross( rightVec, cameraComponent->Position );
+
 				/*
 				 * 1. The mouse direction determines the "intended direction of rotation" for the object.
 				 * 2. The camera is "looking forward."
 				 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
 				 */
-				const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
-
+//				const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
+//				const vec3 rotateAxis = Normalize(vec3( 0.0, 1.0, 0.0 ));
+				const vec3 rotateAxis = Normalize(Cross(cameraComponent->Position, rightVec * delta_x + newUpVec * delta_y));
+//				_Player->pitch = 0;
 				if ( VecLength(rotateAxis) >= 0.001f ) {
 					/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
 					float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
@@ -447,6 +460,7 @@ namespace GLVM::core
 					rotationAngle = Radians(rotationAngle * angleScale);
 					constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
 					[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+//					_Player->pitch += delta_x * 0.05f;
 					// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
 					// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
 					// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
@@ -461,16 +475,43 @@ namespace GLVM::core
 					// forward[1] = appliedRotationQuat.y;
 					// forward[2] = appliedRotationQuat.z;
 					pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
-							.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->forward[0],
-							.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
-					vulkanRenderer->forward[0] = appliedRotationPoint.x;
-					vulkanRenderer->forward[1] = appliedRotationPoint.y;
-					vulkanRenderer->forward[2] = appliedRotationPoint.z;
+							.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->Position[0],
+							.y = cameraComponent->Position[1], .z = cameraComponent->Position[2], .w = 1.0f };
+					// vulkanRenderer->forward[0] = appliedRotationPoint.x;
+					// vulkanRenderer->forward[1] = appliedRotationPoint.y;
+					// vulkanRenderer->forward[2] = appliedRotationPoint.z;
+
+					cameraComponent->Position[0] = appliedRotationPoint.x;
+					cameraComponent->Position[1] = appliedRotationPoint.y;
+					cameraComponent->Position[2] = appliedRotationPoint.z;
+
+					cameraComponent->forward = Normalize(_Player->position - (cameraComponent->Position + _Player->position));
+					_Player->forward = cameraComponent->forward;
+
+					float sign = -1.0f;
+					if( delta_x >= 0.0f ) {
+						sign = 1.0f;
+					}
+					
+					_Player->pitch += acos(clamp(0.0f, Dot(Normalize(vec3(previousFrameForward[0], 0.0, previousFrameForward[2])),
+														   Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
+					previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
 				}
-				cameraComponent->forward = Normalize(vulkanRenderer->forward);
-				_Player->forward = cameraComponent->forward;
+				// vulkanRenderer->forward[0] = _Player->position[0];
+				// vulkanRenderer->forward[1] = _Player->position[1];
+				// vulkanRenderer->forward[2] = _Player->position[2];
+				
+				// cameraComponent->Position[0] = appliedRotationPoint.x;
+				// cameraComponent->Position[1] = appliedRotationPoint.y;
+				// cameraComponent->Position[2] = appliedRotationPoint.z;
+				// cameraComponent->forward = Normalize(cameraComponent->Position - _Player->position);
+				// _Player->forward = cameraComponent->forward;
+				// std::cout << "camera position: " << cameraComponent->Position << std::endl;
+				// std::cout << "player position: " << _Player->position << std::endl;
+				// std::cout << "player address: " << &_Player->position << std::endl;
 				mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
 										cameraComponent->Position + _Player->position + cameraComponent->forward,
+//										_Player->position,
 										vec3( 0.0f, -1.0f, 0.0) );
 				for ( unsigned int i = 0; i < 4; ++i )
 					for ( unsigned int j = 0; j < 4; ++j )
@@ -1130,7 +1171,13 @@ namespace GLVM::core
 					++collisionsWireframesCounter;
 					
 					vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
+					if( animationComponent->isAnimatedOnFrame ) {
+						vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
+						animationComponent->jointMatrices = vulkanRenderer->actors[animationActorsCounter].jointMatrices;
+						animationComponent->isAnimatedOnFrame = false;
+					} else {
+						vulkanRenderer->actors[animationActorsCounter].jointMatrices = animationComponent->jointMatrices;
+					}
 					vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
 					vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
 					vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
@@ -1683,7 +1730,10 @@ namespace GLVM::core
 //		Quaternion result;
 		// result = multiplyQuaternion(pitchQuat, yawQuat);
 
-
+		std::cout << "pitch: " << _transformComponent->pitch << std::endl;
+//		const float rotationAngleScaler = 1.0f / 180.0f;
+		rotationMatrix = Rotate<float, 4, 3>(vec3(0.0, 1.0, 0.0), _transformComponent->pitch);
+		
 		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
 		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
 		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
@@ -1692,7 +1742,7 @@ namespace GLVM::core
 		// 	for ( unsigned int j = 0; j < 4; ++j )
 		// 		rotationMatrix[i][j] = rotationMat[i][j];
 		
-        return scalingMatrix * translationMatrix;
+        return rotationMatrix * scalingMatrix * translationMatrix;
 	}
 	
 	void Engine::computeHudScreeenCoordinates() {

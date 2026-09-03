@@ -10,6 +10,7 @@
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/ItemArchetype.hpp"
 #include "Archetypes/PlayerArchetype.hpp"
+#include "Components/AnimationComponent.hpp"
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -33,6 +34,8 @@ namespace GLVM::ecs
 		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
 		componentsView.playerMoves         = (ecs::components::move*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::MOVE_COMPONENT];
+		componentsView.playerAnimation     = (ecs::components::animation*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::ANIMATION_COMPONENT];
 		componentsView.playerViews         = (ecs::components::beholder*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::VIEW_COMPONENT];
 		componentsView.playerColliderFlags = (ecs::components::colliderFlags*)archView.playerCachedArchetype->
@@ -48,6 +51,7 @@ namespace GLVM::ecs
 			cm::move*          playerMove          = &componentsView.playerMoves[i];
 			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
 			cm::rigidBody*     playerRigidBody     = &componentsView.playerRigidBody[i];
+			cm::animation*     playerAnimation     = &componentsView.playerAnimation[i];
             for(int n = 0; n < 6; ++n) {
 				vec3 right;
 				vec3 forward;
@@ -56,21 +60,30 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement -= right * cameraSpeed;
+//					playerMove->frameMovement += right * cameraSpeed;
+					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement += right * cameraSpeed;
+//					playerMove->frameMovement -= right * cameraSpeed;
+					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement -= forward * cameraSpeed;
+//					playerMove->frameMovement += forward * cameraSpeed;
+					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
+					std::cout << "forw: " << playerView->forward << std::endl;
 					forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement += forward * cameraSpeed;
+//					playerMove->frameMovement -= forward * cameraSpeed;
+					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eJUMP:

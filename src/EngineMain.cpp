@@ -154,10 +154,11 @@ int main()
 	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
 	const uint32_t playerIndex = playerLocation.index;
 
-	playerArch->transforms[playerIndex]  = { .position = { 15.0f, 15.0f, 15.0f }, .scale = 1.0f };
+	playerArch->transforms[playerIndex]  = { .position = { 0.0f, 15.0f, 0.0f }, .scale = 1.0f };
+	std::cout << "new player address: " << &playerArch->transforms[playerIndex].position << std::endl;
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
-	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 2.0f, -3.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 5.0f, 5.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
@@ -191,7 +192,7 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 10, 3.3f, -3.0f ) + randomDirection }, .scale = 1.0f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 20, 3.3f, -15.0f ) + randomDirection }, .scale = 0.05f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
@@ -213,7 +214,7 @@ int main()
 	}
 	enemyFontComponent->lifeTime     = 0.0f;
 	enemyFontComponent->removeble    = false;
-	enemyArch->meshes[enemyIndex]    = { .handle = cyborg_Handle_GLTF, .gltf = true };
+	enemyArch->meshes[enemyIndex]    = { .handle = robot0_Handle_GLTF, .gltf = true };
 	enemyArch->materials[enemyIndex] = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 32.0f * 0.078125f };
 	}
@@ -268,8 +269,8 @@ int main()
 		unsigned int row = i + 1;
 		itemArch->items[itemIndex].itemSlotType = { 2, row };
 		itemArch->items[itemIndex].isActor      = true;
-		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 5.0f, 10.0f + i * 2.0f }, .scale = 0.5f };
-		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 0.0f };
+		itemArch->transforms[itemIndex]         = { .position = { 3.0f, 5.0f, 10.0f + i * 2.0f }, .scale = 0.05f };
+		itemArch->rigidBodies[itemIndex]        = { .fMass_ = 1.0f };
 		if ( i % 2 == 0 )
 			itemArch->meshes[itemIndex].handle = hyperCubeHandle_GLTF;
 		else

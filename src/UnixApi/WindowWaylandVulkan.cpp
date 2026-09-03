@@ -379,6 +379,10 @@ namespace GLVM::core {
 				Input_Stack_.ControlInput(g_eEvent);
 //				printf("inventory\n");
 			}
+			if (key == 24) {
+				g_eEvent.SetEvent(EEvents::eDEBUG_COLLISIONS_ACTIVE);
+				Input_Stack_.ControlInput(g_eEvent);
+			}
 		}
 
 		if (state == WL_KEYBOARD_KEY_STATE_RELEASED) {
@@ -418,6 +422,10 @@ namespace GLVM::core {
 				Input_Stack_.ControlInput(g_eEvent);
 //				keys_pressed[0] = 23;
 //				printf("inventory\n");
+			}
+			if (key == 24) {
+				g_eEvent.SetEvent(EEvents::eDEBUG_COLLISIONS_INACTIVE);
+				Input_Stack_.ControlInput(g_eEvent);
 			}
 		}
 	}

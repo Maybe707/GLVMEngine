@@ -23,6 +23,19 @@ namespace GLVM::ecs {
 		cachedArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
 
+		for( u32 i2 = 0; i2 < spatialGrid.depth; ++i2 ) {
+			for( u32 i3 = 0; i3 < spatialGrid.height; ++i3 ) {
+				for( u32 i4 = 0; i4 < spatialGrid.width; ++i4 ) {
+					for( u32 i5 = 0; i5 < spatialGrid.grid[i2][i3][i4].entities.GetSize(); ++i5 ) {
+						const u32 entity = spatialGrid.grid[i2][i3][i4].entities[i5];
+						ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+						entityLocation.gridCellCounter = 0;
+					}
+					spatialGrid.grid[i2][i3][i4].entities.clear();
+				}
+			}
+		}
+		
 		for( uint32_t i0 = 0; i0 < cachedArchetypesNumber; ++i0 ) {
 			arch::Archetype* arch = cachedArchetypes[i0];
 			view.transforms = (ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
@@ -68,7 +81,7 @@ namespace GLVM::ecs {
 							if( !core::isExist<u32>( chunkEntities, ecs::arch::getId(entity) ) ) {
 								chunkEntities.Push( ecs::arch::getId(entity) );
 								const u32 currentGridCell = entityLocation.gridCellCounter;
-								assert( currentGridCell < 8 );                  ///< 8 is a maximum number for 1 entity to exist in grid cell
+								assert( currentGridCell < 32 );                  ///< 8 is a maximum number for 1 entity to exist in grid cell
 								entityLocation.gridCellIndicies[currentGridCell]  = vec3( i2, i3, i4 );
 								entityLocation.cellEntityIndices[currentGridCell] = chunkEntities.GetSize() - 1;
 								entityLocation.isDirty = false;
@@ -80,7 +93,7 @@ namespace GLVM::ecs {
 			}
 		}
 		if( !isInitialized ) {
-			isInitialized = true;
+//			isInitialized = true;
 		}
 	}
 	

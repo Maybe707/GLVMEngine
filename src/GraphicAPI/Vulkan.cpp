@@ -2245,9 +2245,9 @@ namespace GLVM::core
 
         vkCmdEndRenderPass(commandBuffer);
 
-        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-        //     throw std::runtime_error("failed to record command buffer!");
-        // }
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
     }
 
     void CVulkanRenderer::sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -2662,10 +2662,12 @@ namespace GLVM::core
 
 					mat4 scale(1.0f);
 					mat4 translation(1.0f);
+
+					const float halfSize = chunkSize * 0.5f;
 					
-					translation[3][0] = i4 * chunkSize;
-					translation[3][1] = i3 * chunkSize;
-					translation[3][2] = i2 * chunkSize;
+					translation[3][0] = i4 * chunkSize + halfSize - 4.0 + 1.0;
+					translation[3][1] = i3 * chunkSize + halfSize + 1.0;
+					translation[3][2] = i2 * chunkSize + halfSize - 4.0 + 1.0;
 					translation[3][3] = 1.0f;
 
 					unsigned int uboIndex = currentFrame * spacialGridWireFrameUboNumber + index;
@@ -2942,10 +2944,14 @@ namespace GLVM::core
 		modelMatrixUBO.model = actors[actor].modelMatrix;		
 		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
+		// }
+
+		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
-
+		
         void* modelMatrixData = nullptr;
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
@@ -2960,10 +2966,14 @@ namespace GLVM::core
 		modelMatrixUBO.model = actors[actor].modelMatrix;		
 		modelMatrixUBO.lightSpaceMatrix = spotLightSpaceMatrix[currentLight];
 
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
+		// }
+
+		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
-
+		
         void* modelMatrixData;
 		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
         vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
@@ -2983,7 +2993,11 @@ namespace GLVM::core
 		modelMatrixUBO.farPlane = 100.0f;
 		modelMatrixUBO.lightPosition = pointLights[currentLight].position;
 
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
+		// }
+
+		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
@@ -3004,7 +3018,10 @@ namespace GLVM::core
         modelMatrixUBO.proj = projectionMatrix;
 
 		/// Start of animation logic
-		for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
+		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
+		// }
+		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		/// End of animation logic
@@ -3197,11 +3214,15 @@ namespace GLVM::core
 			uiRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 			uiIconsRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		}
+
+		if( isDebugCollisitionsActive ) {
+			collisionsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		}
 		
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 //		sdfRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
-		collisionsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
-		spacialGridDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+
+//		spacialGridDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
         VkSubmitInfo submitInfo{};
         submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;

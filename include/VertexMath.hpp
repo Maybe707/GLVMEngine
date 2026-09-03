@@ -31,12 +31,14 @@ struct point3D {
 };
 
 template <typename T>
-void clamp( T lowerThreshold, T& targetValue, T upperThreshold ) {
+T clamp( T lowerThreshold, T targetValue, T upperThreshold ) {
 	if( targetValue < lowerThreshold ) {
 		targetValue = lowerThreshold;
 	} else if( targetValue > upperThreshold ) {
 		targetValue = upperThreshold;
 	}
+
+	return targetValue;
 }
 
 template <class T2, int var2>

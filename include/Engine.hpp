@@ -84,6 +84,7 @@ namespace GLVM::core
         [[maybe_unused]] float fPitch = 0.0f;
 		[[maybe_unused]] float previousMouseOffsetX = 0.0f;
 		[[maybe_unused]] float previousMouseOffsetY = 0.0f;
+		vec3 previousFrameForward = { 0.0, 0.0, -1.0 };
 
 		CVulkanRenderer*     vulkanRenderer;
 

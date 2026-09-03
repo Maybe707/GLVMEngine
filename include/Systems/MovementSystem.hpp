@@ -53,6 +53,7 @@ namespace GLVM::ecs
 			ecs::components::beholder*      playerViews         = nullptr;
 			ecs::components::colliderFlags* playerColliderFlags = nullptr;
 			ecs::components::rigidBody*     playerRigidBody     = nullptr;
+			ecs::components::animation*     playerAnimation     = nullptr;
 
 			/// Components related to archetypes contains Rigis
 			ecs::components::transform* transforms   = nullptr;

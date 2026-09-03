@@ -25,7 +25,7 @@ namespace GLVM::ecs::arch {
 	struct EntityLocation {
 		Archetype* arch;
 		uint32_t   index;
-		static const u8 maxGridCellNumber = 8;
+		static const u8 maxGridCellNumber = 32;
 		u8 gridCellCounter = 0;
 		vec3 gridCellIndicies[maxGridCellNumber];
 		u32  cellEntityIndices[maxGridCellNumber];
