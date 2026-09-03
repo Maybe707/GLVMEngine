@@ -154,7 +154,7 @@ int main()
 	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
 	const uint32_t playerIndex = playerLocation.index;
 
-	playerArch->transforms[playerIndex]  = { .position = { 0.0f, 15.0f, 0.0f }, .scale = 1.0f };
+	playerArch->transforms[playerIndex]  = { .position = { 0.0f, 15.0f, 0.0f }, .forward = {}, .pitch = 3.14, .scale = 1.0f };
 	std::cout << "new player address: " << &playerArch->transforms[playerIndex].position << std::endl;
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
