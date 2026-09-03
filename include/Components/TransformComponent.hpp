@@ -16,7 +16,7 @@ namespace GLVM::ecs::components
         vec3 forward{ 0.0f, 0.0f, 0.0f };
 		
         float yaw = 0.0f;
-		float pitch = 0.0f;
+		float pitch = 3.14f;
 		
 		float scale = 1.0f;
 		float gravityAccumulator = 0.0f;

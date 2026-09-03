@@ -202,8 +202,8 @@ namespace GLVM::ecs
 			int pivotRow    = row - rowBasicOffset;
 			int pivotColumn = column - columnBasicOffset;
 
-			clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
-			clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
+			pivotRow    = clamp<int>( 0, pivotRow, static_cast<int>(inventoryComponent->row) - itemHeight );
+			pivotColumn = clamp<int>( 0, pivotColumn, static_cast<int>(inventoryComponent->col) - itemWidth );
 
 			return determineSwappableField( itemComponent, itemWidth, itemHeight, pivotRow, pivotColumn, inventoryComponent, potentialOccupiedSlots );
 		} else {
