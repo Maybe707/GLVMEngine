@@ -82,6 +82,10 @@ namespace GLVM::ecs
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
 						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
 						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
+						arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
+						const u32 projectileIndex = projectileLocation.index;
+						ecs::components::health& projectileHealth = projectileArch->heath[projectileIndex];
+						projectileHealth.randarable = false;
 						
 						core::CreateProjectile(playerTransform->position,
 											   playerView->forward,

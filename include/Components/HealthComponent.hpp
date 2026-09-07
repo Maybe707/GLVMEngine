@@ -12,6 +12,7 @@ namespace GLVM::ecs::components
 	{
 		float maxHealth; 
         float currentHealth;
+		bool randarable = true;
 	};
 }
 

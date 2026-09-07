@@ -42,7 +42,7 @@ namespace GLVM::core
 				std::mt19937 mersenne(rd());
 				std::uniform_int_distribution<int> distCurrentLevel_y(1, 1);
 				unsigned int levelHalfY = distCurrentLevel_y(mersenne);
-				std::uniform_int_distribution<int> distCurrentLevel_x_z(16, 16);
+				std::uniform_int_distribution<int> distCurrentLevel_x_z(32, 32);
 				unsigned int levelHalfX = distCurrentLevel_x_z(mersenne);
 				unsigned int levelHalfZ = distCurrentLevel_x_z(mersenne);
 

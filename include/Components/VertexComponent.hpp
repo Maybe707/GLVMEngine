@@ -21,7 +21,8 @@ namespace GLVM::ecs::components
 	struct mesh
 	{
         MeshHandle handle;
-		bool gltf = true;
+		bool gltf       = true;
+		bool randarable = true;
 	};
 }
 

@@ -4,6 +4,7 @@
 // License: http://opensource.org/licenses/MIT
 
 #include "Systems/EnemySystem.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include "Archetypes/EnemyArchetype.hpp"
 #include "Archetypes/ProjectileArchetype.hpp"
 #include "Components/ActorComponent.hpp"
@@ -12,6 +13,7 @@
 #include "ArchetypeECS/ArchetypeEntityManager.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/DamageComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/MaterialComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
 #include "Texture.hpp"
@@ -85,6 +87,10 @@ namespace GLVM::ecs
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
 						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
 						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
+						arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
+						const u32 projectileIndex = projectileLocation.index;
+						ecs::components::health& projectileHealth = projectileArch->heath[projectileIndex];
+						projectileHealth.randarable = false;
 						
 						core::CreateProjectile(enemyTransformComponent->position,
 											   playerTransformComponent->position - enemyTransformComponent->position,
@@ -94,7 +100,7 @@ namespace GLVM::ecs
 											   projectileLocation);
 
 						soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
-						projectileCooldown = 5.0;
+						projectileCooldown = 15.0;
 					}
 
 					stateEnemyComponent->state = core::States::ATTACK;

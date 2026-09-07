@@ -158,7 +158,7 @@ int main()
 	std::cout << "new player address: " << &playerArch->transforms[playerIndex].position << std::endl;
 	playerArch->rigidBodies[playerIndex] = { .fMass_ = 3.0f };
 	playerArch->health[playerIndex]      = { .maxHealth = 100, .currentHealth = 100 };
-	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 10.0f, 5.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
+	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 5.0f, 1.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
@@ -192,10 +192,10 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 20, 3.3f, -15.0f ) + randomDirection }, .scale = 0.05f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 20, 3.3f, -20.0f ) + randomDirection }, .scale = 0.05f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
-	enemyArch->enemies[enemyIndex]     = { .detectRadius = 10.0f };
+	enemyArch->enemies[enemyIndex]     = { .detectRadius = 15.0f };
 	enemyArch->health[enemyIndex]      = { .maxHealth = 100, .currentHealth = 100 };
 	cm::font* enemyFontComponent       = &enemyArch->fonts[enemyIndex];
 	
@@ -230,7 +230,7 @@ int main()
 		cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
 		cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
-		cubeArch->fonts[cubeIndex].font_string.Push('R');
+		cubeArch->fonts[cubeIndex].font_string.Push(' ');
 	}
 	
 	arch::entity crosshair = archEntityManager->createEntity();

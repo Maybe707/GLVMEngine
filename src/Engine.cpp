@@ -952,8 +952,14 @@ namespace GLVM::core
 			if( ecs::arch::matchesRequiredMask( arch->mask, arch::playerComponentMask ) ) {
 				uiVertexId = healthBarMeshes[0].handle.id;
 			}
+
+			uiVertexId = 0;               ///< TODO: Need to consider another solution
 			
 			for ( unsigned int i = 0; i < arch->entityCount; ++i ) {
+				if( !healthBars->randarable ) {
+					continue;
+				}
+				
 				vulkanRenderer->healthBars.Push({});
 //				unsigned int uiVertexId           = healthBarMeshes[i].handle.id;
 				cm::transform* transformComponent = &healthBarTransforms[i];
