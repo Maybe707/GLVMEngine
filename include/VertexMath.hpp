@@ -247,8 +247,7 @@ std::ostream& operator<<(std::ostream& ostream, const Vector<T2, var2>& vector) 
 		ostream << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << " length: " << vector.Length();
 	} else if( var2 == 4 ) {
 		ostream << "x: " << vector[0] << " y: " << vector[1] << " z: " << vector[2] << " w: " << vector[3] << " length: " << vector.Length();
-	}
-	
+	} 
 	return ostream;
 }
 
@@ -807,6 +806,11 @@ Vector<T, 3> Cross(const Vector<T, 3>& _vector1, const Vector<T, 3>& _vector2)
     return Vector<T, 3>(_vector1[1] * _vector2[2] - _vector1[2] * _vector2[1],
                            _vector1[2] * _vector2[0] - _vector1[0] * _vector2[2],
                            _vector1[0] * _vector2[1] - _vector1[1] * _vector2[0]);
+}
+
+template<typename T>
+T cross( const Vector<T, 2>& vector0, const Vector<T, 2> vector1 ) {
+	return vector0[0] * vector1[1] - vector0[1] * vector1[0];
 }
 
 template <typename T>

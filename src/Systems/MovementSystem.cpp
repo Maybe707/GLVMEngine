@@ -42,6 +42,8 @@ namespace GLVM::ecs
 			components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT];
 		componentsView.playerRigidBody     = (ecs::components::rigidBody*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
+		componentsView.playerTransform     = (ecs::components::transform*)archView.playerCachedArchetype->
+			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		
         const float cameraSpeed = 3.0f * deltaFrameTime;            
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
@@ -52,6 +54,8 @@ namespace GLVM::ecs
 			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
 			cm::rigidBody*     playerRigidBody     = &componentsView.playerRigidBody[i];
 			cm::animation*     playerAnimation     = &componentsView.playerAnimation[i];
+			cm::transform*     playerTransform     = &componentsView.playerTransform[i];
+			playerTransform->frameMovement = 0.0f;
             for(int n = 0; n < 6; ++n) {
 				vec3 right;
 				vec3 forward;
@@ -60,6 +64,7 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_LEFT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement -= right * cameraSpeed;
+					playerTransform->frameMovement = playerMove->frameMovement;
 //					playerMove->frameMovement += right * cameraSpeed;
 					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
@@ -67,6 +72,7 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_RIGHT:
 					right = CalculateVectorRL(*playerView);
 					playerMove->frameMovement += right * cameraSpeed;
+					playerTransform->frameMovement = playerMove->frameMovement;
 //					playerMove->frameMovement -= right * cameraSpeed;
 					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
@@ -74,14 +80,16 @@ namespace GLVM::ecs
                 case core::EEvents::eMOVE_BACKWARD:
                     forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement -= forward * cameraSpeed;
+					playerTransform->frameMovement = playerMove->frameMovement;
 //					playerMove->frameMovement += forward * cameraSpeed;
 					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
                     break;
                 case core::EEvents::eMOVE_FORWARD:
-					std::cout << "forw: " << playerView->forward << std::endl;
+//					std::cout << "forw: " << playerView->forward << std::endl;
 					forward = CalculateVectorFB(*playerView, g_eEvent);
 					playerMove->frameMovement += forward * cameraSpeed;
+					playerTransform->frameMovement = playerMove->frameMovement;
 //					playerMove->frameMovement -= forward * cameraSpeed;
 					playerAnimation->isAnimatedOnFrame = true;
 					entityLocation.isDirty = true;
@@ -91,7 +99,7 @@ namespace GLVM::ecs
 					entityLocation.isDirty = true;
 					uint8_t isGroudCollisionMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
 					if ( playerColliderFlags->flags & isGroudCollisionMask ) {
-						playerRigidBody->jumpAccumulator = 1.5f;
+						playerRigidBody->jumpAccumulator = 1.0f;
 					}
 				}
                     break;

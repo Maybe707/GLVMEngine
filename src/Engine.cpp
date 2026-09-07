@@ -276,7 +276,7 @@ namespace GLVM::core
 				vulkanRenderer->isDebugCollisitionsActive = !vulkanRenderer->isDebugCollisitionsActive;
 				Input_Stack_.Remove(EEvents::eDEBUG_COLLISIONS_ACTIVE);
 			}
-			
+
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
 
@@ -328,6 +328,7 @@ namespace GLVM::core
 			vulkanRenderer->hud_screen_x              = hud_screen_x;
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
+//			Input_Stack_.PrintStack();
 			setFrameData();
 			if( !vulkanRenderer->isInventoryOpened ) {
 				SetViewMatrix();
@@ -440,9 +441,9 @@ namespace GLVM::core
 		
 //				const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
 //				[[maybe_unused]] const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
-
-				const vec3 rightVec = Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0) );
-				[[maybe_unused]] const vec3 newUpVec = Cross( rightVec, cameraComponent->Position );
+//				std::cout << "camera position: " << cameraComponent->Position << std::endl;
+				const vec3 rightVec = Normalize(Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0)));
+				[[maybe_unused]] const vec3 newUpVec = Normalize(Cross( rightVec, cameraComponent->Position ));
 
 				/*
 				 * 1. The mouse direction determines the "intended direction of rotation" for the object.
@@ -485,17 +486,47 @@ namespace GLVM::core
 					cameraComponent->Position[1] = appliedRotationPoint.y;
 					cameraComponent->Position[2] = appliedRotationPoint.z;
 
-					cameraComponent->forward = Normalize(_Player->position - (cameraComponent->Position + _Player->position));
-					_Player->forward = cameraComponent->forward;
+					// if( abs(_Player->frameMovement[0]) > 0.0 ||
+					// 	abs(_Player->frameMovement[2]) > 0.0 ) {
+					// 	previousFrameForward = _Player->forward;
+					// }
 
-					float sign = -1.0f;
-					if( delta_x >= 0.0f ) {
-						sign = 1.0f;
-					}
+					cameraComponent->forward = Normalize(-cameraComponent->Position);
 					
-					_Player->pitch += acos(clamp(0.0f, Dot(Normalize(vec3(previousFrameForward[0], 0.0, previousFrameForward[2])),
-														   Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
-					previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
+					if( (abs(_Player->frameMovement[0]) == 0.0 &&
+						 abs(_Player->frameMovement[2]) == 0.0) &&
+						(previousFrameKeyEvents[0] == 0 &&
+						 previousFrameKeyEvents[1] == 0 &&
+						 previousFrameKeyEvents[2] == 0 &&
+						 previousFrameKeyEvents[3] == 0)) {
+						_Player->forward = cameraComponent->forward;
+//						std::cout << _Player->forward << std::endl;
+						// float sign = -1.0f;
+						// if( delta_x >= 0.0f ) {
+						// 	sign = 1.0f;
+						// }
+
+						const vec2 tempFrameMovement = vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]);
+						float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
+										   vec2(cameraComponent->forward[0], cameraComponent->forward[2]));
+
+//						std::cout << "sign: " << sign << std::endl;
+						if( sign > 0.0f ) {
+							sign = 1.0f;
+						} else if( sign < 0.0f ) {
+							sign = -1.0f;
+						} else {
+							sign = 1.0f;
+						}
+						
+						// _Player->pitch += acos(clamp(-1.0f, Dot(Normalize(vec3(previousFrameForward[0], 0.0, previousFrameForward[2])),
+						// 									   Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
+						// previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
+
+						_Player->pitch -= acos(clamp(-1.0f, Dot(Normalize(vec3(_Player->previousFrameForward[0], 0.0, _Player->previousFrameForward[2])),
+																Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
+						_Player->previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
+					}
 				}
 				// vulkanRenderer->forward[0] = _Player->position[0];
 				// vulkanRenderer->forward[1] = _Player->position[1];
@@ -1153,6 +1184,7 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				[[maybe_unused]] const u32 entity = arch->entities[n];
 				vulkanRenderer->actors.Push({});
 				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];
@@ -1169,6 +1201,113 @@ namespace GLVM::core
 					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
 					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 					++collisionsWireframesCounter;
+
+//					std::cout << "frame movement: " << transformComponent->frameMovement << std::endl;
+					if( abs(transformComponent->frameMovement[0]) > 0.0 ||
+						abs(transformComponent->frameMovement[2]) > 0.0 ) {
+//						std::cout << "frame move" << transformComponent->frameMovement << std::endl;
+//						std::cout << "dot: " << clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
+//																						 transformComponent->frameMovement[2])),
+//																		  Normalize(vec3(transformComponent->forward[0], 0.0,
+//																						 transformComponent->forward[2]))), 1.0f) << std::endl;
+
+
+
+						const vec2 tempFrameMovement = vec2(transformComponent->frameMovement[0], transformComponent->frameMovement[2]);
+
+//						std::cout << "forward: " << transformComponent->forward << std::endl;
+//						std::cout << "movement x: " << tempFrameMovement[0] << " y: " << tempFrameMovement[1] << std::endl;
+						
+						float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
+										   vec2(transformComponent->forward[0], transformComponent->forward[2]));
+
+//						std::cout << "sign: " << sign << std::endl;
+						
+						const float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
+																						 transformComponent->frameMovement[2])),
+																		  Normalize(vec3(transformComponent->forward[0], 0.0,
+																						 transformComponent->forward[2]))), 1.0f));
+
+						
+
+//						Input_Stack_.PrintStack();
+
+						int currentFrameEvents[4];
+							
+						if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
+							currentFrameEvents[0] = eMOVE_FORWARD;
+						} else {
+							currentFrameEvents[0] = 0;
+						}
+						if((Input_Stack_.SearchElement(EEvents::eMOVE_BACKWARD)) == EEvents::eMOVE_BACKWARD) {
+							currentFrameEvents[1] = eMOVE_BACKWARD;
+						} else {
+							currentFrameEvents[1] = 0;
+						}
+						if((Input_Stack_.SearchElement(EEvents::eMOVE_LEFT)) == EEvents::eMOVE_LEFT) {
+							currentFrameEvents[2] = eMOVE_LEFT;
+						} else {
+							currentFrameEvents[2] = 0;
+						}
+						if((Input_Stack_.SearchElement(EEvents::eMOVE_RIGHT)) == EEvents::eMOVE_RIGHT) {
+							currentFrameEvents[3] = eMOVE_RIGHT;
+						} else {
+							currentFrameEvents[3] = 0;
+						}
+
+						// for( int i = 0; i < 4; ++i ) {
+						// 	std::cout << "shtuka " << i << " :" << previousFrameKeyEvents[i] << std::endl;
+						// }
+
+						if( currentFrameEvents[0] == previousFrameKeyEvents[0] &&
+							currentFrameEvents[1] == previousFrameKeyEvents[1] &&
+							currentFrameEvents[2] == previousFrameKeyEvents[2] &&
+							currentFrameEvents[3] == previousFrameKeyEvents[3] ) {
+//							std::cout << "Default case " << std::endl;
+//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						} else if ( currentFrameEvents[0] == 0 &&
+									currentFrameEvents[1] == 0 &&
+									currentFrameEvents[2] == 0 &&
+									currentFrameEvents[3] == 0 ) {
+//							std::cout << "Second default case " << std::endl;
+//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
+						} else {
+							previousFrameKeyEvents[0] = currentFrameEvents[0];
+							previousFrameKeyEvents[1] = currentFrameEvents[1];
+							previousFrameKeyEvents[2] = currentFrameEvents[2];
+							previousFrameKeyEvents[3] = currentFrameEvents[3];
+//							std::cout << "Rewrite key events " << std::endl;
+//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
+//						sleep(1);
+//						if( abs(rotationAngle) > 0.1 ) {
+//							std::cout << "rot angle: " << rotationAngle << std::endl;
+//							if
+
+							if( sign > 0.0f ) {
+								sign = 1.0f;
+							} else if( sign < 0.0f ) {
+								sign = -1.0f;
+							} else {
+								sign = 1.0f;
+							}
+
+							
+							transformComponent->pitch += rotationAngle * sign;
+//						}
+
+							transformComponent->forward = transformComponent->frameMovement;
+							transformComponent->previousFrameForward = transformComponent->forward;
+//							transformComponent->frameMovement = 0;
+						}
+					} else {
+						previousFrameKeyEvents[0] = 0.0f;
+						previousFrameKeyEvents[1] = 0.0f;
+						previousFrameKeyEvents[2] = 0.0f;
+						previousFrameKeyEvents[3] = 0.0f;
+					}
+					// if( ecs::arch::getId( entity ) == 0 ) {
+					// 	std::cout << "forward" << transformComponent->forward << std::endl;
+					// }
 					
 					vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 					if( animationComponent->isAnimatedOnFrame ) {
@@ -1730,7 +1869,7 @@ namespace GLVM::core
 //		Quaternion result;
 		// result = multiplyQuaternion(pitchQuat, yawQuat);
 
-		std::cout << "pitch: " << _transformComponent->pitch << std::endl;
+//		std::cout << "pitch: " << _transformComponent->pitch << std::endl;
 //		const float rotationAngleScaler = 1.0f / 180.0f;
 		rotationMatrix = Rotate<float, 4, 3>(vec3(0.0, 1.0, 0.0), _transformComponent->pitch);
 		
@@ -1738,7 +1877,7 @@ namespace GLVM::core
 		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
 		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
 		// // rotationMatrix = rotateQuaternion<float, 4>(result);
-		// for ( unsigned int i = 0; i < 4; ++i )
+		// for ( aunsigned int i = 0; i < 4; ++i )
 		// 	for ( unsigned int j = 0; j < 4; ++j )
 		// 		rotationMatrix[i][j] = rotationMat[i][j];
 		
