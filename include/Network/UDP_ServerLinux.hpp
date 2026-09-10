@@ -1,11 +1,14 @@
 #ifndef UDP_SERVER_LINUX
 #define UDP_SERVER_LINUX
 
+#ifdef __linux__
 #include <arpa/inet.h>
+#include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+
 
 namespace GLVM::core
 {

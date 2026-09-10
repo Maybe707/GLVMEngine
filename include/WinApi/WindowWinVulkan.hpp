@@ -38,16 +38,19 @@ namespace GLVM::core
     class WindowWinVulkan : public IWindow
     {
         HWND pClassic_Window_;
-        HDC pClassic_DC_;
-        HGLRC pClassic_Context_;
+        [[maybe_unused]] HDC pClassic_DC_;
+        [[maybe_unused]] HGLRC pClassic_Context_;
         
         WNDCLASS window_Class_;
-        HDC pModern_DC_;
-        HGLRC pModern_Context_;
+        [[maybe_unused]] HDC pModern_DC_;
+        [[maybe_unused]] HGLRC pModern_Context_;
         HWND pModern_Window_;
         
     public:
 		CStack           * Input_Stack_;
+		uint16_t width = 1920;
+		uint16_t height = 1080;
+
         WindowWinVulkan();
 
         void SwapBuffers() override;

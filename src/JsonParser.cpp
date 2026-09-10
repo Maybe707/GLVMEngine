@@ -9,7 +9,6 @@
 #include <chrono>
 #include <cstdint>
 #include <ostream>
-#include <pthread.h>
 #include <cassert>
 #include <limits>
 

@@ -10,7 +10,9 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 #include <cstdint>
+#ifdef __linux__
 #include <unistd.h>
+#endif
 
 namespace GLVM::ecs
 {

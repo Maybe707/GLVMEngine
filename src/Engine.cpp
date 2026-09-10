@@ -54,7 +54,7 @@
 #include <mutex>
 #include <sys/types.h>
 #include <thread>
-#include <wayland-client-core.h>
+//#include <wayland-client-core.h>
 #include <fstream>
 
 

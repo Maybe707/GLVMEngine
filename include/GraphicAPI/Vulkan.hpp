@@ -212,7 +212,7 @@ namespace GLVM::core
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        GLVM::core::WindowWinVulkan Window;
+        GLVM::core::WindowWinVulkan* Window;
 #endif
         
         CVulkanRenderer();

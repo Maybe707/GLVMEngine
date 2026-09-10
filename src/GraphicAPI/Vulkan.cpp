@@ -27,7 +27,6 @@
 #include "ShaderStructs.hpp"
 #include "Texture.hpp"
 #include "ThreadPool.hpp"
-#include "UnixApi/WindowWaylandVulkan.hpp"
 #include "Vector.hpp"
 #include "VertexMath.hpp"
 #include "VkStructs.hpp"
@@ -214,7 +213,8 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        createWin32SurfaceInfo.hwnd = Window.GetModernWindowHWND();
+		Window = new GLVM::core::WindowWinVulkan();
+        createWin32SurfaceInfo.hwnd = Window->GetModernWindowHWND();
 		aspectRate = (float)Window->width / (float)Window->height;
         
         createWin32SurfaceInfo.sType = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
@@ -3681,7 +3681,7 @@ namespace GLVM::core
     }
 
     VkExtent2D CVulkanRenderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
-        if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
+        if (capabilities.currentExtent.width != (std::numeric_limits<uint32_t>::max)()) {
             return capabilities.currentExtent;
         } else {
 

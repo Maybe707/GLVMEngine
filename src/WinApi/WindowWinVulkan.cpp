@@ -18,7 +18,7 @@ namespace GLVM::core
     WindowWinVulkan::WindowWinVulkan()
     {
         const char* _title = "Window class";
-        int _width = 1920, _height = 1080;
+        int _width = width, _height = height;
         
         // Register the window class for the main window.
         window_Class_.style = 0;

@@ -14,13 +14,16 @@ namespace GLVM::core::Sound
 {
     class CSoundEngineWaveform : public ISoundEngine
     {
-        HANDLE hData  = NULL;  ///< handle of waveform data memory 
-        HPSTR  lpData = NULL;  ///< pointer to waveform data memory
+        [[maybe_unused]] HANDLE hData  = NULL;  ///< handle of waveform data memory 
+        [[maybe_anused]] HPSTR  lpData = NULL;  ///< pointer to waveform data memory
         
         vector<CSoundSample*> tSound_Container;
     public:
+		void OpenDevice( const char* device ) override;
+		void CloseDevice() override;
         void SoundStream() override;
         void PlaybackSoundSample(CSoundSample& _sound_sample) override;
+		void CreateSoundSample( const char* filePath, u32 duration, u32 rate, float volume ) override;
         void SetMasterVolume(long _lVolume) override;
         vector<CSoundSample*>& GetSoundContainer() override;  
     };

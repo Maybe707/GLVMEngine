@@ -28,7 +28,9 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Engine.hpp"
+#ifdef __linux__
 #include "Network/UDP_ServerLinux.hpp"
+#endif
 #include "SpritesData.hpp"
 #include "Texture.hpp"
 #include "VertexMath.hpp"
@@ -72,14 +74,14 @@ int main()
 	arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
 	
 	core::Engine* GLVM = core::Engine::GetInstance();
-	[[maybe_unused]] cm::MeshHandle cubeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cube.obj");
-	[[maybe_unused]] cm::MeshHandle coneHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cone.obj");
-	[[maybe_unused]] cm::MeshHandle icoSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/ico_sphere.obj");
-	[[maybe_unused]] cm::MeshHandle monkeyHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/suzana.obj");
+//	[[maybe_unused]] cm::MeshHandle cubeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cube.obj");
+//	[[maybe_unused]] cm::MeshHandle coneHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cone.obj");
+//	[[maybe_unused]] cm::MeshHandle icoSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/ico_sphere.obj");
+//	[[maybe_unused]] cm::MeshHandle monkeyHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/suzana.obj");
 //	[[maybe_unused]] cm::MeshHandle monkeyHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/suzana2.obj");
-	[[maybe_unused]] cm::MeshHandle uvSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/uv_sphere.obj");
-	[[maybe_unused]] cm::MeshHandle torusHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/torus.obj");
-	[[maybe_unused]] cm::MeshHandle pipeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/pipe.obj");
+//	[[maybe_unused]] cm::MeshHandle uvSphereHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/uv_sphere.obj");
+//	[[maybe_unused]] cm::MeshHandle torusHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/torus.obj");
+//	[[maybe_unused]] cm::MeshHandle pipeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/pipe.obj");
 	[[maybe_unused]] cm::MeshHandle hyperCubeHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube.gltf");
 	[[maybe_unused]] cm::MeshHandle hyperCubeHandle2_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/hyper_cube2.gltf");
 	[[maybe_unused]] cm::MeshHandle megaChelHandle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/mega_chel.gltf");

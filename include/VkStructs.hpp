@@ -5,6 +5,12 @@
 #include "ShaderStructs.hpp"
 #include "WavefrontObjParser.hpp"
 #include <vulkan/vulkan_core.h>
+#include <array>
+
+#ifdef _WIN32
+#include <cfloat>
+#define MAXFLOAT FLT_MAX
+#endif
 
 namespace GLVM::core
 {

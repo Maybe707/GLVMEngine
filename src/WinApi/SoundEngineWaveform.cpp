@@ -11,6 +11,16 @@
 
 namespace GLVM::core::Sound
 {
+	void CSoundEngineWaveform::OpenDevice( const char* device ) {
+//		const char *kDevice = "default";
+//		(snd_pcm_open(&pPcm, device, SND_PCM_STREAM_PLAYBACK, 0));
+	}
+
+	void CSoundEngineWaveform::CloseDevice() {
+//		snd_pcm_drain(pPcm);
+//        snd_pcm_close(pPcm);
+	}
+	
     void CSoundEngineWaveform::SoundStream()
     {
         for(unsigned int i = 0; i < tSound_Container.GetSize(); ++i)
@@ -81,6 +91,16 @@ namespace GLVM::core::Sound
     }
 
     void CSoundEngineWaveform::SetMasterVolume(long _lVolume) {}
+
+	void CSoundEngineWaveform::CreateSoundSample( const char* filePath, u32 duration, u32 rate, float volume ) {
+//		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+//		pSound_Sample->kPath_to_File_ = filePath;
+//		pSound_Sample->uiDuration_ = duration;
+//		pSound_Sample->uiRate_ = rate;
+//		pSound_Sample->volume  = volume;
+//		tSound_Contaier.Push(pSound_Sample);
+	}
+	
     vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Container; }
 }
 
