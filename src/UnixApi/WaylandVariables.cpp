@@ -26,6 +26,7 @@
 // struct wl_registry* registry;
 // struct wl_callback* frame_callback;
 // struct xdg_surface* xdg_surface;
+
 GLVM::core::CStack Input_Stack_{};
 
 int x_pointer;

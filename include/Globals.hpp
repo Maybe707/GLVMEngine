@@ -33,7 +33,7 @@ extern GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsol
 // extern struct wl_registry* registry;
 // extern struct wl_callback* frame_callback;
 // extern struct xdg_surface *xdg_surface;
-extern GLVM::core::CStack Input_Stack_;
+//extern GLVM::core::CStack Input_Stack_;
 
 extern int x_pointer;
 extern int y_pointer;

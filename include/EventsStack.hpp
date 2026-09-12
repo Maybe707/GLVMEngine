@@ -9,6 +9,8 @@
 #include "Event.hpp"
 #include <iostream>
 
+extern GLVM::core::CStack Input_Stack_;
+
 namespace GLVM::core
 {
 	class CStack
@@ -69,6 +71,7 @@ namespace GLVM::core
 		{
             if(!(SearchElement(_eEvent.GetEvent()) == eEmpty))
                 return;
+			
 			switch(_eEvent.GetEvent())
 			{
 			case eGAME_LOOP_KILL:

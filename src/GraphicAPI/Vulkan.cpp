@@ -134,6 +134,10 @@ namespace GLVM::core
 #ifdef VK_USE_PLATFORM_XCB_KHR
 		Window->configureWindow();
 #endif
+
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+		Window->configureWindow();
+#endif	
 		aspectRate = (float)Window->width / (float)Window->height;
 		
         cleanupSwapChain();
@@ -1579,7 +1583,7 @@ namespace GLVM::core
     void CVulkanRenderer::createMainRenderDescriptorPool() {
         std::array<VkDescriptorPoolSize, 2> poolSizes{};
 
-		uint32_t descriptorCount = 32768;
+		uint32_t descriptorCount = 65536;
         poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         poolSizes[0].descriptorCount = static_cast<uint32_t>(descriptorCount);
 		poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
@@ -1598,6 +1602,10 @@ namespace GLVM::core
 
 	void CVulkanRenderer::allocateDescriptorSets( core::vector<VkDescriptorSet>& descriptorSets, VkDescriptorSetLayout setLayout,
 												  const unsigned int descriptorSetsNumber, const unsigned int descriptorOffset ) {
+		if( descriptorSetsNumber == 0 ) {
+			return;
+		}
+		
 		std::vector<VkDescriptorSetLayout> matrixUboLayouts(descriptorSetsNumber, setLayout);
 		VkDescriptorSetAllocateInfo allocInfo{};
 		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;

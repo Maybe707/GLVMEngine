@@ -47,12 +47,13 @@ namespace GLVM::core
         HWND pModern_Window_;
         
     public:
-		CStack           * Input_Stack_;
+//		CStack           * Input_Stack_;
 		uint16_t width = 1920;
 		uint16_t height = 1080;
 
         WindowWinVulkan();
 
+		void configureWindow();
         void SwapBuffers() override;
         void ClearDisplay() override;
         bool HandleEvent(CEvent& _Event) override;

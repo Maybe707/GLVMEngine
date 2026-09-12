@@ -82,7 +82,7 @@
     std::cout << "You have been destructurized. [=]___[=]" << std::endl; \
     exit(1)
 
-GLVM::core::CEvent g_eEvent;
+GLVM::core::CEvent g_eEvent{};
 GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
 // struct wl_surface*    wl_surface;
 // struct wl_compositor* compositor;
@@ -229,12 +229,12 @@ namespace GLVM::core
 #endif
 
 #ifdef _WIN32
-		MSG msg;
+/*		MSG msg;
 
 		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 				TranslateMessage( &msg );
 				DispatchMessage( &msg );
-		}
+				}*/
 
 		// while(GetMessageA(&msg, vulkanRenderer->Window.GetModernWindowHWND(), WM_KEYFIRST, WM_KEYLAST)) {
 		// 		// TranslateMessage( &msg );

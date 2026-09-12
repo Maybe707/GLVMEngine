@@ -54,6 +54,17 @@ namespace GLVM::core
 		SetCursorPos(0, 0);		
     }
 
+	void WindowWinVulkan::configureWindow() {
+		SetWindowPos(
+			pModern_Window_, 
+			NULL,          // Ignore Z-order placement since we are using SWP_NOZORDER
+			0, 0,          // Ignore X and Y positions since we are using SWP_NOMOVE
+			width, 
+			height, 
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE
+			);
+	}
+	
     void WindowWinVulkan::SwapBuffers() {}
 
     void WindowWinVulkan::ClearDisplay() {}
@@ -68,7 +79,7 @@ namespace GLVM::core
         {
             TranslateMessage( &msg );
             DispatchMessage( &msg );
-			Input_Stack_->ControlInput(_Event);
+			Input_Stack_.ControlInput(_Event);
         }
 		return false;
     }
@@ -182,6 +193,14 @@ namespace GLVM::core
                 pEvent->SetEvent(EEvents::eJUMP);
                 break;
 
+            case 0x49:
+                pEvent->SetEvent(EEvents::eINVENTORY);
+                break;
+
+            case 0x4F:
+                pEvent->SetEvent(EEvents::eDEBUG_COLLISIONS_ACTIVE);
+                break;
+				
 			case VK_UP:
                 break; 
  
@@ -235,7 +254,12 @@ namespace GLVM::core
 
             case VK_SPACE:
                 pEvent->SetEvent(EEvents::eKEYRELEASE_JUMP);
+				break;
 
+			case 0x49:
+                pEvent->SetEvent(EEvents::eINVENTORY_RELEASE);
+				break;
+				
 			case VK_UP:
                 break; 
  

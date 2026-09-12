@@ -67,8 +67,8 @@ namespace GLVM::core
 
     class CEvent
     {
-        EEvents eEvent_;
-		EEvents nextEvent;
+        EEvents eEvent_   = eEmpty;
+		EEvents nextEvent = eEmpty;
     
     public:
         SMousePointerPosition mousePointerPosition;
