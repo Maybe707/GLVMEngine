@@ -248,7 +248,7 @@ namespace GLVM::core
 		    gravity += deltaFrameTime;
 
 			vulkanRenderer->Window->ClearDisplay();
-             
+			g_eEvent.SetEvent(EEvents::eDEFAULT);
 			vulkanRenderer->Window->HandleEvent(g_eEvent);
 //			std::cout << "left mouse released flag" << g_eEvent.isItemDraged << std::endl;			
 			// 	Input_Stack_.ControlInput(g_eEvent);
@@ -799,7 +799,7 @@ namespace GLVM::core
 		vec3 defaultPosition = vec3(0.0, 0.0, 0.0);
 
 #ifndef VK_USE_PLATFORM_WAYLAND_KHR
-		hud_screen_x = -hud_screen_x;
+//		hud_screen_x = -hud_screen_x;
 #endif
 		
 		cursorTransform->position[0] = hud_screen_x;
@@ -818,6 +818,9 @@ namespace GLVM::core
 			model[3][3] = 1.0f;
 		} else {
 			defaultPosition[0] = hud_screen_x;
+#ifdef VK_USE_PLATFORM_WIN32_KHR
+			defaultPosition[0] = -defaultPosition[0];
+#endif
 			defaultPosition[1] = -hud_screen_y;
 			
 			model[3][0] = defaultPosition[0];
