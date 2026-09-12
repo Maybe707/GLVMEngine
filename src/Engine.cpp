@@ -432,9 +432,8 @@ namespace GLVM::core
 				delta_x = vulkanRenderer->current_X;
 				delta_y = -vulkanRenderer->current_Y;
 #else
-				delta_x = current_X - prev_X;
-				delta_y = current_Y - prev_Y;
-				delta_y *= -1.0f;
+				delta_x = vulkanRenderer->current_X;
+				delta_y = -vulkanRenderer->current_Y;
 #endif
 				// delta_x *= kSensitivity;
 				// delta_y *= kSensitivity;

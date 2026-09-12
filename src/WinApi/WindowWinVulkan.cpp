@@ -51,7 +51,7 @@ namespace GLVM::core
         // Show the window and paint its contents.
         ShowWindow(pModern_Window_, SW_SHOWDEFAULT);
         UpdateWindow(pModern_Window_);
-		SetCursorPos(0, 0);		
+		SetCursorPos(960, 540);		
     }
 
 	void WindowWinVulkan::configureWindow() {
@@ -99,23 +99,24 @@ namespace GLVM::core
         ClientToScreen(pModern_Window_, &point_position);
 
         ///< Solve a problem with endlessly growing numbers in the start game run.
-        if(_x_position > 1911 || _x_position < 0 || _y_position > 1052 || _y_position < 0)
-            return;
+//        if(_x_position > 1911 || _x_position < 0 || _y_position > 1052 || _y_position < 0)
+//            return;
         
-        int iOffset_X = 0, iOffset_Y = 0;
-        iOffset_X = _x_position - 960;
-        iOffset_Y = _y_position - 540;
+//		std::cout << "x pos: " << _x_position << std::endl;
+
+		static int flag = 0;
+		if ( flag == 0 ) {
+			*_x_offset = 0;
+			*_y_offset = 0;
+			++flag;
+		} else {
+			*_x_offset = _x_position - 960;
+			*_y_offset = _y_position - 540;
+		}
+
         
-        *_x_offset += iOffset_X;
-        *_y_offset -= iOffset_Y;
-
-        if(*_y_offset > 890)
-            *_y_offset = 890;
-        else if(*_y_offset < -890)
-            *_y_offset = -890;
-
         SetCursorPos(point_position.x, point_position.y);
-        SetCursor(NULL);
+//        SetCursor(NULL);
     }
 //}    
 ///< Callback method for events handling.
@@ -155,6 +156,7 @@ namespace GLVM::core
         case WM_MOUSEMOVE:
             iMouse_Position_X = GET_X_LPARAM(_pLParam);
             iMouse_Position_Y = GET_Y_LPARAM(_pLParam);
+//			std::cout << "mouse x: " << iMouse_Position_X << std::endl;
             pEvent->SetEvent(EEvents::eMOUSE_POINTER_POSITION);
             pEvent->mousePointerPosition.position_X = iMouse_Position_X;
             pEvent->mousePointerPosition.position_Y = iMouse_Position_Y;
