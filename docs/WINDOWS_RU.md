@@ -83,3 +83,32 @@ Windows WAV и отмена воспроизведения, нативное о�
 и коллизий, сворачивание/восстановление и закрытие. Тест камеры проверяет полный
 вертикальный диапазон, обратный поворот у границы, реальное Win32-движение мыши
 за пределами прежних 890 пикселей и возврат фокуса. Linux-регрессии также сохранены.
+
+## Нативная сборка через MSYS2 UCRT64
+
+В терминале MSYS2 **UCRT64**:
+
+```bash
+pacman -S --needed make mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-python \
+    mingw-w64-ucrt-x86_64-vulkan-headers mingw-w64-ucrt-x86_64-vulkan-loader \
+    mingw-w64-ucrt-x86_64-shaderc
+make -j4 PLATFORM=windows CONFIG=Release all test
+```
+
+Для сборки GPU не нужен. Для демо нужен установленный Windows Vulkan-драйвер.
+CI использует этот же способ сборки и CPU-тесты без открытия окна.
+`CONFIG=Debug` создаёт `build-win-debug/GLVMEngine.exe` с Vulkan validation;
+для его графического запуска установите validation layers из Vulkan SDK.
+
+Дополнительные регрессии ECS и сетки:
+
+```bash
+bash scripts/build-windows.sh build-win/ecs_system_tests.exe
+```
+
+```powershell
+.\build-win\ecs_system_tests.exe
+```
+
+Документация пакетов: [MSYS2 UCRT64](https://www.msys2.org/docs/environments/),
+[Vulkan loader](https://packages.msys2.org/packages/mingw-w64-ucrt-x86_64-vulkan-loader).

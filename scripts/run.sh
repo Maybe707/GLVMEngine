@@ -23,12 +23,12 @@ fi
 mkdir -p "$build"
 jobs=${GLVM_BUILD_JOBS:-4}
 if ((debug)); then
-    make -f MakefileLin -j"$jobs" > "$build/build.log" 2>&1 || { tail -60 "$build/build.log"; exit 1; }
+    make CONFIG=Debug -j"$jobs" > "$build/build.log" 2>&1 || { tail -60 "$build/build.log"; exit 1; }
     if command -v llvm-symbolizer-21 >/dev/null; then
         export ASAN_SYMBOLIZER_PATH=$(command -v llvm-symbolizer-21)
     fi
 else
-    make -f MakefileLin BUILD="$build" SANITIZE= OPT='-O2 -DGLVM_DISABLE_VALIDATION' -j"$jobs" \
+    make CONFIG=Release -j"$jobs" \
         > "$build/build.log" 2>&1 || { tail -60 "$build/build.log"; exit 1; }
 fi
 cd "$build"

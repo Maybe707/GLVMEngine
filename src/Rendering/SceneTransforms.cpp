@@ -49,13 +49,14 @@ namespace GLVM::core {
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 		animationArchetypesNumber = 0;
+        cachedAnimationArchetypes.clear();
 		for( uint32_t m = 0; m < world_.archetypes.GetSize(); ++m ) {
 			arch::Archetype* arch = world_.archetypes[m];
 			arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::MESH_COMPONENT) |
 				(1ul << arch::ComponentsIndices::ANIMATION_COMPONENT);
 
 			if( arch::matchesRequiredMask( arch->mask, requiredMask ) ) {
-				cachedAnimationArchetypes[animationArchetypesNumber] = arch;
+				cachedAnimationArchetypes.Push(arch);
 				++animationArchetypesNumber;
 			}
 		}
@@ -65,21 +66,13 @@ namespace GLVM::core {
 			cm::animation* animationView  = nullptr;
 			cm::mesh*      meshView       = nullptr;
 			if( arch != nullptr ) {
-				switch( arch->mask ) {
-				case arch::enemyComponentMask:
-					animationView   = static_cast<arch::EnemyArchetype*>( arch )->animations;
-					meshView        = static_cast<arch::EnemyArchetype*>( arch )->meshes;
-					break;
-				case arch::playerComponentMask:
-					animationView   = static_cast<arch::PlayerArchetype*>( arch )->animations;
-					meshView        = static_cast<arch::PlayerArchetype*>( arch )->meshes;
-					break;
-				}
+                animationView = static_cast<cm::animation*>(arch->components[arch::ComponentsIndices::ANIMATION_COMPONENT]);
+                meshView = static_cast<cm::mesh*>(arch->components[arch::ComponentsIndices::MESH_COMPONENT]);
 
 				for(unsigned int i = 0; i < cachedAnimationArchetypes[n]->entityCount; ++i) {
 					if( &meshView[i] != nullptr && &animationView[i] != nullptr ) {
 						unsigned int mesh_id = meshView[i].handle.id;
-						if ( assets_.jointMatricesPerMesh.GetSize() > 0 && assets_.jointMatricesPerMesh[mesh_id].GetSize() > 0 )
+						if ( mesh_id < assets_.jointMatricesPerMesh.GetSize() && assets_.jointMatricesPerMesh[mesh_id].GetSize() > 0 )
 							animationView[i].frameAccumulator += value;
 					}
 				}

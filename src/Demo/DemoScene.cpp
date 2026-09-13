@@ -76,7 +76,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 
 
 
-	arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+	auto& world = engine.world();
+    auto* archEntityManager = &world.entities;
 
 	core::Engine* GLVM = &engine;
 //	[[maybe_unused]] cm::MeshHandle cubeHandle_OBJ = GLVM->LoadMeshFromFile_OBJ("../waveFrontObj/cube.obj");
@@ -120,17 +121,17 @@ void GLVM::demo::populateScene(core::Engine& engine)
 		arch::PointLightArchetype*       pointLightArch       = new arch::PointLightArchetype;
 		arch::SpotLightArchetype*        spotLightArch        = new arch::SpotLightArchetype;
 
-		arch::world.archetypes.Push( levelChunkArch );
-		arch::world.archetypes.Push( playerArch );
-		arch::world.archetypes.Push( enemyArch );
-		arch::world.archetypes.Push( projectileArch );
-		arch::world.archetypes.Push( staticMeshArch );
-		arch::world.archetypes.Push( crosshairArch );
-		arch::world.archetypes.Push( inventoryArch );
-		arch::world.archetypes.Push( itemArch );
-		arch::world.archetypes.Push( directionalLightArch );
-		arch::world.archetypes.Push( pointLightArch );
-		arch::world.archetypes.Push( spotLightArch );
+		world.archetypes.Push( levelChunkArch );
+		world.archetypes.Push( playerArch );
+		world.archetypes.Push( enemyArch );
+		world.archetypes.Push( projectileArch );
+		world.archetypes.Push( staticMeshArch );
+		world.archetypes.Push( crosshairArch );
+		world.archetypes.Push( inventoryArch );
+		world.archetypes.Push( itemArch );
+		world.archetypes.Push( directionalLightArch );
+		world.archetypes.Push( pointLightArch );
+		world.archetypes.Push( spotLightArch );
 	}
 
 	/// Loading method with stb_image
@@ -156,8 +157,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 
 	arch::entity player = archEntityManager->createEntity();
 //	std::cout << "player: " << ecs::arch::getId(player) << std::endl;
-	arch::world.addEntityToArchetype( player, arch::world.archetypes[1] );
-	arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
+	world.addEntityToArchetype( player, world.archetypes[1] );
+	arch::EntityLocation playerLocation = world.entityLocations[arch::getId( player )];
 	arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
 	const uint32_t playerIndex = playerLocation.index;
 
@@ -177,8 +178,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 
 	for ( u32 i = 0; i < 5; ++i ) {
 	arch::entity enemy = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( enemy, arch::world.archetypes[2] );
-	arch::EntityLocation enemyLocation = arch::world.entityLocations[arch::getId( enemy )];
+	world.addEntityToArchetype( enemy, world.archetypes[2] );
+	arch::EntityLocation enemyLocation = world.entityLocations[arch::getId( enemy )];
 	arch::EnemyArchetype* enemyArch = static_cast<arch::EnemyArchetype*>(enemyLocation.arch);
 	const uint32_t enemyIndex = enemyLocation.index;
 
@@ -229,8 +230,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 	for( u32 i = 0; i < 5; ++i ) {
 		arch::entity cube = archEntityManager->createEntity();
 		std::cout << "Cube: " << arch::getId( cube ) << std::endl;
-		arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
-		arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
+		world.addEntityToArchetype( cube, world.archetypes[4] );
+		arch::EntityLocation cubeLocation = world.entityLocations[arch::getId( cube )];
 		arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
 		const uint32_t cubeIndex = cubeLocation.index;
 		cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 2.0f, 10.0f + i * 2.0f }, .scale = 1.0f };
@@ -241,8 +242,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 	}
 
 	arch::entity crosshair = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( crosshair, arch::world.archetypes[5] );
-	arch::EntityLocation crosshairLocation = arch::world.entityLocations[arch::getId( crosshair )];
+	world.addEntityToArchetype( crosshair, world.archetypes[5] );
+	arch::EntityLocation crosshairLocation = world.entityLocations[arch::getId( crosshair )];
 	arch::CrosshairArchetype* crosshairArch = static_cast<arch::CrosshairArchetype*>(crosshairLocation.arch);
 	const uint32_t crosshairIndex = crosshairLocation.index;
 	crosshairArch->transforms[crosshairIndex]    = { .scale = 0.01f };
@@ -251,8 +252,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 		.specularTextureID_ = container2SpecularTextureHandle, .ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 
 	arch::entity inventory = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( inventory, arch::world.archetypes[6] );
-	arch::EntityLocation inventoryLocation = arch::world.entityLocations[arch::getId( inventory )];
+	world.addEntityToArchetype( inventory, world.archetypes[6] );
+	arch::EntityLocation inventoryLocation = world.entityLocations[arch::getId( inventory )];
 	arch::InventoryArchetype* inventoryArch = static_cast<arch::InventoryArchetype*>(inventoryLocation.arch);
 	const uint32_t inventoryIndex = inventoryLocation.index;
 	cm::inventory* inventoryComponent = &inventoryArch->invetories[inventoryIndex];
@@ -269,8 +270,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 	for ( unsigned int i = 0; i < 5; ++i ) {
 		arch::entity item = archEntityManager->createEntity();
 //		std::cout << "item: " << ecs::arch::getId(item) << " i: " << i << std::endl;
-		arch::world.addEntityToArchetype( item, arch::world.archetypes[7] );
-		arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( item )];
+		world.addEntityToArchetype( item, world.archetypes[7] );
+		arch::EntityLocation itemLocation = world.entityLocations[arch::getId( item )];
 		arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 		const uint32_t itemIndex = itemLocation.index;
 		unsigned int row = i + 1;
@@ -288,8 +289,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 	}
 
 	arch::entity directionalLight = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( directionalLight, arch::world.archetypes[8] );
-	arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
+	world.addEntityToArchetype( directionalLight, world.archetypes[8] );
+	arch::EntityLocation directionalLightLocation = world.entityLocations[arch::getId( directionalLight )];
 	arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
 	const uint32_t directionalLightIndex = directionalLightLocation.index;
 	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 25.0f, 15.0f },
@@ -302,8 +303,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 
 
 	arch::entity pointLight = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( pointLight, arch::world.archetypes[9] );
-	arch::EntityLocation pointLightLocation = arch::world.entityLocations[arch::getId( pointLight )];
+	world.addEntityToArchetype( pointLight, world.archetypes[9] );
+	arch::EntityLocation pointLightLocation = world.entityLocations[arch::getId( pointLight )];
 	arch::PointLightArchetype* pointLightArch = static_cast<arch::PointLightArchetype*>(pointLightLocation.arch);
 	const uint32_t pointLightIndex = pointLightLocation.index;
 	pointLightArch->pointLights[pointLightIndex]   = { .position = { 3.0f, 10.0f, 15.0f },
@@ -316,8 +317,8 @@ void GLVM::demo::populateScene(core::Engine& engine)
 
 
 	arch::entity spotLight = archEntityManager->createEntity();
-	arch::world.addEntityToArchetype( spotLight, arch::world.archetypes[10] );
-	arch::EntityLocation spotLightLocation = arch::world.entityLocations[arch::getId( spotLight )];
+	world.addEntityToArchetype( spotLight, world.archetypes[10] );
+	arch::EntityLocation spotLightLocation = world.entityLocations[arch::getId( spotLight )];
 	arch::SpotLightArchetype* spotLightArch = static_cast<arch::SpotLightArchetype*>(spotLightLocation.arch);
 	const uint32_t spotLightIndex = spotLightLocation.index;
 	spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f },

@@ -9,7 +9,7 @@
 #include "Components/ColliderComponent.hpp"
 #include "../ComponentManager.hpp"
 #include "../Event.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Vector.hpp"
 #include "EventsStack.hpp"
@@ -19,17 +19,17 @@
 
 namespace GLVM::ecs
 {
-    class CPhysicsSystem : public ISystem
+    class CPhysicsSystem : public WorldSystem
     {
     public:
-        float fAcceleration_of_Gravity_;
-        float fDelta_Time_;
+        float fAcceleration_of_Gravity_ = {};
+        float fDelta_Time_ = {};
 		float& gravity;
         core::CStack& Input_Stack_;
 
 		uint32_t cachedArchetypesNumber = 0;
 		struct ArchView {
-			arch::Archetype* cachedArchetypes[32];
+			core::vector<ecs::arch::Archetype*> cachedArchetypes;
 		} archView;
 		
 		struct ComponentsView {
@@ -45,7 +45,7 @@ namespace GLVM::ecs
 			(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
 			(1ul << arch::ComponentsIndices::COLLIDER_COMPONENT);
 		
-        CPhysicsSystem(float& gravity_, core::CStack& _input_Stack) : gravity(gravity_),
+        CPhysicsSystem(arch::World& world, float& gravity_, core::CStack& _input_Stack) : WorldSystem(world), gravity(gravity_),
 																	  Input_Stack_(_input_Stack) {}
         
         ///< Set Y-axis of transform component of backtracking entity to upper Y-axis of ground entity.

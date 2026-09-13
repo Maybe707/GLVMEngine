@@ -14,4 +14,4 @@ if [[ ! -f "$sdk/libvulkan-1.a" || "$loader" -nt "$sdk/libvulkan-1.a" ]]; then
     (cd "$sdk" && gendef "$loader" && x86_64-w64-mingw32-dlltool \
         -d vulkan-1.def -D vulkan-1.dll -l libvulkan-1.a)
 fi
-make -f MakefileWindows -j"${GLVM_BUILD_JOBS:-4}" "$@"
+make -f Makefile PLATFORM=windows -j"${GLVM_BUILD_JOBS:-4}" "$@"

@@ -387,7 +387,7 @@ void ScenePresenter::prepareFrame() {
 					frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 					frame_.collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 					frame_.collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 					++collisionsWireframesCounter;
 
 					frame_.actors[levelChunkActorsCounter].modelMatrix   = model;
@@ -435,7 +435,7 @@ void ScenePresenter::prepareFrame() {
 					frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 					frame_.collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 					frame_.collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 					++collisionsWireframesCounter;
 
 //					std::cout << "frame movement: " << transformComponent->frameMovement << std::endl;
@@ -598,7 +598,7 @@ void ScenePresenter::prepareFrame() {
 					frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 					frame_.collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 					frame_.collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 					++collisionsWireframesCounter;
 
 					frame_.actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
@@ -648,7 +648,7 @@ void ScenePresenter::prepareFrame() {
 					frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 					frame_.collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 					frame_.collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 					++collisionsWireframesCounter;
 
 					frame_.actors[projectileActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
@@ -709,7 +709,7 @@ void ScenePresenter::prepareFrame() {
 						frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 						frame_.collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 						frame_.collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-						frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 						++collisionsWireframesCounter;
 
 						frame_.actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
@@ -751,14 +751,14 @@ void ScenePresenter::prepareFrame() {
 					frame_.collisionsWireframes[collisionsWireframesCounter].model    = model;
 					frame_.collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;
 					frame_.collisionsWireframes[collisionsWireframesCounter].scale    = playerTransformComponent->scale;
-					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					frame_.collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = assets_.meshBounds[meshID];
 					++collisionsWireframesCounter;
 
 					frame_.players[playerEntityCount].position = playerTransformComponent->position;
 					frame_.players[playerEntityCount].forward  = playerTransformComponent->forward;
 				}
+                ++playerEntityCount;
 			}
-			++playerEntityCount;
 		}
 	}
 

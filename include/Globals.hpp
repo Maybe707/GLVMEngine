@@ -9,7 +9,6 @@
 #include "EventsStack.hpp"
 
 extern GLVM::core::CEvent g_eEvent;
-extern GLVM::core::vector<GLVM::core::MeshAxisMaxAbsoluteValues> allMeshMaxAbsoluteValues;      /// contain all maximum absolute axis values
 // extern struct wl_surface*    wl_surface;
 // extern struct wl_compositor* compositor;
 // extern struct xdg_toplevel*  xdg_topLevel;

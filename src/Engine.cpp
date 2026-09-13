@@ -29,11 +29,12 @@ unsigned long frameLimitFromEnvironment() {
 struct Engine::Impl {
     enum class State { Ready, Running, Stopped };
     State state = State::Ready;
+    ecs::arch::World world;
     AssetLibrary assets;
     RenderFrame frame;
     std::unique_ptr<Time::IChrono> timer{Time::CTimerCreator().Create()};
     Sound::AudioService audio{std::unique_ptr<Sound::ISoundEngine>(Sound::CSoundEngineFactory().CreateSoundEngine())};
-    GameplaySystems systems{Input_Stack_, assets, audio.backend(), frame.dragedItemEntity};
+    GameplaySystems systems{world, Input_Stack_, assets, audio.backend(), frame.dragedItemEntity};
     std::unique_ptr<ScenePresenter> scene;
     std::unique_ptr<CVulkanRenderer> renderer;
 
@@ -51,7 +52,7 @@ struct Engine::Impl {
         state = State::Running;
         assets.prepare();
         systems.configureAssets(assets);
-        scene = std::make_unique<ScenePresenter>(ecs::arch::world, assets.data(), frame, g_eEvent, Input_Stack_);
+        scene = std::make_unique<ScenePresenter>(world, assets.data(), frame, g_eEvent, Input_Stack_);
         scene->prepareFrame();
         renderer = std::make_unique<CVulkanRenderer>(assets.data(), frame);
         renderer->run();
@@ -108,6 +109,7 @@ struct Engine::Impl {
 
 Engine::Engine() : impl_(std::make_unique<Impl>()) {}
 Engine::~Engine() = default;
+ecs::arch::World& Engine::world() noexcept { return impl_->world; }
 void Engine::GameLoop() {
     try { impl_->run(); }
     catch (...) { impl_->stop(); throw; }

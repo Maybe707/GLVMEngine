@@ -59,7 +59,8 @@ int main(int argc, char** argv) {
         assert(text == "a");
     } else if (test == "entity") {
         namespace arch = GLVM::ecs::arch;
-        auto* manager = arch::ArchetypeEntityManager::getInstance();
+        arch::ArchetypeEntityManager ownedManager;
+        auto* manager = &ownedManager;
         assert(!manager->isAlive(arch::makeEntity(1000000, 1)));
         auto first = manager->createEntity();
         assert(manager->isAlive(first));

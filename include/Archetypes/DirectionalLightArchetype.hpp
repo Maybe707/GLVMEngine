@@ -23,24 +23,12 @@ namespace GLVM::ecs::arch {
 		components::directionalLight directionalLights[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
 
 		DirectionalLightArchetype() {
-            capacity = std::min<uint32_t>(CAPACITY, DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE);
-			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
-			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
-			components[ComponentsIndices::MATERIAL_COMPONENT]          = materials;
-			components[ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT] = directionalLights;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[3] = ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT;
-			componentCount = 4;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT>(directionalLights);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<DirectionalLightArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

@@ -20,3 +20,10 @@ for path in [root / 'src/Engine.cpp', *(root / 'src/Rendering').glob('*.cpp'),
              root / 'src/ProceduralLevelGeneratingSystem.cpp']:
     assert 'Engine::GetInstance' not in path.read_text(), path
 print('PASS no Engine singleton dependency in runtime, scene and generation')
+for path in [root / 'src/Engine.cpp', *(root / 'src/Systems').glob('*.cpp'),
+             *(root / 'src/Rendering').glob('*.cpp'), root / 'src/ProceduralLevelGeneratingSystem.cpp',
+             root / 'src/Demo/DemoScene.cpp']:
+    source = path.read_text()
+    assert 'arch::world' not in source and 'ArchetypeEntityManager::getInstance' not in source, path
+    assert 'allMeshMaxAbsoluteValues' not in source, path
+print('PASS explicit world and asset ownership in active gameplay and presentation')

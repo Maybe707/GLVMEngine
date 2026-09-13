@@ -12,7 +12,7 @@
 #include "Components/ColliderFlagsComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "Vector.hpp"
 #include "ComponentManager.hpp"
 #include "Globals.hpp"
@@ -41,7 +41,7 @@ namespace GLVM::ecs
 		{ t->attacks };
 	};
 	
-    class CProjectileSystem : public ISystem
+    class CProjectileSystem : public WorldSystem
     {
     public:
         float fYaw = -90.0f;
@@ -52,10 +52,10 @@ namespace GLVM::ecs
         core::CStack&              inputStack;
 		core::vector<ecs::TextureHandle> textureHandlers;
 		core::vector<ecs::components::MeshHandle> meshHandlers;
-		core::Sound::ISoundEngine* soundEngine;
+		core::Sound::ISoundEngine* soundEngine = nullptr;
         float                      projectileCooldown = 2.0f; 
-		float                      deltaFrameTime;
-		bool                       isInventoryOpened;
+		float                      deltaFrameTime = {};
+		bool                       isInventoryOpened = {};
 
 		uint32_t playerArchetypesNumber      = 0;
 		uint32_t projectileArchetypesNumber  = 0;
@@ -82,7 +82,7 @@ namespace GLVM::ecs
 		arch::componentMask projectileRequiredMask =
 			(1ull << ecs::arch::ComponentsIndices::PROJECTILE_TAG_COMPONENT);
 		
-        CProjectileSystem(core::CStack& inputStack);
+        CProjectileSystem(arch::World& world, core::CStack& inputStack);
         void Update() override;
 		template< typename T >
 	    requires UnitOrEnemy<T> && HasAttack<T>

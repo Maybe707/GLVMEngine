@@ -1,100 +1,60 @@
-// This file is part of Game Loop Versatile Modules (GLVM)
-// Copyright © 2024 Maksim Manokhin a.k.a. Yuriorkis_Scream. Contacts: <fellfrostqtw@gmail.com>
-// Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
-// License: http://opensource.org/licenses/MIT
-
 #include "Systems/SpatialGridSystem.hpp"
-#include "ArchetypeECS/ArchECS_World.hpp"
-#include "Common/CommonFunctions.hpp"
-#include "Vector.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/VertexComponent.hpp"
+#include "Components/ItemComponent.hpp"
 
 namespace GLVM::ecs {
-	void SpatialGridSystem::Update() {
-		namespace arch = GLVM::ecs::arch;
-		
-		arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
-		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
-		const float chunkSize = spatialGrid.grid[0][0][0].size;
-
-		const float halfWidth  = spatialGrid.width * chunkSize * 0.5f;
-		const float halfHeight = spatialGrid.height * chunkSize * 0.5f;
-		const float halfDepth  = spatialGrid.depth * chunkSize * 0.5f;
-
-		cachedArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
-
-		for( u32 i2 = 0; i2 < spatialGrid.depth; ++i2 ) {
-			for( u32 i3 = 0; i3 < spatialGrid.height; ++i3 ) {
-				for( u32 i4 = 0; i4 < spatialGrid.width; ++i4 ) {
-					for( u32 i5 = 0; i5 < spatialGrid.grid[i2][i3][i4].entities.GetSize(); ++i5 ) {
-						const u32 entity = spatialGrid.grid[i2][i3][i4].entities[i5];
-						ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
-						entityLocation.gridCellCounter = 0;
-					}
-					spatialGrid.grid[i2][i3][i4].entities.clear();
-				}
-			}
-		}
-		
-		for( uint32_t i0 = 0; i0 < cachedArchetypesNumber; ++i0 ) {
-			arch::Archetype* arch = cachedArchetypes[i0];
-			view.transforms = (ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
-			view.meshes     = (ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT];
-			
-			for( u32 i1 = 0; i1 < arch->entityCount; ++i1 ) {
-				const arch::entity entity = arch->entities[i1];
-				ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
-				if( !entityLocation.isDirty && isInitialized ) {
-					continue;
-				}
-				
-				const components::transform& transform = view.transforms[i1];
-				const components::mesh& mesh           = view.meshes[i1];
-
-				components::MeshHandle entityMeshHandle = mesh.handle;
-				core::MeshAxisMaxAbsoluteValues entityChunkBounds = allMeshMaxAbsoluteValues[entityMeshHandle.id];
-				core::vector<vec3> entityBoxCornerBoundPoints = computeBoxCornerBoundPoints( entityChunkBounds, transform.position, transform.scale );
-
-				/*
-				  Need only left bottom back cornder point and right upper front
-				  conrner point to obtain all box bounds
-				*/
-				const vec3 minEntityPosition = entityBoxCornerBoundPoints[0];
-				const vec3 maxEntityPosition = entityBoxCornerBoundPoints[1];
-					
-				const u32 indexMinX = (minEntityPosition[0] + halfWidth) / chunkSize;
-				const u32 indexMinY = (minEntityPosition[1] + halfHeight) / chunkSize;
-				const u32 indexMinZ = (minEntityPosition[2] + halfDepth) / chunkSize;
-
-				const u32 indexMaxX = (maxEntityPosition[0] + halfWidth) / chunkSize;
-				const u32 indexMaxY = (maxEntityPosition[1] + halfHeight) / chunkSize;
-				const u32 indexMaxZ = (maxEntityPosition[2] + halfDepth) / chunkSize;
-				
-				assert( indexMinX <= indexMaxX && indexMinY <= indexMaxY && indexMinZ <= indexMaxZ );
-				assert( indexMinX < spatialGrid.width && indexMinY < spatialGrid.height && indexMinZ < spatialGrid.depth );
-				assert( indexMaxX < spatialGrid.width && indexMaxY < spatialGrid.height && indexMaxZ < spatialGrid.depth );
-				
-				for( u32 i2 = indexMinZ; i2 <= indexMaxZ; ++i2 ) {
-					for( u32 i3 = indexMinY; i3 <= indexMaxY; ++i3 ) {
-						for( u32 i4 = indexMinX; i4 <= indexMaxX; ++i4 ) {
-							core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
-							if( !core::isExist<u32>( chunkEntities, ecs::arch::getId(entity) ) ) {
-								chunkEntities.Push( ecs::arch::getId(entity) );
-								const u32 currentGridCell = entityLocation.gridCellCounter;
-								assert( currentGridCell < 32 );                  ///< 8 is a maximum number for 1 entity to exist in grid cell
-								entityLocation.gridCellIndicies[currentGridCell]  = vec3( i2, i3, i4 );
-								entityLocation.cellEntityIndices[currentGridCell] = chunkEntities.GetSize() - 1;
-								entityLocation.isDirty = false;
-								++entityLocation.gridCellCounter;
-							}
-						}
-					}
-				}
-			}
-		}
-		if( !isInitialized ) {
-//			isInitialized = true;
-		}
-	}
-	
-}; ///< namespace GLVM::core
+void SpatialGridSystem::Update() {
+    constexpr auto mask = (1ull << arch::ComponentsIndices::COLLIDER_COMPONENT) |
+                          (1ull << arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
+                          (1ull << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
+                          (1ull << arch::ComponentsIndices::MESH_COMPONENT);
+    updatedEntities = visitedCells = 0;
+    for (auto* chunk : world_.query(mask)) {
+        auto* transforms = static_cast<components::transform*>(chunk->components[arch::ComponentsIndices::TRANSFORM_COMPONENT]);
+        auto* meshes = static_cast<components::mesh*>(chunk->components[arch::ComponentsIndices::MESH_COMPONENT]);
+        auto* items = static_cast<components::item*>(chunk->components[arch::ComponentsIndices::ITEM_COMPONENT]);
+        for (u32 i = 0; i < chunk->entityCount; ++i) {
+            const auto id = arch::getId(chunk->entities[i]);
+            auto& location = world_.entityLocations[id];
+            if (items && !items[i].isActor) {
+                if (location.gridInitialized || location.isDirty) {
+                    visitedCells += location.gridCells.GetSize();
+                    world_.detachSpatial(id);
+                    location.isDirty = false;
+                    ++updatedEntities;
+                }
+                continue;
+            }
+            auto& transform = transforms[i];
+            const auto mesh = meshes[i].handle.id;
+            // Also compare transforms: legacy systems may forget to mark an entity dirty.
+            if (location.gridInitialized && !location.isDirty && location.gridPosition == transform.position &&
+                location.gridScale == transform.scale && location.gridMesh == mesh) continue;
+            visitedCells += location.gridCells.GetSize();
+            world_.detachSpatial(id);
+            if (mesh < bounds_.GetSize()) {
+                const auto& bounds = bounds_[mesh];
+                const vec3 center(bounds.origin_offset_x, bounds.origin_offset_y, bounds.origin_offset_z);
+                const vec3 extent(bounds.absolute_x, bounds.absolute_y, bounds.absolute_z);
+                vec3 low = center - extent;
+                vec3 high = center + extent;
+                for (unsigned int axis = 0; axis < 3; ++axis) {
+                    const float a = low[axis] * transform.scale + transform.position[axis];
+                    const float b = high[axis] * transform.scale + transform.position[axis];
+                    low[axis] = std::min(a, b);
+                    high[axis] = std::max(a, b);
+                }
+                if (auto range = arch::SpatialGrid::cellRange(low, high)) world_.attachSpatial(id, *range);
+            }
+            visitedCells += location.gridCells.GetSize();
+            location.gridPosition = transform.position;
+            location.gridScale = transform.scale;
+            location.gridMesh = mesh;
+            location.gridInitialized = true;
+            location.isDirty = false;
+            ++updatedEntities;
+        }
+    }
+}
+}

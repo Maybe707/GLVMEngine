@@ -31,7 +31,7 @@
 
 namespace GLVM::ecs
 {
-    CProjectileSystem::CProjectileSystem(core::CStack& inputStack) : inputStack (inputStack)
+    CProjectileSystem::CProjectileSystem(arch::World& world, core::CStack& inputStack) : WorldSystem(world), inputStack (inputStack)
     {}
     
     void CProjectileSystem::Update()
@@ -41,18 +41,19 @@ namespace GLVM::ecs
 		
         float cameraSpeed = 5.5f * deltaFrameTime;
 
-		playerArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		projectileArchetypesNumber = 0;
+		archView.projectileArchetype = world_.findArchetype(projectileRequiredMask);
+        projectileArchetypesNumber = archView.projectileArchetype ? 1 : 0;
+		
+        if(projectileCooldown > 0)
+            projectileCooldown -= cameraSpeed;
+
+        for (auto* playerChunk : world_.query(playerRequiredMask)) {
+            archView.playerCachedArchetype = playerChunk;
 		componentsView.playerTransforms = (ecs::components::transform*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.playerViews      = (ecs::components::beholder*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::VIEW_COMPONENT];
-
-		projectileArchetypesNumber = 0;
-		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
-		
-        if(projectileCooldown > 0)
-            projectileCooldown -= cameraSpeed;
 
 		/// Iterate on every player and create projectile if "LMB pressed" event found 
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
@@ -61,7 +62,7 @@ namespace GLVM::ecs
 			const u32 maxEventNumber = 6;
             for(u32 n = 0; n < maxEventNumber; ++n) {
                 if(!isInventoryOpened && inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
-                    if(projectileCooldown <= 0) {
+                    if(archView.projectileArchetype && projectileCooldown <= 0) {
 						ecs::components::MeshHandle meshHandle{};
 						const u32 sphereMeshHandleIndex = 2;
 						if ( meshHandlers.GetSize() > 2 )
@@ -78,10 +79,10 @@ namespace GLVM::ecs
 
 						const components::damage damage = { .maximumDamage = 40, .minimumDamage = 20, .criticalHitRate = 0, .criticalModifier = 0 };
 
-						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						ecs::arch::ArchetypeEntityManager* archEntityManager = &world_.entities;
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
-						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
-						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
+						world_.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
+						ecs::arch::EntityLocation projectileLocation = world_.entityLocations[ecs::arch::getId( projectileEntity )];
 						arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
 						const u32 projectileIndex = projectileLocation.index;
 						ecs::components::health& projectileHealth = projectileArch->heath[projectileIndex];
@@ -94,16 +95,16 @@ namespace GLVM::ecs
 											   damage,
 											   projectileLocation);
 
-						soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
+						if (soundEngine) soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
                         projectileCooldown = 2.0;
                     }
                 }
             }
         }
 
-		projectileArchetypesNumber = 0;
-		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
-		
+        }
+        for (auto* projectileChunk : world_.query(projectileRequiredMask)) {
+            archView.projectileArchetype = projectileChunk;
 		componentsView.projectileTransforms    = (ecs::components::transform*)archView.projectileArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.projectileColliderFlags = (ecs::components::colliderFlags*)archView.projectileArchetype->
@@ -132,12 +133,17 @@ namespace GLVM::ecs
 			const u8 wallCollisionBit    = 1;
 			const u8 groundCollistionBit = (1 << 1);
             if((projectileColliderFlags->flags & wallCollisionBit) || (projectileColliderFlags->flags & groundCollistionBit)) {
-				cm::damage* projectileDamage = &componentsView.projectileBundles[i].damage;
+				projectileHealth->currentHealth = 0;
+                cm::damage* projectileDamage = &componentsView.projectileBundles[i].damage;
 				cm::collider* projectileCollider = &componentsView.projectileColliders[i];
 				for ( unsigned int j = 0; j < projectileCollider->colliders.GetSize(); ++j ) {
-					unsigned int collidedEntity = projectileCollider->colliders[j];
+					const auto collidedEntity = projectileCollider->colliders[j];
 
-					arch::EntityLocation collidedEntityLocation = arch::world.entityLocations[arch::getId( collidedEntity )];
+                    const auto collidedId = arch::getId(collidedEntity);
+                    if (collidedId >= world_.entityLocations.GetSize()) continue;
+                    const auto& collidedEntityLocation = world_.entityLocations[collidedId];
+                    if (!collidedEntityLocation.arch ||
+                        collidedEntityLocation.arch->entities[collidedEntityLocation.index] != collidedEntity) continue;
 					arch::componentMask requiredMask = (1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
 						(1ul << arch::ComponentsIndices::ATTACK_COMPONENT);
 
@@ -148,13 +154,14 @@ namespace GLVM::ecs
 
 						projectileHealth->currentHealth = 0;
 //						projectileAttack->damage = 100;
-						// ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						// ecs::arch::ArchetypeEntityManager* archEntityManager = &world_.entities;
 						// archEntityManager->removeEntity( entity );
-						// arch::world.removeEntity( entity );
+						// world_.removeEntity( entity );
 					}
 				}
 //                pEntity_Manager->RemoveEntity(uiEntity_refProjectile, pComponent_Manager);
             }
+        }
         }
     }
 }

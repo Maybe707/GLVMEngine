@@ -1,119 +1,69 @@
 # Game Loop Versatile Modules (GLVM)
 
-[Архитектура после рефакторинга: модули, владение, изменения API и тесты](docs/ARCHITECTURE_RU.md).
+A small C++20 game engine with an archetype ECS, Vulkan renderer, basic AABB
+physics, inventory, WAV audio and OBJ/glTF asset loading.
 
-## Quick start: native Windows
+The maintained demo runs on **Windows x64 / Win32 + Vulkan** and
+**Linux / Wayland + Vulkan** (including WSLg). OpenGL, X11/XCB and networking
+sources are retained as legacy code; they are not supported demo configurations.
+The glTF importer supports the bundled assets, not the complete glTF specification.
 
-Double-click `Run-GLVM.cmd` to start `build-win/GLVMEngine.exe` directly on your
-Windows GPU. Running the prepared executable requires no WSL, compiler or Vulkan
-SDK. Keep the executable inside this project so it can find the bundled assets.
-See [Windows instructions and build steps](docs/WINDOWS_RU.md).
+## Run on Windows
 
-## Ubuntu / Windows WSLg
+After building, double-click `Run-GLVM.cmd`. It launches
+`build-win/GLVMEngine.exe` directly on the Windows GPU; WSL and a compiler are
+not needed at runtime. Keep the executable inside the project so it can find
+models, audio and shaders. Binaries are not checked into Git.
 
-Use `Run-GLVM-WSL.cmd` for the Linux version. It builds the optimized executable
-and starts the bundled demo. See
-[Russian installation and launch instructions](docs/INSTALL_RU.md).
+Controls: WASD movement, Space jump, mouse camera, I inventory,
+O collision overlay, Esc exit.
+
+[Windows setup and build instructions](docs/WINDOWS_RU.md)
+
+## Build
+
+GNU Make is the supported build system. All platforms use
+`make_files/common_sources.mk`; old Makefiles forward to the root entry point.
 
 ```bash
+# Ubuntu / WSL
 bash scripts/install-ubuntu.sh
-bash scripts/run.sh
-# Diagnostics:
-make -f MakefileLin test
-python3 tests/check_shaders.py
-bash scripts/run.sh --debug --frames 30
+make -j4 CONFIG=Debug       # build/linGame; ASan/UBSan, Vulkan validation
+make -j4 CONFIG=Release     # build-release/linGame
+make test
+bash scripts/run.sh        # builds Release, starts on Wayland/WSLg
+
+# Cross-compile a native Windows executable in WSL
+sudo apt-get install g++-mingw-w64-x86-64-posix mingw-w64-tools
+bash scripts/build-windows.sh
 ```
 
-The Linux build is `make -f MakefileLin`; run it with `make -f MakefileLin run`.
-The launcher sets the working directory required by the bundled model, audio
-and shader paths. Shader sources are rebuilt with `glslc` when changed.
+Native MSYS2 UCRT64 also uses `make PLATFORM=windows CONFIG=Release`.
+See the Windows instructions for packages. Debug and Release use separate output
+directories. Header dependencies and changes to compiler/flags invalidate objects.
 
-This is my simple game engine for Linux and Windows OS's with both Vulkan and Opengl support. Its based on entity component system (ECS) with user friendly C++ interface. Also it has partial support of GLTf and wavefront.obj 3D model formats. With GLVM you can make simple phong light of three types (directional, spot, point). Very basic physics included (collitions, gravity).
-Updated version 2.0 with: new Archetype ECS (SOA powered), Vulkan config, read-only render objects, VK command sub-buffers. Refactored: inventory system, gltf parser...
+## Validation
 
-## Linux
-    
-* ### Development libraries:
+`make test` covers containers, JSON, ECS chunks, ID reuse, spatial membership,
+inventory, gameplay, camera math, audio concurrency and resource ownership without
+opening a window or requiring a GPU. GitHub Actions builds Linux Debug/Release
+and native Windows Release, runs CPU tests and compiles all shader sources.
 
-        X11, Xi, XRandR.
+Interactive GPU checks are separate:
 
-        Vulkan.
+```bash
+python3 tests/check_shaders.py
+bash tests/gpu_smoke.sh
+python3 tests/renderer_probe.py
+python3 tests/initialization_failure.py
+```
 
-        Opengl.
-    
-        Alsa.
+Use `tests/windows_smoke.ps1` and the Windows test executables for native window,
+resize, focus, camera and audio checks.
 
-        pulseaudio.
+- [Installation and Linux launch](docs/INSTALL_RU.md)
+- [Architecture and API migration](docs/ARCHITECTURE_RU.md)
+- [Earlier fixes](docs/FIXES_RU.md)
+- [Follow-up audit fixes and regression coverage](docs/RELIABILITY_RU.md)
 
-* ### Repository specific:
-* #### Gentoo:
-        emerge --ask x11-libs/libX11 \
-                     x11-libs/libXi \
-                     x11-apps/xrandr \
-                     media-libs/vulkan-loader \
-                     dev-util/vulkan-tools \
-                     media-libs/mesa \
-                     media-libs/alsa-lib \
-                     media-sound/pulseaudio
-
-* #### Debian:
-        apt install libx11-dev \
-                    libxi-dev \
-                    libxrandr-dev
-                    libgl1-mesa-dev \
-                    libasound2-dev \
-                    libpulse-dev \
-                    libudev-dev
-
-* #### Arch:
-        pacman -S libxi \
-                  libxrandr \
-                  mesa \
-                  libglvnd \
-                  alsa-lib \
-                  pulseaudio
-
-* #### Fedora:
-        dnf install libX11-devel \
-                    libXrandr-devel \
-                    libXi-devel \
-                    mesa-libGL-devel \
-                    alsa-lib-devel \
-                    pulseaudio-libs-devel \
-                    libudev-devel \
-                    libstdc++-static
-  
-## Windows
-
-* ### Development libraries:
-
-        Vulkan
-        
-        Opengl
-
-* ### Specific tools:
-* #### First of all you need MSYS2:
-        You can get it from official website (https://www.msys2.org/) or
-
-         winget install MSYS2.MSYS2
-
-* #### Then get needed compiler tools and Vulkan:
-  Inside MSYS2 for simplier way of installing packages frist of all we need to install pactoys:
-
-      pacman -S pactoys
-
-  Now we can use just shortened names of packages inside any MSYS2 toolchain:
-
-      pacboy -S gcc:p
-      pacboy -S vulkan:p
-
- ## Building GLVM:
-    1. In main project firectory create directory called "build".
-    2. Then copy to main directory preffered Makefile depends on operating system from Makefiles/Lin or Makefiles/Win.
-       If you building from Windows you can choose one of the four make files to build inside cmd, power shell, ucrt MSYS2 or
-       clang64 MSYS2 toolchain.
-    3. After copying make file type next command in project main directory from inside cmd, poiwer shell or MSYS2 terminal:
-
-           make -f Makefile
-
-       where "Makefile" - is a make file you choosen.
+Original engine by Maksim Manokhin (Yuriorkis_Scream), MIT license.

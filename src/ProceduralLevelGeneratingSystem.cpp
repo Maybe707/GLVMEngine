@@ -25,11 +25,10 @@ namespace GLVM::core
 
 
 		/// New arch ECS
-		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
+		arch::ArchetypeEntityManager* archEntityManager = &world_.entities;
+        if (!world_.findArchetype(requiredMask)) return;
 
-		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.cachedPlayerArch, cachedPlayerArchNumber );
-		componentsView.playerTransforms         = (ecs::components::transform*)archView.cachedPlayerArch->
-			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+
 		
 		while ( levelNubmer < 5 ) {
 			core::vector<core::Vertex> nextLevel;
@@ -68,17 +67,19 @@ namespace GLVM::core
 				meshAxisLimitingValues.setToDefaultValues();
 
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, levelHalfX, levelHalfY, levelHalfZ, nextLevel );
-				setMeshBounds( meshAxisLimitingValues );
+				assets_.data().meshBounds.Push(calculateBounds(meshAxisLimitingValues));
 
 				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = assets_.LoadMesh();
 				arch::entity gameLevelChunkEntity = archEntityManager->createEntity();
 
 				cachedLevelChunkArchNumber = 0;
 				/// Search and cache one time for LevelChunkArch
-				arch::world.searchCacheArchetypes( requiredMask, &archView.cachedLevelChunkArch, cachedLevelChunkArchNumber );
+				archView.cachedLevelChunkArch = world_.findArchetype(requiredMask);
+        cachedLevelChunkArchNumber = archView.cachedLevelChunkArch ? 1 : 0;
+                if (!archView.cachedLevelChunkArch) return;
 				
-				arch::world.addEntityToArchetype( gameLevelChunkEntity, archView.cachedLevelChunkArch );
-				arch::EntityLocation gameLevelChunkLocation = arch::world.entityLocations[arch::getId( gameLevelChunkEntity )];
+				world_.addEntityToArchetype( gameLevelChunkEntity, archView.cachedLevelChunkArch );
+				arch::EntityLocation gameLevelChunkLocation = world_.entityLocations[arch::getId( gameLevelChunkEntity )];
 				
 				arch::LevelChunkArchetype* levelChunkArch = static_cast<arch::LevelChunkArchetype*>(gameLevelChunkLocation.arch);
 				const uint32_t gameLevelChunkIndex = gameLevelChunkLocation.index;
@@ -102,13 +103,13 @@ namespace GLVM::core
 				float half_z = 0.0f;
 				setHalfExtentsFromDirection( half_x, half_z, transitionBridgeHalfWidth, transitionBridgeHalfHeight, nextLevelTransitionDirection );
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x, half_y, half_z, transitionBridgeVertices );
-				setMeshBounds( meshAxisLimitingValues );
+				assets_.data().meshBounds.Push(calculateBounds(meshAxisLimitingValues));
 
 				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = assets_.LoadMesh();
 				arch::entity transitionBridgeEntity = archEntityManager->createEntity();
-				arch::world.addEntityToArchetype( transitionBridgeEntity, archView.cachedLevelChunkArch );
+				world_.addEntityToArchetype( transitionBridgeEntity, archView.cachedLevelChunkArch );
 
-				arch::EntityLocation transitionBridgeLocation = arch::world.entityLocations[arch::getId( transitionBridgeEntity )];
+				arch::EntityLocation transitionBridgeLocation = world_.entityLocations[arch::getId( transitionBridgeEntity )];
 
 				arch::LevelChunkArchetype* transitionBridgeArch = static_cast<arch::LevelChunkArchetype*>(transitionBridgeLocation.arch);
 				const uint32_t transitionBridgeIndex = transitionBridgeLocation.index;

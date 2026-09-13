@@ -26,7 +26,7 @@ struct GameplayFrame {
 // together. Systems depend on services, never on the Engine singleton.
 class GameplaySystems final {
 public:
-    GameplaySystems(CStack& input, AssetLibrary& assets, Sound::ISoundEngine& audio,
+    GameplaySystems(ecs::arch::World& world, CStack& input, AssetLibrary& assets, Sound::ISoundEngine& audio,
                     int& draggedItem);
     void configureAssets(const AssetLibrary& assets);
     void update(const GameplayFrame& frame);

@@ -3,7 +3,7 @@
 
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/CrosshairComponent.hpp"
 #include "Components/InventoryComponent.hpp"
@@ -13,8 +13,9 @@
 
 namespace GLVM::ecs
 {
-	class InventorySystem : public ecs::ISystem {
+	class InventorySystem : public WorldSystem {
 	public:
+        explicit InventorySystem(arch::World& world) : WorldSystem(world) {}
 		uint32_t crosshairArchetypesNumber   = 0;
 		uint32_t inventoryArchetypesNumber  = 0;
 		struct ArchView {
@@ -56,15 +57,15 @@ namespace GLVM::ecs
 		point2D<int> determineActualIntersectionSlot( components::transform* crosshairTransformComponent, components::transform* inventoryTransformComponent,
 												 const float inventorySlotScale, const float inventorySlotHalfScale );
 
-		bool          isInventoryOpened;
-		int*          isItemDraged;
-		bool*         isLeftMouseButtonReleased;
-		bool          isLeftMouseButtonPressed;
+		bool          isInventoryOpened = {};
+		int*          isItemDraged = nullptr;
+		bool*         isLeftMouseButtonReleased = nullptr;
+		bool          isLeftMouseButtonPressed = {};
 		float         mouseOffsetX = 0;
 		float         mouseOffsetY = 0;
 		float         aspectRate   = 1.778;                   ///< Multiplier of current aspect rate. For full hd this must be 1920 / 1080
-		arch::Archetype* cachedCrosshairArchetype;
-		arch::Archetype* cachedInventoryArchetype;
+		arch::Archetype* cachedCrosshairArchetype = nullptr;
+		arch::Archetype* cachedInventoryArchetype = nullptr;
 	};
 } ///< namespace GLVM::ecs
 

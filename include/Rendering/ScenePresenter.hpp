@@ -24,28 +24,28 @@ private:
     CStack& input_;
     vec3 previousFrameForward = {0.0f, 0.0f, -1.0f};
     int previousFrameKeyEvents[4] = {};
-		ecs::arch::Archetype* cachedDirectionalLigthArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedDirectionalLigthArchetypes;
 		uint32_t directionalLightArchetypesNumber = 0;
 		ecs::arch::componentMask directionalLightRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::DIRECTIONAL_LIGHT_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)              |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		ecs::arch::Archetype* cachedSpotLigthArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedSpotLigthArchetypes;
 		uint32_t spotLightArchetypesNumber = 0;
 		ecs::arch::componentMask spotLightRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::SPOT_LIGHT_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)       |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		ecs::arch::Archetype* cachedPointLigthArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedPointLigthArchetypes;
 		uint32_t pointLightArchetypesNumber = 0;
 		ecs::arch::componentMask pointLightRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::POINT_LIGHT_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)        |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		ecs::arch::Archetype* cachedAnimationActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedAnimationActorsArchetypes;
 		uint32_t animationActorsArchetypesNumber = 0;
 		ecs::arch::componentMask animatedActorsRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)  |
@@ -54,7 +54,7 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
-		ecs::arch::Archetype* cachedStaticActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedStaticActorsArchetypes;
 		uint32_t staticActorsArchetypesNumber = 0;
 		ecs::arch::componentMask staticActorsRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)        |
@@ -67,7 +67,7 @@ private:
 
 
 
-		ecs::arch::Archetype* cachedPlayerArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedPlayerArchetypes;
 		uint32_t playerArchetypesNumber = 0;
 		ecs::arch::componentMask playerRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
@@ -76,7 +76,7 @@ private:
 
 
 
-		ecs::arch::Archetype* cachedAnimationArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedAnimationArchetypes;
 		uint32_t animationArchetypesNumber = 0;
 		ecs::arch::componentMask animationRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)  |
@@ -86,14 +86,14 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
 
-		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedCrosshairActorsArchetypes;
 		uint32_t crosshairActorsArchetypesNumber = 0;
 		ecs::arch::componentMask crosshairRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::CROSSHAIR_TAG_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)          |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		ecs::arch::Archetype* cachedLevelChunkActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedLevelChunkActorsArchetypes;
 		uint32_t levelChunkActorsArchetypesNumber = 0;
 		ecs::arch::componentMask levelChunkRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT)        |
@@ -103,7 +103,7 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
 
-		ecs::arch::Archetype* cachedProjectileActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedProjectileActorsArchetypes;
 		uint32_t projectileActorsArchetypesNumber = 0;
 		ecs::arch::componentMask projectileRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
@@ -112,7 +112,7 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
 
 
-		ecs::arch::Archetype* cachedItemActorsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedItemActorsArchetypes;
 		uint32_t itemActorsArchetypesNumber = 0;
 		ecs::arch::componentMask rotationItemRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::ITEM_COMPONENT)           |
@@ -124,7 +124,7 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
 
 
-		ecs::arch::Archetype* cachedInventoryArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedInventoryArchetypes;
 		uint32_t inventoryArchetypesNumber = 0;
 		ecs::arch::componentMask inventoryRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::INVENTORY_COMPONENT) |
@@ -133,7 +133,7 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
 
 
-		ecs::arch::Archetype* cachedItemArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedItemArchetypes;
 		uint32_t itemArchetypesNumber = 0;
 		ecs::arch::componentMask itemRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::ITEM_COMPONENT)           |
@@ -143,14 +143,14 @@ private:
 			(1ul << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT);
 
-		ecs::arch::Archetype* cachedHealthBarsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedHealthBarsArchetypes;
 		uint32_t healthBarsArchetypesNumber = 0;
 		ecs::arch::componentMask healthBarsRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::HEALTH_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT)   |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		ecs::arch::Archetype* cachedFontsArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedFontsArchetypes;
 		uint32_t fontsArchetypesNumber = 0;
 		ecs::arch::componentMask fontRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::FONT_COMPONENT) |

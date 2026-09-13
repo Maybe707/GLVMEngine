@@ -100,7 +100,7 @@ void AssetLibrary::prepare() {
 										{jointIndices[0], jointIndices[1], jointIndices[2]},
 										{weights[0], weights[1], weights[2]}});
                 }
-			setMeshBounds( assets_.meshAxisLimitingValues );
+			assets_.meshBounds.Push(calculateBounds(assets_.meshAxisLimitingValues));
 			++wavefrontObjCounter;
         }
 
@@ -188,14 +188,14 @@ void AssetLibrary::prepare() {
 	}
 
 	void AssetLibrary::initializeGLTF() {
-		core::vector<bool> animationFlags;
+		std::deque<bool> animationFlags;
 		for (unsigned int m = 0; m < assets_.pathsGLTF_.GetSize(); ++m) {
 			Core::CJsonParser jsonParser;
 			assets_.aVertexesTemp_.emplace_back();
 			assets_.aIndices_.emplace_back();
 			assets_.frames.Push({});
 			assets_.jointMatricesPerMesh.Push({});
-			animationFlags.Push({});
+			animationFlags.push_back(false);
 			assets_.highest_gltf_Y.emplace_back();
 			uint32_t nextIndexGLTF = wavefrontObjCounter + m;
 			jsonParser.LoadGLTF(assets_.pathsGLTF_[m], assets_.aVertexesTemp_[m], assets_.aIndices_[nextIndexGLTF],
@@ -287,7 +287,7 @@ void AssetLibrary::prepare() {
 			if( !isAlreadyCached ) {
 				writeModelsCache( assets_.pathsGLTF_[m] );
 			}
-			setMeshBounds( assets_.meshAxisLimitingValues );
+			assets_.meshBounds.Push(calculateBounds(assets_.meshAxisLimitingValues));
 		}
 	}
 

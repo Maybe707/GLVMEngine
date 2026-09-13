@@ -23,7 +23,7 @@
 
 namespace GLVM::ecs
 {
-    CMovementSystem::CMovementSystem(core::CStack& inputStack) :
+    CMovementSystem::CMovementSystem(arch::World& world, core::CStack& inputStack) : WorldSystem(world),
         inputStack(inputStack) {}
         
     void CMovementSystem::Update()
@@ -31,7 +31,8 @@ namespace GLVM::ecs
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 
-		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		for (auto* playerChunk : world_.query(playerRequiredMask)) {
+        archView.playerCachedArchetype = playerChunk;
 		componentsView.playerMoves         = (ecs::components::move*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::MOVE_COMPONENT];
 		componentsView.playerAnimation     = (ecs::components::animation*)archView.playerCachedArchetype->
@@ -48,7 +49,7 @@ namespace GLVM::ecs
         const float cameraSpeed = 3.0f * deltaFrameTime;            
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
 			const arch::entity entity = archView.playerCachedArchetype->entities[i];
-			ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+			ecs::arch::EntityLocation& entityLocation = world_.entityLocations[ecs::arch::getId( entity )];
 			cm::beholder*      playerView          = &componentsView.playerViews[i];
 			cm::move*          playerMove          = &componentsView.playerMoves[i];
 			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
@@ -109,8 +110,9 @@ namespace GLVM::ecs
             }
         }
 
+        }
 		rigidBodyContainedArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( rigidBodyRequiredMask, archView.rigidBodyContainedArchetypesCache , rigidBodyContainedArchetypesNumber );
+		world_.searchCacheArchetypes( rigidBodyRequiredMask, archView.rigidBodyContainedArchetypesCache , rigidBodyContainedArchetypesNumber );
 
 		for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
 			arch::Archetype* currentArch = archView.rigidBodyContainedArchetypesCache[i0];
@@ -121,7 +123,7 @@ namespace GLVM::ecs
 
 			for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
 				// const arch::entity entity = currentArch->entities[i1];
-				// ecs::arch::EntityLocation entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+				// ecs::arch::EntityLocation entityLocation = world_.entityLocations[ecs::arch::getId( entity )];
 				// entityLocation.isDirty = true;
 
 				if( componentsView.items && !componentsView.items[i1].isActor )

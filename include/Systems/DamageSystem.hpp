@@ -7,7 +7,7 @@
 #define DAMAGE_SYSTEM
 
 
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "EntityManager.hpp"
 #include "Components/DamageComponent.hpp"
 #include "Components/HealthComponent.hpp"
@@ -16,18 +16,19 @@
 
 namespace GLVM::ecs
 {
-	class DamageSystem : public ISystem
+	class DamageSystem : public WorldSystem
 	{
 	public:
+        explicit DamageSystem(arch::World& world) : WorldSystem(world) {}
 		void Update() override;
 
-		float deltaTime;
+		float deltaTime = {};
 
 		uint32_t cachedAttackableArchetypesNumber = 0;
 		uint32_t cachedFontArchetypesNumber       = 0;
 		struct ArchView {
-			arch::Archetype* cachedAttackableArchetypes[32];
-			arch::Archetype* cachedFontArchetypes[32];
+			core::vector<ecs::arch::Archetype*> cachedAttackableArchetypes;
+			core::vector<ecs::arch::Archetype*> cachedFontArchetypes;
 		} archView;
 		
 		struct ComponentsView {
@@ -40,8 +41,7 @@ namespace GLVM::ecs
 
 		arch::componentMask attackableRequiredMask =
 			(1ul << arch::ComponentsIndices::ATTACK_COMPONENT) |
-			(1ul << arch::ComponentsIndices::HEALTH_COMPONENT) |
-			(1ul << arch::ComponentsIndices::FONT_COMPONENT);
+			(1ul << arch::ComponentsIndices::HEALTH_COMPONENT);
 
 		arch::componentMask fontRequiredMask =
 			(1ull << ecs::arch::ComponentsIndices::FONT_COMPONENT);

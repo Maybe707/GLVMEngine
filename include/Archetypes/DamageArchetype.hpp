@@ -20,21 +20,11 @@ namespace GLVM::ecs::arch {
 		components::font   fonts[DAMAGE_ARCH_CHUNK_SIZE];
 
 		DamageArchetype() {
-            capacity = std::min<uint32_t>(CAPACITY, DAMAGE_ARCH_CHUNK_SIZE);
-			components[ComponentsIndices::ATTACK_COMPONENT]         = attacks;
-			components[ComponentsIndices::HEALTH_COMPONENT]         = health;
-			components[ComponentsIndices::FONT_COMPONENT]           = fonts;
-
-			mask =
-				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
-				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::FONT_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::ATTACK_COMPONENT;
-			componentIds[1] = ComponentsIndices::HEALTH_COMPONENT;
-			componentIds[2] = ComponentsIndices::FONT_COMPONENT;
-			componentCount = 3;
-		}
+            registerComponent<ComponentsIndices::ATTACK_COMPONENT>(attacks);
+            registerComponent<ComponentsIndices::HEALTH_COMPONENT>(health);
+            registerComponent<ComponentsIndices::FONT_COMPONENT>(fonts);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<DamageArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

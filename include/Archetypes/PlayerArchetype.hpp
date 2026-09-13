@@ -54,54 +54,22 @@ namespace GLVM::ecs::arch {
 		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
-            capacity = std::min<uint32_t>(CAPACITY, PLAYER_ARCH_CHUNK_SIZE);
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::VIEW_COMPONENT]            = beholders;
-			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
-			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
-			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
-			components[ComponentsIndices::ATTACK_COMPONENT]          = attacks;
-			components[ComponentsIndices::ANIMATION_COMPONENT]       = animations;
-			components[ComponentsIndices::FONT_COMPONENT]            = fonts;
-			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
-			components[ComponentsIndices::PLAYER_TAG_COMPONENT]      = playerTagComponents;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::VIEW_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
-				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ComponentsIndices::MOVE_COMPONENT) |
-				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
-				(1ull << ComponentsIndices::ANIMATION_COMPONENT) |
-				(1ull << ComponentsIndices::FONT_COMPONENT) |
-				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ComponentsIndices::PLAYER_TAG_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::VIEW_COMPONENT;
-			componentIds[2] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[3] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[4] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[5] = ComponentsIndices::RIGID_BODY_COMPONENT;
-			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
-			componentIds[7] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[8] = ComponentsIndices::MOVE_COMPONENT;
-			componentIds[9] = ComponentsIndices::ATTACK_COMPONENT;
-			componentIds[10] = ComponentsIndices::ANIMATION_COMPONENT;
-			componentIds[11] = ComponentsIndices::FONT_COMPONENT;
-			componentIds[12] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[13] = ComponentsIndices::PLAYER_TAG_COMPONENT;
-			componentCount = 14;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::VIEW_COMPONENT>(beholders);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::RIGID_BODY_COMPONENT>(rigidBodies);
+            registerComponent<ComponentsIndices::HEALTH_COMPONENT>(health);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::MOVE_COMPONENT>(moves);
+            registerComponent<ComponentsIndices::ATTACK_COMPONENT>(attacks);
+            registerComponent<ComponentsIndices::ANIMATION_COMPONENT>(animations);
+            registerComponent<ComponentsIndices::FONT_COMPONENT>(fonts);
+            registerComponent<ComponentsIndices::ROTATION_COMPONENT>(rotations);
+            registerComponent<ComponentsIndices::PLAYER_TAG_COMPONENT>(playerTagComponents);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<PlayerArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

@@ -1,19 +1,19 @@
 #include "Runtime/GameplaySystems.hpp"
 
 namespace GLVM::core {
-GameplaySystems::GameplaySystems(CStack& input, AssetLibrary& assets,
+GameplaySystems::GameplaySystems(ecs::arch::World& world, CStack& input, AssetLibrary& assets,
                                  Sound::ISoundEngine& audio, int& draggedItem)
     : input_(input),
-      level_(scheduler_.add<ProceduralLevelGeneratingSystem>(assets)),
-      movement_(scheduler_.add<ecs::CMovementSystem>(input)),
-      enemy_(scheduler_.add<ecs::EnemySystem>()),
-      projectile_(scheduler_.add<ecs::CProjectileSystem>(input)),
-      spatial_(scheduler_.add<ecs::SpatialGridSystem>()),
-      collision_(scheduler_.add<ecs::CCollisionSystem>(input)),
-      damage_(scheduler_.add<ecs::DamageSystem>()),
-      physics_(scheduler_.add<ecs::CPhysicsSystem>(gravity_, input)),
-      inventory_(scheduler_.add<ecs::InventorySystem>()),
-      item_(scheduler_.add<ecs::ItemSystem>()) {
+      level_(scheduler_.add<ProceduralLevelGeneratingSystem>(world, assets)),
+      movement_(scheduler_.add<ecs::CMovementSystem>(world, input)),
+      enemy_(scheduler_.add<ecs::EnemySystem>(world)),
+      projectile_(scheduler_.add<ecs::CProjectileSystem>(world, input)),
+      spatial_(scheduler_.add<ecs::SpatialGridSystem>(world, assets.data().meshBounds)),
+      collision_(scheduler_.add<ecs::CCollisionSystem>(world, input, assets.data().meshBounds)),
+      damage_(scheduler_.add<ecs::DamageSystem>(world)),
+      physics_(scheduler_.add<ecs::CPhysicsSystem>(world, gravity_, input)),
+      inventory_(scheduler_.add<ecs::InventorySystem>(world)),
+      item_(scheduler_.add<ecs::ItemSystem>(world)) {
     enemy_.soundEngine = &audio;
     projectile_.soundEngine = &audio;
     inventory_.isItemDraged = &draggedItem;

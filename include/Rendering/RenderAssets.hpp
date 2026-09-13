@@ -4,6 +4,7 @@
 #include <vector>
 namespace GLVM::core {
 struct RenderAssets {
+    core::vector<MeshAxisMaxAbsoluteValues> meshBounds;
         std::vector<ecs::Texture> initializeTextureData_{};
         std::vector<const char*> pathsArray_{};
 		core::vector<const char*> pathsGLTF_{};

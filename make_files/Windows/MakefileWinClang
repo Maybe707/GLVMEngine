@@ -1,48 +1,6 @@
-CXX = clang++
-CC = clang
-VULKAN_SDK = C:/VulkanSDK/1.4.357.0
-LDFLAGS = -I$(VULKAN_SDK)/Include -L$(VULKAN_SDK)/Lib -lgdi32 -luser32 -lwinmm -lvulkan-1 -mconsole  -Wl,/DEBUG
-CXXFLAGS = -c -std=c++20 -g -Wall -I$(VULKAN_SDK)/Include -O0
-CFLAGS = -c -g -Wall
-INC = -I./include
-TEX = -I./textures
-BUILD = build
-SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
-	./src/Event.cpp ./src/WinApi/ChronoWin.cpp ./src/TimerCreator.cpp \
-	./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp \
-	./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
-	./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp \
-	./src/WinApi/SoundEngineWaveform.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Vulkan.cpp ./src/TextureManager.cpp \
-	./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
-	./src/WinApi/WindowWinVulkan.cpp \
-	./src/UnixApi/WaylandVariables.cpp \
-	./textures/tileset.cpp \
-	./src/Systems/ItemSystem.cpp ./src/ProceduralLevelGeneratingSystem.cpp \
-	./src/Systems/InventorySystem.cpp ./src/GraphicAPI/VkBuilders.cpp \
-	./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp \
-	./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
-	./textures/container2.cpp ./textures/container2_specular.cpp \
-	./src/Systems/DamageSystem.cpp ./src/Systems/EnemySystem.cpp ./textures/fontAtlas.cpp ./textures/inventorySlot.cpp \
-	./src/ThreadPool.cpp ./src/ArchetypedECS/ArchECS_Utils.cpp \
-	./src/ArchetypedECS/ArchECS_World.cpp ./src/ArchetypedECS/ArchetypeEntityManager.cpp \
-	./src/ArchetypedECS/ArchetypeInterface.cpp ./src/Systems/SpatialGridSystem.cpp \
-	./src/Common/CommonFunctions.cpp \
-	
-OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)\\%.o)
-EXECUTABLE = winGame.exe
-
-all:$(SOURCES) $(EXECUTABLE)
-
-$(EXECUTABLE): $(OBJECTS)
-	$(CXX) $(OBJECTS) $(LDFLAGS) -o $(BUILD)/$@
-
-$(BUILD)\\%.o : ./src/%.cpp
-	if not exist $(@D) mkdir $(@D)
-	$(CXX) $(INC) $(TEX) $(CXXFLAGS) $< -o $@
-
-$(BUILD)\\%.o : %.c
-	$(CC) $(INC) $(TEX) $(CFLAGS) $< -o $@
-
-clean:
-	del /f /s /q "$(BUILD)\*.*"
-
+# Compatibility wrapper. The maintained build is the root Makefile.
+.DEFAULT_GOAL := all
+GLVM_ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))/../..)
+.PHONY: all $(MAKECMDGOALS)
+all $(filter-out all,$(MAKECMDGOALS)):
+	$(MAKE) -C "$(GLVM_ROOT)" -f Makefile PLATFORM=windows $@

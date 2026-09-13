@@ -23,24 +23,12 @@ namespace GLVM::ecs::arch {
 		tagComponents::crossHairTagComponent crosshairTagComponents[CROSSHAIR_ARCH_CHUNK_SIZE];
 
 		CrosshairArchetype() {
-            capacity = std::min<uint32_t>(CAPACITY, CROSSHAIR_ARCH_CHUNK_SIZE);
-			components[ComponentsIndices::TRANSFORM_COMPONENT]     = transforms;
-			components[ComponentsIndices::MESH_COMPONENT]          = meshes;
-			components[ComponentsIndices::MATERIAL_COMPONENT]      = materials;
-			components[ComponentsIndices::CROSSHAIR_TAG_COMPONENT] = crosshairTagComponents;  
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ComponentsIndices::CROSSHAIR_TAG_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[3] = ComponentsIndices::CROSSHAIR_TAG_COMPONENT;
-			componentCount = 4;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::CROSSHAIR_TAG_COMPONENT>(crosshairTagComponents);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<CrosshairArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

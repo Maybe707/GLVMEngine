@@ -33,34 +33,15 @@ namespace GLVM::ecs::arch {
 		tagComponents::levelChunkTagComponent levelChunkTagComponents[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 
 		LevelChunkArchetype() {
-            capacity = std::min<uint32_t>(CAPACITY, LEVEL_CHUNK_ARCH_CHUNK_SIZE);
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
-			components[ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT] = levelChunkTagComponents;
-
-			mask =
-				(1ull << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ecs::arch::ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[2] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[3] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[4] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[5] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[6] = ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT;
-			componentCount = 7;
-
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::ROTATION_COMPONENT>(rotations);
+            registerComponent<ComponentsIndices::LEVEL_CHUNK_TAG_COMPONENT>(levelChunkTagComponents);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<LevelChunkArchetype>(); }
 	};
 };
 

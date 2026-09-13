@@ -38,7 +38,7 @@ namespace GLVM::ecs
 		namespace cm = GLVM::ecs::components;
 
 		cachedArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( requiredMask, archView.cachedArchetypes, cachedArchetypesNumber );
+		world_.searchCacheArchetypes( requiredMask, archView.cachedArchetypes, cachedArchetypesNumber );
 
 		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
 			arch::Archetype* arch = archView.cachedArchetypes[x];
@@ -51,9 +51,14 @@ namespace GLVM::ecs
 				components[arch::ComponentsIndices::RIGID_BODY_COMPONENT];
 			componentsView.colliderFlagsView = (ecs::components::colliderFlags*)archView.cachedArchetypes[x]->
 				components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT];
+            const auto* items = static_cast<cm::item*>(arch->components[arch::ComponentsIndices::ITEM_COMPONENT]);
 
 			float deltaTime = 5.5f * fDelta_Time_;
 			for(unsigned int i = 0; i < arch->entityCount; ++i) {
+                if (items && !items[i].isActor) {
+                    if (componentsView.movesView) componentsView.movesView[i] = {};
+                    continue;
+                }
 				if( componentsView.transformsView && componentsView.colliderFlagsView &&
 					componentsView.movesView && componentsView.rigidBodiesView ) {
 					cm::transform& transformComponent = componentsView.transformsView[i];
@@ -95,4 +100,3 @@ namespace GLVM::ecs
 		}
     }
 }
-

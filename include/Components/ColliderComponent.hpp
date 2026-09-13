@@ -7,6 +7,7 @@
 #define COLLIDER_COMPONENT_HPP
 
 #include "Vector.hpp"
+#include "ArchetypeECS/ArchECS_Types.hpp"
 #include <vector>
 
 namespace GLVM::ecs::components
@@ -14,7 +15,7 @@ namespace GLVM::ecs::components
 	class collider
 	{
     public:
-		core::vector<unsigned int> colliders;
+		core::vector<arch::entity> colliders;
 	};
 }
 

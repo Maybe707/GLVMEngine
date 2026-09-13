@@ -9,7 +9,7 @@
 #include "ArchetypeECS/ArchECS_Types.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Components/AnimationComponent.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "EntityManager.hpp"
 #include "Vector.hpp"
 #include "Components/EnemyComponent.hpp"
@@ -22,9 +22,10 @@
 
 namespace GLVM::ecs
 {
-	class EnemySystem : public ISystem
+	class EnemySystem : public WorldSystem
 	{
 	public:
+        explicit EnemySystem(arch::World& world) : WorldSystem(world) {}
 		uint32_t playerArchetypesNumber      = 0;
 		uint32_t enemyArchetypesNumber       = 0;
 		uint32_t projectileArchetypesNumber  = 0;
@@ -62,11 +63,11 @@ namespace GLVM::ecs
 		// 						 const components::material& material,
 		// 						 const components::damage& damage);
 
-		core::Sound::ISoundEngine* soundEngine;
+		core::Sound::ISoundEngine* soundEngine = nullptr;
 		core::vector<ecs::TextureHandle> textureHandlers;
 		core::vector<ecs::components::MeshHandle> meshHandlers;
 		float projectileCooldown = 5.0f; 
-		float deltaFrameTime;
+		float deltaFrameTime = {};
 	};
 } // namespace GLVM::ecs
 

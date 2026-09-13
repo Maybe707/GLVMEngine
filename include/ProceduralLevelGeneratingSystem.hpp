@@ -4,7 +4,7 @@
 #include "ComponentManager.hpp"
 #include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include <cmath>
 #include <cstdint>
 #include <map>
@@ -16,11 +16,11 @@
 namespace GLVM::core
 {
     class AssetLibrary;
-	class ProceduralLevelGeneratingSystem : public ecs::ISystem
+	class ProceduralLevelGeneratingSystem : public ecs::WorldSystem
 	{
 		AssetLibrary& assets_;
 	public:
-        explicit ProceduralLevelGeneratingSystem(AssetLibrary& assets) : assets_(assets) {}
+        explicit ProceduralLevelGeneratingSystem(ecs::arch::World& world, AssetLibrary& assets) : WorldSystem(world), assets_(assets) {}
 		unsigned int levelNubmer          = 0;
 		bool bredoFlag                    = false;
 		unsigned int previous_half_x_rand = 0;

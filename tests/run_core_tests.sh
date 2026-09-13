@@ -27,7 +27,8 @@ build/json_audio_tests
 clang++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -g \
     -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude \
     tests/world_tests.cpp src/ArchetypedECS/ArchECS_World.cpp \
-    src/ArchetypedECS/ArchECS_Utils.cpp src/ArchetypedECS/ArchetypeInterface.cpp -o build/world_tests
+    src/ArchetypedECS/ArchECS_Utils.cpp src/ArchetypedECS/ArchetypeInterface.cpp \
+    src/ArchetypedECS/ArchetypeEntityManager.cpp -o build/world_tests
 build/world_tests
 clang++ -std=c++20 -Wall -Wextra -Wpedantic -Werror -g \
     -fsanitize=address,undefined -fno-omit-frame-pointer -Iinclude \

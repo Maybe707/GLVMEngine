@@ -3,6 +3,7 @@
 #include "Components/VertexComponent.hpp"
 #include <memory>
 
+namespace GLVM::ecs::arch { struct World; }
 namespace GLVM::core {
 // Application facade. Implementation details and platform headers stay private.
 // One run per instance; GameKill is optional and idempotent (destruction stops it).
@@ -12,6 +13,7 @@ public:
     ~Engine();
     Engine(const Engine&) = delete;
     Engine& operator=(const Engine&) = delete;
+    ecs::arch::World& world() noexcept;
     void GameLoop();
     void GameKill() noexcept;
     ecs::TextureHandle LoadTextureFromFile(const char* path);
