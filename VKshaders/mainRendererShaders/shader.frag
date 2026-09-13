@@ -208,8 +208,10 @@ float delinearize_depth(float depth, float near, float far) {
 void main()
 {
 	/// Start computing virtual texture logic.
-    float indirectTextureX = float(INDIRECT_TEXTURE_WIDTH) * inFragmentTextureCoordinate.x;
-	float indirectTextureY = float(INDIRECT_TEXTURE_HEIGHT) * inFragmentTextureCoordinate.y;
+    // glTF UVs may repeat outside [0, 1]. Wrap before indexing the finite tile table.
+    vec2 repeatedUV = fract(inFragmentTextureCoordinate);
+    float indirectTextureX = float(INDIRECT_TEXTURE_WIDTH) * repeatedUV.x;
+	float indirectTextureY = float(INDIRECT_TEXTURE_HEIGHT) * repeatedUV.y;
 
 	int indirectTextureTileColumn = int(floor(indirectTextureX));
 	int indirectTextureTileRaw = int(floor(indirectTextureY));
@@ -240,7 +242,8 @@ void main()
 	vec3 fragmentNormal = normalize(fs_in.normal);
 	vec3 viewDirection  = normalize(lightData.viewPosition - fs_in.fragmentPosition);
 
-	vec3 result = vec3(0.0, 0.0, 0.0);
+	// Material ambient is applied once and remains visible in shadow.
+	vec3 result = fs_in.ambient * vec3(texture(diffuse, tilesetFinalUV));
 	for(int i = 0; i < lightData.directionalLightsArraySize; ++i ) {
 		vec3 light = ComputeDirectionalLight(lightData.directionalLightsArray[i], fragmentNormal, viewDirection);
 		float shadow = ComputeDirectionalShadow(lightData.directionalLightsArray[i], fs_in.fragmentPositionDirectionalLightSpace[i], directionalLightsShadowMaps[i]);
@@ -250,7 +253,6 @@ void main()
 	}
 
 	for(int i = 0; i < lightData.pointLightsArraySize; ++i) {
-		debugPrintfEXT("Quadratic value: %f", lightData.pointLightsArray[3].quadratic);
 		
 		vec3 light = ComputePointLight(lightData.pointLightsArray[i], fragmentNormal, inFragmentPosition, viewDirection);
 		float shadow = ComputePointShadow(lightData.pointLightsArray[i],
@@ -272,7 +274,7 @@ void main()
 			shadow = 0.0;
 	}
 
-	result = pow( clamp(result, 0.0, 1.0), vec3(0.9) );
+	// The sRGB swapchain performs the linear-to-sRGB conversion on write.
 	outColor = vec4(result, 1.0);
 }
 
@@ -284,11 +286,10 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), fs_in.shininess);
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, fs_in.textureCoords));
 
-	return (ambient + diffuse + specular);
+	return (diffuse + specular);
 }
 
 vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection) {
@@ -303,15 +304,13 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 
-	ambient  *= attenuation;
 	diffuse  *= attenuation;
 	specular *= attenuation;
 
-	return (ambient + diffuse + specular);
+	return (diffuse + specular);
 }
 
 vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 viewDirection) {
@@ -326,17 +325,15 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance)); 
 	// spotlight intensity
     float theta     = dot(lightDirection, normalize(-light.direction));
-	float epsilon   = light.cutOff - light.outerCutOff;
+	float epsilon   = max(light.cutOff - light.outerCutOff, 0.00001);
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
-	ambient  *= attenuation * intensity;
     diffuse  *= attenuation * intensity;
     specular *= attenuation * intensity;
 	
-    return vec3(ambient + diffuse + specular);
+    return vec3(diffuse + specular);
 }
 
 float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDirectionalLightSpace, sampler2D flatShadowMap) {

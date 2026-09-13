@@ -1,6 +1,8 @@
 #include "ThreadPool.hpp"
 
 ThreadPool::ThreadPool(size_t numThreads) : stop(false) {
+    if (numThreads == 0)
+        numThreads = 1;
     for(size_t i = 0; i < numThreads; ++i) {
         workers.emplace_back([this] {
             while(true) {

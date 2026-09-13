@@ -4,9 +4,9 @@
 #include"RenderData.hpp"
 
 namespace GLVM::core {
-	void descriptorSetBuilder();
-	void pipelineBuilder();
-	void renderPassesBuilder();
+	void descriptorSetBuilder(VulkanResources& resources);
+	void pipelineBuilder(VulkanResources& resources);
+	void renderPassesBuilder(VulkanResources& resources);
 }; // GLVM::core
 
 

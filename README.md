@@ -1,91 +1,69 @@
 # Game Loop Versatile Modules (GLVM)
 
-This is my simple game engine for Linux and Windows OS's with both Vulkan and Opengl support. Its based on entity component system (ECS) with user friendly C++ interface. Also it has partial support of GLTf and wavefront.obj 3D model formats. With GLVM you can make simple phong light of three types (directional, spot, point). Very basic physics included (collitions, gravity).
-Updated version 2.0 with: new Archetype ECS (SOA powered), Vulkan config, read-only render objects, VK command sub-buffers. Refactored: inventory system, gltf parser...
+A small C++20 game engine with an archetype ECS, Vulkan renderer, basic AABB
+physics, inventory, WAV audio and OBJ/glTF asset loading.
 
-## Linux
-    
-* ### Development libraries:
+The maintained demo runs on **Windows x64 / Win32 + Vulkan** and
+**Linux / Wayland + Vulkan** (including WSLg). OpenGL, X11/XCB and networking
+sources are retained as legacy code; they are not supported demo configurations.
+The glTF importer supports the bundled assets, not the complete glTF specification.
 
-        X11, Xi, XRandR.
+## Run on Windows
 
-        Vulkan.
+After building, double-click `Run-GLVM.cmd`. It launches
+`build-win/GLVMEngine.exe` directly on the Windows GPU; WSL and a compiler are
+not needed at runtime. Keep the executable inside the project so it can find
+models, audio and shaders. Binaries are not checked into Git.
 
-        Opengl.
-    
-        Alsa.
+Controls: WASD movement, Space jump, mouse camera, I inventory,
+O collision overlay, Esc exit.
 
-        pulseaudio.
+[Windows setup and build instructions](docs/WINDOWS_RU.md)
 
-* ### Repository specific:
-* #### Gentoo:
-        emerge --ask x11-libs/libX11 \
-                     x11-libs/libXi \
-                     x11-apps/xrandr \
-                     media-libs/vulkan-loader \
-                     dev-util/vulkan-tools \
-                     media-libs/mesa \
-                     media-libs/alsa-lib \
-                     media-sound/pulseaudio
+## Build
 
-* #### Debian:
-        apt install libx11-dev \
-                    libxi-dev \
-                    libxrandr-dev
-                    libgl1-mesa-dev \
-                    libasound2-dev \
-                    libpulse-dev \
-                    libudev-dev
+GNU Make is the supported build system. All platforms use
+`make_files/common_sources.mk`; old Makefiles forward to the root entry point.
 
-* #### Arch:
-        pacman -S libxi \
-                  libxrandr \
-                  mesa \
-                  libglvnd \
-                  alsa-lib \
-                  pulseaudio
+```bash
+# Ubuntu / WSL
+bash scripts/install-ubuntu.sh
+make -j4 CONFIG=Debug       # build/linGame; ASan/UBSan, Vulkan validation
+make -j4 CONFIG=Release     # build-release/linGame
+make test
+bash scripts/run.sh        # builds Release, starts on Wayland/WSLg
 
-* #### Fedora:
-        dnf install libX11-devel \
-                    libXrandr-devel \
-                    libXi-devel \
-                    mesa-libGL-devel \
-                    alsa-lib-devel \
-                    pulseaudio-libs-devel \
-                    libudev-devel \
-                    libstdc++-static
-  
-## Windows
+# Cross-compile a native Windows executable in WSL
+sudo apt-get install g++-mingw-w64-x86-64-posix mingw-w64-tools
+bash scripts/build-windows.sh
+```
 
-* ### Development libraries:
+Native MSYS2 UCRT64 also uses `make PLATFORM=windows CONFIG=Release`.
+See the Windows instructions for packages. Debug and Release use separate output
+directories. Header dependencies and changes to compiler/flags invalidate objects.
 
-        Vulkan
-        
-        Opengl
+## Validation
 
-* ### Specific tools:
-* #### First of all you need MSYS2:
-        You can get it from official website (https://www.msys2.org/) or
+`make test` covers containers, JSON, ECS chunks, ID reuse, spatial membership,
+inventory, gameplay, camera math, audio concurrency and resource ownership without
+opening a window or requiring a GPU. GitHub Actions builds Linux Debug/Release
+and native Windows Release, runs CPU tests and compiles all shader sources.
 
-         winget install MSYS2.MSYS2
+Interactive GPU checks are separate:
 
-* #### Then get needed compiler tools and Vulkan:
-  Inside MSYS2 for simplier way of installing packages frist of all we need to install pactoys:
+```bash
+python3 tests/check_shaders.py
+bash tests/gpu_smoke.sh
+python3 tests/renderer_probe.py
+python3 tests/initialization_failure.py
+```
 
-      pacman -S pactoys
+Use `tests/windows_smoke.ps1` and the Windows test executables for native window,
+resize, focus, camera and audio checks.
 
-  Now we can use just shortened names of packages inside any MSYS2 toolchain:
+- [Installation and Linux launch](docs/INSTALL_RU.md)
+- [Architecture and API migration](docs/ARCHITECTURE_RU.md)
+- [Earlier fixes](docs/FIXES_RU.md)
+- [Follow-up audit fixes and regression coverage](docs/RELIABILITY_RU.md)
 
-      pacboy -S gcc:p
-      pacboy -S vulkan:p
-
- ## Building GLVM:
-    1. In main project firectory create directory called "build".
-    2. Then copy to main directory preffered Makefile depends on operating system from Makefiles/Lin or Makefiles/Win.
-       If you building from Windows you can choose one of the four make files to build inside cmd, power shell, ucrt MSYS2 or
-       clang64 MSYS2 toolchain.
-    3. After copying make file type next command in project main directory from inside cmd, poiwer shell or MSYS2 terminal:
-
-           make -f Makefile
-
-       where "Makefile" - is a make file you choosen.
+Original engine by Maksim Manokhin (Yuriorkis_Scream), MIT license.

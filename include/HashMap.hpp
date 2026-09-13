@@ -12,7 +12,7 @@ template <typename T>
 struct Node
 {
     std::string key_;
-    T value_;
+    T value_{};
     Node* next_ = nullptr;
 
     Node(const char* _key) : key_(_key) {}
@@ -54,25 +54,15 @@ public:
 		}
 	}
 
-	void operator=(const HashMap<S>& _map) {
-		capacity_ = _map.capacity_;
-		hashMap_ = new Node<S>*[capacity_];
-
-		for (int i = 0; i < capacity_; ++i) {
-            hashMap_[i] = nullptr;
+    HashMap& operator=(const HashMap& other) {
+        if (this != &other) {
+            HashMap copy(other);
+            std::swap(capacity_, copy.capacity_);
+            std::swap(hashMap_, copy.hashMap_);
         }
-		
-		for (int i = 0; i < capacity_; ++i) {
-			Node<S>* currentNode = _map.hashMap_[i];
-			while (currentNode != nullptr) {
-				unsigned int hash = HashFunction(currentNode->key_.c_str());
-				Link(hashMap_[hash], currentNode->key_.c_str()) = currentNode->value_;
+        return *this;
+    }
 
-				currentNode = currentNode->next_;
-			}
-		}
-	}
-	
     S& operator[](const char* _key) {
         unsigned int hash = HashFunction(_key);
 
@@ -109,16 +99,7 @@ public:
 		hashMap_ = nullptr;
     }
 
-	bool SearchKey(const char* key_) {
-		for ( int i = 0; i < capacity_; ++i ) {
-			if ( hashMap_[i] != nullptr && hashMap_[i]->key_ == key_ ) {
-				std::cout << "key: " << key_ << std::endl;
-				return true;
-			}
-		}
-
-		return false;
-	}
+	bool SearchKey(const char* key) { return Contain(key); }
 
 	unsigned int GetCapacity() { return capacity_; }
 	

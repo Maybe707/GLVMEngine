@@ -26,26 +26,13 @@ namespace GLVM::ecs::arch {
 		components::rigidBody     rigidBodies[PHYSICS_ARCH_CHUNK_SIZE];
 
 		PhysicsArchetype() {
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
-			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ComponentsIndices::MOVE_COMPONENT) |
-				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[2] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[3] = ComponentsIndices::MOVE_COMPONENT;
-			componentIds[4] = ComponentsIndices::RIGID_BODY_COMPONENT;
-			componentCount = 5;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::MOVE_COMPONENT>(moves);
+            registerComponent<ComponentsIndices::RIGID_BODY_COMPONENT>(rigidBodies);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<PhysicsArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

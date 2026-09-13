@@ -54,53 +54,22 @@ namespace GLVM::ecs::arch {
 		components::move          moves[ENEMY_ARCH_CHUNK_SIZE];
 
 		EnemyArchetype() {
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::ENEMY_COMPONENT]           = enemies;
-			components[ComponentsIndices::STATE_COMPONENT]           = states;
-			components[ComponentsIndices::FONT_COMPONENT]            = fonts;
-			components[ComponentsIndices::ANIMATION_COMPONENT]       = animations;
-			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			components[ComponentsIndices::HEALTH_COMPONENT]          = health;
-			components[ComponentsIndices::RIGID_BODY_COMPONENT]      = rigidBodies;
-			components[ComponentsIndices::ATTACK_COMPONENT]          = attacks;
-			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
-			components[ComponentsIndices::MOVE_COMPONENT]            = moves;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::ENEMY_COMPONENT) |
-				(1ull << ComponentsIndices::STATE_COMPONENT) |
-				(1ull << ComponentsIndices::FONT_COMPONENT) |
-				(1ull << ComponentsIndices::ANIMATION_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::RIGID_BODY_COMPONENT) |
-				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
-				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ComponentsIndices::MOVE_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::ENEMY_COMPONENT;
-			componentIds[2] = ComponentsIndices::STATE_COMPONENT;
-			componentIds[3] = ComponentsIndices::FONT_COMPONENT;
-			componentIds[4] = ComponentsIndices::ANIMATION_COMPONENT;
-			componentIds[5] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[6] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[7] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[8] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[9] = ComponentsIndices::HEALTH_COMPONENT;
-			componentIds[10] = ComponentsIndices::RIGID_BODY_COMPONENT;
-			componentIds[11] = ComponentsIndices::ATTACK_COMPONENT;
-			componentIds[12] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[13] = ComponentsIndices::MOVE_COMPONENT;
-			componentCount = 14;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::ENEMY_COMPONENT>(enemies);
+            registerComponent<ComponentsIndices::STATE_COMPONENT>(states);
+            registerComponent<ComponentsIndices::FONT_COMPONENT>(fonts);
+            registerComponent<ComponentsIndices::ANIMATION_COMPONENT>(animations);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::HEALTH_COMPONENT>(health);
+            registerComponent<ComponentsIndices::RIGID_BODY_COMPONENT>(rigidBodies);
+            registerComponent<ComponentsIndices::ATTACK_COMPONENT>(attacks);
+            registerComponent<ComponentsIndices::ROTATION_COMPONENT>(rotations);
+            registerComponent<ComponentsIndices::MOVE_COMPONENT>(moves);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<EnemyArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

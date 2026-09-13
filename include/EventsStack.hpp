@@ -36,6 +36,7 @@ namespace GLVM::core
 
 		EEvents& Pop()
 		{
+			if (iHead_ == 0) return aStack_[0];
 			return aStack_[iHead_-1];
 		}
 

@@ -14,7 +14,7 @@
 #include "Vector.hpp"
 #include "Components/MoveComponent.hpp"
 #include "ComponentManager.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "VertexMath.hpp"
 #include "Components/ViewComponent.hpp"
 #include "EventsStack.hpp"
@@ -30,11 +30,11 @@
 
 namespace GLVM::ecs
 {
-	class CMovementSystem : public ISystem
+	class CMovementSystem : public WorldSystem
 	{
 	public:
-		float deltaFrameTime;
-		float gravity;
+		float deltaFrameTime = {};
+		float gravity = {};
         core::CStack& inputStack;
 		float prev_delta_x       = 0.0f;
 		float prev_X             = 0.0f;
@@ -45,7 +45,7 @@ namespace GLVM::ecs
 		uint32_t rigidBodyContainedArchetypesNumber = 0;
 		struct MovementArchView {
 			arch::Archetype* playerCachedArchetype = nullptr;
-			arch::Archetype* rigidBodyContainedArchetypesCache[32];
+			core::vector<ecs::arch::Archetype*> rigidBodyContainedArchetypesCache;
 		} archView;
 
 		struct MovementComponentsView {
@@ -70,7 +70,7 @@ namespace GLVM::ecs
 			(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
         
-        CMovementSystem( core::CStack& inputStack );
+        CMovementSystem(arch::World& world, core::CStack& inputStack);
 
 		void Update();
         Vector<float, 3> CalculateVectorRL(components::beholder& beholder);

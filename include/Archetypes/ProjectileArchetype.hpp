@@ -45,41 +45,18 @@ namespace GLVM::ecs::arch {
 		tagComponents::projectileTagComponent projectileTagComponents[PROJECTILE_ARCH_CHUNK_SIZE];
 
 		ProjectileArchetype() {
-			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
-			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
-			components[ComponentsIndices::COLLIDER_COMPONENT]          = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]    = colliderFlags;
-			components[ComponentsIndices::ROTATION_COMPONENT]          = rotations;
-			components[ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT] = projectileBundles;
-			components[ComponentsIndices::HEALTH_COMPONENT]            = heath;
-			components[ComponentsIndices::ATTACK_COMPONENT]            = attacks;
-			components[ComponentsIndices::FONT_COMPONENT]              = fonts;
-			components[ComponentsIndices::PROJECTILE_TAG_COMPONENT]    = projectileTagComponents;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT) |
-				(1ull << ComponentsIndices::HEALTH_COMPONENT) |
-				(1ull << ComponentsIndices::ATTACK_COMPONENT) |
-				(1ull << ComponentsIndices::FONT_COMPONENT) |
-				(1ull << ComponentsIndices::PROJECTILE_TAG_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[2] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[3] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[4] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[5] = ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT;
-			componentIds[6] = ComponentsIndices::HEALTH_COMPONENT;
-			componentIds[7] = ComponentsIndices::ATTACK_COMPONENT;
-			componentIds[8] = ComponentsIndices::FONT_COMPONENT;
-			componentIds[9] = ComponentsIndices::PROJECTILE_TAG_COMPONENT;
-			componentCount = 10;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::ROTATION_COMPONENT>(rotations);
+            registerComponent<ComponentsIndices::PROJECTILE_BUNDLE_COMPONENT>(projectileBundles);
+            registerComponent<ComponentsIndices::HEALTH_COMPONENT>(heath);
+            registerComponent<ComponentsIndices::ATTACK_COMPONENT>(attacks);
+            registerComponent<ComponentsIndices::FONT_COMPONENT>(fonts);
+            registerComponent<ComponentsIndices::PROJECTILE_TAG_COMPONENT>(projectileTagComponents);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<ProjectileArchetype>(); }
 	};
 };
 

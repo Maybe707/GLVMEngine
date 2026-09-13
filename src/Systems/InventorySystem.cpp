@@ -21,12 +21,16 @@ namespace GLVM::ecs
 			namespace cm = GLVM::ecs::components;
 
 			crosshairArchetypesNumber = 0;
-			arch::world.searchCacheArchetypes( crosshairRequiredMask, &archView.crosshairCachedArchetype, crosshairArchetypesNumber );
+			archView.crosshairCachedArchetype = world_.findArchetype(crosshairRequiredMask);
+        crosshairArchetypesNumber = archView.crosshairCachedArchetype ? 1 : 0;
+            if (!archView.crosshairCachedArchetype || !archView.crosshairCachedArchetype->entityCount) return;
 			componentsView.crosshairTransformsView = (ecs::components::transform*)archView.crosshairCachedArchetype->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 			
 			inventoryArchetypesNumber = 0;
-			arch::world.searchCacheArchetypes( inventoryRequiredMask, &archView.inventoryCachedArchetype, inventoryArchetypesNumber );
+			archView.inventoryCachedArchetype = world_.findArchetype(inventoryRequiredMask);
+        inventoryArchetypesNumber = archView.inventoryCachedArchetype ? 1 : 0;
+            if (!archView.inventoryCachedArchetype || !archView.inventoryCachedArchetype->entityCount || !isItemDraged || !isLeftMouseButtonReleased) return;
 
 			componentsView.inventoryTransformsView = (ecs::components::transform*)archView.inventoryCachedArchetype->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
@@ -54,7 +58,9 @@ namespace GLVM::ecs
 						const unsigned int column = intersectionSlot.x;
 						const unsigned int entity = inventoryComponent->slots[row][column];
 						if( entity != UINT_MAX && entity >= 0 ) {  ///< Check slot is not empty and hold an item
-							arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( entity )];
+							if (arch::getId(entity) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation itemLocation = world_.entityLocations[arch::getId( entity )];
+                        if (!itemLocation.arch) { return; }
 							arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 							const uint32_t itemIndex = itemLocation.index;
 							cm::item* itemComponent = &itemArch->items[itemIndex];
@@ -78,7 +84,9 @@ namespace GLVM::ecs
 															  inventorySlotScale, inventorySlotHalfScale) ) {
 						[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 
-						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+						if (arch::getId(*isItemDraged) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation itemLocation = world_.entityLocations[arch::getId( *isItemDraged )];
+                        if (!itemLocation.arch) { return; }
 						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 						const uint32_t itemIndex = itemLocation.index;
 						cm::item* itemComponent = &itemArch->items[itemIndex];
@@ -104,7 +112,9 @@ namespace GLVM::ecs
 															  inventorySlotScale, inventorySlotHalfScale) ) {
 						[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 
-						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+						if (arch::getId(*isItemDraged) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation itemLocation = world_.entityLocations[arch::getId( *isItemDraged )];
+                        if (!itemLocation.arch) { return; }
 						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 						const uint32_t itemIndex = itemLocation.index;
 						cm::item* itemComponent = &itemArch->items[itemIndex];
@@ -115,12 +125,16 @@ namespace GLVM::ecs
 
 						const int itemWidth  = itemComponent->itemSlotType.width;
 						const int itemHeight = itemComponent->itemSlotType.height;
+            if (itemWidth <= 0 || itemHeight <= 0 || itemWidth > static_cast<int>(inventoryComponent->col) ||
+                itemHeight > static_cast<int>(inventoryComponent->row)) return;
 
 						if( isSwapable == -1 ) {               ///< Default value. Just drop item to all empty slots
 							itemComponent->occupiedSlots = potentialOccupiedSlots;
 							fillInventorySlots( itemComponent, itemWidth, itemHeight, inventoryComponent, *isItemDraged );
-						} else if ( isSwapable > 0 ) {         ///< Swap one item that we draging to another one in inventory
-							arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( isSwapable )];
+						} else if ( isSwapable >= 0 ) {         ///< Swap one item that we draging to another one in inventory
+							if (arch::getId(isSwapable) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation itemLocation = world_.entityLocations[arch::getId( isSwapable )];
+                        if (!itemLocation.arch) { return; }
 							arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 							const uint32_t itemIndex = itemLocation.index;
 							cm::item* swapedItemComponent = &itemArch->items[itemIndex];
@@ -143,7 +157,9 @@ namespace GLVM::ecs
 							*isItemDraged = isSwapable;
 						}
 					} else {       ///< Item drop to the ground
-						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
+						if (arch::getId(*isItemDraged) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation itemLocation = world_.entityLocations[arch::getId( *isItemDraged )];
+                        if (!itemLocation.arch) { return; }
 						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 						const uint32_t itemIndex = itemLocation.index;
 						itemArch->rigidBodies[itemIndex] = { .fMass_ = 2.0f };
@@ -151,8 +167,10 @@ namespace GLVM::ecs
 						cm::item*      item          = &itemArch->items[itemIndex];
 						item->isActor = true;
 					
-						const uint32_t player = 0;                          ///< REMOVE THIS CRINGE
-						arch::EntityLocation playerLocation = arch::world.entityLocations[arch::getId( player )];
+						const uint32_t player = inventoryComponent->entityOwner;                          ///< REMOVE THIS CRINGE
+						if (arch::getId(player) >= world_.entityLocations.GetSize()) return;
+                        arch::EntityLocation playerLocation = world_.entityLocations[arch::getId( player )];
+                        if (!playerLocation.arch) { return; }
 						arch::PlayerArchetype* playerArch = static_cast<arch::PlayerArchetype*>(playerLocation.arch);
 						const uint32_t playerIndex = playerLocation.index;
 						cm::transform* playerTransform = &playerArch->transforms[playerIndex];
@@ -177,6 +195,8 @@ namespace GLVM::ecs
 		if( itemComponent != nullptr ) {
 			const int itemWidth  = itemComponent->itemSlotType.width;
 			const int itemHeight = itemComponent->itemSlotType.height;
+            if (itemWidth <= 0 || itemHeight <= 0 || itemWidth > static_cast<int>(inventoryComponent->col) ||
+                itemHeight > static_cast<int>(inventoryComponent->row)) return -2;
 
 			const int row    = intersectionSlot.y;
 			const int column = intersectionSlot.x;
@@ -213,28 +233,30 @@ namespace GLVM::ecs
 	
 	void InventorySystem::fillInventorySlots( components::item* itemComponent, const int itemWidth, const int itemHeight,
 											  components::inventory* inventoryComponent, const int fillValue ) {
-		for( int i = 0; i < itemHeight; ++i ) {
-			for( int j = 0; j < itemWidth; ++j ) {
-				const unsigned int slotsRow = itemComponent->occupiedSlots[i * itemWidth + j] / inventoryComponent->col;
-				const unsigned int slotsColumn = itemComponent->occupiedSlots[i * itemWidth + j] % inventoryComponent->col;
-
-				inventoryComponent->slots[slotsRow][slotsColumn] = fillValue;
-			}
-		}
+        (void)itemWidth; (void)itemHeight;
+        if (!inventoryComponent->col) return;
+        for (const auto slot : itemComponent->occupiedSlots) {
+            const auto row = slot / inventoryComponent->col, col = slot % inventoryComponent->col;
+            if (row < inventoryComponent->row) inventoryComponent->slots[row][col] = fillValue;
+        }
 	}
 	
 	int InventorySystem::determineSwappableField( components::item* itemComponent, const int itemWidth, const int itemHeight,
 												  int pivotRow, int pivotColumn, components::inventory* inventoryComponent,
 												  core::vector<unsigned int>& potentialOccupiedSlots) {
-		itemComponent->occupiedSlots.clear();
-		int isSwapable = -1;                   ///< -1: default value. -2: found two entities in potential slots. Any other value: swapable.
+		potentialOccupiedSlots.clear();
+        if (!itemComponent || itemWidth <= 0 || itemHeight <= 0 || pivotRow < 0 || pivotColumn < 0 ||
+            itemWidth > static_cast<int>(inventoryComponent->col) || itemHeight > static_cast<int>(inventoryComponent->row) ||
+            pivotRow > static_cast<int>(inventoryComponent->row) - itemHeight ||
+            pivotColumn > static_cast<int>(inventoryComponent->col) - itemWidth) return -2;
+        int isSwapable = -1;                   ///< -1: default value. -2: found two entities in potential slots. Any other value: swapable.
 		for( int i = 0; i < itemHeight; ++i ) {
 			for( int j = 0; j < itemWidth; ++j ) {
 				const unsigned int finalRow    = pivotRow + i;
 				const unsigned int finalColumn = pivotColumn + j;
 				if ( isSwapable == -1 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX ) {
 					isSwapable = inventoryComponent->slots[finalRow][finalColumn];
-				} else if ( isSwapable > 0 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX
+				} else if ( isSwapable >= 0 && inventoryComponent->slots[finalRow][finalColumn] != UINT_MAX
 							&& (int)inventoryComponent->slots[finalRow][finalColumn] != isSwapable ) {
 					isSwapable = -2;
 				}

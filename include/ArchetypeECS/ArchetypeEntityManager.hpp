@@ -10,22 +10,18 @@ namespace GLVM::ecs::arch {
 
 	
 	struct ArchetypeEntityManager {
-		inline static id nextId = 0;
-		core::vector<generation> generations;
-		core::vector<id>         freeList;
-
-		ArchetypeEntityManager();
-		static ArchetypeEntityManager* getInstance();
+		ArchetypeEntityManager() = default;
+        ArchetypeEntityManager(const ArchetypeEntityManager&) = delete;
+        ArchetypeEntityManager& operator=(const ArchetypeEntityManager&) = delete;
 		
 		entity createEntity();
 		void   removeEntity( entity entity_ );
 		bool   isAlive( entity entity_ ) const;
 
 	private:
-		static ArchetypeEntityManager* pInstance_;
-        static std::mutex  Mutex_;
-
-		~ArchetypeEntityManager();
+        core::vector<generation> generations;
+        core::vector<id> freeList;
+        std::vector<bool> occupied;
 	};
 }; // namespace GLVM::ecs::arch
 

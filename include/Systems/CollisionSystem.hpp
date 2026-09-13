@@ -9,7 +9,7 @@
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "Event.hpp"
 #include "Components/MoveComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -21,17 +21,17 @@
 
 namespace GLVM::ecs
 {
-	class CCollisionSystem : public ISystem
+	class CCollisionSystem : public WorldSystem
 	{   
 	public:
-		float fDelta_Time_;
-		float gravity;
-		bool isInventoryOpened;
-		bool* isItemDraged;
-		bool isLeftMouseButtonPressed;
-		bool* isLeftMouseButtonReleased;
+		float fDelta_Time_ = {};
+		float gravity = {};
+		bool isInventoryOpened = {};
+		bool* isItemDraged = nullptr;
+		bool isLeftMouseButtonPressed = {};
+		bool* isLeftMouseButtonReleased = nullptr;
         core::CStack& Input_Stack_;
-		arch::Archetype* cachedArchetypes[32];
+		core::vector<ecs::arch::Archetype*> cachedArchetypes;
 		uint32_t cachedArchetypesNumber = 0;
 		
 		struct CollisionComponentsView {
@@ -50,7 +50,9 @@ namespace GLVM::ecs
 			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MESH_COMPONENT);
 
-        CCollisionSystem(core::CStack& _input_Stack) : Input_Stack_(_input_Stack) {}
+        CCollisionSystem(arch::World& world, core::CStack& input, const core::vector<core::MeshAxisMaxAbsoluteValues>& bounds)
+            : WorldSystem(world), Input_Stack_(input), bounds_(bounds) {}
+        const core::vector<core::MeshAxisMaxAbsoluteValues>& bounds_;
 		void Update() override;
         bool UpperActorCheck(vec3 backtrackingPosition,
 							 vec3 comparedPosition,

@@ -137,6 +137,7 @@ namespace GLVM::Core
 		}
 		
 		void operator=(const JsonValue& _value) {
+			if (this == &_value) return;
 			switch (type) {
 			case JSON_INVALID_VALUE:
 				break;
@@ -223,12 +224,12 @@ namespace GLVM::Core
     class CJsonParser
     {
         std::string sJsonFileData_;
-        const char* pJsonFileData_;
+        const char* pJsonFileData_ = nullptr;
 		char currentChar_;
         unsigned int globalFileCounter_ = 0;
 		
 		core::vector<JsonValue*> stackOfJsonValues_;
-		JsonValue* root_;
+		JsonValue* root_ = nullptr;
 		bool keyFlag = true;
 	    std::string lastKey_ = "";
 		std::string bufferString_ = "";

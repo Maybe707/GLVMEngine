@@ -1,106 +1,96 @@
-// This file is part of Game Loop Versatile Modules (GLVM)
-// Copyright © 2024 Maksim Manokhin a.k.a. Yuriorkis_Scream. Contacts: <fellfrostqtw@gmail.com>
-// Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
-// License: http://opensource.org/licenses/MIT
-
 #include "SoundEngineWaveform.hpp"
-#include <cstdio>
+#include <algorithm>
+#include <chrono>
+#include <cmath>
+#include <cstring>
 #include <fstream>
-#include <iostream>
-#include <mmeapi.h>
+#include <vector>
 
-namespace GLVM::core::Sound
-{
-	void CSoundEngineWaveform::OpenDevice( const char* device ) {
-//		const char *kDevice = "default";
-//		(snd_pcm_open(&pPcm, device, SND_PCM_STREAM_PLAYBACK, 0));
-	}
-
-	void CSoundEngineWaveform::CloseDevice() {
-//		snd_pcm_drain(pPcm);
-//        snd_pcm_close(pPcm);
-	}
-	
-    void CSoundEngineWaveform::SoundStream()
-    {
-        for(unsigned int i = 0; i < tSound_Container.GetSize(); ++i)
-        {
-            PlaybackSoundSample(*tSound_Container[i]);
-			tSound_Container.Remove(i);
-//            tSound_Contaier.RemoveObject(tSound_Contaier[i]);
-        }
-    }
-
-    void CSoundEngineWaveform::PlaybackSoundSample(CSoundSample& _sound_sample)
-    {
-//        MMRESULT     rc;
-        HWAVEOUT     hWaveOut;
-        WAVEHDR      lpWaveHdr {};
-        WAVEFORMATEX Format;
-		
-//        Format.wFormatTag = WAVE_FORMAT_PCM;
-		Format.wFormatTag = WAVE_FORMAT_PCM; 
-        Format.nChannels = 2; 
-        Format.nSamplesPerSec = _sound_sample.uiRate_; 
-        Format.nAvgBytesPerSec = Format.nSamplesPerSec * Format.nChannels * 2; 
-        Format.nBlockAlign = 4;                                                        ///< Change this field first if got any problems
-        Format.wBitsPerSample = 16; 
-        Format.cbSize = 0;
- 
-        /// Open a waveform device for output using window callback.
-
-		unsigned int rc = 0;
-        rc = waveOutOpen (&hWaveOut, WAVE_MAPPER, &Format, 0L, 0L, 0L);
-         if(rc != MMSYSERR_NOERROR) {
-             std::cerr << "waveOutOpen: " << "error code: " << rc << std::endl;;
- //            print_waveout_error(rc);        ///< MAKE DIFINITION!
-             std::exit(-1);
-         }
-
-        std::ifstream file(_sound_sample.kPath_to_File_, std::ios_base::binary | std::ios_base::in);
-        if(!file) {
-            std::cerr << "Fail to open file." << std::endl;
-            std::exit(-1);
-        }
-        
-        char *buf = (char*)malloc(Format.nAvgBytesPerSec * 2);
-//        frames = fread(buf, uiFrame_Size, FRAMES, iFile_Descritor);
-
-        /// After allocation, set up and prepare header.
-
-//        char* data_ptr = buf + 11;
-
-        while(1)
-        {
-            file.read(buf, Format.nAvgBytesPerSec * 2);
-            if(file.gcount() == 0)
-                break;
-            
-            lpWaveHdr.lpData = buf;
-            lpWaveHdr.dwBufferLength = file.gcount();
-            lpWaveHdr.dwFlags = 0L;
-            lpWaveHdr.dwLoops = 0L;
-            waveOutPrepareHeader(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
-            waveOutWrite(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
-            Sleep((lpWaveHdr.dwBufferLength * 1000) / (Format.nAvgBytesPerSec * 2));
-            waveOutUnprepareHeader(hWaveOut, &lpWaveHdr, sizeof(WAVEHDR));
-        }
-        
-        free(buf);
-        waveOutClose(hWaveOut);
-    }
-
-    void CSoundEngineWaveform::SetMasterVolume(long _lVolume) {}
-
-	void CSoundEngineWaveform::CreateSoundSample( const char* filePath, u32 duration, u32 rate, float volume ) {
-//		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-//		pSound_Sample->kPath_to_File_ = filePath;
-//		pSound_Sample->uiDuration_ = duration;
-//		pSound_Sample->uiRate_ = rate;
-//		pSound_Sample->volume  = volume;
-//		tSound_Contaier.Push(pSound_Sample);
-	}
-	
-    vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Container; }
+namespace GLVM::core::Sound {
+void CSoundEngineWaveform::CloseDevice() {
+    RequestStop();
+    std::lock_guard lock(mutex_);
+    queue_.clear();
 }
-
+void CSoundEngineWaveform::CreateSoundSample(const char* path, u32 duration, u32 rate, float volume) {
+    if (!path || stopped_) return;
+    {
+        std::lock_guard lock(mutex_);
+        queue_.push_back({path, duration, rate, volume});
+    }
+    ready_.notify_one();
+}
+void CSoundEngineWaveform::SetMasterVolume(long volume) {
+    volume_ = std::clamp(volume, 0L, 100L) / 100.0f;
+}
+void CSoundEngineWaveform::SoundStream() {
+    Request request;
+    {
+        std::unique_lock lock(mutex_);
+        ready_.wait_for(lock, std::chrono::milliseconds(10), [this] { return stopped_ || !queue_.empty(); });
+        if (stopped_ || queue_.empty()) return;
+        request = std::move(queue_.front());
+        queue_.pop_front();
+    }
+    CSoundSample sample{request.path.c_str(), request.duration, request.rate, request.volume};
+    PlaybackSoundSample(sample);
+}
+void CSoundEngineWaveform::PlaybackSoundSample(CSoundSample& sample) {
+    if (stopped_ || !sample.kPath_to_File_) return;
+    std::ifstream input(sample.kPath_to_File_, std::ios::binary);
+    char header[12];
+    if (!input.read(header, 12) || std::memcmp(header, "RIFF", 4) || std::memcmp(header + 8, "WAVE", 4)) return;
+    auto le16 = [](const unsigned char* bytes) -> WORD { return bytes[0] | (WORD(bytes[1]) << 8); };
+    auto le32 = [](const unsigned char* bytes) -> DWORD {
+        return DWORD(bytes[0]) | DWORD(bytes[1]) << 8 | DWORD(bytes[2]) << 16 | DWORD(bytes[3]) << 24;
+    };
+    WAVEFORMATEX format{};
+    std::vector<int16_t> pcm;
+    unsigned char chunk[8];
+    while (input.read(reinterpret_cast<char*>(chunk), 8)) {
+        const DWORD size = le32(chunk + 4);
+        if (!std::memcmp(chunk, "fmt ", 4)) {
+            unsigned char data[16];
+            if (size < 16 || !input.read(reinterpret_cast<char*>(data), 16)) return;
+            format.wFormatTag = le16(data);
+            format.nChannels = le16(data + 2);
+            format.nSamplesPerSec = le32(data + 4);
+            format.nAvgBytesPerSec = le32(data + 8);
+            format.nBlockAlign = le16(data + 12);
+            format.wBitsPerSample = le16(data + 14);
+            if (format.wFormatTag != WAVE_FORMAT_PCM || format.wBitsPerSample != 16 ||
+                (format.nChannels != 1 && format.nChannels != 2) || !format.nSamplesPerSec ||
+                format.nBlockAlign != format.nChannels * sizeof(int16_t) ||
+                format.nAvgBytesPerSec != format.nSamplesPerSec * format.nBlockAlign) return;
+            input.seekg(static_cast<std::streamoff>(size - 16) + (size & 1), std::ios::cur);
+        } else if (!std::memcmp(chunk, "data", 4)) {
+            if (!format.nBlockAlign || !size || size > 32 * 1024 * 1024 || size % format.nBlockAlign) return;
+            pcm.resize(size / sizeof(int16_t));
+            if (!input.read(reinterpret_cast<char*>(pcm.data()), size)) return;
+            break;
+        } else input.seekg(static_cast<std::streamoff>(size) + (size & 1), std::ios::cur);
+    }
+    if (pcm.empty()) return;
+    const float gain = std::isfinite(sample.volume) ? std::clamp(sample.volume, 0.0f, 1.0f) * volume_.load() : 0.0f;
+    for (auto& value : pcm) value = static_cast<int16_t>(value * gain);
+    HANDLE completed = CreateEventW(nullptr, FALSE, FALSE, nullptr);
+    if (!completed) return;
+    HWAVEOUT output{};
+    if (waveOutOpen(&output, WAVE_MAPPER, &format, reinterpret_cast<DWORD_PTR>(completed), 0, CALLBACK_EVENT) != MMSYSERR_NOERROR) {
+        CloseHandle(completed);
+        return;
+    }
+    WAVEHDR buffer{};
+    buffer.lpData = reinterpret_cast<char*>(pcm.data());
+    buffer.dwBufferLength = static_cast<DWORD>(pcm.size() * sizeof(int16_t));
+    if (waveOutPrepareHeader(output, &buffer, sizeof(buffer)) == MMSYSERR_NOERROR) {
+        if (waveOutWrite(output, &buffer, sizeof(buffer)) == MMSYSERR_NOERROR) {
+            while (!(buffer.dwFlags & WHDR_DONE) && !stopped_) WaitForSingleObject(completed, 10);
+        }
+        waveOutReset(output);
+        waveOutUnprepareHeader(output, &buffer, sizeof(buffer));
+    }
+    waveOutClose(output);
+    CloseHandle(completed);
+}
+}

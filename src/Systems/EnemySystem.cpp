@@ -24,13 +24,18 @@ namespace GLVM::ecs
 	void EnemySystem::Update() {
 		namespace arch = GLVM::ecs::arch;
 
-		playerArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		projectileArchetypesNumber = 0;
+		archView.projectileArchetype = world_.findArchetype(projectileRequiredMask);
+        projectileArchetypesNumber = archView.projectileArchetype ? 1 : 0;
+
+        if (projectileCooldown > 0) projectileCooldown -= 5.5f * deltaFrameTime;
+        for (auto* playerChunk : world_.query(playerRequiredMask)) {
+            archView.playerCachedArchetype = playerChunk;
 		componentsView.playerTransforms = (ecs::components::transform*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 
-		enemyArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( enemyRequiredMask, &archView.enemyCachedArchetype, enemyArchetypesNumber );
+        for (auto* enemyChunk : world_.query(enemyRequiredMask)) {
+            archView.enemyCachedArchetype = enemyChunk;
 		componentsView.enemyTransforms = (ecs::components::transform*)archView.enemyCachedArchetype->
 			components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 		componentsView.enemyStates     = (ecs::components::state*)archView.enemyCachedArchetype->
@@ -40,9 +45,6 @@ namespace GLVM::ecs
 		componentsView.enemies         = (ecs::components::enemy*)archView.enemyCachedArchetype->
 			components[arch::ComponentsIndices::ENEMY_COMPONENT];
 
-		projectileArchetypesNumber = 0;
-		ecs::arch::world.searchCacheArchetypes( projectileRequiredMask, &archView.projectileArchetype, projectileArchetypesNumber );
-		
 		for( uint32_t j = 0; j < archView.playerCachedArchetype->entityCount; ++j ) {
 			components::transform* playerTransformComponent = &componentsView.playerTransforms[j];
 			for ( unsigned int i = 0; i < archView.enemyCachedArchetype->entityCount; ++i ) {
@@ -54,10 +56,9 @@ namespace GLVM::ecs
 				enemyAnimatin->isAnimatedOnFrame = true;       ///< FIXME: DELETE CRINGE
 				
 				vec3 distance = playerTransformComponent->position - enemyTransformComponent->position;
-				float cameraSpeed = 5.5f * deltaFrameTime;
+
 				
-				if(projectileCooldown > 0)
-					projectileCooldown -= cameraSpeed;
+
 				if ( distance.Length() > enemyComponent->detectRadius && stateEnemyComponent->state == core::States::ATTACK ) {
 					float deltaLength = distance.Length() - enemyComponent->detectRadius;
 					vec3 enemyMove = distance * (deltaLength / distance.Length());
@@ -66,7 +67,7 @@ namespace GLVM::ecs
 				}
 			
 				if ( distance.Length() <= enemyComponent->detectRadius ) {
-					if(projectileCooldown <= 0) {
+					if(archView.projectileArchetype && projectileCooldown <= 0) {
 						ecs::components::MeshHandle meshHandle{};
 						const u32 sphereMeshHandleIndex = 2;
 						if ( meshHandlers.GetSize() > 2 )
@@ -83,10 +84,10 @@ namespace GLVM::ecs
 
 						const components::damage damage = { .maximumDamage = 40, .minimumDamage = 20, .criticalHitRate = 0, .criticalModifier = 0 };
 
-						ecs::arch::ArchetypeEntityManager* archEntityManager = ecs::arch::ArchetypeEntityManager::getInstance();
+						ecs::arch::ArchetypeEntityManager* archEntityManager = &world_.entities;
 						ecs::arch::entity projectileEntity = archEntityManager->createEntity();
-						ecs::arch::world.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
-						ecs::arch::EntityLocation projectileLocation = ecs::arch::world.entityLocations[ecs::arch::getId( projectileEntity )];
+						world_.addEntityToArchetype( projectileEntity, archView.projectileArchetype );
+						ecs::arch::EntityLocation projectileLocation = world_.entityLocations[ecs::arch::getId( projectileEntity )];
 						arch::ProjectileArchetype* projectileArch = static_cast<arch::ProjectileArchetype*>(projectileLocation.arch);
 						const u32 projectileIndex = projectileLocation.index;
 						ecs::components::health& projectileHealth = projectileArch->heath[projectileIndex];
@@ -99,7 +100,7 @@ namespace GLVM::ecs
 											   damage,
 											   projectileLocation);
 
-						soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
+						if (soundEngine) soundEngine->CreateSoundSample( "../laser2.wav", 5, 22050, 0.05 );
 						projectileCooldown = 15.0;
 					}
 
@@ -107,5 +108,7 @@ namespace GLVM::ecs
 				}
 			}
 		}
+        }
+        }
 	}
 } // namespace GLVM::ecs

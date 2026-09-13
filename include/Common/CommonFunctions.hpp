@@ -1,3 +1,4 @@
+#include <array>
 // This file is part of Game Loop Versatile Modules (GLVM)
 // Copyright © 2024 Maksim Manokhin a.k.a. Yuriorkis_Scream. Contacts: <fellfrostqtw@gmail.com>
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
@@ -25,7 +26,7 @@ namespace GLVM::core {
 		const core::MeshAxisMaxAbsoluteValues& backtrackingMeshAxisMaxAbsoluteValues,
 		const core::MeshAxisMaxAbsoluteValues& comparedMeshAxisMaxAbsoluteValues);
 
-	core::vector<vec3> computeBoxCornerBoundPoints(
+	std::array<vec3, 2> computeBoxCornerBoundPoints(
 		const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
 		vec3 entityPosition,
 		const float scale );
@@ -40,7 +41,7 @@ namespace GLVM::core {
 		return false;
 	}
 
-	void setMeshBounds( MeshAxisLimitingValues meshAxisLimitingValues );
+	MeshAxisMaxAbsoluteValues calculateBounds(MeshAxisLimitingValues values);
 	void CreateProjectile(const vec3& projectilePosition,
 							 const vec3& projectileForward,
 							 const ecs::components::MeshHandle& meshHandle,

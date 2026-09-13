@@ -1,246 +1,62 @@
-// Copyright © 2024 Maksim Manokhin a.k.a. Yuriorkis_Scream. Contacts: <fellfrostqtw@gmail.com>
-// This file is part of Game Loop Versatile Modules (GLVM)
-// Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
-// License: http://opensource.org/licenses/MIT
-
 #include "Systems/CollisionSystem.hpp"
-#include "Archetypes/CrosshairArchetype.hpp"
-#include "Archetypes/DirectionalLightArchetype.hpp"
-#include "Archetypes/InventoryArchetype.hpp"
-#include "Archetypes/ItemArchetype.hpp"
-#include "Archetypes/LevelChunkArchetype.hpp"
-#include "Archetypes/PointLightArchetype.hpp"
-#include "Archetypes/SpotLightArchetype.hpp"
-#include "Common/CommonFunctions.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/ColliderFlagsComponent.hpp"
-#include "Components/MoveComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/VertexComponent.hpp"
-#include "Vector.hpp"
-#include "VertexMath.hpp"
-#include "ArchetypeECS/ArchECS_Types.hpp"
-#include "ArchetypeECS/ArchECS_Utils.hpp"
-#include "ArchetypeECS/ArchetypeInterface.hpp"
-#include "Archetypes/EnemyArchetype.hpp"
-#include "Components/ColliderComponent.hpp"
-#include "Components/TransformComponent.hpp"
-#include "Components/VertexComponent.hpp"
-#include "VertexMath.hpp"
-#include <Systems/ProjectileSystem.hpp>
-#include <cstdint>
-#include <sys/types.h>
-#include "ArchetypeECS/ArchECS_World.hpp"
-#include "Archetypes/PlayerArchetype.hpp"
-#include "Archetypes/ProjectileArchetype.hpp"
-#include "Archetypes/StaticMeshArchetype.hpp"
-#include "ArchetypeECS/ArchECS_Types.hpp"
+#include "Components/ItemComponent.hpp"
+#include <algorithm>
 
-namespace GLVM::ecs
-{
-	void CCollisionSystem::Update()
-	{
-		namespace arch = GLVM::ecs::arch;
-		namespace cm   = GLVM::ecs::components;
-
-		/// Spatial grid common data
-		const arch::SpatialGrid& spatialGrid = arch::world.spatialGrid;
-		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
-		const float chunkSize = spatialGrid.grid[0][0][0].size;
-
-		const float chunkHalfWidth  = spatialGrid.width * chunkSize * 0.5f;
-		const float chunkHalfHeight = spatialGrid.height * chunkSize * 0.5f;
-		const float chunkHalfDepth  = spatialGrid.depth * chunkSize * 0.5f;
-
-		
-		cachedArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( requiredMask, cachedArchetypes, cachedArchetypesNumber );
-			
-		const float cameraSpeed = 5.5f * fDelta_Time_;
-		/// Outer cycle on every archetype
-		for( uint32_t x = 0; x < cachedArchetypesNumber; ++x ) {
-			arch::Archetype* arch = cachedArchetypes[x];
-			view.backtrackingTransforms    = (ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
-			view.backtrackingColliders     = (ecs::components::collider*)arch->components[arch::ComponentsIndices::COLLIDER_COMPONENT];
-			view.backtrackingColliderFlags = (ecs::components::colliderFlags*)arch->components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT];
-			view.backtrackingMeshes        = (ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT];
-
-			for(unsigned int i = 0; i < arch->entityCount; ++i) {
-				/// Count on every entity in current outer archetype
-				uint32_t backtrackingEntityID = arch->entities[i];
-				
-				uint8_t groudCollisionTurnOffMask = (1u << 0) | (0u << 1) | (1u << 2) | (1u << 3);
-				if( view.backtrackingColliderFlags && view.backtrackingColliders &&
-					view.backtrackingMeshes && view.backtrackingTransforms ) {
-				
-					view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags & groudCollisionTurnOffMask;
-					view.backtrackingColliders[i].colliders.clear();
-					components::mesh backtrackinEntityMesh = view.backtrackingMeshes[i];
-					components::MeshHandle backtrackingEntityMeshHandle = backtrackinEntityMesh.handle;
-					components::transform* backtrackingTransformComponent = &view.backtrackingTransforms[i];
-					vec3 backtrackingTransform = backtrackingTransformComponent->position;
-					[[maybe_unused]] float backtrackingScale = backtrackingTransformComponent->scale;
-
-					arch::componentMask moveRequiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-					/// Check if outer current archetype has move component
-					if ( arch::matchesRequiredMask( arch->mask, moveRequiredMask) ) {
-						view.backtrackingMove = (ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT];
-						backtrackingTransform += Normalize(view.backtrackingMove[i].frameMovement) * cameraSpeed;
-						backtrackingTransform += view.backtrackingMove[i].gravity;
-					}
-
-					///< Collect entities from grid chunks
-					core::MeshAxisMaxAbsoluteValues entityChunkBounds = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
-					core::vector<vec3> entityBoxCornerBoundPoints = computeBoxCornerBoundPoints(
-						entityChunkBounds,
-						backtrackingTransformComponent->position,
-						backtrackingTransformComponent->scale );
-
-					core::vector<u32> collectedEntities;                                   ///< Result array with collected entities
-					/*
-					  Need only left bottom back cornder point and right upper front
-					  conrner point to obtain all box bounds
-					*/
-					const vec3 minEntityPosition = entityBoxCornerBoundPoints[0];
-					const vec3 maxEntityPosition = entityBoxCornerBoundPoints[1];
-					
-					const u32 indexMinX = (minEntityPosition[0] + chunkHalfWidth) / chunkSize;
-					const u32 indexMinY = (minEntityPosition[1] + chunkHalfHeight) / chunkSize;
-					const u32 indexMinZ = (minEntityPosition[2] + chunkHalfDepth) / chunkSize;
-
-					const u32 indexMaxX = (maxEntityPosition[0] + chunkHalfWidth) / chunkSize;
-					const u32 indexMaxY = (maxEntityPosition[1] + chunkHalfHeight) / chunkSize;
-					const u32 indexMaxZ = (maxEntityPosition[2] + chunkHalfDepth) / chunkSize;
-
-					assert( indexMinX <= indexMaxX && indexMinY <= indexMaxY && indexMinZ <= indexMaxZ );
-					assert( indexMinX < spatialGrid.width && indexMinY < spatialGrid.height && indexMinZ < spatialGrid.depth );
-					assert( indexMaxX < spatialGrid.width && indexMaxY < spatialGrid.height && indexMaxZ < spatialGrid.depth );
-
-					for( u32 i2 = indexMinZ; i2 <= indexMaxZ; ++i2 ) {
-						for( u32 i3 = indexMinY; i3 <= indexMaxY; ++i3 ) {
-							for( u32 i4 = indexMinX; i4 <= indexMaxX; ++i4 ) {
-								const core::vector<u32>& chunkEntities = spatialGrid.grid[i2][i3][i4].entities;
-								for( u32 i5 = 0; i5 < chunkEntities.GetSize(); ++i5 ) {
-									const u32 entity = chunkEntities[i5];
-									if( entity == 0 ) {
-//										std::cout << "x grid demantion: " << i4 << std::endl;
-									}
-									if( !core::isExist( collectedEntities, entity ) )
-										collectedEntities.Push( entity );
-								}
-							}
-						}
-					}
-					
-					/// Inner cycle on every archetype
-					/// Count on every entity in current inner archetype
-					for(unsigned int j = 0; j < collectedEntities.GetSize(); ++j) {
-						/// Check for same entityID and iteration
-						uint32_t comparedEntityID = collectedEntities[j];
-						if( backtrackingEntityID == comparedEntityID ) {
-							continue;
-						}
-
-						arch::EntityLocation comparedEntityLocation = arch::world.entityLocations[arch::getId( comparedEntityID )];
-						const uint32_t comparedEntityIndex = comparedEntityLocation.index;
-
-						components::MeshHandle comparedEntityMeshHandle;
-						if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, requiredMask ) ) {
-							arch::Archetype* arch = comparedEntityLocation.arch;
-							view.comparedTransforms = &((ecs::components::transform*)arch->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[comparedEntityIndex];
-							view.comparedMeshes     = &((ecs::components::mesh*)arch->components[arch::ComponentsIndices::MESH_COMPONENT])[comparedEntityIndex];
-							comparedEntityMeshHandle = view.comparedMeshes->handle;
-								
-							arch::componentMask	moveRequiredMask = (1ul << arch::ComponentsIndices::MOVE_COMPONENT);
-							if( arch::matchesRequiredMask( comparedEntityLocation.arch->mask, moveRequiredMask ) ) {
-								view.comparedMove = &((ecs::components::move*)arch->components[arch::ComponentsIndices::MOVE_COMPONENT])[comparedEntityIndex];
-							}
-						}
-							
-						components::transform* comparedTransformComponent = view.comparedTransforms;
-						components::move* comparedMoveComponent           = view.comparedMove;
-							
-						vec3  comparedTransform = vec3( 0.0f, 0.0f, 0.0f );
-						float comparedScale = 0.0f;
-						comparedTransform = comparedTransformComponent->position;
-						comparedScale     = comparedTransformComponent->scale;
-							
-						vec3 gravityTest{};
-						if( comparedMoveComponent != nullptr ) {
-							comparedTransform += Normalize(comparedMoveComponent->frameMovement) * cameraSpeed;
-							comparedTransform += comparedMoveComponent->gravity;
-							gravityTest = comparedMoveComponent->gravity;
-						}
-
-						bool boxColliderFlag = false;
-						bool upperActorCheckFlag = false;
-
-						core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingEntityMeshHandle.id];
-						core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues = {};
-						if( comparedEntityMeshHandle.id < allMeshMaxAbsoluteValues.GetSize() ) {
-							comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedEntityMeshHandle.id];
-						}
-								
-						boxColliderFlag = core::BoxCollider(backtrackingTransform,
-															comparedTransform,
-															backtrackingScale,
-															comparedScale,
-															backtrackingMeshAxisMaxAbsoluteValues,
-															comparedMeshAxisMaxAbsoluteValues);
-
-						if ( boxColliderFlag ) {
-							upperActorCheckFlag = UpperActorCheck(backtrackingTransform,
-																  comparedTransform,
-																  backtrackingScale,
-																  comparedScale,
-																  backtrackingEntityMeshHandle,
-																  comparedEntityMeshHandle);
-						}
-
-						if(upperActorCheckFlag && boxColliderFlag) {
-									
-							uint8_t groudCollisionTurnOnMask = (0u << 0) | (1u << 1) | (0u << 2) | (0u << 3);
-							view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | groudCollisionTurnOnMask;
-							view.backtrackingColliders[i].colliders.Push(comparedEntityID);
-
-							continue;
-						}
-                    
-						if(boxColliderFlag) {
-							uint8_t wallCollisionTurnOnMask = (1u << 0) | (0u << 1) | (0u << 2) | (0u << 3);
-							view.backtrackingColliderFlags[i].flags = view.backtrackingColliderFlags[i].flags | wallCollisionTurnOnMask;
-							view.backtrackingColliders[i].colliders.Push(comparedEntityID);
-							
-							continue;
-						}
-					}
-				}
-			}
-		}
-		cachedArchetypesNumber = 0;
-	}
-
-    bool CCollisionSystem::UpperActorCheck(vec3 backtrackingPosition,
-										   vec3 comparedPosition,
-										   float backtrackingScale,
-										   float comparedScale,
-										   components::MeshHandle backtrackingMeshHandle,
-										   components::MeshHandle comparedMeshHandle) {
-		core::MeshAxisMaxAbsoluteValues backtrackingMeshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[backtrackingMeshHandle.id];
-
-		// std::cout << "array size: " << allMeshMaxAbsoluteValues.GetSize() << std::endl;
-		// std::cout << "mesh id: " << comparedMeshHandle.id << std::endl;
-		
-		core::MeshAxisMaxAbsoluteValues comparedMeshAxisMaxAbsoluteValues     = allMeshMaxAbsoluteValues[comparedMeshHandle.id];
-
-		constexpr float epsilon = 0.15f;
-        if( backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y -
-			backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale + epsilon >
-			comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y +
-			comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale ) {
-            return true;
+namespace GLVM::ecs {
+void CCollisionSystem::Update() {
+    const auto predicted = [](const components::transform& transform, const components::move* move) {
+        return move ? transform.position + move->frameMovement + move->gravity : transform.position;
+    };
+    for (auto* chunk : world_.query(requiredMask)) {
+        auto* transforms = static_cast<components::transform*>(chunk->components[arch::ComponentsIndices::TRANSFORM_COMPONENT]);
+        auto* meshes = static_cast<components::mesh*>(chunk->components[arch::ComponentsIndices::MESH_COMPONENT]);
+        auto* colliders = static_cast<components::collider*>(chunk->components[arch::ComponentsIndices::COLLIDER_COMPONENT]);
+        auto* flags = static_cast<components::colliderFlags*>(chunk->components[arch::ComponentsIndices::COLLIDER_FLAGS_COMPONENT]);
+        auto* moves = static_cast<components::move*>(chunk->components[arch::ComponentsIndices::MOVE_COMPONENT]);
+        auto* items = static_cast<components::item*>(chunk->components[arch::ComponentsIndices::ITEM_COMPONENT]);
+        for (u32 i = 0; i < chunk->entityCount; ++i) {
+            colliders[i].colliders.clear();
+            flags[i].flags &= ~3u;
+            if (items && !items[i].isActor) continue;
+            if (meshes[i].handle.id >= bounds_.GetSize()) continue;
+            const auto position = predicted(transforms[i], moves ? &moves[i] : nullptr);
+            const auto box = core::computeBoxCornerBoundPoints(bounds_[meshes[i].handle.id], position, transforms[i].scale);
+            const auto range = arch::SpatialGrid::cellRange(box[0], box[1]);
+            if (!range) continue;
+            core::vector<u32> candidates;
+            for (u32 z = range->minZ; z <= range->maxZ; ++z)
+                for (u32 y = range->minY; y <= range->maxY; ++y)
+                    for (u32 x = range->minX; x <= range->maxX; ++x)
+                        for (const auto entity : world_.spatialGrid.grid[z][y][x].entities)
+                            candidates.Push(entity);
+            std::sort(candidates.begin(), candidates.end());
+            const auto end = std::unique(candidates.begin(), candidates.end());
+            for (auto it = candidates.begin(); it != end; ++it) {
+                const auto id = *it;
+                if (id == arch::getId(chunk->entities[i]) || id >= world_.entityLocations.GetSize()) continue;
+                const auto& location = world_.entityLocations[id];
+                if (!location.arch || !arch::matchesRequiredMask(location.arch->mask, requiredMask)) continue;
+                const auto j = location.index;
+                const auto* other = location.arch;
+                const auto& transform = static_cast<components::transform*>(other->components[arch::ComponentsIndices::TRANSFORM_COMPONENT])[j];
+                const auto mesh = static_cast<components::mesh*>(other->components[arch::ComponentsIndices::MESH_COMPONENT])[j].handle;
+                if (mesh.id >= bounds_.GetSize()) continue;
+                const auto* otherMoves = static_cast<components::move*>(other->components[arch::ComponentsIndices::MOVE_COMPONENT]);
+                const auto otherPosition = predicted(transform, otherMoves ? &otherMoves[j] : nullptr);
+                if (!core::BoxCollider(position, otherPosition, transforms[i].scale, transform.scale,
+                                       bounds_[meshes[i].handle.id], bounds_[mesh.id])) continue;
+                flags[i].flags |= UpperActorCheck(position, otherPosition, transforms[i].scale,
+                                                  transform.scale, meshes[i].handle, mesh) ? 2u : 1u;
+                colliders[i].colliders.Push(other->entities[j]);
+            }
         }
-
-        return false;
     }
+}
+bool CCollisionSystem::UpperActorCheck(vec3 a, vec3 b, float scaleA, float scaleB,
+                                      components::MeshHandle meshA, components::MeshHandle meshB) {
+    if (meshA.id >= bounds_.GetSize() || meshB.id >= bounds_.GetSize()) return false;
+    const auto boxA = core::computeBoxCornerBoundPoints(bounds_[meshA.id], a, scaleA);
+    const auto boxB = core::computeBoxCornerBoundPoints(bounds_[meshB.id], b, scaleB);
+    return boxA[0][1] + 0.15f > boxB[1][1];
+}
 }

@@ -7,57 +7,30 @@
 #include "Components/ColliderComponent.hpp"
 
 namespace GLVM::core {
-	bool BoxCollider(const vec3 backtrackingPosition,
-					 const vec3 comparedPosition,
-					 const float backtrackingScale,
-					 const float comparedScale,
-					 const core::MeshAxisMaxAbsoluteValues& backtrackingMeshAxisMaxAbsoluteValues,
-					 const core::MeshAxisMaxAbsoluteValues& comparedMeshAxisMaxAbsoluteValues)
-	{
-        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
-				return true;
-		}
-        
-		return false;
-	}
+    bool BoxCollider(vec3 a, vec3 b, float scaleA, float scaleB,
+                     const MeshAxisMaxAbsoluteValues& boundsA, const MeshAxisMaxAbsoluteValues& boundsB) {
+        const auto boxA = computeBoxCornerBoundPoints(boundsA, a, scaleA);
+        const auto boxB = computeBoxCornerBoundPoints(boundsB, b, scaleB);
+        for (unsigned int axis = 0; axis < 3; ++axis)
+            if (!(boxA[1][axis] > boxB[0][axis] && boxA[0][axis] < boxB[1][axis])) return false;
+        return true;
+    }
+    std::array<vec3, 2> computeBoxCornerBoundPoints(MeshAxisMaxAbsoluteValues bounds, vec3 position, float scale) {
+        const vec3 center = position + vec3(bounds.origin_offset_x, bounds.origin_offset_y, bounds.origin_offset_z) * scale;
+        const vec3 extent = vec3(bounds.absolute_x, bounds.absolute_y, bounds.absolute_z) * std::abs(scale);
+        return {center - extent, center + extent};
+    }
 
-	core::vector<vec3> computeBoxCornerBoundPoints(
-		const core::MeshAxisMaxAbsoluteValues entityChunkBounds,
-		vec3 entityPosition,
-		const float scale ) {
-		const float halfWidht  = entityChunkBounds.absolute_x * scale;
-		const float halfHeight = entityChunkBounds.absolute_y * scale;
-		const float halfDepth  = entityChunkBounds.absolute_z * scale;
-
-		core::vector<vec3> result;
-		result.Push( entityPosition + vec3( -halfWidht, -halfHeight, -halfDepth ) );  ///< left bottom back
-		result.Push( entityPosition + vec3( halfWidht, halfHeight, halfDepth ) );     ///< right upper front
-
-		return result;
-	}
-
-	void setMeshBounds( MeshAxisLimitingValues meshAxisLimitingValues ) {
-		allMeshMaxAbsoluteValues.Push({});
-		
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_x = (meshAxisLimitingValues.highest_x - meshAxisLimitingValues.lowest_x) / 2.0f;
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_y = (meshAxisLimitingValues.highest_y - meshAxisLimitingValues.lowest_y) / 2.0f;
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].absolute_z = (meshAxisLimitingValues.highest_z - meshAxisLimitingValues.lowest_z) / 2.0f;
-
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_x = (meshAxisLimitingValues.highest_x + meshAxisLimitingValues.lowest_x) / 2.0f;
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_y = (meshAxisLimitingValues.highest_y + meshAxisLimitingValues.lowest_y) / 2.0f;
-		allMeshMaxAbsoluteValues[allMeshMaxAbsoluteValues.GetSize() - 1].origin_offset_z = (meshAxisLimitingValues.highest_z + meshAxisLimitingValues.lowest_z) / 2.0f;
-	}
+    MeshAxisMaxAbsoluteValues calculateBounds(MeshAxisLimitingValues values) {
+        MeshAxisMaxAbsoluteValues bounds{};
+        bounds.absolute_x = (values.highest_x - values.lowest_x) * 0.5f;
+        bounds.absolute_y = (values.highest_y - values.lowest_y) * 0.5f;
+        bounds.absolute_z = (values.highest_z - values.lowest_z) * 0.5f;
+        bounds.origin_offset_x = (values.highest_x + values.lowest_x) * 0.5f;
+        bounds.origin_offset_y = (values.highest_y + values.lowest_y) * 0.5f;
+        bounds.origin_offset_z = (values.highest_z + values.lowest_z) * 0.5f;
+        return bounds;
+    }
 
 	void CreateProjectile(const vec3& projectilePosition,
 							 const vec3& projectileForward,

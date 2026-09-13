@@ -23,23 +23,12 @@ namespace GLVM::ecs::arch {
 		components::material  materials[INVENTORY_ARCH_CHUNK_SIZE];
 
 		InventoryArchetype() {
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			components[ComponentsIndices::INVENTORY_COMPONENT]       = invetories;
-			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::INVENTORY_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[2] = ComponentsIndices::INVENTORY_COMPONENT;
-			componentIds[3] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentCount = 4;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::INVENTORY_COMPONENT>(invetories);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<InventoryArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

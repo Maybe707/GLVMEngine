@@ -4,6 +4,7 @@ a.out
 doxy/
 exec
 build/
+build-release/
 sandBox/
 .ccls-cache/
 .cache/
@@ -21,3 +22,6 @@ compile_commands.json
 *.txt
 *.txt.*
 *.obj
+
+/build-win/
+/build-win-debug/

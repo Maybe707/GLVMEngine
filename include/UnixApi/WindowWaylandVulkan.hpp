@@ -64,9 +64,11 @@ namespace GLVM::core {
 		struct zwp_pointer_constraints_v1 *pointer_constraints;
 		struct zwp_relative_pointer_manager_v1* relative_pointer_manager;
 		struct zwp_relative_pointer_v1* relative_pointer;
+		struct zwp_locked_pointer_v1* locked_pointer = nullptr;
+		struct wl_buffer* cursor_buffer = nullptr;
 		void* pixels;
-		uint16_t width = 1920;
-		uint16_t height = 1080;
+		uint16_t width = 1280;
+		uint16_t height = 720;
 		uint8_t  constant_byte = 0;
 		uint8_t  close_xdg_toplevel;
 		struct wl_display*  display;

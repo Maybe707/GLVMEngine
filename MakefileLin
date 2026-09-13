@@ -1,51 +1,82 @@
 C = clang
 CC = clang++
-OPT = -march=x86-64-v3 -O2
-SANITIZE = -fsanitize=null -fno-omit-frame-pointer -fsanitize=address -fsanitize=undefined
-#SANITIZE =
+.DEFAULT_GOAL := all
+CONFIG ?= Debug
+ifeq ($(CONFIG),Debug)
+OPT ?= -O1
+SANITIZE ?= -fno-omit-frame-pointer -fsanitize=address,undefined
+BUILD ?= build
+else ifeq ($(CONFIG),Release)
+OPT ?= -O2 -DGLVM_DISABLE_VALIDATION
+SANITIZE ?=
+BUILD ?= build-release
+else
+$(error CONFIG must be Debug or Release)
+endif
 LDFLAGS = -lX11 -lasound -lvulkan -ldl -lpthread -lXxf86vm -lXrandr -lXi -lxcb -lxcb-keysyms -lxcb-xfixes -lxcb-cursor -lX11-xcb -lwayland-client
-CXXFLAGS = -c -std=c++20 -static -Wall -Wextra -Wpedantic -Werror -g
-CFLAGS = -c -g -Wall -Wextra -Wpedantic -Werror
+CXXFLAGS = -std=c++20 -Wall -Wextra -Wpedantic -Werror -g $(OPT) -MMD -MP
+CFLAGS = -g -Wall -Wextra -Wpedantic -Werror -MMD -MP
 INC = -I./include
 TEX = -I./textures
-BUILD = build
-SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
-	  ./src/Event.cpp ./src/UnixApi/ChronoX.cpp ./src/TimerCreator.cpp \
-	  ./src/VertexData.cpp ./src/Systems/CollisionSystem.cpp ./src/Systems/AnimationSystem.cpp \
-	  ./src/Systems/PhysicsSystem.cpp ./src/ComponentManager.cpp ./src/EntityManager.cpp ./src/Systems/MovementSystem.cpp \
-	  ./src/SystemManager.cpp ./src/Systems/ProjectileSystem.cpp \
-	  ./src/UnixApi/SoundEngineAlsa.cpp ./src/SoundEngineFactory.cpp ./src/GraphicAPI/Vulkan.cpp \
-	  ./src/TextureManager.cpp ./src/WavefrontObjParser.cpp ./src/MeshManager.cpp ./src/JsonParser.cpp \
-	  ./src/UnixApi/WindowXVulkan.cpp ./src/UnixApi/WindowXCBVulkan.cpp \
-	  ./textures/chelik.cpp ./textures/witch.cpp ./textures/crosshair.cpp ./textures/gray.cpp \
-	  ./textures/container2.cpp ./textures/container2_specular.cpp \
-	  ./src/Systems/DamageSystem.cpp ./src/Systems/EnemySystem.cpp ./textures/fontAtlas.cpp ./textures/inventorySlot.cpp \
-	  ./src/Systems/ItemSystem.cpp ./src/ProceduralLevelGeneratingSystem.cpp ./src/Network/UDP_ServerLinux.cpp \
-	  ./src/Network/UDP_ClientLinux.cpp ./src/UnixApi/WindowWaylandVulkan.cpp \
-	  ./src/UnixApi/WaylandVariables.cpp ./textures/tileset.cpp \
-	  ./src/Systems/InventorySystem.cpp ./src/GraphicAPI/VkBuilders.cpp \
-	  ./src/GraphicAPI/RenderData.cpp ./src/GraphicAPI/VkDebugUtils.cpp \
-	  ./src/ThreadPool.cpp ./src/ArchetypedECS/ArchECS_Utils.cpp \
-	  ./src/ArchetypedECS/ArchECS_World.cpp ./src/ArchetypedECS/ArchetypeEntityManager.cpp \
-	  ./src/ArchetypedECS/ArchetypeInterface.cpp ./src/Systems/SpatialGridSystem.cpp \
-	  ./src/Common/CommonFunctions.cpp \
+include make_files/common_sources.mk
+SOURCES = $(COMMON_SOURCES) ./src/UnixApi/ChronoX.cpp \
+    ./src/UnixApi/SoundEngineAlsa.cpp \
+    ./src/UnixApi/WindowXVulkan.cpp \
+    ./src/UnixApi/WindowXCBVulkan.cpp \
+    ./src/Network/UDP_ServerLinux.cpp \
+    ./src/Network/UDP_ClientLinux.cpp \
+    ./src/UnixApi/WindowWaylandVulkan.cpp \
+    ./src/UnixApi/WaylandVariables.cpp
 
 SOURCES_C = xdg-shell-protocol.c pointer-constraints-unstable-v1-protocol.c relative-pointer-unstable-v1-protocol.c
-OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
+OBJECTS = $(patsubst ./%.cpp,$(BUILD)/%.o,$(SOURCES))
 OBJECTS_C = $(SOURCES_C:%.c=$(BUILD)/%.o)
 EXECUTABLE = linGame
+APP_OBJECTS = $(BUILD)/src/EngineMain.o $(BUILD)/src/Demo/DemoScene.o $(filter $(BUILD)/textures/%,$(OBJECTS))
+CORE_OBJECTS = $(filter-out $(APP_OBJECTS),$(OBJECTS)) $(OBJECTS_C)
+LIBRARY = $(BUILD)/libglvm.a
+include make_files/build_config.mk
 
-all: $(EXECUTABLE)
+.PHONY: all clean run test test-runtime test-ecs shaders
+all: shaders $(BUILD)/$(EXECUTABLE)
 
-$(EXECUTABLE): $(OBJECTS) $(OBJECTS_C)
-	$(CC) $(LDFLAGS) $(SANITIZE) $(OBJECTS) $(OBJECTS_C) -o $(BUILD)/$@
+shaders:
+	python3 scripts/compile_shaders.py
 
-$(BUILD)/%.o : ./src/%.cpp
+$(LIBRARY): $(CORE_OBJECTS)
+	$(AR) rcs $@ $(CORE_OBJECTS)
+
+$(BUILD)/$(EXECUTABLE): $(APP_OBJECTS) $(LIBRARY)
+	$(CC) $(SANITIZE) $(APP_OBJECTS) $(LIBRARY) $(LDFLAGS) -o $@
+
+$(BUILD)/runtime_tests: tests/runtime_tests.cpp $(LIBRARY)
+	$(CC) $(INC) $(SANITIZE) $(CXXFLAGS) $< $(LIBRARY) $(LDFLAGS) -o $@
+
+test-runtime: $(BUILD)/runtime_tests
+	./$(BUILD)/runtime_tests
+
+$(BUILD)/ecs_system_tests: tests/ecs_system_tests.cpp $(LIBRARY)
+	$(CC) $(INC) $(SANITIZE) $(CXXFLAGS) $< $(LIBRARY) $(LDFLAGS) -o $@
+
+test-ecs: $(BUILD)/ecs_system_tests
+	./$(BUILD)/ecs_system_tests
+
+$(BUILD)/%.o : ./%.cpp
 	mkdir -p $(@D)
-	$(CC) $(INC) $(TEX) $(SANITIZE) $(CXXFLAGS) $< -o $@
+	$(CC) $(INC) $(TEX) $(SANITIZE) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o : %.c
-	$(C) $(INC) $(TEX) $(SANITIZE) $(CFLAGS) $< -o $@
+	mkdir -p $(@D)
+	$(C) $(INC) $(TEX) $(SANITIZE) $(CFLAGS) -c $< -o $@
+
+run: all
+	cd $(BUILD) && ./$(EXECUTABLE)
+
+test: test-runtime test-ecs
+	bash tests/run_core_tests.sh
+	python3 tests/check_architecture.py
+
+-include $(OBJECTS:.o=.d) $(OBJECTS_C:.o=.d) $(wildcard $(BUILD)/*tests.d)
 
 clean:
 	rm -rf $(BUILD)/*

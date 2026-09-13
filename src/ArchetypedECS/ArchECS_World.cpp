@@ -1,18 +1,10 @@
 #include "ArchetypeECS/ArchECS_World.hpp"
+#include <cmath>
+#include <limits>
 
-#include "Archetypes/CrosshairArchetype.hpp"
-#include "Archetypes/InventoryArchetype.hpp"
-#include "Archetypes/LevelChunkArchetype.hpp"
-#include "Archetypes/RigidBodyArchetype.hpp"
-#include "Archetypes/SpotLightArchetype.hpp"
-#include "Archetypes/StaticMeshArchetype.hpp"
-#include "Archetypes/ProjectileArchetype.hpp"
-#include "Archetypes/ItemArchetype.hpp"
-#include "Archetypes/DirectionalLightArchetype.hpp"
-#include "Archetypes/PointLightArchetype.hpp"
 
 namespace GLVM::ecs::arch {
-	World world = {};
+
 
 	World::World() {
 		assert( spatialGrid.width > 0 && spatialGrid.height > 0 && spatialGrid.depth > 0 );
@@ -40,7 +32,10 @@ namespace GLVM::ecs::arch {
 	}
 	
 	void World::addEntityToArchetype(entity entity_, Archetype* arch) {
+        if (!arch || std::find(archetypes.begin(), archetypes.end(), arch) == archetypes.end())
+            throw std::invalid_argument("Archetype does not belong to this world");
         id id_ = getId(entity_);
+        if (id_ == std::numeric_limits<id>::max()) throw std::out_of_range("Reserved entity ID");
 
         if (id_ >= entityLocations.GetSize())
             entityLocations.Resize(id_ + 1);
@@ -48,21 +43,42 @@ namespace GLVM::ecs::arch {
         EntityLocation& location = entityLocations[id_];
 
         if (location.arch != nullptr) {
-            assert(false && "Entity already assigned to archetype");
+            throw std::logic_error("Entity already assigned to archetype");
+        }
+
+        if (arch->entityCount >= arch->capacity) {
+            auto* available = static_cast<Archetype*>(nullptr);
+            for (auto* candidate : archetypes) {
+                if (typeid(*candidate) == typeid(*arch) && candidate->entityCount < candidate->capacity) {
+                    available = candidate;
+                    break;
+                }
+            }
+            if (!available) {
+                auto chunk = arch->cloneEmpty();
+                available = chunk.get();
+                archetypes.Push(available);
+                chunk.release();
+            }
+            arch = available;
         }
 
         uint32_t index = arch->addEntity(entity_);
 
         location.arch  = arch;
         location.index = index;
+        location.isDirty = true;
     }
 
 	void World::removeEntity(entity entity_) {
         id id_ = getId(entity_);
+        if (id_ >= entityLocations.GetSize()) return;
         EntityLocation& location = entityLocations[id_];
 
         Archetype* arch = location.arch;
         uint32_t index  = location.index;
+        if (!arch || index >= arch->entityCount || arch->entities[index] != entity_) return;
+        detachSpatial(id_);
 
         entity moved = arch->removeEntity(index);
 
@@ -71,18 +87,84 @@ namespace GLVM::ecs::arch {
             entityLocations[movedId].index = index;
 			entityLocations[movedId].arch  = arch;
         }
-		std::cout << "remove entity with id: " << id_ << std::endl;
-        location.arch = nullptr;
+        location = {};
+        entities.removeEntity(entity_);
     }
 
-	void World::searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber ) {
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
-
-			if( (arch->mask & requiredMask) == requiredMask ) {
-				cachedArchetypes[cachedArchetypesNumber] = arch;
-				++cachedArchetypesNumber;
-			}
-		}
-	}
+    std::optional<SpatialGrid::Range> SpatialGrid::cellRange(vec3 minimum, vec3 maximum) {
+        const float half = width * GridChunk::size * 0.5f;
+        Range range{};
+        u32* low[] = {&range.minX, &range.minY, &range.minZ};
+        u32* high[] = {&range.maxX, &range.maxY, &range.maxZ};
+        for (unsigned int axis = 0; axis < 3; ++axis) {
+            if (!std::isfinite(minimum[axis]) || !std::isfinite(maximum[axis]) ||
+                minimum[axis] > maximum[axis] || maximum[axis] < -half || minimum[axis] >= half)
+                return std::nullopt;
+            const auto index = [half](float position) {
+                return static_cast<u32>(std::clamp(std::floor((position + half) / GridChunk::size), 0.0f, float(width - 1)));
+            };
+            *low[axis] = index(minimum[axis]);
+            *high[axis] = index(maximum[axis]);
+        }
+        return range;
+    }
+    void World::detachSpatial(id value) {
+        if (value >= entityLocations.GetSize()) return;
+        auto& location = entityLocations[value];
+        for (const auto& membership : location.gridCells) {
+            auto& cell = spatialGrid.grid[membership.z][membership.y][membership.x];
+            const auto last = cell.entities.GetSize() - 1;
+            if (membership.slot != last) {
+                const auto moved = cell.entities[last];
+                const auto movedMembership = cell.membershipIndices[last];
+                cell.entities[membership.slot] = moved;
+                cell.membershipIndices[membership.slot] = movedMembership;
+                entityLocations[moved].gridCells[movedMembership].slot = membership.slot;
+            }
+            cell.entities.Pop();
+            cell.membershipIndices.Pop();
+        }
+        location.gridCells.clear();
+        location.gridInitialized = false;
+    }
+    void World::attachSpatial(id value, const SpatialGrid::Range& range) {
+        auto& location = entityLocations[value];
+        const u32 count = (range.maxX - range.minX + 1) * (range.maxY - range.minY + 1) * (range.maxZ - range.minZ + 1);
+        location.gridCells.Reserve(count);
+        for (u32 z = range.minZ; z <= range.maxZ; ++z)
+            for (u32 y = range.minY; y <= range.maxY; ++y)
+                for (u32 x = range.minX; x <= range.maxX; ++x) {
+                    auto& cell = spatialGrid.grid[z][y][x];
+                    if (cell.entities.GetSize() == cell.entities.GetCapacity()) {
+                        const auto capacity = std::max(4u, cell.entities.GetCapacity() * 2);
+                        cell.entities.Reserve(capacity);
+                        cell.membershipIndices.Reserve(capacity);
+                    }
+                    const u32 membership = location.gridCells.GetSize();
+                    location.gridCells.Push({x, y, z, cell.entities.GetSize()});
+                    cell.entities.Push(value);
+                    cell.membershipIndices.Push(membership);
+                }
+    }
+    core::vector<Archetype*> World::query(componentMask requiredMask) const {
+        core::vector<Archetype*> result;
+        uint32_t count = 0;
+        searchCacheArchetypes(requiredMask, result, count);
+        return result;
+    }
+    Archetype* World::findArchetype(componentMask requiredMask) const {
+        Archetype* empty = nullptr;
+        for (auto* chunk : archetypes) {
+            if ((chunk->mask & requiredMask) != requiredMask) continue;
+            if (chunk->entityCount) return chunk;
+            if (!empty) empty = chunk;
+        }
+        return empty;
+    }
+    void World::searchCacheArchetypes(componentMask requiredMask, core::vector<Archetype*>& result, uint32_t& count) const {
+        result.clear();
+        for (auto* chunk : archetypes)
+            if ((chunk->mask & requiredMask) == requiredMask) result.Push(chunk);
+        count = result.GetSize();
+    }
 }; // namespace GLVM::ecs::arch

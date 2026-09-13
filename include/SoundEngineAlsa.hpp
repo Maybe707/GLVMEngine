@@ -14,13 +14,17 @@
 #include "ISoundEngine.hpp"
 #include "typenames.hpp"
 #include <algorithm>
+#include <mutex>
+#include <condition_variable>
 
 namespace GLVM::core::Sound
 {
     class CSoundEngineAlsa : public ISoundEngine
     {
-		snd_pcm_t *pPcm;
+		snd_pcm_t *pPcm = nullptr;
         vector<CSoundSample*> tSound_Contaier;
+        std::mutex queueMutex;
+        std::condition_variable queueReady;
     public:
 		void OpenDevice( const char* device ) override;
 		void CloseDevice() override;

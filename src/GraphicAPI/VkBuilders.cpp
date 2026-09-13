@@ -4,57 +4,59 @@
 #include "typenames.hpp"
 
 namespace GLVM::core {
-	void descriptorSetBuilder() {
-		static unsigned int DS_globalBindingsCounter = 0;                 ///< Counts ds bindings indexes inside ds
-		static unsigned int DS_hostNumber = 0;        ///< Counts host data ds
-		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
-		
+	void descriptorSetBuilder(VulkanResources& resources) {
+		unsigned int DS_globalBindingsCounter = 0;                 ///< Counts ds bindings indexes inside ds
+		unsigned int DS_hostNumber = 0;        ///< Counts host data ds
+		unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
+
 		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
-			/// Offset for indexing inside descriptorSetsChunks
-			descriptorSetsConfig[dsCounter].descriptorSetOffset = DS_hostNumber;  
-			DS_hostNumber += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
-			
+			/// Offset for indexing inside resources.descriptorSetsChunks
+			resources.descriptorSetsConfig[dsCounter].descriptorSetOffset = DS_hostNumber;
+			DS_hostNumber += resources.descriptorSetsConfig[dsCounter].hostDescriptorNumber;
+
 			for( unsigned int DS_localBindingsCounter = 0; DS_localBindingsCounter <
-					 descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++DS_localBindingsCounter ) {
+					 resources.descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++DS_localBindingsCounter ) {
 				const u32 DS_sumBindingsCounter = DS_globalBindingsCounter + DS_localBindingsCounter;
 				/// Global offset for discriptors inside ds binding
-				descriptorBindingsConfig[DS_sumBindingsCounter].globalDescriptorOffset = globalDescriptorsOffset;
-					
+				resources.descriptorBindingsConfig[DS_sumBindingsCounter].globalDescriptorOffset = globalDescriptorsOffset;
+
 				/// Index for ds bindings inside ds
-				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[DS_localBindingsCounter] = DS_sumBindingsCounter;    
-				if( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+				resources.descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[DS_localBindingsCounter] = DS_sumBindingsCounter;
+				if( resources.descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
 					for( unsigned int descriptorCounter = 0; descriptorCounter <
-							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
-						GPUDescriptors.Push( {} );
-						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
+							 resources.descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						resources.GPUDescriptors.Push( {} );
+						resources.buffers.emplace_back();
+                        resources.GPUDescriptors[resources.GPUDescriptors.GetSize() - 1].GPUBuffer = &resources.buffers.back();
 						++globalDescriptorsOffset;
 					}
-				} else if ( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+				} else if ( resources.descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
 					for( unsigned int descriptorCounter = 0; descriptorCounter <
-							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
-						GPUDescriptors.Push( {} );
-						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
+							 resources.descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+						resources.GPUDescriptors.Push( {} );
+						resources.images.emplace_back();
+                        resources.GPUDescriptors[resources.GPUDescriptors.GetSize() - 1].GPUImage = &resources.images.back();
 						++globalDescriptorsOffset;
 					}
 				}
 			}
-			DS_globalBindingsCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
+			DS_globalBindingsCounter += resources.descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
 		}
-		descriptorSetsChunks.Resize( DS_hostNumber );
+		resources.descriptorSetsChunks.Resize( DS_hostNumber );
 	}
 
-	void pipelineBuilder() {
-		static unsigned int descriptorSetsLayoutIdCounter = 0;
+	void pipelineBuilder(VulkanResources& resources) {
+		unsigned int descriptorSetsLayoutIdCounter = 0;
 		for( unsigned int pipelineCounter = 0; pipelineCounter < SpecificPipeline::PIPELINES_NUMBER; ++pipelineCounter ) {
 			for( unsigned int linkedDSLayoutCounter = 0; linkedDSLayoutCounter <
-					 pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++linkedDSLayoutCounter ) {
-				pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[linkedDSLayoutCounter] = descriptorSetsLayoutIdCounter + linkedDSLayoutCounter;
+					 resources.pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber; ++linkedDSLayoutCounter ) {
+				resources.pipelineConfigs[pipelineCounter].linkedDescriptorSetIDs[linkedDSLayoutCounter] = descriptorSetsLayoutIdCounter + linkedDSLayoutCounter;
 			}
-			descriptorSetsLayoutIdCounter += pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber;
+			descriptorSetsLayoutIdCounter += resources.pipelineConfigs[pipelineCounter].actualLinkedDescriptorSetsNumber;
 		}
 	}
 
-	void renderPassesBuilder() {
-		renderPasses.Resize( SpecificPipeline::PIPELINES_NUMBER );
+	void renderPassesBuilder(VulkanResources& resources) {
+		resources.renderPasses.Resize( SpecificPipeline::PIPELINES_NUMBER );
 	}
 }; // GLVM::core

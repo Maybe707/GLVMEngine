@@ -23,7 +23,7 @@
 
 namespace GLVM::ecs
 {
-    CMovementSystem::CMovementSystem(core::CStack& inputStack) :
+    CMovementSystem::CMovementSystem(arch::World& world, core::CStack& inputStack) : WorldSystem(world),
         inputStack(inputStack) {}
         
     void CMovementSystem::Update()
@@ -31,7 +31,8 @@ namespace GLVM::ecs
 		namespace cm   = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
 
-		arch::world.searchCacheArchetypes( playerRequiredMask, &archView.playerCachedArchetype, playerArchetypesNumber );
+		for (auto* playerChunk : world_.query(playerRequiredMask)) {
+        archView.playerCachedArchetype = playerChunk;
 		componentsView.playerMoves         = (ecs::components::move*)archView.playerCachedArchetype->
 			components[arch::ComponentsIndices::MOVE_COMPONENT];
 		componentsView.playerAnimation     = (ecs::components::animation*)archView.playerCachedArchetype->
@@ -48,7 +49,7 @@ namespace GLVM::ecs
         const float cameraSpeed = 3.0f * deltaFrameTime;            
         for(unsigned int i = 0; i < archView.playerCachedArchetype->entityCount; ++i) {
 			const arch::entity entity = archView.playerCachedArchetype->entities[i];
-			ecs::arch::EntityLocation& entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+			ecs::arch::EntityLocation& entityLocation = world_.entityLocations[ecs::arch::getId( entity )];
 			cm::beholder*      playerView          = &componentsView.playerViews[i];
 			cm::move*          playerMove          = &componentsView.playerMoves[i];
 			cm::colliderFlags* playerColliderFlags = &componentsView.playerColliderFlags[i];
@@ -109,8 +110,9 @@ namespace GLVM::ecs
             }
         }
 
+        }
 		rigidBodyContainedArchetypesNumber = 0;
-		arch::world.searchCacheArchetypes( rigidBodyRequiredMask, archView.rigidBodyContainedArchetypesCache , rigidBodyContainedArchetypesNumber );
+		world_.searchCacheArchetypes( rigidBodyRequiredMask, archView.rigidBodyContainedArchetypesCache , rigidBodyContainedArchetypesNumber );
 
 		for( uint32_t i0 = 0; i0 < rigidBodyContainedArchetypesNumber; ++i0 ) {
 			arch::Archetype* currentArch = archView.rigidBodyContainedArchetypesCache[i0];
@@ -121,7 +123,7 @@ namespace GLVM::ecs
 
 			for( uint32_t i1 = 0; i1 < currentArch->entityCount; ++i1 ) {
 				// const arch::entity entity = currentArch->entities[i1];
-				// ecs::arch::EntityLocation entityLocation = ecs::arch::world.entityLocations[ecs::arch::getId( entity )];
+				// ecs::arch::EntityLocation entityLocation = world_.entityLocations[ecs::arch::getId( entity )];
 				// entityLocation.isDirty = true;
 
 				if( componentsView.items && !componentsView.items[i1].isActor )
@@ -148,57 +150,8 @@ namespace GLVM::ecs
 
     Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& beholder,
                                                         [[maybe_unused]] core::CEvent& event) {
-        Vector<float, 3> forward(0.0f);
-        // forward[0] = std::cos(Radians(event.mousePointerPosition.yaw * 2));
-        // forward[2] = std::sin(Radians(event.mousePointerPosition.yaw * 2));
-
-		// float sinYaw = std::sin(Radians(event.mousePointerPosition.yaw / 2));
-		// float cosYaw = std::cos(Radians(event.mousePointerPosition.yaw / 2));
-		
-		// Quaternion yawQuat;
-		// yawQuat.w = cosYaw;
-		// yawQuat.x = 0.0f;
-		// yawQuat.y = sinYaw;
-		// yawQuat.z = 0.0f;
-
-		// Quaternion result;
-		// result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
-		// 			.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
-
-		// forward[0] = result.x;
-		// forward[1] = result.y;
-		// forward[2] = result.z;
-
-		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		float delta_x = current_X - prev_X;
-		// if ( delta_x < 0.0001 )
-		// 	delta_x = prev_delta_x;
-
-		const vec3 rotateAxis = { 0.0, -1.0, 0.0 };
-		float rotationAngle = delta_x;
-		constexpr float angleScale = 0.1f;
-		rotationAngle = Radians(rotationAngle * angleScale);
-		constexpr float quatAngleCorrection = 0.5f;                                                                                     /// Quaternions need devision by 2
-		const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-		Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-											 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-		// Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
-		// 																								beholder.forward[1], beholder.forward[2])),
-		// 													conjugate(rotationQuat));
-		const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, beholder.forward[0], beholder.forward[1],
-																		  beholder.forward[2])) * conjugate(rotationQuat);
-		
-		
-		forward[0] = appliedRotationQuat.x;
-		forward[1] = 0.0f;
-		forward[2] = appliedRotationQuat.z;
-
-		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		// if ( delta_x > 0.0f )
-		// 	prev_delta_x = delta_x;
-		
-        forward = Normalize(forward);
-        return forward;
+        // Movement follows the camera; input has already determined its orientation.
+        return Normalize(vec3(beholder.forward[0], 0.0f, beholder.forward[2]));
     }
 }
 

@@ -5,7 +5,7 @@
 #include "ComponentManager.hpp"
 #include "EntityManager.hpp"
 #include "EventsStack.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include "Components/ItemComponent.hpp"
 #include "Components/ColliderComponent.hpp"
 #include "Components/InventoryComponent.hpp"
@@ -23,9 +23,10 @@
 
 namespace GLVM::ecs
 {
-	class ItemSystem : public ISystem
+	class ItemSystem : public WorldSystem
 	{
 	public:
+        explicit ItemSystem(arch::World& world) : WorldSystem(world) {}
 		uint32_t inventoryArchetypesNumber = 0;
 		uint32_t itemArchetypesNumber      = 0;
 		uint32_t crosshairArchetypesNumber = 0;
@@ -65,11 +66,11 @@ namespace GLVM::ecs
 		void Update();
 		bool putItem2x2(components::inventory* inventoryComponent, unsigned int itemEntity);
 
-		core::CStack* inputStack;
-		bool          isInventoryOpened;
-		int*          dragedItemEntity;
-		bool*         isLeftMouseButtonReleased;
-		bool          isLeftMouseButtonPressed;
+		core::CStack* inputStack = nullptr;
+		bool          isInventoryOpened = {};
+		int*          dragedItemEntity = nullptr;
+		bool*         isLeftMouseButtonReleased = nullptr;
+		bool          isLeftMouseButtonPressed = {};
 		float         mouseOffsetX = 0;
 		float         mouseOffsetY = 0;
 	};

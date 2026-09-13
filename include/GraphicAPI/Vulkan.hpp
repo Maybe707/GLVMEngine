@@ -40,12 +40,14 @@
 #include "JsonParser.hpp"
 #include "ShaderStructs.hpp"
 #include "Components/FontComponent.hpp"
-#include <print>
 #include "PGA.hpp"
 #include "VkBuilders.hpp"
 #include "VkDebugUtils.hpp"
 #include "GraphicAPI/RenderConfig.hpp"
 #include "ThreadPool.hpp"
+#include "Rendering/RenderAssets.hpp"
+#include "Rendering/RenderFrame.hpp"
+#include <memory>
 
 #ifdef __linux__
 //#define VK_USE_PLATFORM_XLIB_KHR
@@ -92,21 +94,21 @@ namespace GLVM::core
     const int MAX_FRAMES_IN_FLIGHT = 2;
 //#define NDEBUG
     const std::vector<const char*> validationLayers = {
-//        "VK_LAYER_KHRONOS_validation"
+        "VK_LAYER_KHRONOS_validation"
     };
 
     const std::vector<const char*> deviceExtensions = {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME, "VK_KHR_shader_non_semantic_info"
     };
 
-#ifdef NDEBUG
+#if defined(NDEBUG) || defined(GLVM_DISABLE_VALIDATION)
     const bool enableValidationLayers = false;
 #else
     const bool enableValidationLayers = true;
 #endif
 
     struct Texture {
-        VkDeviceSize textureSize_;
+        VkDeviceSize textureSize_{};
         unsigned char* textureData_;
     };
 
@@ -120,14 +122,17 @@ namespace GLVM::core
     };
 
     struct SwapChainSupportDetails {
-        VkSurfaceCapabilitiesKHR capabilities;
+        VkSurfaceCapabilitiesKHR capabilities{};
         std::vector<VkSurfaceFormatKHR> formats;
         std::vector<VkPresentModeKHR> presentModes;
     };
     
 
     class CVulkanRenderer {
-    public:
+        VulkanResources resources_;
+        RenderAssets& assets_;
+        const RenderFrame& frame_;
+    private:
 		bool print = true;
 		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4 + 1];
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
@@ -146,61 +151,23 @@ namespace GLVM::core
 		};
 		std::chrono::steady_clock::time_point startTime;
 
-        std::vector<ecs::Texture> initializeTextureData_;
-        std::vector<const char*> pathsArray_;
-		core::vector<const char*> pathsGLTF_;
-        std::vector<core::vector<core::Vertex>> levelGeneratedVertices;
-        std::vector<std::vector<uint32_t>> levelGeneratedIndices;
 		
-        std::vector<core::vector<core::Vertex>> aVertices_;
-        std::vector<std::vector<uint32_t>> aIndices_;                          ///< wavefront.obj indices
-		std::vector<std::vector<float>> aVertexesTemp_;                        ///< gltf indices
-		std::vector<float> highest_gltf_Y;                                     /// highest gltf y
-		MeshAxisLimitingValues meshAxisLimitingValues;                         /// keep axis liniting values for every exis per mesh in current iteration while initializing wavefrontobj and gltf
-		core::vector<core::vector<core::vector<mat4>>> jointMatricesPerMesh;
-		core::vector<core::vector<float>> frames;
-		bool isInventoryOpened = false;
-		bool isDebugCollisitionsActive = false;
-		vec3 forward;
-		float hud_screen_x = 0.0f;
-		float hud_screen_y;
 
 		unsigned int entities[32]; ///<
-		core::vector<RenderActor> actors;
-		core::vector<RenderDirectionalLight> directionalLights;
-		core::vector<RenderSpotLight> spotLights;
-		core::vector<RenderPointLight> pointLights;
-		core::vector<RenderHealth> healthBars;
-		core::vector<RenderFont> fonts;
-		core::vector<RenderInventory> inventories;
-		core::vector<RenderItem> items;
-		core::vector<RenderCrosshair> crosshairs;
-		core::vector<RenderPlayer> players;
-		core::vector<RenderCollisionWireframe> collisionsWireframes;
 		core::vector<VkBuffer> collisionsWireframesVKBuffers;
 		core::vector<VkDeviceMemory> collisionsWireframesVKDeviceMemory;
 		core::vector<VkBuffer> collisionsWireframesIndicesVKBuffers;
 		core::vector<VkDeviceMemory> collisionsWireframesIndicesVKDeviceMemory;
 		std::vector<uint32_t> collisionsWireframeIndices;
 		bool isCollisionsWireframeBuffersInitialized = false;
-		RenderPlayer player;
 		bool isSpacialGridWireframeBuffersInitialized = false;
-		RenderSpacialGrid renderSpacialGrid;
 		core::vector<VkBuffer> spacialGridWireframesVKBuffers;
 		core::vector<VkDeviceMemory> spacialGridWireframesVKDeviceMemory;
 
-		float fYaw   = -90.0f;
-        float fPitch = 0.0f;
-		float prev_Y = 0.0f;
-		float current_Y = 0.0f;
-		float prev_X = 0.0f;
-		float current_X = 0.0f;
-		float aspectRate = 0.0f;                   ///< Multiplier of current aspect rate. For full hd this must be 1920 / 1080
-		int   dragedItemEntity;
 
 		
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-		GLVM::core::WindowWaylandVulkan* Window;
+		GLVM::core::WindowWaylandVulkan* Window = nullptr;
 #endif
 		
 #ifdef VK_USE_PLATFORM_XCB_KHR
@@ -208,101 +175,102 @@ namespace GLVM::core
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        GLVM::core::WindowXVulkan* Window;
+        GLVM::core::WindowXVulkan* Window = nullptr;
 #endif
     
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        GLVM::core::WindowWinVulkan* Window;
+        GLVM::core::WindowWinVulkan* Window = nullptr;
 #endif
         
-        CVulkanRenderer();
+    public:
+        auto& window() noexcept { return *Window; }
+        VkExtent2D extent() const noexcept { return swapChainExtent; }
+        const RenderFrame& frame() const noexcept { return frame_; }
+        CVulkanRenderer(RenderAssets& assets, const RenderFrame& frame);
+        CVulkanRenderer(const CVulkanRenderer&) = delete;
+        CVulkanRenderer& operator=(const CVulkanRenderer&) = delete;
         ~CVulkanRenderer();
 
-        void createTextureImage();
-        void recreateSwapChain();
         void draw();
-        void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
-        void SetProjectionMatrix(mat4 _projectionMatrix);
-		void SetViewMatrix(mat4 _viewMatrix);
 		void initializeGameLevelVertices();
         void run();
     
-    public:
-        VkInstance instance;
-        VkDebugUtilsMessengerEXT debugMessenger;
-		mat4 viewMatrix;
-		mat4 projectionMatrix;
-		ThreadPool* renderThreadPool;
+    private:
+        void createTextureImage();
+        void recreateSwapChain();
+        VkInstance instance{};
+        VkDebugUtilsMessengerEXT debugMessenger{};
+		std::unique_ptr<ThreadPool> renderThreadPool;
 
 #ifdef VK_USE_PLATFORM_WAYLAND_KHR
-		VkWaylandSurfaceCreateInfoKHR createWaylandSurfaceInfo;
+		VkWaylandSurfaceCreateInfoKHR createWaylandSurfaceInfo{};
 #endif
 		
 #ifdef VK_USE_PLATFORM_XLIB_KHR
-        VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo;
+        VkXlibSurfaceCreateInfoKHR createXlibSurfaceInfo{};
 #endif
 
 #ifdef VK_USE_PLATFORM_XCB_KHR
-        VkXcbSurfaceCreateInfoKHR createXcbSurfaceInfo;
+        VkXcbSurfaceCreateInfoKHR createXcbSurfaceInfo{};
 #endif		
 		
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-        VkWin32SurfaceCreateInfoKHR createWin32SurfaceInfo;
+        VkWin32SurfaceCreateInfoKHR createWin32SurfaceInfo{};
 #endif
     
         VkSurfaceKHR surface = VK_NULL_HANDLE;
 
         VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-        VkDevice device;
+        VkDevice device{};
 
-        VkQueue graphicsQueue;
-        VkQueue presentQueue;
+        VkQueue graphicsQueue{};
+        VkQueue presentQueue{};
 
-        VkSwapchainKHR swapChain;
+        VkSwapchainKHR swapChain{};
         std::vector<VkImage> swapChainImages;
-        VkFormat swapChainImageFormat;
-        VkExtent2D swapChainExtent;
+        VkFormat swapChainImageFormat{};
+        VkExtent2D swapChainExtent{};
         std::vector<VkImageView> swapChainImageViews;
         std::vector<VkFramebuffer> swapChainFramebuffers;
 
-		VkBuffer hudUniformBuffer;
-		VkDeviceMemory hudUniformBuffersMemory;
-		VkBuffer fontUniformBuffer;
-		VkDeviceMemory fontUniformBuffersMemory;
-		VkBuffer hudScreenUniformBuffer;
-		VkDeviceMemory hudScreenUniformBuffersMemory;
-		VkBuffer uiUniformBuffer;
-		VkDeviceMemory uiUniformBuffersMemory;
-		VkBuffer uiIconsUniformBuffer;
-		VkDeviceMemory uiIconsUniformBuffersMemory;
+		VkBuffer hudUniformBuffer{};
+		VkDeviceMemory hudUniformBuffersMemory{};
+		VkBuffer fontUniformBuffer{};
+		VkDeviceMemory fontUniformBuffersMemory{};
+		VkBuffer hudScreenUniformBuffer{};
+		VkDeviceMemory hudScreenUniformBuffersMemory{};
+		VkBuffer uiUniformBuffer{};
+		VkDeviceMemory uiUniformBuffersMemory{};
+		VkBuffer uiIconsUniformBuffer{};
+		VkDeviceMemory uiIconsUniformBuffersMemory{};
 		core::vector<VkDescriptorSet> virtualTexturesUBODesctiptorSets;
 		core::vector<VkDescriptorSet> virtualTexturesSamplersDesctiptorSets;
-		VkBuffer virtualTexturesUniformBuffer;
-		VkDeviceMemory virtualTexturesUniformBufferMemory;
+		VkBuffer virtualTexturesUniformBuffer{};
+		VkDeviceMemory virtualTexturesUniformBufferMemory{};
 		
-        VkCommandPool directionalLightCommandPool;
-		VkCommandPool spotLightCommandPool;
-		VkCommandPool pointLightCommandPool;
-		VkCommandPool fontCommandPool;
-		VkCommandPool hudCommandPool;
-		VkCommandPool hudScreenCommandPool;
-		VkCommandPool uiCommandPool;
-		VkCommandPool uiIconsCommandPool;
-		VkCommandPool mainRenderCommandPool;
+        VkCommandPool directionalLightCommandPool{};
+		VkCommandPool spotLightCommandPool{};
+		VkCommandPool pointLightCommandPool{};
+		VkCommandPool fontCommandPool{};
+		VkCommandPool hudCommandPool{};
+		VkCommandPool hudScreenCommandPool{};
+		VkCommandPool uiCommandPool{};
+		VkCommandPool uiIconsCommandPool{};
+		VkCommandPool mainRenderCommandPool{};
 		std::vector<VkCommandPool> secondaryBuffersCommandPools;
-		VkCommandPool virtualTexturesCommandPool;
+		VkCommandPool virtualTexturesCommandPool{};
 
 		/// Main pipeline depth.
-		VkImage     mainDepthPipelineImage;
-		VkDeviceMemory mainDepthPipelineImageMemory;
-        VkImageView mainDepthImageView;
+		VkImage     mainDepthPipelineImage{};
+		VkDeviceMemory mainDepthPipelineImageMemory{};
+        VkImageView mainDepthImageView{};
 
 		/// Depth varialbes for shadow map.
-	public:
+	private:
 		unsigned int	directionalLightNumber = 0;
 		std::vector<VkFramebuffer> directionalLightShadowMapFrameBuffers;
-		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer;
-		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory;
+		VkBuffer shadowMapDirectionalLightModelMatrixUniformBuffer{};
+		VkDeviceMemory shadowMapDirectionalLightModelMatrixUniformBuffersMemory{};
 		core::vector<VK_Image> directionalLightTextureImages;
 
 		/*
@@ -316,18 +284,18 @@ namespace GLVM::core
 		
 		unsigned int	pointLightNumber	   = 0;
 		std::vector<std::vector<VkFramebuffer>> pointLightShadowMapFrameBuffers;
-		VkBuffer shadowMapPointLightModelMatrixUniformBuffer;
-		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory;
+		VkBuffer shadowMapPointLightModelMatrixUniformBuffer{};
+		VkDeviceMemory shadowMapPointLightModelMatrixUniformBuffersMemory{};
 		core::vector<VK_Image> pointLightTextureImages;
 
 		unsigned int	spotLightNumber		   = 0;
 		std::vector<VkFramebuffer> spotLightShadowMapFrameBuffers;
-		VkBuffer shadowMapSpotLightModelMatrixUniformBuffer;
-		VkDeviceMemory shadowMapSpotLightModelMatrixUniformBuffersMemory;
+		VkBuffer shadowMapSpotLightModelMatrixUniformBuffer{};
+		VkDeviceMemory shadowMapSpotLightModelMatrixUniformBuffersMemory{};
 		core::vector<VK_Image> spotLightTextureImages;
 
 		std::vector<VK_Image> textureImages;
-		VkSampler textureSampler;
+		VkSampler textureSampler{};
 
         std::vector<VkBuffer> vertexBufferContainer;
         std::vector<VkDeviceMemory> vertexBufferMemoryContainer;
@@ -336,23 +304,21 @@ namespace GLVM::core
 		uint32_t wavefrontObjCounter = 0;
 		uint32_t gltfCounter         = 0;
 
-		core::vector<core::vector<Vertex>> symbolGVerticesContainer;
-		std::vector<unsigned int> fontIndicesContainer;
         std::vector<VkBuffer> fontVertexBufferContainer;
         std::vector<VkDeviceMemory> fontVertexBufferMemoryContainer;
         std::vector<VkBuffer> fontIndexBufferContainer;
         std::vector<VkDeviceMemory> fontIndexBufferMemoryContaner;
 		
-        VkBuffer modelMatrixUniformBuffer;
-        VkDeviceMemory modelMatrixUniformBuffersMemory;
-        VkBuffer lightDataUniformBuffer;
-        VkDeviceMemory lightDataUniformBuffersMemory;
+        VkBuffer modelMatrixUniformBuffer{};
+        VkDeviceMemory modelMatrixUniformBuffersMemory{};
+        VkBuffer lightDataUniformBuffer{};
+        VkDeviceMemory lightDataUniformBuffersMemory{};
 
 		// VkDescriptorImageInfo directionalLightsImageInfo[DIRECTIONAL_LIGHTS_NUMBER];
 		// VkDescriptorImageInfo pointLightsImageInfo[POINT_LIGHTS_NUMBER];
 		// VkDescriptorImageInfo spotLightsImageInfo[SPOT_LIGHTS_NUMBER];
 		
-        VkDescriptorPool descriptorPool;
+        VkDescriptorPool descriptorPool{};
 		const unsigned int matrixUboDescriptorsNumber = 500;
 		const unsigned int hudUboDescriptorNumber = 500;
 		const unsigned int fontUboDescriptorNumber = 128;
@@ -437,7 +403,7 @@ namespace GLVM::core
         void createSurface();
         void pickPhysicalDevice();
         void createLogicalDevice();
-        void createSwapChain();
+        void createSwapChain(const SwapChainSupportDetails& support);
         void createImageViews();
         void createMainRenderPass();
         void createDescriptorSetLayout();

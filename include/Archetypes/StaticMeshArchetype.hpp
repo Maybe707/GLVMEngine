@@ -35,35 +35,16 @@ namespace GLVM::ecs::arch {
 		tagComponents::staticMeshTagComponent staticMeshTagComponents[STATIC_MESH_ARCH_CHUNK_SIZE];
 
 		StaticMeshArchetype() {
-			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
-			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
-			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;
-			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
-			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
-			components[ComponentsIndices::FONT_COMPONENT]            = fonts;
-			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
-			components[ComponentsIndices::STATIC_MESH_TAG_COMPONENT] = staticMeshTagComponents;
-
-			mask =
-				(1ull << ComponentsIndices::TRANSFORM_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_COMPONENT) |
-				(1ull << ComponentsIndices::COLLIDER_FLAGS_COMPONENT) |
-				(1ull << ComponentsIndices::MESH_COMPONENT) |
-				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
-				(1ull << ComponentsIndices::FONT_COMPONENT) |
-				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
-				(1ull << ComponentsIndices::STATIC_MESH_TAG_COMPONENT);
-
-			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
-			componentIds[1] = ComponentsIndices::COLLIDER_COMPONENT;
-			componentIds[2] = ComponentsIndices::COLLIDER_FLAGS_COMPONENT;
-			componentIds[3] = ComponentsIndices::MESH_COMPONENT;
-			componentIds[4] = ComponentsIndices::MATERIAL_COMPONENT;
-			componentIds[5] = ComponentsIndices::FONT_COMPONENT;
-			componentIds[6] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[7] = ComponentsIndices::STATIC_MESH_TAG_COMPONENT;
-			componentCount = 8;
-		}
+            registerComponent<ComponentsIndices::TRANSFORM_COMPONENT>(transforms);
+            registerComponent<ComponentsIndices::COLLIDER_COMPONENT>(colliders);
+            registerComponent<ComponentsIndices::COLLIDER_FLAGS_COMPONENT>(colliderFlags);
+            registerComponent<ComponentsIndices::MESH_COMPONENT>(meshes);
+            registerComponent<ComponentsIndices::MATERIAL_COMPONENT>(materials);
+            registerComponent<ComponentsIndices::FONT_COMPONENT>(fonts);
+            registerComponent<ComponentsIndices::ROTATION_COMPONENT>(rotations);
+            registerComponent<ComponentsIndices::STATIC_MESH_TAG_COMPONENT>(staticMeshTagComponents);
+        }
+        std::unique_ptr<Archetype> cloneEmpty() const override { return std::make_unique<StaticMeshArchetype>(); }
 	};
 }; // namespace GLVM::ecs::arch
 

@@ -219,8 +219,8 @@ public:
 	Vector<T2, dim> operator*(const Matrix<T, dim2>& matrix);
     Vector<T2, dim> operator*(const Vector<T2, dim>& _vector);
     Vector<T2, dim> operator*=(const Vector<T2, dim>& _vector);
-    Vector<T2, dim> operator-(const Vector<T2, dim>& _vector);
-    Vector<T2, dim> operator+(const Vector<T2, dim>& _vector);
+    Vector<T2, dim> operator-(const Vector<T2, dim>& _vector) const;
+    Vector<T2, dim> operator+(const Vector<T2, dim>& _vector) const;
     void operator-=(const Vector<T2, dim>& _vector);
     void operator+=(const Vector<T2, dim>& _vector);
     Vector<T2, dim> operator*(const T2& _scalar);
@@ -307,7 +307,7 @@ Vector<T2, var2> Vector<T2, var2>::operator*=(const Vector<T2, var2>& _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
+Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector) const
 {
     Vector<T2, var2> temp_Vector(1);
 
@@ -319,7 +319,7 @@ Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
 }
 
 template <typename T2, int var2>
-Vector<T2, var2> Vector<T2, var2>::operator+(const Vector<T2, var2>& _vector)
+Vector<T2, var2> Vector<T2, var2>::operator+(const Vector<T2, var2>& _vector) const
 {
         Vector<T2, var2> temp_Vector(1);
 

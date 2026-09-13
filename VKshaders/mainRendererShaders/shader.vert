@@ -52,21 +52,18 @@ layout(location = 2) out vec2 outFragmentTextureCoordinate;
 // } spaceMat;
 
 void main() {
-	mat4 skinMatrix;
-	if (int(inJointIndices.x) != -1) {
-		skinMatrix =
-			inWeights.x * ubo.jointMatrices[int(inJointIndices.x)] +
-			inWeights.y * ubo.jointMatrices[int(inJointIndices.y)] +
-			inWeights.z * ubo.jointMatrices[int(inJointIndices.z)] +
-			inWeights.w * ubo.jointMatrices[int(inJointIndices.w)];
-	} else {
-		skinMatrix = mat4(
-			1.0, 0.0, 0.0, 0.0,
-			0.0, 1.0, 0.0, 0.0,
-			0.0, 0.0, 1.0, 0.0,
-			0.0, 0.0, 0.0, 1.0
-			);
-	}
+    mat4 skinMatrix = mat4(0.0);
+    float totalWeight = 0.0;
+    for (int influence = 0; influence < 4; ++influence) {
+        int joint = int(inJointIndices[influence]);
+        float weight = inWeights[influence];
+        if (joint >= 0 && joint < MAX_JOINTS_NUMBER && weight > 0.0) {
+            skinMatrix += weight * ubo.jointMatrices[joint];
+            totalWeight += weight;
+        }
+    }
+    if (totalWeight == 0.0) skinMatrix = mat4(1.0);
+
 
 	vec4 worldPosition = ubo.model * skinMatrix * vec4(inPosition, 1.0);
 	

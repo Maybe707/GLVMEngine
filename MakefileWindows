@@ -1,0 +1,55 @@
+.DEFAULT_GOAL := all
+CROSS_COMPILE ?= $(if $(filter Windows_NT,$(OS)),,x86_64-w64-mingw32-)
+CXX = $(CROSS_COMPILE)g++
+AR = $(CROSS_COMPILE)ar
+CONFIG ?= Release
+SDK ?= build-win/sdk
+ifeq ($(CONFIG),Release)
+BUILD ?= build-win
+OPT ?= -O2 -DGLVM_DISABLE_VALIDATION
+else ifeq ($(CONFIG),Debug)
+BUILD ?= build-win-debug
+OPT ?= -O0
+else
+$(error CONFIG must be Debug or Release)
+endif
+include make_files/common_sources.mk
+SOURCES = $(COMMON_SOURCES) ./src/WinApi/ChronoWin.cpp ./src/WinApi/WindowWinVulkan.cpp ./src/WinApi/SoundEngineWaveform.cpp
+OBJECTS = $(patsubst ./%.cpp,$(BUILD)/%.o,$(SOURCES))
+APP_OBJECTS = $(BUILD)/src/EngineMain.o $(BUILD)/src/Demo/DemoScene.o $(filter $(BUILD)/textures/%,$(OBJECTS))
+CORE_OBJECTS = $(filter-out $(APP_OBJECTS),$(OBJECTS))
+CXXFLAGS = -std=c++20 $(OPT) -g -Wall -Wextra -DNOMINMAX -DWIN32_LEAN_AND_MEAN -MMD -MP
+CPPFLAGS = -Iinclude -Itextures -I$(SDK)/include
+# MSYS2 ships libvulkan-1.dll.a; keep the GPU loader dynamic while linking
+# the MinGW runtime statically. WSL's generated libvulkan-1.a also works here.
+LDLIBS = -L$(SDK) -Wl,-Bdynamic -lvulkan-1 -Wl,-Bstatic -lwinmm -lgdi32 -luser32
+LDFLAGS = -static -static-libgcc -static-libstdc++ -mwindows
+include make_files/build_config.mk
+
+.PHONY: all shaders test-runtime test
+all: shaders $(BUILD)/GLVMEngine.exe
+shaders:
+	python3 scripts/compile_shaders.py
+$(BUILD)/%.o: %.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(BUILD)/libglvm.a: $(CORE_OBJECTS)
+	$(AR) rcs $@ $(CORE_OBJECTS)
+$(BUILD)/GLVMEngine.exe: $(APP_OBJECTS) $(BUILD)/libglvm.a
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+$(BUILD)/runtime_tests.exe: tests/runtime_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< $(BUILD)/libglvm.a $(LDLIBS) -o $@
+test-runtime: $(BUILD)/runtime_tests.exe
+$(BUILD)/ecs_system_tests.exe: tests/ecs_system_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< $(BUILD)/libglvm.a $(LDLIBS) -o $@
+$(BUILD)/windows_platform_tests.exe: tests/windows_platform_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< $(BUILD)/libglvm.a $(LDLIBS) -o $@
+$(BUILD)/windows_camera_tests.exe: tests/windows_camera_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< $(BUILD)/libglvm.a $(LDLIBS) -o $@
+$(BUILD)/camera_tests.exe: tests/camera_tests.cpp include/Rendering/CameraOrbit.hpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< -o $@
+test: $(BUILD)/runtime_tests.exe $(BUILD)/ecs_system_tests.exe $(BUILD)/camera_tests.exe
+	./$(BUILD)/runtime_tests.exe
+	./$(BUILD)/ecs_system_tests.exe
+	./$(BUILD)/camera_tests.exe
+-include $(OBJECTS:.o=.d) $(wildcard $(BUILD)/*tests.d)

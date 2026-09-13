@@ -4,20 +4,23 @@
 #include "ComponentManager.hpp"
 #include "Components/TransformComponent.hpp"
 #include "EntityManager.hpp"
-#include "ISystem.hpp"
+#include "Systems/WorldSystem.hpp"
 #include <cmath>
 #include <cstdint>
 #include <map>
 #include <random>
-#include "GraphicAPI/Vulkan.hpp"
+#include "Rendering/RenderTypes.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
 
 namespace GLVM::core
 {
-	class ProceduralLevelGeneratingSystem : public ecs::ISystem
+    class AssetLibrary;
+	class ProceduralLevelGeneratingSystem : public ecs::WorldSystem
 	{
+		AssetLibrary& assets_;
 	public:
+        explicit ProceduralLevelGeneratingSystem(ecs::arch::World& world, AssetLibrary& assets) : WorldSystem(world), assets_(assets) {}
 		unsigned int levelNubmer          = 0;
 		bool bredoFlag                    = false;
 		unsigned int previous_half_x_rand = 0;
