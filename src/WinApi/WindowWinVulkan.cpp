@@ -146,12 +146,15 @@ namespace GLVM::core
             return 0;
 
         case WM_LBUTTONDOWN:
-            pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
+			pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON);
+			Input_Stack_.ControlInput(*pEvent);
             return 0;
             
         case WM_LBUTTONUP:
-            pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
-            return 0;
+			pEvent->SetEvent(EEvents::eMOUSE_LEFT_BUTTON_RELEASE);
+			Input_Stack_.ControlInput(*pEvent);
+			pEvent->isLeftMouseButtonReleased = true;
+			return 0;
 
         case WM_MOUSEMOVE:
             iMouse_Position_X = GET_X_LPARAM(_pLParam);

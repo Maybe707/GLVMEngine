@@ -80,6 +80,7 @@ namespace GLVM::core
 		uint32_t meshID = 0;
 		bool isAlreadyCached;
 		float hud_screen_x = 0.0f;
+		float previous_hud_screen_x = 0.0f;                     ///< TODO: No need to use it. Find another way
 		float hud_screen_y;
 		int                  dragedItemEntity = -1;             ///< If dont have any draged item then this variable have value of -1
 		[[maybe_unused]] float fYaw   = -90.0f;

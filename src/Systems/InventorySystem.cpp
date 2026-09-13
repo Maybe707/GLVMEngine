@@ -100,8 +100,9 @@ namespace GLVM::ecs
 
 				if ( *isItemDraged >= 0 && isLeftMouseButtonPressed && *isLeftMouseButtonReleased ) {    ///< Item drop to inventory, swaped or we just cant place
 					int isSwapable = 0;
-					if ( checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent,
-															  inventorySlotScale, inventorySlotHalfScale) ) {
+                    bool isCrosshairInventoryIntersects = checkCrosshairInventoryIntersection( crosshairTransformComponent, inventoryTransformComponent, inventoryComponent, inventorySlotScale, inventorySlotHalfScale);
+					std::cout << "intersects: " << isCrosshairInventoryIntersects << std::endl;
+                    if ( isCrosshairInventoryIntersects ) {
 						[[maybe_unused]] point2D<int> intersectionSlot = determineActualIntersectionSlot( crosshairTransformComponent, inventoryTransformComponent, inventorySlotScale, inventorySlotHalfScale );
 
 						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
@@ -142,7 +143,7 @@ namespace GLVM::ecs
 							*isLeftMouseButtonReleased = false;
 							*isItemDraged = isSwapable;
 						}
-					} else {       ///< Item drop to the ground
+                    } else { ///< Item drop to the ground
 						arch::EntityLocation itemLocation = arch::world.entityLocations[arch::getId( *isItemDraged )];
 						arch::ItemArchetype* itemArch = static_cast<arch::ItemArchetype*>(itemLocation.arch);
 						const uint32_t itemIndex = itemLocation.index;
@@ -158,9 +159,9 @@ namespace GLVM::ecs
 						cm::transform* playerTransform = &playerArch->transforms[playerIndex];
 						itemTransform->position = playerTransform->position;
 						vec3 normalizedForward = Normalize(playerTransform->forward);
-						itemTransform->position[0] += normalizedForward[0] * 2.5f;
-						itemTransform->position[1] += normalizedForward[1] * 2.5f;
-						itemTransform->position[2] += normalizedForward[2] * 2.5f;
+						itemTransform->position[0] += normalizedForward[0] * 1.5f;
+						itemTransform->position[1] += normalizedForward[1] * 1.5f;
+						itemTransform->position[2] += normalizedForward[2] * 1.5f;
 						itemTransform->scale = 0.05f;
 					
 						*isItemDraged = -1;

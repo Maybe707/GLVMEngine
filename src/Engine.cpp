@@ -818,7 +818,7 @@ namespace GLVM::core
 		} else {
 			defaultPosition[0] = hud_screen_x;
 #ifdef VK_USE_PLATFORM_WIN32_KHR
-			defaultPosition[0] = -defaultPosition[0];
+//			defaultPosition[0] = -defaultPosition[0];
 #endif
 			defaultPosition[1] = -hud_screen_y;
 			
@@ -1231,15 +1231,17 @@ namespace GLVM::core
 
 //						std::cout << "sign: " << sign << std::endl;
 						
-						const float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
+						float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
 																						 transformComponent->frameMovement[2])),
 																		  Normalize(vec3(transformComponent->forward[0], 0.0,
 																						 transformComponent->forward[2]))), 1.0f));
 
+						if( rotationAngle < 0.0005f && ((uint32_t)hud_screen_x * 10000 - (uint32_t)previous_hud_screen_x * 10000) == 0.0f ) {
+							rotationAngle = 0.0f;
+						} ///< TODO: Weird workaround solution. Find another one
+
+						previous_hud_screen_x = hud_screen_x;
 						
-
-//						Input_Stack_.PrintStack();
-
 						int currentFrameEvents[4];
 							
 						if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
@@ -1897,8 +1899,10 @@ namespace GLVM::core
 		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
 		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
 #else
-		hud_screen_y -= (previousMouseOffsetY - g_eEvent.mousePointerPosition.offset_Y) / 1080.0f;
-		hud_screen_x += (previousMouseOffsetX - g_eEvent.mousePointerPosition.offset_X) / 1920.0f;
+//		hud_screen_y -= (previousMouseOffsetY - g_eEvent.mousePointerPosition.offset_Y) / 1080.0f;
+//		hud_screen_x += (previousMouseOffsetX - g_eEvent.mousePointerPosition.offset_X) / 1920.0f;
+		hud_screen_y -= g_eEvent.mousePointerPosition.offset_Y / 1080.0f;
+		hud_screen_x += g_eEvent.mousePointerPosition.offset_X / 1920.0f;
 		previousMouseOffsetX = g_eEvent.mousePointerPosition.offset_X;
 		previousMouseOffsetY = g_eEvent.mousePointerPosition.offset_Y;
 #endif
