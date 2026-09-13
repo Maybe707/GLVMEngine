@@ -63,8 +63,8 @@ namespace GLVM::ecs
                 if(!isInventoryOpened && inputStack.SearchElement(core::EEvents::eMOUSE_LEFT_BUTTON) == core::EEvents::eMOUSE_LEFT_BUTTON) {
                     if(projectileCooldown <= 0) {
 						ecs::components::MeshHandle meshHandle{};
-						const u32 sphereMeshHandleIndex = 2;
-						if ( meshHandlers.GetSize() > 2 )
+						const u32 sphereMeshHandleIndex = 1;
+						if ( meshHandlers.GetSize() > 1 )
 							meshHandle = meshHandlers[sphereMeshHandleIndex];
 
 						ecs::TextureHandle textureHandle{};
