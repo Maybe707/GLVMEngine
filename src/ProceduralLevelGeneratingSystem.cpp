@@ -12,8 +12,8 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Constants.hpp"
-#include "Engine.hpp"
-#include "GraphicAPI/Vulkan.hpp"
+#include "Assets/AssetLibrary.hpp"
+
 #include "Vector.hpp"
 
 namespace GLVM::core
@@ -22,7 +22,7 @@ namespace GLVM::core
 		using namespace GLVM;
 		namespace cm  = GLVM::ecs::components;
 		namespace arch = GLVM::ecs::arch;
-		core::Engine* GLVM = core::Engine::GetInstance();
+
 
 		/// New arch ECS
 		arch::ArchetypeEntityManager* archEntityManager = arch::ArchetypeEntityManager::getInstance();
@@ -70,7 +70,7 @@ namespace GLVM::core
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, levelHalfX, levelHalfY, levelHalfZ, nextLevel );
 				setMeshBounds( meshAxisLimitingValues );
 
-				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = GLVM->LoadMesh();
+				[[maybe_unused]] cm::MeshHandle gameLevelMeshHandle = assets_.LoadMesh();
 				arch::entity gameLevelChunkEntity = archEntityManager->createEntity();
 
 				cachedLevelChunkArchNumber = 0;
@@ -104,7 +104,7 @@ namespace GLVM::core
 				makeCubeObjectVertices( { -1, -1, -1, -1 }, { 1, 1, 1, 1 }, half_x, half_y, half_z, transitionBridgeVertices );
 				setMeshBounds( meshAxisLimitingValues );
 
-				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = GLVM->LoadMesh();
+				[[maybe_unused]] cm::MeshHandle transitionBridgeMeshHandle = assets_.LoadMesh();
 				arch::entity transitionBridgeEntity = archEntityManager->createEntity();
 				arch::world.addEntityToArchetype( transitionBridgeEntity, archView.cachedLevelChunkArch );
 

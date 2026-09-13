@@ -10,6 +10,7 @@
 #include "IContainer.hpp"
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include "VertexMath.hpp"
 #include <assert.h>
@@ -29,19 +30,19 @@ namespace GLVM::core
 	public:
 		VectorIterator(vector<T>& vector) {
 			begin = vector.GetVectorContainer();
-		    end   = vector.GetVectorContainer() + (vector.GetSize() - 1);
+		    end = begin ? begin + vector.GetSize() : begin;
 		}
 	
 		bool Next() override {
 			if ( ValidStatus() ) {
 				begin += 1;
-				return true;
+				return ValidStatus();
 			} else
 				return false;
 		}
 
  		bool ValidStatus() override {
-			return end >= begin;
+			return begin != end;
 		}
 	
 		T& Current() override {
@@ -49,7 +50,7 @@ namespace GLVM::core
 		}
 		
 		T& Last() override {
-			return *end;
+			return *(end - 1);
 		}
 	};
 	
@@ -95,7 +96,10 @@ namespace GLVM::core
 			++strSize;
 		}
 		
-        for (unsigned int i = 0; i < size; ++i) {
+        const unsigned int length = size && (*this)[size - 1] == '\0' ? size - 1 : size;
+        if (length != strSize - 1)
+            return false;
+        for (unsigned int i = 0; i < length; ++i) {
 			T& element = *(T*)&rowInnerData[i * sizeof(T)];
             if (element == string_[i])
                 continue;
@@ -263,7 +267,7 @@ namespace GLVM::core
  	template<class T>
 	void vector<T>::Remove(unsigned int index)
 	{
-		if(size < 1)
+		if(index >= size)
 			return;
 
 		for(unsigned int j = index; j < size - 1; ++j) {
@@ -279,37 +283,13 @@ namespace GLVM::core
 		// 	element = 0;                                                     ///< For debug purpouses only!!!
 		// }
 		
-	    --size;
+	    Pop();
 	}
     
 	template<class T>
 	void vector<T>::RemoveFirstItem()
 	{
-		--size;				
-		if(size == 0) {
-			delete [] this->rowInnerData;
-			this->rowInnerData = nullptr;
-			return;
-		}
-		
-		unsigned char* aTemp_Vector_Container = new unsigned char[(size + 1) * sizeof(T)];
-		for(unsigned int i = 0; i < size + 1; ++i) {
-			T& element = *(T*)&rowInnerData[i * sizeof(T)];
-			new (&aTemp_Vector_Container[i * sizeof(T)]) T(element);
-			element.~T();
-		}
-
-		delete [] this->rowInnerData;
-		this->rowInnerData = nullptr;
-
-		rowInnerData = new unsigned char[capacity * sizeof(T)];
-        for(unsigned int i = 0; i < size; ++i) {
-			T& sourceElement = *(T*)&aTemp_Vector_Container[(i + 1) * sizeof(T)];
-			new (&rowInnerData[i * sizeof(T)]) T(sourceElement);
-		}
-
-		delete [] aTemp_Vector_Container;
-		aTemp_Vector_Container = nullptr;
+		Remove(0);
 	}
 	
 	template<class T>
@@ -339,34 +319,14 @@ namespace GLVM::core
 
 	template<typename T>
 	void vector<T>::clear() {
-		if(size < 1)
-			return;
-
-		// /// FIXME: FOR DEBUG ONLY!
-		// if ( typeid(T).name() == typeid(unsigned int).name() ) {
-		// 	for ( unsigned int i = 0; i < capacity; ++i ) {
-		// 		T& element = *(T*)&rowInnerData[i * sizeof(T)];
-		// 		element = 0;                                                     ///< For debug purpouses only!!!
-		// 	}
-		// }
-
-		for(unsigned int i = 0; i < size; ++i) {
-			T& element = *(T*)&rowInnerData[i * sizeof(T)];
-			element.~T();
-		}
-
-		delete [] this->rowInnerData;
-		this->rowInnerData = nullptr;
-		
-		/// FIXME: DEBUG ONLY!
-		// unsigned int sizeOfType = sizeof(T);
-		// for (unsigned int j = 0; j < capacity * sizeOfType; ++j) {
-		// 	*(unsigned char*)&rowInnerData[j] = 0;
-		// }
-		
-		size     = 0;
-//		capacity = 0;
-	}
+        for (unsigned int i = 0; i < size; ++i)
+            reinterpret_cast<T*>(rowInnerData)[i].~T();
+        delete [] rowInnerData;
+        rowInnerData = nullptr;
+        size = 0;
+        capacity = 0;
+        expander = 8;
+    }
 
  	template<class T>
 	bool vector<T>::empty() { return size == 0; }

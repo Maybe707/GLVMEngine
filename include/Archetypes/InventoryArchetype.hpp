@@ -23,6 +23,7 @@ namespace GLVM::ecs::arch {
 		components::material  materials[INVENTORY_ARCH_CHUNK_SIZE];
 
 		InventoryArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, INVENTORY_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			components[ComponentsIndices::INVENTORY_COMPONENT]       = invetories;

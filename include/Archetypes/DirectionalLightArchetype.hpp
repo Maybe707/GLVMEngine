@@ -23,6 +23,7 @@ namespace GLVM::ecs::arch {
 		components::directionalLight directionalLights[DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE];
 
 		DirectionalLightArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, DIRECTIONAL_LIGHT_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
 			components[ComponentsIndices::MATERIAL_COMPONENT]          = materials;

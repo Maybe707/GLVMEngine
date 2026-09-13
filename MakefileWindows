@@ -1,0 +1,34 @@
+CXX = x86_64-w64-mingw32-g++
+AR = x86_64-w64-mingw32-ar
+BUILD = build-win
+include make_files/common_sources.mk
+SOURCES = $(COMMON_SOURCES) ./src/WinApi/ChronoWin.cpp ./src/WinApi/WindowWinVulkan.cpp ./src/WinApi/SoundEngineWaveform.cpp
+OBJECTS = $(patsubst ./%.cpp,$(BUILD)/%.o,$(SOURCES))
+APP_OBJECTS = $(BUILD)/src/EngineMain.o $(BUILD)/src/Demo/DemoScene.o $(filter $(BUILD)/textures/%,$(OBJECTS))
+CORE_OBJECTS = $(filter-out $(APP_OBJECTS),$(OBJECTS))
+CXXFLAGS = -std=c++20 -O2 -g -Wall -Wextra -DNOMINMAX -DWIN32_LEAN_AND_MEAN -DGLVM_DISABLE_VALIDATION -MMD -MP
+CPPFLAGS = -Iinclude -Itextures -I$(BUILD)/sdk/include
+LDLIBS = -L$(BUILD)/sdk -lvulkan-1 -lwinmm -lgdi32 -luser32
+LDFLAGS = -static -static-libgcc -static-libstdc++ -mwindows
+
+.PHONY: all shaders test-runtime
+all: shaders $(BUILD)/GLVMEngine.exe
+shaders:
+	python3 scripts/compile_shaders.py
+$(BUILD)/%.o: %.cpp
+	@mkdir -p $(@D)
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
+$(BUILD)/libglvm.a: $(CORE_OBJECTS)
+	$(AR) rcs $@ $(CORE_OBJECTS)
+$(BUILD)/GLVMEngine.exe: $(APP_OBJECTS) $(BUILD)/libglvm.a
+	$(CXX) $(LDFLAGS) $^ $(LDLIBS) -o $@
+$(BUILD)/runtime_tests.exe: tests/runtime_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $^ $(LDLIBS) -o $@
+test-runtime: $(BUILD)/runtime_tests.exe
+$(BUILD)/windows_platform_tests.exe: tests/windows_platform_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $^ $(LDLIBS) -o $@
+$(BUILD)/windows_camera_tests.exe: tests/windows_camera_tests.cpp $(BUILD)/libglvm.a
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $^ $(LDLIBS) -o $@
+$(BUILD)/camera_tests.exe: tests/camera_tests.cpp include/Rendering/CameraOrbit.hpp
+	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -static -mconsole $< -o $@
+-include $(OBJECTS:.o=.d)

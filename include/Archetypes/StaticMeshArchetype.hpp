@@ -35,6 +35,7 @@ namespace GLVM::ecs::arch {
 		tagComponents::staticMeshTagComponent staticMeshTagComponents[STATIC_MESH_ARCH_CHUNK_SIZE];
 
 		StaticMeshArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, STATIC_MESH_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;

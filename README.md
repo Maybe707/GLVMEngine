@@ -1,5 +1,33 @@
 # Game Loop Versatile Modules (GLVM)
 
+[Архитектура после рефакторинга: модули, владение, изменения API и тесты](docs/ARCHITECTURE_RU.md).
+
+## Quick start: native Windows
+
+Double-click `Run-GLVM.cmd` to start `build-win/GLVMEngine.exe` directly on your
+Windows GPU. Running the prepared executable requires no WSL, compiler or Vulkan
+SDK. Keep the executable inside this project so it can find the bundled assets.
+See [Windows instructions and build steps](docs/WINDOWS_RU.md).
+
+## Ubuntu / Windows WSLg
+
+Use `Run-GLVM-WSL.cmd` for the Linux version. It builds the optimized executable
+and starts the bundled demo. See
+[Russian installation and launch instructions](docs/INSTALL_RU.md).
+
+```bash
+bash scripts/install-ubuntu.sh
+bash scripts/run.sh
+# Diagnostics:
+make -f MakefileLin test
+python3 tests/check_shaders.py
+bash scripts/run.sh --debug --frames 30
+```
+
+The Linux build is `make -f MakefileLin`; run it with `make -f MakefileLin run`.
+The launcher sets the working directory required by the bundled model, audio
+and shader paths. Shader sources are rebuilt with `glslc` when changed.
+
 This is my simple game engine for Linux and Windows OS's with both Vulkan and Opengl support. Its based on entity component system (ECS) with user friendly C++ interface. Also it has partial support of GLTf and wavefront.obj 3D model formats. With GLVM you can make simple phong light of three types (directional, spot, point). Very basic physics included (collitions, gravity).
 Updated version 2.0 with: new Archetype ECS (SOA powered), Vulkan config, read-only render objects, VK command sub-buffers. Refactored: inventory system, gltf parser...
 

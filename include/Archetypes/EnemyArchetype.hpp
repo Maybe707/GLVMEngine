@@ -54,6 +54,7 @@ namespace GLVM::ecs::arch {
 		components::move          moves[ENEMY_ARCH_CHUNK_SIZE];
 
 		EnemyArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, ENEMY_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::ENEMY_COMPONENT]           = enemies;
 			components[ComponentsIndices::STATE_COMPONENT]           = states;

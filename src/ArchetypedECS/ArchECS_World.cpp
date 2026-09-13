@@ -59,10 +59,12 @@ namespace GLVM::ecs::arch {
 
 	void World::removeEntity(entity entity_) {
         id id_ = getId(entity_);
+        if (id_ >= entityLocations.GetSize()) return;
         EntityLocation& location = entityLocations[id_];
 
         Archetype* arch = location.arch;
         uint32_t index  = location.index;
+        if (!arch || index >= arch->entityCount || arch->entities[index] != entity_) return;
 
         entity moved = arch->removeEntity(index);
 
@@ -76,8 +78,8 @@ namespace GLVM::ecs::arch {
     }
 
 	void World::searchCacheArchetypes( arch::componentMask requiredMask, arch::Archetype* cachedArchetypes[], uint32_t& cachedArchetypesNumber ) {
-		for( uint32_t i = 0; i < arch::world.archetypes.GetSize(); ++i ) {
-			arch::Archetype* arch = arch::world.archetypes[i];
+		for( uint32_t i = 0; i < archetypes.GetSize(); ++i ) {
+			arch::Archetype* arch = archetypes[i];
 
 			if( (arch->mask & requiredMask) == requiredMask ) {
 				cachedArchetypes[cachedArchetypesNumber] = arch;

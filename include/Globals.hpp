@@ -5,7 +5,7 @@
 
 #include "Event.hpp"
 #include "Vector.hpp"
-#include "VkStructs.hpp"
+#include "Rendering/RenderTypes.hpp"
 #include "EventsStack.hpp"
 
 extern GLVM::core::CEvent g_eEvent;

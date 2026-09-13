@@ -33,6 +33,7 @@ namespace GLVM::ecs::arch {
 		tagComponents::levelChunkTagComponent levelChunkTagComponents[LEVEL_CHUNK_ARCH_CHUNK_SIZE];
 
 		LevelChunkArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, LEVEL_CHUNK_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;

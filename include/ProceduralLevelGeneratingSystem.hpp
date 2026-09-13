@@ -9,15 +9,18 @@
 #include <cstdint>
 #include <map>
 #include <random>
-#include "GraphicAPI/Vulkan.hpp"
+#include "Rendering/RenderTypes.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
 
 namespace GLVM::core
 {
+    class AssetLibrary;
 	class ProceduralLevelGeneratingSystem : public ecs::ISystem
 	{
+		AssetLibrary& assets_;
 	public:
+        explicit ProceduralLevelGeneratingSystem(AssetLibrary& assets) : assets_(assets) {}
 		unsigned int levelNubmer          = 0;
 		bool bredoFlag                    = false;
 		unsigned int previous_half_x_rand = 0;

@@ -10,7 +10,6 @@
 #include "VertexMath.hpp"
 #include "Components/TransformComponent.hpp"
 #include "ArchetypeECS/ArchECS_Utils.hpp"
-#include <print>
 
 namespace GLVM::ecs
 {

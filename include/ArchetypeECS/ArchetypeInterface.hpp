@@ -10,6 +10,7 @@ namespace GLVM::ecs::arch {
 		virtual ~Archetype() = default;
 		
 		static constexpr uint32_t CAPACITY = 1024;
+		uint32_t capacity = CAPACITY;
 		
 		entity entities[CAPACITY];
 		uint32_t entityCount = 0;

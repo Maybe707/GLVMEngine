@@ -23,6 +23,7 @@ namespace GLVM::ecs::arch {
 		components::spotLight     spotLights[SPOT_LIGHT_ARCH_CHUNK_SIZE];
 
 		SpotLightArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, SPOT_LIGHT_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;

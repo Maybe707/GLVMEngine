@@ -26,6 +26,7 @@ namespace GLVM::ecs::arch {
 		components::rigidBody     rigidBodies[PHYSICS_ARCH_CHUNK_SIZE];
 
 		PhysicsArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, PHYSICS_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;

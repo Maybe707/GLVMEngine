@@ -39,6 +39,7 @@ namespace GLVM::ecs::arch {
 		components::item          items[ITEM_ARCH_CHUNK_SIZE];
 
 		ItemArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, ITEM_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;
 			components[ComponentsIndices::COLLIDER_FLAGS_COMPONENT]  = colliderFlags;

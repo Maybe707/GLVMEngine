@@ -53,12 +53,13 @@ namespace GLVM::core
 
     struct SMousePointerPosition
     {
-        int position_X;
-        int position_Y;
+        int position_X = 0;
+        int position_Y = 0;
+        // Per-frame mouse movement in screen pixels (right/down), not absolute angles.
         int offset_X = 0;
         int offset_Y = 0;
-        float pitch;
-        float yaw;
+        float pitch = 0.0f;
+        float yaw = 0.0f;
     };
     
     /*! \class Event

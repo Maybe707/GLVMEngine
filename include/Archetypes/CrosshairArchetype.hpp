@@ -23,6 +23,7 @@ namespace GLVM::ecs::arch {
 		tagComponents::crossHairTagComponent crosshairTagComponents[CROSSHAIR_ARCH_CHUNK_SIZE];
 
 		CrosshairArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, CROSSHAIR_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]     = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]          = meshes;
 			components[ComponentsIndices::MATERIAL_COMPONENT]      = materials;

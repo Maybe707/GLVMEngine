@@ -26,6 +26,8 @@ namespace GLVM::core::Sound
 
 		virtual void OpenDevice( const char* device ) = 0;
 		virtual void CloseDevice() = 0;
+        // Wake/cancel a pending stream operation before AudioService joins it.
+        virtual void RequestStop() noexcept {}
         virtual vector<CSoundSample*>& GetSoundContainer() = 0;
         virtual void PlaybackSoundSample(CSoundSample& _sound_sample) = 0;
         virtual void SetMasterVolume(long _lVolume) = 0;

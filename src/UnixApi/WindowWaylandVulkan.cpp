@@ -1,4 +1,6 @@
 #include "UnixApi/WindowWaylandVulkan.hpp"
+#include <poll.h>
+#include <cerrno>
 #include "GraphicAPI/Vulkan.hpp"
 #include "UnixApi/pointer-constraints-unstable-v1-client-protocol.h"
 #include <vulkan/vulkan_core.h>
@@ -12,7 +14,9 @@ namespace GLVM::core {
 	
 	void WindowWaylandVulkan::init() {
 		// connects your client application to the Wayland display server
-		display  = wl_display_connect(0);               
+		display  = wl_display_connect(0);
+		if (!display)
+			throw std::runtime_error("Cannot connect to Wayland. Run under WSLg or a Wayland desktop.");
 		/* get the global registry object from the Wayland display server (compositor). This registry allows
 		   the client to discover available global objects, such as wl_compositor, wl_shm, xdg_wm_base, etc.,
 		   which are needed to create surfaces and interact with the window system.
@@ -91,6 +95,7 @@ namespace GLVM::core {
 		   changes to the screen.
 		*/
 		wl_surface_commit( wl_surface );
+		wl_display_roundtrip(display);
 
 		// if (!seat || !pointer_constraints || !relative_pointer_manager || !pointer) {
 		// 	fprintf(stderr, "Missing required Wayland globals\n");
@@ -111,7 +116,33 @@ namespace GLVM::core {
 		x_pointer = 0;
 		y_pointer = 0;
 
-		wl_display_dispatch( display );
+        // Rendering must continue even when the compositor has no input events.
+        bool readPrepared = false;
+        while (!close_xdg_toplevel && !(readPrepared = wl_display_prepare_read(display) == 0)) {
+            if (wl_display_dispatch_pending(display) < 0) {
+                close_xdg_toplevel = 1;
+                break;
+            }
+        }
+        if (!close_xdg_toplevel) {
+            wl_display_flush(display);
+            pollfd fd{wl_display_get_fd(display), POLLIN, 0};
+            const int ready = poll(&fd, 1, 0);
+            if (ready > 0 && (fd.revents & POLLIN)) {
+                if (wl_display_read_events(display) < 0) close_xdg_toplevel = 1;
+            } else {
+                wl_display_cancel_read(display);
+                if ((ready < 0 && errno != EINTR) || (fd.revents & (POLLERR | POLLHUP)))
+                    close_xdg_toplevel = 1;
+            }
+            if (wl_display_dispatch_pending(display) < 0) close_xdg_toplevel = 1;
+        } else if (readPrepared) {
+            wl_display_cancel_read(display);
+        }
+		if (close_xdg_toplevel) {
+			_Event.SetEvent(EEvents::eGAME_LOOP_KILL);
+			Input_Stack_.ControlInput(_Event);
+		}
 // 		while (wl_display_dispatch( display )) {
 // //			printf("%s", "HREN GOVNA!");
 // 			if ( close_xdg_toplevel )
@@ -124,7 +155,9 @@ namespace GLVM::core {
 	struct wl_buffer* WindowWaylandVulkan::create_transparent_cursor([[maybe_unused]] struct wl_shm *shm) {
 		int size = 4 * 64 * 64; // 64x64 RGBA cursor (common size)
 		int32_t file_descriptor = alocate_shared_memory( size );
-		void* data = mmap(NULL, width * height * 4, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
+		if (file_descriptor < 0) return nullptr;
+		void* data = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, file_descriptor, 0);
+		if (data == MAP_FAILED) { close(file_descriptor); return nullptr; }
     
 		// Fill with transparent pixels
 		for ( int i = 0; i < 64 * 64; ++i )
@@ -144,59 +177,48 @@ namespace GLVM::core {
 	};
 	void WindowWaylandVulkan::ClearDisplay() {
 	};
-	void WindowWaylandVulkan::CursorLock([[maybe_unused]] int _x_position, [[maybe_unused]] int _y_position, [[maybe_unused]] int* _x_offset, [[maybe_unused]] int* _y_offset) {
-        // *_x_offset = _x_position - previous_X;
-		// previous_X += *_x_offset;
-
-		// *_y_offset = _y_position - previous_Y;
-		// previous_Y += *_y_offset;
-
-		static int flag = 0;
-		if ( flag == 0 ) {
-			*_x_offset = -960;
-			*_y_offset = -540;
-			++flag;
-		} else {
-			*_x_offset = _x_position;
-			*_y_offset = _y_position;
-		}
-		// std::cout << "x: " << _x_position << std::endl;
-		// std::cout << "y: " << _y_position << std::endl;
-
-        // *_x_offset = _x_position + previous_X;
-		// previous_X = *_x_offset;
-
-		// *_y_offset = _y_position + previous_Y;
-		// previous_Y = *_y_offset;
-		
-		// *_x_offset = _x_position;
-		// *_y_offset = _y_position;
-		// std::cout << "x offset: " << *_x_offset << std::endl;
-		// std::cout << "y offset: " << *_y_offset << std::endl;
-	};
+    void WindowWaylandVulkan::CursorLock(int x, int y, int* offsetX, int* offsetY) {
+        *offsetX = x;
+        *offsetY = y;
+    }
 
 	void WindowWaylandVulkan::Close() {
+		if (!display) return;
+		if (frame_callback) wl_callback_destroy(frame_callback);
+		if (locked_pointer) zwp_locked_pointer_v1_destroy(locked_pointer);
+		if (relative_pointer) zwp_relative_pointer_v1_destroy(relative_pointer);
+		if (pointer) wl_pointer_destroy(pointer);
+		if (cursor_buffer) wl_buffer_destroy(cursor_buffer);
+		if (pointer_surface) wl_surface_destroy(pointer_surface);
+		if (pointer_constraints) zwp_pointer_constraints_v1_destroy(pointer_constraints);
+		if (relative_pointer_manager) zwp_relative_pointer_manager_v1_destroy(relative_pointer_manager);
 		if (keyboard) {
 			wl_keyboard_destroy(keyboard);
 		}
 		/* Release a Wayland seat object, which is responsible for managing input devices like
 		   keyboards, mice, or touchscreens.
 		*/
-		wl_seat_release( seat );
+		if (seat) wl_seat_destroy(seat);
 		if (buffer) {
 			wl_buffer_destroy( buffer );
 		}
 		xdg_toplevel_destroy( xdg_topLevel );
 		xdg_surface_destroy( xdg_surface );
 		wl_surface_destroy( wl_surface );
+		if (xdg_shell) xdg_wm_base_destroy(xdg_shell);
+		if (shared_memory) wl_shm_destroy(shared_memory);
+		if (pointer_shared_memory) wl_shm_destroy(pointer_shared_memory);
+		if (compositor) wl_compositor_destroy(compositor);
+		if (registry) wl_registry_destroy(registry);
 		wl_display_disconnect( display );
+		display = nullptr;
 	}
 	
 	int32_t alocate_shared_memory( uint64_t size ) {
 		char name[8];
 		name[0] = '/';
 		name[7] = 0;
-		for ( int8_t i = 1; i < 6; ++i ) {
+		for ( int8_t i = 1; i < 7; ++i ) {
 			name[i] = ( rand() & 23 ) + 97;
 		}
 		/// shm_open, shm_unlink - create/open or unlink POSIX shared memory objects
@@ -231,7 +253,7 @@ namespace GLVM::core {
 		/* It tells Wayland: “Take this part of the memory pool and treat it as an image buffer that
 		   I’ll draw onto a window.”
 		*/
-		resizeData->buffer = wl_shm_pool_create_buffer( pool, 0, resizeData->width, resizeData->height, resizeData->width * 4, WL_SHM_FORMAT_ABGR8888 );
+		resizeData->buffer = wl_shm_pool_create_buffer( pool, 0, resizeData->width, resizeData->height, resizeData->width * 4, WL_SHM_FORMAT_ARGB8888 );
 		// if ( buffer != NULL )
 		// 	std::cout << "BUFFER NOT NULL" << std::endl;
 		// else 
@@ -261,17 +283,15 @@ namespace GLVM::core {
 	}
 
 	void xdg_toplevel_configure( [[maybe_unused]] void* data, [[maybe_unused]] struct xdg_toplevel* xdg_toplevel, int32_t new_width, int32_t new_height, [[maybe_unused]] struct wl_array* atate ) {
-		if ( !new_width && !new_height ) {
+		if ( new_width <= 0 || new_height <= 0 ) {
 			return;
 		}
 
 		WindowWaylandVulkan* xdg_topLevelData = (WindowWaylandVulkan*)data;
 		
 		if ( xdg_topLevelData->width != new_width || xdg_topLevelData->height != new_height ) {
-			munmap( xdg_topLevelData->pixels, xdg_topLevelData->width * new_height * 4 );
 			xdg_topLevelData->width = new_width;
 			xdg_topLevelData->height = new_height;
-			resize( data );
 		}
 	}
 
@@ -288,12 +308,7 @@ namespace GLVM::core {
 		   that you received and accepted this change. If you don’t call it, your window won’t be
 		   shown or updated properly.
 		*/
-		WindowWaylandVulkan* xdg_surfaceConfigData = (WindowWaylandVulkan*)data;
-		
 		xdg_surface_ack_configure( xdg_surface, serial );
-		if ( !xdg_surfaceConfigData->pixels ) {
-			resize( data );
-		}
 
 //		draw( data );
 	}
@@ -303,6 +318,7 @@ namespace GLVM::core {
 		
 		wl_callback_destroy( frame_call_back );
 		frame_call_back = wl_surface_frame( xdg_surfaceConfigData->wl_surface );
+		xdg_surfaceConfigData->frame_callback = frame_call_back;
 		wl_callback_add_listener( frame_call_back, &windowWaylandVulkan.callback_listener, data );
 
 //	++constant_byte;
@@ -316,7 +332,7 @@ namespace GLVM::core {
 
 	void keyboard_keymap([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t format,
 											  [[maybe_unused]] int32_t keymap_file_descriptor, [[maybe_unused]] uint32_t size) {
-	
+		close(keymap_file_descriptor);
 	}
 
 	void keyboard_enter([[maybe_unused]] void* data, [[maybe_unused]] struct wl_keyboard* keyboard, [[maybe_unused]] uint32_t serial,
@@ -390,7 +406,7 @@ namespace GLVM::core {
 			if (key == 1) {  // Typically ESC key
 //				printf("ESC pressed - exiting\n");
 				WindowWaylandVulkan* registryListenerData = (WindowWaylandVulkan*)data;
-				wl_display_disconnect(registryListenerData->display);
+				registryListenerData->close_xdg_toplevel = 1;
 			}
 			if (key == 17) {  // Typically ESC key
 				g_eEvent.SetEvent(EEvents::eKEYRELEASE_W);
@@ -505,17 +521,18 @@ namespace GLVM::core {
 			
 			windowWaylandVulkan.hideAndLockPointer = true;
 			struct wl_buffer *transparent = windowWaylandVulkan.create_transparent_cursor(registryListenerData->pointer_shared_memory);
+			registryListenerData->cursor_buffer = transparent;
 			wl_surface_attach(registryListenerData->pointer_surface, transparent, 0, 0);
 			wl_surface_commit(registryListenerData->pointer_surface);
 			wl_pointer_set_cursor(pointer, serial, registryListenerData->pointer_surface, 0, 0);
 
-			if (!registryListenerData->pointer_constraints) {
+			if (!registryListenerData->pointer_constraints || !registryListenerData->relative_pointer_manager) {
 //				printf("Pointer constraints not available!\n");
 				return;
 			}
 
 			// Lock pointer to main window surface, not pointer_surface
-			[[maybe_unused]] zwp_locked_pointer_v1* locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
+			registryListenerData->locked_pointer = zwp_pointer_constraints_v1_lock_pointer(
 				registryListenerData->pointer_constraints,
 				registryListenerData->wl_surface,  // Use main window surface
 				pointer,
@@ -651,4 +668,3 @@ namespace GLVM::core {
 		return &windowWaylandVulkan;
 	}
 }; ///< namespace GLVM::core
-

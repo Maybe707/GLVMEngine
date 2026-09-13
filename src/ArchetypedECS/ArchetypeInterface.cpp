@@ -24,10 +24,13 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/StateComponent.hpp"
 #include "Components/MoveComponent.hpp"
+#include "Components/RotationComponent.hpp"
+#include <stdexcept>
 #include "TagComponents/ProjectileTagComponent.hpp"
 
 namespace GLVM::ecs::arch {
 	uint32_t Archetype::addEntity( entity entity_ ) {
+        if (entityCount >= capacity) throw std::length_error("Archetype capacity exceeded");
 		uint32_t index = entityCount++;
 		assert( index < CAPACITY );
 		entities[index] = entity_;
@@ -37,12 +40,16 @@ namespace GLVM::ecs::arch {
 	
 	/// Swap-remove
 	entity Archetype::removeEntity( uint32_t index ) {
+        if (index >= entityCount) throw std::out_of_range("Invalid archetype entity index");
 		uint32_t last = entityCount - 1;
 
 		for( uint32_t i = 0; i < componentCount; ++i ) {
 			const uint32_t componentId = componentIds[i];
 
 			switch( componentId ) {
+			case ComponentsIndices::ROTATION_COMPONENT:
+				static_cast<components::rotation*>(components[componentId])[index] = static_cast<components::rotation*>(components[componentId])[last];
+				break;
 			case ComponentsIndices::TRANSFORM_COMPONENT:
 				static_cast<components::transform*>(components[componentId])[index] = static_cast<components::transform*>(components[componentId])[last];
 				break;

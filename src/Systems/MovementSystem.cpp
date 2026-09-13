@@ -148,57 +148,8 @@ namespace GLVM::ecs
 
     Vector<float, 3> CMovementSystem::CalculateVectorFB(components::beholder& beholder,
                                                         [[maybe_unused]] core::CEvent& event) {
-        Vector<float, 3> forward(0.0f);
-        // forward[0] = std::cos(Radians(event.mousePointerPosition.yaw * 2));
-        // forward[2] = std::sin(Radians(event.mousePointerPosition.yaw * 2));
-
-		// float sinYaw = std::sin(Radians(event.mousePointerPosition.yaw / 2));
-		// float cosYaw = std::cos(Radians(event.mousePointerPosition.yaw / 2));
-		
-		// Quaternion yawQuat;
-		// yawQuat.w = cosYaw;
-		// yawQuat.x = 0.0f;
-		// yawQuat.y = sinYaw;
-		// yawQuat.z = 0.0f;
-
-		// Quaternion result;
-		// result = multiplyQuaternion(multiplyQuaternion(yawQuat, Quaternion{ .w = 0.0f, .x = 0.0f,
-		// 			.y = 0.0f, .z = 1.0f }), inverseQuaternion(yawQuat));
-
-		// forward[0] = result.x;
-		// forward[1] = result.y;
-		// forward[2] = result.z;
-
-		current_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		float delta_x = current_X - prev_X;
-		// if ( delta_x < 0.0001 )
-		// 	delta_x = prev_delta_x;
-
-		const vec3 rotateAxis = { 0.0, -1.0, 0.0 };
-		float rotationAngle = delta_x;
-		constexpr float angleScale = 0.1f;
-		rotationAngle = Radians(rotationAngle * angleScale);
-		constexpr float quatAngleCorrection = 0.5f;                                                                                     /// Quaternions need devision by 2
-		const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-		Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-											 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-		// Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
-		// 																								beholder.forward[1], beholder.forward[2])),
-		// 													conjugate(rotationQuat));
-		const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, beholder.forward[0], beholder.forward[1],
-																		  beholder.forward[2])) * conjugate(rotationQuat);
-		
-		
-		forward[0] = appliedRotationQuat.x;
-		forward[1] = 0.0f;
-		forward[2] = appliedRotationQuat.z;
-
-		prev_X = (float)g_eEvent.mousePointerPosition.offset_X;
-		// if ( delta_x > 0.0f )
-		// 	prev_delta_x = delta_x;
-		
-        forward = Normalize(forward);
-        return forward;
+        // Movement follows the camera; input has already determined its orientation.
+        return Normalize(vec3(beholder.forward[0], 0.0f, beholder.forward[2]));
     }
 }
 

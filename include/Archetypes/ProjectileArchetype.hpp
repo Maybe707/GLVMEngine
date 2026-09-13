@@ -45,6 +45,7 @@ namespace GLVM::ecs::arch {
 		tagComponents::projectileTagComponent projectileTagComponents[PROJECTILE_ARCH_CHUNK_SIZE];
 
 		ProjectileArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, PROJECTILE_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]         = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]              = meshes;
 			components[ComponentsIndices::COLLIDER_COMPONENT]          = colliders;

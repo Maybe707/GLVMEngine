@@ -54,6 +54,7 @@ namespace GLVM::ecs::arch {
 		tagComponents::playerTagComponent playerTagComponents[PLAYER_ARCH_CHUNK_SIZE];
 
 		PlayerArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, PLAYER_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::VIEW_COMPONENT]            = beholders;
 			components[ComponentsIndices::COLLIDER_COMPONENT]        = colliders;

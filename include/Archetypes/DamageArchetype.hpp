@@ -20,6 +20,7 @@ namespace GLVM::ecs::arch {
 		components::font   fonts[DAMAGE_ARCH_CHUNK_SIZE];
 
 		DamageArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, DAMAGE_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::ATTACK_COMPONENT]         = attacks;
 			components[ComponentsIndices::HEALTH_COMPONENT]         = health;
 			components[ComponentsIndices::FONT_COMPONENT]           = fonts;

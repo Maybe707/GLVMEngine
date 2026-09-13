@@ -23,6 +23,7 @@ namespace GLVM::ecs::arch {
 		components::pointLight    pointLights[POINT_LIGHT_ARCH_CHUNK_SIZE];
 
 		PointLightArchetype() {
+            capacity = std::min<uint32_t>(CAPACITY, POINT_LIGHT_ARCH_CHUNK_SIZE);
 			components[ComponentsIndices::TRANSFORM_COMPONENT]       = transforms;
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
