@@ -20,7 +20,9 @@ APP_OBJECTS = $(BUILD)/src/EngineMain.o $(BUILD)/src/Demo/DemoScene.o $(filter $
 CORE_OBJECTS = $(filter-out $(APP_OBJECTS),$(OBJECTS))
 CXXFLAGS = -std=c++20 $(OPT) -g -Wall -Wextra -DNOMINMAX -DWIN32_LEAN_AND_MEAN -MMD -MP
 CPPFLAGS = -Iinclude -Itextures -I$(SDK)/include
-LDLIBS = -L$(SDK) -lvulkan-1 -lwinmm -lgdi32 -luser32
+# MSYS2 ships libvulkan-1.dll.a; keep the GPU loader dynamic while linking
+# the MinGW runtime statically. WSL's generated libvulkan-1.a also works here.
+LDLIBS = -L$(SDK) -Wl,-Bdynamic -lvulkan-1 -Wl,-Bstatic -lwinmm -lgdi32 -luser32
 LDFLAGS = -static -static-libgcc -static-libstdc++ -mwindows
 include make_files/build_config.mk
 
