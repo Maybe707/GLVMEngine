@@ -8,6 +8,7 @@
 #include <fstream>
 #include <iostream>
 #include <mmeapi.h>
+#include <algorithm>
 
 namespace GLVM::core::Sound
 {
@@ -75,6 +76,19 @@ namespace GLVM::core::Sound
             file.read(buf, Format.nAvgBytesPerSec * 2);
             if(file.gcount() == 0)
                 break;
+
+            int16_t* samples = reinterpret_cast<int16_t*>(buf);
+			size_t sampleCount = file.gcount() / sizeof(int16_t);
+			float volume = 0.2f;
+			for (size_t i = 0; i < sampleCount; ++i)
+			{
+				float sample = static_cast<float>(samples[i]);
+				sample *= volume;
+
+				sample = std::clamp(sample, -32768.0f, 32767.0f);
+
+				samples[i] = static_cast<int16_t>(sample);
+			}
             
             lpWaveHdr.lpData = buf;
             lpWaveHdr.dwBufferLength = file.gcount();
@@ -93,12 +107,12 @@ namespace GLVM::core::Sound
     void CSoundEngineWaveform::SetMasterVolume(long _lVolume) {}
 
 	void CSoundEngineWaveform::CreateSoundSample( const char* filePath, u32 duration, u32 rate, float volume ) {
-//		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
-//		pSound_Sample->kPath_to_File_ = filePath;
-//		pSound_Sample->uiDuration_ = duration;
-//		pSound_Sample->uiRate_ = rate;
-//		pSound_Sample->volume  = volume;
-//		tSound_Contaier.Push(pSound_Sample);
+		core::Sound::CSoundSample* pSound_Sample = new core::Sound::CSoundSample();
+		pSound_Sample->kPath_to_File_ = filePath;
+		pSound_Sample->uiDuration_ = duration;
+		pSound_Sample->uiRate_ = rate;
+		pSound_Sample->volume  = volume;
+		tSound_Container.Push(pSound_Sample);
 	}
 	
     vector<CSoundSample*>& CSoundEngineWaveform::GetSoundContainer() { return tSound_Container; }
