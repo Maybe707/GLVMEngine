@@ -272,6 +272,23 @@ void main()
 			shadow = 0.0;
 	}
 
+	// float NdotL = saturate(dot(Normal, LightDirection));
+	// float3 diffuseColor;
+	// if (NdotL > 0.5) {
+	//   diffuseColor = BaseColor;
+	// } else {
+	//   diffuseColor = BaseColor * 0.5;
+	// }
+
+	// float NdotL = saturate(dot(fragmentNormal, lightData.directionalLightsArray[0].xyz));
+
+	// float threshold = 0.5;
+	// float softness = 0.1;
+
+	// float toon = smoothstep( threshold - softness, threshold + softness, NdotL );
+
+	// result = toon;
+
 	result = pow( clamp(result, 0.0, 1.0), vec3(0.9) );
 	outColor = vec4(result, 1.0);
 }

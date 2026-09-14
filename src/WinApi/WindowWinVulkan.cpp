@@ -116,7 +116,7 @@ namespace GLVM::core
 
         
         SetCursorPos(point_position.x, point_position.y);
-//        SetCursor(NULL);
+        SetCursor(NULL);
     }
 //}    
 ///< Callback method for events handling.
