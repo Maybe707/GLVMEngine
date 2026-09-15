@@ -488,6 +488,7 @@ namespace GLVM::core
 		void updateHudUBO( uint32_t offset, bool isHudExists, float highestY, uint32_t healthCounter );
 		void updateHudScreenUBO( uint32_t offset, uint32_t crosshair );
 		void updateSdfUBO(uint32_t offset, uint32_t crosshair);
+		void updateMathObjectsDebugUBO(uint32_t offset, uint32_t crosshair);
 		void updateCollisionsDebugUBO(uint32_t offset, mat4 model, DescriptorSetDataLink descriptorSetLink);
 		void updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset );
 		void updateUBO_IconsUI( uint32_t offset, uint32_t item );
@@ -495,7 +496,8 @@ namespace GLVM::core
 		void uiRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void uiIconsRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void hudScreenRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
-		void sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
+		void sdfRecordCommandBuffer(VkCommandBuffer &commandBuffer, uint32_t imageIndex);
+		void mathObjectsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void collisionsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void spacialGridDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);
 		void fontRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex);

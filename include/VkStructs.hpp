@@ -82,7 +82,7 @@ namespace GLVM::core
 			}
 		}
 	};
-	
+
 	enum DescriptorSetDataLink {
 		/// Pipelines related values
 		SHADOW_MAP_DIRECTIONAL_LIGHT,
@@ -105,11 +105,12 @@ namespace GLVM::core
 		SDF_DATA,
 		COLLISIONS_DEBUG_DATA,
 		SPACIAL_GRID_DEBUG_DATA,
+		MATH_OBJECTS_DEBUG_DATA,
 		/// Not related to any pipeline values
 		RIDABLE_TEXTURES,
 		DESCRIPTOR_CHUNKS_NUMBER
 	};
-	
+
 	enum SpecificPipeline {
 		DIRECTIONAL_LIGHT_PIPELINE,
 		SPOT_LIGHT_PIPELINE,
@@ -124,6 +125,7 @@ namespace GLVM::core
 		SDF_PIPELINE,
 		COLLISIONS_DEBUG_PIPELINE,
 		SPACIAL_GRID_DEBUG_PIPELINE,
+		MATH_OBJECTS_DEBUG_PIPELINE,
 		PIPELINES_NUMBER
 	};
 

@@ -1914,6 +1914,20 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
+	void CVulkanRenderer::updateMathObjectsDebugUBO(uint32_t offset, uint32_t crosshair) {
+		COLLISIONS_DEBUG_UBO hudUBO{};
+		hudUBO.model      = crosshairs[crosshair].model;
+		hudUBO.view       = viewMatrix;
+		hudUBO.projection = projectionMatrix;
+		
+		void* hudMatrixData;
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA].descriptorsBindingsIDs[0];		
+        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(COLLISIONS_DEBUG_UBO) * offset,
+					sizeof(COLLISIONS_DEBUG_UBO), 0, &hudMatrixData);
+        memcpy(hudMatrixData, &hudUBO, sizeof(COLLISIONS_DEBUG_UBO));
+        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+	}
+	
 	void CVulkanRenderer::updateCollisionsDebugUBO(uint32_t offset, mat4 model, DescriptorSetDataLink descriptorSetLink) {
 		COLLISIONS_DEBUG_UBO collisionsDebugUBO{};
 		collisionsDebugUBO.model      = model;
@@ -2251,11 +2265,11 @@ namespace GLVM::core
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
-        vkCmdEndRenderPass(commandBuffer);
+        // vkCmdEndRenderPass(commandBuffer);
 
-        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-            throw std::runtime_error("failed to record command buffer!");
-        }
+        // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to record command buffer!");
+        // }
     }
 
     void CVulkanRenderer::sdfRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -2520,6 +2534,80 @@ namespace GLVM::core
         // }
     }
 
+    void CVulkanRenderer::mathObjectsDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
+        VkCommandBufferBeginInfo beginInfo{};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+        // if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        //     throw std::runtime_error("failed to begin recording command buffer!");
+        // }
+
+//		CreateEndDebugUtilsLabelEXT(instance, commandBuffer);
+		
+        VkRenderPassBeginInfo renderPassInfo{};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPasses[SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE];
+        renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+        renderPassInfo.renderArea.offset = {0, 0};
+        renderPassInfo.renderArea.extent.height = swapChainExtent.height;
+		renderPassInfo.renderArea.extent.width = swapChainExtent.width;
+
+        std::array<VkClearValue, 2> clearValues{};
+        clearValues[0].color = {{0.5f, 0.2f, 0.2f, 1.0f}};
+        clearValues[1].depthStencil = {1.0f, 0};
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE].pipeline);
+
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) swapChainExtent.width;
+        viewport.height = (float) swapChainExtent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
+
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = swapChainExtent;
+        vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+
+		for ( unsigned int i = 0; i < crosshairs.GetSize(); ++i ) {
+			RenderCrosshair crosshair = crosshairs[i];
+			unsigned int uiVertexId = crosshair.meshID;
+
+//			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i; ///< TODO: Have to figure out why frames in flight doesn't work
+			unsigned int uboIndex = hudScreenUboDescriptorNumber + i;
+			updateMathObjectsDebugUBO(uboIndex, i);
+			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE].linkedDescriptorSetIDs[0];
+  			const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
+			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE].pipelineLayout,
+									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
+
+			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkDeviceSize offsets[] = {0};
+			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+
+			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+
+//			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+
+//			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
+		}
+
+        vkCmdEndRenderPass(commandBuffer);
+
+        if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+    
     void CVulkanRenderer::spacialGridDebugRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
         VkCommandBufferBeginInfo beginInfo{};
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -3226,8 +3314,9 @@ namespace GLVM::core
 		if( isDebugCollisitionsActive ) {
 			collisionsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 		}
-		
+
 		hudScreenRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
+		mathObjectsDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 //		sdfRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);
 
 //		spacialGridDebugRecordCommandBuffer(mainRenderCommandBuffers[currentFrame], imageIndex);

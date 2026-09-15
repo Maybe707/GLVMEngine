@@ -1,0 +1,23 @@
+#version 450
+
+// #extension GL_ARB_separate_shader_objects : enable
+// #extension GL_ARB_shading_language_420pack : enable
+
+layout(location = 0) in vec3 inPosition;
+layout(location = 1) in vec3 inNormal;
+layout(location = 2) in vec2 inTextureCoordinate;
+layout(location = 3) in vec4 inJointIndices;
+layout(location = 4) in vec4 inWeights;
+
+layout(set = 0, binding = 0) uniform UniformBufferObject {
+    mat4 model;
+    mat4 view;
+    mat4 projection;
+} ubo;
+
+void main() {
+  gl_Position = ubo.projection * ubo.view * ubo.model * vec4(inPosition + vec3(0.3, 1.0, 0.0), 1.0);
+  //gl_Position = vec4(inPosition, 1.0) + vec4(0.3, 0.0, 0.0, 0.0);
+}
+
+
