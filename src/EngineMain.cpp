@@ -92,7 +92,8 @@ int main()
 	[[maybe_unused]] cm::MeshHandle cyborg_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/cyborg11.gltf");
 //	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/robot3.gltf");
 	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/scene.gltf");
-
+	[[maybe_unused]] cm::MeshHandle tree_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/tree.gltf");
+	
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
 	[[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromAddress(32, 32, gray_dat_len, gray_dat);
@@ -223,13 +224,14 @@ int main()
 	}
 
 	for( u32 i = 0; i < 5; ++i ) {
+		unsigned int random = dist(mersenne);
 		arch::entity cube = archEntityManager->createEntity();
 		std::cout << "Cube: " << arch::getId( cube ) << std::endl;
 		arch::world.addEntityToArchetype( cube, arch::world.archetypes[4] );
 		arch::EntityLocation cubeLocation = arch::world.entityLocations[arch::getId( cube )];
 		arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
 		const uint32_t cubeIndex = cubeLocation.index;
-		cubeArch->transforms[cubeIndex] = { .position = { 7.0f, 2.0f, 10.0f + i * 2.0f }, .scale = 1.0f };
+		cubeArch->transforms[cubeIndex] = { .position = { -8.0f + i * 6.0f, 2.0f + i * 3.0f, 15.0f + random * 2 }, .scale = 3.0f };
 		cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
 		cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
