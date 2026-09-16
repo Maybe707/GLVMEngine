@@ -1914,9 +1914,9 @@ namespace GLVM::core
         vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
-	void CVulkanRenderer::updateMathObjectsDebugUBO(uint32_t offset, uint32_t crosshair) {
+	void CVulkanRenderer::updateMathObjectsDebugUBO(uint32_t offset, uint32_t mathObject) {
 		COLLISIONS_DEBUG_UBO hudUBO{};
-		hudUBO.model      = crosshairs[crosshair].model;
+		hudUBO.model      = mathObjects[mathObject].modelMatrix;
 		hudUBO.view       = viewMatrix;
 		hudUBO.projection = projectionMatrix;
 		

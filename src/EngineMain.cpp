@@ -94,6 +94,7 @@ int main()
 //	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/robot3.gltf");
 	[[maybe_unused]] cm::MeshHandle robot0_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/scene.gltf");
 	[[maybe_unused]] cm::MeshHandle tree_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/tree.gltf");
+	[[maybe_unused]] cm::MeshHandle debugVector_Handle_GLTF = GLVM->LoadMeshFromFile_GLTF("../gltf/debugVector.gltf");
 	
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
@@ -336,8 +337,9 @@ int main()
 	arch::MathObjectArchetype* vectorArch = static_cast<arch::MathObjectArchetype*>(vectorLocation.arch);
 	const uint32_t vectorIndex = vectorLocation.index;
 
-	vectorArch->transforms[vectorIndex]  = { .position = { 3.0f, 5.0f, 0.0f }, .forward = {}, .pitch = 3.14, .scale = 1.0f };
-	vectorArch->meshes[vectorIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
+	vectorArch->transforms[vectorIndex]  = { .position = { 15.0f, 2.0f, 0.0f }, .forward = {}, .yaw = -1.57, .pitch = 0.0f, .scale = 1.0f };
+	vectorArch->meshes[vectorIndex]      = { .handle = debugVector_Handle_GLTF, .gltf = true };
+//	vectorArch->rotations[vectorIndex]   = { .pitch = 30.0f };
 	vectorArch->materials[vectorIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
