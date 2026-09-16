@@ -2577,9 +2577,9 @@ namespace GLVM::core
         scissor.extent = swapChainExtent;
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-		for ( unsigned int i = 0; i < crosshairs.GetSize(); ++i ) {
-			RenderCrosshair crosshair = crosshairs[i];
-			unsigned int uiVertexId = crosshair.meshID;
+		for ( unsigned int i = 0; i < mathObjects.GetSize(); ++i ) {
+			RenderMathObject mathObject = mathObjects[i];
+			unsigned int uiVertexId = mathObject.meshID;
 
 //			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i; ///< TODO: Have to figure out why frames in flight doesn't work
 			unsigned int uboIndex = hudScreenUboDescriptorNumber + i;
@@ -2595,10 +2595,10 @@ namespace GLVM::core
 
 			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
 
-//			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
+			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-//			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
-			vkCmdDrawIndexed(commandBuffer, 3, 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
+			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
         vkCmdEndRenderPass(commandBuffer);

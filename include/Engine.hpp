@@ -51,6 +51,7 @@
 #include "Archetypes/DirectionalLightArchetype.hpp"
 #include "Archetypes/PointLightArchetype.hpp"
 #include "Archetypes/SpotLightArchetype.hpp"
+#include "Archetypes/MathObjectaArchetype.hpp"
 
 using Entity = unsigned int;
 
@@ -165,7 +166,10 @@ namespace GLVM::core
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
 			(1ul << ecs::arch::ComponentsIndices::VIEW_COMPONENT);
 
-
+		ecs::arch::Archetype* cachedMathObjectArchetypes[32];
+		uint32_t mathObjectArchetypesNumber = 0;
+		ecs::arch::componentMask mathObjectRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MATH_OBJECT_COMPONENT);
 		
 		ecs::arch::Archetype* cachedAnimationArchetypes[32];
 		uint32_t animationArchetypesNumber = 0;

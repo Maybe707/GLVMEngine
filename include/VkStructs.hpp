@@ -259,6 +259,13 @@ struct RenderPlayer {
 	vec3 forward;
 };
 
+struct RenderMathObject {
+	vec3 position;
+	vec3 forward;
+	mat4 modelMatrix;
+	unsigned int meshID;
+};
+
 struct RenderActor {
 	mat4 modelMatrix;
 	GLVM::core::vector<mat4> jointMatrices;

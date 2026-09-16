@@ -1501,10 +1501,45 @@ namespace GLVM::core
 		}
 
 		
+		vulkanRenderer->mathObjects.clear();
+		mathObjectArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( mathObjectRequiredMask, cachedMathObjectArchetypes, mathObjectArchetypesNumber );
+
+		uint32_t mathObjectEntityCount = 0;
+		for( uint32_t x = 0; x < mathObjectArchetypesNumber; ++x ) {
+			arch::Archetype* arch = cachedMathObjectArchetypes[x];
+			cm::transform *mathObjectTransforms =
+				(ecs::components::transform *)arch->components
+				[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::rotation*    mathObjectRotations = (ecs::components::rotation*)arch->
+				components[arch::ComponentsIndices::ROTATION_COMPONENT];
+			cm::mesh*        mathObjectMeshes    = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			
+			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
+				vulkanRenderer->mathObjects.Push({});
+				cm::transform* mathObjectTransformComponent = &mathObjectTransforms[n];
+				cm::rotation*  mathObjectRotationComponent  = &mathObjectRotations[n];
+				if( &mathObjectTransforms[n] != nullptr ) {
+					const unsigned int meshID = mathObjectMeshes[n].handle.id;
+					const mat4 model = computeModelMatrix(mathObjectTransformComponent, mathObjectRotationComponent);
+
+					vulkanRenderer->mathObjects[mathObjectEntityCount].meshID      = meshID;
+					vulkanRenderer->mathObjects[mathObjectEntityCount].modelMatrix = model;
+					vulkanRenderer->mathObjects[mathObjectEntityCount].position    = mathObjectTransformComponent->position;
+					vulkanRenderer->mathObjects[mathObjectEntityCount].forward     = mathObjectTransformComponent->forward;
+				}
+				
+				++mathObjectEntityCount;
+			}
+
+		}
+
 		vulkanRenderer->players.clear();
 		playerArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( playerRequiredMask, cachedPlayerArchetypes, playerArchetypesNumber );
-		
+
+
 		uint32_t playerEntityCount = 0;
 		for( uint32_t x = 0; x < playerArchetypesNumber; ++x ) {
 			arch::Archetype* arch = cachedPlayerArchetypes[x];
@@ -1532,8 +1567,9 @@ namespace GLVM::core
 					vulkanRenderer->players[playerEntityCount].position = playerTransformComponent->position;
 					vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
 				}
+
+				++playerEntityCount;
 			}
-			++playerEntityCount;
 		}
 	}
 

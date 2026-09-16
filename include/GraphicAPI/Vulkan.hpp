@@ -176,6 +176,7 @@ namespace GLVM::core
 		core::vector<RenderItem> items;
 		core::vector<RenderCrosshair> crosshairs;
 		core::vector<RenderPlayer> players;
+		core::vector<RenderMathObject> mathObjects;
 		core::vector<RenderCollisionWireframe> collisionsWireframes;
 		core::vector<VkBuffer> collisionsWireframesVKBuffers;
 		core::vector<VkDeviceMemory> collisionsWireframesVKDeviceMemory;

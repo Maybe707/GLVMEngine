@@ -8,6 +8,7 @@
 #include "Archetypes/CrosshairArchetype.hpp"
 #include "Archetypes/InventoryArchetype.hpp"
 #include "Archetypes/LevelChunkArchetype.hpp"
+#include "Archetypes/MathObjectaArchetype.hpp"
 #include "Archetypes/RigidBodyArchetype.hpp"
 #include "Archetypes/SpotLightArchetype.hpp"
 #include "Archetypes/StaticMeshArchetype.hpp"
@@ -116,7 +117,8 @@ int main()
 		arch::DirectionalLightArchetype* directionalLightArch = new arch::DirectionalLightArchetype;
 		arch::PointLightArchetype*       pointLightArch       = new arch::PointLightArchetype;
 		arch::SpotLightArchetype*        spotLightArch        = new arch::SpotLightArchetype;
-	
+		arch::MathObjectArchetype*       mathObjectsArch      = new arch::MathObjectArchetype;
+		
 		arch::world.archetypes.Push( levelChunkArch );
 		arch::world.archetypes.Push( playerArch );
 		arch::world.archetypes.Push( enemyArch );
@@ -127,7 +129,8 @@ int main()
 		arch::world.archetypes.Push( itemArch );
 		arch::world.archetypes.Push( directionalLightArch );
 		arch::world.archetypes.Push( pointLightArch );
-		arch::world.archetypes.Push( spotLightArch );
+		arch::world.archetypes.Push(spotLightArch);
+		arch::world.archetypes.Push( mathObjectsArch );
 	}
 
 	/// Loading method with stb_image
@@ -325,7 +328,18 @@ int main()
 	spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 12.0f, 5.0f }, .scale = 0.2f };
 	spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
 	spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
-	
+
+	arch::entity vector = archEntityManager->createEntity();
+//	std::cout << "player: " << ecs::arch::getId(player) << std::endl;
+	arch::world.addEntityToArchetype( vector, arch::world.archetypes[11] );
+	arch::EntityLocation vectorLocation = arch::world.entityLocations[arch::getId( vector )];
+	arch::MathObjectArchetype* vectorArch = static_cast<arch::MathObjectArchetype*>(vectorLocation.arch);
+	const uint32_t vectorIndex = vectorLocation.index;
+
+	vectorArch->transforms[vectorIndex]  = { .position = { 3.0f, 5.0f, 0.0f }, .forward = {}, .pitch = 3.14, .scale = 1.0f };
+	vectorArch->meshes[vectorIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
+	vectorArch->materials[vectorIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
     ///< Game rendering loop
 //	Glvm->GameLoop(GLVM::core::OPENGL_RENDERER);
