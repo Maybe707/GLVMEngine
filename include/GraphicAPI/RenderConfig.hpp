@@ -735,8 +735,9 @@ namespace GLVM::core
 		descriptorBindingsConfig[22].binding                 = 0;
 		descriptorBindingsConfig[22].shaderDescriptorsNumber = 1;
 		descriptorBindingsConfig[22].uboChunkSize            = sizeof(COLLISIONS_DEBUG_UBO);
-		
 
+
+		pipelineConfigs[SPACIAL_GRID_DEBUG_PIPELINE].vertShader                       = "../VKshaders/debug/collisions/vertDebug.spv";
 		pipelineConfigs[SPACIAL_GRID_DEBUG_PIPELINE].fragShader                       = "../VKshaders/debug/collisions/fragDebug.spv";
 		pipelineConfigs[SPACIAL_GRID_DEBUG_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[SPACIAL_GRID_DEBUG_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();

@@ -2265,7 +2265,7 @@ namespace GLVM::core
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 
-        // vkCmdEndRenderPass(commandBuffer);
+        vkCmdEndRenderPass(commandBuffer);
 
         // if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
         //     throw std::runtime_error("failed to record command buffer!");
