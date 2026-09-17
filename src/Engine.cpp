@@ -1895,73 +1895,20 @@ namespace GLVM::core
 		translationMatrix[3][2] = _transformComponent->position[2];
 		translationMatrix[3][3] = 1.0f;
 
-		// float sinPitch = std::sin(Radians(-rotation->pitch / 2));
-		// float cosPitch = std::cos(Radians(-rotation->pitch / 2));
-		// float sinYaw = std::sin(Radians((rotation->yaw)  / 2));
-		// float cosYaw = std::cos(Radians((rotation->yaw)  / 2));
+		const float yaw   = _transformComponent->yaw;
+		const float pitch = _transformComponent->pitch;
+
+		const float halfPitch = pitch * 0.5f;
+		const float halfYaw   = yaw   * 0.5f;
+
+		const Quaternion qPitch( cosf(halfPitch), 0.0f, sinf(halfPitch), 0.0f );
+		const Quaternion qYaw( cosf(halfYaw), sinf(halfYaw), 0.0f, 0.0f );
+
+		const Quaternion rotationQuat = qPitch * qYaw;
+		rotationMatrix = rotateQuaternion<float, 4>(rotationQuat);
 		
-		// Quaternion pitchQuat;
-		// Quaternion yawQuat;
-		// pitchQuat.w = cosPitch;
-		// pitchQuat.x = sinPitch;
-		// pitchQuat.y = 0.0f;
-		// pitchQuat.z = 0.0f;
-
-		// yawQuat.w = cosYaw;
-		// yawQuat.x = 0.0f;
-		// yawQuat.y = sinYaw;
-		// yawQuat.z = 0.0f;
-
-		// Quaternion result;
-		// result = multiplyQuaternion(pitchQuat, yawQuat);
-
-		// float sinPitch = std::sin(Radians(-_transformComponent->pitch / 2));
-		// float cosPitch = std::cos(Radians(-_transformComponent->pitch / 2));
-		// float sinYaw = std::sin(Radians((_transformComponent->yaw)  / 2));
-		// float cosYaw = std::cos(Radians((_transformComponent->yaw)  / 2));
-		
-		// Quaternion pitchQuat;
-		// Quaternion yawQuat;
-		// pitchQuat.w = cosPitch;
-		// pitchQuat.x = sinPitch;
-		// pitchQuat.y = 0.0f;
-		// pitchQuat.z = 0.0f;
-
-		// yawQuat.w = cosYaw;
-		// yawQuat.x = 0.0f;
-		// yawQuat.y = sinYaw;
-		// yawQuat.z = 0.0f;
-
-		// Quaternion result;
-		// result = multiplyQuaternion(pitchQuat, yawQuat);
-
-		// constexpr float quatAngleCorrection = 0.5f;
-		// const vec3 rotateAxis = { 0.0, 1.0, 0.0 };
-		// constexpr float angleScale = 0.1f;
-		// Quaternion rotationQuat = Quaternion(cosf((pitchQuat.w + yawQuat.w)  * quatAngleCorrection), pitchQuat.x * rotateAxis[0],
-//											 yawQuat.y * rotateAxis[1], rotateAxis[2]);
-		// Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, beholder.forward[0],
-		// 																								beholder.forward[1], beholder.forward[2])),
-		// 													conjugate(rotationQuat));
-
-//		rotationMatrix = rotateQuaternion<float, 4>(result);		
-//		std::cout << "pitch: " << _transformComponent->pitch << std::endl;
-//		const float rotationAngleScaler = 1.0f / 180.0f;
-
-		mat4 pitchRotationMatrix = Rotate<float, 4, 3>(vec3(0.0, 1.0, 0.0), _transformComponent->pitch);
-		mat4 yawRotationMatrix = Rotate<float, 4, 3>(vec3(1.0, 0.0, 0.0), _transformComponent->yaw);
-
-		rotationMatrix = pitchRotationMatrix * yawRotationMatrix;
-		
-		// glm::quat rotation = glm::quat(cos(glm::radians(fPitch/2)),(glm::radians(fPitch/2))*1, 0,0);
-		// glm::mat4 rotationMat = glm::mat4_cast(rotation);
-		// // result = { rotation.w, rotation.x, rotation.y, rotation.z };
-		// // rotationMatrix = rotateQuaternion<float, 4>(result);
-		// for ( aunsigned int i = 0; i < 4; ++i )
-		// 	for ( unsigned int j = 0; j < 4; ++j )
-		// 		rotationMatrix[i][j] = rotationMat[i][j];
-		
-        return rotationMatrix * scalingMatrix * translationMatrix;
+		rotationMatrix.SelfTensorTranspose();
+        return scalingMatrix * rotationMatrix * translationMatrix;
 	}
 	
 	void Engine::computeHudScreeenCoordinates() {
