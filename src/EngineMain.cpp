@@ -239,7 +239,7 @@ int main()
 		cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
 		cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
 			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
-		cubeArch->fonts[cubeIndex].font_string.Push(' ');
+//		cubeArch->fonts[cubeIndex].font_string.Push(' ');
 	}
 	
 	arch::entity crosshair = archEntityManager->createEntity();

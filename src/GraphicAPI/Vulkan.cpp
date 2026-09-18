@@ -403,14 +403,14 @@ namespace GLVM::core
     void CVulkanRenderer::cleanup() {
         cleanupSwapChain();
 
-		for( unsigned int i = 0, j = 0; i < GPUDescriptors.GetSize(); ++j ) {
-			if( descriptorBindingsConfig[j].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+		for( unsigned int i = 0; i < GPUDescriptors.GetSize(); ++i ) {
+			if( descriptorBindingsConfig[i].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
 				vkDestroyBuffer(device, GPUDescriptors[i].GPUBuffer->buffer, nullptr);
 				vkFreeMemory(device, GPUDescriptors[i].GPUBuffer->deviceMemory, nullptr);
 				delete GPUDescriptors[i].GPUBuffer;
 				GPUDescriptors[i].GPUBuffer = nullptr;
-			} else if( descriptorBindingsConfig[j].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
-				for( unsigned int n = i; n < i + descriptorBindingsConfig[j].shaderDescriptorsNumber; ++n ) {
+			} else if( descriptorBindingsConfig[i].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+				for( unsigned int n = i; n < i + descriptorBindingsConfig[i].shaderDescriptorsNumber; ++n ) {
 					if( GPUDescriptors[n].GPUImage->views.size() )
 						clearVK_Image( GPUDescriptors[n].GPUImage );
 
@@ -418,7 +418,6 @@ namespace GLVM::core
 					GPUDescriptors[n].GPUImage = nullptr;
 				}
 			}
-			i = i + descriptorBindingsConfig[j].shaderDescriptorsNumber;
 		}
 
 		for( size_t i = 0; i < collisionsWireframesVKBuffers.GetSize(); ++i ) {
