@@ -184,7 +184,7 @@ namespace GLVM::core
         mapMemoryUBO(SpecificPipeline::UI_PIPELINE, DescriptorSetDataLink::UI, sizeof(UI_UBO));
         mapMemoryUBO(SpecificPipeline::UI_ICONS_PIPELINE, DescriptorSetDataLink::UI_ICONS, sizeof(UI_UBO));
         mapMemoryUBO(SpecificPipeline::COLLISIONS_DEBUG_PIPELINE, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
-        mapMemoryUBO(SpecificPipeline::HUD_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
+        mapMemoryUBO(SpecificPipeline::HUD_SCREEN_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
 		mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
     }
     
