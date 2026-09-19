@@ -179,13 +179,13 @@ namespace GLVM::core
         mapMemoryUBO(SpecificPipeline::SPOT_LIGHT_PIPELINE, DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT, sizeof(ShadowMapMatrixUBO));
         mapMemoryUBO(SpecificPipeline::POINT_LIGHT_PIPELINE, DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT, sizeof(PointLightShadowMapMatrixUBO));
         mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO, sizeof(ModelMatrixUBO));
-        // mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT,
-        //              sizeof(PointLightShadowMapMatrixUBO));
-        // mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT,
-        //              sizeof(PointLightShadowMapMatrixUBO));
-        // mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT,
-        //              sizeof(PointLightShadowMapMatrixUBO));
-		// mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT, sizeof(PointLightShadowMapMatrixUBO));
+        mapMemoryUBO(SpecificPipeline::HUD_PIPELINE, DescriptorSetDataLink::HUD, sizeof(HUD_UBO));
+        mapMemoryUBO(SpecificPipeline::FONT_PIPELINE, DescriptorSetDataLink::FONT_RENDER_UBO, sizeof(FONT_UBO));
+        mapMemoryUBO(SpecificPipeline::UI_PIPELINE, DescriptorSetDataLink::UI, sizeof(UI_UBO));
+        mapMemoryUBO(SpecificPipeline::UI_ICONS_PIPELINE, DescriptorSetDataLink::UI_ICONS, sizeof(UI_UBO));
+        mapMemoryUBO(SpecificPipeline::COLLISIONS_DEBUG_PIPELINE, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
+        mapMemoryUBO(SpecificPipeline::HUD_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
+		mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
     }
     
     void CVulkanRenderer::initWindow() {
@@ -1890,24 +1890,18 @@ namespace GLVM::core
 		hudUBO.entityPosition = healthBars[healthCounter].position;
 		hudUBO.highestY    = highestY;
 
-		void* hudMatrixData;
-		unsigned int hudUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(HUD_UBO) * offset,
-					sizeof(HUD_UBO), 0, &hudMatrixData);
+		unsigned int hudUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD].descriptorsBindingsIDs[0];
+		HUD_UBO* hudMatrixData = (HUD_UBO*)(GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
 	void CVulkanRenderer::updateHudScreenUBO(uint32_t offset, uint32_t crosshair) {
 		HUD_SCREEN_UBO hudUBO{};
 		hudUBO.model = crosshairs[crosshair].model;
 		
-		void* hudMatrixData;
-		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD_SCREEN].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(HUD_SCREEN_UBO) * offset,
-					sizeof(HUD_SCREEN_UBO), 0, &hudMatrixData);
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::HUD_SCREEN].descriptorsBindingsIDs[0];
+		HUD_SCREEN_UBO* hudMatrixData = (HUD_SCREEN_UBO*)(GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(hudMatrixData, &hudUBO, sizeof(HUD_SCREEN_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
 	void CVulkanRenderer::updateSdfUBO(uint32_t offset, uint32_t crosshair) {
@@ -1931,29 +1925,20 @@ namespace GLVM::core
 		hudUBO.view       = viewMatrix;
 		hudUBO.projection = projectionMatrix;
 		
-		void* hudMatrixData;
-		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(COLLISIONS_DEBUG_UBO) * offset,
-					sizeof(COLLISIONS_DEBUG_UBO), 0, &hudMatrixData);
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA].descriptorsBindingsIDs[0];
+		COLLISIONS_DEBUG_UBO* hudMatrixData = (COLLISIONS_DEBUG_UBO*)(GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(hudMatrixData, &hudUBO, sizeof(COLLISIONS_DEBUG_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 	
 	void CVulkanRenderer::updateCollisionsDebugUBO(uint32_t offset, mat4 model, DescriptorSetDataLink descriptorSetLink) {
 		COLLISIONS_DEBUG_UBO collisionsDebugUBO{};
 		collisionsDebugUBO.model      = model;
-//		collisionsDebugUBO.model      = collisionsWireframes[crosshair].model;
 		collisionsDebugUBO.view       = viewMatrix;
 		collisionsDebugUBO.projection = projectionMatrix;
 
-//		std::cout << "model: " << collisionsDebugUBO.model << std::endl;
-		
-		void* collisionsDebugData;
-		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[descriptorSetLink].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(COLLISIONS_DEBUG_UBO) * offset,
-					sizeof(COLLISIONS_DEBUG_UBO), 0, &collisionsDebugData);
+		unsigned int hudScreenUboDescriptorBindingIndex = descriptorSetsConfig[descriptorSetLink].descriptorsBindingsIDs[0];
+		COLLISIONS_DEBUG_UBO* collisionsDebugData = (COLLISIONS_DEBUG_UBO*)(GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(collisionsDebugData, &collisionsDebugUBO, sizeof(COLLISIONS_DEBUG_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[hudScreenUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 	
 	void CVulkanRenderer::updateUBO_UI( const unsigned int currentInventoryRow, const unsigned int currentInventoryColumn, const unsigned int inventory, uint32_t offset ) {
@@ -1963,24 +1948,18 @@ namespace GLVM::core
 		hudUBO.model = inventories[inventory].slotData[colSize * currentInventoryRow + currentInventoryColumn].model;
 		hudUBO.color = inventories[inventory].slotData[colSize * currentInventoryRow + currentInventoryColumn].color;
 
-		void* hudMatrixData;
 		unsigned int uiUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI].descriptorsBindingsIDs[0];
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(UI_UBO) * offset,
-					sizeof(UI_UBO), 0, &hudMatrixData);
+		UI_UBO* hudMatrixData = (UI_UBO*)(GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(hudMatrixData, &hudUBO, sizeof(UI_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 
 	void CVulkanRenderer::updateUBO_IconsUI( uint32_t offset, uint32_t item ) {
 		UI_UBO hudUBO{};
 		hudUBO.model = items[item].model;
 		
-		void* hudMatrixData;
 		unsigned int uiIconsUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::UI_ICONS].descriptorsBindingsIDs[0];
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(UI_UBO) * offset,
-					sizeof(UI_UBO), 0, &hudMatrixData);
+		UI_UBO* hudMatrixData = (UI_UBO*)(GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
         memcpy(hudMatrixData, &hudUBO, sizeof(UI_UBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[uiIconsUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 	}
 	
     void CVulkanRenderer::hudRecordCommandBuffer(VkCommandBuffer& commandBuffer, uint32_t imageIndex) {
@@ -2889,12 +2868,13 @@ namespace GLVM::core
 					ndcPosition[1] -= font.lifeTime / 5.0f;
 					fontUBO.position = ndcPosition;
 
-					void* modelMatrixData;
+//					void* modelMatrixData;
 					unsigned int fontUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::FONT_RENDER_UBO].descriptorsBindingsIDs[0];
-					vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(fontUBO) * (currentActorMemoryOffset + j),
-								sizeof(fontUBO), 0, &modelMatrixData);
+					FONT_UBO* modelMatrixData = (FONT_UBO*)(GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentActorMemoryOffset;
+					// vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(fontUBO) * (currentActorMemoryOffset + j),
+					// 			sizeof(fontUBO), 0, &modelMatrixData);
 					memcpy(modelMatrixData, &fontUBO, sizeof(fontUBO));
-					vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+//					vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[fontUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
 
 					const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::FONT_PIPELINE].linkedDescriptorSetIDs[0];
 					const DescriptorSet& currentDescriptorSet = descriptorSetsConfig[linkedDescriptorSetID];
@@ -3066,14 +3046,9 @@ namespace GLVM::core
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
-		// void* modelMatrixData = nullptr;
-
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];
 		ShadowMapMatrixUBO* modelMatrixData = (ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage;
-        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
@@ -3090,12 +3065,8 @@ namespace GLVM::core
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
-//        void* modelMatrixData;
 		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		 ShadowMapMatrixUBO* modelMatrixData = (ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage;
-        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, uint32_t currentLight, uint32_t layer, unsigned int actor) {
@@ -3117,13 +3088,9 @@ namespace GLVM::core
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
-//        void* modelMatrixData;
         unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];
 		PointLightShadowMapMatrixUBO* modelMatrixData = (PointLightShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage;
-        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, unsigned int actor) {
@@ -3157,13 +3124,7 @@ namespace GLVM::core
 
         unsigned int mainRenderDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].descriptorsBindingsIDs[0];
 		ModelMatrixUBO* modelMatrixData = (ModelMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[mainRenderDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
-		
-//		void *modelMatrixData;
-//        ModelMatrixUBO* modelMatrixData = (ModelMatrixUBO*)(GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->buffer) + offset;
-        // vkMapMemory(device, GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory, sizeof(modelMatrixUBO) * offset,
-		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
         memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-//        vkUnmapMemory(device, GPUDescriptors[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].GPUBuffer->deviceMemory);
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {
