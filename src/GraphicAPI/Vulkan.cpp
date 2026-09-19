@@ -175,10 +175,10 @@ namespace GLVM::core
         initWindow();
         initVulkan();
 
-        mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT, sizeof(ShadowMapMatrixUBO));
-        mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT, sizeof(ShadowMapMatrixUBO));
-        mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT, sizeof(PointLightShadowMapMatrixUBO));
-        mapMemoryUBO(DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO, sizeof(ModelMatrixUBO));
+        mapMemoryUBO(SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE, DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT, sizeof(ShadowMapMatrixUBO));
+        mapMemoryUBO(SpecificPipeline::SPOT_LIGHT_PIPELINE, DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT, sizeof(ShadowMapMatrixUBO));
+        mapMemoryUBO(SpecificPipeline::POINT_LIGHT_PIPELINE, DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT, sizeof(PointLightShadowMapMatrixUBO));
+        mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO, sizeof(ModelMatrixUBO));
         // mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT,
         //              sizeof(PointLightShadowMapMatrixUBO));
         // mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT,
@@ -3045,9 +3045,9 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::mapMemoryUBO( DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize ) {
+    void CVulkanRenderer::mapMemoryUBO( SpecificPipeline pipeline, DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize ) {
 		unsigned int DescriptorBindingIndex = descriptorSetsConfig[descriptorSetDataLink].descriptorsBindingsIDs[0];
-		const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
+		const unsigned int linkedDescriptorSetID = pipelineConfigs[pipeline].linkedDescriptorSetIDs[0];
 		u32 descriptorNumber = descriptorSetsConfig[linkedDescriptorSetID].hostDescriptorNumber;
 		vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, 0, uboDataSize * descriptorNumber, 0, &(GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr));
 	}

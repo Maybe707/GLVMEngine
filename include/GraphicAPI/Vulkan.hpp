@@ -506,7 +506,7 @@ namespace GLVM::core
         void createSyncObjects(std::vector<VkSemaphore> &imageAvailableSemaphores,
                           std::vector<VkSemaphore> &renderFinishedSemaphores,
                           std::vector<VkFence> &inFlightFences);
-        void mapMemoryUBO( DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize );
+        void mapMemoryUBO( SpecificPipeline pipeline, DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize );
 		void updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
 		void updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor);
 		void updatePointLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, uint32_t layer, unsigned int actor);
