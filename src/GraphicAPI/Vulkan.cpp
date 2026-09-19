@@ -174,6 +174,10 @@ namespace GLVM::core
 		
         initWindow();
         initVulkan();
+
+        mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT, sizeof(ShadowMapMatrixUBO));
+        mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT, sizeof(ShadowMapMatrixUBO));
+		mapMemoryUBO(DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT, sizeof(PointLightShadowMapMatrixUBO));
     }
     
     void CVulkanRenderer::initWindow() {
@@ -3032,7 +3036,14 @@ namespace GLVM::core
             }
         }
     }
-	
+
+    void CVulkanRenderer::mapMemoryUBO( DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize ) {
+		unsigned int DescriptorBindingIndex = descriptorSetsConfig[descriptorSetDataLink].descriptorsBindingsIDs[0];
+		const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE].linkedDescriptorSetIDs[0];
+		u32 descriptorNumber = descriptorSetsConfig[linkedDescriptorSetID].hostDescriptorNumber;
+		vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, 0, uboDataSize * descriptorNumber, 0, &(GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr));
+	}
+    
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
 		ShadowMapMatrixUBO modelMatrixUBO{};
 
@@ -3047,12 +3058,12 @@ namespace GLVM::core
 			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
 		}
 		
-        void* modelMatrixData = nullptr;
+        // void* modelMatrixData = nullptr;
 		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-					sizeof(modelMatrixUBO), 0, &modelMatrixData);
-        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
+		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
+        memcpy((ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage, &modelMatrixUBO, sizeof(modelMatrixUBO));
+        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
@@ -3071,10 +3082,10 @@ namespace GLVM::core
 		
         void* modelMatrixData;
 		unsigned int shadowMapSpotLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_SPOT_LIGHT].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-					sizeof(modelMatrixUBO), 0, &modelMatrixData);
-        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
+		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
+        memcpy((ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage, &modelMatrixUBO, sizeof(modelMatrixUBO));
+        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapSpotLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updatePointLightShadowMapMatrixUBO([[maybe_unused]] uint32_t currentImage, uint32_t currentLight, uint32_t layer, unsigned int actor) {
@@ -3098,10 +3109,10 @@ namespace GLVM::core
 		
         void* modelMatrixData;
 		unsigned int shadowMapPointLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_POINT_LIGHT].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
-					sizeof(modelMatrixUBO), 0, &modelMatrixData);
-        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+        // vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, currentImage * sizeof(modelMatrixUBO),
+		// 			sizeof(modelMatrixUBO), 0, &modelMatrixData);
+        memcpy((PointLightShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage, &modelMatrixUBO, sizeof(modelMatrixUBO));
+        // vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[shadowMapPointLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
     }
 
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, unsigned int actor) {

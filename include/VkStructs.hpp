@@ -1,10 +1,12 @@
 #ifndef VK_STRUCTS
 #define VK_STRUCTS
 
+#include <cstdint>
 #include <math.h>
 #include "ShaderStructs.hpp"
 #include "WavefrontObjParser.hpp"
 #include <vulkan/vulkan_core.h>
+#include "typenames.hpp"
 #include <array>
 
 #ifdef _WIN32
@@ -194,6 +196,7 @@ namespace GLVM::core
 	struct GPUBuffer {
 		VkBuffer buffer;
 		VkDeviceMemory deviceMemory;
+		void* mapedDataPtr;
 	};
 
 	union Descriptor {
