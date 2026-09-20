@@ -3033,22 +3033,14 @@ namespace GLVM::core
 	}
     
     void CVulkanRenderer::updateDirectionalLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
-		ShadowMapMatrixUBO modelMatrixUBO{};
+		unsigned int shadowMapDirectionalLightDescriptorBindingIndex =
+			descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];
+		ShadowMapMatrixUBO* modelMatrixUBO = (ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage;
 
-		modelMatrixUBO.model = actors[actor].modelMatrix;		
-		modelMatrixUBO.lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
+		modelMatrixUBO->model            = actors[actor].modelMatrix;		
+		modelMatrixUBO->lightSpaceMatrix = dirLightSpaceMatrix[currentLight];
 
-		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
-		// }
-
-		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
-			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
-		}
-		
-		unsigned int shadowMapDirectionalLightDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::SHADOW_MAP_DIRECTIONAL_LIGHT].descriptorsBindingsIDs[0];
-		ShadowMapMatrixUBO* modelMatrixData = (ShadowMapMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[shadowMapDirectionalLightDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + currentImage;
-        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
+		memcpy(modelMatrixUBO->jointMatrices, actors[actor].jointMatrices.GetVectorContainer(), actors[actor].jointMatrices.GetSize() * sizeof(mat4));
     }
 
     void CVulkanRenderer::updateSpotLightShadowMapMatrixUBO(uint32_t currentImage, uint32_t currentLight, unsigned int actor) {
@@ -3094,37 +3086,21 @@ namespace GLVM::core
     }
 
     void CVulkanRenderer::updateMatrixUniformBuffer(uint32_t offset, unsigned int actor) {
-        ModelMatrixUBO modelMatrixUBO{};
-		
-		modelMatrixUBO.model = actors[actor].modelMatrix;		
-		
-        modelMatrixUBO.view = viewMatrix;
-        modelMatrixUBO.proj = projectionMatrix;
-
-		/// Start of animation logic
-		// for ( unsigned int j = 0; j < MAX_JOINTS_NUMBER; ++j ) {
-		// 	modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
-		// }
-		for ( unsigned int j = 0; j < actors[actor].jointMatrices.GetSize(); ++j ) {
-			modelMatrixUBO.jointMatrices[j] = actors[actor].jointMatrices[j];
-		}
-		/// End of animation logic
-
-		modelMatrixUBO.ambient = actors[actor].ambient;
-		modelMatrixUBO.shininess = actors[actor].shininess;
-
-		for ( uint32_t i = 0; i < directionalLightNumber; ++i )
-			modelMatrixUBO.dirSpaceMatrix[i] = dirLightSpaceMatrix[i];
-
-		for ( uint32_t i = 0; i < spotLightNumber; ++i )
-			modelMatrixUBO.spotSpaceMatrix[i] = spotLightSpaceMatrix[i];
-		
-		modelMatrixUBO.directionalLightsNumber = directionalLightNumber;
-		modelMatrixUBO.spotLightsNumber        = spotLightNumber;
-
         unsigned int mainRenderDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_MATRIX_UBO].descriptorsBindingsIDs[0];
-		ModelMatrixUBO* modelMatrixData = (ModelMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[mainRenderDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
-        memcpy(modelMatrixData, &modelMatrixUBO, sizeof(modelMatrixUBO));
+		ModelMatrixUBO* modelMatrixUBO = (ModelMatrixUBO*)(GPUDescriptors[descriptorBindingsConfig[mainRenderDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->mapedDataPtr) + offset;
+		
+		modelMatrixUBO->model = actors[actor].modelMatrix;		
+        modelMatrixUBO->view  = viewMatrix;
+        modelMatrixUBO->proj  = projectionMatrix;
+
+		memcpy(modelMatrixUBO->jointMatrices, actors[actor].jointMatrices.GetVectorContainer(), actors[actor].jointMatrices.GetSize() * sizeof(mat4));
+		memcpy(modelMatrixUBO->dirSpaceMatrix, dirLightSpaceMatrix, DIRECTIONAL_LIGHTS_NUMBER * sizeof(mat4));
+		memcpy(modelMatrixUBO->spotSpaceMatrix, spotLightSpaceMatrix, SPOT_LIGHTS_NUMBER * sizeof(mat4));
+		
+		modelMatrixUBO->ambient                 = actors[actor].ambient;
+		modelMatrixUBO->shininess               = actors[actor].shininess;
+		modelMatrixUBO->directionalLightsNumber = directionalLightNumber;
+		modelMatrixUBO->spotLightsNumber        = spotLightNumber;
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {
