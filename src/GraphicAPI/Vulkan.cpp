@@ -185,7 +185,8 @@ namespace GLVM::core
         mapMemoryUBO(SpecificPipeline::UI_ICONS_PIPELINE, DescriptorSetDataLink::UI_ICONS, sizeof(UI_UBO));
         mapMemoryUBO(SpecificPipeline::COLLISIONS_DEBUG_PIPELINE, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
         mapMemoryUBO(SpecificPipeline::HUD_SCREEN_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
-		mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
+        mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
+		mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO, sizeof(LightData));
     }
     
     void CVulkanRenderer::initWindow() {
@@ -3091,64 +3092,51 @@ namespace GLVM::core
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {
-		LightData lightDataUBO{};
-		lightDataUBO.viewPosition = players[player].position;
+		unsigned int lightDataUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[0];
+		LightData* lightDataUBO = (LightData*)(GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].
+												GPUBuffer->mapedDataPtr) + currentImage;
 
-		DirectionalLight directionalLight{};
+		lightDataUBO->viewPosition = players[player].position;
 		directionalLightNumber = directionalLights.GetSize();
 		assert(directionalLightNumber <= 4 && "Directional lights number greater then 4");
 		for ( unsigned int i = 0; i < directionalLightNumber; ++i ) {
-			RenderDirectionalLight dirLight = directionalLights[i];
-			
-			directionalLight.position  = dirLight.position;
-			directionalLight.direction = dirLight.direction;
-			directionalLight.ambient   = dirLight.ambient;
-			directionalLight.diffuse   = dirLight.diffuse;
-			directionalLight.specular  = dirLight.specular;
-
-			lightDataUBO.directionalLights[i] = directionalLight;			
+			lightDataUBO->directionalLights[i].position  = directionalLights[i].position;
+			lightDataUBO->directionalLights[i].direction = directionalLights[i].direction;
+			lightDataUBO->directionalLights[i].ambient   = directionalLights[i].ambient;
+			lightDataUBO->directionalLights[i].diffuse   = directionalLights[i].diffuse;
+			lightDataUBO->directionalLights[i].specular  = directionalLights[i].specular;
 		}
-		lightDataUBO.directionalLightsArraySize = directionalLightNumber;
+		lightDataUBO->directionalLightsArraySize = directionalLightNumber;
 
 		pointLightNumber = pointLights.GetSize();
 		assert(pointLightNumber <= POINT_LIGHTS_NUMBER && "Point lights number greater than 32");
 		for ( unsigned int i = 0; i < pointLightNumber; ++i ) {
-			RenderPointLight pointLight = pointLights[i];
-			PointLight pointLightUBO{};
-
- 			pointLightUBO.position  = pointLight.position;
-			pointLightUBO.ambient   = pointLight.ambient;
-			pointLightUBO.diffuse   = pointLight.diffuse;
-			pointLightUBO.specular  = pointLight.specular;
-			pointLightUBO.constant  = pointLight.constant;
-			pointLightUBO.linear    = pointLight.linear;
-			pointLightUBO.quadratic = pointLight.quadratic;
-
-			lightDataUBO.pointLights[i] = pointLightUBO;
+ 			lightDataUBO->pointLights[i].position  = pointLights[i].position;
+			lightDataUBO->pointLights[i].ambient   = pointLights[i].ambient;
+			lightDataUBO->pointLights[i].diffuse   = pointLights[i].diffuse;
+			lightDataUBO->pointLights[i].specular  = pointLights[i].specular;
+			lightDataUBO->pointLights[i].constant  = pointLights[i].constant;
+			lightDataUBO->pointLights[i].linear    = pointLights[i].linear;
+			lightDataUBO->pointLights[i].quadratic = pointLights[i].quadratic;
 		}
-		lightDataUBO.pointLightsArraySize = pointLightNumber;
-		lightDataUBO.farPlane = 100.0f;
+		lightDataUBO->pointLightsArraySize = pointLightNumber;
+		lightDataUBO->farPlane = 100.0f;
 
-		SpotLight spotLightUBO{};
 		spotLightNumber = spotLights.GetSize();
 		assert(spotLightNumber <= 8 && "Spot light number greater then 8");
 		for ( unsigned int i = 0; i < spotLightNumber; ++i ) {
-			RenderSpotLight spotLight = spotLights[i];
-			
-			spotLightUBO.position    = spotLight.position;
-			spotLightUBO.direction   = spotLight.direction;
-			spotLightUBO.cutOff      = std::cos(Radians(spotLight.cutOff));
-			spotLightUBO.outerCutOff = std::cos(Radians(spotLight.outerCutOff));
-			spotLightUBO.ambient     = spotLight.ambient;
-			spotLightUBO.diffuse     = spotLight.diffuse;
-			spotLightUBO.specular    = spotLight.specular;
-			spotLightUBO.constant    = spotLight.constant;
-			spotLightUBO.linear      = spotLight.linear;
-			spotLightUBO.quadratic   = spotLight.quadratic; 
-
-			lightDataUBO.spotLights[i] = spotLightUBO;
+			lightDataUBO->spotLights[i].position    = spotLights[i].position;
+			lightDataUBO->spotLights[i].direction   = spotLights[i].direction;
+			lightDataUBO->spotLights[i].cutOff      = std::cos(Radians(spotLights[i].cutOff));
+			lightDataUBO->spotLights[i].outerCutOff = std::cos(Radians(spotLights[i].outerCutOff));
+			lightDataUBO->spotLights[i].ambient     = spotLights[i].ambient;
+			lightDataUBO->spotLights[i].diffuse     = spotLights[i].diffuse;
+			lightDataUBO->spotLights[i].specular    = spotLights[i].specular;
+			lightDataUBO->spotLights[i].constant    = spotLights[i].constant;
+			lightDataUBO->spotLights[i].linear      = spotLights[i].linear;
+			lightDataUBO->spotLights[i].quadratic   = spotLights[i].quadratic; 
 		}
-		lightDataUBO.spotLightArraySize = spotLightNumber;
+		lightDataUBO->spotLightArraySize = spotLightNumber;
 
 		std::random_device rd;
 		std::mt19937 mersenne(rd());
@@ -3172,19 +3160,11 @@ namespace GLVM::core
 		// if( print == true )
 		// 	print = false;
 
-		lightDataUBO.tilesetTilesCount = vec2(TILESET_ROW, TILESET_COLUMN);
-		lightDataUBO.tilesRaw = 8;
-		lightDataUBO.tilesColumn = 8;
-		for( int i = 0; i < INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4 + 1; ++i ) {
-			lightDataUBO.indirectTexture[i] = indirectTexture[i];
-		}
+		lightDataUBO->tilesetTilesCount = vec2(TILESET_ROW, TILESET_COLUMN);
+		lightDataUBO->tilesRaw = 8;
+		lightDataUBO->tilesColumn = 8;
 		
-        void* data;
-		unsigned int lightDataUboDescriptorBindingIndex = descriptorSetsConfig[DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO].descriptorsBindingsIDs[0];		
-        vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory, sizeof(lightDataUBO) * currentImage,
-					sizeof(lightDataUBO), 0, &data);
-        memcpy(data, &lightDataUBO, sizeof(lightDataUBO));
-        vkUnmapMemory(device, GPUDescriptors[descriptorBindingsConfig[lightDataUboDescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory);
+		memcpy(lightDataUBO->indirectTexture, indirectTexture, (INDIRECT_TEXTURE_HEIGHT * INDIRECT_TEXTURE_WIDTH / 4 + 1) * sizeof(Vector<int, 4>));
 	}
 
     void CVulkanRenderer::mainRenderDrawFrame() {
