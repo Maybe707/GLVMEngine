@@ -337,6 +337,13 @@ namespace GLVM::core
 		uint32_t wavefrontObjCounter = 0;
 		uint32_t gltfCounter         = 0;
 
+		core::vector<core::vector<core::Vertex>> mathObjectsVertices;
+		std::vector<std::vector<uint32_t>> mathObjectsIndices;
+        std::vector<VkBuffer> mathObjectsVertexBufferContainer;
+        std::vector<VkDeviceMemory> mathObjectsVertexBufferMemoryContainer;
+        std::vector<VkBuffer> mathObjectsIndexBufferContainer;
+        std::vector<VkDeviceMemory> mathObjectsIndexBufferMemoryContaner;
+		
 		core::vector<core::vector<Vertex>> symbolGVerticesContainer;
 		std::vector<unsigned int> fontIndicesContainer;
         std::vector<VkBuffer> fontVertexBufferContainer;
@@ -430,6 +437,7 @@ namespace GLVM::core
 		void initializeVertexBuffersWithWavefrontData();
 		void initializeVertexBuffersWithGLTFData();
 		void initializeVertexBuffersWithFontData();
+		void initializeVertexBuffersWithMathObjectsData();
         void cleanupSwapChain();
         void cleanup();
         void createInstance();

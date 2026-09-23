@@ -303,6 +303,7 @@ namespace GLVM::core
 		initializeVertexBuffersWithWavefrontData();
 		initializeVertexBuffersWithGLTFData();
 		initializeVertexBuffersWithFontData();
+        initializeVertexBuffersWithMathObjectsData();        
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
@@ -368,6 +369,18 @@ namespace GLVM::core
 				
 				createVertexBuffer(fontVertexBufferContainer[nextBufferIndex], fontVertexBufferMemoryContainer[nextBufferIndex], symbol_g_vertices);
 				createIndexBuffer(fontIndexBufferContainer[nextBufferIndex], fontIndexBufferMemoryContaner[nextBufferIndex], symbol_g_indices);
+		}
+	}
+
+	void CVulkanRenderer::initializeVertexBuffersWithMathObjectsData() {
+		for (unsigned int m = 0; m < mathObjectsVertices.GetSize(); ++m) {
+			mathObjectsVertexBufferContainer.emplace_back();
+			mathObjectsVertexBufferMemoryContainer.emplace_back();
+			createVertexBuffer(mathObjectsVertexBufferContainer[m], mathObjectsVertexBufferMemoryContainer[m], mathObjectsVertices[m]);
+
+			mathObjectsIndexBufferContainer.emplace_back();
+			mathObjectsIndexBufferMemoryContaner.emplace_back();
+			createIndexBuffer(mathObjectsIndexBufferContainer[m], mathObjectsIndexBufferMemoryContaner[m], mathObjectsIndices[m]);
 		}
 	}
 	
@@ -2588,7 +2601,6 @@ namespace GLVM::core
 
 			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
 
-			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 

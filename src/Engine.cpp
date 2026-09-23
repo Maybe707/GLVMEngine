@@ -214,6 +214,7 @@ namespace GLVM::core
 		loadWavefrontObj();
 		initializeGLTF();
 		initializeFontData();
+		initializeMathObjectsData();
 		vulkanRenderer->run();
 //		vulkanRenderer->Window->Input_Stack_    = &Input_Stack_;		
 
@@ -1881,6 +1882,58 @@ namespace GLVM::core
 			}
 	}
 
+	void Engine::initializeMathObjectsData() {
+		constexpr int IndexBufferIndices[36] =
+			{ 0, 1, 2 };
+
+		std::vector<uint32_t> indices;
+		for ( unsigned int i = 0; i < 3; ++i )
+			indices.push_back(IndexBufferIndices[i]);
+
+		vulkanRenderer->mathObjectsIndices.push_back( indices );
+		
+		core::vector<core::Vertex> vertices;
+		SVertex vertex;
+		SVertex normal;
+		normal[0] = 0;
+		normal[1] = 1;
+		normal[2] = 0;
+		SVertex texture;
+		texture[0] = 0;
+		texture[1] = 1;
+                
+		vertex[0] = -1.0;
+		vertex[1] = 0.0;
+		vertex[2] = 0.0;
+
+		vertices.Push({{vertex[0], vertex[1], vertex[2]},
+					   {normal[0], normal[1], normal[2]},
+					   {texture[0], texture[1]},
+					   { -1, -1, -1, -1 },
+					   { 1, 1, 1, 1 }});
+
+		vertex[0] = 1.0;
+		vertex[1] = 0.0;
+		vertex[2] = 0.0;
+		vertices.Push({{vertex[0], vertex[1], vertex[2]},
+					   {normal[0], normal[1], normal[2]},
+					   {texture[0], texture[1]},
+					   { -1, -1, -1, -1 },
+					   { 1, 1, 1, 1 }});
+
+		
+        vertex[0] = 1.0;
+		vertex[1] = 1.0;
+		vertex[2] = 0.0;
+		vertices.Push({{vertex[0], vertex[1], vertex[2]},
+					   {normal[0], normal[1], normal[2]},
+					   {texture[0], texture[1]},
+					   { -1, -1, -1, -1 },
+					   { 1, 1, 1, 1 }});
+
+		vulkanRenderer->mathObjectsVertices.Push( vertices );
+	}
+	
 	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation) {
 		mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);

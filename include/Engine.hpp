@@ -299,6 +299,7 @@ namespace GLVM::core
 		void writeModelsCache( const std::string& modelFilePath );
 		void initializeGLTF();
 		void initializeFontData();
+		void initializeMathObjectsData();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);
