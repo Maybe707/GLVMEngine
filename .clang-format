@@ -1,0 +1,11 @@
+ColumnLimit: 160
+
+BinPackArguments: true
+BinPackParameters: true
+
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+
+PenaltyBreakBeforeFirstCallParameter: 100000
+PenaltyBreakFunctionCall: 100000
+PenaltyExcessCharacter: 1000000

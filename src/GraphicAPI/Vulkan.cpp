@@ -165,12 +165,9 @@ namespace GLVM::core
 		descriptorSetBuilder();
 		pipelineBuilder();
 		renderPassesBuilder();
-		for( int i = 0; i < 20; ++i ) {
-//			std::cout << "descriptor offset: " << descriptorBindingsConfig[i].globalDescriptorOffset << std::endl;
-		}
 
 		renderThreadPool = new ThreadPool(3);
-		startTime = std::chrono::steady_clock::now();
+		startTime = std::chrono::steady_clock::now();      ///< For SDF pipeline
 		
         initWindow();
         initVulkan();
@@ -186,7 +183,7 @@ namespace GLVM::core
         mapMemoryUBO(SpecificPipeline::COLLISIONS_DEBUG_PIPELINE, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
         mapMemoryUBO(SpecificPipeline::HUD_SCREEN_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
         mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
-		mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO, sizeof(LightData));
+		mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO, sizeof(LightData), 1);
     }
     
     void CVulkanRenderer::initWindow() {
@@ -3038,10 +3035,11 @@ namespace GLVM::core
         }
     }
 
-    void CVulkanRenderer::mapMemoryUBO( SpecificPipeline pipeline, DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize ) {
+    void CVulkanRenderer::mapMemoryUBO( SpecificPipeline pipeline, DescriptorSetDataLink descriptorSetDataLink, u32 uboDataSize, u32 descriptorSetID ) {
 		unsigned int DescriptorBindingIndex = descriptorSetsConfig[descriptorSetDataLink].descriptorsBindingsIDs[0];
-		const unsigned int linkedDescriptorSetID = pipelineConfigs[pipeline].linkedDescriptorSetIDs[0];
+		const unsigned int linkedDescriptorSetID = pipelineConfigs[pipeline].linkedDescriptorSetIDs[descriptorSetID];
 		u32 descriptorNumber = descriptorSetsConfig[linkedDescriptorSetID].hostDescriptorNumber;
+		std::cout << "ds number: " << descriptorNumber << std::endl;
 		vkMapMemory(device, GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex].globalDescriptorOffset].GPUBuffer->deviceMemory,
                     0, uboDataSize * descriptorNumber, 0, &(GPUDescriptors[descriptorBindingsConfig[DescriptorBindingIndex]
 																		   .globalDescriptorOffset].GPUBuffer->mapedDataPtr));
