@@ -40,8 +40,14 @@ constexpr int boxIndicesForIndexBuffer[36] =
   5, 4, 7, 6, 5, 7,
   3, 2, 6, 7, 3, 6 };
 
-constexpr int IndexBufferIndices[3] =
+constexpr int triangleIndexBufferData[3] =
 { 0, 1, 2 };
+
+constexpr int vectorIndexBufferData[2] =
+{ 0, 1 };
+
+constexpr int planeIndexBufferData[8] =
+{ 0, 1, 1, 2, 2, 3, 3, 0 };
 
 #endif
 

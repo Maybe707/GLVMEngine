@@ -186,6 +186,7 @@ namespace GLVM::core
 		const char* vertShader = nullptr;
 		const char* fragShader = nullptr;
 		VkPolygonMode polygonMode = VK_POLYGON_MODE_FILL;
+		VkPrimitiveTopology topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 		VkVertexInputBindingDescription bindingDescription;
 		std::array<VkVertexInputAttributeDescription, 5> attributeDescriptions;
 		unsigned int                    actualLinkedDescriptorSetsNumber;

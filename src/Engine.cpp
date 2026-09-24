@@ -30,6 +30,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/VertexComponent.hpp"
 #include "Components/ViewComponent.hpp"
+#include "Constants.hpp"
 #include "Event.hpp"
 #include "ISoundEngine.hpp"
 #include "GraphicAPI/Vulkan.hpp"
@@ -1903,6 +1904,34 @@ namespace GLVM::core
 				const core::vector<vec3>& vertices = mathObjectGeneratedMeshes[i1].vertices;
 				const u32 verticesNumber = vertices.GetSize();
 
+				if( verticesNumber == 3) {
+					std::vector<uint32_t> indices;
+					for ( unsigned int i = 0; i < 3; ++i )
+						indices.push_back(triangleIndexBufferData[i]);
+
+					vulkanRenderer->mathObjectsIndices.push_back( indices );
+				} else if( verticesNumber == 8 ) {
+					std::vector<uint32_t> indices;
+					for ( unsigned int i = 0; i < 36; ++i )
+						indices.push_back(boxIndicesForIndexBuffer[i]);
+
+					vulkanRenderer->mathObjectsIndices.push_back( indices );
+				} else if( verticesNumber == 2 ) {
+					std::vector<uint32_t> indices;
+					for ( unsigned int i = 0; i < 2; ++i )
+						indices.push_back(vectorIndexBufferData[i]);
+
+					vulkanRenderer->mathObjectsIndices.push_back( indices );
+				} else if( verticesNumber == 4 ) {
+					std::vector<uint32_t> indices;
+					for ( unsigned int i = 0; i < 8; ++i )
+						indices.push_back(planeIndexBufferData[i]);
+
+					vulkanRenderer->mathObjectsIndices.push_back( indices );
+				} else {
+					throw std::runtime_error("Passing wrong vertices number for generation mesh");
+				}
+
 				core::vector<core::Vertex> verticesVK;
 				SVertex normal;
 				normal[0] = 0;
@@ -1913,13 +1942,6 @@ namespace GLVM::core
 				texture[1] = 1;
 				for( u32 i2 = 0; i2 < verticesNumber; ++i2 ) {
 					const vec3 vertex = vertices[i2];
-					if( verticesNumber == 3) {
-						std::vector<uint32_t> indices;
-						for ( unsigned int i = 0; i < 3; ++i )
-							indices.push_back(IndexBufferIndices[i]);
-
-						vulkanRenderer->mathObjectsIndices.push_back( indices );
-					}
 
 					SVertex vertexVK;
 					vertexVK[0] = vertex[0];
