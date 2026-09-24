@@ -166,7 +166,7 @@ namespace GLVM::core
 		VkShaderStageFlags     shaderStageFlag;
 		unsigned int           binding;
 		unsigned int           shaderDescriptorsNumber;
-		unsigned int           globalDescriptorOffset;
+		unsigned int           globalDescriptorOffset;     ///< Offset in GPUDescriptors array
 		VkDeviceSize           uboChunkSize;
 	};
 

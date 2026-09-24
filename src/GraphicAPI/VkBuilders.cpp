@@ -5,40 +5,40 @@
 
 namespace GLVM::core {
 	void descriptorSetBuilder() {
-		static unsigned int DS_globalBindingsCounter = 0;                 ///< Counts ds bindings indexes inside ds
-		static unsigned int DS_hostNumber = 0;        ///< Counts host data ds
-		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts offsets data descriptors
+		static unsigned int DS_globalBindingsCounter = 0;                 ///< Counts descriptor set bindings indexes inside it
+		static unsigned int DS_hostNumber = 0;                            ///< Counts host data ds
+		static unsigned int globalDescriptorsOffset = 0;                  ///< Counts descriptors in GPUDescriptors array
 		
-		for( unsigned int dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
+		for( u32 dsCounter = 0; dsCounter < DescriptorSetDataLink::DESCRIPTOR_CHUNKS_NUMBER; ++dsCounter ) {
 			/// Offset for indexing inside descriptorSetsChunks
-			descriptorSetsConfig[dsCounter].descriptorSetOffset = DS_hostNumber;  
-			DS_hostNumber += descriptorSetsConfig[dsCounter].hostDescriptorNumber;
+			DescriptorSet& descriptorSet = descriptorSetsConfig[dsCounter];
+			descriptorSet.descriptorSetOffset = DS_hostNumber;  
+			DS_hostNumber += descriptorSet.hostDescriptorNumber;
 			
-			for( unsigned int DS_localBindingsCounter = 0; DS_localBindingsCounter <
-					 descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber; ++DS_localBindingsCounter ) {
-				const u32 DS_sumBindingsCounter = DS_globalBindingsCounter + DS_localBindingsCounter;
+			for( u32 DS_localBindingsCounter = 0; DS_localBindingsCounter <
+					 descriptorSet.actualLinkedDescriptorBindingsNumber; ++DS_localBindingsCounter ) {
+				const u32 DS_sumBindingsCounter = DS_globalBindingsCounter + DS_localBindingsCounter;    ///< Current binding in descriptorBindingConfig *
+				DescriptorBinding& binding =  descriptorBindingsConfig[DS_sumBindingsCounter];
 				/// Global offset for discriptors inside ds binding
-				descriptorBindingsConfig[DS_sumBindingsCounter].globalDescriptorOffset = globalDescriptorsOffset;
+				binding.globalDescriptorOffset = globalDescriptorsOffset;
 					
 				/// Index for ds bindings inside ds
-				descriptorSetsConfig[dsCounter].descriptorsBindingsIDs[DS_localBindingsCounter] = DS_sumBindingsCounter;    
-				if( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-					for( unsigned int descriptorCounter = 0; descriptorCounter <
-							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+				descriptorSet.descriptorsBindingsIDs[DS_localBindingsCounter] = DS_sumBindingsCounter;    
+				if( binding.vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
+					for( u32 descriptorCounter = 0; descriptorCounter < binding.shaderDescriptorsNumber; ++descriptorCounter ) {
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUBuffer = new GPUBuffer;
 						++globalDescriptorsOffset;
 					}
-				} else if ( descriptorBindingsConfig[DS_sumBindingsCounter].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
-					for( unsigned int descriptorCounter = 0; descriptorCounter <
-							 descriptorBindingsConfig[DS_sumBindingsCounter].shaderDescriptorsNumber; ++descriptorCounter ) {
+				} else if ( binding.vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
+					for( u32 descriptorCounter = 0; descriptorCounter < binding.shaderDescriptorsNumber; ++descriptorCounter ) {
 						GPUDescriptors.Push( {} );
 						GPUDescriptors[ GPUDescriptors.GetSize() - 1].GPUImage = new VK_Image;
 						++globalDescriptorsOffset;
 					}
 				}
 			}
-			DS_globalBindingsCounter += descriptorSetsConfig[dsCounter].actualLinkedDescriptorBindingsNumber;
+			DS_globalBindingsCounter += descriptorSet.actualLinkedDescriptorBindingsNumber; ///< Set offset on every number of binding of current descriptor set *
 		}
 		descriptorSetsChunks.Resize( DS_hostNumber );
 	}
