@@ -2590,14 +2590,11 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE].pipelineLayout,
 									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
-			VkBuffer vertexBuffers[] = {vertexBufferContainer[uiVertexId]};
+			VkBuffer vertexBuffers[] = {mathObjectsVertexBufferContainer[uiVertexId]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-
-			vkCmdBindIndexBuffer(commandBuffer, indexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
-
-			unsigned int indicesContainerSize = aIndices_[uiVertexId].size();
-
+			vkCmdBindIndexBuffer(commandBuffer, mathObjectsIndexBufferContainer[uiVertexId], 0, VK_INDEX_TYPE_UINT32);
+			unsigned int indicesContainerSize = mathObjectsIndices[uiVertexId].size();
 			vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indicesContainerSize), 1, 0, 0, 0);
 		}
 

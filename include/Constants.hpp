@@ -40,6 +40,9 @@ constexpr int boxIndicesForIndexBuffer[36] =
   5, 4, 7, 6, 5, 7,
   3, 2, 6, 7, 3, 6 };
 
+constexpr int IndexBufferIndices[3] =
+{ 0, 1, 2 };
+
 #endif
 
 

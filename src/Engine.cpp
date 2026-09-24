@@ -18,6 +18,7 @@
 #include "Archetypes/StaticMeshArchetype.hpp"
 #include "Common/CommonFunctions.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/MeshGenerationComponent.hpp"
 #include "Components/ProjectileBundle.hpp"
 #include "Components/AnimationComponent.hpp"
 #include "Components/ColliderComponent.hpp"
@@ -1516,16 +1517,19 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::mesh*        mathObjectMeshes    = (ecs::components::mesh*)arch->
 				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::meshGeneration* mathObjectGeneratedMeshes = (ecs::components::meshGeneration*)arch->
+				components[arch::ComponentsIndices::MESH_GENERATION_COMPONENT];
 			
 			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->mathObjects.Push({});
-				cm::transform* mathObjectTransformComponent = &mathObjectTransforms[n];
-				cm::rotation*  mathObjectRotationComponent  = &mathObjectRotations[n];
+				cm::transform* mathObjectTransformComponent  = &mathObjectTransforms[n];
+				cm::rotation*  mathObjectRotationComponent   = &mathObjectRotations[n];
+				cm::meshGeneration* mathObjectGenerationMesh = &mathObjectGeneratedMeshes[n];
 				if( &mathObjectTransforms[n] != nullptr ) {
-					const unsigned int meshID = mathObjectMeshes[n].handle.id;
+//					const unsigned int meshID = mathObjectMeshes[n].handle.id;
 					const mat4 model = computeModelMatrix(mathObjectTransformComponent, mathObjectRotationComponent);
 
-					vulkanRenderer->mathObjects[mathObjectEntityCount].meshID      = meshID;
+					vulkanRenderer->mathObjects[mathObjectEntityCount].meshID      = mathObjectGenerationMesh->meshID;
 					vulkanRenderer->mathObjects[mathObjectEntityCount].modelMatrix = model;
 					vulkanRenderer->mathObjects[mathObjectEntityCount].position    = mathObjectTransformComponent->position;
 					vulkanRenderer->mathObjects[mathObjectEntityCount].forward     = mathObjectTransformComponent->forward;
@@ -1883,55 +1887,56 @@ namespace GLVM::core
 	}
 
 	void Engine::initializeMathObjectsData() {
-		constexpr int IndexBufferIndices[36] =
-			{ 0, 1, 2 };
+		namespace cm = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
 
-		std::vector<uint32_t> indices;
-		for ( unsigned int i = 0; i < 3; ++i )
-			indices.push_back(IndexBufferIndices[i]);
+		mathObjectArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( mathObjectRequiredMask, cachedMathObjectArchetypes, mathObjectArchetypesNumber );
 
-		vulkanRenderer->mathObjectsIndices.push_back( indices );
-		
-		core::vector<core::Vertex> vertices;
-		SVertex vertex;
-		SVertex normal;
-		normal[0] = 0;
-		normal[1] = 1;
-		normal[2] = 0;
-		SVertex texture;
-		texture[0] = 0;
-		texture[1] = 1;
-                
-		vertex[0] = -1.0;
-		vertex[1] = 0.0;
-		vertex[2] = 0.0;
+		for( u32 i0 = 0; i0 < mathObjectArchetypesNumber; ++i0 ) {
+			arch::Archetype* arch = cachedMathObjectArchetypes[i0];
+			cm::meshGeneration* mathObjectGeneratedMeshes = (ecs::components::meshGeneration*)arch->
+				components[arch::ComponentsIndices::MESH_GENERATION_COMPONENT];
+			
+			for( u32 i1 = 0; i1 < arch->entityCount; ++i1 ) {
+				mathObjectGeneratedMeshes[i1].meshID = i1;
+				const core::vector<vec3>& vertices = mathObjectGeneratedMeshes[i1].vertices;
+				const u32 verticesNumber = vertices.GetSize();
 
-		vertices.Push({{vertex[0], vertex[1], vertex[2]},
-					   {normal[0], normal[1], normal[2]},
-					   {texture[0], texture[1]},
-					   { -1, -1, -1, -1 },
-					   { 1, 1, 1, 1 }});
+				core::vector<core::Vertex> verticesVK;
+				SVertex normal;
+				normal[0] = 0;
+				normal[1] = 1;
+				normal[2] = 0;
+				SVertex texture;
+				texture[0] = 0;
+				texture[1] = 1;
+				for( u32 i2 = 0; i2 < verticesNumber; ++i2 ) {
+					const vec3 vertex = vertices[i2];
+					if( verticesNumber == 3) {
+						std::vector<uint32_t> indices;
+						for ( unsigned int i = 0; i < 3; ++i )
+							indices.push_back(IndexBufferIndices[i]);
 
-		vertex[0] = 1.0;
-		vertex[1] = 0.0;
-		vertex[2] = 0.0;
-		vertices.Push({{vertex[0], vertex[1], vertex[2]},
-					   {normal[0], normal[1], normal[2]},
-					   {texture[0], texture[1]},
-					   { -1, -1, -1, -1 },
-					   { 1, 1, 1, 1 }});
+						vulkanRenderer->mathObjectsIndices.push_back( indices );
+					}
 
-		
-        vertex[0] = 1.0;
-		vertex[1] = 1.0;
-		vertex[2] = 0.0;
-		vertices.Push({{vertex[0], vertex[1], vertex[2]},
-					   {normal[0], normal[1], normal[2]},
-					   {texture[0], texture[1]},
-					   { -1, -1, -1, -1 },
-					   { 1, 1, 1, 1 }});
+					SVertex vertexVK;
+					vertexVK[0] = vertex[0];
+					vertexVK[1] = vertex[1];
+					vertexVK[2] = vertex[2];
 
-		vulkanRenderer->mathObjectsVertices.Push( vertices );
+					verticesVK.Push({{vertexVK[0], vertexVK[1], vertexVK[2]},
+								   {normal[0], normal[1], normal[2]},
+								   {texture[0], texture[1]},
+								   { -1, -1, -1, -1 },
+								   { 1, 1, 1, 1 }});
+				}
+
+				vulkanRenderer->mathObjectsVertices.Push( verticesVK );
+			}
+
+		}
 	}
 	
 	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation) {

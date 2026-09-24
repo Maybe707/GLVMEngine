@@ -29,6 +29,7 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Engine.hpp"
+#include "Vector.hpp"
 #ifdef __linux__
 #include "Network/UDP_ServerLinux.hpp"
 #endif
@@ -331,20 +332,20 @@ int main()
 	spotLightArch->materials[spotLightIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle };
 
 	arch::entity vector = archEntityManager->createEntity();
-//	std::cout << "player: " << ecs::arch::getId(player) << std::endl;
 	arch::world.addEntityToArchetype( vector, arch::world.archetypes[11] );
 	arch::EntityLocation vectorLocation = arch::world.entityLocations[arch::getId( vector )];
 	arch::MathObjectArchetype* vectorArch = static_cast<arch::MathObjectArchetype*>(vectorLocation.arch);
 	const uint32_t vectorIndex = vectorLocation.index;
 
-	vectorArch->transforms[vectorIndex]  = { .position = { 15.0f, 2.0f, 0.0f }, .forward = {}, .yaw = 1.57, .pitch = 1.57, .scale = 1.0f };
-	vectorArch->meshes[vectorIndex]      = { .handle = debugVector_Handle_GLTF, .gltf = true };
-//	vectorArch->rotations[vectorIndex]   = { .pitch = 30.0f };
-	vectorArch->materials[vectorIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
+	vectorArch->transforms[vectorIndex]    = { .position = { 15.0f, 2.0f, 0.0f }, .forward = {}, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
+	core::vector<vec3>& vectorVertices =  vectorArch->generatedMesh[vectorIndex].vertices;
+	vectorVertices.Push( vec3( -1.0, 0.0, 0.0) );
+	vectorVertices.Push( vec3( 1.0, 0.0, 0.0) );
+	vectorVertices.Push( vec3( 0.0, 2.0, 0.0) );
+	vectorArch->materials[vectorIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
     ///< Game rendering loop
-//	Glvm->GameLoop(GLVM::core::OPENGL_RENDERER);
 	std::cout << "ARCHETYPES NUMBER: " << arch::world.archetypes.GetSize() << std::endl;
 	GLVM->GameLoop();
 

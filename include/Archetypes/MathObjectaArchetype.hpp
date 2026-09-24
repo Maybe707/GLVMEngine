@@ -8,6 +8,7 @@
 #include "Components/VertexComponent.hpp"
 #include "TagComponents/MathObjectComponent.hpp"
 #include "Components/RotationComponent.hpp"
+#include "Components/MeshGenerationComponent.hpp"
 #include "Globals.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 
@@ -17,6 +18,7 @@ constexpr uint32_t MATH_OBJECT_ARCH_CHUNK_SIZE =
                             sizeof(components::mesh) +
 							sizeof(components::material) +
 							sizeof(components::rotation) +
+							sizeof(components::meshGeneration) +
 							sizeof(components::pointLight));
 	
 	struct MathObjectArchetype : Archetype {
@@ -24,6 +26,7 @@ constexpr uint32_t MATH_OBJECT_ARCH_CHUNK_SIZE =
 		components::mesh                         meshes[MATH_OBJECT_ARCH_CHUNK_SIZE];
 		components::material                     materials[MATH_OBJECT_ARCH_CHUNK_SIZE];
 		components::rotation                     rotations[MATH_OBJECT_ARCH_CHUNK_SIZE];
+		components::meshGeneration               generatedMesh[MATH_OBJECT_ARCH_CHUNK_SIZE];
 		tagComponents::mathObjectTagComponent    mathObjects[MATH_OBJECT_ARCH_CHUNK_SIZE];
 
 		MathObjectArchetype() {
@@ -31,6 +34,7 @@ constexpr uint32_t MATH_OBJECT_ARCH_CHUNK_SIZE =
 			components[ComponentsIndices::MESH_COMPONENT]            = meshes;
 			components[ComponentsIndices::MATERIAL_COMPONENT]        = materials;
 			components[ComponentsIndices::ROTATION_COMPONENT]        = rotations;
+			components[ComponentsIndices::MESH_GENERATION_COMPONENT] = generatedMesh;
 			components[ComponentsIndices::MATH_OBJECT_COMPONENT]     = mathObjects;
 
 			mask =
@@ -38,14 +42,16 @@ constexpr uint32_t MATH_OBJECT_ARCH_CHUNK_SIZE =
 				(1ull << ComponentsIndices::MESH_COMPONENT) |
 				(1ull << ComponentsIndices::MATERIAL_COMPONENT) |
 				(1ull << ComponentsIndices::ROTATION_COMPONENT) |
+				(1ull << ComponentsIndices::MESH_GENERATION_COMPONENT) |
 				(1ull << ComponentsIndices::MATH_OBJECT_COMPONENT);
 
 			componentIds[0] = ComponentsIndices::TRANSFORM_COMPONENT;
 			componentIds[1] = ComponentsIndices::MESH_COMPONENT;
 			componentIds[2] = ComponentsIndices::MATERIAL_COMPONENT;
 			componentIds[3] = ComponentsIndices::ROTATION_COMPONENT;
-			componentIds[4] = ComponentsIndices::MATH_OBJECT_COMPONENT;
-			componentCount = 5;
+			componentIds[4] = ComponentsIndices::MESH_GENERATION_COMPONENT;
+			componentIds[5] = ComponentsIndices::MATH_OBJECT_COMPONENT;
+			componentCount = 6;
 		}
 	};
 }; // namespace GLVM::ecs::arch

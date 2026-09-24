@@ -38,6 +38,7 @@ namespace GLVM::ecs::arch {
             MOVE_COMPONENT,
             PROJECTILE_BUNDLE_COMPONENT,
             ROTATION_COMPONENT,
+			MESH_GENERATION_COMPONENT,
 
             LEVEL_CHUNK_TAG_COMPONENT,
             PLAYER_TAG_COMPONENT,
