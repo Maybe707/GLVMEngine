@@ -62,6 +62,70 @@ namespace GLVM::core
         projectionMatrix = _projectionMatrix;
     }
 
+	CVulkanRenderer::Frustum CVulkanRenderer::extractFrustum( const mat4& vp ) {
+		frustum.planes[Frustum::PlaneIndex::LEFT_PLANE] = {
+			{
+				vp[0][3] + vp[0][0],
+				vp[1][3] + vp[1][0],
+				vp[2][3] + vp[2][0]
+			},
+			vp[3][3] + vp[3][0]
+		};
+
+		frustum.planes[Frustum::PlaneIndex::RIGHT_PLANE] = {
+			{
+				vp[0][3] - vp[0][0],
+				vp[1][3] - vp[1][0],
+				vp[2][3] - vp[2][0]
+			},
+			vp[3][3] - vp[3][0]
+		};
+
+		frustum.planes[Frustum::PlaneIndex::BOTTOM_PLANE] = {
+			{
+				vp[0][3] + vp[0][1],
+				vp[1][3] + vp[1][1],
+				vp[2][3] + vp[2][1]
+			},
+			vp[3][3] + vp[3][1]
+		};
+
+		frustum.planes[Frustum::PlaneIndex::TOP_PLANE] = {
+			{
+				vp[0][3] - vp[0][1],
+				vp[1][3] - vp[1][1],
+				vp[2][3] - vp[2][1]
+			},
+			vp[3][3] - vp[3][1]
+		};
+
+		frustum.planes[Frustum::PlaneIndex::NEAR_PLANE] = {
+			{
+				vp[0][3] + vp[0][2],
+				vp[1][3] + vp[1][2],
+				vp[2][3] + vp[2][2]
+			},
+			vp[3][3] + vp[3][2]
+		};
+
+		frustum.planes[Frustum::PlaneIndex::FAR_PLANE] = {
+			{
+				vp[0][3] - vp[0][2],
+				vp[1][3] - vp[1][2],
+				vp[2][3] - vp[2][2]
+			},
+			vp[3][3] - vp[3][2]
+		};
+
+		for ( plane& plane : frustum.planes ) {
+			const float length = plane.normal.Length();
+			plane.normal   = Normalize( plane.normal );
+			plane.distance = plane.distance / length;
+		}
+
+		return frustum;
+	}
+
     void CVulkanRenderer::createTextureImage() {
 		uint32_t texWidth, texHeight;
 		[[maybe_unused]] uint32_t texChannels;

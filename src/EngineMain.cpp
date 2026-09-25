@@ -337,7 +337,7 @@ int main()
 	arch::MathObjectArchetype* vectorArch = static_cast<arch::MathObjectArchetype*>(vectorLocation.arch);
 	const uint32_t vectorIndex = vectorLocation.index;
 
-	vectorArch->transforms[vectorIndex]    = { .position = { 15.0f, 2.0f, 0.0f }, .forward = {}, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
+	vectorArch->transforms[vectorIndex]    = { .position = { 0.0f, 0.0f, 0.0f }, .forward = {}, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
 	core::vector<vec3>& vectorVertices =  vectorArch->generatedMesh[vectorIndex].vertices;
 	/// Vector
 	// vectorVertices.Push( vec3( 1.0, 1.0, 0.0) );
@@ -349,21 +349,21 @@ int main()
 	// vectorVertices.Push( vec3( 0.0, 3.0, 0.0) );
 
 	/// Plane
-	vectorVertices.Push( vec3( -1.0, -1.0, -1.0) );
-	vectorVertices.Push( vec3( 1.0, -1.0, -1.0) );
-	vectorVertices.Push( vec3( 1.0, 1.0, -1.0) );
-	vectorVertices.Push( vec3( -1.0, 1.0, -1.0) );
-
-	/// Cube
 	// vectorVertices.Push( vec3( -1.0, -1.0, -1.0) );
 	// vectorVertices.Push( vec3( 1.0, -1.0, -1.0) );
 	// vectorVertices.Push( vec3( 1.0, 1.0, -1.0) );
 	// vectorVertices.Push( vec3( -1.0, 1.0, -1.0) );
 
-	// vectorVertices.Push( vec3( -1.0, -1.0, 1.0) );
-	// vectorVertices.Push( vec3( 1.0, -1.0, 1.0) );
-	// vectorVertices.Push( vec3( 1.0, 1.0, 1.0) );
-	// vectorVertices.Push( vec3( -1.0, 1.0, 1.0) );
+	/// Cube
+	vectorVertices.Push( vec3( -1.0, 1.0, 0.0) );
+	vectorVertices.Push( vec3( 1.0, 1.0, 0.0) );
+	vectorVertices.Push( vec3( 1.0, -1.0, 0.0) );
+	vectorVertices.Push( vec3( -1.0, -1.0, 0.0) );
+
+	vectorVertices.Push( vec3( -1.0, 1.0, 1.0) );
+	vectorVertices.Push( vec3( 1.0, 1.0, 1.0) );
+	vectorVertices.Push( vec3( 1.0, -1.0, 1.0) );
+	vectorVertices.Push( vec3( -1.0, -1.0, 1.0) );
 
 	vectorArch->materials[vectorIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 

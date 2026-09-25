@@ -1912,8 +1912,8 @@ namespace GLVM::core
 					vulkanRenderer->mathObjectsIndices.push_back( indices );
 				} else if( verticesNumber == 8 ) {
 					std::vector<uint32_t> indices;
-					for ( unsigned int i = 0; i < 36; ++i )
-						indices.push_back(boxIndicesForIndexBuffer[i]);
+					for ( unsigned int i = 0; i < 24; ++i )
+						indices.push_back(boxIndexBufferDataLineMode[i]);
 
 					vulkanRenderer->mathObjectsIndices.push_back( indices );
 				} else if( verticesNumber == 2 ) {
@@ -1941,7 +1941,16 @@ namespace GLVM::core
 				texture[0] = 0;
 				texture[1] = 1;
 				for( u32 i2 = 0; i2 < verticesNumber; ++i2 ) {
-					const vec3 vertex = vertices[i2];
+					vec3 vertex = vertices[i2];
+
+					mat4 view = LookAtMain( vec3(0.0, 0.0, 0.0),
+											vec3(0.0, 0.0, -1.0),
+											vec3( 0.0f, -1.0f, 0.0) );
+
+					mat4 vp = vulkanRenderer->projectionMatrix * view;;
+					vp = inverse_matrix_4x4( vp );
+					const vec4 tempVector = vp * vec4( vertex[0], vertex[1], vertex[2], 1.0 );
+					vertex = vec3(tempVector[0] / tempVector[3], tempVector[1] / tempVector[3], tempVector[2] / tempVector[3]);
 
 					SVertex vertexVK;
 					vertexVK[0] = vertex[0];

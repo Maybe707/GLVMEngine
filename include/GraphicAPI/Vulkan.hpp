@@ -133,6 +133,21 @@ namespace GLVM::core
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_PoL_Mes_Act;
 
+		struct Frustum {
+			plane planes[6];
+			
+			struct PlaneIndex {
+				enum EPlaneIndex {
+					LEFT_PLANE,
+					RIGHT_PLANE,
+					BOTTOM_PLANE,
+					TOP_PLANE,
+					NEAR_PLANE,
+					FAR_PLANE
+				};
+			} planeIndex;
+		} frustum;
+
 		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 			'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
@@ -224,6 +239,7 @@ namespace GLVM::core
         void draw();
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
         void SetProjectionMatrix(mat4 _projectionMatrix);
+		Frustum extractFrustum( const mat4& vp );
 		void SetViewMatrix(mat4 _viewMatrix);
 		void initializeGameLevelVertices();
         void run();

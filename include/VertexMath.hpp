@@ -847,6 +847,11 @@ Vector<T, 3> Normalize(Vector<T, 3> _vector)
     return _vector;
 }
 
+struct plane {
+	vec3 normal;
+	float distance;
+};
+
 // template <typename T>
 // Matrix<T, 4> LookAtRH(Vector<T, 3> _eye, Vector<T, 3> _target, Vector<T, 3> _up)
 // {
@@ -896,7 +901,7 @@ Matrix<T, 4> GLVM_perspectiveRH_NO(T fov, T aspect, T near_plane, T far_plane) {
 
 	Result[0][0] = static_cast<T>(1) / (aspect * tanHalfFov);
 	Result[1][1] = static_cast<T>(1) / (tanHalfFov);
-	Result[2][2] = - (far_plane - near_plane) / (far_plane - near_plane);
+	Result[2][2] = - (far_plane - near_plane) / (far_plane + near_plane);
 	Result[2][3] = - static_cast<T>(1);
 	Result[3][2] = -(static_cast<T>(2) * far_plane * near_plane) / (far_plane - near_plane);
 	return Result;
