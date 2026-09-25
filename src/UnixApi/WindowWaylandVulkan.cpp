@@ -55,7 +55,7 @@ namespace GLVM::core {
 		/* set up a frame callback, which lets the client know when it's a good time to start rendering
 		   the next frame — usually tied to the compositor's refresh cycle (like vsync).
 		*/
-		frame_callback = wl_surface_frame( wl_surface );
+//		frame_callback = wl_surface_frame( wl_surface );
 		// attach a listener (callback function) to a wl_callback object — typically created using wl_surface_frame
 		// XDG_surfaceConfigData xdg_surfaceConfigData;
 		// xdg_surfaceConfigData.width  = windowWaylandVulkan.width;
@@ -65,7 +65,7 @@ namespace GLVM::core {
 		// xdg_surfaceConfigData.buffer = windowWaylandVulkan.buffer;
 		// xdg_surfaceConfigData.constant_byte = windowWaylandVulkan.constant_byte;
 		// xdg_surfaceConfigData.wl_surface    = windowWaylandVulkan.wl_surface;
-		wl_callback_add_listener( frame_callback, &callback_listener, (void*)(&windowWaylandVulkan) );
+//		wl_callback_add_listener( frame_callback, &callback_listener, (void*)(&windowWaylandVulkan) );
 
 		/* create a top-level window or popup window from a given wl_surface.
 		   wraps a wl_surface with an XDG surface, which provides window management features
@@ -296,10 +296,10 @@ namespace GLVM::core {
 		WindowWaylandVulkan* xdg_topLevelData = (WindowWaylandVulkan*)data;
 		
 		if ( xdg_topLevelData->width != new_width || xdg_topLevelData->height != new_height ) {
-			munmap( xdg_topLevelData->pixels, xdg_topLevelData->width * new_height * 4 );
+//			munmap( xdg_topLevelData->pixels, xdg_topLevelData->width * new_height * 4 );
 			xdg_topLevelData->width = new_width;
 			xdg_topLevelData->height = new_height;
-			resize( data );
+//			resize( data );
 		}
 	}
 
@@ -316,12 +316,12 @@ namespace GLVM::core {
 		   that you received and accepted this change. If you don’t call it, your window won’t be
 		   shown or updated properly.
 		*/
-		WindowWaylandVulkan* xdg_surfaceConfigData = (WindowWaylandVulkan*)data;
+//		WindowWaylandVulkan* xdg_surfaceConfigData = (WindowWaylandVulkan*)data;
 		
 		xdg_surface_ack_configure( xdg_surface, serial );
-		if ( !xdg_surfaceConfigData->pixels ) {
-			resize( data );
-		}
+		// if ( !xdg_surfaceConfigData->pixels ) {
+		// 	resize( data );
+		// }
 
 //		draw( data );
 	}
@@ -632,12 +632,12 @@ namespace GLVM::core {
 		windowWaylandVulkan.xdg_surface_listener = {
 			.configure = xdg_surface_configure
 		};
-		windowWaylandVulkan.callback_listener = {
-			/* Notify the client when the related request is done.
-			   param callback_data request-specific data for the callback
-			*/
-			.done = new_frame
-		};
+		// windowWaylandVulkan.callback_listener = {
+		// 	/* Notify the client when the related request is done.
+		// 	   param callback_data request-specific data for the callback
+		// 	*/
+		// 	.done = new_frame
+		// };
 		windowWaylandVulkan.shell_listener = {
 			.ping = shell_ping
 		};
