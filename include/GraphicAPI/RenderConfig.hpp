@@ -9,8 +9,9 @@
 
 namespace GLVM::core
 {
+	const u32 descriptorBindingsConfigMaxNumber = 32;
 	inline DescriptorSet descriptorSetsConfig[32];
-	inline DescriptorBinding descriptorBindingsConfig[32];
+	inline DescriptorBinding descriptorBindingsConfig[descriptorBindingsConfigMaxNumber];
 	inline Pipeline pipelineConfigs[32];
 	inline RenderPass renderPassConfigs[32];
 	constexpr uint32_t MAX_TEXTURES = 18;
@@ -849,6 +850,8 @@ namespace GLVM::core
 		descriptorBindingsConfig[24].binding                 = 0;
 		descriptorBindingsConfig[24].shaderDescriptorsNumber = MAX_TEXTURES;
 	}
+
+	const u32 actualDescriptorBindingsConfigNumber = 25;
 	// inline DescriptorSet directionalLightDescriptorSet0{ {}, {{VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,
 	// 			VK_SHADER_STAGE_VERTEX_BIT, 0, 1}}, 512};
 	// inline DescriptorBinding directionalLightDescriptorBinding0_Set0{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, DescriptorsTypes::DIRECTIONAL_LIGHT_SHADOW_MAP_MATRIX_UBO,

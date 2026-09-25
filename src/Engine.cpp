@@ -1239,7 +1239,7 @@ namespace GLVM::core
 																		  Normalize(vec3(transformComponent->forward[0], 0.0,
 																						 transformComponent->forward[2]))), 1.0f));
 
-						if( rotationAngle < 0.0005f && ((uint32_t)hud_screen_x * 10000 - (uint32_t)previous_hud_screen_x * 10000) == 0.0f ) {
+						if( rotationAngle < 0.0005f && ((int32_t)hud_screen_x * 10000 - (int32_t)previous_hud_screen_x * 10000) == 0.0f ) {
 							rotationAngle = 0.0f;
 						} ///< TODO: Weird workaround solution. Find another one
 
@@ -1516,7 +1516,7 @@ namespace GLVM::core
 				[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 			cm::rotation*    mathObjectRotations = (ecs::components::rotation*)arch->
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
-			cm::mesh*        mathObjectMeshes    = (ecs::components::mesh*)arch->
+			[[maybe_unused]] cm::mesh*        mathObjectMeshes    = (ecs::components::mesh*)arch->
 				components[arch::ComponentsIndices::MESH_COMPONENT];
 			cm::meshGeneration* mathObjectGeneratedMeshes = (ecs::components::meshGeneration*)arch->
 				components[arch::ComponentsIndices::MESH_GENERATION_COMPONENT];
@@ -1970,7 +1970,7 @@ namespace GLVM::core
 		}
 	}
 	
-	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation) {
+	mat4 Engine::computeModelMatrix(ecs::components::transform* _transformComponent, [[maybe_unused]] ecs::components::rotation* rotation) {
 		mat4 rotationMatrix(1.0f);
         mat4 scalingMatrix(1.0f);
         mat4 translationMatrix(1.0f);

@@ -490,19 +490,25 @@ namespace GLVM::core
     void CVulkanRenderer::cleanup() {
         cleanupSwapChain();
 
-		for( unsigned int i = 0; i < GPUDescriptors.GetSize(); ++i ) {
+		u32 descriptorIndex = 0;
+		for( u32 i = 0; i < actualDescriptorBindingsConfigNumber; ++i ) {
+			std::cout << "i: " << i << std::endl;
 			if( descriptorBindingsConfig[i].vkType == VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER ) {
-				vkDestroyBuffer(device, GPUDescriptors[i].GPUBuffer->buffer, nullptr);
-				vkFreeMemory(device, GPUDescriptors[i].GPUBuffer->deviceMemory, nullptr);
-				delete GPUDescriptors[i].GPUBuffer;
-				GPUDescriptors[i].GPUBuffer = nullptr;
+				for( unsigned int n = 0; n < descriptorBindingsConfig[i].shaderDescriptorsNumber; ++n ) {
+					vkDestroyBuffer(device, GPUDescriptors[descriptorIndex].GPUBuffer->buffer, nullptr);
+					vkFreeMemory(device, GPUDescriptors[descriptorIndex].GPUBuffer->deviceMemory, nullptr);
+					delete GPUDescriptors[descriptorIndex].GPUBuffer;
+					GPUDescriptors[descriptorIndex].GPUBuffer = nullptr;
+					++descriptorIndex;
+				}
 			} else if( descriptorBindingsConfig[i].vkType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER ) {
-				for( unsigned int n = i; n < i + descriptorBindingsConfig[i].shaderDescriptorsNumber; ++n ) {
-					if( GPUDescriptors[n].GPUImage->views.size() )
-						clearVK_Image( GPUDescriptors[n].GPUImage );
+				for( unsigned int n = 0; n < descriptorBindingsConfig[i].shaderDescriptorsNumber; ++n ) {
+					if( GPUDescriptors[descriptorIndex].GPUImage->views.size() )
+						clearVK_Image( GPUDescriptors[descriptorIndex].GPUImage );
 
-					delete GPUDescriptors[n].GPUImage;
-					GPUDescriptors[n].GPUImage = nullptr;
+					delete GPUDescriptors[descriptorIndex].GPUImage;
+					GPUDescriptors[descriptorIndex].GPUImage = nullptr;
+					++descriptorIndex;
 				}
 			}
 		}
