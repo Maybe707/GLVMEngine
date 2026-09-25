@@ -4,6 +4,7 @@
 #include <vulkan/vulkan_core.h>
 #include <wayland-client-protocol.h>
 #include <wayland-util.h>
+#include <poll.h>
 
 namespace GLVM::core {
 	static WindowWaylandVulkan windowWaylandVulkan;
@@ -101,25 +102,52 @@ namespace GLVM::core {
 //		std::cout << "CONSTRUCTOR WAYLAND" << std::endl;
 	}
 
+// 	bool WindowWaylandVulkan::HandleEvent([[maybe_unused]] CEvent& _Event) {
+// 		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
+// 		   buffers, and other resources.
+// 		*/
+// //		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
+// 		_Event.mousePointerPosition.position_X = x_pointer;
+// 		_Event.mousePointerPosition.position_Y = y_pointer;
+// 		x_pointer = 0;
+// 		y_pointer = 0;
+
+// 		wl_display_dispatch( display );
+// // 		while (wl_display_dispatch( display )) {
+// // //			printf("%s", "HREN GOVNA!");
+// // 			if ( close_xdg_toplevel )
+// // 				break;
+// // 		}
+// 		return false;
+// 	}
+
 	bool WindowWaylandVulkan::HandleEvent([[maybe_unused]] CEvent& _Event) {
-		/* Process events and dispatch them to the appropriate Wayland objects, such as surfaces,
-		   buffers, and other resources.
-		*/
-//		_Event.SetEvent(EEvents::eMOUSE_POINTER_POSITION);
 		_Event.mousePointerPosition.position_X = x_pointer;
 		_Event.mousePointerPosition.position_Y = y_pointer;
 		x_pointer = 0;
 		y_pointer = 0;
-
-		wl_display_dispatch( display );
-// 		while (wl_display_dispatch( display )) {
-// //			printf("%s", "HREN GOVNA!");
-// 			if ( close_xdg_toplevel )
-// 				break;
-// 		}
-		return false;
+ 
+		wl_display_flush(display);
+ 
+		while (wl_display_prepare_read(display) != 0) {
+			wl_display_dispatch_pending(display);
+		}
+ 
+		struct pollfd pfd;
+		pfd.fd = wl_display_get_fd(display);
+		pfd.events = POLLIN;
+		pfd.revents = 0;
+ 
+		if (poll(&pfd, 1, 0) > 0) {
+			wl_display_read_events(display);
+			wl_display_dispatch_pending(display);
+		} else {
+			wl_display_cancel_read(display);
+		}
+ 
+		return close_xdg_toplevel;
 	}
-
+	
 // Create transparent cursor
 	struct wl_buffer* WindowWaylandVulkan::create_transparent_cursor([[maybe_unused]] struct wl_shm *shm) {
 		int size = 4 * 64 * 64; // 64x64 RGBA cursor (common size)
