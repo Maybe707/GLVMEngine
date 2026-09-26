@@ -11,6 +11,7 @@
 #include <wchar.h>
 #include <windows.h>
 #include <windowsx.h>
+#include <cstdint>
 
 //#define VULKAN_API
 #define OPENGL_API
