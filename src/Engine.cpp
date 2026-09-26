@@ -213,6 +213,8 @@ namespace GLVM::core
 		staticActorsArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( staticActorsRequiredMask, cachedStaticActorsArchetypes, staticActorsArchetypesNumber );
 
+//		vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
+		
 		loadWavefrontObj();
 		initializeGLTF();
 		initializeFontData();
@@ -335,7 +337,7 @@ namespace GLVM::core
 			setFrameData();
 			if( !vulkanRenderer->isInventoryOpened ) {
 				SetViewMatrix();
-				SetProjectionMatrix();
+				vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
 			}
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
@@ -558,11 +560,13 @@ namespace GLVM::core
 		}
     }
 	
-	void Engine::SetProjectionMatrix()
+	mat4 Engine::SetProjectionMatrix( const float fov, const float viewPortWidth, const float viewPortHeight, const float nearPlane, const float farPlane )
 	{
-		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
-		vulkanRenderer->projectionMatrix = tProjection_Matrix;
-		vulkanRenderer->projectionMatrix[1][1] *= 1.0f;
+//		mat4 tProjection_Matrix = Perspective(Radians(90.0f), (float)1920 / (float)1080, 0.1f, 100.0f);
+		mat4 projectionMatrix = Perspective(Radians(fov), viewPortWidth / viewPortHeight, nearPlane, farPlane);
+		return projectionMatrix;
+//		vulkanRenderer->projectionMatrix = tProjection_Matrix;
+//		vulkanRenderer->projectionMatrix[1][1] *= 1.0f;
 	}
 	
 	[[nodiscard]] core::vector<mat4> Engine::updateAnimationFrames([[maybe_unused]] ecs::components::animation* animationComponent, [[maybe_unused]] unsigned int meshID) {
@@ -1898,8 +1902,11 @@ namespace GLVM::core
 			arch::Archetype* arch = cachedMathObjectArchetypes[i0];
 			cm::meshGeneration* mathObjectGeneratedMeshes = (ecs::components::meshGeneration*)arch->
 				components[arch::ComponentsIndices::MESH_GENERATION_COMPONENT];
+			cm::transform* transformGeneratedMeshes = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
 			
 			for( u32 i1 = 0; i1 < arch->entityCount; ++i1 ) {
+				const cm::transform* transform = &transformGeneratedMeshes[i1];
 				mathObjectGeneratedMeshes[i1].meshID = i1;
 				const core::vector<vec3>& vertices = mathObjectGeneratedMeshes[i1].vertices;
 				const u32 verticesNumber = vertices.GetSize();
@@ -1944,12 +1951,29 @@ namespace GLVM::core
 					vec3 vertex = vertices[i2];
 
 					mat4 view = LookAtMain( vec3(0.0, 0.0, 0.0),
-											vec3(0.0, 0.0, -1.0),
+											transform->forward,
 											vec3( 0.0f, -1.0f, 0.0) );
 
-					mat4 vp = vulkanRenderer->projectionMatrix * view;;
+					const mat4 projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
+					mat4 vp = view * projectionMatrix;
 					vp = inverse_matrix_4x4( vp );
-					const vec4 tempVector = vp * vec4( vertex[0], vertex[1], vertex[2], 1.0 );
+					const vec4 tempVector = vec4( vertex[0], vertex[1], vertex[2], 1.0 ) * vp;
+
+					std::cout << "VIEW MATRIX" << std::endl;
+					std::cout << view << std::endl;
+					std::cout << "PROJECTION MATRIX" << std::endl;
+					std::cout << vulkanRenderer->projectionMatrix << std::endl;
+					std::cout << "VP MATRIX" << std::endl;
+					std::cout << vp << std::endl;
+
+					printf("det(VP) = %f\n", determinant_4x4(vp));
+						
+					printf(
+						"NDC (%f %f %f) -> (%f %f %f %f)\n",
+						vertex[0], vertex[1], vertex[2],
+						tempVector[0], tempVector[1], tempVector[2], tempVector[3]
+						);
+					
 					vertex = vec3(tempVector[0] / tempVector[3], tempVector[1] / tempVector[3], tempVector[2] / tempVector[3]);
 
 					SVertex vertexVK;

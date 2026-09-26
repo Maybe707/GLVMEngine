@@ -337,7 +337,7 @@ int main()
 	arch::MathObjectArchetype* vectorArch = static_cast<arch::MathObjectArchetype*>(vectorLocation.arch);
 	const uint32_t vectorIndex = vectorLocation.index;
 
-	vectorArch->transforms[vectorIndex]    = { .position = { 0.0f, 0.0f, 0.0f }, .forward = {}, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
+	vectorArch->transforms[vectorIndex]    = { .position = { 0.0f, 0.0f, 0.0f }, .forward = { 0.0, 0.0, 1.0 }, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
 	core::vector<vec3>& vectorVertices =  vectorArch->generatedMesh[vectorIndex].vertices;
 	/// Vector
 	// vectorVertices.Push( vec3( 1.0, 1.0, 0.0) );
@@ -354,17 +354,51 @@ int main()
 	// vectorVertices.Push( vec3( 1.0, 1.0, -1.0) );
 	// vectorVertices.Push( vec3( -1.0, 1.0, -1.0) );
 
-	/// Cube
+	/// Frustum Cube
+	// vectorVertices.Push( vec3( -1.0, 1.0, 0.0) );
+	// vectorVertices.Push( vec3( 1.0, 1.0, 0.0) );
+	// vectorVertices.Push( vec3( 1.0, -1.0, 0.0) );
+	// vectorVertices.Push( vec3( -1.0, -1.0, 0.0) );
+
+	// vectorVertices.Push( vec3( 1.0, -1.0, 1.0) );
+	// vectorVertices.Push( vec3( -1.0, -1.0, 1.0) );
+	// vectorVertices.Push( vec3( -1.0, 1.0, 1.0) );
+	// vectorVertices.Push( vec3( 1.0, 1.0, 1.0) );
+
+	/// Hvostum Cube
 	vectorVertices.Push( vec3( -1.0, 1.0, 0.0) );
 	vectorVertices.Push( vec3( 1.0, 1.0, 0.0) );
 	vectorVertices.Push( vec3( 1.0, -1.0, 0.0) );
 	vectorVertices.Push( vec3( -1.0, -1.0, 0.0) );
 
-	vectorVertices.Push( vec3( -1.0, 1.0, 1.0) );
-	vectorVertices.Push( vec3( 1.0, 1.0, 1.0) );
-	vectorVertices.Push( vec3( 1.0, -1.0, 1.0) );
-	vectorVertices.Push( vec3( -1.0, -1.0, 1.0) );
+	vectorVertices.Push( vec3( -1.0, 1.0, 0.999) );
+	vectorVertices.Push( vec3( 1.0, 1.0, 0.999) );
+	vectorVertices.Push( vec3( 1.0, -1.0, 0.999) );
+	vectorVertices.Push( vec3( -1.0, -1.0, 0.999) );
+	
+	vectorArch->materials[vectorIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
+		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 
+	arch::entity frustum1 = archEntityManager->createEntity();
+	arch::world.addEntityToArchetype( frustum1, arch::world.archetypes[11] );
+	arch::EntityLocation frustumLocation1 = arch::world.entityLocations[arch::getId( frustum1 )];
+	arch::MathObjectArchetype* frustumArch1 = static_cast<arch::MathObjectArchetype*>(frustumLocation1.arch);
+	const uint32_t frustumIndex1 = frustumLocation1.index;
+
+	frustumArch1->transforms[frustumIndex1]    = { .position = { 0.0f, 0.0f, 0.0f }, .forward = { 0.0, 0.0, -1.0 }, .yaw = 0.0, .pitch = 0.0, .scale = 1.0f };
+	core::vector<vec3>& frustumVertices1 =  frustumArch1->generatedMesh[frustumIndex1].vertices;
+
+	/// Hvostum Cube
+	frustumVertices1.Push( vec3( -1.0, 1.0, 0.0) );
+	frustumVertices1.Push( vec3( 1.0, 1.0, 0.0) );
+	frustumVertices1.Push( vec3( 1.0, -1.0, 0.0) );
+	frustumVertices1.Push( vec3( -1.0, -1.0, 0.0) );
+
+	frustumVertices1.Push( vec3( -1.0, 1.0, 0.5) );
+	frustumVertices1.Push( vec3( 1.0, 1.0, 0.5) );
+	frustumVertices1.Push( vec3( 1.0, -1.0, 0.5) );
+	frustumVertices1.Push( vec3( -1.0, -1.0, 0.5) );
+	
 	vectorArch->materials[vectorIndex]     = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	

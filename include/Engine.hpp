@@ -274,7 +274,7 @@ namespace GLVM::core
 		void RenderVulkan();
 		void EnlargeFrameAccumulator(float value);
 		void SetViewMatrix();
-		void SetProjectionMatrix();
+		mat4 SetProjectionMatrix( const float fov, const float viewPortWidth, const float viewPortHeight, const float nearPlane, const float farPlane );
 		[[nodiscard]] core::vector<mat4> updateAnimationFrames(ecs::components::animation* animationComponent, unsigned int meshID);
 		mat4 updateDirectionalLightSpaceMatrixShadowMapUBO(ecs::components::directionalLight* directionalLightComponent);
 		mat4 updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent );
