@@ -126,6 +126,27 @@ namespace GLVM::core
 		return frustum;
 	}
 
+	bool CVulkanRenderer::isFrustumIntersect(const AABB& aabb) {
+		for (int i = 0; i < 6; ++i) {
+			const plane& plane = frustum.planes[i];
+
+			float boxExtentsProjectionOnPlaneNormal = aabb.extents[0] * std::abs(plane.normal[0]) +
+				aabb.extents[1] * std::abs(plane.normal[1]) +
+				aabb.extents[2] * std::abs(plane.normal[2]);
+
+			float boxCentreToPlaneDistance = (plane.normal[0] * aabb.center[0]) + 
+				(plane.normal[1] * aabb.center[1]) + 
+				(plane.normal[2] * aabb.center[2]) + 
+				plane.distance;
+
+			if ( boxCentreToPlaneDistance < -boxExtentsProjectionOnPlaneNormal ) {
+				return false;
+			}
+		}
+
+		return true; 
+	}
+	
     void CVulkanRenderer::createTextureImage() {
 		uint32_t texWidth, texHeight;
 		[[maybe_unused]] uint32_t texChannels;

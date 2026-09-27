@@ -240,6 +240,7 @@ namespace GLVM::core
         void SetMeshData(std::vector<const char*> _pathsArray, core::vector<const char*> pathsGLTF);
         void SetProjectionMatrix(mat4 _projectionMatrix);
 		Frustum extractFrustum( const mat4& vp );
+		bool isFrustumIntersect(const AABB& aabb);
 		void SetViewMatrix(mat4 _viewMatrix);
 		void initializeGameLevelVertices();
         void run();

@@ -85,6 +85,11 @@ namespace GLVM::core
 		}
 	};
 
+	struct AABB {
+		vec3 center;
+		vec3 extents;
+	};
+	
 	enum DescriptorSetDataLink {
 		/// Pipelines related values
 		SHADOW_MAP_DIRECTIONAL_LIGHT,

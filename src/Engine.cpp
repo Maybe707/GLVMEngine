@@ -213,7 +213,10 @@ namespace GLVM::core
 		staticActorsArchetypesNumber = 0;
 		arch::world.searchCacheArchetypes( staticActorsRequiredMask, cachedStaticActorsArchetypes, staticActorsArchetypesNumber );
 
-//		vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
+		// vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
+		// SetViewMatrix();
+		// const mat4 vp = vulkanRenderer->viewMatrix * vulkanRenderer->projectionMatrix;
+		// vulkanRenderer->extractFrustum( vp );
 		
 		loadWavefrontObj();
 		initializeGLTF();
@@ -334,11 +337,14 @@ namespace GLVM::core
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
 //			Input_Stack_.PrintStack();
-			setFrameData();
 			if( !vulkanRenderer->isInventoryOpened ) {
 				SetViewMatrix();
 				vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
+				
+				const mat4 vp = vulkanRenderer->viewMatrix * vulkanRenderer->projectionMatrix;
+				vulkanRenderer->extractFrustum( vp );
 			}
+			setFrameData();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
 		}
@@ -1197,10 +1203,9 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
-
+			std::cout << "NEXT FRAME" << std::endl;
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
-				vulkanRenderer->actors.Push({});
 				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorMaterials[n];
@@ -1325,21 +1330,44 @@ namespace GLVM::core
 					// if( ecs::arch::getId( entity ) == 0 ) {
 					// 	std::cout << "forward" << transformComponent->forward << std::endl;
 					// }
+
+					const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					// const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
+					// const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
+					// const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
+
+					const float scale = transformComponent->scale;
+					const vec3 originOffsets = { meshAxisMaxAbsoluteValues.origin_offset_x * scale,
+						meshAxisMaxAbsoluteValues.origin_offset_y * scale,
+						meshAxisMaxAbsoluteValues.origin_offset_z * scale };
+
+					const vec3 halfSizes = { meshAxisMaxAbsoluteValues.absolute_x * scale,
+						meshAxisMaxAbsoluteValues.absolute_y * scale,
+						meshAxisMaxAbsoluteValues.absolute_z * scale };
+
+					std::cout << originOffsets << std::endl;
+					std::cout << halfSizes << std::endl;
 					
-					vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-					if( animationComponent->isAnimatedOnFrame ) {
-						vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
-						animationComponent->jointMatrices = vulkanRenderer->actors[animationActorsCounter].jointMatrices;
-						animationComponent->isAnimatedOnFrame = false;
-					} else {
-						vulkanRenderer->actors[animationActorsCounter].jointMatrices = animationComponent->jointMatrices;
+					const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
+					const bool isFrustumIntersect = vulkanRenderer->isFrustumIntersect( aabb );
+					std::cout << "frustum culling flag: " << isFrustumIntersect << std::endl;
+					if( isFrustumIntersect ) {
+						vulkanRenderer->actors.Push({});
+						vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+						if( animationComponent->isAnimatedOnFrame ) {
+							vulkanRenderer->actors[animationActorsCounter].jointMatrices = updateAnimationFrames(animationComponent, meshID);
+							animationComponent->jointMatrices = vulkanRenderer->actors[animationActorsCounter].jointMatrices;
+							animationComponent->isAnimatedOnFrame = false;
+						} else {
+							vulkanRenderer->actors[animationActorsCounter].jointMatrices = animationComponent->jointMatrices;
+						}
+						vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+						vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+						vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
+						vulkanRenderer->actors[animationActorsCounter].shininess = materialComponent->shininess;
+						++animationActorsCounter;
 					}
-					vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
-					vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-					vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-					vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
-					vulkanRenderer->actors[animationActorsCounter].shininess = materialComponent->shininess;
-					++animationActorsCounter;
 				}
 			}
 		}
