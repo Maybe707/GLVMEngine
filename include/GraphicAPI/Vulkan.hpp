@@ -132,21 +132,7 @@ namespace GLVM::core
 		Vector<int, 4> indirectTexture[INDIRECT_TEXTURE_WIDTH * INDIRECT_TEXTURE_HEIGHT / 4 + 1];
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_Mat_Mes_Act;
 		core::vector<unsigned int> entitiesCollectionLinked__Trn_PoL_Mes_Act;
-
-		struct Frustum {
-			plane planes[6];
-			
-			struct PlaneIndex {
-				enum EPlaneIndex {
-					LEFT_PLANE,
-					RIGHT_PLANE,
-					BOTTOM_PLANE,
-					TOP_PLANE,
-					NEAR_PLANE,
-					FAR_PLANE
-				};
-			} planeIndex;
-		} frustum;
+		Frustum mainCameraFrustum;
 
 		char glyphs[128]  = { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
 			'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',

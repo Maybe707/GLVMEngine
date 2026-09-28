@@ -342,7 +342,7 @@ namespace GLVM::core
 				vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
 				
 				const mat4 vp = vulkanRenderer->viewMatrix * vulkanRenderer->projectionMatrix;
-				vulkanRenderer->extractFrustum( vp );
+				vulkanRenderer->mainCameraFrustum = extractFrustum( vp );
 			}
 			setFrameData();
 			vulkanRenderer->draw();
@@ -1349,9 +1349,9 @@ namespace GLVM::core
 					std::cout << halfSizes << std::endl;
 					
 					const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
-					const bool isFrustumIntersect = vulkanRenderer->isFrustumIntersect( aabb );
-					std::cout << "frustum culling flag: " << isFrustumIntersect << std::endl;
-					if( isFrustumIntersect ) {
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, aabb );
+					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
+					if( isFrustumIntersectFlag ) {
 						vulkanRenderer->actors.Push({});
 						vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 						if( animationComponent->isAnimatedOnFrame ) {
