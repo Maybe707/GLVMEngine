@@ -1203,7 +1203,7 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
-			std::cout << "NEXT FRAME" << std::endl;
+
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
 				vulkanRenderer->collisionsWireframes.Push({});
@@ -1345,12 +1345,12 @@ namespace GLVM::core
 						meshAxisMaxAbsoluteValues.absolute_y * scale,
 						meshAxisMaxAbsoluteValues.absolute_z * scale };
 
-					std::cout << originOffsets << std::endl;
-					std::cout << halfSizes << std::endl;
+					// std::cout << originOffsets << std::endl;
+					// std::cout << halfSizes << std::endl;
 					
 					const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, aabb );
-					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
+//					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
 					if( isFrustumIntersectFlag ) {
 						vulkanRenderer->actors.Push({});
 						vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
@@ -1987,20 +1987,20 @@ namespace GLVM::core
 					vp = inverse_matrix_4x4( vp );
 					const vec4 tempVector = vec4( vertex[0], vertex[1], vertex[2], 1.0 ) * vp;
 
-					std::cout << "VIEW MATRIX" << std::endl;
-					std::cout << view << std::endl;
-					std::cout << "PROJECTION MATRIX" << std::endl;
-					std::cout << vulkanRenderer->projectionMatrix << std::endl;
-					std::cout << "VP MATRIX" << std::endl;
-					std::cout << vp << std::endl;
+					// std::cout << "VIEW MATRIX" << std::endl;
+					// std::cout << view << std::endl;
+					// std::cout << "PROJECTION MATRIX" << std::endl;
+					// std::cout << vulkanRenderer->projectionMatrix << std::endl;
+					// std::cout << "VP MATRIX" << std::endl;
+					// std::cout << vp << std::endl;
 
-					printf("det(VP) = %f\n", determinant_4x4(vp));
+					// printf("det(VP) = %f\n", determinant_4x4(vp));
 						
-					printf(
-						"NDC (%f %f %f) -> (%f %f %f %f)\n",
-						vertex[0], vertex[1], vertex[2],
-						tempVector[0], tempVector[1], tempVector[2], tempVector[3]
-						);
+					// printf(
+					// 	"NDC (%f %f %f) -> (%f %f %f %f)\n",
+					// 	vertex[0], vertex[1], vertex[2],
+					// 	tempVector[0], tempVector[1], tempVector[2], tempVector[3]
+					// 	);
 					
 					vertex = vec3(tempVector[0] / tempVector[3], tempVector[1] / tempVector[3], tempVector[2] / tempVector[3]);
 

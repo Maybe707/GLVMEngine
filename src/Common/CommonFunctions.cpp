@@ -14,18 +14,18 @@ namespace GLVM::core {
 					 const core::MeshAxisMaxAbsoluteValues& backtrackingMeshAxisMaxAbsoluteValues,
 					 const core::MeshAxisMaxAbsoluteValues& comparedMeshAxisMaxAbsoluteValues)
 	{
-        if(backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x + backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  >
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x - comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[0] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x - backtrackingMeshAxisMaxAbsoluteValues.absolute_x * backtrackingScale  <
-		   comparedPosition[0] + comparedMeshAxisMaxAbsoluteValues.origin_offset_x + comparedMeshAxisMaxAbsoluteValues.absolute_x * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y + backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  >
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y - comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[1] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y * backtrackingScale  <
-		   comparedPosition[1] + comparedMeshAxisMaxAbsoluteValues.origin_offset_y + comparedMeshAxisMaxAbsoluteValues.absolute_y * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z + backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  >
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z - comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale &&
-           backtrackingPosition[2] + backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z - backtrackingMeshAxisMaxAbsoluteValues.absolute_z * backtrackingScale  <
-		   comparedPosition[2] + comparedMeshAxisMaxAbsoluteValues.origin_offset_z + comparedMeshAxisMaxAbsoluteValues.absolute_z * comparedScale) {
+        if(backtrackingPosition[0] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x + backtrackingMeshAxisMaxAbsoluteValues.absolute_x) * backtrackingScale  >
+		   comparedPosition[0] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_x - comparedMeshAxisMaxAbsoluteValues.absolute_x) * comparedScale &&
+           backtrackingPosition[0] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_x - backtrackingMeshAxisMaxAbsoluteValues.absolute_x) * backtrackingScale  <
+		   comparedPosition[0] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_x + comparedMeshAxisMaxAbsoluteValues.absolute_x) * comparedScale &&
+           backtrackingPosition[1] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y + backtrackingMeshAxisMaxAbsoluteValues.absolute_y) * backtrackingScale  >
+		   comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_y - comparedMeshAxisMaxAbsoluteValues.absolute_y) * comparedScale &&
+           backtrackingPosition[1] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_y - backtrackingMeshAxisMaxAbsoluteValues.absolute_y) * backtrackingScale  <
+		   comparedPosition[1] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_y + comparedMeshAxisMaxAbsoluteValues.absolute_y) * comparedScale &&
+           backtrackingPosition[2] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z + backtrackingMeshAxisMaxAbsoluteValues.absolute_z) * backtrackingScale  >
+		   comparedPosition[2] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_z - comparedMeshAxisMaxAbsoluteValues.absolute_z) * comparedScale &&
+           backtrackingPosition[2] + (backtrackingMeshAxisMaxAbsoluteValues.origin_offset_z - backtrackingMeshAxisMaxAbsoluteValues.absolute_z) * backtrackingScale  <
+		   comparedPosition[2] + (comparedMeshAxisMaxAbsoluteValues.origin_offset_z + comparedMeshAxisMaxAbsoluteValues.absolute_z) * comparedScale) {
 				return true;
 		}
         
