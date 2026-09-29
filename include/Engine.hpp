@@ -251,7 +251,11 @@ namespace GLVM::core
 			(1ul << ecs::arch::ComponentsIndices::FONT_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT);
 
-		
+		ecs::arch::Archetype* cachedMeshObjectArchetypes[32];
+		uint32_t meshObjectArchetypesNumber = 0;
+		ecs::arch::componentMask meshObjectRequiredMask =
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
+
 		/// For FPS counting
 		unsigned int fpsCounter = 0;
 		double fpsAccumulator   = 0;
@@ -300,6 +304,7 @@ namespace GLVM::core
 		void initializeGLTF();
 		void initializeFontData();
 		void initializeMathObjectsData();
+		void initializeAABB();
 		mat4 computeModelMatrix(ecs::components::transform* _transformComponent, ecs::components::rotation* rotation);
 		void computeHudScreeenCoordinates();
 		ecs::TextureHandle LoadTextureFromFile(const char* path_to_texture);

@@ -201,7 +201,7 @@ int main()
 		break;
 	}
 
-	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 20, 3.3f, -20.0f ) + randomDirection }, .scale = 0.05f };
+	enemyArch->transforms[enemyIndex]  = { .position = { vec3( (float)i * 20, 3.3f, -25.0f ) + randomDirection }, .scale = 0.05f };
 	enemyArch->states[enemyIndex]      = { .state = core::States::ROAMING };
 	enemyArch->rigidBodies[enemyIndex] = { .fMass_ = 0.0f };
 	enemyArch->enemies[enemyIndex]     = { .detectRadius = 15.0f };

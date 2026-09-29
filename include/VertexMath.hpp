@@ -321,7 +321,7 @@ Vector<T2, var2> Vector<T2, var2>::operator-(const Vector<T2, var2>& _vector)
 template <typename T2, int var2>
 Vector<T2, var2> Vector<T2, var2>::operator+(const Vector<T2, var2>& _vector)
 {
-        Vector<T2, var2> temp_Vector(1);
+	Vector<T2, var2> temp_Vector(1);
 
     temp_Vector[0] = m_vector[0] + _vector[0];
     temp_Vector[1] = m_vector[1] + _vector[1];
@@ -848,7 +848,7 @@ Vector<T, 3> Normalize(Vector<T, 3> _vector)
 }
 
 struct AABB {
-	vec3 center;
+	vec3 origin;
 	vec3 extents;
 };
 
@@ -1410,9 +1410,9 @@ inline bool isFrustumIntersect(const Frustum& frustum, const AABB& aabb) {
 			aabb.extents[1] * std::abs(plane.normal[1]) +
 			aabb.extents[2] * std::abs(plane.normal[2]);
 
-		float boxCentreToPlaneDistance = (plane.normal[0] * aabb.center[0]) + 
-			(plane.normal[1] * aabb.center[1]) + 
-			(plane.normal[2] * aabb.center[2]) + 
+		float boxCentreToPlaneDistance = (plane.normal[0] * aabb.origin[0]) + 
+			(plane.normal[1] * aabb.origin[1]) + 
+			(plane.normal[2] * aabb.origin[2]) + 
 			plane.distance;
 
 		if ( boxCentreToPlaneDistance < -boxExtentsProjectionOnPlaneNormal ) {
@@ -1421,6 +1421,24 @@ inline bool isFrustumIntersect(const Frustum& frustum, const AABB& aabb) {
 	}
 
 	return true; 
+}
+
+inline AABB computeLocalAABB( const float scale, vec3 originOffsets, vec3 extents ) {
+	const vec3 scaledOffsets = {
+		originOffsets[0] * scale,
+		originOffsets[1] * scale,
+		originOffsets[2] * scale };
+
+	const vec3 scaledExtents = {
+		extents[0] * scale,
+		extents[1] * scale,
+		extents[2] * scale };
+
+	return { .origin = scaledOffsets, .extents = scaledExtents };
+}
+
+inline AABB computeWorldAABB( const AABB aabb, vec3 position ) {
+	return { .origin = position + aabb.origin, .extents = aabb.extents };
 }
 
 #endif

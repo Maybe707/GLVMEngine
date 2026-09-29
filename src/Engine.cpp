@@ -344,6 +344,7 @@ namespace GLVM::core
 				const mat4 vp = vulkanRenderer->viewMatrix * vulkanRenderer->projectionMatrix;
 				vulkanRenderer->mainCameraFrustum = extractFrustum( vp );
 			}
+			initializeAABB();
 			setFrameData();
 			vulkanRenderer->draw();
 			vulkanRenderer->Window->SwapBuffers();
@@ -1203,7 +1204,7 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
-
+//			std::cout << "NEXT FRAME" << std::endl;
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
 				vulkanRenderer->collisionsWireframes.Push({});
@@ -1331,25 +1332,26 @@ namespace GLVM::core
 					// 	std::cout << "forward" << transformComponent->forward << std::endl;
 					// }
 
-					const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+					[[maybe_unused]] const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 					// const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
 					// const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
 					// const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
 
-					const float scale = transformComponent->scale;
-					const vec3 originOffsets = { meshAxisMaxAbsoluteValues.origin_offset_x * scale,
-						meshAxisMaxAbsoluteValues.origin_offset_y * scale,
-						meshAxisMaxAbsoluteValues.origin_offset_z * scale };
+					// const float scale = transformComponent->scale;
+					// const vec3 originOffsets = { meshAxisMaxAbsoluteValues.origin_offset_x * scale,
+					// 	meshAxisMaxAbsoluteValues.origin_offset_y * scale,
+					// 	meshAxisMaxAbsoluteValues.origin_offset_z * scale };
 
-					const vec3 halfSizes = { meshAxisMaxAbsoluteValues.absolute_x * scale,
-						meshAxisMaxAbsoluteValues.absolute_y * scale,
-						meshAxisMaxAbsoluteValues.absolute_z * scale };
+					// const vec3 halfSizes = { meshAxisMaxAbsoluteValues.absolute_x * scale,
+					// 	meshAxisMaxAbsoluteValues.absolute_y * scale,
+					// 	meshAxisMaxAbsoluteValues.absolute_z * scale };
 
-					// std::cout << originOffsets << std::endl;
-					// std::cout << halfSizes << std::endl;
+					// // std::cout << originOffsets << std::endl;
+					// // std::cout << halfSizes << std::endl;
 					
-					const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
-					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, aabb );
+					// const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
+					const AABB worldAABB = computeWorldAABB( meshComponent->aabb, transformComponent->position );
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 //					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
 					if( isFrustumIntersectFlag ) {
 						vulkanRenderer->actors.Push({});
@@ -2019,6 +2021,38 @@ namespace GLVM::core
 				vulkanRenderer->mathObjectsVertices.Push( verticesVK );
 			}
 
+		}
+	}
+
+	void Engine::initializeAABB() {
+		namespace cm   = GLVM::ecs::components;
+		namespace arch = GLVM::ecs::arch;
+		
+		meshObjectArchetypesNumber = 0;
+		arch::world.searchCacheArchetypes( meshObjectRequiredMask, cachedMeshObjectArchetypes, meshObjectArchetypesNumber );
+
+		for( u32 i0 = 0; i0 < meshObjectArchetypesNumber; ++i0 ) {
+			arch::Archetype* arch = cachedMeshObjectArchetypes[i0];
+			cm::mesh* meshes          = (ecs::components::mesh*)arch->
+				components[arch::ComponentsIndices::MESH_COMPONENT];
+			cm::transform* transforms = (ecs::components::transform*)arch->
+				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+
+			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
+				cm::transform* transformComponent = &transforms[n];
+				cm::mesh*      meshComponent      = &meshes[n];
+
+				unsigned int meshID               = meshComponent->handle.id;
+				const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+				const AABB localAABB = computeLocalAABB( transformComponent->scale,
+														 vec3( meshAxisMaxAbsoluteValues.origin_offset_x,
+															   meshAxisMaxAbsoluteValues.origin_offset_y,
+															   meshAxisMaxAbsoluteValues.origin_offset_z ),
+														 vec3( meshAxisMaxAbsoluteValues.absolute_x,
+															   meshAxisMaxAbsoluteValues.absolute_y,
+															   meshAxisMaxAbsoluteValues.absolute_z ) );
+				meshComponent->aabb = localAABB;
+			}
 		}
 	}
 	

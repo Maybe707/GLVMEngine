@@ -11,6 +11,7 @@
 // #include "GraphicAPI/Vulkan.hpp"
 
 #include <cstdint>
+#include "VertexMath.hpp"
 
 namespace GLVM::ecs::components
 {
@@ -22,6 +23,7 @@ namespace GLVM::ecs::components
 	{
         MeshHandle handle;
 		bool gltf       = true;
+		AABB aabb{};
 		bool randarable = true;
 	};
 }
