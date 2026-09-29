@@ -1210,7 +1210,7 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
-//			std::cout << "NEXT FRAME" << std::endl;
+
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
 				vulkanRenderer->collisionsWireframes.Push({});
@@ -1221,27 +1221,15 @@ namespace GLVM::core
 				cm::rotation*  rotationComponent  = &actorRotations[n];
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
-//					std::cout << "frame movement: " << transformComponent->frameMovement << std::endl;
+
 					if( abs(transformComponent->frameMovement[0]) > 0.0 ||
 						abs(transformComponent->frameMovement[2]) > 0.0 ) {
-//						std::cout << "frame move" << transformComponent->frameMovement << std::endl;
-//						std::cout << "dot: " << clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
-//																						 transformComponent->frameMovement[2])),
-//																		  Normalize(vec3(transformComponent->forward[0], 0.0,
-//																						 transformComponent->forward[2]))), 1.0f) << std::endl;
-
-
-
+						/// Needed only projection on XZ plane
 						const vec2 tempFrameMovement = vec2(transformComponent->frameMovement[0], transformComponent->frameMovement[2]);
 
-//						std::cout << "forward: " << transformComponent->forward << std::endl;
-//						std::cout << "movement x: " << tempFrameMovement[0] << " y: " << tempFrameMovement[1] << std::endl;
-						
 						float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
 										   vec2(transformComponent->forward[0], transformComponent->forward[2]));
 
-//						std::cout << "sign: " << sign << std::endl;
-						
 						float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
 																						 transformComponent->frameMovement[2])),
 																		  Normalize(vec3(transformComponent->forward[0], 0.0,
@@ -1276,34 +1264,22 @@ namespace GLVM::core
 							currentFrameEvents[3] = 0;
 						}
 
-						// for( int i = 0; i < 4; ++i ) {
-						// 	std::cout << "shtuka " << i << " :" << previousFrameKeyEvents[i] << std::endl;
-						// }
-
 						if( currentFrameEvents[0] == previousFrameKeyEvents[0] &&
 							currentFrameEvents[1] == previousFrameKeyEvents[1] &&
 							currentFrameEvents[2] == previousFrameKeyEvents[2] &&
 							currentFrameEvents[3] == previousFrameKeyEvents[3] ) {
 //							std::cout << "Default case " << std::endl;
-//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
 						} else if ( currentFrameEvents[0] == 0 &&
 									currentFrameEvents[1] == 0 &&
 									currentFrameEvents[2] == 0 &&
 									currentFrameEvents[3] == 0 ) {
 //							std::cout << "Second default case " << std::endl;
-//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
 						} else {
 							previousFrameKeyEvents[0] = currentFrameEvents[0];
 							previousFrameKeyEvents[1] = currentFrameEvents[1];
 							previousFrameKeyEvents[2] = currentFrameEvents[2];
 							previousFrameKeyEvents[3] = currentFrameEvents[3];
 //							std::cout << "Rewrite key events " << std::endl;
-//							std::this_thread::sleep_for(std::chrono::milliseconds(200));
-//						sleep(1);
-//						if( abs(rotationAngle) > 0.1 ) {
-//							std::cout << "rot angle: " << rotationAngle << std::endl;
-//							if
-
 							if( sign > 0.0f ) {
 								sign = 1.0f;
 							} else if( sign < 0.0f ) {
@@ -1312,13 +1288,9 @@ namespace GLVM::core
 								sign = 1.0f;
 							}
 
-							
 							transformComponent->pitch += rotationAngle * sign;
-//						}
-
 							transformComponent->forward = transformComponent->frameMovement;
 							transformComponent->previousFrameForward = transformComponent->forward;
-//							transformComponent->frameMovement = 0;
 						}
 					} else {
 						previousFrameKeyEvents[0] = 0.0f;
@@ -1326,33 +1298,12 @@ namespace GLVM::core
 						previousFrameKeyEvents[2] = 0.0f;
 						previousFrameKeyEvents[3] = 0.0f;
 					}
-					// if( ecs::arch::getId( entity ) == 0 ) {
-					// 	std::cout << "forward" << transformComponent->forward << std::endl;
-					// }
-
-					[[maybe_unused]] const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					// const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
-					// const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
-					// const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
-
-					// const float scale = transformComponent->scale;
-					// const vec3 originOffsets = { meshAxisMaxAbsoluteValues.origin_offset_x * scale,
-					// 	meshAxisMaxAbsoluteValues.origin_offset_y * scale,
-					// 	meshAxisMaxAbsoluteValues.origin_offset_z * scale };
-
-					// const vec3 halfSizes = { meshAxisMaxAbsoluteValues.absolute_x * scale,
-					// 	meshAxisMaxAbsoluteValues.absolute_y * scale,
-					// 	meshAxisMaxAbsoluteValues.absolute_z * scale };
-
-					// // std::cout << originOffsets << std::endl;
-					// // std::cout << halfSizes << std::endl;
 					
-					// const AABB aabb = { .center = transformComponent->position + originOffsets, .extents = halfSizes };
 					const AABB worldAABB = computeWorldAABB( meshComponent->aabb, transformComponent->position );
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
-//					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
+
 					if( isFrustumIntersectFlag ) {
-						unsigned int meshID               = meshComponent->handle.id;
+						u32 meshID       = meshComponent->handle.id;
 						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
@@ -1369,7 +1320,7 @@ namespace GLVM::core
 						} else {
 							vulkanRenderer->actors[animationActorsCounter].jointMatrices = animationComponent->jointMatrices;
 						}
-						vulkanRenderer->actors[animationActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[animationActorsCounter].meshID    = meshID;
 						vulkanRenderer->actors[animationActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
 						vulkanRenderer->actors[animationActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
 						vulkanRenderer->actors[animationActorsCounter].ambient   = materialComponent->ambient;
