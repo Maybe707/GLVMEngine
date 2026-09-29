@@ -1158,8 +1158,6 @@ namespace GLVM::core
 			}
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
-				vulkanRenderer->actors.Push({});
-				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &levelChunkTransforms[n];
 				cm::material*  materialComponent  = &levelChunkMaterials[n];
 				cm::rotation*  rotationComponent  = &levelChunkRotations[n];
@@ -1169,21 +1167,29 @@ namespace GLVM::core
 //					cm::transform playerTransform = *transformComponent;
 //					playerTransform.position += vec3(0.0f, 2.0f, -3.0f);
 //					cm::rotation  playerRotation  = *rotationComponent;
-					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					++collisionsWireframesCounter;
+					const AABB worldAABB = computeWorldAABB( levelChunkMeshes[n].aabb, transformComponent->position );
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+
+					if( isFrustumIntersectFlag ) {
+						vulkanRenderer->actors.Push({});
+						vulkanRenderer->collisionsWireframes.Push({});
+
+						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
 					
-					vulkanRenderer->actors[levelChunkActorsCounter].modelMatrix   = model;
-					vulkanRenderer->actors[levelChunkActorsCounter].jointMatrices = jointMatrices;
-					vulkanRenderer->actors[levelChunkActorsCounter].meshID        = meshID;
-					vulkanRenderer->actors[levelChunkActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-					vulkanRenderer->actors[levelChunkActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-					vulkanRenderer->actors[levelChunkActorsCounter].ambient   = materialComponent->ambient;
-					vulkanRenderer->actors[levelChunkActorsCounter].shininess = materialComponent->shininess;
-					++levelChunkActorsCounter;
+						vulkanRenderer->actors[levelChunkActorsCounter].modelMatrix   = model;
+						vulkanRenderer->actors[levelChunkActorsCounter].jointMatrices = jointMatrices;
+						vulkanRenderer->actors[levelChunkActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[levelChunkActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+						vulkanRenderer->actors[levelChunkActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+						vulkanRenderer->actors[levelChunkActorsCounter].ambient   = materialComponent->ambient;
+						vulkanRenderer->actors[levelChunkActorsCounter].shininess = materialComponent->shininess;
+						++levelChunkActorsCounter;
+					}
 				}
 			}
 		}
@@ -1215,14 +1221,6 @@ namespace GLVM::core
 				cm::rotation*  rotationComponent  = &actorRotations[n];
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
-					unsigned int meshID               = meshComponent->handle.id;
-					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					++collisionsWireframesCounter;
-
 //					std::cout << "frame movement: " << transformComponent->frameMovement << std::endl;
 					if( abs(transformComponent->frameMovement[0]) > 0.0 ||
 						abs(transformComponent->frameMovement[2]) > 0.0 ) {
@@ -1354,6 +1352,14 @@ namespace GLVM::core
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 //					std::cout << "frustum culling flag: " << isFrustumIntersectFlag << std::endl;
 					if( isFrustumIntersectFlag ) {
+						unsigned int meshID               = meshComponent->handle.id;
+						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
+						
 						vulkanRenderer->actors.Push({});
 						vulkanRenderer->actors[animationActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
 						if( animationComponent->isAnimatedOnFrame ) {
@@ -1397,29 +1403,36 @@ namespace GLVM::core
 			}
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
-				vulkanRenderer->actors.Push({});
-				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &staticActorTransforms[n];
 				cm::material*  materialComponent  = &staticActorMaterials[n];
 				cm::rotation*  rotationComponent  = &staticActorRotations[n];
 				if( staticActorTransforms && staticActorMaterials &&
 					staticActorRotations && staticActorMeshes ) {
 					unsigned int meshID = staticActorMeshes[n].handle.id;
-					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					++collisionsWireframesCounter;
+
+					const AABB worldAABB = computeWorldAABB( staticActorMeshes[n].aabb, transformComponent->position );
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+
+					if( isFrustumIntersectFlag ) {
+						vulkanRenderer->actors.Push({});
+						vulkanRenderer->collisionsWireframes.Push({});
+
+						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
 					
-					vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
-					vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
-					vulkanRenderer->actors[staticActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-					vulkanRenderer->actors[staticActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-					vulkanRenderer->actors[staticActorsCounter].ambient   = materialComponent->ambient;
-					vulkanRenderer->actors[staticActorsCounter].shininess = materialComponent->shininess;
-					++staticActorsCounter;
+						vulkanRenderer->actors[staticActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->actors[staticActorsCounter].jointMatrices = jointMatrices;
+						vulkanRenderer->actors[staticActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[staticActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+						vulkanRenderer->actors[staticActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+						vulkanRenderer->actors[staticActorsCounter].ambient   = materialComponent->ambient;
+						vulkanRenderer->actors[staticActorsCounter].shininess = materialComponent->shininess;
+						++staticActorsCounter;
+					}
 				}
 			}
 		}
@@ -1448,29 +1461,35 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				vulkanRenderer->isCollisionsWireframeBuffersInitialized = false;
-				vulkanRenderer->actors.Push({});
-				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorProjectileBundles[n].material;
 				cm::rotation*  rotationComponent  = &actorRotations[n];
 				if( actorTransforms && actorProjectileBundles &&
 					actorRotations && actorMeshes ) {
 					unsigned int meshID = actorMeshes[n].handle.id;
-					const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					++collisionsWireframesCounter;
+					const AABB worldAABB = computeWorldAABB( actorMeshes[n].aabb, transformComponent->position );
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+
+					if( isFrustumIntersectFlag ) {
+						vulkanRenderer->actors.Push({});
+						vulkanRenderer->collisionsWireframes.Push({});
+
+						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
 					
-					vulkanRenderer->actors[projectileActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-					vulkanRenderer->actors[projectileActorsCounter].jointMatrices = jointMatrices;
-					vulkanRenderer->actors[projectileActorsCounter].meshID        = meshID;
-					vulkanRenderer->actors[projectileActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-					vulkanRenderer->actors[projectileActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-					vulkanRenderer->actors[projectileActorsCounter].ambient   = materialComponent->ambient;
-					vulkanRenderer->actors[projectileActorsCounter].shininess = materialComponent->shininess;
-					++projectileActorsCounter;
+						vulkanRenderer->actors[projectileActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+						vulkanRenderer->actors[projectileActorsCounter].jointMatrices = jointMatrices;
+						vulkanRenderer->actors[projectileActorsCounter].meshID        = meshID;
+						vulkanRenderer->actors[projectileActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+						vulkanRenderer->actors[projectileActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+						vulkanRenderer->actors[projectileActorsCounter].ambient   = materialComponent->ambient;
+						vulkanRenderer->actors[projectileActorsCounter].shininess = materialComponent->shininess;
+						++projectileActorsCounter;
+					}
 				}
 			}
 		}
@@ -1509,29 +1528,35 @@ namespace GLVM::core
 			
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				if( items[n].isActor ) {
-					vulkanRenderer->actors.Push({});
-					vulkanRenderer->collisionsWireframes.Push({});
 					cm::transform* transformComponent = &itemTransforms[n];
 					cm::material*  materialComponent  = &itemMaterials[n];
 					cm::rotation*  rotationComponent  = &itemRotations[n];
 					if( itemTransforms && itemMaterials &&
 						itemRotations && itemMeshes ) {
 						unsigned int meshID = itemMeshes[n].handle.id;
-						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
-						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
-						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
-						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-						++collisionsWireframesCounter;
+						const AABB worldAABB = computeWorldAABB( itemMeshes[n].aabb, transformComponent->position );
+						const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+
+						if( isFrustumIntersectFlag ) {
+							vulkanRenderer->actors.Push({});
+							vulkanRenderer->collisionsWireframes.Push({});
+							
+							const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
+							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
+							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+							++collisionsWireframesCounter;
 						
-						vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
-						vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
-						vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
-						vulkanRenderer->actors[itemActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
-						vulkanRenderer->actors[itemActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
-						vulkanRenderer->actors[itemActorsCounter].ambient   = materialComponent->ambient;
-						vulkanRenderer->actors[itemActorsCounter].shininess = materialComponent->shininess;
-						++itemActorsCounter;
+							vulkanRenderer->actors[itemActorsCounter].modelMatrix   = computeModelMatrix(transformComponent, rotationComponent);
+							vulkanRenderer->actors[itemActorsCounter].jointMatrices = jointMatrices;
+							vulkanRenderer->actors[itemActorsCounter].meshID        = meshID;
+							vulkanRenderer->actors[itemActorsCounter].diffuseTextureIndex  = materialComponent->diffuseTextureID_.id;
+							vulkanRenderer->actors[itemActorsCounter].specularTextureIndex = materialComponent->specularTextureID_.id;
+							vulkanRenderer->actors[itemActorsCounter].ambient   = materialComponent->ambient;
+							vulkanRenderer->actors[itemActorsCounter].shininess = materialComponent->shininess;
+							++itemActorsCounter;
+						}
 					}
 				}
 			}
@@ -1556,14 +1581,14 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::MESH_GENERATION_COMPONENT];
 			
 			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
-				vulkanRenderer->mathObjects.Push({});
 				cm::transform* mathObjectTransformComponent  = &mathObjectTransforms[n];
 				cm::rotation*  mathObjectRotationComponent   = &mathObjectRotations[n];
 				cm::meshGeneration* mathObjectGenerationMesh = &mathObjectGeneratedMeshes[n];
 				if( &mathObjectTransforms[n] != nullptr ) {
 //					const unsigned int meshID = mathObjectMeshes[n].handle.id;
+					vulkanRenderer->mathObjects.Push({});
+						
 					const mat4 model = computeModelMatrix(mathObjectTransformComponent, mathObjectRotationComponent);
-
 					vulkanRenderer->mathObjects[mathObjectEntityCount].meshID      = mathObjectGenerationMesh->meshID;
 					vulkanRenderer->mathObjects[mathObjectEntityCount].modelMatrix = model;
 					vulkanRenderer->mathObjects[mathObjectEntityCount].position    = mathObjectTransformComponent->position;
@@ -1591,21 +1616,28 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::MESH_COMPONENT];
 			
 			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
-				vulkanRenderer->players.Push({});
-				vulkanRenderer->collisionsWireframes.Push({});
 				cm::transform* playerTransformComponent = &playerTransforms[n];
 				cm::rotation*  playerRotationComponent  = &playerRotations[n];
 				if( &playerTransforms[n] != nullptr ) {
 					const unsigned int meshID = playerMeshes[n].handle.id;
-					const mat4 model = computeModelMatrix(playerTransformComponent, playerRotationComponent);
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = playerTransformComponent->scale;
-					vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
-					++collisionsWireframesCounter;
+
+					const AABB worldAABB = computeWorldAABB( playerMeshes[n].aabb, playerTransformComponent->position );
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+
+					if( isFrustumIntersectFlag ) {
+						vulkanRenderer->players.Push({});
+						vulkanRenderer->collisionsWireframes.Push({});
+						
+						const mat4 model = computeModelMatrix(playerTransformComponent, playerRotationComponent);
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = playerTransformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
+						++collisionsWireframesCounter;
 					
-					vulkanRenderer->players[playerEntityCount].position = playerTransformComponent->position;
-					vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
+						vulkanRenderer->players[playerEntityCount].position = playerTransformComponent->position;
+						vulkanRenderer->players[playerEntityCount].forward  = playerTransformComponent->forward;
+					}
 				}
 
 				++playerEntityCount;
