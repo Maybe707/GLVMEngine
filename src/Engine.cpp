@@ -486,8 +486,8 @@ namespace GLVM::core
 					// forward[0] = appliedRotationQuat.x;
 					// forward[1] = appliedRotationQuat.y;
 					// forward[2] = appliedRotationQuat.z;
-					pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.m_vector[0],
-							.ry = -rotateAxis.m_vector[1], .rz = -rotateAxis.m_vector[2]}) >> pga::point{ .x = cameraComponent->Position[0],
+					pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.x,
+							.ry = -rotateAxis.y, .rz = -rotateAxis.z}) >> pga::point{ .x = cameraComponent->Position[0],
 							.y = cameraComponent->Position[1], .z = cameraComponent->Position[2], .w = 1.0f };
 					// vulkanRenderer->forward[0] = appliedRotationPoint.x;
 					// vulkanRenderer->forward[1] = appliedRotationPoint.y;
@@ -1683,22 +1683,22 @@ namespace GLVM::core
     }
 
 	void Engine::calculateMeshBounds(const vec4& animatedVertex) {
-		if ( animatedVertex[0] < vulkanRenderer->meshAxisLimitingValues.lowest_x ) {
-			vulkanRenderer->meshAxisLimitingValues.lowest_x = animatedVertex[0];
-		} else if ( animatedVertex[0] > vulkanRenderer->meshAxisLimitingValues.highest_x ) {
-			vulkanRenderer->meshAxisLimitingValues.highest_x = animatedVertex[0];
+		if ( animatedVertex.x < vulkanRenderer->meshAxisLimitingValues.lowest_x ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_x = animatedVertex.x;
+		} else if ( animatedVertex.x > vulkanRenderer->meshAxisLimitingValues.highest_x ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_x = animatedVertex.x;
 		}
 
-		if ( animatedVertex[1] < vulkanRenderer->meshAxisLimitingValues.lowest_y ) {
-			vulkanRenderer->meshAxisLimitingValues.lowest_y = animatedVertex[1];
-		} else if ( animatedVertex[1] > vulkanRenderer->meshAxisLimitingValues.highest_y ) {
-			vulkanRenderer->meshAxisLimitingValues.highest_y = animatedVertex[1];
+		if ( animatedVertex.y < vulkanRenderer->meshAxisLimitingValues.lowest_y ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_y = animatedVertex.y;
+		} else if ( animatedVertex.y > vulkanRenderer->meshAxisLimitingValues.highest_y ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_y = animatedVertex.y;
 		}
 
-		if ( animatedVertex[2] < vulkanRenderer->meshAxisLimitingValues.lowest_z ) {
-			vulkanRenderer->meshAxisLimitingValues.lowest_z = animatedVertex[2];
-		} else if ( animatedVertex[2] > vulkanRenderer->meshAxisLimitingValues.highest_z ) {
-			vulkanRenderer->meshAxisLimitingValues.highest_z = animatedVertex[2];
+		if ( animatedVertex.z < vulkanRenderer->meshAxisLimitingValues.lowest_z ) {
+			vulkanRenderer->meshAxisLimitingValues.lowest_z = animatedVertex.z;
+		} else if ( animatedVertex.z > vulkanRenderer->meshAxisLimitingValues.highest_z ) {
+			vulkanRenderer->meshAxisLimitingValues.highest_z = animatedVertex.z;
 		}
 	}
 

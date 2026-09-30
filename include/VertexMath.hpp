@@ -6,6 +6,8 @@
 #ifndef VERTEX_MATH
 #define VERTEX_MATH
 
+#include <cassert>
+#include <cstdint>
 #include <iostream>
 #include <cmath>
 #include <ostream>
@@ -357,6 +359,386 @@ Vector<T2, var2> Vector<T2, var2>::operator*(const T2& _scalar)
     return temp_vec;
 }
 
+template <typename T2>
+class Vector<T2, 1>
+{
+public:
+	T2 x;
+
+	Vector(T2 x = 0) 
+	{
+		this->x = x;
+	}
+
+	T2& operator[](const int index);
+	const T2& operator[](const int index) const;
+	template<class T, int dim2>
+	Vector<T2, 1> operator*(const Matrix<T, dim2>& matrix);
+    Vector<T2, 1> operator*(const Vector<T2, 1>& _vector);
+    void operator*=(const Vector<T2, 1>& _vector);
+    Vector<T2, 1> operator-(const Vector<T2, 1>& _vector);
+    Vector<T2, 1> operator+(const Vector<T2, 1>& _vector);
+    void operator-=(const Vector<T2, 1>& _vector);
+    void operator+=(const Vector<T2, 1>& _vector);
+    Vector<T2, 1> operator*(const T2& _scalar);
+	Vector<T2, 1> operator-();
+	T2 Length() const;
+	bool operator==(const Vector<T2, 1> vector) const;
+};
+
+template <class T2>
+bool Vector<T2, 1>::operator==(const Vector<T2, 1> vector) const {
+	return this->x == vector.x;
+}
+
+template <class T2>
+T2 Vector<T2, 1>::Length() const { 
+	return std::sqrt(x * x);		
+}
+
+template <class T2>
+std::ostream& operator<<(std::ostream& ostream, const Vector<T2, 1>& vector) {
+	ostream << "x: " << vector.x << " length: " << vector.Length();
+	
+	return ostream;
+}
+
+template <class T2>
+Vector<T2, 1> Vector<T2, 1>::operator-() {
+	return { .x = -x };
+}
+
+template<class T2>
+T2& Vector<T2, 1>::operator[](const int index) {
+	return *(&x + index);
+}
+
+template<class T2>
+const T2& Vector<T2, 1>::operator[](const int index) const {
+	return *(&x + index);
+}
+
+template <class T2>
+template <class T, int var>
+Vector<T2, 1> Vector<T2, 1>::operator*(const Matrix<T, var>& matrix) {
+	Vector<T2, 4> tempVector;
+	for(int i = 0; i < 1; ++i) {
+		for(int j = 0; j < var; ++j) {
+			tempVector[i] += *((&this->x) + j) * matrix[j][i];
+		}
+	}
+
+	return tempVector;
+}
+
+template <typename T2>
+Vector<T2, 1> Vector<T2, 1>::operator*(const Vector<T2, 1>& _vector) {
+    Vector<T2, 1> tempVector;
+    for(int i = 0; i < 1; ++i) {
+        tempVector[i] = (*this)[i] * _vector[i];
+	}
+	
+    return tempVector;
+}
+
+template <typename T2>
+void Vector<T2, 1>::operator*=(const Vector<T2, 1>& _vector)
+{
+    for(int i = 0; i < 1; ++i) {
+        (*this)[i] = (*this)[i] * _vector[i];
+	}
+}
+
+template <typename T2>
+Vector<T2, 1> Vector<T2, 1>::operator-(const Vector<T2, 1>& _vector) {
+    return { .x = this->x - _vector[0] };
+}
+
+template <typename T2>
+Vector<T2, 1> Vector<T2, 1>::operator+(const Vector<T2, 1>& _vector) {
+	return { .x = this->x + _vector[0] };
+}
+
+template <typename T2>
+void Vector<T2, 1>::operator-=(const Vector<T2, 1>& _vector) {
+	this->x = this->x - _vector[0];
+}
+
+template <typename T2>
+void Vector<T2, 1>::operator+=(const Vector<T2, 1>& _vector)
+{
+	this->x = this->x + _vector[0];
+}
+
+template <typename T2>
+Vector<T2, 1> Vector<T2, 1>::operator*(const T2& _scalar)
+{
+	return { .x = (*this)[0] * _scalar };
+}
+
+template <typename T2>
+Vector<T2, 1> operator*(const Vector<T2, 1>& vector, const T2 _scalar)
+{
+	return { .x = vector[0] * _scalar };
+}
+
+template <typename T2>
+class Vector<T2, 2>
+{
+public:
+	T2 x;
+	T2 y;
+
+	Vector(T2 x = 0, T2 y = 0) {
+		this->x = x;
+		this->y = y;
+	}
+
+	T2& operator[](const int index);
+	const T2& operator[](const int index) const;
+	template<class T, int dim2>
+	Vector<T2, 2> operator*(const Matrix<T, dim2>& matrix);
+    Vector<T2, 2> operator*(const Vector<T2, 2>& _vector);
+    void operator*=(const Vector<T2, 2>& _vector);
+    Vector<T2, 2> operator-(const Vector<T2, 2>& _vector);
+    Vector<T2, 2> operator+(const Vector<T2, 2>& _vector);
+    void operator-=(const Vector<T2, 2>& _vector);
+    void operator+=(const Vector<T2, 2>& _vector);
+    Vector<T2, 2> operator*(const T2& _scalar);
+	Vector<T2, 2> operator-();
+	T2 Length() const;
+	bool operator==(const Vector<T2, 2> vector) const;
+};
+
+template <class T2>
+bool Vector<T2, 2>::operator==(const Vector<T2, 2> vector) const {
+	return this->x == vector.x && this->y == vector.y;
+}
+
+template <class T2>
+T2 Vector<T2, 2>::Length() const { 
+	return std::sqrt(x * x + y * y);		
+}
+
+template <class T2>
+std::ostream& operator<<(std::ostream& ostream, const Vector<T2, 2>& vector) {
+	ostream << "x: " << vector.x << " y: " << vector.y << " z: " << vector.z << " w: " << vector.w << " length: " << vector.Length();
+	
+	return ostream;
+}
+
+template <class T2>
+Vector<T2, 2> Vector<T2, 2>::operator-() {
+	return { .x = -x, .y = -y };
+}
+
+template<class T2>
+T2& Vector<T2, 2>::operator[](const int index) {
+	return *(&x + index);
+}
+
+template<class T2>
+const T2& Vector<T2, 2>::operator[](const int index) const {
+	return *(&x + index);
+}
+
+template <class T2>
+template <class T, int var>
+Vector<T2, 2> Vector<T2, 2>::operator*(const Matrix<T, var>& matrix) {
+	static_assert(var == 2, "Size error");
+	Vector<T2, 2> tempVector;
+	for(int i = 0; i < 2; ++i) {
+		for(int j = 0; j < var; ++j) {
+			tempVector[i] += *((&this->x) + j) * matrix[j][i];
+		}
+	}
+
+	return tempVector;
+}
+
+template <typename T2>
+Vector<T2, 2> Vector<T2, 2>::operator*(const Vector<T2, 2>& _vector) {
+    Vector<T2, 2> tempVector;
+    for(int i = 0; i < 2; ++i) {
+        tempVector[i] = (*this)[i] * _vector[i];
+	}
+	
+    return tempVector;
+}
+
+template <typename T2>
+void Vector<T2, 2>::operator*=(const Vector<T2, 2>& _vector) {
+    for(int i = 0; i < 2; ++i) {
+        (*this)[i] = (*this)[i] * _vector[i];
+	}
+}
+
+template <typename T2>
+Vector<T2, 2> Vector<T2, 2>::operator-(const Vector<T2, 2>& _vector) {
+    return { this->x - _vector[0], this->y - _vector[1] };
+}
+
+template <typename T2>
+Vector<T2, 2> Vector<T2, 2>::operator+(const Vector<T2, 2>& _vector) {
+	return { this->x + _vector[0], this->y + _vector[1] };
+}
+
+template <typename T2>
+void Vector<T2, 2>::operator-=(const Vector<T2, 2>& _vector) {
+	this->x = this->x - _vector[0];
+	this->y = this->y - _vector[1];
+}
+
+template <typename T2>
+void Vector<T2, 2>::operator+=(const Vector<T2, 2>& _vector) {
+	this->x = this->x + _vector[0];
+	this->y = this->y + _vector[1];
+}
+
+template <typename T2>
+Vector<T2, 2> Vector<T2, 2>::operator*(const T2& _scalar) {
+	return { .x = (*this)[0] * _scalar, .y = (*this)[1] * _scalar };
+}
+
+template <typename T2>
+Vector<T2, 2> operator*(const Vector<T2, 2>& vector, const T2 _scalar) {
+	return { .x = vector[0] * _scalar, .y = vector[1] * _scalar };
+}
+
+template <typename T2>
+class Vector<T2, 3>
+{
+public:
+	T2 x;
+	T2 y;
+	T2 z;
+
+	Vector(T2 x = 0, T2 y = 0, T2 z = 0) {
+		this->x = x;
+		this->y = y;
+		this->z = z;
+	}
+
+	T2& operator[](const int index);
+	const T2& operator[](const int index) const;
+	template<class T, int dim2>
+	Vector<T2, 3> operator*(const Matrix<T, dim2>& matrix);
+    Vector<T2, 3> operator*(const Vector<T2, 3>& _vector);
+    void operator*=(const Vector<T2, 3>& _vector);
+    Vector<T2, 3> operator-(const Vector<T2, 3>& _vector);
+    Vector<T2, 3> operator+(const Vector<T2, 3>& _vector);
+    void operator-=(const Vector<T2, 3>& _vector);
+    void operator+=(const Vector<T2, 3>& _vector);
+    Vector<T2, 3> operator*(const T2& _scalar);
+	Vector<T2, 3> operator-();
+	T2 Length() const;
+	bool operator==(const Vector<T2, 3> vector) const;
+};
+
+template <class T2>
+bool Vector<T2, 3>::operator==(const Vector<T2, 3> vector) const {
+	return this->x == vector.x && this->y == vector.y && this->z == vector.z;
+}
+
+template <class T2>
+T2 Vector<T2, 3>::Length() const { 
+	return std::sqrt(x * x + y * y + z * z);		
+}
+
+template <class T2>
+std::ostream& operator<<(std::ostream& ostream, const Vector<T2, 3>& vector) {
+	ostream << "x: " << vector.x << " y: " << vector.y << " z: " << vector.z << " length: " << vector.Length();
+	
+	return ostream;
+}
+
+template <class T2>
+Vector<T2, 3> Vector<T2, 3>::operator-() {
+	return { -x, -y, -z };
+}
+
+template<class T2>
+T2& Vector<T2, 3>::operator[](const int index)
+{
+	return *(&x + index);
+}
+
+template<class T2>
+const T2& Vector<T2, 3>::operator[](const int index) const
+{
+	return *(&x + index);
+}
+
+template <class T2>
+template <class T, int var>
+Vector<T2, 3> Vector<T2, 3>::operator*(const Matrix<T, var>& matrix)
+{
+	static_assert(var == 3, "Size error");
+	Vector<T2, 3> tempVector;
+	for(int i = 0; i < 3; ++i) {
+		for(int j = 0; j < var; ++j) {
+			tempVector[i] += *((&this->x) + j) * matrix[j][i];
+		}
+	}
+
+	return tempVector;
+}
+
+template <typename T2>
+Vector<T2, 3> Vector<T2, 3>::operator*(const Vector<T2, 3>& _vector)
+{
+    Vector<T2, 3> tempVector;
+    for(int i = 0; i < 3; ++i) {
+        tempVector[i] = (*this)[i] * _vector[i];
+	}
+	
+    return tempVector;
+}
+
+template <typename T2>
+void Vector<T2, 3>::operator*=(const Vector<T2, 3>& _vector)
+{
+    for(int i = 0; i < 3; ++i) {
+        (*this)[i] = (*this)[i] * _vector[i];
+	}
+}
+
+template <typename T2>
+Vector<T2, 3> Vector<T2, 3>::operator-(const Vector<T2, 3>& _vector) {
+    return { this->x - _vector[0], this->y - _vector[1], this->z - _vector[2] };
+}
+
+template <typename T2>
+Vector<T2, 3> Vector<T2, 3>::operator+(const Vector<T2, 3>& _vector) {
+	return { this->x + _vector[0], this->y + _vector[1], this->z + _vector[2] };
+}
+
+template <typename T2>
+void Vector<T2, 3>::operator-=(const Vector<T2, 3>& _vector) {
+	this->x = this->x - _vector[0];
+	this->y = this->y - _vector[1];
+	this->z = this->z - _vector[2];
+}
+
+template <typename T2>
+void Vector<T2, 3>::operator+=(const Vector<T2, 3>& _vector) {
+	this->x = this->x + _vector[0];
+	this->y = this->y + _vector[1];
+	this->z = this->z + _vector[2];
+}
+
+template <typename T2>
+Vector<T2, 3> Vector<T2, 3>::operator*(const T2& _scalar)
+{
+	return { (*this)[0] * _scalar, (*this)[1] * _scalar, (*this)[2] * _scalar };
+}
+
+template <typename T2>
+Vector<T2, 3> operator*(const Vector<T2, 3>& vector, const T2 _scalar)
+{
+	return { vector[0] * _scalar, vector[1] * _scalar, vector[2] * _scalar };
+}
+
 template <typename T2, int var2>
 Vector<T2, var2> operator*(const Vector<T2, var2>& vector, const T2 _scalar)
 {
@@ -367,6 +749,170 @@ Vector<T2, var2> operator*(const Vector<T2, var2>& vector, const T2 _scalar)
     return temp;
 }
 
+template <typename T2>
+class Vector<T2, 4>
+{
+public:
+	T2 x;
+	T2 y;
+	T2 z;
+	T2 w;
+
+	Vector(T2 x = 0, T2 y = 0, T2 z = 0, T2 w = 0) 
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		this->w = w;
+	}
+
+	T2 get( const uint32_t index ) {
+		switch( index ) {
+		case 0:
+			return x;
+			break;
+		case 1:
+			return y;
+			break;
+		case 2:
+			return z;
+			break;
+		case 3:
+			return w;
+			break;
+		default:
+			break;
+		}
+
+		assert("Index out of bound");
+		return -1;
+	}
+	
+	T2& operator[](const int index);
+	const T2& operator[](const int index) const;
+	template<class T, int dim2>
+	Vector<T2, 4> operator*(const Matrix<T, dim2>& matrix);
+    Vector<T2, 4> operator*(const Vector<T2, 4>& _vector);
+    void operator*=(const Vector<T2, 4>& _vector);
+    Vector<T2, 4> operator-(const Vector<T2, 4>& _vector);
+    Vector<T2, 4> operator+(const Vector<T2, 4>& _vector);
+    void operator-=(const Vector<T2, 4>& _vector);
+    void operator+=(const Vector<T2, 4>& _vector);
+    Vector<T2, 4> operator*(const T2& _scalar);
+	Vector<T2, 4> operator-();
+	T2 Length() const;
+	bool operator==(const Vector<T2, 4> vector) const;
+};
+
+template <class T2>
+bool Vector<T2, 4>::operator==(const Vector<T2, 4> vector) const {
+	return this->x == vector.x && this->y == vector.y && this->z == vector.z && this->w == vector.w;
+}
+
+template <class T2>
+T2 Vector<T2, 4>::Length() const { 
+	return std::sqrt(x * x + y * y + z * z);		
+}
+
+template <class T2>
+std::ostream& operator<<(std::ostream& ostream, const Vector<T2, 4>& vector) {
+	ostream << "x: " << vector.x << " y: " << vector.y << " z: " << vector.z << " w: " << vector.w << " length: " << vector.Length();
+	
+	return ostream;
+}
+
+template <class T2>
+Vector<T2, 4> Vector<T2, 4>::operator-() {
+	return { .x = -x, .y = -y, .z = -z, .w = -w };
+}
+
+template<class T2>
+T2& Vector<T2, 4>::operator[](const int index)
+{
+	return *(&x + index);
+}
+
+template<class T2>
+const T2& Vector<T2, 4>::operator[](const int index) const
+{
+	return *(&x + index);
+}
+
+template <class T2>
+template <class T, int var>
+Vector<T2, 4> Vector<T2, 4>::operator*(const Matrix<T, var>& matrix)
+{
+	static_assert(var == 4, "Size error");
+	Vector<T2, 4> tempVector;
+	for(int i = 0; i < 4; ++i) {
+		for(int j = 0; j < var; ++j) {
+			tempVector[i] += *((&this->x) + j) * matrix[j][i];
+		}
+	}
+
+	return tempVector;
+}
+
+template <typename T2>
+Vector<T2, 4> Vector<T2, 4>::operator*(const Vector<T2, 4>& _vector)
+{
+    Vector<T2, 4> tempVector;
+    for(int i = 0; i < 4; ++i) {
+        tempVector[i] = (*this)[i] * _vector[i];
+	}
+	
+    return tempVector;
+}
+
+template <typename T2>
+void Vector<T2, 4>::operator*=(const Vector<T2, 4>& _vector)
+{
+    for(int i = 0; i < 4; ++i) {
+        (*this)[i] = (*this)[i] * _vector[i];
+	}
+}
+
+template <typename T2>
+Vector<T2, 4> Vector<T2, 4>::operator-(const Vector<T2, 4>& _vector)
+{
+    return { .x = get(0) - _vector[0], .y = get(1) - _vector[1], .z = get(2) - _vector[2], .w = get(3) - _vector[3] };
+}
+
+template <typename T2>
+Vector<T2, 4> Vector<T2, 4>::operator+(const Vector<T2, 4>& _vector)
+{
+	return { .x = get(0) + _vector[0], .y = get(1) + _vector[1], .z = get(2) + _vector[2], .w = get(3) + _vector[3] };
+}
+
+template <typename T2>
+void Vector<T2, 4>::operator-=(const Vector<T2, 4>& _vector)
+{
+	this->x = this->x - _vector[0];
+	this->y = this->y - _vector[1];
+	this->z = this->z - _vector[2];
+	this->w = this->w - _vector[3];
+}
+
+template <typename T2>
+void Vector<T2, 4>::operator+=(const Vector<T2, 4>& _vector)
+{
+	this->x = this->x + _vector[0];
+	this->y = this->y + _vector[1];
+	this->z = this->z + _vector[2];
+	this->w = this->w + _vector[3];
+}
+
+template <typename T2>
+Vector<T2, 4> Vector<T2, 4>::operator*(const T2& _scalar)
+{
+	return { .x = (*this)[0] * _scalar, .y = (*this)[1] * _scalar, .z = (*this)[2] * _scalar, .w = (*this)[3] * _scalar };
+}
+
+template <typename T2>
+Vector<T2, 4> operator*(const Vector<T2, 4>& vector, const T2 _scalar)
+{
+	return { .x = vector[0] * _scalar, .y = vector[1] * _scalar, .z = vector[2] * _scalar, .w = vector[3] * _scalar };
+}
 
 // template <typename T, int size, int row, int col>
 // Matrix<T, size - 1> matrix_minor( Matrix<T, size> matrix ) {

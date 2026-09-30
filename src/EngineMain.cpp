@@ -188,16 +188,16 @@ int main()
 	vec3 randomDirection = {};
 	switch( random ) {
 	case 0:
-		randomDirection = vec3( 3.0f, 0.0f, 0.0f, 0.0 );
+		randomDirection = vec3( 3.0f, 0.0f, 0.0f );
 		break;
 	case 1:
-		randomDirection = vec3( -3.0f, 0.0f, 0.0f, 0.0 );
+		randomDirection = vec3( -3.0f, 0.0f, 0.0f );
 		break;
 	case 2:
-		randomDirection = vec3( 0.0f, 0.0f, 3.0f, 0.0 );
+		randomDirection = vec3( 0.0f, 0.0f, 3.0f );
 		break;
 	case 3:
-		randomDirection = vec3( 0.0f, 0.0f, -3.0f, 0.0 );
+		randomDirection = vec3( 0.0f, 0.0f, -3.0f );
 		break;
 	}
 
