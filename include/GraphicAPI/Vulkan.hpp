@@ -441,6 +441,7 @@ namespace GLVM::core
 		void initializeVertexBuffersWithGLTFData();
 		void initializeVertexBuffersWithFontData();
 		void initializeVertexBuffersWithMathObjectsData();
+		void initializeCollisionWireframesBuffers();
         void cleanupSwapChain();
         void cleanup();
         void createInstance();

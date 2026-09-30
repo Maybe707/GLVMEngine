@@ -337,6 +337,10 @@ namespace GLVM::core
 			vulkanRenderer->hud_screen_y              = hud_screen_y;
 			vulkanRenderer->initializeGameLevelVertices();
 //			Input_Stack_.PrintStack();
+			if( !vulkanRenderer->isCollisionsWireframeBuffersInitialized ) {
+				vulkanRenderer->initializeCollisionWireframesBuffers();
+			}
+			
 			if( !vulkanRenderer->isInventoryOpened ) {
 				SetViewMatrix();
 				vulkanRenderer->projectionMatrix = SetProjectionMatrix( 90.0f, 1920.0f, 1080.0f, 0.1f, 100.0f );
@@ -1178,6 +1182,7 @@ namespace GLVM::core
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 						++collisionsWireframesCounter;
 					
@@ -1309,6 +1314,7 @@ namespace GLVM::core
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 						++collisionsWireframesCounter;
 						
@@ -1373,6 +1379,7 @@ namespace GLVM::core
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 						++collisionsWireframesCounter;
 					
@@ -1430,6 +1437,7 @@ namespace GLVM::core
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 						++collisionsWireframesCounter;
 					
@@ -1497,6 +1505,7 @@ namespace GLVM::core
 							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = transformComponent->position;
 							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = transformComponent->scale;
+							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 							vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 							++collisionsWireframesCounter;
 						
@@ -1584,6 +1593,7 @@ namespace GLVM::core
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].scale    = playerTransformComponent->scale;
+						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshID   = meshID;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[meshID];
 						++collisionsWireframesCounter;
 					

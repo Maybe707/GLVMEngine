@@ -362,6 +362,7 @@ struct RenderCollisionWireframe {
 	mat4 model;
 	vec3 position;
 	float scale;
+	u32 meshID;
 	GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues;
 };
 

@@ -3,6 +3,7 @@
 // Author: Maksim Manokhin a.k.a. Yuriorkis_Scream
 // License: http://opensource.org/licenses/MIT
 
+#include "Archetypes/CrosshairArchetype.hpp"
 #include "ComponentManager.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Components/ActorComponent.hpp"
@@ -301,7 +302,7 @@ namespace GLVM::core
 		initializeVertexBuffersWithWavefrontData();
 		initializeVertexBuffersWithGLTFData();
 		initializeVertexBuffersWithFontData();
-        initializeVertexBuffersWithMathObjectsData();        
+        initializeVertexBuffersWithMathObjectsData();
 		
         createMainRenderUniformBuffers();
         createMainRenderDescriptorPool();
@@ -380,6 +381,116 @@ namespace GLVM::core
 			mathObjectsIndexBufferMemoryContaner.emplace_back();
 			createIndexBuffer(mathObjectsIndexBufferContainer[m], mathObjectsIndexBufferMemoryContaner[m], mathObjectsIndices[m]);
 		}
+	}
+
+	void CVulkanRenderer::initializeCollisionWireframesBuffers() {
+		// for( size_t i = 0; i < collisionsWireframesVKBuffers.GetSize(); ++i ) {
+		// 	vkDestroyBuffer(device, collisionsWireframesVKBuffers[i], nullptr);
+		// 	vkFreeMemory(device, collisionsWireframesVKDeviceMemory[i], nullptr);
+		// 	vkDestroyBuffer(device, collisionsWireframesIndicesVKBuffers[i], nullptr);
+		// 	vkFreeMemory(device, collisionsWireframesIndicesVKDeviceMemory[i], nullptr);
+		// }
+		// vkDeviceWaitIdle(device);
+		// collisionsWireframesVKBuffers.clear();
+		// collisionsWireframesVKDeviceMemory.clear();
+		// collisionsWireframesIndicesVKBuffers.clear();
+		// collisionsWireframesIndicesVKDeviceMemory.clear();
+		// collisionsWireframeIndices.clear();
+
+		constexpr int boxIndicesForIndexBuffer[36] =
+			{ 0, 1, 2, 3, 0, 2,
+			  4, 0, 3, 7, 4, 3,
+			  4, 5, 1, 0, 4, 1,
+			  1, 5, 6, 2, 1, 6,
+			  5, 4, 7, 6, 5, 7,
+			  3, 2, 6, 7, 3, 6 };
+
+		for ( unsigned int i = 0; i < 36; ++i )
+			collisionsWireframeIndices.push_back(boxIndicesForIndexBuffer[i]);
+			
+		for ( unsigned int i = 0; i < allMeshMaxAbsoluteValues.GetSize(); ++i ) {
+			core::vector<core::Vertex> vertices;
+			unsigned int cube_vertices = 8;
+
+			const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = allMeshMaxAbsoluteValues[i];
+//			const float scale   = collisionWireframe.scale;
+			const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
+			const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
+			const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
+
+			const float bottom_half_x = meshAxisMaxAbsoluteValues.origin_offset_x - meshAxisMaxAbsoluteValues.absolute_x;
+			const float bottom_half_y = meshAxisMaxAbsoluteValues.origin_offset_y - meshAxisMaxAbsoluteValues.absolute_y;
+			const float bottom_half_z = meshAxisMaxAbsoluteValues.origin_offset_z - meshAxisMaxAbsoluteValues.absolute_z;
+			
+			for ( unsigned int i = 0; i < cube_vertices; ++i ) {
+				SVertex vertex;
+				switch( i ) {
+				case 0:
+					vertex[0] = half_x;
+					vertex[1] = half_y;
+					vertex[2] = half_z;
+					break;
+				case 1:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = half_y;
+					vertex[2] = half_z;
+					break;			
+				case 2:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = half_z;
+					break;			
+				case 3:
+					vertex[0] = half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = half_z;
+					break;
+				case 4:
+					vertex[0] = half_x;
+					vertex[1] = half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;
+				case 5:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				case 6:
+					vertex[0] = (float)bottom_half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				case 7:
+					vertex[0] = half_x;
+					vertex[1] = (float)bottom_half_y;
+					vertex[2] = (float)bottom_half_z;
+					break;			
+				}
+
+				SVertex normal;
+				normal[0] = 0;
+				normal[1] = 1;
+				normal[2] = 0;
+				SVertex texture;
+				texture[0] = 0;
+				texture[1] = 1;
+
+				vertices.Push({{vertex[0], vertex[1], vertex[2]},
+							   {normal[0], normal[1], normal[2]},
+							   {texture[0], texture[1]},
+							   { -1, -1, -1, -1 },
+							   { 1, 1, 1, 1 }});
+			}			
+
+			collisionsWireframesVKBuffers.Push({});;
+			collisionsWireframesVKDeviceMemory.Push({});
+			createVertexBuffer(collisionsWireframesVKBuffers[i], collisionsWireframesVKDeviceMemory[i], vertices);
+
+			collisionsWireframesIndicesVKBuffers.Push({});
+			collisionsWireframesIndicesVKDeviceMemory.Push({});
+			createIndexBuffer(collisionsWireframesIndicesVKBuffers[i], collisionsWireframesIndicesVKDeviceMemory[i], collisionsWireframeIndices);
+		}
+		isCollisionsWireframeBuffersInitialized = true;
 	}
 	
 	void CVulkanRenderer::clearVK_Image( VK_Image* textureImages ) {
@@ -2398,124 +2509,12 @@ namespace GLVM::core
         vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 //		std::cout << "FRAME" << std::endl;
 
-		if( collisionsWireframes.GetSize() != collisionsWireframesVKBuffers.GetSize() ) {
-			vkDeviceWaitIdle(device);
-			for( size_t i = 0; i < collisionsWireframesVKBuffers.GetSize(); ++i ) {
-				vkDestroyBuffer(device, collisionsWireframesVKBuffers[i], nullptr);
-				vkFreeMemory(device, collisionsWireframesVKDeviceMemory[i], nullptr);
-				vkDestroyBuffer(device, collisionsWireframesIndicesVKBuffers[i], nullptr);
-				vkFreeMemory(device, collisionsWireframesIndicesVKDeviceMemory[i], nullptr);
-			}
-			vkDeviceWaitIdle(device);
-			collisionsWireframesVKBuffers.clear();
-			collisionsWireframesVKDeviceMemory.clear();
-			collisionsWireframesIndicesVKBuffers.clear();
-			collisionsWireframesIndicesVKDeviceMemory.clear();
-			collisionsWireframeIndices.clear();
-
-			constexpr int boxIndicesForIndexBuffer[36] =
-				{ 0, 1, 2, 3, 0, 2,
-				  4, 0, 3, 7, 4, 3,
-				  4, 5, 1, 0, 4, 1,
-				  1, 5, 6, 2, 1, 6,
-				  5, 4, 7, 6, 5, 7,
-				  3, 2, 6, 7, 3, 6 };
-
-			for ( unsigned int i = 0; i < 36; ++i )
-				collisionsWireframeIndices.push_back(boxIndicesForIndexBuffer[i]);
-			
-			for ( unsigned int i = 0; i < collisionsWireframes.GetSize(); ++i ) {
-				RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
-
-				core::vector<core::Vertex> vertices;
-				unsigned int cube_vertices = 8;
-
-				const GLVM::core::MeshAxisMaxAbsoluteValues meshAxisMaxAbsoluteValues = collisionWireframe.meshAxisMaxAbsoluteValues;
-//			const float scale   = collisionWireframe.scale;
-				const float half_x = meshAxisMaxAbsoluteValues.origin_offset_x + meshAxisMaxAbsoluteValues.absolute_x;
-				const float half_y = meshAxisMaxAbsoluteValues.origin_offset_y + meshAxisMaxAbsoluteValues.absolute_y;
-				const float half_z = meshAxisMaxAbsoluteValues.origin_offset_z + meshAxisMaxAbsoluteValues.absolute_z;
-
-				const float bottom_half_x = meshAxisMaxAbsoluteValues.origin_offset_x - meshAxisMaxAbsoluteValues.absolute_x;
-				const float bottom_half_y = meshAxisMaxAbsoluteValues.origin_offset_y - meshAxisMaxAbsoluteValues.absolute_y;
-				const float bottom_half_z = meshAxisMaxAbsoluteValues.origin_offset_z - meshAxisMaxAbsoluteValues.absolute_z;
-			
-				for ( unsigned int i = 0; i < cube_vertices; ++i ) {
-					SVertex vertex;
-					switch( i ) {
-					case 0:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;
-					case 1:
-						vertex[0] = (float)bottom_half_x;
-						vertex[1] = half_y;
-						vertex[2] = half_z;
-						break;			
-					case 2:
-						vertex[0] = (float)bottom_half_x;
-						vertex[1] = (float)bottom_half_y;
-						vertex[2] = half_z;
-						break;			
-					case 3:
-						vertex[0] = half_x;
-						vertex[1] = (float)bottom_half_y;
-						vertex[2] = half_z;
-						break;
-					case 4:
-						vertex[0] = half_x;
-						vertex[1] = half_y;
-						vertex[2] = (float)bottom_half_z;
-						break;
-					case 5:
-						vertex[0] = (float)bottom_half_x;
-						vertex[1] = half_y;
-						vertex[2] = (float)bottom_half_z;
-						break;			
-					case 6:
-						vertex[0] = (float)bottom_half_x;
-						vertex[1] = (float)bottom_half_y;
-						vertex[2] = (float)bottom_half_z;
-						break;			
-					case 7:
-						vertex[0] = half_x;
-						vertex[1] = (float)bottom_half_y;
-						vertex[2] = (float)bottom_half_z;
-						break;			
-					}
-
-					SVertex normal;
-					normal[0] = 0;
-					normal[1] = 1;
-					normal[2] = 0;
-					SVertex texture;
-					texture[0] = 0;
-					texture[1] = 1;
-
-					vertices.Push({{vertex[0], vertex[1], vertex[2]},
-								   {normal[0], normal[1], normal[2]},
-								   {texture[0], texture[1]},
-								   { -1, -1, -1, -1 },
-								   { 1, 1, 1, 1 }});
-				}			
-
-				collisionsWireframesVKBuffers.Push({});;
-				collisionsWireframesVKDeviceMemory.Push({});
-				createVertexBuffer(collisionsWireframesVKBuffers[i], collisionsWireframesVKDeviceMemory[i], vertices);
-
-				collisionsWireframesIndicesVKBuffers.Push({});
-				collisionsWireframesIndicesVKDeviceMemory.Push({});
-				createIndexBuffer(collisionsWireframesIndicesVKBuffers[i], collisionsWireframesIndicesVKDeviceMemory[i], collisionsWireframeIndices);
-			}
-			isCollisionsWireframeBuffersInitialized = true;
-		}
-		
 		for ( unsigned int i = 0; i < collisionsWireframes.GetSize(); ++i ) {
 			[[maybe_unused]] RenderCollisionWireframe collisionWireframe = collisionsWireframes[i];
 //			RenderCrosshair crosshair = crosshairs[i];
 //			unsigned int uiVertexId = crosshair.meshID;
 
+			const u32 meshID = collisionWireframe.meshID;
 			unsigned int uboIndex = currentFrame * hudScreenUboDescriptorNumber + i;
 			updateCollisionsDebugUBO(uboIndex, collisionWireframe.model, DescriptorSetDataLink::COLLISIONS_DEBUG_DATA);
 			const unsigned int linkedDescriptorSetID = pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].linkedDescriptorSetIDs[0];
@@ -2523,12 +2522,11 @@ namespace GLVM::core
 			vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineConfigs[SpecificPipeline::COLLISIONS_DEBUG_PIPELINE].pipelineLayout,
 									0, 1, &(*(descriptorSetsChunks.GetVectorContainer() + currentDescriptorSet.descriptorSetOffset + uboIndex)), 0, nullptr);
 
-			
-			VkBuffer vertexBuffers[] = {collisionsWireframesVKBuffers[i]};
+			VkBuffer vertexBuffers[] = {collisionsWireframesVKBuffers[meshID]};
 			VkDeviceSize offsets[] = {0};
 			vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 
-			vkCmdBindIndexBuffer(commandBuffer, collisionsWireframesIndicesVKBuffers[i], 0, VK_INDEX_TYPE_UINT32);
+			vkCmdBindIndexBuffer(commandBuffer, collisionsWireframesIndicesVKBuffers[meshID], 0, VK_INDEX_TYPE_UINT32);
 
 			unsigned int indicesContainerSize = collisionsWireframeIndices.size();
 
