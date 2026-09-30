@@ -657,7 +657,7 @@ namespace GLVM::core
 	mat4 Engine::updateSpotLightSpaceMatrixShadowMapUBO( ecs::components::spotLight* spotLightComponent ) {
 		float nearPlaneFlatShadowMap = 5.5f;
 		float farPlaneFlatShadowMap = 100.0f;
-		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE,
+		mat4 spotProjectionMatrixLight = Perspective(Radians(90.0f), 1920.0f / 1080.0f,
 														 nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 		
 		vec3 positionVectorLight  = spotLightComponent->position;

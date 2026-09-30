@@ -376,9 +376,9 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 	// PCF
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(flatShadowMap, 0);
-	for (int x = -1; x <= 1; ++x)
+	for (int x = -3; x <= 3; ++x)
 	{
-		for (int y = -1; y <= 1; ++y)
+		for (int y = -3; y <= 3; ++y)
 		{
 			float pcfDepth = texture(flatShadowMap, projectiveCoordinatesZO.xy + vec2(x, y) * texelSize).r;
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
@@ -494,9 +494,9 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	// PCF
 	float shadow = 0.0;
 	vec2 texelSize = 1.0 / textureSize(flatShadowMap, 0);
-	for (int x = -1; x <= 1; ++x)
+	for (int x = -3; x <= 3; ++x)
 	{
-		for (int y = -1; y <= 1; ++y)
+		for (int y = -3; y <= 3; ++y)
 		{
 			float pcfDepth = texture(flatShadowMap, projectiveCoordinatesZO.xy + vec2(x, y) * texelSize).r;
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
