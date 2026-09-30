@@ -1213,7 +1213,7 @@ namespace GLVM::core
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
-				vulkanRenderer->collisionsWireframes.Push({});
+
 				cm::transform* transformComponent = &actorTransforms[n];
 				cm::material*  materialComponent  = &actorMaterials[n];
 				cm::mesh*      meshComponent      = &actorMeshes[n];
@@ -1303,6 +1303,7 @@ namespace GLVM::core
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 
 					if( isFrustumIntersectFlag ) {
+						vulkanRenderer->collisionsWireframes.Push({});
 						u32 meshID       = meshComponent->handle.id;
 						const mat4 model = computeModelMatrix(transformComponent, rotationComponent);
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
@@ -1352,7 +1353,7 @@ namespace GLVM::core
 				mat4 unitMatrix(1.0f);
 				jointMatrices[i] = unitMatrix;
 			}
-			
+
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				cm::transform* transformComponent = &staticActorTransforms[n];
 				cm::material*  materialComponent  = &staticActorMaterials[n];
