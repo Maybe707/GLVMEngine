@@ -197,6 +197,17 @@ vec3 debugCubemapUnflatted(vec2 quadSize, samplerCube pointLightsCubeShadowMap)
     return texture(pointLightsCubeShadowMap, direction).xyz;
 }
 
+vec3 dither(vec3 color, vec2 pixel)
+{
+    float noise = fract(   ///< Take a fractional part
+	    sin(dot(pixel, vec2(12.9898, 78.233))) * 43758.5453 ///< sin gives value from -1 to 1. Constants just empiric values to mix coordinates
+    );
+
+    noise = noise - 0.5;  ///< Map value from [-1, 1] to [-0.5, 0.5]
+
+    return color + noise / 255.0;
+}
+
 float linearize_depth(float depth,float zNear,float zFar) {
     return zNear * zFar / (zFar + depth * (zNear - zFar));
 }
@@ -290,6 +301,7 @@ void main()
 	// result = toon;
 
 	result = pow( clamp(result, 0.0, 1.0), vec3(0.9) );
+	result = dither(result, gl_FragCoord.xy);	
 	outColor = vec4(result, 1.0);
 }
 

@@ -694,9 +694,9 @@ namespace GLVM::core
 
         VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
         if (enableValidationLayers) {
-//            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-//            createInfo.ppEnabledLayerNames = validationLayers.data();
-			createInfo.enabledLayerCount = 0;
+            createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+            createInfo.ppEnabledLayerNames = validationLayers.data();
+//			createInfo.enabledLayerCount = 0;
 			
             populateDebugMessengerCreateInfo(debugCreateInfo);
             createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debugCreateInfo;
