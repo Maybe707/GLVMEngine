@@ -40,6 +40,25 @@ constexpr int boxIndicesForIndexBuffer[36] =
   5, 4, 7, 6, 5, 7,
   3, 2, 6, 7, 3, 6 };
 
+constexpr int boxIndicesForIndexBuffer1[36] =
+{ 0, 1, 2, 3, 0, 2,
+  4, 5, 6, 7, 4, 6,
+  8, 9, 10, 11, 8, 10,
+  12, 13, 14, 15, 12, 14,
+  16, 17, 18, 19, 16, 18,
+  20, 21, 22, 23, 20, 22 };
+
+constexpr int boxIndicesIndexBuffer[24] =
+{ 0, 1, 2, 3, 4, 5,
+  6, 7, 8, 9, 10, 11,
+  12, 13, 14, 15, 16,
+  17, 18, 19, 20, 21,
+  22, 23 };
+
+constexpr int squareIndicesIndexBuffer[6] =
+{ 0, 1, 2, 3, 0, 2 };
+
+
 constexpr int boxIndexBufferDataLineMode[24] =
 { 0, 1, 1, 2, 2, 3, 3, 0,
   4, 5, 5, 6, 6, 7, 7, 4,

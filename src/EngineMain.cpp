@@ -309,10 +309,10 @@ int main()
 	arch::EntityLocation pointLightLocation = arch::world.entityLocations[arch::getId( pointLight )];
 	arch::PointLightArchetype* pointLightArch = static_cast<arch::PointLightArchetype*>(pointLightLocation.arch);
 	const uint32_t pointLightIndex = pointLightLocation.index;
-	pointLightArch->pointLights[pointLightIndex]   = { .position = { 3.0f, 10.0f, 15.0f },
+	pointLightArch->pointLights[pointLightIndex]   = { .position = { 3.0f, 10.0f, 0.0f },
 		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse  = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
-		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.032f };
-	pointLightArch->transforms[pointLightIndex]    = { .position = { 3.0f, 10.0f, 15.0f }, .scale = 0.2f };
+		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.0032f };
+	pointLightArch->transforms[pointLightIndex]    = { .position = { 3.0f, 10.0f, 0.0f }, .scale = 0.2f };
 	pointLightArch->meshes[pointLightIndex].handle = hyperCubeHandle_GLTF;
 	pointLightArch->materials[pointLightIndex]     = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
 		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };

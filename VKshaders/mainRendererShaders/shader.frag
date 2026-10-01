@@ -320,7 +320,7 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
+	vec3 ambient  = light.ambient * texture(diffuse, tilesetFinalUV).rgb;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 
@@ -409,65 +409,12 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 	// closestDepth              *= farPlane;
 	// Now get current linear depth as the length between the fragment and light position
 	float currentDepth         = length(fragmentToLight);
-	// currentDepth               -= 1.0;
-	// currentDepth = delinearize_depth(currentDepth, 1.0, 100.0);
-//	currentDepth               = currentDepth / 100.0;
-	// Test for shadows simple
-	// float bias                 = 10.0;
-	// float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-
-	// Test for shadows full solid cube of offsets
-	// float bias    = 0.05;
-	// float shadow  = 0.0;
-	// float samples = 4.0;
-	// float offset  = 0.1;
-	// for(float x = -offset; x < offset; x += offset / (samples * 0.5))
-	// 	{
-	// 		for(float y = -offset; y < offset; y += offset / (samples * 0.5))
-	// 			{
-	// 				for(float z = -offset; z < offset; z += offset / (samples * 0.5))
-	// 					{
-	// 						float closestDepth = texture(pointLightsCubeShadowMaps, fragmentToLight + vec3(x, y, z)).r;
-	// 						closestDepth *= farPlane; ///< undo mapping [0;1]
-	// 						if(currentDepth - bias > closestDepth)
-	// 							shadow += 1.0;
-	// 					}
-	// 			}
-	// 	}
-	// shadow /= (samples * samples * samples);
-
+	float closestDepth = texture(pointLightsCubeShadowMap, fragmentToLight).r;
+	closestDepth *= lightData.farPlane;
 	// Test for shadows ranged cube of offsets
-	vec3 sampleOffsetDirections[20] = vec3[]
-		(
-			vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
-			vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
-			vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
-			vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
-			vec3( 0,  1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0,  1, -1)
-		);  
-	
-	float shadow  = 0.0;
-	float bias    = 0.15;
-//	float bias    = -0.12514;
-	float samples = 20;
-	float viewDistance = length(lightData.viewPosition - fragmentPosition);
-	float diskRadius   = (1.0 + (viewDistance / lightData.farPlane)) / 25.0;
-	for(int i = 0; i < samples; ++i)
-		{
-			float closestDepth = texture(pointLightsCubeShadowMap, fragmentToLight + sampleOffsetDirections[i] *
-										 diskRadius).r;
-//			closestDepth = linearize_depth(closestDepth, 1.0, 100.0);
-			closestDepth *= lightData.farPlane;
-			// bias = linearize_depth(bias, 1.0, 100.0);
-			// closestDepth += 1.0;
-			
-//			closestDepth *= pointLights.farPlane; // undo mapping [0;1]
-//			closestDepth *= 100.0; // undo mapping [0;1]
-			if(currentDepth - bias > closestDepth)
-				shadow += 1.0;
-		}
-	shadow /= float(samples);
-//	shadow /= float(100);
+
+	float bias = max(0.05 * (1.0 - dot(fs_in.normal, fragmentToLight)), 0.17);  
+    float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;      
 
 //	return closestDepth;
 	return shadow;

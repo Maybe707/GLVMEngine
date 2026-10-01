@@ -15,6 +15,7 @@
 #include "Engine.hpp"
 #include "GraphicAPI/Vulkan.hpp"
 #include "Vector.hpp"
+#include "VkStructs.hpp"
 
 namespace GLVM::core
 {
@@ -63,7 +64,7 @@ namespace GLVM::core
 				generateTransitionBridge( levelHalfX, levelHalfY, levelHalfZ, transitionBridgeHalfWidth, transitionBridgeHalfHeight );
 
 				for ( unsigned int i = 0; i < 36; ++i )
-					indices.push_back(boxIndicesForIndexBuffer[i]);
+					indices.push_back(boxIndicesForIndexBuffer1[i]);
 
 				meshAxisLimitingValues.setToDefaultValues();
 
@@ -93,7 +94,7 @@ namespace GLVM::core
 				levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
 				
 				for ( unsigned int i = 0; i < 36; ++i )
-					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer[i]);
+					transitionBridgeIndices.push_back(boxIndicesForIndexBuffer1[i]);
 
 				meshAxisLimitingValues.setToDefaultValues();
 
@@ -112,7 +113,7 @@ namespace GLVM::core
 
 				arch::LevelChunkArchetype* transitionBridgeArch = static_cast<arch::LevelChunkArchetype*>(transitionBridgeLocation.arch);
 				const uint32_t transitionBridgeIndex = transitionBridgeLocation.index;
-				ecs::TextureHandle transitionBridgeTexture = textureHandlers[3];
+				ecs::TextureHandle transitionBridgeTexture = textureHandlers[2];
 				transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
 				transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
 				transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
@@ -260,63 +261,83 @@ namespace GLVM::core
 
 	void ProceduralLevelGeneratingSystem::makeCubeObjectVertices( vec4 joinIndices, vec4 weights, float half_x, float half_y, float half_z,
 																  core::vector<core::Vertex>& destinationVerticesContainer ) {
-		unsigned int cube_vertices = 8;
+		const float x = half_x;
+		const float y = half_y;
+		const float z = half_z;
+		
+		const vec3 cubeVertices[24] = {
+			// Back (+Z)
+			{-x,  y,  z},  ///< left bottom back
+			{ x,  y,  z},  ///< right bottom back
+			{ x, -y,  z},  ///< right upper back
+			{-x, -y,  z},  ///< left upper back
+
+			// Front (-Z)
+			{ x,  y, -z},  ///< right bottom front
+			{-x,  y, -z},  ///< left bottom front
+			{-x, -y, -z},  ///< left upper front
+			{ x, -y, -z},  ///< right upper front
+
+			// Right (+X)
+			{ x,  y,  z},
+			{ x,  y, -z},
+			{ x, -y, -z},
+			{ x, -y,  z},
+
+			// Left (-X)
+			{-x,  y, -z},
+			{-x,  y,  z},
+			{-x, -y,  z},
+			{-x, -y, -z},
+
+			// Top (+Y)
+			{-x,  y, -z},
+			{ x,  y, -z},
+			{ x,  y,  z},
+			{-x,  y,  z},
+
+			// Bottom (-Y)
+			{-x, -y,  z},
+			{ x, -y,  z},
+			{ x, -y, -z},
+			{-x, -y, -z},
+		};
+		
+		const vec3 normals[24] = {
+			{ 0,  0, 1}, { 0,  0, 1}, { 0,  0, 1}, { 0,  0, 1},
+			{ 0,  0, -1}, { 0,  0, -1}, { 0,  0,  -1}, { 0,  0,  -1},
+			{ 1,  0,  0}, { 1,  0,  0}, { 1,  0,  0}, { 1,  0,  0},
+			{-1,  0,  0}, {-1,  0,  0}, {-1,  0,  0}, {-1,  0,  0},
+			{ 0, 1,  0}, { 0,  1,  0}, { 0,  1,  0}, { 0,  1,  0},
+			{ 0, -1,  0}, { 0, -1,  0}, { 0, -1,  0}, { 0, -1,  0}
+		};
+
+		const vec2 textureCoordinates[24] = {
+			{0, 1}, {1, 1}, {1, 0}, {0, 0},
+			{0, 1}, {1, 1}, {1, 0}, {0, 0},
+			{0, 1}, {1, 1}, {1, 0}, {0, 0},
+			{0, 1}, {1, 1}, {1, 0}, {0, 0},
+			{0, 1}, {1, 1}, {1, 0}, {0, 0},
+			{0, 1}, {1, 1}, {1, 0}, {0, 0}
+		};
+		
+		unsigned int cube_vertices = 24;		
 		for ( unsigned int i = 0; i < cube_vertices; ++i ) {
 			SVertex vertex;
-					
-			switch( i ) {
-			case 0:
-				vertex[0] = half_x;
-				vertex[1] = half_y;
-				vertex[2] = half_z;
-				break;
-			case 1:
-				vertex[0] = -(float)half_x;
-				vertex[1] = half_y;
-				vertex[2] = half_z;
-				break;			
-			case 2:
-				vertex[0] = -(float)half_x;
-				vertex[1] = -(float)half_y;
-				vertex[2] = half_z;
-				break;			
-			case 3:
-				vertex[0] = half_x;
-				vertex[1] = -(float)half_y;
-				vertex[2] = half_z;
-				break;
-			case 4:
-				vertex[0] = half_x;
-				vertex[1] = half_y;
-				vertex[2] = -(float)half_z;
-				break;
-			case 5:
-				vertex[0] = -(float)half_x;
-				vertex[1] = half_y;
-				vertex[2] = -(float)half_z;
-				break;			
-			case 6:
-				vertex[0] = -(float)half_x;
-				vertex[1] = -(float)half_y;
-				vertex[2] = -(float)half_z;
-				break;			
-			case 7:
-				vertex[0] = half_x;
-				vertex[1] = -(float)half_y;
-				vertex[2] = -(float)half_z;
-				break;			
-			}
+			vertex[0] = cubeVertices[i].x;
+			vertex[1] = cubeVertices[i].y;
+			vertex[2] = cubeVertices[i].z;
 
 			meshAxisLimitingValues.comparePerDirectionAndSetToMaximumValueByModule( vertex );
-					
-			SVertex normal;
-			normal[0] = 0;
-			normal[1] = 1;
-			normal[2] = 0;
-			SVertex texture;
-			texture[0] = 0;
-			texture[1] = 1;
 
+			SVertex normal;
+			normal[0] = normals[i].x;
+			normal[1] = normals[i].y;
+			normal[2] = normals[i].z;
+			SVertex texture;
+			texture[0] = textureCoordinates[i].x;
+			texture[1] = textureCoordinates[i].y;
+			
 			destinationVerticesContainer.Push({{vertex[0], vertex[1], vertex[2]},
 											   {normal[0], normal[1], normal[2]},
 											   {texture[0], texture[1]},
