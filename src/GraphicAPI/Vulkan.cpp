@@ -110,6 +110,7 @@ namespace GLVM::core
 				.usageFlags = VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
 				.aspectFlags = VK_IMAGE_ASPECT_COLOR_BIT,
 				.format = VK_FORMAT_R8G8B8A8_SRGB,
+//				.format = VK_FORMAT_BC7_SRGB_BLOCK,
 				.tiling = VK_IMAGE_TILING_OPTIMAL,
 				.arrayLayers = 1,
 				.width = texWidth,

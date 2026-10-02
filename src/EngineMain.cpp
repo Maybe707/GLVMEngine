@@ -29,6 +29,8 @@
 #include "Components/ItemComponent.hpp"
 #include "Components/ActorComponent.hpp"
 #include "Engine.hpp"
+#include "TextureFormatStructs.hpp"
+#include "TextureLoadingUtils.hpp"
 #include "Vector.hpp"
 #ifdef __linux__
 #include "Network/UDP_ServerLinux.hpp"
@@ -100,6 +102,10 @@ int main()
 	[[maybe_unused]] ecs::TextureHandle chelikTextureHandle = GLVM->LoadTextureFromAddress(128, 96, chelik_dat_len, chelik_dat);
 	[[maybe_unused]] ecs::TextureHandle witchTexturehandle = GLVM->LoadTextureFromAddress(32, 32, witch_dat_len, witch_dat);
 	[[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromAddress(32, 32, gray_dat_len, gray_dat);
+	// core::DDSData grayTextureDDS = core::loadDDS( "../textures/data/gray_texture_bc7.dds" );
+	// const u32 grayTextureDataLength = grayTextureDDS.height * grayTextureDDS.width;
+	// [[maybe_unused]] ecs::TextureHandle grayTextureHandle = GLVM->LoadTextureFromAddress(grayTextureDDS.width, grayTextureDDS.height,
+	// 																					 grayTextureDataLength, (unsigned char*)grayTextureDDS.data.data());
 	[[maybe_unused]] ecs::TextureHandle container2Texturehandle = GLVM->LoadTextureFromAddress(500, 500, container2_dat_len, container2_dat);
 	[[maybe_unused]] ecs::TextureHandle container2SpecularTextureHandle = GLVM->LoadTextureFromAddress(500, 500, container2_specular_dat_len, container2_specular_dat);
 	[[maybe_unused]] ecs::TextureHandle crosshairTexturehandle = GLVM->LoadTextureFromAddress(32, 32, Crosshair_dat_len, Crosshair_dat);
@@ -295,13 +301,13 @@ int main()
 	arch::EntityLocation directionalLightLocation = arch::world.entityLocations[arch::getId( directionalLight )];
 	arch::DirectionalLightArchetype* directionalLightArch = static_cast<arch::DirectionalLightArchetype*>(directionalLightLocation.arch);
 	const uint32_t directionalLightIndex = directionalLightLocation.index;
-	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 15.0f, 10.0f },
+	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 20.0f, 15.0f },
 		.direction = { 0.0f, -1.0f, -10.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
 		.specular = {0.1f, 0.1f, 0.1f}};
-	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 15.0f, 10.0f }, .scale = 0.1f };
+	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 20.0f, 15.0f }, .scale = 0.1f };
 	directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;
 	directionalLightArch->materials[directionalLightIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
-		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+		.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 	
 	
 	arch::entity pointLight = archEntityManager->createEntity();

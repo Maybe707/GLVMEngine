@@ -90,7 +90,7 @@ namespace GLVM::core
 					// 	vec3( currentLevelPosition[0], componentsView.playerTransforms->position[1], currentLevelPosition[2] );
 				}
 				levelChunkArch->transforms[gameLevelChunkIndex] = { .position = currentLevelPosition, .scale = 1.0f };
-				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+				levelChunkArch->materials[gameLevelChunkIndex]  = { .diffuseTextureID_ = gameLevelTexture, .specularTextureID_ = gameLevelTexture, .ambient = { 0.05f, 0.05f, 0.5f }, .shininess = 128.0f * 0.078125f };
 				levelChunkArch->meshes[gameLevelChunkIndex].handle = gameLevelMeshHandle;
 				
 				for ( unsigned int i = 0; i < 36; ++i )
@@ -115,7 +115,7 @@ namespace GLVM::core
 				const uint32_t transitionBridgeIndex = transitionBridgeLocation.index;
 				ecs::TextureHandle transitionBridgeTexture = textureHandlers[2];
 				transitionBridgeArch->transforms[transitionBridgeIndex] = { .position = transitionBridgePosition, .scale = 1.0f };
-				transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f };
+				transitionBridgeArch->materials[transitionBridgeIndex]  = { .diffuseTextureID_ = transitionBridgeTexture, .specularTextureID_ = transitionBridgeTexture, .ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
 				transitionBridgeArch->meshes[transitionBridgeIndex].handle = transitionBridgeMeshHandle;
 				
 				++levelNubmer;

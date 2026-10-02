@@ -52,6 +52,7 @@
 #include "Archetypes/PointLightArchetype.hpp"
 #include "Archetypes/SpotLightArchetype.hpp"
 #include "Archetypes/MathObjectaArchetype.hpp"
+#include "TextureLoadingUtils.hpp"
 
 using Entity = unsigned int;
 
