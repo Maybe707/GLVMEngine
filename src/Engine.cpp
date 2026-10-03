@@ -640,7 +640,7 @@ namespace GLVM::core
 	mat4 Engine::updateDirectionalLightSpaceMatrixShadowMapUBO( ecs::components::directionalLight* directionalLightComponent ) {
 		float nearPlaneFlatShadowMap = 5.5f;
 		float farPlaneFlatShadowMap = 100.0f;
-		mat4 directionalProjectionMatrixLight = ortho(-50.0f, 50.0f, -50.0f, 50.0f,
+		mat4 directionalProjectionMatrixLight = ortho(-20.0f, 20.0f, -20.0f, 20.0f,
 													  nearPlaneFlatShadowMap, farPlaneFlatShadowMap);
 
 		vec3 positionVectorLight = directionalLightComponent->position;

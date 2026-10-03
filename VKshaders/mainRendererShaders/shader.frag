@@ -313,7 +313,8 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	vec3 reflectDirection   = reflect(-lightDirection, normal);
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), fs_in.shininess);
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
+	//	vec3 ambient  = light.ambient * fs_in.ambient;
+	vec3 ambient = light.ambient * texture(diffuse, tilesetFinalUV).rgb;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, fs_in.textureCoords));
 

@@ -1167,7 +1167,7 @@ namespace GLVM::core
 				pointLightsRenderAttachments.push_back((*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + j].GPUImage).views[m]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE],
-											 pointLightShadowMapFrameBuffers[j][m], 1920, 1080);
+											 pointLightShadowMapFrameBuffers[j][m], swapChainExtent.width, swapChainExtent.height);
 			}
 		}
     }
