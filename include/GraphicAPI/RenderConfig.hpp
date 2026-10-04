@@ -39,6 +39,8 @@ namespace GLVM::core
 		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].cullMode                         = VK_CULL_MODE_BACK_BIT;
+//		pipelineConfigs[DIRECTIONAL_LIGHT_PIPELINE].cullMode                         = VK_CULL_MODE_FRONT_BIT;
 
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
 		renderPassConfigs[DIRECTIONAL_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;

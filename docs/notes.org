@@ -1,0 +1,6 @@
+#+title: Important notes for GLVM
+#+author: Yuriorkis_Scream
+
+* Shadow optimization
+** Shadow atlas - to change size of shadow in shadow atlas depending on distance
+** Multidraw (VK_EXT_multi_draw)

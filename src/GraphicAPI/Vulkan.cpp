@@ -1035,8 +1035,8 @@ namespace GLVM::core
 			rasterizer.rasterizerDiscardEnable = VK_FALSE;
 			rasterizer.polygonMode = pipeline.polygonMode;
 			rasterizer.lineWidth = 1.0f;
-			rasterizer.cullMode = 0;
-			rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+			rasterizer.cullMode = pipeline.cullMode;
+			rasterizer.frontFace = pipeline.windingOrder;
 			rasterizer.depthBiasEnable = VK_FALSE;
 
 			VkPipelineMultisampleStateCreateInfo multisampling{};
