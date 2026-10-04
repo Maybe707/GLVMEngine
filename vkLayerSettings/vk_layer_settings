@@ -1,0 +1,4 @@
+khronos_validation.validate_sync = true
+khronos_validation.syncval_submit_time_validation = true
+khronos_validation.duplicate_message_limit = 200
+

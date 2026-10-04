@@ -5,6 +5,7 @@
 #include "VkStructs.hpp"
 #include "ToString.hpp"
 #include "RenderConfig.hpp"
+#include "Constants.hpp"
 
 namespace GLVM::core::vkDebugUtils
 {

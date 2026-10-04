@@ -73,6 +73,8 @@ constexpr int vectorIndexBufferData[2] =
 constexpr int planeIndexBufferData[8] =
 { 0, 1, 1, 2, 2, 3, 3, 0 };
 
+extern const char* pipelinesNames[14];
+
 #endif
 
 

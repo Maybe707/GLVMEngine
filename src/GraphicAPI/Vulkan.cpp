@@ -187,6 +187,9 @@ namespace GLVM::core
         mapMemoryUBO(SpecificPipeline::HUD_SCREEN_PIPELINE, DescriptorSetDataLink::HUD_SCREEN, sizeof(HUD_SCREEN_UBO));
         mapMemoryUBO(SpecificPipeline::MATH_OBJECTS_DEBUG_PIPELINE, DescriptorSetDataLink::MATH_OBJECTS_DEBUG_DATA, sizeof(COLLISIONS_DEBUG_UBO));
 		mapMemoryUBO(SpecificPipeline::MAIN_RENDER_PIPELINE, DescriptorSetDataLink::MAIN_RENDER_LIGHT_DATA_UBO, sizeof(LightData), 1);
+
+		vkDebugUtils::setDebugObjectNames( device, vertexBufferContainer, indexBufferContainer, GPUDescriptors,
+										   fontIndicesContainer, fontVertexBufferContainer, fontIndexBufferContainer );
     }
     
     void CVulkanRenderer::initWindow() {
@@ -1167,7 +1170,7 @@ namespace GLVM::core
 				pointLightsRenderAttachments.push_back((*GPUDescriptors[descriptorBindingsConfig[descriptorBindingIndex].globalDescriptorOffset + j].GPUImage).views[m]);
 				pointLightShadowMapFrameBuffers[j].push_back({});
 				createRenderPassFramebuffers(pointLightsRenderAttachments, renderPasses[SpecificPipeline::POINT_LIGHT_PIPELINE],
-											 pointLightShadowMapFrameBuffers[j][m], swapChainExtent.width, swapChainExtent.height);
+											 pointLightShadowMapFrameBuffers[j][m], SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 			}
 		}
     }
@@ -3305,7 +3308,7 @@ namespace GLVM::core
         } else if (result != VK_SUCCESS) {
             throw std::runtime_error("failed to present swap chain image!");
         }
-
+//		vkDeviceWaitIdle(device);
         currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 //		currentFrame = 0;
     }
@@ -3384,7 +3387,7 @@ namespace GLVM::core
 			VkCommandBufferInheritanceInfo inheritanceInfo{};
 			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
-			inheritanceInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
+			inheritanceInfo.framebuffer = directionalLightShadowMapFrameBuffers[currentFrame * directionalLightNumber + directionalLightCounter];
 			inheritanceInfo.subpass = 0;
 			
 			VkCommandBufferBeginInfo beginInfo{};
@@ -3440,7 +3443,7 @@ namespace GLVM::core
 				RenderActor actor = actors[actorCounter];
 				unsigned int meshId = actor.meshID;
 
-				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * directionalLightCurrentFrame +
+				unsigned int uboDirectionalLightIndex = directionalLightNumber * actorsNumber * currentFrame +
 					actorsNumber * directionalLightCounter + actorCounter;
 
 				updateDirectionalLightShadowMapMatrixUBO(uboDirectionalLightIndex, directionalLightCounter, actorCounter);

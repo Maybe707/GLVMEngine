@@ -1,4 +1,7 @@
 #include "GraphicAPI/VkDebugUtils.hpp"
+#include "Constants.hpp"
+#include "GraphicAPI/RenderConfig.hpp"
+#include "GraphicAPI/RenderData.hpp"
 
 namespace GLVM::core::vkDebugUtils
 {
@@ -73,12 +76,27 @@ namespace GLVM::core::vkDebugUtils
 		descriptorSetObjectInfo.objectHandle = (uint64_t)descriptorSet;
 		SetDebugObjectName(device, &descriptorSetObjectInfo);
 	}
+
+	void setRenderPassDebugObjectName( VkDevice device, VkRenderPass renderPass, std::string renderPassName, unsigned int index ) {
+		VkDebugUtilsObjectNameInfoEXT pipelineDebugObjectInfo{};
+		pipelineDebugObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		std::string name = ConcatIntBetweenTwoStrings(VK_DEBUG_RENDER_PASS_SET_RED, " \x1b[31m" + renderPassName + " render pass #\x1b[0m ", index);
+		const char* strName = name.c_str();
+		pipelineDebugObjectInfo.pObjectName = strName;
+		pipelineDebugObjectInfo.objectType = VK_OBJECT_TYPE_RENDER_PASS;
+		pipelineDebugObjectInfo.objectHandle = (uint64_t)renderPass;
+		SetDebugObjectName(device, &pipelineDebugObjectInfo);
+	}
 	
 	void setDebugObjectNames( VkDevice device, const std::vector<VkBuffer>& vertexBufferContainer, const std::vector<VkBuffer>& indexBufferContainer, const GLVM::core::vector<Descriptor>& GPUDescriptors,
 							  const std::vector<unsigned int>& fontIndicesContainer, const std::vector<VkBuffer>& fontVertexBufferContainer, const std::vector<VkBuffer>& fontIndexBufferContainer) {
 		setPipelineDebugObjectName( device, pipelineConfigs[SpecificPipeline::FONT_PIPELINE].pipeline, "fontPipeline" );
 		setPipelineDebugObjectName( device, pipelineConfigs[SpecificPipeline::UI_PIPELINE].pipeline, "uiPipeline" );
 		setPipelineDebugObjectName( device, pipelineConfigs[SpecificPipeline::UI_ICONS_PIPELINE].pipeline, "uiIconsPipeline" );
+
+		for( u32 i = 0; i < renderPasses.GetSize(); ++i ) {
+			setRenderPassDebugObjectName( device, renderPasses[i], pipelinesNames[i], i );
+		}
 		
 		VkDebugUtilsObjectNameInfoEXT mainPipelineObjectInfo{};
 		mainPipelineObjectInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
