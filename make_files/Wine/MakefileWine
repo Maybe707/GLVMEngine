@@ -26,7 +26,7 @@ SOURCES = ./src/Engine.cpp ./src/EngineMain.cpp \
 	./src/ThreadPool.cpp ./src/ArchetypedECS/ArchECS_Utils.cpp \
 	./src/ArchetypedECS/ArchECS_World.cpp ./src/ArchetypedECS/ArchetypeEntityManager.cpp \
 	./src/ArchetypedECS/ArchetypeInterface.cpp ./src/Systems/SpatialGridSystem.cpp \
-	./src/Common/CommonFunctions.cpp \
+	./src/Common/CommonFunctions.cpp ./src/Constants.cpp \
 
 OBJECTS = $(SOURCES:./src/%.cpp=$(BUILD)/%.o)
 EXECUTABLE = winGame

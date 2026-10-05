@@ -3387,7 +3387,7 @@ namespace GLVM::core
 			VkCommandBufferInheritanceInfo inheritanceInfo{};
 			inheritanceInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO;
 			inheritanceInfo.renderPass = renderPasses[SpecificPipeline::DIRECTIONAL_LIGHT_PIPELINE];
-			inheritanceInfo.framebuffer = directionalLightShadowMapFrameBuffers[currentFrame * directionalLightNumber + directionalLightCounter];
+			inheritanceInfo.framebuffer = directionalLightShadowMapFrameBuffers[directionalLightCounter];
 			inheritanceInfo.subpass = 0;
 			
 			VkCommandBufferBeginInfo beginInfo{};
