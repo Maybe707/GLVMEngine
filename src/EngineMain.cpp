@@ -176,7 +176,7 @@ int main()
 	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 5.0f, 1.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
-		.ambient = { 0.05f, 0.85f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
+		.ambient = { 1.0f, 1.0f, 1.0f }, .shininess = 128.0f * 0.078125f }; 
 	
     std::random_device rd;
     std::map<int, int> hist;
