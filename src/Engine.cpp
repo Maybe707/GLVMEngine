@@ -1172,8 +1172,7 @@ namespace GLVM::core
 //					playerTransform.position += vec3(0.0f, 2.0f, -3.0f);
 //					cm::rotation  playerRotation  = *rotationComponent;
 					const AABB worldAABB = computeWorldAABB( levelChunkMeshes[n].aabb, transformComponent->position );
-					bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
-					isFrustumIntersectFlag = true;     ///< Workaround make because of shadow blinkage
+					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 					
 					if( isFrustumIntersectFlag ) {
 						vulkanRenderer->actors.Push({});

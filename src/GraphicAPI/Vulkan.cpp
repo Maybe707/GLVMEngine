@@ -871,8 +871,8 @@ namespace GLVM::core
 
         createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
         createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-//        createInfo.presentMode = presentMode;
-		createInfo.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
+        createInfo.presentMode = presentMode;
+//		createInfo.presentMode = VK_PRESENT_MODE_IMMEDIATE_KHR;
         createInfo.clipped = VK_TRUE;
 
         if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
@@ -3544,7 +3544,7 @@ namespace GLVM::core
 			for ( unsigned int actorsCounter = 0; actorsCounter < actorsNumber; ++actorsCounter ) {
 				RenderActor actor = actors[actorsCounter];
 				unsigned int meshID = actor.meshID;
-				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * spotLightCurrentFrame +
+				unsigned int uboSpotLightIndex = spotLightNumber * actorsNumber * currentFrame +
 					actorsNumber * spotLightCounter + actorsCounter;
 
 				updateSpotLightShadowMapMatrixUBO(uboSpotLightIndex, spotLightCounter, actorsCounter);
@@ -3674,7 +3674,7 @@ namespace GLVM::core
 					unsigned int meshID = actor.meshID;
 						
 					unsigned int uboIndex = pointLightNumber *
-						actorsNumber * maxCubeMapLayers * pointLightCurrentFrame +                           ///< Choose frame (first 168 or second 168)
+						actorsNumber * maxCubeMapLayers * currentFrame +                           ///< Choose frame (first 168 or second 168)
 						actorsNumber * maxCubeMapLayers * pointLightCounter +                      ///< Choose point light (i)
 						maxCubeMapLayers * actorCounter + cubeMapLayerCounter;                     ///< Choose actor (m) and layer (j)
 
