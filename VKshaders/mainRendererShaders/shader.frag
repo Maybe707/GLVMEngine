@@ -397,7 +397,7 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
 		}
 	}
-	shadow /= 9.0;
+	shadow /= 49.0;
 	
 	if (projectiveCoordinatesZO.z > 1.0)
 		shadow = 0.0;
@@ -426,7 +426,7 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 	closestDepth *= lightData.farPlane;
 	// Test for shadows ranged cube of offsets
 
-	float bias = max(0.05 * (1.0 - dot(fs_in.normal, fragmentToLight)), 0.17);  
+	float bias = max(0.05 * (1.0 - dot(fs_in.normal, fragmentToLight)), 0.005);  
     float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;      
 
 //	return closestDepth;
@@ -462,7 +462,7 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
 		}
 	}
-	shadow /= 9.0;
+	shadow /= 49.0;
 	
 	if (projectiveCoordinatesZO.z > 1.0)
 		shadow = 0.0;
