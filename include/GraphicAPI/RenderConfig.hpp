@@ -89,6 +89,7 @@ namespace GLVM::core
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[SPOT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		pipelineConfigs[SPOT_LIGHT_PIPELINE].cullMode                         = VK_CULL_MODE_FRONT_BIT;
 
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
 		renderPassConfigs[SPOT_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;
@@ -138,6 +139,7 @@ namespace GLVM::core
 		pipelineConfigs[POINT_LIGHT_PIPELINE].bindingDescription               = Vertex::getBindingDescription();
 		pipelineConfigs[POINT_LIGHT_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[POINT_LIGHT_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
+		pipelineConfigs[POINT_LIGHT_PIPELINE].cullMode                         = VK_CULL_MODE_FRONT_BIT;
 
 		renderPassConfigs[POINT_LIGHT_PIPELINE].actualAttachmentDescriptionNumber        = 1;
 		renderPassConfigs[POINT_LIGHT_PIPELINE].attachmentDescriptions[0].flags          = 0;
