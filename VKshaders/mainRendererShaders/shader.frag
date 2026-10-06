@@ -314,7 +314,7 @@ vec3 ComputeDirectionalLight(DirectionalLight light, vec3 normal, vec3 viewDirec
 	float specularComponent = pow(max(dot(viewDirection, reflectDirection), 0.0f), fs_in.shininess);
 	// combine results
 	//	vec3 ambient  = light.ambient * fs_in.ambient;
-	vec3 ambient = light.ambient * texture(diffuse, tilesetFinalUV).rgb;
+	vec3 ambient = fs_in.ambient * light.ambient * texture(diffuse, tilesetFinalUV).rgb;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, fs_in.textureCoords));
 
@@ -333,7 +333,7 @@ vec3 ComputePointLight(PointLight light, vec3 normal, vec3 fragmentPosition, vec
 	float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
 
 	// combine results
-	vec3 ambient  = light.ambient * texture(diffuse, tilesetFinalUV).rgb;
+	vec3 ambient  = fs_in.ambient * light.ambient * texture(diffuse, tilesetFinalUV).rgb;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 
@@ -359,7 +359,7 @@ vec3 ComputeSpotLight(SpotLight light, vec3 normal, vec3 fragmentPosition, vec3 
 	float epsilon   = light.cutOff - light.outerCutOff;
 	float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
 	// combine results
-	vec3 ambient  = light.ambient * fs_in.ambient;
+	vec3 ambient  = light.ambient * fs_in.ambient * texture(diffuse, tilesetFinalUV).rgb;;
 	vec3 diffuse  = light.diffuse * difference * vec3(texture(diffuse, tilesetFinalUV));
 	vec3 specular = light.specular * specularComponent * vec3(texture(specular, inFragmentTextureCoordinate));
 	ambient  *= attenuation * intensity;
@@ -380,10 +380,10 @@ float ComputeDirectionalShadow(DirectionalLight light, vec4 fragmentPositionDire
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.normal);
-	vec3 lightDir = normalize(light.position - fragmentPositionDirectionalLightSpace.xyz);
-//	vec3 lightDir = normalize(light.position - vec3(fs_in.fragmentPosition));
-//	vec3 lightDir = normalize(vec3(fs_in.fragmentPosition) - light.position);
-	float bias                 = max(0.01 * (1.0 - dot(normal, lightDir)), 0.005);
+	//	vec3 lightDir = normalize(light.position - fragmentPositionDirectionalLightSpace.xyz);
+	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
+	//	vec3 lightDir = normalize(vec3(fs_in.fragmentPosition) - light.position);
+	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 	
 	// PCF
@@ -426,7 +426,7 @@ float ComputePointShadow(PointLight light, vec3 fragmentPosition, samplerCube po
 	closestDepth *= lightData.farPlane;
 	// Test for shadows ranged cube of offsets
 
-	float bias = max(0.05 * (1.0 - dot(fs_in.normal, fragmentToLight)), 0.005);  
+	float bias = max(0.05 * (1.0 - dot(fs_in.normal, fragmentToLight)), 0.17);  
     float shadow = currentDepth -  bias > closestDepth ? 1.0 : 0.0;      
 
 //	return closestDepth;
@@ -446,8 +446,8 @@ float ComputeSpotShadow(SpotLight light, vec4 fragmentPositionSpotLightSpace, sa
 	float currentDepth         = projectiveCoordinates.z;
 	// Check whether current fragment position is in shadow
 	vec3 normal = normalize(fs_in.normal);
-	vec3 lightDir = normalize(light.position - fragmentPositionSpotLightSpace.xyz);
-//	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
+	//	vec3 lightDir = normalize(light.position - fragmentPositionSpotLightSpace.xyz);
+	vec3 lightDir = normalize(light.position - fs_in.fragmentPosition);
 	float bias                 = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
 //	float shadow               = currentDepth - bias > closestDepth ? 1.0 : 0.0;
 

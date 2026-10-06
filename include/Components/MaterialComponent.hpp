@@ -15,7 +15,7 @@ namespace GLVM::ecs::components
 	{
 		ecs::TextureHandle diffuseTextureID_ = {};
 		ecs::TextureHandle specularTextureID_ = {};
-		vec3 ambient = { 0.0f, 0.0f, 0.0f };
+		vec3 ambient = { 1.0f, 1.0f, 1.0f };
 		float shininess = 0.0f;
 	};
 }

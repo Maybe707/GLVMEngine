@@ -176,7 +176,7 @@ int main()
 	playerArch->beholders[playerIndex]   = {  .Position = {0.0f, 5.0f, 1.0f}, .forward = { 0.0f, 0.0f, -1.0f } };
 	playerArch->meshes[playerIndex]      = { .handle = megaChelHandle_GLTF, .gltf = true };
 	playerArch->materials[playerIndex]   = { .diffuseTextureID_ = grayTextureHandle, .specularTextureID_ = grayTextureHandle,
-		.ambient = { 0.05f, 0.05f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
+		.ambient = { 0.05f, 0.85f, 0.0f }, .shininess = 128.0f * 0.078125f }; 
 	
     std::random_device rd;
     std::map<int, int> hist;
@@ -243,9 +243,9 @@ int main()
 		arch::StaticMeshArchetype* cubeArch = static_cast<arch::StaticMeshArchetype*>(cubeLocation.arch);
 		const uint32_t cubeIndex = cubeLocation.index;
 		cubeArch->transforms[cubeIndex] = { .position = { -8.0f + i * 6.0f, 2.0f, 15.0f + random * 2 }, .scale = 3.0f };
-		cubeArch->meshes[cubeIndex]     = { .handle = hyperCubeHandle2_GLTF, .gltf = true };
+		cubeArch->meshes[cubeIndex]     = { .handle = simpleCubeHandle_GLTF, .gltf = true };
 		cubeArch->materials[cubeIndex]  = { .diffuseTextureID_ = tilesetTexturehandle, .specularTextureID_ = container2SpecularTextureHandle,
-			.ambient = { 0.05f, 0.05f, 0.05f }, .shininess = 128.0f * 0.078125f };
+			.ambient = { 0.85f, 0.85f, 0.85f }, .shininess = 128.0f * 0.078125f };
 //		cubeArch->fonts[cubeIndex].font_string.Push(' ');
 	}
 	
@@ -303,7 +303,7 @@ int main()
 	const uint32_t directionalLightIndex = directionalLightLocation.index;
 	directionalLightArch->directionalLights[directionalLightIndex] = { .position = { 0.0f, 20.0f, 15.0f },
 		.direction = { 5.0f, 0.0f, 7.0f}, .ambient = { 0.05f, 0.05f, 0.05f }, .diffuse = {0.4f, 0.4f, 0.4f},
-		.specular = {0.1f, 0.1f, 0.1f}};
+		.specular = {0.5f, 0.5f, 0.5f}};
 	directionalLightArch->transforms[directionalLightIndex]    = { .position = { 0.0f, 20.0f, 15.0f }, .scale = 0.1f };
 	directionalLightArch->meshes[directionalLightIndex].handle = hyperCubeHandle_GLTF;
 	directionalLightArch->materials[directionalLightIndex] = { .diffuseTextureID_ = container2Texturehandle, .specularTextureID_ = container2Texturehandle,
@@ -316,7 +316,7 @@ int main()
 	arch::PointLightArchetype* pointLightArch = static_cast<arch::PointLightArchetype*>(pointLightLocation.arch);
 	const uint32_t pointLightIndex = pointLightLocation.index;
 	pointLightArch->pointLights[pointLightIndex]   = { .position = { 3.0f, 20.0f, 0.0f },
-		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse  = { 0.8f, 0.8f, 0.8f }, .specular = { 2.0f, 2.0f, 2.0f },
+		.ambient = { 0.1f, 0.1f, 0.1f }, .diffuse  = { 0.8f, 0.8f, 0.8f }, .specular = { 1.0f, 1.0f, 1.0f },
 		.constant = 1.0f, .linear = 0.09f, .quadratic = 0.0032f };
 	pointLightArch->transforms[pointLightIndex]    = { .position = { 3.0f, 20.0f, 0.0f }, .scale = 0.2f };
 	pointLightArch->meshes[pointLightIndex].handle = hyperCubeHandle_GLTF;
@@ -331,7 +331,7 @@ int main()
 	const uint32_t spotLightIndex = spotLightLocation.index;
 	spotLightArch->spotLights[spotLightIndex]    = { .position = { 1.0f, 17.0f, -5.0f },
 		.direction = { 0.0f, -1.0f, 3.0f }, .cutOff = 32.5f, .outerCutOff = 37.5f, .ambient = { 0.05f, 0.05f, 0.05f },
-		.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 5.0f, 5.0f, 5.0f }, .constant = 1.0f, .linear = 0.09f,
+		.diffuse = { 3.8f, 3.8f, 3.8f }, .specular = { 4.0f, 4.0f, 4.0f }, .constant = 1.0f, .linear = 0.09f,
 		.quadratic = 0.032f };
 	spotLightArch->transforms[spotLightIndex]    = { .position = { 1.0f, 17.0f, -5.0f }, .scale = 0.2f };
 	spotLightArch->meshes[spotLightIndex].handle = simpleCubeHandle_GLTF;
