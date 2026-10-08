@@ -808,7 +808,7 @@ namespace GLVM::core
 		/// ===================================================================================== ///
 
 		descriptorSetsConfig[SPACIAL_GRID_DEBUG_DATA].actualLinkedDescriptorBindingsNumber                   = 1;
-		descriptorSetsConfig[SPACIAL_GRID_DEBUG_DATA].hostDescriptorNumber                                   = 16384;
+		descriptorSetsConfig[SPACIAL_GRID_DEBUG_DATA].hostDescriptorNumber                                   = 2048;
 		descriptorSetsConfig[SPACIAL_GRID_DEBUG_DATA].isTexture                                              = false;
 
 		descriptorBindingsConfig[22].vkType                  = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
