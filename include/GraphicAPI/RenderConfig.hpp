@@ -761,6 +761,7 @@ namespace GLVM::core
 		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].attributeDescriptions            = Vertex::getAttributeDescriptions();
 		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].actualLinkedDescriptorSetsNumber = 1;
 		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].polygonMode                      = VK_POLYGON_MODE_LINE;
+		pipelineConfigs[COLLISIONS_DEBUG_PIPELINE].topology                         = VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 
 		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].actualAttachmentDescriptionNumber        = 2;
 		renderPassConfigs[COLLISIONS_DEBUG_PIPELINE].attachmentDescriptions[0].flags          = 0;

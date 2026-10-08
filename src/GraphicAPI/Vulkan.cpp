@@ -401,15 +401,24 @@ namespace GLVM::core
 		// collisionsWireframesIndicesVKDeviceMemory.clear();
 		// collisionsWireframeIndices.clear();
 
-		constexpr int boxIndicesForIndexBuffer[36] =
-			{ 0, 1, 2, 3, 0, 2,
-			  4, 0, 3, 7, 4, 3,
-			  4, 5, 1, 0, 4, 1,
-			  1, 5, 6, 2, 1, 6,
-			  5, 4, 7, 6, 5, 7,
-			  3, 2, 6, 7, 3, 6 };
+		// constexpr int boxIndicesForIndexBuffer[36] =
+		// 	{ 0, 1, 2, 3, 0, 2,
+		// 	  4, 0, 3, 7, 4, 3,
+		// 	  4, 5, 1, 0, 4, 1,
+		// 	  1, 5, 6, 2, 1, 6,
+		// 	  5, 4, 7, 6, 5, 7,
+		// 	  3, 2, 6, 7, 3, 6 };
 
-		for ( unsigned int i = 0; i < 36; ++i )
+		const u32 indexBufferSize = 54;
+		constexpr int boxIndicesForIndexBuffer[indexBufferSize] =
+			{ 0, 1, 1, 2, 2, 3, 3, 0,
+			  4, 0, 0, 3, 3, 7, 7, 4,
+			  4, 5, 5, 1, 1, 0, 0, 4,
+			  1, 5, 5, 6, 6, 2, 2, 1,
+			  5, 4, 4, 7, 7, 6, 6, 5,
+			  3, 2, 2, 6, 6, 7, 7, 3};
+		
+		for ( unsigned int i = 0; i < indexBufferSize; ++i )
 			collisionsWireframeIndices.push_back(boxIndicesForIndexBuffer[i]);
 			
 		for ( unsigned int i = 0; i < allMeshMaxAbsoluteValues.GetSize(); ++i ) {
