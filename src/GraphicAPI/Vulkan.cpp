@@ -95,7 +95,7 @@ namespace GLVM::core
 
             VkBuffer stagingBuffer;
             VkDeviceMemory stagingBufferMemory;
-            createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+            createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, stagingBuffer, stagingBufferMemory);
 
             void* data;
             vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
@@ -3113,14 +3113,14 @@ namespace GLVM::core
         modelMatrixUBO->view  = viewMatrix;
         modelMatrixUBO->proj  = projectionMatrix;
 
-		memcpy(modelMatrixUBO->jointMatrices, actors[actor].jointMatrices.GetVectorContainer(), actors[actor].jointMatrices.GetSize() * sizeof(mat4));
-		memcpy(modelMatrixUBO->dirSpaceMatrix, dirLightSpaceMatrix, DIRECTIONAL_LIGHTS_NUMBER * sizeof(mat4));
-		memcpy(modelMatrixUBO->spotSpaceMatrix, spotLightSpaceMatrix, SPOT_LIGHTS_NUMBER * sizeof(mat4));
-		
 		modelMatrixUBO->ambient                 = actors[actor].ambient;
 		modelMatrixUBO->shininess               = actors[actor].shininess;
 		modelMatrixUBO->directionalLightsNumber = directionalLightNumber;
 		modelMatrixUBO->spotLightsNumber        = spotLightNumber;
+		
+		memcpy(modelMatrixUBO->jointMatrices, actors[actor].jointMatrices.GetVectorContainer(), actors[actor].jointMatrices.GetSize() * sizeof(mat4));
+		memcpy(modelMatrixUBO->dirSpaceMatrix, dirLightSpaceMatrix, DIRECTIONAL_LIGHTS_NUMBER * sizeof(mat4));
+		memcpy(modelMatrixUBO->spotSpaceMatrix, spotLightSpaceMatrix, SPOT_LIGHTS_NUMBER * sizeof(mat4));
     }
 
 	void CVulkanRenderer::updateViewPositionUniformBuffer( uint32_t currentImage, uint32_t player ) {

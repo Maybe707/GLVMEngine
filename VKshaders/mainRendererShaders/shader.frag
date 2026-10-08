@@ -103,8 +103,8 @@ layout(set = 1, binding = 0) uniform LightData {
 } lightData;
 vec2 tilesetFinalUV;
 layout(set = 1, binding = 1) uniform sampler2D directionalLightsShadowMaps[DIRECTIONAL_LIGHTS_NUMBER];
-layout(set = 1, binding = 5) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
-layout(set = 1, binding = 37) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
+layout(set = 1, binding = 2) uniform samplerCube pointLightsCubeShadowMaps[POINT_LIGHTS_NUMBER];
+layout(set = 1, binding = 3) uniform sampler2D spotLightsShadowMaps[SPOT_LIGHTS_NUMBER];
 
 // layout(set = 3, binding = 0) uniform DirectionalLightsUBO {
 

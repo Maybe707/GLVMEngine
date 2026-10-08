@@ -607,12 +607,12 @@ namespace GLVM::core
 
 		descriptorBindingsConfig[16].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorBindingsConfig[16].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
-		descriptorBindingsConfig[16].binding                 = 5;
+		descriptorBindingsConfig[16].binding                 = 2;
 		descriptorBindingsConfig[16].shaderDescriptorsNumber = 32;
 
 		descriptorBindingsConfig[17].vkType                  = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorBindingsConfig[17].shaderStageFlag         = VK_SHADER_STAGE_FRAGMENT_BIT;
-		descriptorBindingsConfig[17].binding                 = 37;
+		descriptorBindingsConfig[17].binding                 = 3;
 		descriptorBindingsConfig[17].shaderDescriptorsNumber = 8;
 
 		descriptorSetsConfig[MAIN_RENDER_SPECULAR_SAMPLER].actualLinkedDescriptorBindingsNumber = 1;
