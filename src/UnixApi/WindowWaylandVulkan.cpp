@@ -636,7 +636,8 @@ namespace GLVM::core {
 			.axis_stop = nullptr,
 			.axis_discrete = nullptr,
 			.axis_value120 = nullptr,
-			.axis_relative_direction = nullptr
+			.axis_relative_direction = nullptr,
+			.warp = nullptr
 		};
 		windowWaylandVulkan.seat_lintener = {
 			.capabilities = seat_capabilities,
