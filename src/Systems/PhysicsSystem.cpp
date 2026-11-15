@@ -81,7 +81,7 @@ namespace GLVM::ecs
 					transformComponent.position += move.frameMovement;
 					transformComponent.position += move.gravity;
 					move.gravity       = 0.0f;
-					move.frameMovement = 0.0f;
+//					move.frameMovement = 0.0f;
 //				componentManager->RemoveComponent<cm::move>(entityRefMove);
 
 					cm::rigidBody& rigidBody = componentsView.rigidBodiesView[i];

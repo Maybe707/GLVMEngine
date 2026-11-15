@@ -66,7 +66,6 @@ namespace GLVM::ecs
 		arch::componentMask playerRequiredMask =
 			(1ull << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT);
 		arch::componentMask rigidBodyRequiredMask =
-			(1ul << arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
 			(1ul << arch::ComponentsIndices::RIGID_BODY_COMPONENT) |
 			(1ul << arch::ComponentsIndices::MOVE_COMPONENT);
         

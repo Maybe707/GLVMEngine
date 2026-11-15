@@ -14,7 +14,6 @@ namespace GLVM::ecs::components
 	{
         vec3 position{ 0.0f, 0.0f, 0.0f };
         vec3 forward{ 0.0f, 0.0f, 0.0f };
-		vec3 frameMovement{ 0.0f, 0.0f, 0.0f };
 		vec3 previousFrameForward = { 0.0, 0.0, -1.0 };
 		
         float yaw = 0.0f;

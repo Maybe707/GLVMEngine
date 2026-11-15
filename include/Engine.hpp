@@ -165,7 +165,8 @@ namespace GLVM::core
 		ecs::arch::componentMask playerRequiredMask =
 			(1ul << ecs::arch::ComponentsIndices::PLAYER_TAG_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT)  |
-			(1ul << ecs::arch::ComponentsIndices::VIEW_COMPONENT);
+			(1ul << ecs::arch::ComponentsIndices::VIEW_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MOVE_COMPONENT);
 
 		ecs::arch::Archetype* cachedMathObjectArchetypes[32];
 		uint32_t mathObjectArchetypesNumber = 0;
@@ -179,8 +180,8 @@ namespace GLVM::core
 			(1ul << ecs::arch::ComponentsIndices::ANIMATION_COMPONENT) |
 			(1ul << ecs::arch::ComponentsIndices::ROTATION_COMPONENT)  |
 			(1ul << ecs::arch::ComponentsIndices::TRANSFORM_COMPONENT) |
-			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT);
-
+			(1ul << ecs::arch::ComponentsIndices::MESH_COMPONENT) |
+			(1ul << ecs::arch::ComponentsIndices::MOVE_COMPONENT);
 		
 		ecs::arch::Archetype* cachedCrosshairActorsArchetypes[32];
 		uint32_t crosshairActorsArchetypesNumber = 0;
@@ -297,7 +298,7 @@ namespace GLVM::core
 								   ecs::components::mesh* itemMesh,
 								   int itemEntity);
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
-		void calculatePitch( ecs::components::transform* transformComponent );
+		void calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent );
 		void setFrameData();
 		void loadWavefrontObj();
 		void calculateMeshBounds(const vec4& animatedVertex);

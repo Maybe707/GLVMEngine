@@ -414,10 +414,13 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::VIEW_COMPONENT];
 			cm::transform* transfroms = (ecs::components::transform*)arch->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::move*      moves      = (ecs::components::move*)arch->
+				components[arch::ComponentsIndices::MOVE_COMPONENT];
 
 			for( uint32_t x = 0; x < arch->entityCount; ++x ) {
 				cm::beholder* cameraComponent   = &views[x];
 				cm::transform* _Player          = &transfroms[x];
+				cm::move*     moveComponent     = &moves[x];
 
 				Matrix<float, 4> viewMatrix_(1.0f);
 				const float kSensitivity = 0.1f;
@@ -508,8 +511,8 @@ namespace GLVM::core
 
 					cameraComponent->forward = Normalize(-cameraComponent->Position);
 					
-					if( (abs(_Player->frameMovement[0]) == 0.0 &&
-						 abs(_Player->frameMovement[2]) == 0.0) &&
+					if( (abs(moveComponent->frameMovement[0]) == 0.0 &&
+						 abs(moveComponent->frameMovement[2]) == 0.0) &&
 						(previousFrameKeyEvents[0] == 0 &&
 						 previousFrameKeyEvents[1] == 0 &&
 						 previousFrameKeyEvents[2] == 0 &&
@@ -852,17 +855,17 @@ namespace GLVM::core
 		return model;
 	}
 
-	void Engine::calculatePitch( ecs::components::transform* transformComponent ) {
-		if( abs(transformComponent->frameMovement[0]) > 0.0 ||
-			abs(transformComponent->frameMovement[2]) > 0.0 ) {
+	void Engine::calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent ) {
+		if( abs(moveComponent->frameMovement[0]) > 0.0 ||
+			abs(moveComponent->frameMovement[2]) > 0.0 ) {
 			/// Needed only projection on XZ plane
-			const vec2 tempFrameMovement = vec2(transformComponent->frameMovement[0], transformComponent->frameMovement[2]);
+			const vec2 tempFrameMovement = vec2(moveComponent->frameMovement[0], moveComponent->frameMovement[2]);
 
 			float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
 									  vec2(transformComponent->forward[0], transformComponent->forward[2]));
 
-			float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
-																	   transformComponent->frameMovement[2])),
+			float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(moveComponent->frameMovement[0], 0.0,
+																	   moveComponent->frameMovement[2])),
 														Normalize(vec3(transformComponent->forward[0], 0.0,
 																	   transformComponent->forward[2]))), 1.0f));
 
@@ -920,7 +923,7 @@ namespace GLVM::core
 				}
 
 				transformComponent->pitch += rotationAngle * sign;
-				transformComponent->forward = transformComponent->frameMovement;
+				transformComponent->forward = moveComponent->frameMovement;
 				transformComponent->previousFrameForward = transformComponent->forward;
 			}
 		} else {
@@ -1294,6 +1297,8 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
+			cm::move*      actorMove       = (ecs::components::move*)arch->
+				components[arch::ComponentsIndices::MOVE_COMPONENT];
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
 				[[maybe_unused]] const u32 entity = arch->entities[n];
@@ -1306,7 +1311,7 @@ namespace GLVM::core
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
 
-					calculatePitch( transformComponent );
+					calculatePitch( transformComponent, actorMove );
 					const AABB worldAABB = computeWorldAABB( meshComponent->aabb, transformComponent->position );
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 
