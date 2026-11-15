@@ -297,6 +297,7 @@ namespace GLVM::core
 								   ecs::components::mesh* itemMesh,
 								   int itemEntity);
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
+		void calculatePitch( ecs::components::transform* transformComponent );
 		void setFrameData();
 		void loadWavefrontObj();
 		void calculateMeshBounds(const vec4& animatedVertex);

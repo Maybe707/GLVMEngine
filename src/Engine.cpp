@@ -851,6 +851,85 @@ namespace GLVM::core
 
 		return model;
 	}
+
+	void Engine::calculatePitch( ecs::components::transform* transformComponent ) {
+		if( abs(transformComponent->frameMovement[0]) > 0.0 ||
+			abs(transformComponent->frameMovement[2]) > 0.0 ) {
+			/// Needed only projection on XZ plane
+			const vec2 tempFrameMovement = vec2(transformComponent->frameMovement[0], transformComponent->frameMovement[2]);
+
+			float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
+									  vec2(transformComponent->forward[0], transformComponent->forward[2]));
+
+			float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
+																	   transformComponent->frameMovement[2])),
+														Normalize(vec3(transformComponent->forward[0], 0.0,
+																	   transformComponent->forward[2]))), 1.0f));
+
+			if( rotationAngle < 0.0005f && ((int32_t)hud_screen_x * 10000 - (int32_t)previous_hud_screen_x * 10000) == 0.0f ) {
+				rotationAngle = 0.0f;
+			} ///< TODO: Weird workaround solution. Find another one
+
+			previous_hud_screen_x = hud_screen_x;
+						
+			int currentFrameEvents[4];
+							
+			if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
+				currentFrameEvents[0] = eMOVE_FORWARD;
+			} else {
+				currentFrameEvents[0] = 0;
+			}
+			if((Input_Stack_.SearchElement(EEvents::eMOVE_BACKWARD)) == EEvents::eMOVE_BACKWARD) {
+				currentFrameEvents[1] = eMOVE_BACKWARD;
+			} else {
+				currentFrameEvents[1] = 0;
+			}
+			if((Input_Stack_.SearchElement(EEvents::eMOVE_LEFT)) == EEvents::eMOVE_LEFT) {
+				currentFrameEvents[2] = eMOVE_LEFT;
+			} else {
+				currentFrameEvents[2] = 0;
+			}
+			if((Input_Stack_.SearchElement(EEvents::eMOVE_RIGHT)) == EEvents::eMOVE_RIGHT) {
+				currentFrameEvents[3] = eMOVE_RIGHT;
+			} else {
+				currentFrameEvents[3] = 0;
+			}
+
+			if( currentFrameEvents[0] == previousFrameKeyEvents[0] &&
+				currentFrameEvents[1] == previousFrameKeyEvents[1] &&
+				currentFrameEvents[2] == previousFrameKeyEvents[2] &&
+				currentFrameEvents[3] == previousFrameKeyEvents[3] ) {
+//							std::cout << "Default case " << std::endl;
+			} else if ( currentFrameEvents[0] == 0 &&
+						currentFrameEvents[1] == 0 &&
+						currentFrameEvents[2] == 0 &&
+						currentFrameEvents[3] == 0 ) {
+//							std::cout << "Second default case " << std::endl;
+			} else {
+				previousFrameKeyEvents[0] = currentFrameEvents[0];
+				previousFrameKeyEvents[1] = currentFrameEvents[1];
+				previousFrameKeyEvents[2] = currentFrameEvents[2];
+				previousFrameKeyEvents[3] = currentFrameEvents[3];
+//							std::cout << "Rewrite key events " << std::endl;
+				if( sign > 0.0f ) {
+					sign = 1.0f;
+				} else if( sign < 0.0f ) {
+					sign = -1.0f;
+				} else {
+					sign = 1.0f;
+				}
+
+				transformComponent->pitch += rotationAngle * sign;
+				transformComponent->forward = transformComponent->frameMovement;
+				transformComponent->previousFrameForward = transformComponent->forward;
+			}
+		} else {
+			previousFrameKeyEvents[0] = 0.0f;
+			previousFrameKeyEvents[1] = 0.0f;
+			previousFrameKeyEvents[2] = 0.0f;
+			previousFrameKeyEvents[3] = 0.0f;
+		}
+	}
 	
 	void Engine::setFrameData() {
 		namespace cm = GLVM::ecs::components;
@@ -1227,83 +1306,7 @@ namespace GLVM::core
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
 
-					if( abs(transformComponent->frameMovement[0]) > 0.0 ||
-						abs(transformComponent->frameMovement[2]) > 0.0 ) {
-						/// Needed only projection on XZ plane
-						const vec2 tempFrameMovement = vec2(transformComponent->frameMovement[0], transformComponent->frameMovement[2]);
-
-						float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
-										   vec2(transformComponent->forward[0], transformComponent->forward[2]));
-
-						float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(transformComponent->frameMovement[0], 0.0,
-																						 transformComponent->frameMovement[2])),
-																		  Normalize(vec3(transformComponent->forward[0], 0.0,
-																						 transformComponent->forward[2]))), 1.0f));
-
-						if( rotationAngle < 0.0005f && ((int32_t)hud_screen_x * 10000 - (int32_t)previous_hud_screen_x * 10000) == 0.0f ) {
-							rotationAngle = 0.0f;
-						} ///< TODO: Weird workaround solution. Find another one
-
-						previous_hud_screen_x = hud_screen_x;
-						
-						int currentFrameEvents[4];
-							
-						if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
-							currentFrameEvents[0] = eMOVE_FORWARD;
-						} else {
-							currentFrameEvents[0] = 0;
-						}
-						if((Input_Stack_.SearchElement(EEvents::eMOVE_BACKWARD)) == EEvents::eMOVE_BACKWARD) {
-							currentFrameEvents[1] = eMOVE_BACKWARD;
-						} else {
-							currentFrameEvents[1] = 0;
-						}
-						if((Input_Stack_.SearchElement(EEvents::eMOVE_LEFT)) == EEvents::eMOVE_LEFT) {
-							currentFrameEvents[2] = eMOVE_LEFT;
-						} else {
-							currentFrameEvents[2] = 0;
-						}
-						if((Input_Stack_.SearchElement(EEvents::eMOVE_RIGHT)) == EEvents::eMOVE_RIGHT) {
-							currentFrameEvents[3] = eMOVE_RIGHT;
-						} else {
-							currentFrameEvents[3] = 0;
-						}
-
-						if( currentFrameEvents[0] == previousFrameKeyEvents[0] &&
-							currentFrameEvents[1] == previousFrameKeyEvents[1] &&
-							currentFrameEvents[2] == previousFrameKeyEvents[2] &&
-							currentFrameEvents[3] == previousFrameKeyEvents[3] ) {
-//							std::cout << "Default case " << std::endl;
-						} else if ( currentFrameEvents[0] == 0 &&
-									currentFrameEvents[1] == 0 &&
-									currentFrameEvents[2] == 0 &&
-									currentFrameEvents[3] == 0 ) {
-//							std::cout << "Second default case " << std::endl;
-						} else {
-							previousFrameKeyEvents[0] = currentFrameEvents[0];
-							previousFrameKeyEvents[1] = currentFrameEvents[1];
-							previousFrameKeyEvents[2] = currentFrameEvents[2];
-							previousFrameKeyEvents[3] = currentFrameEvents[3];
-//							std::cout << "Rewrite key events " << std::endl;
-							if( sign > 0.0f ) {
-								sign = 1.0f;
-							} else if( sign < 0.0f ) {
-								sign = -1.0f;
-							} else {
-								sign = 1.0f;
-							}
-
-							transformComponent->pitch += rotationAngle * sign;
-							transformComponent->forward = transformComponent->frameMovement;
-							transformComponent->previousFrameForward = transformComponent->forward;
-						}
-					} else {
-						previousFrameKeyEvents[0] = 0.0f;
-						previousFrameKeyEvents[1] = 0.0f;
-						previousFrameKeyEvents[2] = 0.0f;
-						previousFrameKeyEvents[3] = 0.0f;
-					}
-					
+					calculatePitch( transformComponent );
 					const AABB worldAABB = computeWorldAABB( meshComponent->aabb, transformComponent->position );
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 
