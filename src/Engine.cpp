@@ -518,29 +518,9 @@ namespace GLVM::core
 						 previousFrameKeyEvents[2] == 0 &&
 						 previousFrameKeyEvents[3] == 0)) {
 						_Player->forward = cameraComponent->forward;
-//						std::cout << _Player->forward << std::endl;
-						// float sign = -1.0f;
-						// if( delta_x >= 0.0f ) {
-						// 	sign = 1.0f;
-						// }
-
-						const vec2 tempFrameMovement = vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]);
-						float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
-										   vec2(cameraComponent->forward[0], cameraComponent->forward[2]));
-
-//						std::cout << "sign: " << sign << std::endl;
-						if( sign > 0.0f ) {
-							sign = 1.0f;
-						} else if( sign < 0.0f ) {
-							sign = -1.0f;
-						} else {
-							sign = 1.0f;
-						}
+						float sign = calculateSign( vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]),
+													vec2(cameraComponent->forward[0], cameraComponent->forward[2]) );
 						
-						// _Player->pitch += acos(clamp(-1.0f, Dot(Normalize(vec3(previousFrameForward[0], 0.0, previousFrameForward[2])),
-						// 									   Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
-						// previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
-
 						_Player->pitch -= acos(clamp(-1.0f, Dot(Normalize(vec3(_Player->previousFrameForward[0], 0.0, _Player->previousFrameForward[2])),
 																Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
 						_Player->previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
@@ -891,16 +871,25 @@ namespace GLVM::core
 			currentFrameEvents[2] == 0 &&
 			currentFrameEvents[3] == 0;
 	}
+
+	float Engine::calculateSign( vec2 previousFrameForwardXY, vec2 currentFrameForwardXZ ) {
+		float sign = cross<float>( previousFrameForwardXY, currentFrameForwardXZ);
+
+		if( sign > 0.0f ) {
+			sign = 1.0f;
+		} else if( sign < 0.0f ) {
+			sign = -1.0f;
+		} else {
+			sign = 1.0f;
+		}
+		
+		return sign;
+	}
 	
 	void Engine::calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent ) {
 		if( abs(moveComponent->frameMovement[0]) > 0.0 ||
 			abs(moveComponent->frameMovement[2]) > 0.0 ) {
 			/// Needed only projection on XZ plane
-			const vec2 tempFrameMovement = vec2(moveComponent->frameMovement[0], moveComponent->frameMovement[2]);
-
-			float sign = cross<float>(vec2(tempFrameMovement[0], tempFrameMovement[1]),
-									  vec2(transformComponent->forward[0], transformComponent->forward[2]));
-
 			float rotationAngle = acos(clamp(-1.0f, Dot(Normalize(vec3(moveComponent->frameMovement[0], 0.0,
 																	   moveComponent->frameMovement[2])),
 														Normalize(vec3(transformComponent->forward[0], 0.0,
@@ -920,15 +909,10 @@ namespace GLVM::core
 				previousFrameKeyEvents[1] = currentFrameEvents[1];
 				previousFrameKeyEvents[2] = currentFrameEvents[2];
 				previousFrameKeyEvents[3] = currentFrameEvents[3];
-//							std::cout << "Rewrite key events " << std::endl;
-				if( sign > 0.0f ) {
-					sign = 1.0f;
-				} else if( sign < 0.0f ) {
-					sign = -1.0f;
-				} else {
-					sign = 1.0f;
-				}
 
+				float sign = calculateSign( vec2(moveComponent->frameMovement[0], moveComponent->frameMovement[2]),
+											vec2(transformComponent->forward[0], transformComponent->forward[2]) );
+				
 				transformComponent->pitch += rotationAngle * sign;
 				transformComponent->forward = moveComponent->frameMovement;
 				transformComponent->previousFrameForward = transformComponent->forward;

@@ -300,6 +300,7 @@ namespace GLVM::core
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
 		bool isFrameEvetsEqualPreviousFrame( int* currentFrameEvents );
 		bool isFrameKeyEventsEmpty( int* currentFrameEvents );
+		float calculateSign( vec2 previousFrameForwardXY, vec2 currentFrameForwardXZ );
 		void calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent );
 		void setFrameData();
 		void loadWavefrontObj();
