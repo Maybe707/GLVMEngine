@@ -298,6 +298,8 @@ namespace GLVM::core
 								   ecs::components::mesh* itemMesh,
 								   int itemEntity);
 		mat4 updateDataHudScreenUBO( ecs::components::transform* cursorTransform );
+		bool isFrameEvetsEqualPreviousFrame( int* currentFrameEvents );
+		bool isFrameKeyEventsEmpty( int* currentFrameEvents );
 		void calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent );
 		void setFrameData();
 		void loadWavefrontObj();

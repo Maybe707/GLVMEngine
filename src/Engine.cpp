@@ -855,6 +855,43 @@ namespace GLVM::core
 		return model;
 	}
 
+	void resolveFrameEvents( int* currentFrameEvents ) {
+		if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
+			currentFrameEvents[0] = eMOVE_FORWARD;
+		} else {
+			currentFrameEvents[0] = 0;
+		}
+		if((Input_Stack_.SearchElement(EEvents::eMOVE_BACKWARD)) == EEvents::eMOVE_BACKWARD) {
+			currentFrameEvents[1] = eMOVE_BACKWARD;
+		} else {
+			currentFrameEvents[1] = 0;
+		}
+		if((Input_Stack_.SearchElement(EEvents::eMOVE_LEFT)) == EEvents::eMOVE_LEFT) {
+			currentFrameEvents[2] = eMOVE_LEFT;
+		} else {
+			currentFrameEvents[2] = 0;
+		}
+		if((Input_Stack_.SearchElement(EEvents::eMOVE_RIGHT)) == EEvents::eMOVE_RIGHT) {
+			currentFrameEvents[3] = eMOVE_RIGHT;
+		} else {
+			currentFrameEvents[3] = 0;
+		}
+	}
+
+	bool Engine::isFrameEvetsEqualPreviousFrame( int* currentFrameEvents ) {
+		return currentFrameEvents[0] == previousFrameKeyEvents[0] &&
+			currentFrameEvents[1] == previousFrameKeyEvents[1] &&
+			currentFrameEvents[2] == previousFrameKeyEvents[2] &&
+			currentFrameEvents[3] == previousFrameKeyEvents[3];
+	}
+
+	bool Engine::isFrameKeyEventsEmpty( int* currentFrameEvents ) {
+		return currentFrameEvents[0] == 0 &&
+			currentFrameEvents[1] == 0 &&
+			currentFrameEvents[2] == 0 &&
+			currentFrameEvents[3] == 0;
+	}
+	
 	void Engine::calculatePitch( ecs::components::transform* transformComponent, ecs::components::move* moveComponent ) {
 		if( abs(moveComponent->frameMovement[0]) > 0.0 ||
 			abs(moveComponent->frameMovement[2]) > 0.0 ) {
@@ -875,40 +912,10 @@ namespace GLVM::core
 
 			previous_hud_screen_x = hud_screen_x;
 						
-			int currentFrameEvents[4];
-							
-			if((Input_Stack_.SearchElement(EEvents::eMOVE_FORWARD)) == EEvents::eMOVE_FORWARD) {
-				currentFrameEvents[0] = eMOVE_FORWARD;
-			} else {
-				currentFrameEvents[0] = 0;
-			}
-			if((Input_Stack_.SearchElement(EEvents::eMOVE_BACKWARD)) == EEvents::eMOVE_BACKWARD) {
-				currentFrameEvents[1] = eMOVE_BACKWARD;
-			} else {
-				currentFrameEvents[1] = 0;
-			}
-			if((Input_Stack_.SearchElement(EEvents::eMOVE_LEFT)) == EEvents::eMOVE_LEFT) {
-				currentFrameEvents[2] = eMOVE_LEFT;
-			} else {
-				currentFrameEvents[2] = 0;
-			}
-			if((Input_Stack_.SearchElement(EEvents::eMOVE_RIGHT)) == EEvents::eMOVE_RIGHT) {
-				currentFrameEvents[3] = eMOVE_RIGHT;
-			} else {
-				currentFrameEvents[3] = 0;
-			}
+			int currentFrameEvents[4] = {};
+			resolveFrameEvents( currentFrameEvents );
 
-			if( currentFrameEvents[0] == previousFrameKeyEvents[0] &&
-				currentFrameEvents[1] == previousFrameKeyEvents[1] &&
-				currentFrameEvents[2] == previousFrameKeyEvents[2] &&
-				currentFrameEvents[3] == previousFrameKeyEvents[3] ) {
-//							std::cout << "Default case " << std::endl;
-			} else if ( currentFrameEvents[0] == 0 &&
-						currentFrameEvents[1] == 0 &&
-						currentFrameEvents[2] == 0 &&
-						currentFrameEvents[3] == 0 ) {
-//							std::cout << "Second default case " << std::endl;
-			} else {
+			if( !isFrameEvetsEqualPreviousFrame( currentFrameEvents ) && !isFrameKeyEventsEmpty( currentFrameEvents ) ) {
 				previousFrameKeyEvents[0] = currentFrameEvents[0];
 				previousFrameKeyEvents[1] = currentFrameEvents[1];
 				previousFrameKeyEvents[2] = currentFrameEvents[2];
