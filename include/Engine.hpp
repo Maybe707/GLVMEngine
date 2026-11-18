@@ -279,6 +279,8 @@ namespace GLVM::core
 		void EventQueueFlush();
 		void RenderVulkan();
 		void EnlargeFrameAccumulator(float value);
+		mat4 calculateViewMatrixTPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
+									 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y );
 		void SetViewMatrix();
 		mat4 SetProjectionMatrix( const float fov, const float viewPortWidth, const float viewPortHeight, const float nearPlane, const float farPlane );
 		[[nodiscard]] core::vector<mat4> updateAnimationFrames(ecs::components::animation* animationComponent, unsigned int meshID);

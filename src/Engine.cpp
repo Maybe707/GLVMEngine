@@ -400,6 +400,54 @@ namespace GLVM::core
 		}
 	}
 
+	mat4 Engine::calculateViewMatrixTPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
+										 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y ) {
+		const vec3 rightVec = Normalize(Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0)));
+		[[maybe_unused]] const vec3 newUpVec = Normalize(Cross( rightVec, cameraComponent->Position ));
+
+		/*
+		 * 1. The mouse direction determines the "intended direction of rotation" for the object.
+		 * 2. The camera is "looking forward."
+		 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
+		 */
+		const vec3 rotateAxis = Normalize(Cross(cameraComponent->Position, rightVec * delta_x + newUpVec * delta_y));
+		if ( VecLength(rotateAxis) >= 0.001f ) {
+			/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
+			float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
+			constexpr float angleScale = 0.1f;                                                                                     
+			rotationAngle = Radians(rotationAngle * angleScale);
+			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
+			[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+			pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.x,
+					.ry = -rotateAxis.y, .rz = -rotateAxis.z}) >> pga::point{ .x = cameraComponent->Position[0],
+					.y = cameraComponent->Position[1], .z = cameraComponent->Position[2], .w = 1.0f };
+
+			cameraComponent->Position[0] = appliedRotationPoint.x;
+			cameraComponent->Position[1] = appliedRotationPoint.y;
+			cameraComponent->Position[2] = appliedRotationPoint.z;
+
+			cameraComponent->forward = Normalize(-cameraComponent->Position);
+					
+			if( (abs(moveComponent->frameMovement[0]) == 0.0 &&
+				 abs(moveComponent->frameMovement[2]) == 0.0) &&
+				(previousFrameKeyEvents[0] == 0 &&
+				 previousFrameKeyEvents[1] == 0 &&
+				 previousFrameKeyEvents[2] == 0 &&
+				 previousFrameKeyEvents[3] == 0)) {
+				_Player->forward = cameraComponent->forward;
+				float sign = calculateSign( vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]),
+											vec2(cameraComponent->forward[0], cameraComponent->forward[2]) );
+						
+				_Player->pitch -= acos(clamp(-1.0f, Dot(Normalize(vec3(_Player->previousFrameForward[0], 0.0, _Player->previousFrameForward[2])),
+														Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
+				_Player->previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
+			}
+		}
+		return LookAtMain( cameraComponent->Position + _Player->position,
+						   cameraComponent->Position + _Player->position + cameraComponent->forward,
+						   vec3( 0.0f, -1.0f, 0.0) );
+	}
+	
     void Engine::SetViewMatrix()
     {
 		namespace cm = GLVM::ecs::components;
@@ -454,94 +502,7 @@ namespace GLVM::core
 				delta_x = vulkanRenderer->current_X;
 				delta_y = -vulkanRenderer->current_Y;
 #endif
-				// delta_x *= kSensitivity;
-				// delta_y *= kSensitivity;
-		
-//				const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
-//				[[maybe_unused]] const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
-//				std::cout << "camera position: " << cameraComponent->Position << std::endl;
-				const vec3 rightVec = Normalize(Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0)));
-				[[maybe_unused]] const vec3 newUpVec = Normalize(Cross( rightVec, cameraComponent->Position ));
-
-				/*
-				 * 1. The mouse direction determines the "intended direction of rotation" for the object.
-				 * 2. The camera is "looking forward."
-				 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
-				 */
-//				const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
-//				const vec3 rotateAxis = Normalize(vec3( 0.0, 1.0, 0.0 ));
-				const vec3 rotateAxis = Normalize(Cross(cameraComponent->Position, rightVec * delta_x + newUpVec * delta_y));
-//				_Player->pitch = 0;
-				if ( VecLength(rotateAxis) >= 0.001f ) {
-					/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
-					float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
-					constexpr float angleScale = 0.1f;                                                                                     
-					rotationAngle = Radians(rotationAngle * angleScale);
-					constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
-					[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
-//					_Player->pitch += delta_x * 0.05f;
-					// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
-					// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
-					// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
-					// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
-					// // 													conjugate(rotationQuat));
-
-					// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
-					// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
-
-			
-					// forward[0] = appliedRotationQuat.x;
-					// forward[1] = appliedRotationQuat.y;
-					// forward[2] = appliedRotationQuat.z;
-					pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.x,
-							.ry = -rotateAxis.y, .rz = -rotateAxis.z}) >> pga::point{ .x = cameraComponent->Position[0],
-							.y = cameraComponent->Position[1], .z = cameraComponent->Position[2], .w = 1.0f };
-					// vulkanRenderer->forward[0] = appliedRotationPoint.x;
-					// vulkanRenderer->forward[1] = appliedRotationPoint.y;
-					// vulkanRenderer->forward[2] = appliedRotationPoint.z;
-
-					cameraComponent->Position[0] = appliedRotationPoint.x;
-					cameraComponent->Position[1] = appliedRotationPoint.y;
-					cameraComponent->Position[2] = appliedRotationPoint.z;
-
-					// if( abs(_Player->frameMovement[0]) > 0.0 ||
-					// 	abs(_Player->frameMovement[2]) > 0.0 ) {
-					// 	previousFrameForward = _Player->forward;
-					// }
-
-					cameraComponent->forward = Normalize(-cameraComponent->Position);
-					
-					if( (abs(moveComponent->frameMovement[0]) == 0.0 &&
-						 abs(moveComponent->frameMovement[2]) == 0.0) &&
-						(previousFrameKeyEvents[0] == 0 &&
-						 previousFrameKeyEvents[1] == 0 &&
-						 previousFrameKeyEvents[2] == 0 &&
-						 previousFrameKeyEvents[3] == 0)) {
-						_Player->forward = cameraComponent->forward;
-						float sign = calculateSign( vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]),
-													vec2(cameraComponent->forward[0], cameraComponent->forward[2]) );
-						
-						_Player->pitch -= acos(clamp(-1.0f, Dot(Normalize(vec3(_Player->previousFrameForward[0], 0.0, _Player->previousFrameForward[2])),
-																Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
-						_Player->previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
-					}
-				}
-				// vulkanRenderer->forward[0] = _Player->position[0];
-				// vulkanRenderer->forward[1] = _Player->position[1];
-				// vulkanRenderer->forward[2] = _Player->position[2];
-				
-				// cameraComponent->Position[0] = appliedRotationPoint.x;
-				// cameraComponent->Position[1] = appliedRotationPoint.y;
-				// cameraComponent->Position[2] = appliedRotationPoint.z;
-				// cameraComponent->forward = Normalize(cameraComponent->Position - _Player->position);
-				// _Player->forward = cameraComponent->forward;
-				// std::cout << "camera position: " << cameraComponent->Position << std::endl;
-				// std::cout << "player position: " << _Player->position << std::endl;
-				// std::cout << "player address: " << &_Player->position << std::endl;
-				mat4 view = LookAtMain( cameraComponent->Position + _Player->position,
-										cameraComponent->Position + _Player->position + cameraComponent->forward,
-//										_Player->position,
-										vec3( 0.0f, -1.0f, 0.0) );
+				mat4 view = calculateViewMatrixTPS( _Player, moveComponent, cameraComponent, delta_x, delta_y );
 				for ( unsigned int i = 0; i < 4; ++i )
 					for ( unsigned int j = 0; j < 4; ++j )
 						viewMatrix_[i][j] = view[i][j];
