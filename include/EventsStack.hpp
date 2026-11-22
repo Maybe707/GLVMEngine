@@ -122,6 +122,12 @@ namespace GLVM::core
 			case eDEBUG_COLLISIONS_INACTIVE:
 				Push(eDEBUG_COLLISIONS_INACTIVE);
 				break;
+			case eSWITCH_VIEW_CAMERA:
+				Push(eSWITCH_VIEW_CAMERA);
+				break;
+			case eSWITCH_VIEW_CAMERA_RELEASE:
+				Push(eSWITCH_VIEW_CAMERA_RELEASE);
+				break;
             case eMOUSE_LEFT_BUTTON:
                 Push(eMOUSE_LEFT_BUTTON);
                 break;

@@ -85,6 +85,8 @@ namespace GLVM::core
 		float previous_hud_screen_x = 0.0f;                     ///< TODO: No need to use it. Find another way
 		float hud_screen_y;
 		int                  dragedItemEntity = -1;             ///< If dont have any draged item then this variable have value of -1
+		int   viewCameraMode = 0;                               /// 0 = FPS; 1 = TPS
+		bool  viewCameraSwitchFlag = false;
 		[[maybe_unused]] float fYaw   = -90.0f;
         [[maybe_unused]] float fPitch = 0.0f;
 		[[maybe_unused]] float previousMouseOffsetX = 0.0f;
@@ -280,6 +282,8 @@ namespace GLVM::core
 		void RenderVulkan();
 		void EnlargeFrameAccumulator(float value);
 		mat4 calculateViewMatrixTPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
+									 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y );
+		mat4 calculateViewMatrixFPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
 									 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y );
 		void SetViewMatrix();
 		mat4 SetProjectionMatrix( const float fov, const float viewPortWidth, const float viewPortHeight, const float nearPlane, const float farPlane );

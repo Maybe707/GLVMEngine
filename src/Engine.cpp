@@ -264,6 +264,13 @@ namespace GLVM::core
 				bGame_Loop_Active = false;
 			}
 
+			if((Input_Stack_.SearchElement(EEvents::eSWITCH_VIEW_CAMERA)) == EEvents::eSWITCH_VIEW_CAMERA) {
+				std::cout << "TEST" << std::endl;
+				viewCameraMode = (viewCameraMode + 1) % 2;
+				viewCameraSwitchFlag = true;
+				Input_Stack_.Remove(EEvents::eSWITCH_VIEW_CAMERA);
+			}
+			
 			if((Input_Stack_.SearchElement(EEvents::eMOUSE_LEFT_BUTTON)) == EEvents::eMOUSE_LEFT_BUTTON) {
 				isLeftMouseButtonPressed = true;
 			} else {
@@ -284,7 +291,7 @@ namespace GLVM::core
 				vulkanRenderer->isDebugCollisitionsActive = !vulkanRenderer->isDebugCollisitionsActive;
 				Input_Stack_.Remove(EEvents::eDEBUG_COLLISIONS_ACTIVE);
 			}
-
+			
 			// }
 			g_eEvent.SetLastEvent(Input_Stack_);
 
@@ -400,7 +407,7 @@ namespace GLVM::core
 		}
 	}
 
-	mat4 Engine::calculateViewMatrixTPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
+	mat4 Engine::calculateViewMatrixTPS( ecs::components::transform* _Player, [[maybe_unused]] ecs::components::move* moveComponent,
 										 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y ) {
 		const vec3 rightVec = Normalize(Cross( cameraComponent->Position, vec3( 0.0f, -1.0f, 0.0)));
 		[[maybe_unused]] const vec3 newUpVec = Normalize(Cross( rightVec, cameraComponent->Position ));
@@ -447,6 +454,69 @@ namespace GLVM::core
 						   cameraComponent->Position + _Player->position + cameraComponent->forward,
 						   vec3( 0.0f, -1.0f, 0.0) );
 	}
+
+	mat4 Engine::calculateViewMatrixFPS( ecs::components::transform* _Player, ecs::components::move* moveComponent,
+										 ecs::components::beholder* cameraComponent, const float delta_x, const float delta_y ) {
+		const vec3 rightVec = Cross( cameraComponent->forward, vec3( 0.0f, -1.0f, 0.0) );
+		const vec3 newUpVec = Cross( rightVec, cameraComponent->forward );
+		/*
+		 * 1. The mouse direction determines the "intended direction of rotation" for the object.
+		 * 2. The camera is "looking forward."
+		 * 3. To make the object "rotate as if the mouse is pushing it," you need to rotate it around an axis that is perpendicular to both the view direction and the mouse movement.
+		 */
+		const vec3 rotateAxis = Normalize(Cross(cameraComponent->forward, rightVec * delta_x + newUpVec * delta_y));
+
+		if ( VecLength(rotateAxis) >= 0.001f ) {
+			/// A vector in the screen's tangent plane: it indicates the direction in which the mouse moved, but expressed in world (or 3D) space.
+			float rotationAngle = sqrt(delta_y * delta_y + delta_x * delta_x);
+			constexpr float angleScale = 0.1f;                                                                                     
+			rotationAngle = Radians(rotationAngle * angleScale);
+			constexpr float quatAngleCorrection = 0.5f;                                                                                 /// Quaternions need devision by 2
+			[[maybe_unused]] const float sinRotationAngle = sinf(rotationAngle * quatAngleCorrection);
+			// const Quaternion rotationQuat = Quaternion(cosf(rotationAngle * quatAngleCorrection), sinRotationAngle * rotateAxis[0],
+			// 									 sinRotationAngle * rotateAxis[1], sinRotationAngle * rotateAxis[2]);
+			// // const Quaternion appliedRotationQuat = multiplyQuaternion(multiplyQuaternion(rotationQuat, Quaternion(0.0f, cameraComponent.forward[0],
+			// // 																								cameraComponent.forward[1], cameraComponent.forward[2])),
+			// // 													conjugate(rotationQuat));
+
+			// const Quaternion appliedRotationQuat = (rotationQuat * Quaternion(0.0f, cameraComponent.forward[0], cameraComponent.forward[1],
+			// 																  cameraComponent.forward[2])) * conjugate(rotationQuat);
+
+			
+			// forward[0] = appliedRotationQuat.x;
+			// forward[1] = appliedRotationQuat.y;
+			// forward[2] = appliedRotationQuat.z;
+			pga::point appliedRotationPoint = exp(rotationAngle * quatAngleCorrection, pga::rline{ .rx = -rotateAxis.x,
+					.ry = -rotateAxis.y, .rz = -rotateAxis.z }) >> pga::point{ .x = cameraComponent->forward[0],
+					.y = cameraComponent->forward[1], .z = cameraComponent->forward[2], .w = 1.0f };
+			vulkanRenderer->forward[0] = appliedRotationPoint.x;
+			vulkanRenderer->forward[1] = appliedRotationPoint.y;
+			vulkanRenderer->forward[2] = appliedRotationPoint.z;
+
+			cameraComponent->forward = Normalize(vulkanRenderer->forward);
+			_Player->forward = cameraComponent->forward;
+
+			if( (abs(moveComponent->frameMovement[0]) == 0.0 &&
+				 abs(moveComponent->frameMovement[2]) == 0.0) &&
+				(previousFrameKeyEvents[0] == 0 &&
+				 previousFrameKeyEvents[1] == 0 &&
+				 previousFrameKeyEvents[2] == 0 &&
+				 previousFrameKeyEvents[3] == 0)) {
+				_Player->forward = cameraComponent->forward;
+				float sign = calculateSign( vec2(_Player->previousFrameForward[0],_Player->previousFrameForward[2]),
+											vec2(cameraComponent->forward[0], cameraComponent->forward[2]) );
+
+				_Player->pitch -= acos(clamp(-1.0f, Dot(Normalize(vec3(_Player->previousFrameForward[0], 0.0, _Player->previousFrameForward[2])),
+														Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]))), 1.0f)) * sign;
+				_Player->previousFrameForward = Normalize(vec3(cameraComponent->forward[0], 0.0, cameraComponent->forward[2]));
+			}
+		}
+		// cameraComponent->forward = Normalize(vulkanRenderer->forward);
+		// _Player->forward = cameraComponent->forward;
+		return LookAtMain( cameraComponent->Position + _Player->position,
+						   cameraComponent->Position + _Player->position + cameraComponent->forward,
+						   vec3( 0.0f, -1.0f, 0.0) );
+	}
 	
     void Engine::SetViewMatrix()
     {
@@ -468,7 +538,7 @@ namespace GLVM::core
 			for( uint32_t x = 0; x < arch->entityCount; ++x ) {
 				cm::beholder* cameraComponent   = &views[x];
 				cm::transform* _Player          = &transfroms[x];
-				cm::move*     moveComponent     = &moves[x];
+				[[maybe_unused]] cm::move*     moveComponent     = &moves[x];
 
 				Matrix<float, 4> viewMatrix_(1.0f);
 				const float kSensitivity = 0.1f;
@@ -502,7 +572,24 @@ namespace GLVM::core
 				delta_x = vulkanRenderer->current_X;
 				delta_y = -vulkanRenderer->current_Y;
 #endif
-				mat4 view = calculateViewMatrixTPS( _Player, moveComponent, cameraComponent, delta_x, delta_y );
+				mat4 view;
+				if( viewCameraMode == 0 ) {
+//					cameraComponent->Position =
+					if( viewCameraSwitchFlag ) {
+						viewCameraSwitchFlag = false;
+						cameraComponent->Position = { 0.0, 2.0, 0.0f };
+					}
+					
+					view = calculateViewMatrixFPS( _Player, moveComponent, cameraComponent, delta_x, -delta_y );
+				} else if ( viewCameraMode == 1 ) {
+					if( viewCameraSwitchFlag ) {
+						viewCameraSwitchFlag = false;
+						cameraComponent->Position += { 0.0f, 5.0f, 1.0f };
+					}
+					
+					view = calculateViewMatrixTPS( _Player, moveComponent, cameraComponent, delta_x, delta_y );
+				}
+
 				for ( unsigned int i = 0; i < 4; ++i )
 					for ( unsigned int j = 0; j < 4; ++j )
 						viewMatrix_[i][j] = view[i][j];
@@ -865,7 +952,14 @@ namespace GLVM::core
 			int currentFrameEvents[4] = {};
 			resolveFrameEvents( currentFrameEvents );
 
-			if( !isFrameEvetsEqualPreviousFrame( currentFrameEvents ) && !isFrameKeyEventsEmpty( currentFrameEvents ) ) {
+			for( int i = 0; i < 4; ++i ) {
+				std::cout << "current frame element " << i << " : " << currentFrameEvents[i] << std::endl;
+				std::cout << "previous frame element " << i << " : " << previousFrameKeyEvents[i] << std::endl;
+			}
+			
+			std::cout << "is current frame events eqaul previous frame events: " << isFrameEvetsEqualPreviousFrame ( currentFrameEvents ) << std::endl;
+			
+//			if( !isFrameEvetsEqualPreviousFrame( currentFrameEvents ) && !isFrameKeyEventsEmpty( currentFrameEvents ) ) {
 				previousFrameKeyEvents[0] = currentFrameEvents[0];
 				previousFrameKeyEvents[1] = currentFrameEvents[1];
 				previousFrameKeyEvents[2] = currentFrameEvents[2];
@@ -873,16 +967,16 @@ namespace GLVM::core
 
 				float sign = calculateSign( vec2(moveComponent->frameMovement[0], moveComponent->frameMovement[2]),
 											vec2(transformComponent->forward[0], transformComponent->forward[2]) );
-				
+				std::cout << "TEST PITCH: " << rotationAngle * sign << std::endl;
 				transformComponent->pitch += rotationAngle * sign;
 				transformComponent->forward = moveComponent->frameMovement;
 				transformComponent->previousFrameForward = transformComponent->forward;
-			}
+//			}
 		} else {
-			previousFrameKeyEvents[0] = 0.0f;
-			previousFrameKeyEvents[1] = 0.0f;
-			previousFrameKeyEvents[2] = 0.0f;
-			previousFrameKeyEvents[3] = 0.0f;
+			// previousFrameKeyEvents[0] = 0.0f;
+			// previousFrameKeyEvents[1] = 0.0f;
+			// previousFrameKeyEvents[2] = 0.0f;
+			// previousFrameKeyEvents[3] = 0.0f;
 		}
 	}
 	
@@ -1249,7 +1343,7 @@ namespace GLVM::core
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::animation* actorAnimations = (ecs::components::animation*)arch->
 				components[arch::ComponentsIndices::ANIMATION_COMPONENT];
-			cm::move*      actorMove       = (ecs::components::move*)arch->
+			[[maybe_unused]] cm::move*      actorMove       = (ecs::components::move*)arch->
 				components[arch::ComponentsIndices::MOVE_COMPONENT];
 
 			for( uint32_t n = 0; n < arch->entityCount; ++n ) {
@@ -1263,7 +1357,7 @@ namespace GLVM::core
 				if( actorTransforms && actorMaterials &&
 					actorAnimations && actorRotations ) {
 
-					calculatePitch( transformComponent, actorMove );
+//					calculatePitch( transformComponent, actorMove );
 					const AABB worldAABB = computeWorldAABB( meshComponent->aabb, transformComponent->position );
 					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 
@@ -1531,6 +1625,8 @@ namespace GLVM::core
 			arch::Archetype* arch = cachedPlayerArchetypes[x];
 			cm::transform*   playerTransforms = (ecs::components::transform*)arch->
 				components[arch::ComponentsIndices::TRANSFORM_COMPONENT];
+			cm::move*        playerMoves     = (ecs::components::move*)arch->
+				components[arch::ComponentsIndices::MOVE_COMPONENT];
 			cm::rotation*    playerRotations = (ecs::components::rotation*)arch->
 				components[arch::ComponentsIndices::ROTATION_COMPONENT];
 			cm::mesh*        playerMeshes    = (ecs::components::mesh*)arch->
@@ -1539,16 +1635,18 @@ namespace GLVM::core
 			for( unsigned int n = 0; n < arch->entityCount; ++n ) {
 				cm::transform* playerTransformComponent = &playerTransforms[n];
 				cm::rotation*  playerRotationComponent  = &playerRotations[n];
+				[[maybe_unused]] cm::move*      playerMoveComponent      = &playerMoves[n];
 				if( &playerTransforms[n] != nullptr ) {
 					const unsigned int meshID = playerMeshes[n].handle.id;
 
-					const AABB worldAABB = computeWorldAABB( playerMeshes[n].aabb, playerTransformComponent->position );
-					const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
+					calculatePitch( playerTransformComponent, playerMoveComponent );
+					// const AABB worldAABB = computeWorldAABB( playerMeshes[n].aabb, playerTransformComponent->position );
+					// const bool isFrustumIntersectFlag = isFrustumIntersect( vulkanRenderer->mainCameraFrustum, worldAABB );
 
-					if( isFrustumIntersectFlag ) {
+					if( 1 ) {
 						vulkanRenderer->players.Push({});
 						vulkanRenderer->collisionsWireframes.Push({});
-						
+//						std::cout << "Player pitch: " << playerTransformComponent->pitch << std::endl;
 						const mat4 model = computeModelMatrix(playerTransformComponent, playerRotationComponent);
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].model    = model;
 						vulkanRenderer->collisionsWireframes[collisionsWireframesCounter].position = playerTransformComponent->position;

@@ -5,6 +5,7 @@
 
 #include "Systems/MovementSystem.hpp"
 #include "ArchetypeECS/ArchECS_Types.hpp"
+#include "ArchetypeECS/ArchECS_Utils.hpp"
 #include "ArchetypeECS/ArchECS_World.hpp"
 #include "ArchetypeECS/ArchetypeInterface.hpp"
 #include "Archetypes/EnemyArchetype.hpp"

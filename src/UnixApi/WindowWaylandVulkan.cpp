@@ -383,6 +383,10 @@ namespace GLVM::core {
 				g_eEvent.SetEvent(EEvents::eDEBUG_COLLISIONS_ACTIVE);
 				Input_Stack_.ControlInput(g_eEvent);
 			}
+			if (key == 38) {
+				g_eEvent.SetEvent(EEvents::eSWITCH_VIEW_CAMERA);
+				Input_Stack_.ControlInput(g_eEvent);
+			}
 		}
 
 		if (state == WL_KEYBOARD_KEY_STATE_RELEASED) {
@@ -425,6 +429,10 @@ namespace GLVM::core {
 			}
 			if (key == 24) {
 				g_eEvent.SetEvent(EEvents::eDEBUG_COLLISIONS_INACTIVE);
+				Input_Stack_.ControlInput(g_eEvent);
+			}
+			if (key == 38) {
+				g_eEvent.SetEvent(EEvents::eSWITCH_VIEW_CAMERA_RELEASE);
 				Input_Stack_.ControlInput(g_eEvent);
 			}
 		}
